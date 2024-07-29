@@ -1,5 +1,5 @@
-import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
@@ -45,9 +45,7 @@ export class VerListadoNivelComponent implements OnInit {
     idSucursalForm: this.idSucursal,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -73,7 +71,6 @@ export class VerListadoNivelComponent implements OnInit {
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   CargarDatos() {
     var id_depa = this.info.id_departamento_nivel;
-    //var id_establecimiento = this.info.id_sucursal;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
       this.empleados = datos;
     }, error => {

@@ -28,18 +28,19 @@ class TituloRutas {
 
     configuracion(): void {
 
-        // METODO PARA LISTAR TITULOS
+        // METODO PARA LISTAR TITULOS   ** USADO
         this.router.get('/', TokenValidation, TITULO_CONTROLADOR.ListarTitulos);
-        // METODO PARA BUSCAR TITULOS POR SU NOMBRE
+        // METODO PARA BUSCAR TITULOS POR SU NOMBRE   **USADO
         this.router.post('/titulo-nombre', TokenValidation, TITULO_CONTROLADOR.ObtenerTituloNombre);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, TITULO_CONTROLADOR.EliminarRegistros);
-        // METODO PARA ACTUALIZAR REGISTRO DE TITULO
+        // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
         this.router.put('/', TokenValidation, TITULO_CONTROLADOR.ActualizarTitulo);
-        this.router.post('/', TokenValidation, TITULO_CONTROLADOR.create);
+        // METODO PARA REGISTRAR TITULO   **USADO
+        this.router.post('/', TokenValidation, TITULO_CONTROLADOR.CrearTitulo);
+        // METODO DE VALIDACION DE DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TITULO_CONTROLADOR.RevisarDatos);
-
-        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA   **USADO
         this.router.post('/registrarTitulos', TokenValidation, TITULO_CONTROLADOR.RegistrarTitulosPlantilla);
     }
 }

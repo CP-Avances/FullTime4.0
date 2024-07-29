@@ -1,11 +1,11 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Component, ViewChild } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import * as xlsx from 'xlsx';
@@ -124,12 +124,12 @@ export class CatTipoCargosComponent {
       });
   }
 
+
+  // METODO PARA LISTAR TIPO DE CARGOS
   ObtenerCargos() {
-    this._TipoCargos.listaCargos().subscribe(res => {
-      //console.log('lista ', res);
+    this._TipoCargos.ListaCargos().subscribe(res => {
       this.listaTipoCargos = res
     }, error => {
-      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       if (error.status == 400 || error.status == 404) {
         this.toastr.info('No se han encontrado registros.', '', {
           timeOut: 3500,
@@ -143,6 +143,7 @@ export class CatTipoCargosComponent {
     });
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.Datos_tipo_cargos = null;
     this.archivoSubido = [];
@@ -156,6 +157,7 @@ export class CatTipoCargosComponent {
     this.messajeExcel = '';
   }
 
+  // METODO PARA ABRIR VENTA DE REGISTRO DE TIPO CARGO
   AbrirVentanaRegistrarCargo(): void {
     this.ventana.open(RegistrarCargoComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
@@ -167,6 +169,8 @@ export class CatTipoCargosComponent {
     this.selectionTipoCargo.clear();
     this.tiposCargoEliminar = [];
   }
+
+  // METODO PARA ABRIR VENTANA DE EDICION DE TIPOS DE CARGOS
   AbrirEditar(item_cargo: any): void {
     this.ventana.open(EditarTipoCargoComponent, { width: '450px', data: item_cargo })
       .afterClosed().subscribe(items => {
@@ -174,6 +178,7 @@ export class CatTipoCargosComponent {
       });
   }
 
+  // METODO DE CONFIRMAICON DE ELIMINACION
   ConfirmarDelete(cargo: any) {
     const mensaje = 'eliminar';
     const data = {
@@ -184,7 +189,6 @@ export class CatTipoCargosComponent {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this._TipoCargos.Eliminar(cargo.id, data).subscribe(res => {
-            //console.log('res eliminado: ', res);
             this.toastr.error('Registro eliminado.', '', {
               timeOut: 4000,
             });
@@ -238,7 +242,6 @@ export class CatTipoCargosComponent {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    //console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -261,7 +264,7 @@ export class CatTipoCargosComponent {
     this.mostrarbtnsubir = true;
   }
 
-
+  // METODO PARA REVISAR DATOS DE PLANTILLAS
   Datos_tipo_cargos: any
   listaCargosCorrectas: any = [];
   messajeExcel: string = '';
@@ -271,15 +274,13 @@ export class CatTipoCargosComponent {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_tipo_cargos.sort((a, b) => {
+      this.Datos_tipo_cargos.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -309,7 +310,6 @@ export class CatTipoCargosComponent {
         });
       }
     }, error => {
-      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -321,7 +321,7 @@ export class CatTipoCargosComponent {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
@@ -335,8 +335,9 @@ export class CatTipoCargosComponent {
       return 'rgb(242, 21, 21)';
     }
   }
+
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -345,19 +346,19 @@ export class CatTipoCargosComponent {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    //console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.subirDatosPlantillaModal()
+          this.SubirDatosPlantilla()
         }
       });
   }
 
-  subirDatosPlantillaModal() {
+  // METODO PARA CARGAR DATOS DE LA PLANTILLA
+  SubirDatosPlantilla() {
     if (this.listaCargosCorrectas.length > 0) {
       const data = {
         plantilla: this.listaCargosCorrectas,
@@ -374,7 +375,7 @@ export class CatTipoCargosComponent {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups !!! algo salio mal.', {
             timeOut: 3500,
           });
         }
@@ -409,7 +410,6 @@ export class CatTipoCargosComponent {
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaTipoCargos);
     const documentDefinition = this.GetDocumentDefinicion();
-    //console.log('this.listaTipoCargos: ', this.listaTipoCargos)
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -420,7 +420,6 @@ export class CatTipoCargosComponent {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('tipoCargo', this.listaTipoCargos);
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -448,7 +447,7 @@ export class CatTipoCargosComponent {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: 'Lista de Tipo Cargos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
-        this.PresentarDataPDFFeriados(),
+        this.PresentarDataPDF(),
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -458,7 +457,7 @@ export class CatTipoCargosComponent {
     };
   }
 
-  PresentarDataPDFFeriados() {
+  PresentarDataPDF() {
     return {
       columns: [
         { width: '*', text: '' },
@@ -540,7 +539,6 @@ export class CatTipoCargosComponent {
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
-      //console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -583,6 +581,11 @@ export class CatTipoCargosComponent {
     this.BuscarParametro();
   }
 
+
+  /** ************************************************************************************************* **
+   ** **                         METODO DE SELECCION MULTIPLE DE DATOS                               ** **
+   ** ************************************************************************************************* **/
+
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -621,7 +624,7 @@ export class CatTipoCargosComponent {
     return `${this.selectionTipoCargo.isSelected(row) ? 'deselect' : 'select'} row ${row.cargo + 1}`;
   }
 
-
+  // METODO DE ELIMINACION MULTIPLE DE DATOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -660,6 +663,7 @@ export class CatTipoCargosComponent {
     );
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -680,7 +684,5 @@ export class CatTipoCargosComponent {
         }
       });
   }
-
-
 
 }

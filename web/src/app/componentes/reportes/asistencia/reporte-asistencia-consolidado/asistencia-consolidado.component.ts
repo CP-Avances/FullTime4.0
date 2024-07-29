@@ -255,7 +255,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
    **********************************************/
   fechaHoy: string;
   getDocumentDefinicionAsistencia() {
-    sessionStorage.setItem('Empleado', this.empleados);
+
     var f = new Date();
     f.setUTCHours(f.getHours())
     this.fechaHoy = f.toJSON();

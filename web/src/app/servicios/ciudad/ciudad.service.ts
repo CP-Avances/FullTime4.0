@@ -12,7 +12,7 @@ export class CiudadService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR INFORMACION DE LA CIUDAD
+  // BUSCAR INFORMACION DE LA CIUDAD  **USADO
   BuscarInformacionCiudad(id_ciudad: number) {
     return this.http.get(`${environment.url}/ciudades/informacion-ciudad/${id_ciudad}`);
   }

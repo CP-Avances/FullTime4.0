@@ -23,22 +23,22 @@ export class EmpleadoService {
    ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
    ** ** ********************************************************************************************* **/
 
-  // METODO PARA BUSCAR CONFIGURACION DE CODIGO DE USUARIO
+  // METODO PARA BUSCAR CONFIGURACION DE CODIGO DE USUARIO   **USADO
   ObtenerCodigo() {
     return this.http.get(`${environment.url}/empleado/encontrarDato/codigo`);
   }
 
-  // METODO PRA REGISTRAR CODIGO DE USUARIO
+  // METODO PRA REGISTRAR CODIGO DE USUARIO    **USADO
   CrearCodigo(datos: any) {
     return this.http.post(`${environment.url}/empleado/crearCodigo`, datos);
   }
 
-  // METODO DE BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
+  // METODO DE BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA   **USADO
   ObtenerCodigoMAX() {
     return this.http.get(`${environment.url}/empleado/encontrarDato/codigo/empleado`);
   }
 
-  // METODO PARA ACTUALIZAR VALOR DE CODIGO
+  // METODO PARA ACTUALIZAR VALOR DE CODIGO    **USADO
   ActualizarCodigoTotal(datos: any) {
     return this.http.put(`${environment.url}/empleado/cambiarValores`, datos);
   }

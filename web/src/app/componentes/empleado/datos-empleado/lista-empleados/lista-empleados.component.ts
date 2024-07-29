@@ -598,7 +598,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas);
@@ -735,7 +735,7 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   GetDocumentDefinicion(numero: any) {
-    sessionStorage.setItem('Empleados', this.empleado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

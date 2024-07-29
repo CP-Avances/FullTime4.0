@@ -179,7 +179,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem("Provincia", this.provincias);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: "portrait",

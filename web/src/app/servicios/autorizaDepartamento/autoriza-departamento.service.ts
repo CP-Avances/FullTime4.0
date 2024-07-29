@@ -47,7 +47,7 @@ export class AutorizaDepartamentoService {
     return this.http.get(`${environment.url}/autorizaDepartamento/empleadosAutorizan/${id}`);
   }
 
-  // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    --**VERIFICADO
+  // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    **USADO
   BuscarListaEmpleadosAutorizan(id: any) {
     return this.http.get(`${environment.url}/autorizaDepartamento/listaempleadosAutorizan/${id}`);
   }

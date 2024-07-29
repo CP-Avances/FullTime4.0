@@ -319,7 +319,7 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   getDocumentDefinicion(codigo: string | number) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

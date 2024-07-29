@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-departamento',
@@ -33,9 +32,7 @@ export class EditarDepartamentoComponent implements OnInit {
     idSucursalForm: this.idSucursal,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

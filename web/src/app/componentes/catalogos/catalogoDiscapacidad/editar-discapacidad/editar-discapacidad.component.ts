@@ -51,7 +51,7 @@ export class EditarDiscapacidadComponent implements OnInit {
     })
   }
 
-  // METODO PARA ACTUALIZAR discapacidad LABORAL
+  // METODO PARA ACTUALIZAR TIPO DISCAPACIDAD
   EditarDiscapacidad(form: any) {
     let discapacidad = {
       id: this.data.id,

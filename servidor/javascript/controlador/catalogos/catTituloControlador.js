@@ -20,7 +20,7 @@ const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class TituloControlador {
-    // METODO PARA LISTAR TITULOS
+    // METODO PARA LISTAR TITULOS   **USADO
     ListarTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const titulo = yield database_1.default.query(`
@@ -32,7 +32,7 @@ class TituloControlador {
             res.jsonp(titulo.rows);
         });
     }
-    // METODO PARA BUSCAR UN TITULO POR SU NOMBRE
+    // METODO PARA BUSCAR UN TITULO POR SU NOMBRE    **USADO
     ObtenerTituloNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, nivel } = req.body;
@@ -47,7 +47,7 @@ class TituloControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -56,7 +56,7 @@ class TituloControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query('SELECT * FROM et_titulos WHERE id = $1', [id]);
+                const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -93,12 +93,11 @@ class TituloControlador {
             catch (error) {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO   **USADO
     ActualizarTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -106,7 +105,7 @@ class TituloControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query('SELECT * FROM et_titulos WHERE id = $1', [id]);
+                const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -147,7 +146,8 @@ class TituloControlador {
             }
         });
     }
-    create(req, res) {
+    // METODO PARA REGISTRAR TITULO   **USADO
+    CrearTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nombre, id_nivel, user_name, ip } = req.body;
@@ -177,7 +177,7 @@ class TituloControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -320,7 +320,7 @@ class TituloControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA
+    // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
     RegistrarTitulosPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { titulos, user_name, ip } = req.body;

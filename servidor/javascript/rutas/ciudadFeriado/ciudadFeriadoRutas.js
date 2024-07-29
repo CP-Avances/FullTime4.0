@@ -12,7 +12,7 @@ class CiudadRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
+        // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE  **USADO
         this.router.get('/:nombre', verificarToken_1.TokenValidation, ciudadFeriadoControlador_1.default.FiltrarCiudadesProvincia);
         // METODO PARA BUSCAR NOMBRES DE CIUDADES
         this.router.get('/nombresCiudades/:idferiado', verificarToken_1.TokenValidation, ciudadFeriadoControlador_1.default.EncontrarCiudadesFeriado);

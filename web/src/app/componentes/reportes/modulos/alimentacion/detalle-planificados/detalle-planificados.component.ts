@@ -345,7 +345,7 @@ export class DetallePlanificadosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

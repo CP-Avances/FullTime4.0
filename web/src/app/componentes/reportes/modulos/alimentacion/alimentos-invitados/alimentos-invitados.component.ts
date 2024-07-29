@@ -183,7 +183,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -387,7 +387,7 @@ export class AlimentosInvitadosComponent implements OnInit {
 
   /** GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS */
   GenerarSinRegistros() {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

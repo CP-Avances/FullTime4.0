@@ -503,7 +503,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // DEFINICION DEL DOCUMENTO PDF
   EstructurarPDF() {
-    sessionStorage.setItem('Empleados', this.horarios);
+
     return {
       // ENCABEZADO DE PÁGINA
       pageSize: 'A4',

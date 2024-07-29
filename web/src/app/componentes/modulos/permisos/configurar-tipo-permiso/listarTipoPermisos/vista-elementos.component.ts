@@ -211,7 +211,7 @@ export class VistaElementosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('TipoPermisos', this.tipoPermiso);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

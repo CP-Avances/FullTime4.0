@@ -35,7 +35,7 @@ class TiposCargosControlador {
             }
         });
     }
-    // METODO PARA LISTAR TIPO CARGOS
+    // METODO PARA LISTAR TIPO CARGOS     **USADO
     ListaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -54,7 +54,7 @@ class TiposCargosControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR TIPO CARGO
+    // METODO PARA REGISTRAR TIPO CARGO    **USADO
     CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -100,7 +100,7 @@ class TiposCargosControlador {
             }
         });
     }
-    // METODO PARA EDITAR TIPO CARGO
+    // METODO PARA EDITAR TIPO CARGO   **USADO
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -166,7 +166,7 @@ class TiposCargosControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO   **USADO
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -217,8 +217,8 @@ class TiposCargosControlador {
             }
         });
     }
-    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO
-    VerfificarPlantillaTipoCargos(req, res) {
+    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO   **USADO
+    VerificarPlantillaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
@@ -337,7 +337,7 @@ class TiposCargosControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA TIPO CARGO 
+    // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;

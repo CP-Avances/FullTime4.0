@@ -24,17 +24,19 @@ class TituloRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR TITULOS
+        // METODO PARA LISTAR TITULOS   ** USADO
         this.router.get('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.ListarTitulos);
-        // METODO PARA BUSCAR TITULOS POR SU NOMBRE
+        // METODO PARA BUSCAR TITULOS POR SU NOMBRE   **USADO
         this.router.post('/titulo-nombre', verificarToken_1.TokenValidation, catTituloControlador_1.default.ObtenerTituloNombre);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catTituloControlador_1.default.EliminarRegistros);
-        // METODO PARA ACTUALIZAR REGISTRO DE TITULO
+        // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.ActualizarTitulo);
-        this.router.post('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.create);
+        // METODO PARA REGISTRAR TITULO   **USADO
+        this.router.post('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.CrearTitulo);
+        // METODO DE VALIDACION DE DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catTituloControlador_1.default.RevisarDatos);
-        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA   **USADO
         this.router.post('/registrarTitulos', verificarToken_1.TokenValidation, catTituloControlador_1.default.RegistrarTitulosPlantilla);
     }
 }

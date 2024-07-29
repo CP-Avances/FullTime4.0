@@ -257,7 +257,7 @@ export class ListarTipoComidasComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('Comidas', this.tipoComidas);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

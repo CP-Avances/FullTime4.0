@@ -4015,7 +4015,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem("Pedidos", this.listaPedidos);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",

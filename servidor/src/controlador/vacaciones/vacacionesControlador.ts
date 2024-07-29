@@ -137,7 +137,7 @@ class VacacionesControlador {
       const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado,
         id_peri_vacacion, id_empleado, user_name, ip } = req.body;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
@@ -162,7 +162,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
@@ -174,7 +174,7 @@ class VacacionesControlador {
 
 
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).
         jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -188,7 +188,7 @@ class VacacionesControlador {
 
       const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -206,7 +206,7 @@ class VacacionesControlador {
           observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -231,7 +231,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
@@ -243,7 +243,7 @@ class VacacionesControlador {
 
 
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -257,7 +257,7 @@ class VacacionesControlador {
       const { user_name, ip } = req.body;
       let { id_vacacion } = req.params;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -275,7 +275,7 @@ class VacacionesControlador {
           observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -365,7 +365,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (objetoVacacion) {
@@ -375,7 +375,7 @@ class VacacionesControlador {
         return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
       }
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
 
@@ -410,7 +410,7 @@ class VacacionesControlador {
       const { estado, user_name, ip } = req.body;
       console.log('estado', id);
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -428,7 +428,7 @@ class VacacionesControlador {
           observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -449,14 +449,14 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (3 === estado) {
         RestarPeriodoVacacionAutorizada(parseInt(id), user_name, ip);
       }
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }

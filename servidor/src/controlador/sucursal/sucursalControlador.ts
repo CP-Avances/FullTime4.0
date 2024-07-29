@@ -10,7 +10,7 @@ import fs from 'fs';
 
 class SucursalControlador {
 
-  // BUSCAR SUCURSALES POR EL NOMBRE
+  // BUSCAR SUCURSALES POR EL NOMBRE   **USADO
   public async BuscarNombreSucursal(req: Request, res: Response) {
     const { nombre } = req.body;
     const SUCURSAL = await pool.query(
@@ -27,7 +27,7 @@ class SucursalControlador {
     }
   }
 
-  // GUARDAR REGISTRO DE SUCURSAL
+  // GUARDAR REGISTRO DE SUCURSAL   **USADO
   public async CrearSucursal(req: Request, res: Response): Promise<Response> {
 
     try {
@@ -71,7 +71,7 @@ class SucursalControlador {
     }
   }
 
-  // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO
+  // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO  **USADO
   public async ActualizarSucursal(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id_ciudad, id, user_name, ip } = req.body;
@@ -80,7 +80,7 @@ class SucursalControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM e_sucursales WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -119,6 +119,7 @@ class SucursalControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -126,7 +127,7 @@ class SucursalControlador {
     }
   }
 
-  // BUSCAR SUCURSAL POR ID DE EMPRESA
+  // BUSCAR SUCURSAL POR ID DE EMPRESA  **USADO
   public async ObtenerSucursalEmpresa(req: Request, res: Response): Promise<any> {
     const { id_empresa } = req.params;
     const SUCURSAL = await pool.query(
@@ -210,7 +211,7 @@ class SucursalControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -219,7 +220,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
+  // METODO PARA BUSCAR DATOS DE UNA SUCURSAL  **USADO
   public async ObtenerUnaSucursal(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const SUCURSAL = await pool.query(
@@ -237,7 +238,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR  **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
@@ -402,7 +403,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO PARA CARGAR PLANTILLA DE SUCURSALES
+  // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
   public async RegistrarSucursales(req: Request, res: Response): Promise<Response> {
     const { sucursales, user_name, ip } = req.body;
     let error: boolean = false;
@@ -419,7 +420,7 @@ class SucursalControlador {
           INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
           `
           , [nombre, id_ciudad, id_empresa]);
-        
+
         const [sucursal] = response.rows;
 
         // AUDITORIA
@@ -435,7 +436,7 @@ class SucursalControlador {
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-      
+
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');

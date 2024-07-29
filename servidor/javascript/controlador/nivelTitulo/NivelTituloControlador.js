@@ -20,7 +20,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class NivelTituloControlador {
-    // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL
+    // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL   **USADO
     ListarNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const titulo = yield database_1.default.query(`
@@ -34,7 +34,7 @@ class NivelTituloControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     EliminarNivelTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -43,7 +43,7 @@ class NivelTituloControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -79,12 +79,11 @@ class NivelTituloControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA REGISTRAR NIVEL DE TITULO
+    // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
     CrearNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -115,14 +114,13 @@ class NivelTituloControlador {
                 }
             }
             catch (error) {
-                console.log(error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al registrar el nivel de título.' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO
+    // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO    **USADO
     ActualizarNivelTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -130,7 +128,7 @@ class NivelTituloControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -170,7 +168,7 @@ class NivelTituloControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TITULO POR SU NOMBRE
+    // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
     ObtenerNivelNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
@@ -185,7 +183,7 @@ class NivelTituloControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -292,7 +290,7 @@ class NivelTituloControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO
+    // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO    **USADO
     RegistrarNivelesPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { niveles, user_name, ip } = req.body;

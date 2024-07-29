@@ -4,7 +4,7 @@ import pool from '../../database';
 
 class CiudadControlador {
 
-    // BUSCAR DATOS RELACIONADOS A LA CIUDAD
+    // BUSCAR DATOS RELACIONADOS A LA CIUDAD   **USADO
     public async ListarInformacionCiudad(req: Request, res: Response) {
         const { id_ciudad } = req.params;
         const CIUDAD = await pool.query(

@@ -13,46 +13,46 @@ export class DepartamentosService {
   ) { }
 
 
-  // REGISTRAR DEPARTAMENTO
+  // REGISTRAR DEPARTAMENTO    **USADO
   RegistrarDepartamento(data: any) {
     return this.http.post(`${environment.url}/departamento`, data).pipe(
       catchError(data)
     );
   }
 
-  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL
+  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL  **USADO
   BuscarDepartamentoSucursal(id: number) {
     return this.http.get(`${environment.url}/departamento/sucursal-departamento/${id}`);
   }
 
-  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR
+  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR  ** USADO
   BuscarDepartamentoSucursal_(id_sucursal: number, id: number) {
     return this.http.get(`${environment.url}/departamento/sucursal-departamento-edicion/${id_sucursal}/${id}`);
   }
 
-  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR
+  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL   **USADO
   BuscarDepartamento(id: number) {
     return this.http.get(`${environment.url}/departamento/infodepartamento/${id}`);
   }
 
-  // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
+  // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  **USADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
     return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   --**VERIFICADO
+  // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   **USADO
   BuscarInformacionDepartamento(id_sucursal: number) {
     return this.http.get(`${environment.url}/departamento/buscar/datosDepartamento/${id_sucursal}`);
   }
 
-  // METODO PARA BUSCAR DEPARTAMENTOS   --**VERIFICADO
+  // METODO PARA BUSCAR DEPARTAMENTOS   **USADO
   ConsultarDepartamentos() {
     return this.http.get(`${environment.url}/departamento/listarDepartamentos`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO  **USADO
   EliminarRegistro(id: any, datos: any) {
     const url = `${environment.url}/departamento/eliminar/${id}`;
     const httpOtions = {
@@ -61,26 +61,26 @@ export class DepartamentosService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
+  // REGISTRAR NIVELDEPARTAMENTO  **USADO
   RegistrarNivelDepartamento(data: any) {
     return this.http.post(`${environment.url}/departamento/crearnivel`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA BUSCAR NIVELDEPARTAMENTOS   --**VERIFICADO
+  // METODO PARA BUSCAR NIVELDEPARTAMENTOS   **USADO
   ConsultarNivelDepartamento(id_departamento: number, id_establecimiento: number) {
     return this.http.get(`${environment.url}/departamento/infoniveldepa/${id_departamento}/${id_establecimiento}`);
   }
 
-  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO    --**VERIFICADO
+  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO   **USADO
   ActualizarNivelDepa(id: number, data: any) {
     return this.http.put(`${environment.url}/departamento/nivelactualizar/${id}`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
+  // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   **USADO
   EliminarRegistroNivelDepa(id: number, datos: any) {
     const url = `${environment.url}/departamento/eliminarniveldepa/${id}`;
     const httpOtions = {
@@ -89,7 +89,7 @@ export class DepartamentosService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
+  // REGISTRAR NIVELDEPARTAMENTO  **USADO
   ActualizarNombreNivel(data: any) {
     return this.http.post(`${environment.url}/departamento/actualizarNombrenivel`, data).pipe(
       catchError(data)

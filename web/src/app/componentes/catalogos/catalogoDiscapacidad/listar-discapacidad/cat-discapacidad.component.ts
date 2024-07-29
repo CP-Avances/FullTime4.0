@@ -1,12 +1,12 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -25,7 +25,6 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
 import { EditarDiscapacidadComponent } from '../editar-discapacidad/editar-discapacidad.component';
 import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
-
 
 @Component({
   selector: 'app-cat-discapacidad',
@@ -209,7 +208,6 @@ export class CatDiscapacidadComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -233,6 +231,7 @@ export class CatDiscapacidadComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA REVISAR DATOS DE PLANTILLA
   Datos_discapacidad: any
   listaDiscapacidadCorrectas: any = [];
   messajeExcel: string = '';
@@ -250,7 +249,7 @@ export class CatDiscapacidadComponent implements OnInit {
       this.Datos_discapacidad = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_discapacidad.sort((a, b) => {
+      this.Datos_discapacidad.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -260,7 +259,6 @@ export class CatDiscapacidadComponent implements OnInit {
         return 0;
       });
 
-      //console.log('probando plantilla discapacidad', this.Datos_discapacidad);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -281,8 +279,7 @@ export class CatDiscapacidadComponent implements OnInit {
         });
       }
     }, error => {
-      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
       this.progreso = false;
@@ -293,7 +290,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
@@ -307,8 +304,9 @@ export class CatDiscapacidadComponent implements OnInit {
       return 'rgb(242, 21, 21)';
     }
   }
+
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -317,25 +315,26 @@ export class CatDiscapacidadComponent implements OnInit {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.subirDatosPlantilla();
+          this.SubirDatosPlantilla();
         }
       });
   }
 
-  subirDatosPlantilla() {
+  // METODO PARA CARGAR LOS DATOS DE LA PLANTILLA
+  SubirDatosPlantilla() {
     if (this.listaDiscapacidadCorrectas.length > 0) {
       const data = {
         plantilla: this.listaDiscapacidadCorrectas,
         user_name: this.user_name,
         ip: this.ip,
       }
-      this.rest.subirArchivoExcel(data).subscribe({
+      this.rest.SubirArchivoExcel(data).subscribe({
         next: (response) => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
             timeOut: 3000,
@@ -378,7 +377,6 @@ export class CatDiscapacidadComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('Discapacidades', this.discapacidades);
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -463,6 +461,7 @@ export class CatDiscapacidadComponent implements OnInit {
         NOMBRE: obj.nombre,
       }
     }));
+
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
     const header = Object.keys(this.discapacidades[0]); // NOMBRE DE CABECERAS DE COLUMNAS
     var wscols: any = [];
@@ -516,7 +515,6 @@ export class CatDiscapacidadComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
 
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Discapacidades.xml';
@@ -538,6 +536,10 @@ export class CatDiscapacidadComponent implements OnInit {
     FileSaver.saveAs(data, "DiscapacidadesCSV" + '.csv');
     this.ObtenerDiscapacidad();
   }
+
+  /** ************************************************************************************************* **
+   ** **                           METODO DE SELECCION MULTIPLE DE DATOS                             ** **
+   ** ************************************************************************************************* **/
 
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
@@ -643,7 +645,7 @@ export class CatDiscapacidadComponent implements OnInit {
     );
   }
 
-  // METODO PARA CONFIRMAR ELIMINACIÓN MULTIPLE
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

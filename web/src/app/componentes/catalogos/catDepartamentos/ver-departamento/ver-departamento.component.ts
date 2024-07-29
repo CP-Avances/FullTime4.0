@@ -68,9 +68,7 @@ export class VerDepartamentoComponent implements OnInit {
     { valor: 5, nombre: '5' }
   ];
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -322,6 +320,8 @@ export class VerDepartamentoComponent implements OnInit {
     this.ActualizarRegistros(datos);
   }
 
+
+  // METODO DE ELIMINACION MULTIPLE
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
@@ -354,6 +354,7 @@ export class VerDepartamentoComponent implements OnInit {
     )
   }
 
+  // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

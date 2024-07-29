@@ -33,13 +33,13 @@ class EmpleadoRutas {
         /** ** ********************************************************************************************** **
          ** ** **                         MANEJO DE CODIGOS DE USUARIOS                                    ** **
          ** ** ********************************************************************************************** **/
-        // METODO DE BUSQUEDA DE CONFIGURACION DE CODIGO DE USUARIOS
+        // METODO DE BUSQUEDA DE CONFIGURACION DE CODIGO DE USUARIOS   **USADO
         this.router.get('/encontrarDato/codigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerCodigo);
-        // METODO PARA REGISTRAR CODIGO DE USUARIO
+        // METODO PARA REGISTRAR CODIGO DE USUARIO    **USADO
         this.router.post('/crearCodigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearCodigo);
-        // METODO DE BUSQUEDA DEL ULTIMO CODIGO DE EMPLEADO REGISTRADO EN EL SISTEMA
+        // METODO DE BUSQUEDA DEL ULTIMO CODIGO DE EMPLEADO REGISTRADO EN EL SISTEMA   **USADO
         this.router.get('/encontrarDato/codigo/empleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerMAXCodigo);
-        // METODO PARA ACTUALIZAR CODIGO VALOR TOTAL
+        // METODO PARA ACTUALIZAR CODIGO VALOR TOTAL   **USADO
         this.router.put('/cambiarValores', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarCodigoTotal);
         // METODO DE ACTUALIZACION DE CODIGO
         this.router.put('/cambiarCodigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarCodigo);

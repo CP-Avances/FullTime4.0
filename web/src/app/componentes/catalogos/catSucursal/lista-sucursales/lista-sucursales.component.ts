@@ -1,31 +1,31 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
+
+import { environment } from 'src/environments/environment';
 
 import { RegistrarSucursalesComponent } from '../registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/catalogos/catSucursal/editar-sucursal/editar-sucursal.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-
-import { environment } from 'src/environments/environment';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
@@ -79,13 +79,6 @@ export class ListaSucursalesComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
-
-
-  // // VARIABLES PROGRESS SPINNER
-  // progreso: boolean = false;
-  // color: ThemePalette = 'primary';
-  // mode: ProgressSpinnerMode = 'indeterminate';
-  // value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -184,8 +177,6 @@ export class ListaSucursalesComponent implements OnInit {
         }
       });
     this.ObtenerSucursal();
-
-
     this.activar_seleccion = true;
 
     this.plan_multiple = false;
@@ -205,7 +196,7 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
-      this.ObtenerSucursal();
+    this.ObtenerSucursal();
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -257,7 +248,6 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Establecimientos', this.sucursales);
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
@@ -423,14 +413,12 @@ export class ListaSucursalesComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
 
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Estamblecimientos.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
-
 
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
@@ -470,9 +458,9 @@ export class ListaSucursalesComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Datasucursales: any;
   messajeExcel: string = '';
-  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
     this.listSucursalesCorrectas = [];
     let formData = new FormData();
@@ -480,14 +468,12 @@ export class ListaSucursalesComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    // this.progreso = true;
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datasucursales = res.data;
       this.messajeExcel = res.message;
 
-      this.Datasucursales.sort((a, b) => {
+      this.Datasucursales.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -510,7 +496,7 @@ export class ListaSucursalesComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
-        //Separa llas filas que estan con la observacion OK para luego registrar en la base.
+        // SEPARA LLAS FILAS QUE ESTAN CON LA OBSERVACION OK PARA LUEGO REGISTRAR EN LA BASE.
         this.Datasucursales.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
 
@@ -531,23 +517,18 @@ export class ListaSucursalesComponent implements OnInit {
         }
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      // this.progreso = false;
       this.messajeExcel = 'error';
-    }, () => {
-      // this.progreso = false;
     });
-
   }
 
 
   // METODO PARA LISTAR CIUDADES
   datosCiudades: any = [];
   ciudad: any = [];
-  ListarCiudades(ciudadd): string {
+  ListarCiudades(ciudadd: string) {
     this.ciudad = [];
     this.ciudad = this.datosCiudades.filter((item: any) => item.id == ciudadd);
     if (this.ciudad[0]) {
@@ -557,20 +538,21 @@ export class ListaSucursalesComponent implements OnInit {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarSucursales();
+          this.RegistrarSucursales();
         }
       });
   }
 
+  // METODO PARA REGISTRAR SUCURSALES
   listSucursalesCorrectas: any = [];
   btn_registrar: boolean = true;
-  registrarSucursales() {
+  RegistrarSucursales() {
     if (this.listSucursalesCorrectas.length > 0) {
       let data = {
         sucursales: this.listSucursalesCorrectas,
@@ -579,17 +561,17 @@ export class ListaSucursalesComponent implements OnInit {
       }
       this.rest.RegistrarSucursales(data).subscribe({
         next: (res: any) => {
-          this.toastr.success('Plantilla de Sucursales importada.','Operación exitosa.', {
+          this.toastr.success('Plantilla de Sucursales importada.', 'Operación exitosa.', {
             timeOut: 10000,
           });
           this.LimpiarCampoBuscar();
 
-      }, error: (error: any) => {
-        this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
-          timeOut: 6000,
-        });
-      }
-    });
+        }, error: (error: any) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 6000,
+          });
+        }
+      });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
@@ -605,7 +587,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     arrayObservacion[0]
     if (observacion == 'ok') {
@@ -629,7 +611,7 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -714,6 +696,7 @@ export class ListaSucursalesComponent implements OnInit {
       });
   }
 
+  // METODO DE ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -747,6 +730,7 @@ export class ListaSucursalesComponent implements OnInit {
     )
   }
 
+  // METOOD DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

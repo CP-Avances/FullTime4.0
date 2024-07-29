@@ -5,7 +5,7 @@ import pool from '../../database';
 
 class CiudadFeriadoControlador {
 
-    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
+    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE  **USADO
     public async FiltrarCiudadesProvincia(req: Request, res: Response): Promise<any> {
         const { nombre } = req.params;
         const CIUDAD_FERIADO = await pool.query(

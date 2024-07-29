@@ -13,17 +13,17 @@ export class TituloService {
   ) { }
 
 
-  // METODO PARA LISTAR TITULOS
+  // METODO PARA LISTAR TITULOS   **USADO
   ListarTitulos() {
     return this.http.get(`${environment.url}/titulo/`);
   }
 
-  // METODO PARA CREAR ARCHIVO XML
+  // METODO PARA BUSCAR EL NOMBRE DE UN TITULO PROFESIONAL   **USADO
   BuscarTituloNombre(data: any) {
     return this.http.post(`${environment.url}/titulo/titulo-nombre`, data);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarRegistro(id: any, datos:any) {
     const url = `${environment.url}/titulo/eliminar/${id}`;
     const httpOtions = {
@@ -33,21 +33,22 @@ export class TituloService {
   }
 
 
-  // METODO PARA REGISTRAR TITULO
+  // METODO PARA REGISTRAR TITULO    **USADO
   RegistrarTitulo(data: any) {
     return this.http.post(`${environment.url}/titulo`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE TITULO
+  // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
   ActualizarUnTitulo(datos: any) {
     return this.http.put(`${environment.url}/titulo`, datos);
   }
 
-  RevisarFormato(formData) {
+  // METODO DE VALIDACION DE DATOS DE PLANTILLA  **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
   }
 
-  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA   **USADO
   RegistrarTitulosPlantilla(data: any) {
     return this.http.post(`${environment.url}/titulo/registrarTitulos`, data);
   }

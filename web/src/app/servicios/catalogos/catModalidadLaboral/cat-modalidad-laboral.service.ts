@@ -16,17 +16,20 @@ export class CatModalidadLaboralService {
     return this.http.get<any>(environment.url + '/modalidadLaboral');
   }
   
+  // METODO PARA REGISTRAR UNA MODALIDAD LABORAL   **USADO
   CrearModalidadLaboral(modalidad: any){
     return this.http.post(`${environment.url}/modalidadLaboral/crearModalidad`, modalidad).pipe(
       catchError(modalidad)
     );
   }
-  // METODO PARA ACTUALIZAR REGISTRO
+  
+  // METODO PARA ACTUALIZAR REGISTRO    **USADO
   ActualizarModalidadLab(datos: any) {
     return this.http.put(`${environment.url}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
   
+  // METODO PARA ELIMINAR DATOS
   Eliminar(id: any, datos: any){
     const url = `${environment.url}/modalidadLaboral/eliminar/${id}`;
     const httpOtions = {
@@ -35,11 +38,13 @@ export class CatModalidadLaboralService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  RevisarFormato(formData) {
+  // METODO PARA REVISAR DATOS DE PLANTILLA  **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);
   }
-
-  SubirArchivoExcel(formData) {
+Ç
+// METODO PARA SUBR DATOS AL SISTEMA    **USADO
+  SubirArchivoExcel(formData: any) {
     return this.http.post<any>(`${environment.url}/modalidadLaboral/cargar_plantilla`, formData);
   }
 

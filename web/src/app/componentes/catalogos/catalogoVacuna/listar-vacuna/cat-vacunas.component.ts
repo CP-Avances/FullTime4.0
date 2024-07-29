@@ -1,11 +1,11 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -111,7 +111,7 @@ export class CatVacunasComponent implements OnInit {
   // METODO PARA LISTAR TIPO VACUNAS
   ObtenerVacuna() {
     this.vacunas = [];
-    this.rest.listaVacuna().subscribe(res => {
+    this.rest.ListaVacuna().subscribe(res => {
       this.vacunas = res
     }, error => {
       if (error.status == 400 || error.status == 404) {
@@ -119,7 +119,7 @@ export class CatVacunasComponent implements OnInit {
           timeOut: 1500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo slaio mal.', {
+        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -203,7 +203,6 @@ export class CatVacunasComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -217,7 +216,7 @@ export class CatVacunasComponent implements OnInit {
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
 
@@ -227,6 +226,7 @@ export class CatVacunasComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA REVISAR DATOS DE PLANTILLA
   Datos_vacunas: any
   listaVacunasCorrectas: any = [];
   messajeExcel: string = '';
@@ -239,12 +239,12 @@ export class CatVacunasComponent implements OnInit {
 
     this.progreso = true;
 
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_vacunas = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_vacunas.sort((a, b) => {
+      this.Datos_vacunas.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -253,8 +253,6 @@ export class CatVacunasComponent implements OnInit {
         }
         return 0;
       });
-
-      console.log('probando plantilla vacunas', this.Datos_vacunas, ' -  ', this.messajeExcel);
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -276,7 +274,6 @@ export class CatVacunasComponent implements OnInit {
         });
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -288,7 +285,7 @@ export class CatVacunasComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
@@ -303,7 +300,7 @@ export class CatVacunasComponent implements OnInit {
     }
   }
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -312,19 +309,19 @@ export class CatVacunasComponent implements OnInit {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('listaContratosCorrectas: ', this.listaVacunasCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.subirDatosPlantilla();
+          this.SubirDatosPlantilla();
         }
       });
   }
 
-  subirDatosPlantilla() {
+// METODO PARA CARGAR DATOS DE PLANTILLA AL SISTEMA
+  SubirDatosPlantilla() {
     if (this.listaVacunasCorrectas.length > 0) {
       const data = {
         plantilla: this.listaVacunasCorrectas,
@@ -333,11 +330,9 @@ export class CatVacunasComponent implements OnInit {
       }
       this.rest.SubirArchivoExcel(data).subscribe({
         next: (response) => {
-          console.log('respuesta: ', response);
           this.toastr.success('Plantilla de vacunas importada.', 'Operación exitosa.',  {
             timeOut: 3000,
           });
-          //window.location.reload();
           this.LimpiarCampos();
           this.archivoForm.reset();
           this.nameFile = '';
@@ -349,7 +344,6 @@ export class CatVacunasComponent implements OnInit {
         }
       });
     } else {
-      console.log('entro en salir')
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -376,7 +370,6 @@ export class CatVacunasComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('vacunas', this.vacunas);
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -498,7 +491,6 @@ export class CatVacunasComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arreglovacunas);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -535,6 +527,10 @@ export class CatVacunasComponent implements OnInit {
     FileSaver.saveAs(data, "vacunasCSV" + '.csv');
     this.ObtenerVacuna();
   }
+
+  /** ************************************************************************************************* **
+   ** **                           METODO DE SELECCION MULTIPLE DE DATPS                             ** **
+   ** ************************************************************************************************* **/
 
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;

@@ -12,7 +12,7 @@ class CiudadRutas {
         this.configuracion();
     }
     configuracion() {
-        // BUSCAR INFORMACION DE LA CIUDAD
+        // BUSCAR INFORMACION DE LA CIUDAD  **USADO
         this.router.get('/informacion-ciudad/:id_ciudad', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarInformacionCiudad);
         // BUSQUEDA DE LISTA DE CIUDADES
         this.router.get('/listaCiudad', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarCiudades);

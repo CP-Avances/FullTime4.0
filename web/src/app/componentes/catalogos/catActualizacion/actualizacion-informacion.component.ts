@@ -1,20 +1,21 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnInit } from '@angular/core';
+import { checkOptions, FormCriteriosBusqueda, ITableEmpleados } from 'src/app/model/reportes.model';
 import { FormControl, Validators } from '@angular/forms';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { Component, OnInit } from '@angular/core';
+import { MatRadioChange } from '@angular/material/radio';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatRadioChange } from '@angular/material/radio';
-import { ToastrService } from 'ngx-toastr';
-import { checkOptions, FormCriteriosBusqueda, ITableEmpleados } from 'src/app/model/reportes.model';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+
 import { EditarRolUserComponent } from './editar-rol-user/editar-rol-user.component';
 import { EditarDepaUserComponent } from './editar-depa-user/editar-depa-user.component';
 

@@ -53,9 +53,7 @@ export class RegistrarSucursalesComponent implements OnInit {
     idCiudadForm: this.idCiudad,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -81,21 +79,21 @@ export class RegistrarSucursalesComponent implements OnInit {
   private _filterPais(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
   private _filterProvincia(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.provincias.filter(provincias => provincias.nombre.toLowerCase().includes(filterValue));
+      return this.provincias.filter((provincias: any) => provincias.nombre.toLowerCase().includes(filterValue));
     }
   }
 
   private _filterCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.ciudades.filter(ciudades => ciudades.descripcion.toLowerCase().includes(filterValue));
+      return this.ciudades.filter((ciudades: any) => ciudades.descripcion.toLowerCase().includes(filterValue));
     }
   }
 

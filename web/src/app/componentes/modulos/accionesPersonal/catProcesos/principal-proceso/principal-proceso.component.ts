@@ -216,7 +216,7 @@ export class PrincipalProcesoComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Procesos', this.procesos);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

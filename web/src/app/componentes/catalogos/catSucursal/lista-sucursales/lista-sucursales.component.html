@@ -217,13 +217,13 @@
                             <td>
                                 <div style="width: 250px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(data.observacion)">
+                                        [style.background-color]="EstiloCelda(data.observacion)">
                                     </div>
                                     {{ data.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
-                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
+                            <td [style.color]="EstiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
+                            <td [style.color]="EstiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
 
                         </tr>
                     </tbody>

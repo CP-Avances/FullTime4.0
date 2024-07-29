@@ -770,7 +770,7 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem("PlanificacionesA", this.planificaciones);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: {

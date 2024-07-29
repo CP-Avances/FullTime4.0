@@ -622,7 +622,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem("PlanificacionesHE", this.listaPlan);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: {

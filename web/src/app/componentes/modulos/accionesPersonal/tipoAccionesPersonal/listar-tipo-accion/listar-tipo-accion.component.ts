@@ -214,7 +214,7 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('TipoPermisos', this.tipo_acciones);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

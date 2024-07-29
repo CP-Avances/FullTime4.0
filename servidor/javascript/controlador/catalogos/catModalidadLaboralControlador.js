@@ -39,8 +39,8 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR MODALIDAD LABORAL
-    CrearMadalidadLaboral(req, res) {
+    // METODO PARA REGISTRAR MODALIDAD LABORAL   **USADO
+    CrearModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { modalidad, user_name, ip } = req.body;
@@ -85,7 +85,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // METODO PARA EDITAR MODALIDAD LABORAL
+    // METODO PARA EDITAR MODALIDAD LABORAL    **USADO
     EditarModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -150,7 +150,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -201,7 +201,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO 
+    // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO    **USADO
     VerfificarPlantillaModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -321,7 +321,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;

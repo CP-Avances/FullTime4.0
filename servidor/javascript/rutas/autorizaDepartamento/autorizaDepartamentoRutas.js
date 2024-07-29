@@ -22,8 +22,8 @@ class DepartamentoRutas {
         // METODO PARA ELIMINAR REGISTROS
         this.router.delete('/eliminar/:id', autorizaDepartamentoControlador_1.default.EliminarAutorizacionDepartamento);
         this.router.get('/empleadosAutorizan/:id_depar', autorizaDepartamentoControlador_1.default.ObtenerQuienesAutorizan);
-        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   --** VERIFICADO
-        this.router.get('/listaempleadosAutorizan/:id_depa', autorizaDepartamentoControlador_1.default.ObtenerlistaEmpleadosAutorizan);
+        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   **USADO
+        this.router.get('/listaempleadosAutorizan/:id_depa', autorizaDepartamentoControlador_1.default.ObtenerListaEmpleadosAutorizan);
         this.router.get('/listaDepaAutoriza/:id_depar', autorizaDepartamentoControlador_1.default.ObtenerListaAutorizaDepa);
     }
 }

@@ -14,7 +14,6 @@ import { EditarSucursalComponent } from 'src/app/componentes/catalogos/catSucurs
 import { VerEmpresaComponent } from '../../catEmpresa/ver-empresa/ver-empresa.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
-
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 
@@ -92,7 +91,7 @@ export class VerSucursalComponent implements OnInit {
     return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nombre < b.nombre) {
@@ -168,6 +167,10 @@ export class VerSucursalComponent implements OnInit {
     }
   }
 
+  /** ******************************************************************************************* ** 
+   ** **                      METODO DE SELECCION DE MULTIPLES DATOS                           ** **
+   ** ******************************************************************************************* **/
+
   // CHECK SUCURSALES
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -227,7 +230,7 @@ export class VerSucursalComponent implements OnInit {
         if (nivel != 0) {
           this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
-            this.departamentosNiveles.filter(item => {
+            this.departamentosNiveles.filter((item: any) => {
               this.restD.EliminarRegistroNivelDepa(item.id, data).subscribe(
                 (res: any) => {
                   if (res.message === 'error') {
@@ -273,6 +276,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
+  // METODO DE ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -284,12 +288,12 @@ export class VerSucursalComponent implements OnInit {
     this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
-      this.datosDepartamentos = this.datosDepartamentos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO
+      this.datosDepartamentos = this.datosDepartamentos.filter((item: any) => item.id !== datos.id);
+      // AQUI MODIFICAR EL METODO
       this.contador = this.contador + 1;
       this.restD.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.',  {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -300,7 +304,7 @@ export class VerSucursalComponent implements OnInit {
           if (datos.nivel != 0) {
             this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
               this.departamentosNiveles = datos;
-              this.departamentosNiveles.filter(item => {
+              this.departamentosNiveles.filter((item: any) => {
                 this.restD.EliminarRegistroNivelDepa(item.id, data).subscribe(
                   (res: any) => {
                     if (res.message === 'error') {
@@ -335,6 +339,7 @@ export class VerSucursalComponent implements OnInit {
     )
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION DE DATOS
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -351,7 +356,6 @@ export class VerSucursalComponent implements OnInit {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
         }
       });

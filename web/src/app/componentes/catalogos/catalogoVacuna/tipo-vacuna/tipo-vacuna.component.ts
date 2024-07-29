@@ -1,8 +1,8 @@
 // IMPORTAR LIBRERIAS
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Component } from '@angular/core';
 
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
@@ -28,10 +28,10 @@ export class TipoVacunaComponent {
   ip: string | null;
 
   constructor(
-    public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
     private rest: CatVacunasService, // VARIABLE DE CONSULTA DE DATOS DE TIPOS VACUNAS
-    public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
+    public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
+    public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
   ) { }
 
   ngOnInit(): void {
@@ -51,7 +51,6 @@ export class TipoVacunaComponent {
       ip: this.ip,
     }
     this.rest.CrearVacuna(vacuna).subscribe(response => {
-      //---console.log('response: ', response);
       if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,

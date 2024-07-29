@@ -16,7 +16,7 @@ exports.CIUDAD_FERIADO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class CiudadFeriadoControlador {
-    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
+    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE  **USADO
     FiltrarCiudadesProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;

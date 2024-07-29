@@ -388,7 +388,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.rest.Crear_feriados_ciudad(data).subscribe();
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
@@ -553,7 +553,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('Feriados', this.feriados);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

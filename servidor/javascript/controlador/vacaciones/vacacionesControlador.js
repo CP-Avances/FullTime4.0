@@ -133,7 +133,7 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empleado, user_name, ip } = req.body;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
@@ -152,7 +152,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
@@ -161,7 +161,7 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).
                     jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -174,7 +174,7 @@ class VacacionesControlador {
             try {
                 const id = req.params.id;
                 const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
@@ -189,7 +189,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -208,7 +208,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
@@ -217,7 +217,7 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -230,7 +230,7 @@ class VacacionesControlador {
             try {
                 const { user_name, ip } = req.body;
                 let { id_vacacion } = req.params;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
@@ -245,7 +245,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -317,7 +317,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (objetoVacacion) {
                     return res.status(200).jsonp(objetoVacacion);
@@ -327,7 +327,7 @@ class VacacionesControlador {
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -359,7 +359,7 @@ class VacacionesControlador {
                 const id = req.params.id;
                 const { estado, user_name, ip } = req.body;
                 console.log('estado', id);
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
@@ -374,7 +374,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -391,14 +391,14 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (3 === estado) {
                     (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id), user_name, ip);
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }

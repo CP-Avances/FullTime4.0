@@ -312,7 +312,7 @@ export class CargarPlantillaComponent implements OnInit {
     });
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listaContratosCorrectas: ', this.listaContratosCorrectas.length);
@@ -509,7 +509,7 @@ export class CargarPlantillaComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultipleCargos() {
     const mensaje = 'registro';
     console.log('listaCargosCorrectas: ', this.listaCargosCorrectas);

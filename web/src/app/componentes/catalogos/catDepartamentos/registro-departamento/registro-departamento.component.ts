@@ -32,9 +32,8 @@ export class RegistroDepartamentoComponent implements OnInit {
     nombreForm: this.nombre,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
+
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

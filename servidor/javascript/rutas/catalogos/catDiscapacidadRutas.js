@@ -24,17 +24,17 @@ class DiscapacidadRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
+        // METODO PARA LISTAR TIPOS DE DISCAPACIDAD   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.ListarDiscapacidad);
-        // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDDA
+        // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDDA   **USADO
         this.router.post('/crearDiscapacidad', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.CrearDiscapacidad);
-        // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD
+        // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD    **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.EditarDiscapacidad);
-        // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
+        // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD    **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catDiscapacidadControlador_1.default.RevisarDatos);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.CargarPlantilla);
     }
 }

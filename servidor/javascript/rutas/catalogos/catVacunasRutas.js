@@ -24,17 +24,17 @@ class VacunasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA CREAR TIPO VACUNAS
+        // METODO PARA CREAR TIPO VACUNAS  **USADO
         this.router.post('/crearVacuna', verificarToken_1.TokenValidation, catVacunasControlador_1.default.CrearVacuna);
-        // METODO PARA LISTAR TIPO VACUNAS
+        // METODO PARA LISTAR TIPO VACUNAS    **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catVacunasControlador_1.default.ListaVacuna);
-        // METODO PARA EDITAR TIPO VACUNAS
+        // METODO PARA EDITAR TIPO VACUNAS   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catVacunasControlador_1.default.EditarVacuna);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO    **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catVacunasControlador_1.default.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catVacunasControlador_1.default.RevisarDatos);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catVacunasControlador_1.default.CargarPlantilla);
     }
 }

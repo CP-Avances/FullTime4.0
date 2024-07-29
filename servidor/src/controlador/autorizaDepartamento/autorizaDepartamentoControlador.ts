@@ -210,16 +210,12 @@ class AutorizaDepartamentoControlador {
     }
 
 
-    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
-    public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
+    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     **USADO
+    public async ObtenerListaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
         const { id_depa } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja, v.cargo 
-            FROM ed_autoriza_departamento AS d 
-            INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar 
-                AND d.id_empleado_cargo = v.id_cargo 
-            WHERE d.id_departamento = $1
+            SELECT * FROM informacionpersonalautoriza ia WHERE ia.id_depar = 9
             `
             , [id_depa]);
         if (EMPLEADOS.rowCount != 0) {
@@ -234,7 +230,7 @@ class AutorizaDepartamentoControlador {
         const { id_depar } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT * FROM VistaAutorizanCargo WHERE id_depar = $1
+            SELECT * FROM informacionpersonalautoriza WHERE id_depar = $1
             `
             , [id_depar]);
         if (EMPLEADOS.rowCount != 0) {

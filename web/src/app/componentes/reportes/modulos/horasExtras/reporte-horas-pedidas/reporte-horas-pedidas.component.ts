@@ -255,7 +255,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   GenerarArchivoSolicitudes(solicitudHoras) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -400,7 +400,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
    * ****************************************************************************************************/
 
   GenerarSolicitudesAprobadas(horasAutorizadas) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -561,7 +561,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   GenerarSolicitudEmpleado(id_seleccionado: number) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -792,7 +792,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
    *  **********************************************************************************************/
 
   GenerarSolicitudAutorizaEmpleado(id_seleccionado: number) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

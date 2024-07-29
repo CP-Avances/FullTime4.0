@@ -26,7 +26,7 @@ class TiposCargosControlador {
         }
     }
 
-    // METODO PARA LISTAR TIPO CARGOS
+    // METODO PARA LISTAR TIPO CARGOS     **USADO
     public async ListaTipoCargos(req: Request, res: Response) {
         try {
             const TIPO_CARGO = await pool.query(
@@ -44,7 +44,7 @@ class TiposCargosControlador {
         }
     }
 
-    // METODO PARA REGISTRAR TIPO CARGO
+    // METODO PARA REGISTRAR TIPO CARGO    **USADO
     public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
             const { cargo, user_name, ip } = req.body;
@@ -100,7 +100,7 @@ class TiposCargosControlador {
         }
     }
 
-    // METODO PARA EDITAR TIPO CARGO
+    // METODO PARA EDITAR TIPO CARGO   **USADO
     public async EditarCargo(req: Request, res: Response): Promise<Response> {
         try {
             const { id, cargo } = req.body;
@@ -179,7 +179,7 @@ class TiposCargosControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO   **USADO
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
@@ -240,8 +240,8 @@ class TiposCargosControlador {
         }
     }
 
-    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO
-    public async VerfificarPlantillaTipoCargos(req: Request, res: Response) {
+    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO   **USADO
+    public async VerificarPlantillaTipoCargos(req: Request, res: Response) {
         try {
             const documento = req.file?.originalname;
             let separador = path.sep;
@@ -373,7 +373,7 @@ class TiposCargosControlador {
         }
     }
 
-    // REGISTRAR PLANTILLA TIPO CARGO 
+    // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
         const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
@@ -409,7 +409,7 @@ class TiposCargosControlador {
 
                 // FIN DE TRANSACCION
                 await pool.query('COMMIT');
-                
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
@@ -420,7 +420,7 @@ class TiposCargosControlador {
         if (error) {
             return res.status(500).jsonp({ message: 'error' });
         }
-    
+
         return res.status(200).jsonp({ message: 'ok' });
 
     }

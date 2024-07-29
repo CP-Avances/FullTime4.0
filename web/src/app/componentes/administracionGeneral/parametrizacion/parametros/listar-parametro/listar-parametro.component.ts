@@ -159,7 +159,7 @@ export class ListarParametroComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Parametros', this.parametros);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

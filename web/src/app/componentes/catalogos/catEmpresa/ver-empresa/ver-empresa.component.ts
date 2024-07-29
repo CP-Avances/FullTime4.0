@@ -308,7 +308,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
   getDocumentDefinicion() {
-    sessionStorage.setItem('Empresas', this.empresas);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

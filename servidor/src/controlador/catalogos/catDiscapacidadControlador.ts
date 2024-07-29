@@ -9,7 +9,7 @@ import excel from 'xlsx';
 
 class DiscapacidadControlador {
 
-    // METODO PARA LISTAR TIPO DE DISCAPACIDAD
+    // METODO PARA LISTAR TIPO DE DISCAPACIDAD    **USADO
     public async ListarDiscapacidad(req: Request, res: Response) {
         try {
             const DISCAPACIDAD = await pool.query(
@@ -27,7 +27,7 @@ class DiscapacidadControlador {
         }
     }
 
-    // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD    **USADO
     public async CrearDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
             const { discapacidad, user_name, ip } = req.body;
@@ -82,7 +82,7 @@ class DiscapacidadControlador {
         }
     }
 
-    // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD    **USADO
     public async EditarDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
             const { id, nombre, user_name, ip } = req.body;
@@ -92,7 +92,7 @@ class DiscapacidadControlador {
                 `
                 , [nombre.toUpperCase(), id])
 
-            const consulta = await pool.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+            const consulta = await pool.query(`SELECT * FROM e_cat_discapacidad WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -154,7 +154,7 @@ class DiscapacidadControlador {
         }
     }
 
-    // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD   **USADO
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
@@ -207,7 +207,6 @@ class DiscapacidadControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
             res.jsonp({ message: 'Registro eliminado.' });
 
         } catch (error) {
@@ -217,7 +216,7 @@ class DiscapacidadControlador {
         }
     }
 
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **usado
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
         try {
             const documento = req.file?.originalname;
@@ -298,7 +297,7 @@ class DiscapacidadControlador {
                             item.observacion = 'Ya existe en el sistema'
                         }
 
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
                         if (duplicados.find((p: any) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         } else {
@@ -351,17 +350,17 @@ class DiscapacidadControlador {
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
 
         const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
-            const { item, discapacidad, observacion } = data;
+            const { discapacidad } = data;
             const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
             try {
-                 // INICIAR TRANSACCION
+                // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
@@ -373,7 +372,7 @@ class DiscapacidadControlador {
 
                 const [discapacidad_emp] = response.rows;
 
-                 // AUDITORIA
+                // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_cat_discapacidad',
                     usuario: user_name,
@@ -390,12 +389,12 @@ class DiscapacidadControlador {
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
-                error = true;  
+                error = true;
             }
         }
-            
+
         if (error) {
-          return res.status(500).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
         }
 
         return res.status(200).jsonp({ message: 'ok' });

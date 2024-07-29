@@ -30,7 +30,7 @@ class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
      ** ** ********************************************************************************************* **/
-    // BUSQUEDA DE CODIGO DEL EMPLEADO
+    // BUSQUEDA DE CODIGO DEL EMPLEADO   **USADO
     ObtenerCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VALOR = yield database_1.default.query(`
@@ -44,7 +44,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // CREAR CODIGO DE EMPLEADO
+    // CREAR CODIGO DE EMPLEADO    **USADO
     CrearCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -75,7 +75,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
+    // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA   **USADO
     ObtenerMAXCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -90,12 +90,11 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                console.log('error ---- ', error);
                 return res.status(404).jsonp({ text: 'Error al obtener código máximo.' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
+    // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS   **USADO
     ActualizarCodigoTotal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

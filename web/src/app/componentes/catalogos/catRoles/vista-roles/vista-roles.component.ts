@@ -178,7 +178,7 @@ export class VistaRolesComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('Roles', this.roles);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

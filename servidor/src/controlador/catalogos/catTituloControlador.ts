@@ -8,7 +8,7 @@ import fs from 'fs';
 
 class TituloControlador {
 
-  // METODO PARA LISTAR TITULOS
+  // METODO PARA LISTAR TITULOS   **USADO
   public async ListarTitulos(req: Request, res: Response) {
     const titulo = await pool.query(
       `
@@ -21,7 +21,7 @@ class TituloControlador {
     res.jsonp(titulo.rows);
   }
 
-  // METODO PARA BUSCAR UN TITULO POR SU NOMBRE
+  // METODO PARA BUSCAR UN TITULO POR SU NOMBRE    **USADO
   public async ObtenerTituloNombre(req: Request, res: Response): Promise<any> {
     const { nombre, nivel } = req.body;
     const TITULO = await pool.query(
@@ -39,7 +39,7 @@ class TituloControlador {
   }
 
 
-  // METODO PARA ELIMINAR REGISTROS
+  // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -49,7 +49,7 @@ class TituloControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query('SELECT * FROM et_titulos WHERE id = $1', [id]);
+      const rol = await pool.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
       if (!datosOriginales) {
@@ -89,16 +89,16 @@ class TituloControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
       return res.jsonp({ message: 'error' });
 
     }
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO   **USADO
   public async ActualizarTitulo(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id_nivel, id, user_name, ip } = req.body;
@@ -107,7 +107,7 @@ class TituloControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query('SELECT * FROM et_titulos WHERE id = $1', [id]);
+      const rol = await pool.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
       if (!datosOriginales) {
@@ -147,6 +147,7 @@ class TituloControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+      
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
@@ -154,7 +155,8 @@ class TituloControlador {
     }
   }
 
-  public async create(req: Request, res: Response): Promise<void> {
+  // METODO PARA REGISTRAR TITULO   **USADO
+  public async CrearTitulo(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, id_nivel, user_name, ip } = req.body;
 
@@ -181,6 +183,7 @@ class TituloControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Título guardado' });
+
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
@@ -188,7 +191,7 @@ class TituloControlador {
     }
   }
 
-  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
@@ -345,11 +348,11 @@ class TituloControlador {
 
   }
 
-  // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA
+  // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
   public async RegistrarTitulosPlantilla(req: Request, res: Response): Promise<any> {
     const { titulos, user_name, ip } = req.body;
     let error: boolean = false;
-    
+
     for (const titulo of titulos) {
       const { nombre, id_nivel } = titulo;
       try {
@@ -375,7 +378,7 @@ class TituloControlador {
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        
+
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');

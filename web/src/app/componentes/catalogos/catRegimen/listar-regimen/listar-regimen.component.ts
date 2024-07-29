@@ -198,7 +198,7 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem("Regimen", this.regimen);
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",

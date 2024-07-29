@@ -7,11 +7,11 @@ import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import excel from 'xlsx';
 import path from 'path';
-import fs from 'fs'; 
+import fs from 'fs';
 
 class NivelTituloControlador {
 
-  // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL
+  // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL   **USADO
   public async ListarNivel(req: Request, res: Response) {
     const titulo = await pool.query(
       `
@@ -26,7 +26,7 @@ class NivelTituloControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTROS
+  // METODO PARA ELIMINAR REGISTROS   **USADO
   public async EliminarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -36,7 +36,7 @@ class NivelTituloControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -74,16 +74,16 @@ class NivelTituloControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
       return res.jsonp({ message: 'error' });
 
     }
   }
 
-  // METODO PARA REGISTRAR NIVEL DE TITULO
+  // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
   public async CrearNivel(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, user_name, ip } = req.body;
@@ -119,15 +119,15 @@ class NivelTituloControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
+
     } catch (error) {
-      console.log(error);
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al registrar el nivel de título.' });
     }
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO
+  // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO    **USADO
   public async ActualizarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id, user_name, ip } = req.body;
@@ -136,7 +136,7 @@ class NivelTituloControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -175,6 +175,7 @@ class NivelTituloControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -182,7 +183,7 @@ class NivelTituloControlador {
     }
   }
 
-  // METODO PARA BUSCAR TITULO POR SU NOMBRE
+  // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
   public async ObtenerNivelNombre(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
     const unNivelTitulo = await pool.query(
@@ -200,8 +201,7 @@ class NivelTituloControlador {
   }
 
 
-
-  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
@@ -314,7 +314,7 @@ class NivelTituloControlador {
     }
   }
 
-  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO    **USADO
   public async RegistrarNivelesPlantilla(req: Request, res: Response): Promise<any> {
     const { niveles, user_name, ip } = req.body;
     let error: boolean = false;

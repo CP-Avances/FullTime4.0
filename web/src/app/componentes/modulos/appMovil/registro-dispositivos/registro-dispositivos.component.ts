@@ -300,7 +300,7 @@ export class RegistroDispositivosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('dispositivos_moviles', this.dispositivosRegistrados);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

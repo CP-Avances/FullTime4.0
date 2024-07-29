@@ -435,7 +435,7 @@ class DatosGeneralesControlador {
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = yield database_1.default.query(`
                 SELECT * FROM informacion_general AS ig
-                WHERE ig.estado = 1 AND 
+                WHERE ig.estado = $1 AND 
 	   		        ig.jefe = false AND
 			        ig.cedula = empl.cedula AND
 			        usd.id_empleado = empl.id AND

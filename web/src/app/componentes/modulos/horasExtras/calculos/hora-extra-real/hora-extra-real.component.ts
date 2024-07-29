@@ -338,7 +338,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Empleados', this.empleado);
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -586,7 +586,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   DefinirPDFTimbre() {
-    sessionStorage.setItem('Timbres Empleado', this.empleado);
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

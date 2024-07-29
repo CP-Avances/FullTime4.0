@@ -336,7 +336,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
@@ -427,7 +427,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Departamentos', this.departamentos);
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',

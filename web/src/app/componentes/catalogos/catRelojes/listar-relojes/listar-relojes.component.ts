@@ -384,7 +384,7 @@ export class ListarRelojesComponent implements OnInit {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listDepartamentosCorrectos: ', this.listaDispositivosCorrectos.length);
@@ -484,7 +484,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Dispositivos', this.relojes);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

@@ -1,10 +1,8 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -27,8 +25,8 @@ import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulo
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 
-import { SelectionModel } from '@angular/cdk/collections';
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
+import { SelectionModel } from '@angular/cdk/collections';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -46,7 +44,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   nivelTitulos: any = [];
   empleado: any = [];
 
-  idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESIÓN
+  idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESION
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -143,7 +141,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -165,10 +162,11 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   DataNivelesProfesionales: any;
   listNivelesCorrectos: any = [];
   messajeExcel: string = '';
-  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
     this.listNivelesCorrectos = [];
     let formData = new FormData();
@@ -176,13 +174,12 @@ export class ListarNivelTitulosComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
 
-      this.DataNivelesProfesionales.sort((a, b) => {
+      this.DataNivelesProfesionales.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -218,24 +215,23 @@ export class ListarNivelTitulosComponent implements OnInit {
         timeOut: 4000,
       });
 
-    }, () => {
-
     });
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarNiveles();
+          this.RegistrarNiveles();
         }
       });
   }
 
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
   btn_registrar: boolean = true;
-  registrarNiveles() {
+  RegistrarNiveles() {
     if (this.listNivelesCorrectos.length > 0) {
 
       const data = {
@@ -246,7 +242,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
       this.nivel.RegistrarNivelesPlantilla(data).subscribe({
         next: (res) => {
-          this.toastr.success('Plantilla de Niveles profesionales importada.', 'Operación exitosa.',  {
+          this.toastr.success('Plantilla de Niveles profesionales importada.', 'Operación exitosa.', {
             timeOut: 1500,
           });
           this.LimpiarCampos();
@@ -272,7 +268,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
@@ -286,7 +282,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -365,7 +361,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    sessionStorage.setItem('Títulos', this.nivelTitulos);
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -521,6 +516,11 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.ObtenerNiveles();
   }
 
+
+  /** ************************************************************************************************** **
+   ** **                             METODO DE SELECCION MULTIPLE DE DATOS                            ** **
+   ** ************************************************************************************************** **/
+
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -599,9 +599,10 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
 
   }
+
+  // METODO DE ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
-
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
@@ -633,6 +634,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     )
   }
 
+  // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

@@ -28,17 +28,17 @@ class TiposCargosRutas {
 
         // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE
         this.router.post('/buscar/tipo_cargo/nombre', TokenValidation, TIPOSCARGOSCONTROLADOR.BuscarTipoCargoNombre);
-        // METODO PARA LISTAR TIPO CARGOS
+        // METODO PARA LISTAR TIPO CARGOS   **USADO
         this.router.get('/', TokenValidation, TIPOSCARGOSCONTROLADOR.ListaTipoCargos);
-        // METODO PARA REGISTRAR TIPO CARGO
+        // METODO PARA REGISTRAR TIPO CARGO    **USADO
         this.router.post('/crearCargo', TokenValidation, TIPOSCARGOSCONTROLADOR.CrearCargo);
-        // METODO PARA EDITAR TIPO CARGO
+        // METODO PARA EDITAR TIPO CARGO   **USADO
         this.router.put('/', TokenValidation, TIPOSCARGOSCONTROLADOR.EditarCargo);
-        // METODO PARA ELIMINAR TIPO CARGO
+        // METODO PARA ELIMINAR TIPO CARGO    **USADO
         this.router.delete('/eliminar/:id', TokenValidation, TIPOSCARGOSCONTROLADOR.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
-        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TIPOSCARGOSCONTROLADOR.VerfificarPlantillaTipoCargos);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA   **USADO
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TIPOSCARGOSCONTROLADOR.VerificarPlantillaTipoCargos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla/', TokenValidation, TIPOSCARGOSCONTROLADOR.CargarPlantilla);
     }
 }

@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+
 import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-modalidad',
   templateUrl: './registro-modalidad.component.html',
   styleUrls: ['./registro-modalidad.component.css']
 })
-export class RegistroModalidadComponent implements OnInit{
+
+export class RegistroModalidadComponent implements OnInit {
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -24,8 +27,9 @@ export class RegistroModalidadComponent implements OnInit{
   constructor(
     private toastr: ToastrService,
     private modalidad_: CatModalidadLaboralService,
+    public validar: ValidacionesService,
     public ventana: MatDialogRef<RegistroModalidadComponent>,
-  ){}
+  ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -45,23 +49,20 @@ export class RegistroModalidadComponent implements OnInit{
       ip: this.ip,
     };
     this.modalidad_.CrearModalidadLaboral(modalidadLaboral).subscribe(response => {
-      console.log('response: ',response);
-      if(response.status == '200'){
+      if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,
         });
         this.CerrarVentana();
-      }else if(response.status == '300'){
+      } else if (response.status == '300') {
         this.toastr.warning(response.message, 'Operación fallida.', {
           timeOut: 4000,
         });
-      }else{
+      } else {
         this.toastr.error(response.message, 'Error.', {
           timeOut: 4000,
         });
       }
-
-
     }, error => {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,
@@ -71,27 +72,8 @@ export class RegistroModalidadComponent implements OnInit{
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
-
 
   // METODO PARA CERRAR VENTANA DE REGISTRO
   CerrarVentana() {

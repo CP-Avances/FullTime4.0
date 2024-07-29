@@ -265,7 +265,7 @@ export class ListaHorasExtrasComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('HorasExtras', this.horasExtras);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

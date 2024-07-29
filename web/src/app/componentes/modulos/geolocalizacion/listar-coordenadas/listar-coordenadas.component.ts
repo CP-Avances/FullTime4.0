@@ -220,7 +220,7 @@ export class ListarCoordenadasComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem('Parametros', this.coordenadas);
+
     return {
 
       // ENCABEZADO DE LA PAGINA

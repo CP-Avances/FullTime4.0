@@ -13,7 +13,7 @@ export class CiudadFeriadosService {
   ) { }
 
 
-  // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
+  // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE   **USADO
   BuscarCiudadProvincia(nombre: string) {
     return this.http.get(`${environment.url}/ciudadFeriados/${nombre}`);
   }

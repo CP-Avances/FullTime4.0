@@ -20,7 +20,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class VacunaControlador {
-    // METODO PARA LISTAR TIPO VACUNAS
+    // METODO PARA LISTAR TIPO VACUNAS    **USADO
     ListaVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -39,7 +39,7 @@ class VacunaControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR TIPO VACUNA
+    // METODO PARA REGISTRAR TIPO VACUNA   **USADO
     CrearVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,7 +85,7 @@ class VacunaControlador {
             }
         });
     }
-    // METODO PARA EDITAR VACUNA
+    // METODO PARA EDITAR VACUNA    **USADO
     EditarVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -97,7 +97,7 @@ class VacunaControlador {
                     const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    const consulta = yield database_1.default.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+                    const consulta = yield database_1.default.query(`SELECT * FROM e_cat_vacuna WHERE id = $1`, [id]);
                     const [datosOriginales] = consulta.rows;
                     if (!datosOriginales) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -114,9 +114,9 @@ class VacunaControlador {
                         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                     }
                     const response = yield database_1.default.query(`
-                UPDATE e_cat_vacuna SET nombre = $2
-                WHERE id = $1 RETURNING *
-                `, [id, vacunaEditar]);
+                    UPDATE e_cat_vacuna SET nombre = $2
+                    WHERE id = $1 RETURNING *
+                    `, [id, vacunaEditar]);
                     const [vacunaActualizada] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -148,7 +148,7 @@ class VacunaControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -199,7 +199,7 @@ class VacunaControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -271,7 +271,7 @@ class VacunaControlador {
                             else {
                                 item.observacion = 'Ya existe en el sistema';
                             }
-                            // Discriminación de elementos iguales
+                            // DISCRIMINACION DE ELEMENTOS IGUALES
                             if (duplicados.find((p) => p.vacuna.toLowerCase() === item.vacuna.toLowerCase()) == undefined) {
                                 duplicados.push(item);
                             }
@@ -320,7 +320,7 @@ class VacunaControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA TIPO VACUNA
+    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
@@ -334,8 +334,8 @@ class VacunaControlador {
                     yield database_1.default.query('BEGIN');
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
-                        INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                        `, [vacu]);
+                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+                    `, [vacu]);
                     const [vacuna_emp] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
