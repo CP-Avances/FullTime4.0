@@ -27,7 +27,7 @@ class NotificacionTiempoRealRutas {
         this.router.get('/receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListarNotificacionUsuario);
 
         // RUTAS CONFIGURACION DE RECEPCION DE NOTIFICACIONES CONFIGURAR_ALERTAS 
-   
+
         this.router.post('/config/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearConfiguracion);
         this.router.put('/config/noti-put/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarConfigEmpleado);
 
@@ -46,7 +46,7 @@ class NotificacionTiempoRealRutas {
          ** *************************************************************************************** **/
         // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE
         this.router.post('/mail-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
-        
+
         // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE DESDE LA APLICACION  MÓVIL
         this.router.post('/mail-multiple-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
 
@@ -58,6 +58,8 @@ class NotificacionTiempoRealRutas {
         this.router.post('/mail-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoComunicado);
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS
         this.router.post('/noti-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
+        //------------------------------------------ METODOS APP MOVIL -----------------------------------------------------------------------
+        this.router.get('/info-empl-recieve', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getInfoEmpleadoByCodigo);
 
     }
 }

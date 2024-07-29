@@ -133,6 +133,11 @@ class PermisosRutas {
         this.router.post('/mail-noti-permiso-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoMovil);
         // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoEditarMovil);
+        //-------------------------------------RUTAS APP MOVIL ----------------------------------------------------------
+        this.router.get('/lista-permisos', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByCodigo);
+        this.router.get('/lista-permisosfechas', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByFechasyCodigo);
+        this.router.get('/lista-permisoshoras', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByHorasyCodigo);
+        this.router.post('/insert-permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByHorasyCodigo);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

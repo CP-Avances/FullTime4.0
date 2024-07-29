@@ -283,7 +283,7 @@ class PermisosControlador {
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-                return res.status(200).jsonp({message: 'ok', permiso});
+                return res.status(200).jsonp({ message: 'ok', permiso });
             }
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -482,7 +482,7 @@ class PermisosControlador {
                     DELETE FROM ecm_realtime_notificacion where id_permiso = $1
                     `
                     , [id_permiso]);
-    
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ecm_realtime_notificacion',
@@ -651,7 +651,7 @@ class PermisosControlador {
         let permisosCorrectos: any = [];
         let mensaje: string = '';
 
-        for ( const datos of permisosArray ) {
+        for (const datos of permisosArray) {
             const { message, error, permiso } = await CrearPermiso(datos);
             mensaje = message;
 
@@ -664,17 +664,17 @@ class PermisosControlador {
             if (datos.subir_documento) {
                 try {
                     const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
-    
+
                     const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
                     const numeroPermiso = consulta.rows[0].numero_permiso;
-        
+
                     const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
                     permiso.nombreArchivo = nombreArchivo;
-    
+
                     fs.copyFileSync(documentoTemporal, documento);
-                    
+
                     const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = await RegistrarDocumentoPermiso(permiso);
-    
+
                     if (errorDoc) {
                         console.error('Error al registrar documento:', messageDoc);
                         errorPermisos = true;
@@ -682,8 +682,8 @@ class PermisosControlador {
                     }
 
                     permiso.documento = nombreDocumento;
-    
-                    
+
+
                 } catch (error) {
                     console.error('Error al copiar el archivo:', error);
                     errorPermisos = true;
@@ -691,8 +691,8 @@ class PermisosControlador {
                 }
             }
 
-            const permisoCreado = {datos, permiso};
-                
+            const permisoCreado = { datos, permiso };
+
             permisosCorrectos.push(permisoCreado);
         }
 
@@ -715,7 +715,7 @@ class PermisosControlador {
     // METODO PARA GUARDAR DOCUMENTOS DE PERMISOS MULTIPLES
     public async GuardarDocumentosPermisosMultiples(req: Request, res: Response): Promise<any> {
         try {
-            
+
         } catch (error) {
 
         }
@@ -1638,6 +1638,116 @@ class PermisosControlador {
             res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' + datos });
         }
     }
+    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+
+    public async getlistaPermisosByCodigo(req: Request, res: Response): Promise<Response> {
+        try {
+            const { codigo } = req.query;
+            const subquery = '( select i.descripcion from mp_cat_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso ';
+            const subquery1 = '( select (nombre || \' \' || apellido) from eu_empleados i where i.id = p.id_empleado) as nempleado ';
+            const query = `SELECT p.*, ${subquery}, ${subquery1} FROM mp_solicitud_permiso p WHERE p.id_empleado = '${codigo}' ORDER BY p.numero_permiso DESC LIMIT 100`
+            const response: QueryResult = await pool.query(query);
+            const permisos: any[] = response.rows;
+            return res.status(200).jsonp(permisos);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
+
+    public async getlistaPermisosByFechasyCodigo(req: Request, res: Response): Promise<Response> {
+        try {
+            const { fec_inicio, fec_final, codigo } = req.query;
+            const PERMISO = await pool.query(`SELECT * FROM mp_solicitud_permiso p 
+            WHERE p.id_empleado::varchar = $1 
+            AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3)))
+             `
+                , [codigo, fec_inicio, fec_final]);
+
+            return res.status(200).jsonp(PERMISO.rows);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
+    public async getlistaPermisosByHorasyCodigo(req: Request, res: Response): Promise<Response> {
+        try {
+            const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.query;
+
+            console.log("fecha Inicio: ", fec_inicio,)
+            console.log("fecha Inicio: ", fec_final,)
+            console.log('hora inicio: ', hora_inicio)
+            console.log('hora final: ', hora_final)
+
+            const PERMISO = await pool.query(`SELECT id FROM mp_solicitud_permiso p 
+            WHERE p.id_empleado::varchar = $1 
+            AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3))) 
+            AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `
+                , [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
+
+            return res.status(200).jsonp(PERMISO.rows);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
+
+    public async postNuevoPermiso(req: Request, res: Response): Promise<Response> {
+        try {
+
+            const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
+                id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
+                documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
+
+            await pool.query('BEGIN');
+
+
+
+            const response: QueryResult = await pool.query(
+                'INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
+                'dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
+                'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
+                'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
+                'RETURNING * ',
+                [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
+                    id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
+                    documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
+            const fechaCreacionN = await FormatearFecha2(fecha_creacion.toLocaleString(), 'ddd');
+            const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+            const horaIngresoN = await FormatearHora(hora_ingreso);
+            const horaSalidaN = await FormatearHora(hora_salida);
+            const horasPermisoN = await FormatearHora(horas_permiso);
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{id_empleado_contrato: ${id_empleado_contrato}, id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+                ip: ip,
+                observacion: null
+            });
+
+
+            await pool.query('COMMIT');
+
+
+            const [objetoPermiso] = response.rows;
+
+            if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+
+            const permiso: any = objetoPermiso
+            return res.status(200).jsonp(permiso);
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    }
+
+
+
 
 }
 
@@ -1790,7 +1900,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             [depa_user_loggin]).then((result: any) => { return result.rows });
 
         if (JefesDepartamentos.length === 0) {
-            return {message: 'Revisar configuración de departamento y autorización de solicitudes.', error: false, permiso};
+            return { message: 'Revisar configuración de departamento y autorización de solicitudes.', error: false, permiso };
         }
         else {
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
@@ -1807,7 +1917,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const {id, codigo, nombreArchivo, user_name, ip, eliminar} = datos;
+        const { id, codigo, nombreArchivo, user_name, ip, eliminar } = datos;
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1886,7 +1996,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
             await EliminarDocumentoServidor(codigo, datosOriginales.documento);
         }
 
-        return {message: 'Documento actualizado.', error: false, documento};
+        return { message: 'Documento actualizado.', error: false, documento };
     } catch (error) {
         // REVERTIR TRANSACCION
         console.log('Error al registrar documento del permiso: ', error);
@@ -1895,7 +2005,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
     }
 }
 
-async function EliminarDocumentoServidor(codigo: string, nombreDocumento: string){
+async function EliminarDocumentoServidor(codigo: string, nombreDocumento: string) {
 
     const carpetaPermisos = await ObtenerRutaPermisos(codigo);
     const separador = path.sep;

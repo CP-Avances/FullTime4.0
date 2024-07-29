@@ -678,6 +678,31 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
+    getInfoEmpleadoByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo } = req.query;
+                const query = `
+            SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            da.correo, da.codigo, da.estado, da.id_sucursal, da.id_contrato,
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
+            FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn            
+            WHERE da.id = ${codigo} AND cn.id_empleado = da.id
+            `;
+                const response = yield database_1.default.query(query);
+                const [infoEmpleado] = response.rows;
+                console.log("ver", response.rows);
+                console.log(infoEmpleado);
+                return res.status(200).jsonp(infoEmpleado);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 const generarTablaHTMLWeb = function (datos) {
     return __awaiter(this, void 0, void 0, function* () {

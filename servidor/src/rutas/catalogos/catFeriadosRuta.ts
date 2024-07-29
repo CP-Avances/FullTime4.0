@@ -70,7 +70,7 @@ class FeriadosRuta {
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos);
         this.router.post('/upload/crearFeriado', [TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado);
         this.router.post('/upload/crearFeriadoCiudad', [TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado_Ciudad);
-
+        this.router.get('/cg-feriados', TokenValidation, FERIADOS_CONTROLADOR.getCgFeriados)
     }
 }
 

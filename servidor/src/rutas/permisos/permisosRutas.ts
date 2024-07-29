@@ -141,6 +141,12 @@ class PermisosRutas {
         this.router.post('/mail-noti-permiso-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoMovil);
         // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoEditarMovil);
+        //-------------------------------------RUTAS APP MOVIL ----------------------------------------------------------
+        this.router.get('/lista-permisos',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByCodigo)
+        this.router.get('/lista-permisosfechas',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByFechasyCodigo)
+        this.router.get('/lista-permisoshoras', TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByHorasyCodigo)
+        this.router.post('/insert-permiso', TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByHorasyCodigo)
+
 
     }
 }

@@ -293,7 +293,7 @@ class ParametrosControlador {
 
     //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
 
-    public async BuscarFechasHoras(req: Request, res: Response): Promise<Response> {
+    public async BuscarFechasHoras(req: Request,res: Response): Promise<Response> {
         try {
             let formato_fecha = await BuscarFecha();
             let formato_hora = await BuscarHora();

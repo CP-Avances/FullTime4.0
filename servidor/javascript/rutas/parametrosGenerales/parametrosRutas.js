@@ -19,7 +19,7 @@ class ParametrosRutas {
         // METODO PARA VER DATOS DE UN PARAMETRO
         this.router.get('/ver-parametro/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
-        this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
+        this.router.get('/buscar-formato', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // METODO PARA ELIMINAR DETALLE DE PARAMETRO
         this.router.delete('/eliminar-detalle/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.EliminarDetalleParametro);
         // METODO PARA REGISTRAR DETALLE DE PARAMETRO
@@ -28,8 +28,7 @@ class ParametrosRutas {
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
-        //-------------------------------- METODOS APP WEB ------------------------------------
-        this.router.get('/buscarformatos', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
+        this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
     }
 }
 const PARAMETROS_RUTAS = new ParametrosRutas();

@@ -63,6 +63,7 @@ class FeriadosRuta {
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos);
         this.router.post('/upload/crearFeriado', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RegistrarFeriado);
         this.router.post('/upload/crearFeriadoCiudad', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RegistrarFeriado_Ciudad);
+        this.router.get('/cg-feriados', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.getCgFeriados);
     }
 }
 const FERIADOS_RUTA = new FeriadosRuta();

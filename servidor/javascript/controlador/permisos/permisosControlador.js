@@ -1471,6 +1471,103 @@ class PermisosControlador {
             }
         });
     }
+    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+    getlistaPermisosByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo } = req.query;
+                const subquery = '( select i.descripcion from mp_cat_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso ';
+                const subquery1 = '( select (nombre || \' \' || apellido) from eu_empleados i where i.id = p.id_empleado) as nempleado ';
+                const query = `SELECT p.*, ${subquery}, ${subquery1} FROM mp_solicitud_permiso p WHERE p.id_empleado = '${codigo}' ORDER BY p.numero_permiso DESC LIMIT 100`;
+                const response = yield database_1.default.query(query);
+                const permisos = response.rows;
+                return res.status(200).jsonp(permisos);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getlistaPermisosByFechasyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fec_inicio, fec_final, codigo } = req.query;
+                const PERMISO = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso p 
+            WHERE p.id_empleado::varchar = $1 
+            AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3)))
+             `, [codigo, fec_inicio, fec_final]);
+                return res.status(200).jsonp(PERMISO.rows);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getlistaPermisosByHorasyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.query;
+                console.log("fecha Inicio: ", fec_inicio);
+                console.log("fecha Inicio: ", fec_final);
+                console.log('hora inicio: ', hora_inicio);
+                console.log('hora final: ', hora_final);
+                const PERMISO = yield database_1.default.query(`SELECT id FROM mp_solicitud_permiso p 
+            WHERE p.id_empleado::varchar = $1 
+            AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3))) 
+            AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `, [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
+                return res.status(200).jsonp(PERMISO.rows);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    postNuevoPermiso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query('INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
+                    'dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
+                    'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
+                    'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
+                    'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
+                    id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
+                    documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
+                const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fecha_creacion.toLocaleString(), 'ddd');
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+                const fechaFinN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+                const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
+                const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
+                const horasPermisoN = yield (0, settingsMail_1.FormatearHora)(horas_permiso);
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mp_solicitud_permiso',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_empleado_contrato: ${id_empleado_contrato}, id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                yield database_1.default.query('COMMIT');
+                const [objetoPermiso] = response.rows;
+                if (!objetoPermiso)
+                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+                const permiso = objetoPermiso;
+                return res.status(200).jsonp(permiso);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
 }
 // METODO PARA CREAR TABLA DE USUARIOS
 const generarTablaHTMLWeb = function (datos, tipo) {

@@ -43,6 +43,8 @@ class NotificacionTiempoRealRutas {
         this.router.post('/mail-comunicado/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarCorreoComunicado);
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS
         this.router.post('/noti-comunicado/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarNotificacionGeneral);
+        //------------------------------------------ METODOS APP MOVIL -----------------------------------------------------------------------
+        this.router.get('/info-empl-recieve', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getInfoEmpleadoByCodigo);
     }
 }
 const NOTIFICACION_TIEMPO_REAL_RUTAS = new NotificacionTiempoRealRutas();

@@ -90,7 +90,7 @@ class LoginControlador {
                     caducidad_licencia = fec_desactivacion;
                     // BUSQUEDA DE INFORMACION
                     const INFORMACION = yield database_1.default.query(`
-           SELECT empl.nombre, empl.apellido, empl.cedula, e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
+           SELECT empl.nombre, empl.apellido, empl.cedula, empl.codigo, e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
             c.id AS id_cargo, cg_e.ruc ,cg_e.acciones_timbres, cg_e.public_key, 
             (SELECT id FROM mv_periodo_vacacion pv WHERE pv.id_empleado = empl.id 
             ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
@@ -124,7 +124,7 @@ class LoginControlador {
                                     caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                                     departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                                     empresa: id_empresa, cargo: id_cargo, estado: autoriza_est, ip_adress: ip_cliente,
-                                    modulos: modulos, id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, ruc: ruc, version: '4.0.0'
+                                    modulos: modulos, id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version: '4.0.0'
                                 });
                             }
                             else {
@@ -138,7 +138,7 @@ class LoginControlador {
                                     caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                                     departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                                     empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, modulos: modulos,
-                                    id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, ruc: ruc, version: '4.0.0'
+                                    id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version: '4.0.0'
                                 });
                             }
                         }

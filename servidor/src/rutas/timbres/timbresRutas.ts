@@ -39,7 +39,8 @@ class TimbresRutas {
         this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
         this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
-        
+        this.router.post('/atraso',TokenValidation, TIMBRES_CONTROLADOR.justificarAtraso);
+        this.router.get('/timbreEmpleado/:idUsuario',TokenValidation,  TIMBRES_CONTROLADOR.getTimbreById);
     }
 }
 
