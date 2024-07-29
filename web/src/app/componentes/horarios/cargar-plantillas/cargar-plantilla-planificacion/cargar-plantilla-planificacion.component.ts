@@ -385,7 +385,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // OBTENER NOMBRE DE USUARIO
   ObtenerNombreUsuario(nombre: any, usuario: any) {
-    return nombre ? nombre : 'Empleado no válido';
+    return nombre ? nombre : 'Empleado no existe en el sistema';
   }
 
   ManejarPaginaResultados(e: PageEvent) {
