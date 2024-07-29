@@ -180,13 +180,19 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     for (let i = 0; i < this.archivo.length; i++) {
       formData.append("uploads", this.archivo[i], this.archivo[i].name);
     }
-    this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe( (res: any) => {
-      this.OrganizarDatosPlanificacion(res);
-      this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
-        timeOut: 6000,
-      });
+    this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe({
+      next: (res: any) => {
+        this.OrganizarDatosPlanificacion(res);
+        this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
+          timeOut: 6000,
+        });
+      },
+      error: (error: any) => {
+        this.toastr.error('Error al verificar la plantilla de planificación horaria', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
     });
-
   }
 
   // METODO PARA ORGANIZAR LOS DATOS DE LA PLANIFICACION

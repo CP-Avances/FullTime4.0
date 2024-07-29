@@ -11,121 +11,131 @@ class PlanificacionHorariaControlador {
 
     //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
-        const documento = req.file?.originalname;
-
-        let separador = path.sep;
-        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-        const workbook = excel.readFile(ruta);
-        const sheet_name_list = workbook.SheetNames;
-        const plantillaPlanificacionHoraria: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        const plantillaPlanificacionHorariaHeaders: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
-
-        // OBTENER FECHA DE LA PLANTILLA
-        const segundaColumna = plantillaPlanificacionHorariaHeaders[0][2];
-
-        let [diaSemana, fecha] = segundaColumna.split(', ');
-        let [dia, mes, ano] = fecha.split('/');
-        let fechaFormateada: string = `${dia}/${mes}/${ano}`;
-        let fechaInicial: string;
-        let fechaFinal: string;
-
         try {
-            let fechaEntrada = moment.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
+            const documento = req.file?.originalname;
+    
+            let separador = path.sep;
+            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+            const workbook = excel.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
+            const plantillaPlanificacionHoraria: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            const plantillaPlanificacionHorariaHeaders: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
+    
+            // OBTENER FECHA DE LA PLANTILLA
+            const terceraColumna = plantillaPlanificacionHorariaHeaders[0][2];
 
-            // RESTAR 1 DIA A LA FECHA DE ENTRADA
-            fechaInicial = moment.utc(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
-
-            // SUMAR 1 MES A LA FECHA DE ENTRADA
-            fechaFinal = moment.utc(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
-
-        } catch (error) {
-            res.json({ error: 'Fecha no valida' });
-            return;
-        }
-
-        // FILTRAR PLANTILLA PLANIFICACION HORARIA PARA ELIMINAR LOS REGISTROS VACIOS
-        const plantillaPlanificacionHorariaFiltrada = plantillaPlanificacionHoraria.filter((data: any) => {
-            return Object.keys(data).length > 1;
-        });
-
-        // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
-        let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
-            let nuevoObjeto: { cedula: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { cedula: data.CEDULA, dias: {} };
-
-            // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
-            for (let propiedad in data) {
-                if (propiedad !== 'EMPLEADO' && propiedad !== 'CEDULA') {
-                    let [diaSemana, fecha] = propiedad.split(', ');
-                    let [dia, mes, ano] = fecha.split('/');
-                    let fechaFormateada = `${ano}-${mes}-${dia}`;
-                    nuevoObjeto.dias[fechaFormateada] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
+            if (!terceraColumna) {
+                throw new Error('Estructura de la plantilla de planificación horaria incorrecta');
+            }
+    
+            let [diaSemana, fecha] = terceraColumna.split(', ');
+            let [dia, mes, ano] = fecha.split('/');
+            let fechaFormateada: string = `${dia}/${mes}/${ano}`;
+            let fechaInicial: string;
+            let fechaFinal: string;
+    
+            try {
+                let fechaEntrada = moment.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
+    
+                // RESTAR 1 DIA A LA FECHA DE ENTRADA
+                fechaInicial = moment.utc(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
+    
+                // SUMAR 1 MES A LA FECHA DE ENTRADA
+                fechaFinal = moment.utc(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
+    
+            } catch (error) {
+                res.json({ error: 'Fecha no valida' });
+                return;
+            }
+    
+            // FILTRAR PLANTILLA PLANIFICACION HORARIA PARA ELIMINAR LOS REGISTROS VACIOS
+            const plantillaPlanificacionHorariaFiltrada = plantillaPlanificacionHoraria.filter((data: any) => {
+                return Object.keys(data).length > 1;
+            });
+    
+            // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
+            let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
+                let nuevoObjeto: { cedula: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { cedula: data.CEDULA, dias: {} };
+    
+                // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
+                for (let propiedad in data) {
+                    if (propiedad !== 'EMPLEADO' && propiedad !== 'CEDULA') {
+                        let [diaSemana, fecha] = propiedad.split(', ');
+                        let [dia, mes, ano] = fecha.split('/');
+                        let fechaFormateada = `${ano}-${mes}-${dia}`;
+                        nuevoObjeto.dias[fechaFormateada] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
+                    }
                 }
+    
+                return nuevoObjeto;
+            });
+    
+            // VERIFICAR EMPLEADO, HORARIOS Y SOBREPOSICION DE HORARIOS
+            for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
+                let { cedula: cedula } = data;
+    
+                cedula = cedula.toString();
+    
+                // VERIFICAR DATO REQUERIDO EMPLEADO
+                if (!cedula) {
+                    data.observacion = 'Datos no registrados: EMPLEADO';
+                    continue;
+                }
+    
+                // VERIFICAR EMPLEADO DUPLICADO
+                if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === cedula).length > 1) {
+                    data.observacion = 'Empleado duplicado';
+                    continue;
+                }
+    
+                // VERIFICAR EXISTENCIA DE EMPLEADO
+                const empleadoVerificado = await VerificarEmpleado(cedula);
+    
+                if (!empleadoVerificado[0]) {
+                    data.observacion = empleadoVerificado[2];
+                    data.dias = {};
+                    continue;
+                } else {
+                    data.codigo_empleado = empleadoVerificado[1].codigo;
+                    data.id_empleado = empleadoVerificado[1].id;
+                    data.id_empl_cargo = empleadoVerificado[1].id_cargo;
+                    data.nombre_usuario = `${empleadoVerificado[1].nombre} ${empleadoVerificado[1].apellido}`;
+                    data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
+                    data.cedula_empleado = empleadoVerificado[1].cedula;
+                }
+    
+                // VERIFICAR HORARIOS
+                const datosVerificacionHorarios: DatosVerificacionHorarios = {
+                    dias: data.dias,
+                    fecha_inicio: fechaInicial,
+                    fecha_final: fechaFinal,
+                    id_empleado: data.id_empleado,
+                    hora_trabaja: data.hora_trabaja
+                };
+    
+                data.dias = await VerificarHorarios(datosVerificacionHorarios);
+    
+                // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
+                const datosVerificacionSobreposicionHorarios: DatosVerificacionSuperposicionHorarios = {
+                    dias: data.dias,
+                    id_empleado: data.id_empleado,
+                    fecha_inicio: fechaInicial,
+                    fecha_final: fechaFinal
+                };
+    
+                data.dias = await VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
             }
-
-            return nuevoObjeto;
-        });
-
-        // VERIFICAR EMPLEADO, HORARIOS Y SOBREPOSICION DE HORARIOS
-        for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
-            let { cedula: cedula } = data;
-
-            cedula = cedula.toString();
-
-            // VERIFICAR DATO REQUERIDO EMPLEADO
-            if (!cedula) {
-                data.observacion = 'Datos no registrados: EMPLEADO';
-                continue;
-            }
-
-            // VERIFICAR EMPLEADO DUPLICADO
-            if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === cedula).length > 1) {
-                data.observacion = 'Empleado duplicado';
-                continue;
-            }
-
-            // VERIFICAR EXISTENCIA DE EMPLEADO
-            const empleadoVerificado = await VerificarEmpleado(cedula);
-
-            if (!empleadoVerificado[0]) {
-                data.observacion = empleadoVerificado[2];
-                data.dias = {};
-                continue;
-            } else {
-                data.codigo_empleado = empleadoVerificado[1].codigo;
-                data.id_empleado = empleadoVerificado[1].id;
-                data.id_empl_cargo = empleadoVerificado[1].id_cargo;
-                data.nombre_usuario = `${empleadoVerificado[1].nombre} ${empleadoVerificado[1].apellido}`;
-                data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
-                data.cedula_empleado = empleadoVerificado[1].cedula;
-            }
-
-            // VERIFICAR HORARIOS
-            const datosVerificacionHorarios: DatosVerificacionHorarios = {
-                dias: data.dias,
-                fecha_inicio: fechaInicial,
-                fecha_final: fechaFinal,
-                id_empleado: data.id_empleado,
-                hora_trabaja: data.hora_trabaja
-            };
-
-            data.dias = await VerificarHorarios(datosVerificacionHorarios);
-
-            // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
-            const datosVerificacionSobreposicionHorarios: DatosVerificacionSuperposicionHorarios = {
-                dias: data.dias,
-                id_empleado: data.id_empleado,
-                fecha_inicio: fechaInicial,
-                fecha_final: fechaFinal
-            };
-
-            data.dias = await VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
+    
+    
+            const fechaInicioMes = moment.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
+            const fechaFinalMes = moment.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
+    
+            res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
+        } catch (error) {
+            console.log(error.message);
+            return res.status(404).jsonp({ message: error.message });
+            
         }
-
-
-        const fechaInicioMes = moment.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
-        const fechaFinalMes = moment.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
-
-        res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
     }
 
     //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
