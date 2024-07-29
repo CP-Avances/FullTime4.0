@@ -386,7 +386,7 @@ function VerificarHorarios(datos) {
                     if (!horarioVerificado[0]) {
                         horariosNoValidos.push(horario);
                         // AÑADIR OBSERVACION A HORARIO
-                        dias[dia].horarios[i].observacion = `Horario no valido`;
+                        dias[dia].horarios[i].observacion = `Horario no existe en el sistema`;
                     }
                     else {
                         // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
