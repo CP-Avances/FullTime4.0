@@ -221,7 +221,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
-      console.log(this.planificacionesHorarias);
 
     }
   }
@@ -379,7 +378,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA OBTENER EL COLOR DEL USUARIO
   ObtenerColorEmpleado(observacion: string) {
-    console.log('observacion', observacion);
     if(observacion === 'Empleado no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
   }
 
