@@ -364,23 +364,30 @@ export class PrincipalHorarioComponent implements OnInit {
 
     }
 
-    this.rest.VerificarDatosHorario(formData).subscribe(res => {
-      this.dataHorarios = res;
-      this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
-        if (obj.OBSERVACION == 'Ok') {
-          this.listaHorariosCorrectos.push(obj);
-        }
-      });
-      this.dataHorarios.plantillaDetalles.forEach((obj: any) => {
-        if (obj.OBSERVACION == 'Ok') {
-          this.listaDetalleCorrectos.push(obj);
-        }
-      });
-      this.OrdenarHorarios();
-      this.OrdenarDetalles();
+    this.rest.VerificarDatosHorario(formData).subscribe({
+      next: (res) => {
+        this.dataHorarios = res;
+        this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
+          if (obj.OBSERVACION == 'Ok') {
+            this.listaHorariosCorrectos.push(obj);
+          }
+        });
+        this.dataHorarios.plantillaDetalles.forEach((obj: any) => {
+          if (obj.OBSERVACION == 'Ok') {
+            this.listaDetalleCorrectos.push(obj);
+          }
+        });
+        this.OrdenarHorarios();
+        this.OrdenarDetalles();
 
-      this.horariosCorrectos = this.listaHorariosCorrectos.length;
-      this.detallesCorrectos = this.listaDetalleCorrectos.length;
+        this.horariosCorrectos = this.listaHorariosCorrectos.length;
+        this.detallesCorrectos = this.listaDetalleCorrectos.length;
+      },
+      error: (err) => {
+        this.toastr.error('Error al verificar la plantilla.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
     });
   }
 
