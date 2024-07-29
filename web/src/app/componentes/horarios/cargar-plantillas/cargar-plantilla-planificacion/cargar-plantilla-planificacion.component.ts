@@ -367,6 +367,8 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     switch (observacion) {
       case 'OK':
         return 'rgb(19, 191, 65)';
+      case 'FD':
+        return 'rgb(22, 19, 191)';
       default:
         return 'rgb(242, 21, 21)';
     }

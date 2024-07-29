@@ -451,8 +451,9 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
 
                     // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                     if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
-                        dias[dia].horarios[i].observacion = `Horario no valido para día feriado`;
+                        dias[dia].horarios[i].observacion = `Horario no válido para día feriado`;
                         dias[dia].observacion3 = `Este día no permite horarios laborables`;
+                        dias[dia].observacion5 = 'FD';
                         dias[dia].horarios[i].default = 'DEFAULT-FERIADO';
                         horariosNoValidos.push(horario);
                     } else {
@@ -463,7 +464,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
                 }
             }
 
-            dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos` : 'OK';
+            dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no válidos` : 'OK';
 
             // VERIFICAR HORAS TOTALES DE HORARIOS
             if (horasTotales > hora_trabaja) {

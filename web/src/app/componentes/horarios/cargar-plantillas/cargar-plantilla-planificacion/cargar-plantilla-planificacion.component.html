@@ -116,7 +116,9 @@
                         <div [style.color]="ObtenerColorObservacion(dia.observacion)">
                           {{dia.observacion}}
                         </div>
-                        <br>
+                        <div *ngIf="dia.observacion5" [style.color]="ObtenerColorObservacion(dia.observacion5)">
+                          {{dia.observacion5}}
+                        </div>
                         <div class="icon-container">
                           <i id="ver" *ngIf="MostrarVisualizarObservacion(dia)"
                             class="fa fa-eye" matSuffix matTooltipPosition="right"
