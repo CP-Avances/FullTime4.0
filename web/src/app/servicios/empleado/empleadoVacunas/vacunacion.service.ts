@@ -13,7 +13,7 @@ export class VacunacionService {
 
   ) { }
 
-  // METODO PARA BUSCAR REGISTROS DE VACUNA DE UN EMPLEADO
+  // METODO PARA BUSCAR REGISTROS DE VACUNA DE UN EMPLEADO   **USADO
   ObtenerVacunaEmpleado(id_empleado: number) {
     return this.http.get(`${environment.url}/vacunas/${id_empleado}`);
   }
@@ -53,7 +53,7 @@ export class VacunacionService {
     return this.http.put(`${environment.url}/vacunas/eliminar_carnet/base_servidor`, datos)
   }
 
-  // METODO PARA ELIMINAR REGISTRO VACUNA EMPLEADO
+  // METODO PARA ELIMINAR REGISTRO VACUNA EMPLEADO    **USADO
   EliminarRegistroVacuna(id: number, documento: string, datos: any) {
     const url = `${environment.url}/vacunas/eliminar/${id}/${documento}`;
     const httpOptions = {
@@ -61,11 +61,5 @@ export class VacunacionService {
     };
     return this.http.request('delete', url, httpOptions);
   }
-
-  // METODO DE REGISTROS DE TIPO DE VACUNACION
-  // CrearTipoVacuna(data: any) {
-  //   return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data).pipe(catchError(data));
-  // }
-
 
 }

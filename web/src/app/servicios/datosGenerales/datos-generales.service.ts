@@ -12,7 +12,7 @@ export class DatosGeneralesService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS
+  // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS    **USADO
   ObtenerInformacionGeneral(estado: any) {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`);
   }
@@ -47,7 +47,7 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${environment.url}/generalidades/datos_generales_comunicados-jefe/${estado}`, data);
   }
 
-  // METODO PARA CONSULTAR DATOS DEL USUARIO
+  // METODO PARA CONSULTAR DATOS DEL USUARIO    **USADO
   ObtenerDatosActuales(id_empleado: number) {
     return this.http.get(`${environment.url}/generalidades/datos-actuales/${id_empleado}`);
   }
@@ -83,7 +83,7 @@ export class DatosGeneralesService {
     return this.http.get(`${environment.url}/generalidades/info_actual_id`);
   }
 
-  // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
+  // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES   **USADO
   InformarEmpleadoAutoriza(id_empleado: number) {
     return this.http.get(`${environment.url}/generalidades/empleadoAutoriza/${id_empleado}`);
   }

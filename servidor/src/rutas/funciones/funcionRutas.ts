@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import FUNCIONES_CONTROLADOR from '../../controlador/funciones/funcionControlador';
-import { TokenValidation } from '../../libs/verificarToken'
 
 class DoumentosRutas {
     public router: Router = Router();
@@ -10,7 +9,7 @@ class DoumentosRutas {
     }
 
     configuracion(): void {
-        // METODO PARA LISTAR FUNCIONES DEL SISTEMA
+        // METODO PARA LISTAR FUNCIONES DEL SISTEMA   **USO TEMPORAL
         this.router.get('/funcionalidad', FUNCIONES_CONTROLADOR.ConsultarFunciones);
     }
 }

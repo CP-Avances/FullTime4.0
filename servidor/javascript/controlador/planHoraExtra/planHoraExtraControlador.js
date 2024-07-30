@@ -377,7 +377,7 @@ class PlanHoraExtraControlador {
             }
         });
     }
-    // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
+    // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO    **USADO
     EliminarPlanEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -427,7 +427,7 @@ class PlanHoraExtraControlador {
             }
         });
     }
-    // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO -- verificar si se requiere estado
+    // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO    **USADO
     BuscarPlanUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -448,9 +448,9 @@ class PlanHoraExtraControlador {
         });
     }
     /** ********************************************************************************************* **
-     ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACIÓN DE HORAS EXTRAS                  **
+     ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACION DE HORAS EXTRAS                  **
      ** ********************************************************************************************* **/
-    // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS -- verificar si se requiere estado
+    // METODO ENVIO CORREO DESDE APLICACION WEB CREACIoN DE PLANIFICACION DE HORAS EXTRAS   **USADO
     EnviarCorreoPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -550,9 +550,9 @@ class PlanHoraExtraControlador {
         });
     }
     /** ********************************************************************************************* **
-     ** *             ENVIO DE NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                      * **
+     ** *             ENVIO DE NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS                      * **
      ** ********************************************************************************************* **/
-    // ENVIO DE NOTIFICACION DE PLANIFICACION DE HORAS EXTRAS
+    // ENVIO DE NOTIFICACION DE PLANIFICACION DE HORAS EXTRAS   **USADO
     EnviarNotiPlanHE(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

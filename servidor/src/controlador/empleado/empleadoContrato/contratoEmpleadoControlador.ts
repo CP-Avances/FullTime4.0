@@ -183,7 +183,7 @@ class ContratoEmpleadoControlador {
     }
 
 
-    // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO
+    // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO   **USADO
     public async BuscarContratoEmpleado(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
         const CONTRATO_EMPLEADO = await pool.query(
@@ -414,13 +414,13 @@ class ContratoEmpleadoControlador {
         res.jsonp({ message: 'Documento actualizado.' });
     }
 
-    // METODO PARA BUSCAR ID ACTUAL
+    // METODO PARA BUSCAR ID ACTUAL   ** USADO
     public async EncontrarIdContratoActual(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
         const CONTRATO = await pool.query(
             `
-            SELECT MAX(ec.id) FROM eu_empleado_contratos AS ec, eu_empleados AS e 
-            WHERE ec.id_empleado = e.id AND e.id = $1
+            SELECT * FROM ultimo_contrato AS uc 
+            WHERE uc.id_empleado = $1
             `
             , [id_empleado]);
         if (CONTRATO.rowCount != 0) {
@@ -436,7 +436,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // METODO PARA BUSCAR DATOS DE CONTRATO POR ID 
+    // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
     public async EncontrarDatosUltimoContrato(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const CONTRATO = await pool.query(
@@ -569,7 +569,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
         const documento = req.file?.originalname;
         let separador = path.sep;
@@ -599,13 +599,12 @@ class ContratoEmpleadoControlador {
             var duplicados: any = [];
             var mensaje: string = 'correcto';
 
-
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach(async (dato: any) => {
                 var { ITEM, CEDULA, PAIS, REGIMEN_LABORAL, MODALIDAD_LABORAL, FECHA_DESDE, FECHA_HASTA,
                     CONTROLAR_ASISTENCIA, CONTROLAR_VACACIONES, TIPO_CARGO } = dato;
 
-                //Verificar que el registo no tenga datos vacios
+                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                 if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
                     (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
                     (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined) &&
@@ -618,37 +617,32 @@ class ContratoEmpleadoControlador {
 
                     data.observacion = 'no registrado';
 
-                    //Valida si los datos de la columna cedula son numeros.
+                    // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                     const rege = /^[0-9]+$/;
                     if (rege.test(data.cedula)) {
                         if (data.cedula.toString().length != 10) {
                             data.observacion = 'La cédula ingresada no es válida';
                         } else {
-                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                             if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                 if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { } else {
                                     data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
                                 }
                             } else {
                                 data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
                             }
-
-
                         }
                     } else {
                         data.observacion = 'La cédula ingresada no es válida';
                     }
-
                     listContratos.push(data);
-
                 } else {
                     data.fila = ITEM;
                     data.cedula = CEDULA; data.pais = PAIS;
                     data.regimen_la = REGIMEN_LABORAL; data.modalida_la = MODALIDAD_LABORAL;
                     data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
                     data.control_asis = CONTROLAR_ASISTENCIA; data.control_vaca = CONTROLAR_VACACIONES;
-
                     data.observacion = 'no registrado';
 
                     if (data.fila == '' || data.fila == undefined) {
@@ -687,23 +681,25 @@ class ContratoEmpleadoControlador {
                     if (CEDULA == undefined) {
                         data.cedula = 'No registrado'
                         data.observacion = 'Cédula ' + data.observacion;
-                    } else {
-                        //Valida si los datos de la columna cedula son numeros.
+                    }
+                    else {
+                        // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
                             if (data.cedula.toString().length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
                             } else {
-                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                 if (data.fecha_desde != 'No registrado') {
                                     if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                        // Verificar si la variable tiene el formato de fecha correcto con moment
+                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                         if (data.fecha_hasta != 'No registrado') {
                                             if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
                                                 if (data.control_vaca != 'No registrado') {
                                                     if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
                                                         data.observacion = 'Control de vacaciones es incorrecto'
-                                                    } else {
+                                                    }
+                                                    else {
                                                         if (data.control_asis != 'No registrado') {
                                                             if (data.control_asis.toUpperCase() != 'NO' && data.control_asis.toUpperCase() != 'SI') {
                                                                 data.observacion = 'Control de asistencia es incorrecto'
@@ -711,28 +707,25 @@ class ContratoEmpleadoControlador {
                                                         }
                                                     }
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                                             }
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
                                     }
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             data.observacion = 'La cédula ingresada no es válida';
                         }
-
                     }
-
                     listContratos.push(data);
-
-
                 }
-
                 data = {}
-
             });
 
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -748,76 +741,83 @@ class ContratoEmpleadoControlador {
                 if (valor.observacion == 'no registrado') {
                     var VERIFICAR_CEDULA = await pool.query(
                         `
-                    SELECT * FROM eu_empleados WHERE cedula = $1
-                    `
+                        SELECT * FROM eu_empleados WHERE cedula = $1
+                        `
                         , [valor.cedula]);
                     if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
                         if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                             const fechaRango: any = await pool.query(
                                 `
-                            SELECT * FROM eu_empleado_contratos 
-                            WHERE id_empleado = $1 AND 
-                                ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
-                                fecha_ingreso BETWEEN $2 AND $3)
-                            `
+                                SELECT * FROM eu_empleado_contratos 
+                                WHERE id_empleado = $1 AND 
+                                    ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                                    fecha_ingreso BETWEEN $2 AND $3)
+                                `
                                 , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_desde, valor.fecha_hasta])
 
                             if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                 valor.observacion = 'Existe un contrato vigente en esas fechas'
-                            } else {
+                            }
+                            else {
                                 var VERIFICAR_PAISES = await pool.query(
                                     `
-                                SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
-                                `
+                                    SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                                    `
                                     , [valor.pais.toUpperCase()]);
                                 if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
                                     var id_pais = VERIFICAR_PAISES.rows[0].id
                                     if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
                                         var VERIFICAR_REGIMENES = await pool.query(
                                             `
-                                        SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
-                                        `
+                                            SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                            `
                                             , [valor.regimen_la.toUpperCase()])
                                         if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
                                             if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
                                                 if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
                                                     var VERIFICAR_MODALIDAD = await pool.query(
                                                         `
-                                                    SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                                                    `
+                                                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                        `
                                                         , [valor.modalida_la.toUpperCase()])
                                                     if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
                                                         if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
                                                             valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
                                                         }
-                                                    } else {
+                                                    }
+                                                    else {
                                                         valor.observacion = 'Modalidad Laboral no existe en el sistema'
                                                     }
                                                 }
 
-                                            } else {
+                                            }
+                                            else {
                                                 valor.observacion = 'País no corresponde con el Régimen Laboral'
                                             }
 
-                                        } else {
+                                        }
+                                        else {
                                             valor.observacion = 'Régimen Laboral no existe en el sistema'
                                         }
                                     }
-                                } else {
+                                }
+                                else {
                                     valor.observacion = 'País no existe en el sistema'
                                 }
                             }
                         }
 
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                         if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
                             duplicados.push(valor);
-                        } else {
+                        }
+                        else {
                             valor.observacion = '1';
                         }
 
-                    } else {
+                    }
+                    else {
                         valor.observacion = 'Cédula no existe en el sistema'
                     }
                 }
@@ -826,12 +826,12 @@ class ContratoEmpleadoControlador {
             var tiempo = 2000;
             if (listContratos.length > 500 && listContratos.length <= 1000) {
                 tiempo = 4000;
-            } else if (listContratos.length > 1000) {
+            }
+            else if (listContratos.length > 1000) {
                 tiempo = 7000;
             }
 
             setTimeout(() => {
-
                 listContratos.sort((a: any, b: any) => {
                     // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
@@ -874,16 +874,13 @@ class ContratoEmpleadoControlador {
                 if (mensaje == 'error') {
                     listContratos = undefined;
                 }
-
-                console.log('listContratos: ', listContratos);
-
                 return res.jsonp({ message: mensaje, data: listContratos });
-
             }, tiempo)
         }
 
     }
 
+    // METODO PARA REGISTRAR DATOS DE CONTRATOS   **USADO
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<any> {
         const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
@@ -891,7 +888,7 @@ class ContratoEmpleadoControlador {
         for (const data of plantilla) {
             try {
 
-                const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta,
+                const { cedula, regimen_la, modalida_la, fecha_desde, fecha_hasta,
                     control_asis, control_vaca } = data;
 
                 // INICIAR TRANSACCION
@@ -899,32 +896,34 @@ class ContratoEmpleadoControlador {
 
                 const ID_EMPLEADO: any = await pool.query(
                     `
-                SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
-                `
+                    SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
+                    `
                     , [cedula]);
                 const ID_REGIMEN: any = await pool.query(
                     `
-                SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
-                `
+                    SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                    `
                     , [regimen_la.toUpperCase()]);
                 const ID_TIPO_CONTRATO: any = await pool.query(
                     `
-                SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                `
+                    SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                    `
                     , [modalida_la.toUpperCase()]);
 
-                //Transformar el string en booleano
+                // TRANSFORMAR EL STRING EN BOOLEANO
                 let vaca_controla: any;
                 if (control_vaca.toUpperCase() === 'SI') {
                     vaca_controla = true;
-                } else {
+                }
+                else {
                     vaca_controla = false;
                 }
 
                 let asis_controla: any;
                 if (control_asis.toUpperCase() === 'SI') {
                     asis_controla = true;
-                } else {
+                }
+                else {
                     asis_controla = false;
                 }
 
@@ -934,10 +933,10 @@ class ContratoEmpleadoControlador {
 
                 const response: QueryResult = await pool.query(
                     `
-                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-                    controlar_asistencia, id_regimen, id_modalidad_laboral) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-                `
+                    INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                        controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                    `
                     , [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
                         id_tipo_contrato]);
 
@@ -968,9 +967,7 @@ class ContratoEmpleadoControlador {
         }
 
         return res.status(200).jsonp({ message: 'ok' });
-
     }
-
 }
 
 const CONTRATO_EMPLEADO_CONTROLADOR = new ContratoEmpleadoControlador();

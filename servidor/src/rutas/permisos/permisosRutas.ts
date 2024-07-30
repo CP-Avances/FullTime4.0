@@ -103,9 +103,9 @@ class PermisosRutas {
         this.router.put('/eliminar-documento', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarDocumentoPermiso);
 
 
-        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
+        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO    **USADO
         this.router.get('/permiso-usuario/:id_empleado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerPermisoEmpleado);
-        // BUSCAR INFORMACION DE UN PERMISO
+        // BUSCAR INFORMACION DE UN PERMISO   **USADO
         this.router.get('/informe-un-permiso/:id_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.InformarUnPermiso);
 
         // ELIMINAR PERMISO

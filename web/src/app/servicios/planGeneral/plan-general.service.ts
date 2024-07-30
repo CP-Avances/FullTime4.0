@@ -16,12 +16,12 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
   }
 
-  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
   BuscarFechas(datos: any) {
     return this.http.post(`${environment.url}/planificacion_general/buscar_fechas`, datos);
   }
 
-  // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+  // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {
     return this.http.post<any>(`${environment.url}/planificacion_general/eliminar`, data);
   }
@@ -31,12 +31,12 @@ export class PlanGeneralService {
     return this.http.post(`${environment.url}/planificacion_general/horario-general-fechas`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO  **USADO
   BuscarPlanificacionHoraria(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO   **USADO
   BuscarDetallePlanificacion(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-detalle`, datos);
   }

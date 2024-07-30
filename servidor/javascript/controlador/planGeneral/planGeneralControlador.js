@@ -83,7 +83,7 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     BuscarFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final, id_horario, id_empleado } = req.body;
@@ -99,7 +99,7 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var errores = 0;
@@ -153,7 +153,6 @@ class PlanGeneralControlador {
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
-                    console.log(error);
                     yield database_1.default.query('ROLLBACK');
                     errores++;
                     ocurrioError = true;
@@ -200,12 +199,11 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   **USADO
     ListarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, id_empleado } = req.body;
-                console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', id_empleado);
                 const HORARIO = yield database_1.default.query("SELECT id_e, codigo_e, nombre_e, anio, mes, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
@@ -263,7 +261,7 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
+    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              **USADO
     ListarDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

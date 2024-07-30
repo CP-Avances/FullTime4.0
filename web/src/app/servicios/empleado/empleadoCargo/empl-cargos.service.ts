@@ -29,12 +29,12 @@ export class EmplCargosService {
    ** **                METODO DE CONSULTA DE CARGOS DEL USUARIO                             ** ** 
    ** ***************************************************************************************** **/
 
-  // METODO PARA EDITAR ESTADO DEL CARGO
+  // METODO PARA EDITAR ESTADO DEL CARGO   **USADO
   EditarEstadoCargo(data: any) {
     return this.http.post(`${environment.url}/empleadoCargos/estado-cargo`, data);
   }
 
-  // METODO PARA BUSCAR CARGOS ACTIVOS
+  // METODO PARA BUSCAR CARGOS ACTIVOS   **USADO
   BuscarCargoActivo(data: any) {
     return this.http.post<any>(`${environment.url}/empleadoCargos/cargo-activo`, data);
   }
@@ -46,7 +46,7 @@ export class EmplCargosService {
     return this.http.post(`${environment.url}/empleadoCargos`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE CARGO POR ID
+  // METODO PARA BUSCAR DATOS DE CARGO POR ID   **USADO
   BuscarCargoID(id: number) {
     return this.http.get<any>(`${environment.url}/empleadoCargos/${id}`);
   }
@@ -56,7 +56,7 @@ export class EmplCargosService {
     return this.http.put(`${environment.url}/empleadoCargos/${id_empl_contrato}/${id}/actualizar`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
+  // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO   **USADO
   BuscarCargoIDContrato(id_empl_contrato: number) {
     return this.http.get<any>(`${environment.url}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
   }
@@ -91,12 +91,13 @@ export class EmplCargosService {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-regimen/${id}`);
   }
 
-
-  RevisarFormato(formData) {
+  // METODO PARA VERIFICAR DATOS DE PLANTILLA DE CARGOS  **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);
   }
 
-  subirArchivoExcelCargo(formData) {
+  // METODO PARA REGISTRAR DATOS DE CARGOS  **USADO
+  SubirArchivoExcelCargo(formData: any) {
     return this.http.post<any>(`${environment.url}/empleadoCargos/cargar_plantilla/`, formData);
   }
 

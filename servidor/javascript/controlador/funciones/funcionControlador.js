@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FUNCIONES_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 class FuncionesControlador {
-    // METODO PARA LISTAR FUNCIONES DEL SISTEMA
+    // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
     ConsultarFunciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const FUNCIONES = yield database_1.default.query(`

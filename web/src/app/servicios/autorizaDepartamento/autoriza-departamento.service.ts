@@ -13,7 +13,7 @@ export class AutorizaDepartamentoService {
   ) { }
 
 
-  // METODO PARA BUSCAR USUARIO AUTORIZA
+  // METODO PARA BUSCAR USUARIO AUTORIZA    **USADO
   BuscarAutoridadEmpleado(id: any) {
     return this.http.get(`${environment.url}/autorizaDepartamento/autoriza/${id}`);
   }
@@ -33,7 +33,7 @@ export class AutorizaDepartamentoService {
     return this.http.put(`${environment.url}/autorizaDepartamento/actualizar`, datos);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarRegistro(id: number, datos: any) {
     const url = `${environment.url}/autorizaDepartamento/eliminar/${id}`;
     const httpOtions = {

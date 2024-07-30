@@ -16,7 +16,7 @@ exports.AUTORIZACION_CONTROLADOR = void 0;
 const auditoriaControlador_1 = require("../auditoria/auditoriaControlador");
 const database_1 = __importDefault(require("../../database"));
 class AutorizacionesControlador {
-    // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS
+    // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS   **USADO
     ObtenerAutorizacionPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_permiso;

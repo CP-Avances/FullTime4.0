@@ -12,7 +12,7 @@ export class FuncionesService {
   ) { }
 
   
-  // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA
+  // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA   **USO TEMPORAL
   ListarFunciones() {
     return this.http.get<any>(`${environment.url}/administracion/funcionalidad`)
   }

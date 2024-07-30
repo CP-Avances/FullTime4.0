@@ -11,7 +11,7 @@ class UsuarioRutas {
     configuracion() {
         // CREAR REGISTRO DE USUARIOS
         this.router.post('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuario);
-        // METODO DE BUSQUEDA DE DATOS DE USUARIO
+        // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
         this.router.get('/datos/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDatosUsuario);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
         this.router.get('/dato/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
@@ -57,11 +57,11 @@ class UsuarioRutas {
         this.router.post('/buscar-ids-usuarios-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerIdUsuariosDepartamento);
         // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
         this.router.post('/buscar-asignacion-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
-        // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO   **USADO
         this.router.put('/actualizar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);
-        // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
+        // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO   **USADO
         this.router.delete('/eliminar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
-        // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+        // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS    **USADO
         this.router.post('/usuario-departamento/multiple', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
     }
 }

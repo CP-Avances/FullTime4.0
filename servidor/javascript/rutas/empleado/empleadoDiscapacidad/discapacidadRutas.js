@@ -12,13 +12,13 @@ class DiscapacidadRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO
+        // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO   **USADO
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.BuscarDiscapacidadUsuario);
         // METODO PARA REGISTRAR DISCAPACIDAD
         this.router.post('/', verificarToken_1.TokenValidation, discapacidadControlador_1.default.RegistrarDiscapacidad);
         // METODO PARA ACTUALIZAR DATOS DISCAPACIDAD
         this.router.put('/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ActualizarDiscapacidad);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.EliminarDiscapacidad);
         /** *************************************************************************************** **
          ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **

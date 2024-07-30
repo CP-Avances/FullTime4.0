@@ -408,7 +408,7 @@ class PermisosControlador {
         }
     }
 
-    // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
+    // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO    **USADO
     public async ObtenerPermisoEmpleado(req: Request, res: Response) {
         try {
             const { id_empleado } = req.params;
@@ -429,7 +429,7 @@ class PermisosControlador {
         }
     }
 
-    // METODO PARA OBTENER INFORMACION DE UN PERMISO
+    // METODO PARA OBTENER INFORMACION DE UN PERMISO   **USADO (VERIFICAR CONSULTA)
     public async InformarUnPermiso(req: Request, res: Response) {
         const id = req.params.id_permiso
         const PERMISOS = await pool.query(

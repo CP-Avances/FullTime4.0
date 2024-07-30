@@ -14,11 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class DatosGeneralesControlador {
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    **USADO
     BuscarDataGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
-            // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -432,14 +431,12 @@ class DatosGeneralesControlador {
     BuscarDataGeneralRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
-            // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = yield database_1.default.query(`
-                SELECT * FROM informacion_general AS ig
+                SELECT * FROM informacion_general AS ig, eu_usuario_departamento AS ud
                 WHERE ig.estado = $1 AND 
 	   		        ig.jefe = false AND
-			        ig.cedula = empl.cedula AND
-			        usd.id_empleado = empl.id AND
-	                usd.administra = false
+			        ud.id_empleado = ig.id AND
+	                ud.administra = false
                 ORDER BY ig.name_suc ASC
                 `, [estado]).then((result) => { return result.rows; });
             if (informacion.length === 0)
@@ -447,7 +444,7 @@ class DatosGeneralesControlador {
             return res.status(200).jsonp(informacion);
         });
     }
-    // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO
+    // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO   **USADO
     DatosActuales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;
@@ -934,6 +931,7 @@ class DatosGeneralesControlador {
             }
         });
     }
+    // METODO PARA VER INFORMACION DE UN USUARIO AUTORIZA   **USADO
     ListarDatosEmpleadoAutoriza(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;

@@ -710,7 +710,7 @@ class EmpleadoControlador {
             return res.jsonp({ message: 'Upps!!! ocurrio un error.' });
         });
     }
-    // CARGAR IMAGEN DE EMPLEADO
+    // CARGAR IMAGEN DE EMPLEADO   **USADO
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -753,7 +753,6 @@ class EmpleadoControlador {
                     // VERIFICAR SI LA CARPETA DE IMAGENES SE CREO
                     if (verificar_imagen === 0) {
                         let ruta_guardar = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(unEmpleado.rows[0].id)) + separador + imagen;
-                        //console.log('ruta 1 ', ruta1)
                         fs_1.default.access(ruta_temporal, fs_1.default.constants.F_OK, (err) => {
                             if (!err) {
                                 sharp(ruta_temporal)
@@ -826,12 +825,11 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO
+    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
     GeolocalizacionCrokis(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             let { lat, lng, user_name, ip } = req.body;
-            console.log(lat, lng, id);
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -881,17 +879,17 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
      ** **************************************************************************************** **/
-    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO
+    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
     ObtenerTitulosEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const unEmpleadoTitulo = yield database_1.default.query(`
-        SELECT et.id, et.observacion As observaciones, et.id_titulo, 
-          et.id_empleado, ct.nombre, nt.nombre as nivel
-        FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-        WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
-        ORDER BY id
-        `, [id_empleado]);
+      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
+        et.id_empleado, ct.nombre, nt.nombre as nivel
+      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
+      ORDER BY id
+      `, [id_empleado]);
             if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
@@ -1001,7 +999,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO
+    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     EliminarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1010,7 +1008,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

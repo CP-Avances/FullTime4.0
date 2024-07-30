@@ -112,12 +112,13 @@ export class DepartamentosService {
     return this.http.get(`${environment.url}/departamento/buscar/regimen-departamento/${id}`);
   }
 
-  RevisarFormatoNivelDep(formData){
-    console.log('formDataDepartamentos: ',formData);
+  // METODO PARA VALIDAR DATOS DE PLANTILLA DE NIVELES DE DEPARTAMENTO   **USADO
+  RevisarFormatoNivelDep(formData: any){
     return this.http.post<any>(environment.url + '/departamento/upload/revisionNivel', formData);
   }
 
-  subirDepaNivel(formData){
+  // METODO PARA SUBIR DATOS DE PLANTILLA DE NIVELES DE DEPARTAMENTO  **USADO
+  SubirDepaNivel(formData: any){
     return this.http.post<any>(`${environment.url}/departamento/cargar_plantillaNivel/`, formData);
   }
 

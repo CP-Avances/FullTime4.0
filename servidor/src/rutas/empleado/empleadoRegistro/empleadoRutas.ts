@@ -74,9 +74,9 @@ class EmpleadoRutas {
         this.router.put('/activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ActivarMultiplesEmpleados);
         // METODO PARA REACTIVAR EMPLEADOS
         this.router.put('/re-activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ReactivarMultiplesEmpleados);
-        // METODO PARA CARGAR IMAGEN DEL USUARIO
+        // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
         this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
-        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
+        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
         // METODO PARA ELIMINAR EMPLEADOS
         this.router.delete('/eliminar', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
@@ -88,7 +88,7 @@ class EmpleadoRutas {
          ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** ** 
          ** **************************************************************************************** **/
 
-        // METODO PARA BUSCAR TITULO DEL USUARIO
+        // METODO PARA BUSCAR TITULO DEL USUARIO   **USADO
         this.router.get('/emplTitulos/:id_empleado', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTitulosEmpleado);
         // METODO PARA REGISTRAR TITULO PROFESIONAL
         this.router.post('/emplTitulos/', TokenValidation, EMPLEADO_CONTROLADOR.CrearEmpleadoTitulos);
@@ -96,7 +96,7 @@ class EmpleadoRutas {
         this.router.post('/emplTitulos/usuario', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTituloEspecifico);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/:id_empleado_titulo/titulo', TokenValidation, EMPLEADO_CONTROLADOR.EditarTituloEmpleado);
-        // METODO PARA ELIMINAR TITULO 
+        // METODO PARA ELIMINAR TITULO   **USADO
         this.router.delete('/eliminar/titulo/:id_empleado_titulo', TokenValidation, EMPLEADO_CONTROLADOR.EliminarTituloEmpleado);
 
 

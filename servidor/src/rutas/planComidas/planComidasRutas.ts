@@ -11,13 +11,13 @@ class DepartamentoRutas {
 
     configuracion(): void {
 
-
+        // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
         this.router.get('/infoComida/:id_empleado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaIdEmpleado);
         this.router.get('/infoComida/estado/aprobado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaAprobada);
         this.router.get('/infoComida/estado/negado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaNull);
         this.router.get('/infoComida/estado/expirada', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaExpirada);
 
-        /** PLANIFICACIÓN DE ALIMENTACIÓN */
+        /** PLANIFICACION DE ALIMENTACION */
         this.router.get('/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.ListarPlanComidas);
         this.router.post('/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.CrearPlanComidas);
 
@@ -27,6 +27,7 @@ class DepartamentoRutas {
         this.router.post('/duplicidad/actualizar/plan', TokenValidation, PLAN_COMIDAS_CONTROLADOR.ActualizarPlanComidaEmpleadoFechas);
         this.router.post('/duplicidad/actualizar/sol', TokenValidation, PLAN_COMIDAS_CONTROLADOR.ActualizarSolComidaEmpleadoFechas);
 
+        // METODO PARA CONSULTAR DATOS DE ALIMENTACION CONSUMIDOS    **USADO
         this.router.post('/empleado/plan/consumido', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarPlanComidaEmpleadoConsumido);
 
 
@@ -59,21 +60,21 @@ class DepartamentoRutas {
         this.router.delete('/eliminar/plan-solicitud/:id/:fecha/:id_empleado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EliminarComidaAprobada);
         // ELIMINAR PLANIFICACION DE ALIMENTACION
         this.router.delete('/eliminar/:id', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EliminarRegistros);
-        // ELIMINAR PLANIFICACION DE UN USUARIO
+        // ELIMINAR PLANIFICACION DE UN USUARIO   **USADO
         this.router.delete('/eliminar/plan-comida/:id/:id_empleado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EliminarPlanComidaEmpleado);
         // REGISTRO DE LA PLANIFICACIÓN DE ALIMENTACIÓN AL EMPLEADO 
         this.router.post('/empleado/plan', TokenValidation, PLAN_COMIDAS_CONTROLADOR.CrearPlanEmpleado);
         // BUSQUEDA DE DATOS DE USUARIO POR ID DE PLANIFICACION
         this.router.get('/comida-empleado/plan/:id', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarPlanComidaIdPlan);
-        // BUSQUEDA DE PLANIFICACIONES DE ALIMENTACION POR ID DE USUARIO
+        // BUSQUEDA DE PLANIFICACIONES DE ALIMENTACION POR ID DE USUARIO    **USADO
         this.router.get('/infoComida/plan/:id_empleado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarPlanComidaIdEmpleado);
-                
+
 
         /** ************************************************************************************************ **
-         ** *                     NOTIFICACIONES DE SERVICIOS DE ALIMENTACIÓN                             ** **
+         ** *                     NOTIFICACIONES DE SERVICIOS DE ALIMENTACION                             ** **
          ** ************************************************************************************************ **/
 
-        // METODO DE ENVIO DE NOTIFICACIONES DE SOLICITUDES
+        // METODO DE ENVIO DE NOTIFICACIONES DE SOLICITUDES   **USADO
         this.router.post('/send/planifica/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EnviarNotificacionComidas);
 
 
@@ -83,7 +84,7 @@ class DepartamentoRutas {
 
         // METODO DE ENVIO DE CORREO DE SOLICITUD DE SERVICIO DE ALIMENTACION
         this.router.post('/mail-noti/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EnviarCorreoComidas);
-        // METODO DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIO DE ALIMENTACION APP WEB
+        // METODO DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIO DE ALIMENTACION APP WEB   **USADO
         this.router.post('/mail-plan-comida/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EnviarCorreoPlanComidas);
         // METODO DE ENVIO DE CORREO ELECTRONICO DE SOLICITUD DE SERVICIO DE ALIMENTACION APP MOVIL
         this.router.post('/mail-noti-solicitud-comida-movil/:id_empresa', PLAN_COMIDAS_CONTROLADOR.EnviarCorreoComidasMovil);

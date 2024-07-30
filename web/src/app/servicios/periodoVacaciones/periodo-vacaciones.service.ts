@@ -11,7 +11,7 @@ export class PeriodoVacacionesService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR ID PERIODO DE VACACIONES
+  // BUSCAR ID PERIODO DE VACACIONES   **USADO
   BuscarIDPerVacaciones(id: number) {
     return this.http.get(`${environment.url}/perVacacion/buscar/${id}`);
   }
@@ -20,9 +20,11 @@ export class PeriodoVacacionesService {
     return this.http.post(`${environment.url}/perVacacion`, datos);
   }
 
+  // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION   **USADO
   ObtenerPeriodoVacaciones(id_empleado: string | number) {
     return this.http.get<any>(`${environment.url}/perVacacion/infoPeriodo/${id_empleado}`);
   }
+
   ActualizarPeriodoV(datos: any) {
     return this.http.put(`${environment.url}/perVacacion`, datos);
   }

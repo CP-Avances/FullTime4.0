@@ -1517,48 +1517,6 @@
 
     </mat-tab>
 
-    <!-- PLANTILLAS DE CARGA DE HORARIOS -->
-    <mat-tab *ngIf="plantillas" label="cargar_plantilla">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">today</mat-icon>
-            <h6 id="items">Plantillas</h6>
-        </ng-template>
-
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_rotativo">
-            <div class="row">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div style="text-align: center; padding-top: 20px;" *ngIf="plantillas">
-                            <button type="submit" class="redondo">
-                                <a style="text-decoration: none;" matSuffix matTooltipPosition="right"
-                                    matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">>
-                                    <mat-icon style="color: white; font-size: 20px;">cloud_download</mat-icon>
-                                    <span style="color: white; font-size: xx-small;">
-                                        Descargar plantilla
-                                    </span>
-                                </a>
-                            </button>
-                        </div>
-                        <div style="text-align: center; padding-top: 20px;" *ngIf="plantillas">
-                            <form method="post" enctype="multipart/form-data">
-                                <input (change)="FileChangeHorario($event)" type="file"
-                                    [formControl]="archivoHorarioForm" id="redondo"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">
-                                    Cargar plantilla
-                                </label>
-                            </form>
-                        </div>
-                        <br>
-                    </mat-card>
-                </div>
-            </div>
-        </div>
-
-    </mat-tab>
-
     <!-- PERMISOS -->
     <mat-tab *ngIf="HabilitarPermisos" label="solicitudes_permisos">
         <ng-template mat-tab-label>

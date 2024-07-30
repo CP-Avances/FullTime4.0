@@ -113,7 +113,7 @@ export class EmpleadoService {
     return this.http.put<any>(`${environment.url}/empleado/re-activar/masivo`, data)
   }
 
-  // METODO PARA CARGAR IMAGEN DEL USUARIO
+  // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
   SubirImagen(formData: any, idEmpleado: number) {
     return this.http.put(`${environment.url}/empleado/${idEmpleado}/uploadImage`, formData)
   }
@@ -141,7 +141,7 @@ export class EmpleadoService {
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **
    ** *********************************************************************** **/
 
-  // METODO PARA BUSCAR TITULO DE EMPLEADO
+  // METODO PARA BUSCAR TITULO DE EMPLEADO    **USADO
   BuscarTituloUsuario(id: number) {
     return this.http.get(`${environment.url}/empleado/emplTitulos/${id}`);
   }
@@ -160,7 +160,7 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/empleado/${id}/titulo`, data);
   }
 
-  // METODO DE ELIMINACION DE TITULO DE EMPLEADO
+  // METODO DE ELIMINACION DE TITULO DE EMPLEADO   **USADO
   EliminarTitulo(id: number, datos: any) {
     const url = `${environment.url}/empleado/eliminar/titulo/${id}`;
     const httpOtions = {
@@ -174,7 +174,7 @@ export class EmpleadoService {
    ** **         CONTROL DE GEOLOCALIZACION EN EL SISTEMA                     **
    ** *********************************************************************** **/
 
-  // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
+  // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
   ActualizarDomicilio(id: number, data: any) {
     return this.http.put<any>(`${environment.url}/empleado/geolocalizacion/${id}`, data)
   }
@@ -218,7 +218,7 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/contratoEmpleado/${id}/documento-contrato`, formData)
   }
 
-  // BUSCAR CONTRATOS POR ID DE EMPLEADO
+  // BUSCAR CONTRATOS POR ID DE EMPLEADO   **USADO
   BuscarContratosEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato-empleado/${id}`);
   }
@@ -243,12 +243,12 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/contratoEmpleado/eliminar_contrato/servidor`, datos)
   }
 
-  // METODO PARA BUSCAR ID DE CONTRATO ACTUAL
+  // METODO PARA BUSCAR ID DE CONTRATO ACTUAL   **USADO
   BuscarIDContratoActual(id: number) {
     return this.http.get(`${environment.url}/contratoEmpleado/contratoActual/${id}`);
   }
 
-  // METODO PARA BUSCAR DATOS DE CONTRATO POR ID
+  // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
   BuscarDatosContrato(id: number) {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato/${id}`);
   }
@@ -293,11 +293,13 @@ export class EmpleadoService {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha/contrato`, datos);
   }
 
-  RevisarFormato(formData) {
+  // METODO PARA REVISAR DATOS DE PLANTILLA CONTRATOS   **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/upload/revision`, formData);
   }
 
-  subirArchivoExcelContrato(formData) {
+  // METODO PARA SUBIR DATOS DE CONTRATOS   **USADO
+  SubirArchivoExcelContrato(formData: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
   }
 

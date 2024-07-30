@@ -16,7 +16,7 @@ exports.AUTORIZA_DEPARTAMENTO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class AutorizaDepartamentoControlador {
-    // METODO PARA BUSCAR USUARIO AUTORIZA
+    // METODO PARA BUSCAR USUARIO AUTORIZA    **USADO
     EncontrarAutorizacionEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -146,7 +146,7 @@ class AutorizaDepartamentoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     EliminarAutorizacionDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -155,7 +155,7 @@ class AutorizaDepartamentoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ELIMINAR
-                const response = yield database_1.default.query('SELECT * FROM ed_autoriza_departamento WHERE id = $1', [id]);
+                const response = yield database_1.default.query(`SELECT * FROM ed_autoriza_departamento WHERE id = $1`, [id]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

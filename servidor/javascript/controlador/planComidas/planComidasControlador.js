@@ -95,6 +95,7 @@ class PlanComidasControlador {
             }
         });
     }
+    // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
     EncontrarSolicitaComidaIdEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -176,6 +177,7 @@ class PlanComidasControlador {
             }
         });
     }
+    // METODO PARA CONSULTAR DATOS DE ALIMENTACION CONSUMIDOS    **USADO
     EncontrarPlanComidaEmpleadoConsumido(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_plan_comida, id_empleado } = req.body;
@@ -662,7 +664,7 @@ class PlanComidasControlador {
             }
         });
     }
-    // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
+    // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO    **USADO
     EliminarPlanComidaEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -775,7 +777,7 @@ class PlanComidasControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE PLANIFICACIÓN DE ALIMENTACIÓN POR ID DE USUARIO
+    // METODO PARA BUSCAR DATOS DE PLANIFICACION DE ALIMENTACION POR ID DE USUARIO     **USADO
     EncontrarPlanComidaIdEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -797,9 +799,9 @@ class PlanComidasControlador {
         });
     }
     /** ********************************************************************************************** **
-     ** *              ENVIO DE NOTIFICACIONES DE SERVICIOS DE ALIMENTACIÓN                          * **
+     ** *              ENVIO DE NOTIFICACIONES DE SERVICIOS DE ALIMENTACION                          * **
      ** ********************************************************************************************** **/
-    // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
+    // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACION DE SERVICIO DE ALIMENTACION   **USADO
     EnviarNotificacionComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1072,7 +1074,7 @@ class PlanComidasControlador {
     /** ************************************************************************************************ **
      ** **    METODOS DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIOS DE ALIMENTACION    ** **
      ** ************************************************************************************************ **/
-    // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB  -- verificar si se requiere estado
+    // ENVIAR CORREO ELECTRONICO DE PLANIFICACION DE COMIDA APLICACION WEB  **USADO
     EnviarCorreoPlanComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -1082,7 +1084,6 @@ class PlanComidasControlador {
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_envia, desde, hasta, inicio, final, correo, id_comida, observacion, extra, nombres, asunto, tipo_solicitud, proceso } = req.body;
-                console.log('data', req.body);
                 var tipo_servicio = 'Extra';
                 if (extra === false) {
                     tipo_servicio = 'Normal';
@@ -1093,7 +1094,6 @@ class PlanComidasControlador {
         FROM informacion_general AS da
         WHERE da.id = $1
         `, [id_envia]).then((resultado) => { return resultado.rows[0]; });
-                console.log('envia...', Envia);
                 const SERVICIO_SOLICITADO = yield database_1.default.query(`
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, dm.nombre AS comida, dm.valor, 
           dm.observacion 

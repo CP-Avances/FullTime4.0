@@ -14,15 +14,15 @@ class DepartamentoRutas {
     configuracion() {
         // METODO PARA REGISTRAR PLAN GENERAL  --**VERIFICADO
         this.router.post('/', verificarToken_1.TokenValidation, planGeneralControlador_1.default.CrearPlanificacion);
-        // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+        // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL  **USADO
         this.router.post('/buscar_fechas', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarFechas);
-        // METODO PARA ELIMINAR REGISTROS   --**VERIFICADO
+        // METODO PARA ELIMINAR REGISTROS  **USADO
         this.router.post('/eliminar', verificarToken_1.TokenValidation, planGeneralControlador_1.default.EliminarRegistros);
         // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
         this.router.post('/horario-general-fechas', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarHorarioFechas);
-        // METODO PARA LISTAR PLANIFICACION DE USUARIOS  --**VERIFICADO
+        // METODO PARA LISTAR PLANIFICACION DE USUARIOS  **USADO
         this.router.post('/horario-general-planificacion', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ListarPlanificacionHoraria);
-        // METODO PARA LISTAR DETALLE DE HORARIOS DE LOS USUARIOS  --**VERIFICADO
+        // METODO PARA LISTAR DETALLE DE HORARIOS DE LOS USUARIOS    **USADO
         this.router.post('/horario-general-detalle', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ListarDetalleHorarios);
         // METODO PARA LISTAR SOLO HORARIOS DE USUARIOS  --**VERIFICADO
         this.router.post('/horario-solo-planificacion/lista', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ListarHorariosUsuario);

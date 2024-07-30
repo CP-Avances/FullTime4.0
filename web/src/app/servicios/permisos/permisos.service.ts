@@ -83,12 +83,12 @@ export class PermisosService {
     return this.http.put<any>(`${environment.url}/empleadoPermiso/documentos-multiples/`, datos);
   }
 
-  // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
+  // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO   **USADO
   BuscarPermisoEmpleado(id_empleado: any) {
     return this.http.get(`${environment.url}/empleadoPermiso/permiso-usuario/${id_empleado}`);
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UN PERMISO
+  // METODO PARA BUSCAR INFORMACION DE UN PERMISO    **USADO
   ObtenerInformeUnPermiso(id_permiso: number) {
     return this.http.get(`${environment.url}/empleadoPermiso/informe-un-permiso/${id_permiso}`);
   }

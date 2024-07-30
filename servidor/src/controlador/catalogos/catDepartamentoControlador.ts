@@ -813,6 +813,7 @@ class DepartamentoControlador {
     }
   }
 
+  // METODO PARA REVISAR DATOS DE NIVELES DE DEPARTAMENTOS   **USADO
   RevisarDatosNivel(req: Request, res: Response) {
     try {
       const documento = req.file?.originalname;
@@ -898,12 +899,9 @@ class DepartamentoControlador {
               data.sucursal_depa_superior = 'No registrado';
               data.observacion = 'Sucursal departamento superior ' + data.observacion;
             }
-
             listNivelesDep.push(data);
-
           }
           data = {};
-
         });
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -918,52 +916,68 @@ class DepartamentoControlador {
         listNivelesDep.forEach(async (item: any) => {
           if (item.observacion == 'no registrada') {
             var validSucursal = await pool.query(
-              `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+              `
+              SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+              `
               , [item.sucursal.toUpperCase()])
             if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
               var validDeparta = await pool.query(
-                `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                `
+                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                `
                 , [item.departamento.toUpperCase()])
               if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                 var validDepaSucu = await pool.query(
-                  `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
+                  `
+                  SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                  `
                   , [validSucursal.rows[0].id, item.departamento.toUpperCase()])
                 if (validDepaSucu.rows[0] != undefined && validDepaSucu.rows[0] != '') {
                   if (regex.test(item.nivel)) {
                     if (item.nivel > 0 && item.nivel <= 5) {
                       var validDepSuperior = await pool.query(
-                        `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                        `
+                        SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                        `
                         , [item.depa_superior.toUpperCase()])
                       if (validDepSuperior.rows[0] != undefined && validDepSuperior.rows[0] != '') {
                         var validSucSuperior = await pool.query(
-                          `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+                          `
+                          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                          `
                           , [item.sucursal_depa_superior.toUpperCase()])
 
                         if (validSucSuperior.rows[0] != undefined && validSucSuperior.rows[0] != '') {
 
                           var validDepaSucuSuper = await pool.query(
-                            `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
+                            `
+                            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                            `
                             , [validSucSuperior.rows[0].id, item.depa_superior.toUpperCase()])
 
                           if (validDepaSucuSuper.rows[0] != undefined && validDepaSucuSuper.rows[0] != '') {
                             var validNivelExiste = await pool.query(
-                              `SELECT * FROM ed_niveles_departamento WHERE UPPER(departamento) = $1
-                                      and nivel = $2`
+                              `
+                              SELECT * FROM ed_niveles_departamento 
+                              WHERE UPPER(departamento) = $1 AND nivel = $2
+                              `
                               , [item.departamento.toUpperCase(), item.nivel])
                             if (validNivelExiste.rows[0] != undefined && validNivelExiste.rows[0] != '') {
                               item.observacion = 'Ya existe en el sistema';
                             } else {
 
                               var validaDepaSuperiorNivel = await pool.query(
-                                `SELECT id FROM ed_niveles_departamento WHERE UPPER(departamento) = $1
-                                          and UPPER(departamento_nombre_nivel) = $2`
+                                `
+                                SELECT id FROM ed_niveles_departamento 
+                                WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
+                                `
                                 , [item.departamento.toUpperCase(), item.depa_superior.toUpperCase()])
 
                               if (validaDepaSuperiorNivel.rows[0] != undefined && validaDepaSuperiorNivel.rows[0] != '') {
                                 item.observacion = 'Departamento superior ya se encuentra configurado';
                               } else {
 
-                                // Discriminación de elementos iguales
+                                // DISCRIMINACION DE ELEMENTOS IGUALES
                                 if (duplicados.find((p: any) => p.sucursal.toLowerCase() === item.sucursal.toLowerCase() &&
                                   p.departamento.toLowerCase() === item.departamento.toLowerCase() &&
                                   p.nivel === item.nivel) == undefined) {
@@ -971,19 +985,14 @@ class DepartamentoControlador {
                                 } else {
                                   item.observacion = '1';
                                 }
-
                               }
-
                             }
-
                           } else {
                             item.observacion = 'Departamento superior no pertenece a la sucursal';
                           }
-
                         } else {
                           item.observacion = 'Sucursal superior no existe en el sistema';
                         }
-
                       } else {
                         item.observacion = 'Departamento superior no existe en el sistema';
                       }
@@ -993,7 +1002,6 @@ class DepartamentoControlador {
                   } else {
                     item.observacion = 'Nivel incorrecto (solo números)';
                   }
-
                 } else {
                   item.observacion = 'Departamento no pertenece al establecimiento';
                 }
@@ -1015,7 +1023,6 @@ class DepartamentoControlador {
 
         setTimeout(() => {
           auxiListNivelDep = [];
-
           listNivelesDep.sort((a: any, b: any) => {
             // COMPARA LOS NUMEROS DE LOS OBJETOS
             if (a.fila < b.fila) {
@@ -1052,32 +1059,28 @@ class DepartamentoControlador {
             } else {
               return mensaje = 'error';
             }
-
             filaDuplicada = item.fila;
-
           });
 
           /*****  PROCESO PARA VALIDAR EL NIVEL DEL DEPARTAMENTO EN EL SISTEMA Y DENTRO DEL DOCUMENTO *****/
-          //Ordenar por departamento y nivel (nivel en orden ascendente)
+          // ORDENAR POR DEPARTAMENTO Y NIVEL (NIVEL EN ORDEN ASCENDENTE)
           auxiListNivelDep.sort((a: any, b: any) => {
             if (a.departamento === b.departamento) {
-              // Convierte los niveles a números cuando sea posible
+              // CONVIERTE LOS NIVELES A NUMEROS CUANDO SEA POSIBLE
               const nivelA = typeof a.nivel === 'number' ? a.nivel : parseInt(a.nivel, 10);
               const nivelB = typeof b.nivel === 'number' ? b.nivel : parseInt(b.nivel, 10);
-              // Si ambos niveles son números, los comparamos numéricamente
+              // SI AMBOS NIVELES SON NUMEROS, LOS COMPARAMOS NUMERICAMENTE
               if (!isNaN(nivelA) && !isNaN(nivelB)) {
-                return nivelA - nivelB; // Orden descendente por nivel numérico
+                return nivelA - nivelB; // ORDEN DESCENDENTE POR NIVEL NUMERICO
               }
-
-              // Manejo de casos donde los niveles no son números
+              // MANEJO DE CASOS DONDE LOS NIVELES NO SON NUMEROS
               if (isNaN(nivelA) && isNaN(nivelB)) {
-                // Ambos niveles no son números, compararlos como strings
+                // AMBOS NIVELES NO SON NUMEROS, COMPARARLOS COMO STRINGS
                 return a.nivel.toString().localeCompare(b.nivel.toString());
               }
-
-              // Si uno es número y el otro no, el número tiene prioridad
-              if (!isNaN(nivelA)) return -1; // a tiene un nivel numérico, debe ir antes
-              if (!isNaN(nivelB)) return 1;  // b tiene un nivel numérico, debe ir antes
+              // SI UNO ES NUMERO Y EL OTRO NO, EL NUMERO TIENE PRIORIDAD
+              if (!isNaN(nivelA)) return -1; // A TIENE UN NIVEL NUMERICO, DEBE IR ANTES
+              if (!isNaN(nivelB)) return 1;  // B TIENE UN NIVEL NUMERICO, DEBE IR ANTES
 
               return 0;
             }
@@ -1085,7 +1088,7 @@ class DepartamentoControlador {
             return a.departamento.localeCompare(b.departamento);
           });
 
-          //Discriminamos los departamentos repetidos para dejar solo un departamento con el nivel mas alto
+          // DISCRIMINAMOS LOS DEPARTAMENTOS REPETIDOS PARA DEJAR SOLO UN DEPARTAMENTO CON EL NIVEL MAS ALTO
           const uniqueDepartments: any = [];
           const seenDepartments: Set<string> = new Set();
           for (const obj of auxiListNivelDep) {
@@ -1097,7 +1100,12 @@ class DepartamentoControlador {
 
           uniqueDepartments.forEach(async (item: any) => {
             let ValidNiveles = await pool.query(
-              `SELECT nivel, departamento_nombre_nivel FROM ed_niveles_departamento WHERE UPPER(departamento) = $1 ORDER BY nivel DESC`
+              `
+              SELECT nivel, departamento_nombre_nivel 
+              FROM ed_niveles_departamento 
+              WHERE UPPER(departamento) = $1 
+              ORDER BY nivel DESC
+              `
               , [item.departamento.toUpperCase()])
 
             let objauxiliar = {
@@ -1129,11 +1137,9 @@ class DepartamentoControlador {
 
               }
             });
-
           });
 
           setTimeout(() => {
-
             listNivelesDep.forEach((item: any) => {
               auxiListNivelDep.forEach((valor: any) => {
                 if (item.fila == valor.fila) {
@@ -1150,53 +1156,58 @@ class DepartamentoControlador {
             if (mensaje == 'error') {
               listNivelesDep = undefined;
             }
-
             return res.jsonp({ message: mensaje, data: listNivelesDep });
-
           }, 1500);
-
         }, tiempo)
-
       }
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
   }
 
+  // METODO PARA REGISTRAR NIVELES DE DEPARTAMENTO  **USADO
   public async CargarPlantillaNivelesDep(req: Request, res: Response) {
     const { plantilla, user_name, ip } = req.body;
     let error: boolean = false;
 
     for (const data of plantilla) {
       try {
-        const { fila, sucursal, departamento, nivel, depa_superior, sucursal_depa_superior, observacion } = data;
+        const { sucursal, departamento, nivel, depa_superior, sucursal_depa_superior } = data;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
         var validSucursal = await pool.query(
-          `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+          `
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
           , [sucursal.toUpperCase()])
 
         var validDeparta = await pool.query(
-          `SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`
+          `
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `
           , [departamento.toUpperCase()])
 
         var validDepSuperior = await pool.query(
-          `SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`
+          `
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `
           , [depa_superior.toUpperCase()])
 
         var validSucSuperior = await pool.query(
-          `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+          `
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
           , [sucursal_depa_superior.toUpperCase()])
 
-        //Variables de id de almacenamiento
+        // VARIABLES DE ID DE ALMACENAMIENTO
         var id_sucursal = validSucursal.rows[0].id;
         var id_departamento = validDeparta.rows[0].id;
         var id_sucuDepSuperior = validDepSuperior.rows[0].id;
         var id_depaDepSuperior = validSucSuperior.rows[0].id;
 
-        // Registro de los datos de contratos
+        // REGISTRO DE LOS DATOS DE CONTRATOS
         const response: QueryResult = await pool.query(
           `INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
@@ -1223,7 +1234,6 @@ class DepartamentoControlador {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
         error = true;
-
       }
     }
 

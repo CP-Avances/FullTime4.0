@@ -1,22 +1,24 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { ThemePalette } from '@angular/material/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { FormControl, Validators } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
+import { MatDialog } from '@angular/material/dialog';
+
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+
+import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-cargar-plantilla',
   templateUrl: './cargar-plantilla.component.html',
   styleUrls: ['./cargar-plantilla.component.css']
 })
+
 export class CargarPlantillaComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -47,17 +49,17 @@ export class CargarPlantillaComponent implements OnInit {
   ip: string | null;
 
   constructor(
-    public restCa: EmplCargosService,
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public restCa: EmplCargosService,
     public restDep: DepartamentosService, // SERVICIO DATOS DE DEPARTAMENTOS
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-    private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
   ) {
     this.DatosContrato = [];
     this.DatosCargos = [];
     this.DatosNivelesDep = [];
   }
+
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
@@ -68,14 +70,15 @@ export class CargarPlantillaComponent implements OnInit {
     if (tipo == 'depaNivel') {
       this.tamanio_paginaDepaNivel = e.pageSize;
       this.numero_paginaDepaNivel = e.pageIndex + 1
-    } else if (tipo == 'contrato') {
+    }
+    else if (tipo == 'contrato') {
       this.tamanio_paginaMul = e.pageSize;
       this.numero_paginaMul = e.pageIndex + 1
-    } else if (tipo == 'cargo') {
+    }
+    else if (tipo == 'cargo') {
       this.tamanio_paginaMulCargo = e.pageSize;
       this.numero_paginaMulCargo = e.pageIndex + 1
     }
-
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -104,10 +107,10 @@ export class CargarPlantillaComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
 
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS NIVELES DE DEPARTAMENTO DEL ARCHIVO EXCEL
   /** ************************************************************************************************************* **
-** **                       TRATAMIENTO DE PLANTILLA DE NIVELES DE DEPARTAMENTO                               ** **
-** ************************************************************************************************************* **/
+   ** **                       TRATAMIENTO DE PLANTILLA DE NIVELES DE DEPARTAMENTO                               ** **
+   ** ************************************************************************************************************* **/
+  // METODO PARA VALIDAR DATOS DE PLANTILLA
   DatosNivelesDep: any
   listaNivelesCorrectas: any = [];
   messajeExcel: string = '';
@@ -118,15 +121,11 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     this.restDep.RevisarFormatoNivelDep(formData).subscribe(res => {
-      console.log('plantilla niveles', res);
       this.DatosNivelesDep = res.data;
       this.messajeExcel = res.message;
-
-      this.DatosNivelesDep.sort((a, b) => {
+      this.DatosNivelesDep.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -157,9 +156,7 @@ export class CargarPlantillaComponent implements OnInit {
           }
         });
       }
-
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -169,6 +166,7 @@ export class CargarPlantillaComponent implements OnInit {
     });
   }
 
+  // METODO PARA REGISTRAR NIVELES DE DEPARTAMENTOS
   RegistrarDepaNiveles() {
     if (this.listaNivelesCorrectas.length > 0) {
       const datos = {
@@ -176,7 +174,7 @@ export class CargarPlantillaComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip
       }
-      this.restDep.subirDepaNivel(datos).subscribe({
+      this.restDep.SubirDepaNivel(datos).subscribe({
         next: (response) => {
           this.toastr.success('Plantilla de Nivel departamentos importada.', 'Operación exitosa.', {
             timeOut: 3000,
@@ -187,7 +185,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
             timeOut: 4000,
           });
           this.progreso = false;
@@ -200,9 +198,7 @@ export class CargarPlantillaComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }
-
   }
-
 
 
   /** ************************************************************************************************************* **
@@ -215,7 +211,6 @@ export class CargarPlantillaComponent implements OnInit {
     this.tamanio_paginaMul = 5;
     this.numero_paginaDepaNivel = 1;
     this.tamanio_paginaDepaNivel = 5;
-    //this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
@@ -223,12 +218,10 @@ export class CargarPlantillaComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
-        console.log('niveles: ', tipo);
         if (tipo == 'niveles') {
           this.RevisarplantillaNiveles();
         } else {
@@ -242,16 +235,16 @@ export class CargarPlantillaComponent implements OnInit {
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
-
       this.nameFile = '';
     }
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA REVISAR DATOS DE PLANTILLA DE CONTRATOS
   DatosContrato: any
   listaContratosCorrectas: any = [];
   Revisarplantilla() {
@@ -261,15 +254,11 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     this.restE.RevisarFormato(formData).subscribe(res => {
-      console.log('plantilla contrato', res);
       this.DatosContrato = res.data;
       this.messajeExcel = res.message;
-
-      this.DatosContrato.sort((a, b) => {
+      this.DatosContrato.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -302,7 +291,6 @@ export class CargarPlantillaComponent implements OnInit {
       }
 
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -315,13 +303,11 @@ export class CargarPlantillaComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('listaContratosCorrectas: ', this.listaContratosCorrectas.length);
-    console.log('listaContratosCorrectas: ', this.listaNivelesCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           if (this.listaContratosCorrectas.length > 0) {
-            this.registroContratos();
+            this.RegistroContratos();
           } else if (this.listaNivelesCorrectas.length > 0) {
             this.RegistrarDepaNiveles();
           }
@@ -330,15 +316,15 @@ export class CargarPlantillaComponent implements OnInit {
       });
   }
 
-  registroContratos() {
+  // METODO PARA REGISTRAR DATOS DE CONTRATO
+  RegistroContratos() {
     if (this.listaContratosCorrectas.length > 0) {
       const datos = {
         plantilla: this.listaContratosCorrectas,
         user_name: this.user_name,
         ip: this.ip
       }
-
-      this.restE.subirArchivoExcelContrato(datos).subscribe({
+      this.restE.SubirArchivoExcelContrato(datos).subscribe({
         next: (response) => {
           this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
             timeOut: 3000,
@@ -349,7 +335,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
             timeOut: 4000,
           });
           this.progreso = false;
@@ -367,8 +353,7 @@ export class CargarPlantillaComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCeldaNivel(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
+  EstiloCeldaNivel(observacion: string): string {
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     }
@@ -404,7 +389,7 @@ export class CargarPlantillaComponent implements OnInit {
   }
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Fecha duplicada') {
       return 'rgb(170, 129, 236)';
@@ -456,7 +441,7 @@ export class CargarPlantillaComponent implements OnInit {
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     if (texto == 'No registrado') {
       return 'rgb(255, 80, 80)';
     } else {
@@ -477,7 +462,6 @@ export class CargarPlantillaComponent implements OnInit {
   FileChangeCargo(element: any) {
     this.numero_paginaMulCargo = 1;
     this.tamanio_paginaMulCargo = 5;
-    //this.paginator.firstPage();
     this.archivoSubidoCargo = [];
     this.nameFileCargo = '';
     this.archivoSubidoCargo = element.target.files;
@@ -485,7 +469,6 @@ export class CargarPlantillaComponent implements OnInit {
     let arrayItems = this.nameFileCargo.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -516,11 +499,12 @@ export class CargarPlantillaComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registroCargos();
+          this.RegistroCargos();
         }
       });
   }
 
+  // METODO DE VERIFICACION DE DATOS DE PLANTILLA DE CARGOS
   RevisarplantillaCargo() {
     this.listaCargosCorrectas = [];
     this.DatosCargos = [];
@@ -528,15 +512,11 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubidoCargo.length; i++) {
       formData.append("uploads", this.archivoSubidoCargo[i], this.archivoSubidoCargo[i].name);
     }
-
     this.progreso = true;
-
     this.restCa.RevisarFormato(formData).subscribe(res => {
-      console.log('plantilla cargo', res);
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
-
-      this.DatosCargos.sort((a, b) => {
+      this.DatosCargos.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -545,7 +525,6 @@ export class CargarPlantillaComponent implements OnInit {
         }
         return 0;
       });
-
       if (this.messajeExcelCargos == 'error') {
         this.DatosCargos = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -568,9 +547,7 @@ export class CargarPlantillaComponent implements OnInit {
           }
         });
       }
-
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -578,18 +555,17 @@ export class CargarPlantillaComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
-
   }
 
-  registroCargos() {
+  // METODO PARA REGISTRAR DATOS DE CARGOS
+  RegistroCargos() {
     if (this.listaCargosCorrectas.length > 0) {
       const datos = {
         plantilla: this.listaCargosCorrectas,
         user_name: this.user_name,
         ip: this.ip
       }
-
-      this.restCa.subirArchivoExcelCargo(datos).subscribe({
+      this.restCa.SubirArchivoExcelCargo(datos).subscribe({
         next: (response) => {
           this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
             timeOut: 3000,
@@ -600,7 +576,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal', {
             timeOut: 4000,
           });
           this.progreso = false;
@@ -614,11 +590,5 @@ export class CargarPlantillaComponent implements OnInit {
       this.nameFile = '';
     }
   }
-
-
-
-
-
-
 
 }

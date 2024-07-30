@@ -449,7 +449,7 @@ class HorasExtrasPedidasControlador {
             }
         });
     }
-    // BUSCAR REGISTROS DE HORAS EXTRAS DE UN USUARIO
+    // BUSCAR REGISTROS DE HORAS EXTRAS DE UN USUARIO   **USADO
     ObtenerListaHora(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_user } = req.params;

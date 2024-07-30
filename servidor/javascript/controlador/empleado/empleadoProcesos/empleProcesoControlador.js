@@ -109,6 +109,7 @@ class EmpleadoProcesoControlador {
             }
         });
     }
+    // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
     BuscarProcesoUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;

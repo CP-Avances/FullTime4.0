@@ -138,7 +138,7 @@ class ProcesoControlador {
             }
         });
     }
-    // METODO PARA ELIMINA PROCESOS
+    // METODO PARA ELIMINA PROCESOS   **USADO
     EliminarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -184,7 +184,6 @@ class ProcesoControlador {
                 return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });

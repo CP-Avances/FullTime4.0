@@ -1,45 +1,9 @@
 <!--  ********************  VER LISTA DE SUCURSALES  ************************  -->
 <div *ngIf="ver_principal">
-    <div class="container" style="margin-bottom: 25px; padding-bottom:5px; padding-top: 20px;">
-        <div id="resultados">
-            <span>CRÍTERIOS DE BÚSQUEDA</span>
-        </div>
-        <br>
-        <form>
-            <div class="row">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Ciudad</mat-label>
-                            <input matInput placeholder="Buscar" placeholder="Buscar"
-                                (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de ciudades por nombre.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Establecimiento</mat-label>
-                            <input matInput placeholder="Buscar" [formControl]="buscarNombre">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de establecimiento por nombre.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <hr>
     <!--  ********************************* LISTA DE ESTABLECIMIENTOS  **********************************  -->
-    <div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="container" style="padding-top: 20px; padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+            <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
@@ -50,6 +14,25 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" placeholder="Buscar"
+                                        (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de acuerdo a cada columna de la tabla.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
                         <tr
                             *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{s.descripcion}}</td>

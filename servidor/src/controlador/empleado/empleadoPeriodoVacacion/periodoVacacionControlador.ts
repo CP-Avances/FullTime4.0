@@ -1,23 +1,22 @@
-import { Request, Response } from "express";
 import AUDITORIA_CONTROLADOR from "../../auditoria/auditoriaControlador";
-import pool from "../../../database";
-import excel from "xlsx";
-import fs from "fs";
+import { Request, Response } from "express";
 import { FormatearFecha2 } from "../../../libs/settingsMail";
+import pool from "../../../database";
 
 class PeriodoVacacionControlador {
-  // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES
+
+  // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
   public async EncontrarIdPerVacaciones(req: Request, res: Response): Promise<any> {
 
     const { id_empleado } = req.params;
     const VACACIONES = await pool.query(
       `
-        SELECT pv.id, pv.id_empleado_cargo
-        FROM mv_periodo_vacacion AS pv
-        WHERE pv.id = (SELECT MAX(pv.id) AS id 
-                       FROM mv_periodo_vacacion AS pv 
-                       WHERE pv.id_empleado = $1 )
-        `
+      SELECT pv.id, pv.id_empleado_cargo
+      FROM mv_periodo_vacacion AS pv
+      WHERE pv.id = (SELECT MAX(pv.id) AS id 
+        FROM mv_periodo_vacacion AS pv 
+        WHERE pv.id_empleado = $1 )
+      `
       , [id_empleado]);
     if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
@@ -75,12 +74,13 @@ class PeriodoVacacionControlador {
     }
   }
 
+  // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION    **USADO
   public async EncontrarPerVacaciones(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const PERIODO_VACACIONES = await pool.query(
       `
-        SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
-        `
+      SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
+      `
       , [id_empleado]);
     if (PERIODO_VACACIONES.rowCount != 0) {
       return res.jsonp(PERIODO_VACACIONES.rows)
@@ -131,7 +131,7 @@ class PeriodoVacacionControlador {
         ,
         [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]
-        );
+      );
 
       const [datosNuevos] = periodoNuevo.rows;
       const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');

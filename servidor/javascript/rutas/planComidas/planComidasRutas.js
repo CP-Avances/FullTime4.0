@@ -12,17 +12,19 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
+        // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
         this.router.get('/infoComida/:id_empleado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarSolicitaComidaIdEmpleado);
         this.router.get('/infoComida/estado/aprobado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarSolicitaComidaAprobada);
         this.router.get('/infoComida/estado/negado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarSolicitaComidaNull);
         this.router.get('/infoComida/estado/expirada', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarSolicitaComidaExpirada);
-        /** PLANIFICACIÓN DE ALIMENTACIÓN */
+        /** PLANIFICACION DE ALIMENTACION */
         this.router.get('/', verificarToken_1.TokenValidation, planComidasControlador_1.default.ListarPlanComidas);
         this.router.post('/', verificarToken_1.TokenValidation, planComidasControlador_1.default.CrearPlanComidas);
         this.router.post('/duplicidad/plan', verificarToken_1.TokenValidation, planComidasControlador_1.default.BuscarPlanComidaEmpleadoFechas);
         this.router.post('/duplicidad/solicitud', verificarToken_1.TokenValidation, planComidasControlador_1.default.BuscarSolEmpleadoFechasActualizar);
         this.router.post('/duplicidad/actualizar/plan', verificarToken_1.TokenValidation, planComidasControlador_1.default.ActualizarPlanComidaEmpleadoFechas);
         this.router.post('/duplicidad/actualizar/sol', verificarToken_1.TokenValidation, planComidasControlador_1.default.ActualizarSolComidaEmpleadoFechas);
+        // METODO PARA CONSULTAR DATOS DE ALIMENTACION CONSUMIDOS    **USADO
         this.router.post('/empleado/plan/consumido', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarPlanComidaEmpleadoConsumido);
         // Registrar en tabla tipo_comida
         this.router.post('/tipo_comida', verificarToken_1.TokenValidation, planComidasControlador_1.default.CrearTipoComidas);
@@ -47,25 +49,25 @@ class DepartamentoRutas {
         this.router.delete('/eliminar/plan-solicitud/:id/:fecha/:id_empleado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EliminarComidaAprobada);
         // ELIMINAR PLANIFICACION DE ALIMENTACION
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, planComidasControlador_1.default.EliminarRegistros);
-        // ELIMINAR PLANIFICACION DE UN USUARIO
+        // ELIMINAR PLANIFICACION DE UN USUARIO   **USADO
         this.router.delete('/eliminar/plan-comida/:id/:id_empleado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EliminarPlanComidaEmpleado);
         // REGISTRO DE LA PLANIFICACIÓN DE ALIMENTACIÓN AL EMPLEADO 
         this.router.post('/empleado/plan', verificarToken_1.TokenValidation, planComidasControlador_1.default.CrearPlanEmpleado);
         // BUSQUEDA DE DATOS DE USUARIO POR ID DE PLANIFICACION
         this.router.get('/comida-empleado/plan/:id', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarPlanComidaIdPlan);
-        // BUSQUEDA DE PLANIFICACIONES DE ALIMENTACION POR ID DE USUARIO
+        // BUSQUEDA DE PLANIFICACIONES DE ALIMENTACION POR ID DE USUARIO    **USADO
         this.router.get('/infoComida/plan/:id_empleado', verificarToken_1.TokenValidation, planComidasControlador_1.default.EncontrarPlanComidaIdEmpleado);
         /** ************************************************************************************************ **
-         ** *                     NOTIFICACIONES DE SERVICIOS DE ALIMENTACIÓN                             ** **
+         ** *                     NOTIFICACIONES DE SERVICIOS DE ALIMENTACION                             ** **
          ** ************************************************************************************************ **/
-        // METODO DE ENVIO DE NOTIFICACIONES DE SOLICITUDES
+        // METODO DE ENVIO DE NOTIFICACIONES DE SOLICITUDES   **USADO
         this.router.post('/send/planifica/', verificarToken_1.TokenValidation, planComidasControlador_1.default.EnviarNotificacionComidas);
         /** ************************************************************************************************ **
          ** *                     ENVIO DE CORREO DE SERVICIOS DE ALIMENTACION                            ** **
          ** ************************************************************************************************ **/
         // METODO DE ENVIO DE CORREO DE SOLICITUD DE SERVICIO DE ALIMENTACION
         this.router.post('/mail-noti/', verificarToken_1.TokenValidation, planComidasControlador_1.default.EnviarCorreoComidas);
-        // METODO DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIO DE ALIMENTACION APP WEB
+        // METODO DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIO DE ALIMENTACION APP WEB   **USADO
         this.router.post('/mail-plan-comida/', verificarToken_1.TokenValidation, planComidasControlador_1.default.EnviarCorreoPlanComidas);
         // METODO DE ENVIO DE CORREO ELECTRONICO DE SOLICITUD DE SERVICIO DE ALIMENTACION APP MOVIL
         this.router.post('/mail-noti-solicitud-comida-movil/:id_empresa', planComidasControlador_1.default.EnviarCorreoComidasMovil);

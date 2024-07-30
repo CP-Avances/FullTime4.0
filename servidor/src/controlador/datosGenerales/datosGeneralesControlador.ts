@@ -4,10 +4,9 @@ import pool from '../../database';
 
 class DatosGeneralesControlador {
 
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    **USADO
     public async BuscarDataGeneral(req: Request, res: Response) {
         let estado = req.params.estado;
-        // CONSULTA DE BUSQUEDA DE SUCURSALES
         let informacion = await pool.query(
             `
             SELECT * FROM informacion_general AS ig
@@ -492,15 +491,13 @@ class DatosGeneralesControlador {
         // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
      public async BuscarDataGeneralRol(req: Request, res: Response) {
             let estado = req.params.estado;
-            // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = await pool.query(
                 `
-                SELECT * FROM informacion_general AS ig
+                SELECT * FROM informacion_general AS ig, eu_usuario_departamento AS ud
                 WHERE ig.estado = $1 AND 
 	   		        ig.jefe = false AND
-			        ig.cedula = empl.cedula AND
-			        usd.id_empleado = empl.id AND
-	                usd.administra = false
+			        ud.id_empleado = ig.id AND
+	                ud.administra = false
                 ORDER BY ig.name_suc ASC
                 `
                 , [estado]
@@ -538,7 +535,7 @@ class DatosGeneralesControlador {
 
 
 
-    // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO
+    // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO   **USADO
     public async DatosActuales(req: Request, res: Response) {
         const { empleado_id } = req.params;
         const DATOS = await pool.query(
@@ -1132,6 +1129,7 @@ class DatosGeneralesControlador {
     }
 
 
+    // METODO PARA VER INFORMACION DE UN USUARIO AUTORIZA   **USADO
     public async ListarDatosEmpleadoAutoriza(req: Request, res: Response) {
         const { empleado_id } = req.params;
         const DATOS = await pool.query(

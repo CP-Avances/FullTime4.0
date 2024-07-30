@@ -8,8 +8,6 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
@@ -136,15 +134,14 @@ export class ActualizacionInformacionComponent implements OnInit {
     public restR: ReportesService,
     public plan: PlanGeneralService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
-    private restUsuario: UsuarioService,
     private asignaciones: AsignacionesService,
-    private restRoles: RolesService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.check = this.restR.checkOptions([{ opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -179,7 +176,7 @@ export class ActualizacionInformacionComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    //console.log('ver original ', this.origen)
+    console.log('ver original ', informacion)
     informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
@@ -227,10 +224,13 @@ export class ActualizacionInformacionComponent implements OnInit {
     })
 
     this.OmitirDuplicados();
+    console.log('regimen ---', this.regimen)
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
+    console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
+      console.log('ingresa')
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
@@ -246,6 +246,7 @@ export class ActualizacionInformacionComponent implements OnInit {
     }
 
     this.mostrarTablas = true;
+    console.log('regimen ', this.regimen)
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -766,34 +767,34 @@ export class ActualizacionInformacionComponent implements OnInit {
     }
   }
 
-    // METODO PARA TOMAR DATOS SELECCIONADOS
-    MetodosFiltro(valor: any, tipo: string) {
-      if (this.opcion === 'c') {
-        this.ModelarCargo(valor.id, tipo, valor.id_suc);
-      }
-      else if (this.opcion === 'd') {
-        this.ModelarDepartamentos(valor.id, tipo, valor.id_suc);
-      }
-      else if (this.opcion === 'r') {
-        this.ModelarRegimen(valor.id, tipo, valor.id_suc);
-      }
-      else {
-        this.ModelarEmpleados(tipo);
-      }
-      
+  // METODO PARA TOMAR DATOS SELECCIONADOS
+  MetodosFiltro(valor: any, tipo: string) {
+    if (this.opcion === 'c') {
+      this.ModelarCargo(valor.id, tipo, valor.id_suc);
     }
-  
+    else if (this.opcion === 'd') {
+      this.ModelarDepartamentos(valor.id, tipo, valor.id_suc);
+    }
+    else if (this.opcion === 'r') {
+      this.ModelarRegimen(valor.id, tipo, valor.id_suc);
+    }
+    else {
+      this.ModelarEmpleados(tipo);
+    }
 
-  abriEditarRolUser(datos: any){
-    console.log('roles seleccionados: ',datos)
-    if(datos.length > 0){
+  }
+
+
+  abriEditarRolUser(datos: any) {
+    console.log('roles seleccionados: ', datos)
+    if (datos.length > 0) {
       this.ventana.open(EditarRolUserComponent, { width: '600px', data: datos }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          
-        }
-      });
-    }else{
+        .subscribe((confirmado: Boolean) => {
+          if (confirmado) {
+
+          }
+        });
+    } else {
       this.toastr.warning('Seleccione usuarios para actualizar.', '', {
         timeOut: 4000,
       });

@@ -505,7 +505,7 @@ class HorasExtrasPedidasControlador {
     }
   }
 
-  // BUSCAR REGISTROS DE HORAS EXTRAS DE UN USUARIO
+  // BUSCAR REGISTROS DE HORAS EXTRAS DE UN USUARIO   **USADO
   public async ObtenerListaHora(req: Request, res: Response): Promise<any> {
     const { id_user } = req.params;
     const HORAS_EXTRAS_PEDIDAS = await pool.query(

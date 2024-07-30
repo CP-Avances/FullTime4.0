@@ -100,9 +100,9 @@ class PermisosRutas {
         this.router.put('/permisos-multiples', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.CrearPermisosMultiples);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarDocumentoPermiso);
-        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
+        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO    **USADO
         this.router.get('/permiso-usuario/:id_empleado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ObtenerPermisoEmpleado);
-        // BUSCAR INFORMACION DE UN PERMISO
+        // BUSCAR INFORMACION DE UN PERMISO   **USADO
         this.router.get('/informe-un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.InformarUnPermiso);
         // ELIMINAR PERMISO
         this.router.delete('/eliminar/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);

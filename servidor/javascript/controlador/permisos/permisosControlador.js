@@ -365,7 +365,7 @@ class PermisosControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
+    // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO    **USADO
     ObtenerPermisoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -386,7 +386,7 @@ class PermisosControlador {
             }
         });
     }
-    // METODO PARA OBTENER INFORMACION DE UN PERMISO
+    // METODO PARA OBTENER INFORMACION DE UN PERMISO   **USADO (VERIFICAR CONSULTA)
     InformarUnPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_permiso;

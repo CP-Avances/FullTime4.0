@@ -12,6 +12,7 @@ import path from 'path';
 
 class VacacionesControlador {
 
+  // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO    **USADO
   public async VacacionesIdPeriodo(req: Request, res: Response) {
     const { id } = req.params;
     const VACACIONES = await pool.query(

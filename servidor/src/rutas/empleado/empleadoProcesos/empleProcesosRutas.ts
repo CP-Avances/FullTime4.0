@@ -10,6 +10,7 @@ class DepartamentoRutas {
     }
 
     configuracion(): void {
+        // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
         this.router.get('/infoProceso/:id_empleado', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.BuscarProcesoUsuario);
         this.router.post('/', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.CrearEmpleProcesos);
         this.router.put('/', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.ActualizarProcesoEmpleado);

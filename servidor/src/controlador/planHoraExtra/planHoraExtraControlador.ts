@@ -430,7 +430,7 @@ class PlanHoraExtraControlador {
     }
   }
 
-  // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
+  // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO    **USADO
   public async EliminarPlanEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -479,8 +479,8 @@ class PlanHoraExtraControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -488,7 +488,7 @@ class PlanHoraExtraControlador {
     }
   }
 
-  // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO -- verificar si se requiere estado
+  // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO    **USADO
   public async BuscarPlanUsuario(req: Request, res: Response) {
     const { id } = req.params;
     const PLAN = await pool.query(
@@ -511,10 +511,10 @@ class PlanHoraExtraControlador {
 
 
   /** ********************************************************************************************* **
-   ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACIÓN DE HORAS EXTRAS                  **
+   ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACION DE HORAS EXTRAS                  **
    ** ********************************************************************************************* **/
 
-  // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS -- verificar si se requiere estado
+  // METODO ENVIO CORREO DESDE APLICACION WEB CREACIoN DE PLANIFICACION DE HORAS EXTRAS   **USADO
   public async EnviarCorreoPlanificacion(req: Request, res: Response): Promise<void> {
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -624,10 +624,10 @@ class PlanHoraExtraControlador {
 
 
   /** ********************************************************************************************* **
-   ** *             ENVIO DE NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                      * **
+   ** *             ENVIO DE NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS                      * **
    ** ********************************************************************************************* **/
 
-  // ENVIO DE NOTIFICACION DE PLANIFICACION DE HORAS EXTRAS
+  // ENVIO DE NOTIFICACION DE PLANIFICACION DE HORAS EXTRAS   **USADO
   public async EnviarNotiPlanHE(req: Request, res: Response): Promise<Response> {
     try {
       var tiempo = fechaHora();
@@ -679,7 +679,6 @@ class PlanHoraExtraControlador {
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
-
   }
 
 }

@@ -703,6 +703,7 @@ class DepartamentoControlador {
             }
         });
     }
+    // METODO PARA REVISAR DATOS DE NIVELES DE DEPARTAMENTOS   **USADO
     RevisarDatosNivel(req, res) {
         var _a;
         try {
@@ -794,33 +795,49 @@ class DepartamentoControlador {
                 });
                 listNivelesDep.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.observacion == 'no registrada') {
-                        var validSucursal = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [item.sucursal.toUpperCase()]);
+                        var validSucursal = yield database_1.default.query(`
+              SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+              `, [item.sucursal.toUpperCase()]);
                         if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
-                            var validDeparta = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [item.departamento.toUpperCase()]);
+                            var validDeparta = yield database_1.default.query(`
+                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                `, [item.departamento.toUpperCase()]);
                             if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
-                                var validDepaSucu = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`, [validSucursal.rows[0].id, item.departamento.toUpperCase()]);
+                                var validDepaSucu = yield database_1.default.query(`
+                  SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                  `, [validSucursal.rows[0].id, item.departamento.toUpperCase()]);
                                 if (validDepaSucu.rows[0] != undefined && validDepaSucu.rows[0] != '') {
                                     if (regex.test(item.nivel)) {
                                         if (item.nivel > 0 && item.nivel <= 5) {
-                                            var validDepSuperior = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [item.depa_superior.toUpperCase()]);
+                                            var validDepSuperior = yield database_1.default.query(`
+                        SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                        `, [item.depa_superior.toUpperCase()]);
                                             if (validDepSuperior.rows[0] != undefined && validDepSuperior.rows[0] != '') {
-                                                var validSucSuperior = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [item.sucursal_depa_superior.toUpperCase()]);
+                                                var validSucSuperior = yield database_1.default.query(`
+                          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                          `, [item.sucursal_depa_superior.toUpperCase()]);
                                                 if (validSucSuperior.rows[0] != undefined && validSucSuperior.rows[0] != '') {
-                                                    var validDepaSucuSuper = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`, [validSucSuperior.rows[0].id, item.depa_superior.toUpperCase()]);
+                                                    var validDepaSucuSuper = yield database_1.default.query(`
+                            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                            `, [validSucSuperior.rows[0].id, item.depa_superior.toUpperCase()]);
                                                     if (validDepaSucuSuper.rows[0] != undefined && validDepaSucuSuper.rows[0] != '') {
-                                                        var validNivelExiste = yield database_1.default.query(`SELECT * FROM ed_niveles_departamento WHERE UPPER(departamento) = $1
-                                      and nivel = $2`, [item.departamento.toUpperCase(), item.nivel]);
+                                                        var validNivelExiste = yield database_1.default.query(`
+                              SELECT * FROM ed_niveles_departamento 
+                              WHERE UPPER(departamento) = $1 AND nivel = $2
+                              `, [item.departamento.toUpperCase(), item.nivel]);
                                                         if (validNivelExiste.rows[0] != undefined && validNivelExiste.rows[0] != '') {
                                                             item.observacion = 'Ya existe en el sistema';
                                                         }
                                                         else {
-                                                            var validaDepaSuperiorNivel = yield database_1.default.query(`SELECT id FROM ed_niveles_departamento WHERE UPPER(departamento) = $1
-                                          and UPPER(departamento_nombre_nivel) = $2`, [item.departamento.toUpperCase(), item.depa_superior.toUpperCase()]);
+                                                            var validaDepaSuperiorNivel = yield database_1.default.query(`
+                                SELECT id FROM ed_niveles_departamento 
+                                WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
+                                `, [item.departamento.toUpperCase(), item.depa_superior.toUpperCase()]);
                                                             if (validaDepaSuperiorNivel.rows[0] != undefined && validaDepaSuperiorNivel.rows[0] != '') {
                                                                 item.observacion = 'Departamento superior ya se encuentra configurado';
                                                             }
                                                             else {
-                                                                // Discriminación de elementos iguales
+                                                                // DISCRIMINACION DE ELEMENTOS IGUALES
                                                                 if (duplicados.find((p) => p.sucursal.toLowerCase() === item.sucursal.toLowerCase() &&
                                                                     p.departamento.toLowerCase() === item.departamento.toLowerCase() &&
                                                                     p.nivel === item.nivel) == undefined) {
@@ -910,31 +927,31 @@ class DepartamentoControlador {
                         filaDuplicada = item.fila;
                     }));
                     /*****  PROCESO PARA VALIDAR EL NIVEL DEL DEPARTAMENTO EN EL SISTEMA Y DENTRO DEL DOCUMENTO *****/
-                    //Ordenar por departamento y nivel (nivel en orden ascendente)
+                    // ORDENAR POR DEPARTAMENTO Y NIVEL (NIVEL EN ORDEN ASCENDENTE)
                     auxiListNivelDep.sort((a, b) => {
                         if (a.departamento === b.departamento) {
-                            // Convierte los niveles a números cuando sea posible
+                            // CONVIERTE LOS NIVELES A NUMEROS CUANDO SEA POSIBLE
                             const nivelA = typeof a.nivel === 'number' ? a.nivel : parseInt(a.nivel, 10);
                             const nivelB = typeof b.nivel === 'number' ? b.nivel : parseInt(b.nivel, 10);
-                            // Si ambos niveles son números, los comparamos numéricamente
+                            // SI AMBOS NIVELES SON NUMEROS, LOS COMPARAMOS NUMERICAMENTE
                             if (!isNaN(nivelA) && !isNaN(nivelB)) {
-                                return nivelA - nivelB; // Orden descendente por nivel numérico
+                                return nivelA - nivelB; // ORDEN DESCENDENTE POR NIVEL NUMERICO
                             }
-                            // Manejo de casos donde los niveles no son números
+                            // MANEJO DE CASOS DONDE LOS NIVELES NO SON NUMEROS
                             if (isNaN(nivelA) && isNaN(nivelB)) {
-                                // Ambos niveles no son números, compararlos como strings
+                                // AMBOS NIVELES NO SON NUMEROS, COMPARARLOS COMO STRINGS
                                 return a.nivel.toString().localeCompare(b.nivel.toString());
                             }
-                            // Si uno es número y el otro no, el número tiene prioridad
+                            // SI UNO ES NUMERO Y EL OTRO NO, EL NUMERO TIENE PRIORIDAD
                             if (!isNaN(nivelA))
-                                return -1; // a tiene un nivel numérico, debe ir antes
+                                return -1; // A TIENE UN NIVEL NUMERICO, DEBE IR ANTES
                             if (!isNaN(nivelB))
-                                return 1; // b tiene un nivel numérico, debe ir antes
+                                return 1; // B TIENE UN NIVEL NUMERICO, DEBE IR ANTES
                             return 0;
                         }
                         return a.departamento.localeCompare(b.departamento);
                     });
-                    //Discriminamos los departamentos repetidos para dejar solo un departamento con el nivel mas alto
+                    // DISCRIMINAMOS LOS DEPARTAMENTOS REPETIDOS PARA DEJAR SOLO UN DEPARTAMENTO CON EL NIVEL MAS ALTO
                     const uniqueDepartments = [];
                     const seenDepartments = new Set();
                     for (const obj of auxiListNivelDep) {
@@ -944,7 +961,12 @@ class DepartamentoControlador {
                         }
                     }
                     uniqueDepartments.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                        let ValidNiveles = yield database_1.default.query(`SELECT nivel, departamento_nombre_nivel FROM ed_niveles_departamento WHERE UPPER(departamento) = $1 ORDER BY nivel DESC`, [item.departamento.toUpperCase()]);
+                        let ValidNiveles = yield database_1.default.query(`
+              SELECT nivel, departamento_nombre_nivel 
+              FROM ed_niveles_departamento 
+              WHERE UPPER(departamento) = $1 
+              ORDER BY nivel DESC
+              `, [item.departamento.toUpperCase()]);
                         let objauxiliar = {
                             depa_superior: '',
                             nivel: 0,
@@ -1000,25 +1022,34 @@ class DepartamentoControlador {
             return res.status(500).jsonp({ message: error });
         }
     }
+    // METODO PARA REGISTRAR NIVELES DE DEPARTAMENTO  **USADO
     CargarPlantillaNivelesDep(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
-                    const { fila, sucursal, departamento, nivel, depa_superior, sucursal_depa_superior, observacion } = data;
+                    const { sucursal, departamento, nivel, depa_superior, sucursal_depa_superior } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    var validSucursal = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
-                    var validDeparta = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [departamento.toUpperCase()]);
-                    var validDepSuperior = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [depa_superior.toUpperCase()]);
-                    var validSucSuperior = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal_depa_superior.toUpperCase()]);
-                    //Variables de id de almacenamiento
+                    var validSucursal = yield database_1.default.query(`
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `, [sucursal.toUpperCase()]);
+                    var validDeparta = yield database_1.default.query(`
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `, [departamento.toUpperCase()]);
+                    var validDepSuperior = yield database_1.default.query(`
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `, [depa_superior.toUpperCase()]);
+                    var validSucSuperior = yield database_1.default.query(`
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `, [sucursal_depa_superior.toUpperCase()]);
+                    // VARIABLES DE ID DE ALMACENAMIENTO
                     var id_sucursal = validSucursal.rows[0].id;
                     var id_departamento = validDeparta.rows[0].id;
                     var id_sucuDepSuperior = validDepSuperior.rows[0].id;
                     var id_depaDepSuperior = validSucSuperior.rows[0].id;
-                    // Registro de los datos de contratos
+                    // REGISTRO DE LOS DATOS DE CONTRATOS
                     const response = yield database_1.default.query(`INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
           `, [id_sucursal, id_departamento, departamento, nivel, id_sucuDepSuperior, depa_superior, id_depaDepSuperior]);

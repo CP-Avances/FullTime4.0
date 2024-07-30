@@ -81,7 +81,7 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     public async BuscarFechas(req: Request, res: Response) {
         const { fec_inicio, fec_final, id_horario, id_empleado } = req.body;
         const FECHAS = await pool.query(
@@ -98,9 +98,8 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
-
         var errores: number = 0;
         let ocurrioError = false;
         let mensajeError = '';
@@ -167,7 +166,6 @@ class PlanGeneralControlador {
 
             } catch (error) {
                 // REVERTIR TRANSACCION
-                console.log(error)
                 await pool.query('ROLLBACK');
                 errores++;
                 ocurrioError = true;
@@ -217,11 +215,10 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   **USADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
-            console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', id_empleado)
             const HORARIO = await pool.query(
                 "SELECT id_e, codigo_e, nombre_e, anio, mes, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
@@ -283,7 +280,7 @@ class PlanGeneralControlador {
     }
 
 
-    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
+    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              **USADO
     public async ListarDetalleHorarios(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;

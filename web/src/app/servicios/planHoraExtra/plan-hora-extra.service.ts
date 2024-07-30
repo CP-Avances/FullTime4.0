@@ -62,7 +62,7 @@ export class PlanHoraExtraService {
     };
     return this.http.request('delete', url, httpOptions);
   }
-  // ELIMINAR PLANIFICACIÓN DE HORA EXTRA DE UN USUARIO
+  // ELIMINAR PLANIFICACION DE HORA EXTRA DE UN USUARIO   **USADO
   EliminarPlanEmpleado(id: number, id_empleado: number, datos: any) {
     const url = `${environment.url}/planificacionHoraExtra/eliminar/plan-hora/${id}/${id_empleado}`;
     const httpOptions = {
@@ -70,7 +70,8 @@ export class PlanHoraExtraService {
     };
     return this.http.request('delete', url, httpOptions);
   }
-  // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
+
+  // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO    ** USADO
   ListarPlanificacionUsuario(id_empleado: number) {
     return this.http.get(`${environment.url}/planificacionHoraExtra/listar-plan/${id_empleado}`);
   }
@@ -82,20 +83,20 @@ export class PlanHoraExtraService {
 
 
   /** *************************************************************************************************** **
-   ** *                 ENVIO DE CORREO ELECTRONICO DE PLANIFICACIÓN DE HORAS EXTRAS                    * **
+   ** *                 ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE HORAS EXTRAS                    * **
    ****************************************************************************************************** **/
 
-  // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+  // CREACIÓN DE PLANIFICACION DE HORAS EXTRAS    **USADO
   EnviarCorreoPlanificacion(data: any) {
     return this.http.post<any>(`${environment.url}/planificacionHoraExtra/send/correo-planifica/`, data);
   }
 
 
   /** *************************************************************************************************** **
-   ** *                 ENVIO DE NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                    * **
+   ** *                 ENVIO DE NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS                    * **
    ****************************************************************************************************** **/
 
-  // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+  // CREACION DE PLANIFICACION DE HORAS EXTRAS   **USADO
   EnviarNotiPlanificacion(data: any) {
     return this.http.post<any>(`${environment.url}/planificacionHoraExtra/send/noti-planifica`, data);
   }

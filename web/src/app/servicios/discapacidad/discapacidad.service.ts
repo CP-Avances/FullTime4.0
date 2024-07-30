@@ -12,7 +12,7 @@ export class DiscapacidadService {
 
   ) { }
 
-  // METODO PARA BUSCAR DATOS DE UN USUARIO
+  // METODO PARA BUSCAR DATOS DE UN USUARIO   **USADO
   BuscarDiscapacidadUsuario(id: number) {
     return this.http.get(`${environment.url}/discapacidad/${id}`);
   }
@@ -27,7 +27,7 @@ export class DiscapacidadService {
     return this.http.put(`${environment.url}/discapacidad/${id}`, data);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarDiscapacidad(id: number, datos: any) {
     const url = `${environment.url}/discapacidad/eliminar/${id}`;
     const httpOtions = {

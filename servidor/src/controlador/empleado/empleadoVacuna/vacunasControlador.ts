@@ -1,15 +1,15 @@
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
+
 class VacunasControlador {
 
-    // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
+    // LISTAR REGISTROS DE VACUNACION DEL EMPLEADO POR SU ID   **USADO
     public async ListarUnRegistro(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
         const VACUNA = await pool.query(
@@ -97,9 +97,9 @@ class VacunasControlador {
                     SELECT id FROM eu_usuarios WHERE id_empleado = $1
                     `
                     , [id_empleado]);
-            
-                  const id_usuario = usuario.rows[0].id;
-                  
+
+                const id_usuario = usuario.rows[0].id;
+
 
                 const response: QueryResult = await pool.query(
                     `
@@ -411,7 +411,7 @@ class VacunasControlador {
         }
     }
 
-    // ELIMINAR REGISTRO DE VACUNACION
+    // ELIMINAR REGISTRO DE VACUNACION   **USADO
     public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
@@ -423,7 +423,7 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacunaconsulta = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
+            const vacunaconsulta = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
             if (!datosOriginales) {
@@ -476,6 +476,7 @@ class VacunasControlador {
                 });
             }
             return res.jsonp({ message: 'Registro eliminado.' });
+            
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');

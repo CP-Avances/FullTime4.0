@@ -15,7 +15,8 @@ class ProcesoRutas {
         this.router.get('/busqueda/:nombre', TokenValidation, PROCESO_CONTROLADOR.getIdByNombre);
         this.router.get('/:id', TokenValidation, PROCESO_CONTROLADOR.getOne);
         this.router.post('/', TokenValidation, PROCESO_CONTROLADOR.create);
-        this.router.put('/', TokenValidation, PROCESO_CONTROLADOR.ActualizarProceso);  
+        this.router.put('/', TokenValidation, PROCESO_CONTROLADOR.ActualizarProceso);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, PROCESO_CONTROLADOR.EliminarProceso);
     }
 }

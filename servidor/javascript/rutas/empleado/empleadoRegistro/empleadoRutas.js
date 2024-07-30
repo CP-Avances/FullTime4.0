@@ -64,16 +64,16 @@ class EmpleadoRutas {
         this.router.put('/activar/masivo', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActivarMultiplesEmpleados);
         // METODO PARA REACTIVAR EMPLEADOS
         this.router.put('/re-activar/masivo', verificarToken_1.TokenValidation, empleadoControlador_1.default.ReactivarMultiplesEmpleados);
-        // METODO PARA CARGAR IMAGEN DEL USUARIO
+        // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
         this.router.put('/:id_empleado/uploadImage', [verificarToken_1.TokenValidation, upload_plantilla.single('image')], empleadoControlador_1.default.CrearImagenEmpleado);
-        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
+        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
         this.router.put('/geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.GeolocalizacionCrokis);
         // METODO PARA ELIMINAR EMPLEADOS
         this.router.delete('/eliminar', verificarToken_1.TokenValidation, empleadoControlador_1.default.EliminarEmpleado);
         /** **************************************************************************************** **
          ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
          ** **************************************************************************************** **/
-        // METODO PARA BUSCAR TITULO DEL USUARIO
+        // METODO PARA BUSCAR TITULO DEL USUARIO   **USADO
         this.router.get('/emplTitulos/:id_empleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerTitulosEmpleado);
         // METODO PARA REGISTRAR TITULO PROFESIONAL
         this.router.post('/emplTitulos/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearEmpleadoTitulos);
@@ -81,7 +81,7 @@ class EmpleadoRutas {
         this.router.post('/emplTitulos/usuario', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerTituloEspecifico);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/:id_empleado_titulo/titulo', verificarToken_1.TokenValidation, empleadoControlador_1.default.EditarTituloEmpleado);
-        // METODO PARA ELIMINAR TITULO 
+        // METODO PARA ELIMINAR TITULO   **USADO
         this.router.delete('/eliminar/titulo/:id_empleado_titulo', verificarToken_1.TokenValidation, empleadoControlador_1.default.EliminarTituloEmpleado);
         /** ********************************************************************************************* **
          ** **               CONSULTAS DE GEOLOCALIZACION DEL USUARIO                                  ** **

@@ -12,6 +12,7 @@ class VacacionesRutas {
     configuracion(): void {
         this.router.get('/', TokenValidation, VACACIONES_CONTROLADOR.ListarVacaciones);
         this.router.get('/estado-solicitud', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionesAutorizadas);
+        // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO   **USADO
         this.router.get('/:id', TokenValidation, VACACIONES_CONTROLADOR.VacacionesIdPeriodo);
 
         this.router.post('/fechasFeriado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerFechasFeriado);

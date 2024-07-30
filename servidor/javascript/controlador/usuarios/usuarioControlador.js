@@ -51,7 +51,7 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA DE DATOS DE USUARIO
+    // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
     ObtenerDatosUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -1493,7 +1493,7 @@ class UsuarioControlador {
             }
         });
     }
-    // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+    // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO   **USADO
     ActualizarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1542,7 +1542,7 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+    // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO   **USADO
     EliminarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1590,7 +1590,7 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO
+    // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO
     RegistrarUsuarioDepartamentoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
@@ -1642,21 +1642,34 @@ class UsuarioControlador {
     0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
     1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
-    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */ function VerificarAsignaciones(datos, personal, isPersonal) {
-    return __awaiter(this, void 0, void 0, function* () { const { id_empleado, id_departamento } = datos; const consulta = yield database_1.default.query(`      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `, [id_empleado, id_departamento]); if (consulta.rowCount === 0)
-        return 1; const asignacion = consulta.rows[0]; if (asignacion.principal) {
-        datos.principal = true;
-        datos.id = asignacion.id;
-        datos.personal = asignacion.personal;
-        if (isPersonal) {
-            datos.personal = true;
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION
+*/
+// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION
+function VerificarAsignaciones(datos, personal, isPersonal) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { id_empleado, id_departamento } = datos;
+        const consulta = yield database_1.default.query(`
+    SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
+    `, [id_empleado, id_departamento]);
+        if (consulta.rowCount === 0)
+            return 1;
+        const asignacion = consulta.rows[0];
+        if (asignacion.principal) {
+            datos.principal = true;
+            datos.id = asignacion.id;
+            datos.personal = asignacion.personal;
+            if (isPersonal) {
+                datos.personal = true;
+            }
+            if (personal) {
+                datos.administra = asignacion.administra;
+            }
+            return 2;
         }
-        if (personal) {
-            datos.administra = asignacion.administra;
-        }
-        return 2;
-    } return 3; });
+        return 3;
+    });
 }
+// METODO PARA REGISTRAR UNA ASIGNACION
 function RegistrarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1687,6 +1700,7 @@ function RegistrarUsuarioDepartamento(datos) {
         }
     });
 }
+// METODO PARA EDITAR UNA ASIGNACION
 function EditarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

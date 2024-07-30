@@ -37,7 +37,7 @@ class HorasExtrasPedidasRutas {
         this.router.delete('/eliminar/:id_hora_extra/:documento', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.EliminarHoraExtra);
         // EDITAR REGISTRO DE HORA EXTRA
         this.router.put('/:id/solicitud', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.EditarHoraExtra);
-        // BUSCAR LISTA DE HORAS EXTRAS DE UN USUARIO
+        // BUSCAR LISTA DE HORAS EXTRAS DE UN USUARIO   **USADO
         this.router.get('/lista/:id_user', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ObtenerListaHora);
         // EDITAR TIEMPO AUTORIZADO DE SOLICITUD
         this.router.put('/tiempo-autorizado/:id_hora', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.TiempoAutorizado);

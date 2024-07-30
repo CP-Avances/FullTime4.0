@@ -13,14 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACUNAS_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class VacunasControlador {
-    // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
+    // LISTAR REGISTROS DE VACUNACION DEL EMPLEADO POR SU ID   **USADO
     ListarUnRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -365,7 +365,7 @@ class VacunasControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE VACUNACION
+    // ELIMINAR REGISTRO DE VACUNACION   **USADO
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -375,7 +375,7 @@ class VacunasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const vacunaconsulta = yield database_1.default.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
+                const vacunaconsulta = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
                 const [datosOriginales] = vacunaconsulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

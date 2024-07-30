@@ -171,7 +171,7 @@ class ContratoEmpleadoControlador {
             });
         });
     }
-    // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO
+    // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO   **USADO
     BuscarContratoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -380,13 +380,13 @@ class ContratoEmpleadoControlador {
             res.jsonp({ message: 'Documento actualizado.' });
         });
     }
-    // METODO PARA BUSCAR ID ACTUAL
+    // METODO PARA BUSCAR ID ACTUAL   ** USADO
     EncontrarIdContratoActual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const CONTRATO = yield database_1.default.query(`
-            SELECT MAX(ec.id) FROM eu_empleado_contratos AS ec, eu_empleados AS e 
-            WHERE ec.id_empleado = e.id AND e.id = $1
+            SELECT * FROM ultimo_contrato AS uc 
+            WHERE uc.id_empleado = $1
             `, [id_empleado]);
             if (CONTRATO.rowCount != 0) {
                 if (CONTRATO.rows[0]['max'] != null) {
@@ -401,7 +401,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE CONTRATO POR ID 
+    // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
     EncontrarDatosUltimoContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -519,7 +519,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -552,7 +552,7 @@ class ContratoEmpleadoControlador {
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, CEDULA, PAIS, REGIMEN_LABORAL, MODALIDAD_LABORAL, FECHA_DESDE, FECHA_HASTA, CONTROLAR_ASISTENCIA, CONTROLAR_VACACIONES, TIPO_CARGO } = dato;
-                    //Verificar que el registo no tenga datos vacios
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
                         (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
                         (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined) &&
@@ -567,16 +567,16 @@ class ContratoEmpleadoControlador {
                         data.control_asis = CONTROLAR_ASISTENCIA;
                         data.control_vaca = CONTROLAR_VACACIONES;
                         data.observacion = 'no registrado';
-                        //Valida si los datos de la columna cedula son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
                             if (data.cedula.toString().length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
                             }
                             else {
-                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                 if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                     if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { }
                                     else {
                                         data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
@@ -640,17 +640,17 @@ class ContratoEmpleadoControlador {
                             data.observacion = 'Cédula ' + data.observacion;
                         }
                         else {
-                            //Valida si los datos de la columna cedula son numeros.
+                            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {
                                 if (data.cedula.toString().length != 10) {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                     if (data.fecha_desde != 'No registrado') {
                                         if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                             if (data.fecha_hasta != 'No registrado') {
                                                 if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
                                                     if (data.control_vaca != 'No registrado') {
@@ -697,35 +697,35 @@ class ContratoEmpleadoControlador {
                 listContratos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query(`
-                    SELECT * FROM eu_empleados WHERE cedula = $1
-                    `, [valor.cedula]);
+                        SELECT * FROM eu_empleados WHERE cedula = $1
+                        `, [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                             if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                                 const fechaRango = yield database_1.default.query(`
-                            SELECT * FROM eu_empleado_contratos 
-                            WHERE id_empleado = $1 AND 
-                                ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
-                                fecha_ingreso BETWEEN $2 AND $3)
-                            `, [VERIFICAR_CEDULA.rows[0].id, valor.fecha_desde, valor.fecha_hasta]);
+                                SELECT * FROM eu_empleado_contratos 
+                                WHERE id_empleado = $1 AND 
+                                    ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                                    fecha_ingreso BETWEEN $2 AND $3)
+                                `, [VERIFICAR_CEDULA.rows[0].id, valor.fecha_desde, valor.fecha_hasta]);
                                 if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                     valor.observacion = 'Existe un contrato vigente en esas fechas';
                                 }
                                 else {
                                     var VERIFICAR_PAISES = yield database_1.default.query(`
-                                SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
-                                `, [valor.pais.toUpperCase()]);
+                                    SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                                    `, [valor.pais.toUpperCase()]);
                                     if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
                                         var id_pais = VERIFICAR_PAISES.rows[0].id;
                                         if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
                                             var VERIFICAR_REGIMENES = yield database_1.default.query(`
-                                        SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
-                                        `, [valor.regimen_la.toUpperCase()]);
+                                            SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                            `, [valor.regimen_la.toUpperCase()]);
                                             if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
                                                 if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
                                                     if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
                                                         var VERIFICAR_MODALIDAD = yield database_1.default.query(`
-                                                    SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                                                    `, [valor.modalida_la.toUpperCase()]);
+                                                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                        `, [valor.modalida_la.toUpperCase()]);
                                                         if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
                                                             if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
                                                                 valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
@@ -750,7 +750,7 @@ class ContratoEmpleadoControlador {
                                     }
                                 }
                             }
-                            // Discriminación de elementos iguales
+                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                             if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
                                 duplicados.push(valor);
                             }
@@ -807,31 +807,31 @@ class ContratoEmpleadoControlador {
                     if (mensaje == 'error') {
                         listContratos = undefined;
                     }
-                    console.log('listContratos: ', listContratos);
                     return res.jsonp({ message: mensaje, data: listContratos });
                 }, tiempo);
             }
         });
     }
+    // METODO PARA REGISTRAR DATOS DE CONTRATOS   **USADO
     CargarPlantilla_contrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
-                    const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta, control_asis, control_vaca } = data;
+                    const { cedula, regimen_la, modalida_la, fecha_desde, fecha_hasta, control_asis, control_vaca } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const ID_EMPLEADO = yield database_1.default.query(`
-                SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
-                `, [cedula]);
+                    SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
+                    `, [cedula]);
                     const ID_REGIMEN = yield database_1.default.query(`
-                SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
-                `, [regimen_la.toUpperCase()]);
+                    SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                    `, [regimen_la.toUpperCase()]);
                     const ID_TIPO_CONTRATO = yield database_1.default.query(`
-                SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                `, [modalida_la.toUpperCase()]);
-                    //Transformar el string en booleano
+                    SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                    `, [modalida_la.toUpperCase()]);
+                    // TRANSFORMAR EL STRING EN BOOLEANO
                     let vaca_controla;
                     if (control_vaca.toUpperCase() === 'SI') {
                         vaca_controla = true;
@@ -850,10 +850,10 @@ class ContratoEmpleadoControlador {
                     const id_regimen = ID_REGIMEN.rows[0].id;
                     const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
                     const response = yield database_1.default.query(`
-                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-                    controlar_asistencia, id_regimen, id_modalidad_laboral) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-                `, [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
+                    INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                        controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                    `, [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
                         id_tipo_contrato]);
                     const [contrato] = response.rows;
                     // AUDITORIA

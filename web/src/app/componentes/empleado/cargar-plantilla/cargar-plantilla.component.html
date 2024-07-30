@@ -87,15 +87,15 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCeldaNivel(nt.observacion)"></div>
+                                                [style.background-color]="EstiloCeldaNivel(nt.observacion)"></div>
                                             {{nt.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(nt.sucursal)" style="font-size: 12px;" style="font-size: 12px;">{{nt.sucursal}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.departamento)" style="font-size: 12px;">{{nt.departamento}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">{{nt.depa_superior}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.sucursal_depa_superior)" style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.sucursal)" style="font-size: 12px;" style="font-size: 12px;">{{nt.sucursal}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.departamento)" style="font-size: 12px;">{{nt.departamento}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">{{nt.depa_superior}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.sucursal_depa_superior)" style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
                                 </tr>
                             </tbody>
                     </table>
@@ -205,18 +205,18 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(contrato.observacion)"></div>
+                                                [style.background-color]="EstiloCelda(contrato.observacion)"></div>
                                             {{contrato.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">{{contrato.fecha_desde}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">{{contrato.fecha_hasta}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">{{contrato.fecha_desde}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">{{contrato.fecha_hasta}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
                                     
                                 </tr>
                             </tbody>
@@ -324,19 +324,19 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(cargo.observacion)"></div>
+                                                [style.background-color]="EstiloCelda(cargo.observacion)"></div>
                                             {{cargo.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">{{cargo.fecha_desde}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">{{cargo.fecha_hasta}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.admini_depa)" id="letras" style="font-size: 12px;">{{cargo.admini_depa}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">{{cargo.fecha_desde}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">{{cargo.fecha_hasta}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.admini_depa)" id="letras" style="font-size: 12px;">{{cargo.admini_depa}}</td>
                                 </tr>
                             </tbody>
                         </table>

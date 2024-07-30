@@ -52,7 +52,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
   public async ObtenerDatosUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const UN_USUARIO = await pool.query(
@@ -1740,7 +1740,7 @@ class UsuarioControlador {
     }
   }
 
-  // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+  // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO   **USADO
   public async ActualizarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
@@ -1789,6 +1789,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+      
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -1797,7 +1798,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO   **USADO
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, id } = req.body;
@@ -1845,6 +1846,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1852,7 +1854,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO
   public async RegistrarUsuarioDepartamentoMultiple(req: Request, res: Response) {
     const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
     let error: boolean = false;
@@ -1912,8 +1914,37 @@ class UsuarioControlador {
     0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
     1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL) 
-    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */  async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> { const { id_empleado, id_departamento } = datos; const consulta = await pool.query(`      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `, [id_empleado, id_departamento]); if (consulta.rowCount === 0) return 1; const asignacion = consulta.rows[0]; if (asignacion.principal) { datos.principal = true; datos.id = asignacion.id; datos.personal = asignacion.personal; if (isPersonal) { datos.personal = true; } if (personal) { datos.administra = asignacion.administra; } return 2; } return 3; }
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  
+*/
 
+// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION
+async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> {
+  const { id_empleado, id_departamento } = datos;
+  const consulta = await pool.query(
+    `
+    SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
+    `
+    , [id_empleado, id_departamento]);
+
+  if (consulta.rowCount === 0) return 1;
+  const asignacion = consulta.rows[0];
+
+  if (asignacion.principal) {
+    datos.principal = true;
+    datos.id = asignacion.id;
+    datos.personal = asignacion.personal;
+    if (isPersonal) {
+      datos.personal = true;
+    }
+    if (personal) {
+      datos.administra = asignacion.administra;
+    }
+    return 2;
+  }
+  return 3;
+}
+
+// METODO PARA REGISTRAR UNA ASIGNACION
 async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
@@ -1949,6 +1980,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   }
 }
 
+// METODO PARA EDITAR UNA ASIGNACION
 async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;

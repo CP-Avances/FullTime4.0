@@ -145,7 +145,7 @@ class EmpleadoControlador {
       //FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
-      
+
     } catch (error) {
       //REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -829,7 +829,7 @@ class EmpleadoControlador {
     return res.jsonp({ message: 'Upps!!! ocurrio un error.' });
   }
 
-  // CARGAR IMAGEN DE EMPLEADO
+  // CARGAR IMAGEN DE EMPLEADO   **USADO
   public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
     sharp.cache(false);
 
@@ -878,7 +878,6 @@ class EmpleadoControlador {
         // VERIFICAR SI LA CARPETA DE IMAGENES SE CREO
         if (verificar_imagen === 0) {
           let ruta_guardar = await ObtenerRutaUsuario(unEmpleado.rows[0].id) + separador + imagen;
-          //console.log('ruta 1 ', ruta1)
           fs.access(ruta_temporal, fs.constants.F_OK, (err) => {
             if (!err) {
               sharp(ruta_temporal)
@@ -966,11 +965,10 @@ class EmpleadoControlador {
   }
 
 
-  // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO
+  // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
   public async GeolocalizacionCrokis(req: Request, res: Response): Promise<Response> {
     let id = req.params.id
     let { lat, lng, user_name, ip } = req.body
-    console.log(lat, lng, id);
     try {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -1019,6 +1017,7 @@ class EmpleadoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.status(200).jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1030,17 +1029,17 @@ class EmpleadoControlador {
    ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** ** 
    ** **************************************************************************************** **/
 
-  // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO
+  // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
   public async ObtenerTitulosEmpleado(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const unEmpleadoTitulo = await pool.query(
       `
-        SELECT et.id, et.observacion As observaciones, et.id_titulo, 
-          et.id_empleado, ct.nombre, nt.nombre as nivel
-        FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-        WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
-        ORDER BY id
-        `
+      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
+        et.id_empleado, ct.nombre, nt.nombre as nivel
+      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
+      ORDER BY id
+      `
       , [id_empleado]);
     if (unEmpleadoTitulo.rowCount != 0) {
       return res.jsonp(unEmpleadoTitulo.rows)
@@ -1168,7 +1167,7 @@ class EmpleadoControlador {
     }
   }
 
-  // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO
+  // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
   public async EliminarTituloEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -1178,7 +1177,7 @@ class EmpleadoControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 
       if (!datosOriginales) {
@@ -1217,6 +1216,7 @@ class EmpleadoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

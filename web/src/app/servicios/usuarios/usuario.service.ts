@@ -20,7 +20,7 @@ export class UsuarioService {
       );
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
   BuscarDatosUser(id: number) {
     return this.http.get(`${environment.url}/usuarios/datos/${id}`);
   }
@@ -155,13 +155,13 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS   **USADO
   ActualizarUsuarioDepartamento(data: any) {
     return this.http.put(`${environment.url}/usuarios/actualizar-usuario-departamento`, data).pipe(
       catchError(data));
   }
 
-  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
+  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO    **USADO
   EliminarUsuarioDepartamento(datos: any) {
     const url = `${environment.url}/usuarios/eliminar-usuario-departamento`;
     const httpOptions = {
@@ -170,7 +170,7 @@ export class UsuarioService {
     return this.http.request('delete', url, httpOptions);
   }
 
-  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS   **USADO
   RegistrarUsuarioDepartamentoMultiple(data: any) {
     return this.http.post(`${environment.url}/usuarios/usuario-departamento/multiple`, data);
   }
