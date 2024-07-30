@@ -495,12 +495,14 @@ class DatosGeneralesControlador {
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = await pool.query(
                 `
-                SELECT * FROM informacion_general AS ig
-                WHERE ig.estado = 1 AND 
-	   		        ig.jefe = false AND
-			        ig.cedula = empl.cedula AND
-			        usd.id_empleado = empl.id AND
-	                usd.administra = false
+                SELECT * FROM informacion_general AS ig, 
+                        eu_usuario_departamento AS usd, 
+			            datos_actuales_empleado AS empl
+                WHERE ig.estado = $1 AND 
+	   		            ig.jefe = false AND
+			            ig.cedula = empl.cedula AND
+			            usd.id_empleado = empl.id AND
+	                    usd.administra = false
                 ORDER BY ig.name_suc ASC
                 `
                 , [estado]

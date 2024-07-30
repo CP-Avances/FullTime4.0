@@ -434,12 +434,14 @@ class DatosGeneralesControlador {
             let estado = req.params.estado;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let informacion = yield database_1.default.query(`
-                SELECT * FROM informacion_general AS ig
-                WHERE ig.estado = 1 AND 
-	   		        ig.jefe = false AND
-			        ig.cedula = empl.cedula AND
-			        usd.id_empleado = empl.id AND
-	                usd.administra = false
+                SELECT * FROM informacion_general AS ig, 
+                        eu_usuario_departamento AS usd, 
+			            datos_actuales_empleado AS empl
+                WHERE ig.estado = $1 AND 
+	   		            ig.jefe = false AND
+			            ig.cedula = empl.cedula AND
+			            usd.id_empleado = empl.id AND
+	                    usd.administra = false
                 ORDER BY ig.name_suc ASC
                 `, [estado]).then((result) => { return result.rows; });
             if (informacion.length === 0)
