@@ -687,7 +687,7 @@ class NotificacionTiempoRealControlador {
             da.correo, da.codigo, da.estado, da.id_sucursal, da.id_contrato,
             (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
             (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
-            FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn            
+            FROM informacion_general AS da, eu_configurar_alertas AS cn            
             WHERE da.id = ${codigo} AND cn.id_empleado = da.id
             `;
                 const response = yield database_1.default.query(query);
