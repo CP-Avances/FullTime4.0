@@ -78,7 +78,7 @@ class PlanificacionHorariaControlador {
                     cedula = cedula.toString();
                     // VERIFICAR DATO REQUERIDO EMPLEADO
                     if (!cedula) {
-                        data.observacion = 'Datos no registrados: EMPLEADO';
+                        data.observacion = 'Datos no registrados: CEDULA';
                         continue;
                     }
                     // VERIFICAR EMPLEADO DUPLICADO
@@ -109,7 +109,9 @@ class PlanificacionHorariaControlador {
                         id_empleado: data.id_empleado,
                         hora_trabaja: data.hora_trabaja
                     };
-                    data.dias = yield VerificarHorarios(datosVerificacionHorarios);
+                    const result = yield VerificarHorarios(datosVerificacionHorarios);
+                    data.dias = result.dias;
+                    data.feriados = result.feriados;
                     // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
                     const datosVerificacionSobreposicionHorarios = {
                         dias: data.dias,
@@ -150,7 +152,7 @@ class PlanificacionHorariaControlador {
                             if (horario.observacion === 'OK') {
                                 const origen = horario.tipo === 'N' ? horario.tipo : (horario.tipo === 'FD' ? 'DFD' : 'DL');
                                 entrada = {
-                                    id_empleado: data.codigo_empleado,
+                                    id_empleado: data.id_empleado,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horario.id,
                                     fec_horario: horario.dia,
@@ -227,10 +229,10 @@ class PlanificacionHorariaControlador {
                                 planificacionesImportadas++;
                             }
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
-                                // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL EMPLEADO EN ESA FECHA
+                                // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA
                                 const horarioRegistrado = yield database_1.default.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
-                        `, [data.id_empleado, horario.dia, horarioDefaultLibre.entrada.id_horario]);
+                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
+                        `, [data.id_empleado, horario.dia]);
                                 if (horarioRegistrado.rowCount != 0) {
                                     continue;
                                 }
@@ -279,11 +281,21 @@ class PlanificacionHorariaControlador {
                             }
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL EMPLEADO EN ESA FECHA
-                                const horarioRegistrado = yield database_1.default.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
-                        `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
-                                if (horarioRegistrado.rowCount != 0) {
+                                const horarioDefaultRegistrado = yield database_1.default.query(`
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
+                                `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
+                                if (horarioDefaultRegistrado.rowCount != 0) {
                                     continue;
+                                }
+                                // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA QUE NO SEA DE TIPO FERIADO
+                                const horarioRegistrado = yield database_1.default.query(`
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                `, [data.id_emeplado, horario.dia]);
+                                if (horarioRegistrado.rowCount != 0) {
+                                    // SI YA EXISTE ELIMINAR HORARIO REGISTRADO
+                                    yield database_1.default.query(`
+                                    DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                    `, [data.id_empleado, horario.dia]);
                                 }
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultFeriado.salida.hora}`;
@@ -426,7 +438,7 @@ function VerificarHorarios(datos) {
                     dias[dia].observacion4 = `Jornada superada: ${horas} tiempo total`;
                 }
             }
-            return dias;
+            return { dias, feriados };
         }
         catch (error) {
             throw error;
@@ -532,8 +544,10 @@ function VerificarSuperposicionHorarios(datos) {
                     // VERIFICAR SOBREPOSICIÓN CON HORARIOSPLANIFICACION
                     for (let j = 0; j < horariosPlanificacion.length; j++) {
                         const horario2 = horariosPlanificacion[j];
-                        if (SeSuperponen(horario1, horario2)) {
-                            ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                        if (horario2.codigo !== 'DEFAULT-LIBRE' && horario2.codigo !== 'DEFAULT-FERIADO') {
+                            if (SeSuperponen(horario1, horario2)) {
+                                ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                            }
                         }
                     }
                 }
@@ -659,6 +673,28 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             let { user_name, ip } = datosUsuario;
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
+            // CONSULTAR SI EXISTE HORARIO REGISTRADO PARA EL EMPLEADO EN ESA FECHA CON CODIGO DEFAULT-LIBRE O DEFAULT-FERIADO Y ELIMINARLO
+            const consultaHorarioDefault = yield database_1.default.query(`
+            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario IN (1,2)
+        `, [entrada.id_empleado, entrada.fec_horario]);
+            const asistenciasGeneralDefault = consultaHorarioDefault.rows;
+            if (asistenciasGeneralDefault) {
+                for (const asistencia of asistenciasGeneralDefault) {
+                    yield database_1.default.query(`
+                    DELETE FROM eu_asistencia_general WHERE id = $1
+                `, [asistencia.id]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(asistencia),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    });
+                }
+            }
             // CREAR ENTRADA
             const registroEntrada = yield database_1.default.query(`
             INSERT INTO eu_asistencia_general (id_empleado, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
@@ -771,6 +807,7 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             yield database_1.default.query('COMMIT');
         }
         catch (error) {
+            console.log(error);
             yield database_1.default.query('ROLLBACK');
             throw error;
         }

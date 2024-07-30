@@ -78,7 +78,7 @@ class PlanificacionHorariaControlador {
     
                 // VERIFICAR DATO REQUERIDO EMPLEADO
                 if (!cedula) {
-                    data.observacion = 'Datos no registrados: EMPLEADO';
+                    data.observacion = 'Datos no registrados: CEDULA';
                     continue;
                 }
     
@@ -113,7 +113,9 @@ class PlanificacionHorariaControlador {
                     hora_trabaja: data.hora_trabaja
                 };
     
-                data.dias = await VerificarHorarios(datosVerificacionHorarios);
+                const result = await VerificarHorarios(datosVerificacionHorarios);
+                data.dias = result.dias;
+                data.feriados = result.feriados;
     
                 // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
                 const datosVerificacionSobreposicionHorarios: DatosVerificacionSuperposicionHorarios = {
@@ -167,7 +169,7 @@ class PlanificacionHorariaControlador {
                             const origen = horario.tipo === 'N' ? horario.tipo : (horario.tipo === 'FD' ? 'DFD' : 'DL');
 
                             entrada = {
-                                id_empleado: data.codigo_empleado,
+                                id_empleado: data.id_empleado,
                                 id_empl_cargo: data.id_empl_cargo,
                                 id_horario: horario.id,
                                 fec_horario: horario.dia,
@@ -251,15 +253,14 @@ class PlanificacionHorariaControlador {
 
                         } else if (horario.observacion === 'DEFAULT-LIBRE') {
 
-                            // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL EMPLEADO EN ESA FECHA
+                            // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA
                             const horarioRegistrado = await pool.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
-                        `, [data.id_empleado, horario.dia, horarioDefaultLibre.entrada.id_horario]);
+                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
+                        `, [data.id_empleado, horario.dia]);
 
                             if (horarioRegistrado.rowCount != 0) {
                                 continue;
                             }
-
 
                             const fecha_horario_entrada = `${horario.dia} ${horarioDefaultLibre.entrada.hora}`;
                             const fecha_horario_salida = `${horario.dia} ${horarioDefaultLibre.salida.hora}`;
@@ -312,13 +313,25 @@ class PlanificacionHorariaControlador {
                         } else if (horario.observacion === 'DEFAULT-FERIADO') {
 
                             // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL EMPLEADO EN ESA FECHA
-                            const horarioRegistrado = await pool.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
-                        `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
+                            const horarioDefaultRegistrado = await pool.query(`
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
+                                `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
 
-                            if (horarioRegistrado.rowCount != 0) {
+                            if (horarioDefaultRegistrado.rowCount != 0) {
                                 continue;
                             }
+
+                            // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA QUE NO SEA DE TIPO FERIADO
+                            const horarioRegistrado = await pool.query(`
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                `, [data.id_emeplado, horario.dia]);
+    
+                                if (horarioRegistrado.rowCount != 0) {
+                                    // SI YA EXISTE ELIMINAR HORARIO REGISTRADO
+                                    await pool.query(`
+                                    DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                    `, [data.id_empleado, horario.dia]);
+                                }
 
 
                             const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
@@ -483,7 +496,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
             }
 
         }
-        return dias;
+        return {dias, feriados};
     } catch (error) {
         throw error;
     }
@@ -609,8 +622,10 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                 // VERIFICAR SOBREPOSICIÓN CON HORARIOSPLANIFICACION
                 for (let j = 0; j < horariosPlanificacion.length; j++) {
                     const horario2 = horariosPlanificacion[j];
-                    if (SeSuperponen(horario1, horario2)) {
-                        ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                    if (horario2.codigo !== 'DEFAULT-LIBRE' && horario2.codigo !== 'DEFAULT-FERIADO') {
+                        if (SeSuperponen(horario1, horario2)) {
+                            ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                        }
                     }
                 }
             }
@@ -752,11 +767,39 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
             salida
         } = planificacionHoraria;
 
+
         // DESESTRUCTURAR DATOS EMPLEADO
         let { user_name, ip } = datosUsuario;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
+
+        // CONSULTAR SI EXISTE HORARIO REGISTRADO PARA EL EMPLEADO EN ESA FECHA CON CODIGO DEFAULT-LIBRE O DEFAULT-FERIADO Y ELIMINARLO
+        const consultaHorarioDefault = await pool.query(`
+            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario IN (1,2)
+        `, [entrada.id_empleado, entrada.fec_horario]);
+
+        const asistenciasGeneralDefault = consultaHorarioDefault.rows;
+
+        if (asistenciasGeneralDefault) {
+            for (const asistencia of asistenciasGeneralDefault) {
+                await pool.query(`
+                    DELETE FROM eu_asistencia_general WHERE id = $1
+                `, [asistencia.id]);
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(asistencia),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+            }
+        }
+
 
         // CREAR ENTRADA
         const registroEntrada = await pool.query(
@@ -902,6 +945,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         await pool.query('COMMIT');
 
     } catch (error) {
+        console.log(error);
         await pool.query('ROLLBACK');
         throw error;
     }
