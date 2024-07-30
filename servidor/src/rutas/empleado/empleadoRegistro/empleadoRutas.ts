@@ -133,6 +133,8 @@ class EmpleadoRutas {
          ** **************************************************************************************** **/
         this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
+        //--------------------------------------------------------------- METODO APP MOVIL -------------------------------------------------------------------
+        this.router.get('/horarios/horariosEmpleado', TokenValidation, EMPLEADO_CONTROLADOR.getHorariosEmpleadoByCodigo);
     }
 
 }

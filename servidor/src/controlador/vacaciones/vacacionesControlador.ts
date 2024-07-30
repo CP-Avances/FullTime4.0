@@ -702,6 +702,28 @@ class VacacionesControlador {
     }
   }
 
+  //------------------------------------------------- METODO APP MOBIL ----------------------------------------------------------------------
+  public async getlistaVacacionesByFechasyCodigo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { fec_inicio, fec_final, codigo } = req.query;
+
+      const query = `SELECT v.* FROM mv_solicitud_vacacion v WHERE v.id_empleado = '${codigo}' AND (
+            ((\'${fec_inicio}\' BETWEEN v.fecha_inicio AND v.fecha_final ) OR 
+             (\'${fec_final}\' BETWEEN v.fecha_inicio AND v.fecha_final)) 
+            OR
+            ((v.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
+             (v.fecha_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
+            )`
+
+      const response: QueryResult = await pool.query(query);
+      const vacaciones: any[] = response.rows;
+      return res.status(200).jsonp(vacaciones);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
+
 }
 
 export const VACACIONES_CONTROLADOR = new VacacionesControlador();

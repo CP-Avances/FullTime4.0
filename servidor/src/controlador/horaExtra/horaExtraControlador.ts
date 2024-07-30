@@ -297,7 +297,7 @@ class HorasExtrasPedidasControlador {
 
     try {
       const id = req.params.id
-  
+
       const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
@@ -322,7 +322,7 @@ class HorasExtrasPedidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'error' });
       }
-  
+
       const response: QueryResult = await pool.query(
         `
           UPDATE mhe_solicitud_hora_extra SET fecha_inicio = $1, fecha_final = $2, horas_solicitud = $3, descripcion = $4, 
@@ -330,7 +330,7 @@ class HorasExtrasPedidasControlador {
           WHERE id = $7 RETURNING *
         `
         , [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
-  
+
       const [objetoHoraExtra] = response.rows;
 
       // AUDITORIA
@@ -382,13 +382,13 @@ class HorasExtrasPedidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'error' });
       }
-  
+
       await pool.query(
         `
         DELETE FROM ecm_realtime_notificacion WHERE id_hora_extra = $1
         `
         , [id_hora_extra]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ecm_realtime_notificacion',
@@ -419,7 +419,7 @@ class HorasExtrasPedidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'error' });
       }
-  
+
       await pool.query(
         `
         DELETE FROM ecm_autorizaciones WHERE id_hora_extra = $1
@@ -436,7 +436,7 @@ class HorasExtrasPedidasControlador {
         ip,
         observacion: null
       });
-  
+
       // CONSULTAR DATOS ORIGINALES SOLICITUD DE HORA EXTRA
       const datosOriginalesHoraExtra = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id_hora_extra]);
       const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
@@ -478,7 +478,7 @@ class HorasExtrasPedidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (documento != 'null' && documento != '' && documento != null) {
         let filePath = `servidor\\horasExtras\\${documento}`
         let direccionCompleta = __dirname.split("servidor")[0] + filePath;
@@ -491,7 +491,7 @@ class HorasExtrasPedidasControlador {
           }
         });
       }
-  
+
       if (objetoHoraExtra) {
         return res.status(200).jsonp(objetoHoraExtra)
       }
@@ -717,7 +717,7 @@ class HorasExtrasPedidasControlador {
       }
     } catch (error) {
       // REVERTIR TRNASACCION
-      await pool.query('ROLLBACK');    
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -831,7 +831,7 @@ class HorasExtrasPedidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'error' });
       }
-  
+
       await pool.query(
         `
         UPDATE mhe_solicitud_hora_extra SET documento = null, docu_nombre = null WHERE id = $1
@@ -851,7 +851,7 @@ class HorasExtrasPedidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (documento != 'null' && documento != '' && documento != null) {
         let filePath = `servidor\\horasExtras\\${documento}`
         let direccionCompleta = __dirname.split("servidor")[0] + filePath;
@@ -864,7 +864,7 @@ class HorasExtrasPedidasControlador {
           }
         });
       }
-  
+
       return res.jsonp({ message: 'Documento Actualizado' });
     } catch (error) {
       // REVERTIR TRNASACCION
@@ -1123,6 +1123,28 @@ class HorasExtrasPedidasControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
+
+  //----------------------------------------------------------------- METODOS APP MOVIL------------------------------------------------------------------------------------------------------
+   public async getlistaHorasExtrasByFechasyCodigo(req: Request, res: Response): Promise<Response>  {
+    try {
+      const { fecha_inicio, fecha_final, codigo } = req.query;
+
+      const query = `SELECT h.* FROM mhe_solicitud_hora_extra h WHERE h.id_empleado_solicita = '${codigo}' AND (
+            ((\'${fecha_inicio}\' BETWEEN h.fecha_inicio AND h.fecha_final ) OR 
+             (\'${fecha_final}\' BETWEEN h.fecha_inicio AND h.fecha_final)) 
+            OR
+            ((h.fecha_inicio BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\') OR 
+             (h.fecha_final BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\'))
+            )`
+
+      const response: QueryResult = await pool.query(query);
+      const horas_extras: any[] = response.rows;
+      return res.status(200).jsonp(horas_extras);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
 
 
 }

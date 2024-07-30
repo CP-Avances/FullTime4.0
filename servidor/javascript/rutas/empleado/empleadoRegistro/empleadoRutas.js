@@ -107,6 +107,8 @@ class EmpleadoRutas {
          ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** **
          ** **************************************************************************************** **/
         this.router.post('/crear_carpetas/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearCarpetasEmpleado);
+        //--------------------------------------------------------------- METODO APP MOVIL -------------------------------------------------------------------
+        this.router.get('/horarios/horariosEmpleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.getHorariosEmpleadoByCodigo);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

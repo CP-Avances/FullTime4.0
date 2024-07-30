@@ -995,6 +995,29 @@ class HorasExtrasPedidasControlador {
             }
         });
     }
+    //----------------------------------------------------------------- METODOS APP MOVIL------------------------------------------------------------------------------------------------------
+    getlistaHorasExtrasByFechasyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_inicio, fecha_final, codigo } = req.query;
+                const query = `SELECT h.* FROM mhe_solicitud_hora_extra h WHERE h.id_empleado_solicita = '${codigo}' AND (
+            ((\'${fecha_inicio}\' BETWEEN h.fecha_inicio AND h.fecha_final ) OR 
+             (\'${fecha_final}\' BETWEEN h.fecha_inicio AND h.fecha_final)) 
+            OR
+            ((h.fecha_inicio BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\') OR 
+             (h.fecha_final BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\'))
+            )`;
+                const response = yield database_1.default.query(query);
+                const horas_extras = response.rows;
+                return res.status(200).jsonp(horas_extras);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.horaExtraPedidasControlador = new HorasExtrasPedidasControlador();
 exports.default = exports.horaExtraPedidasControlador;

@@ -66,7 +66,8 @@ class HorasExtrasPedidasRutas {
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS WEB
         this.router.delete('/eliminar-documento-web/:documento', [TokenValidation, ModuloHoraExtraValidation], HorasExtrasPedidasControlador.EliminarArchivoMovil);
 
-         
+        this.router.get('/horas-extras/lista-horas-extrasfechas', TokenValidation, HorasExtrasPedidasControlador.getlistaHorasExtrasByFechasyCodigo);
+
 
         /** ************************************************************************************************** ** 
          ** **                         METODO PARA ENVIO DE NOTIFICACIONES                                  ** ** 

@@ -137,7 +137,7 @@ class PermisosRutas {
         this.router.get('/lista-permisos', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByCodigo);
         this.router.get('/lista-permisosfechas', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByFechasyCodigo);
         this.router.get('/lista-permisoshoras', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByHorasyCodigo);
-        this.router.post('/insert-permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByHorasyCodigo);
+        this.router.post('/insert-permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.postNuevoPermiso);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

@@ -102,11 +102,11 @@ class EmpleadoCargosControlador {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
-        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe, ec.estado,
+        ec.hora_trabaja, s.nombre AS sucursal, ec.id_departamento, ec.jefe, ec.estado,
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
         e_cat_tipo_cargo AS tc 
-      WHERE ec.id = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id AND 
+      WHERE ec.id = $1 AND ec.id_departamento = d.id AND 
         s.id_empresa = e.id AND ec.id_tipo_cargo = tc.id 
       ORDER BY ec.id
       `, [id]);
@@ -229,7 +229,7 @@ class EmpleadoCargosControlador {
       SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
         s.nombre AS sucursal, d.nombre AS departamento, ec.jefe 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
-      WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
+      WHERE ec.id_contrato = $1 AND ec.id_departamento = d.id
       `, [id_empl_contrato]);
             if (unEmplCargp.rowCount != 0) {
                 return res.jsonp(unEmplCargp.rows);

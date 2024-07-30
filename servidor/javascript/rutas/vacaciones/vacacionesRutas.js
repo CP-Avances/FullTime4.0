@@ -18,6 +18,7 @@ class VacacionesRutas {
         this.router.post('/fechasFeriado', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerFechasFeriado);
         this.router.get('/datosSolicitud/:id_emple_vacacion', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerSolicitudVacaciones);
         this.router.get('/datosAutorizacion/:id_vacaciones', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerAutorizacionVacaciones);
+        this.router.get('/lista-vacacionesfechas/fechas/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.getlistaVacacionesByFechasyCodigo);
         /** ************************************************************************************************* **
          ** **                          METODOS PARA MANEJO DE VACACIONES                                  ** **
          ** ************************************************************************************************* **/

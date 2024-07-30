@@ -2827,6 +2827,33 @@ class EmpleadoControlador {
       res.jsonp({ message: 'Carpetas creadas con éxito.' });
     }
   }
+
+  public async getHorariosEmpleadoByCodigo(req: Request, res: Response): Promise<Response>{
+    try {
+        const { codigo, fecha_inicio} = req.query;
+        const response: QueryResult = await pool.query(
+            `
+            SELECT id, id_empleado AS empl_codigo, id_empleado_cargo, id_horario,
+                fecha_horario AS fecha, fecha_hora_horario::time AS horario,
+                tipo_dia, tipo_accion AS tipo_hora, id_detalle_horario
+            FROM eu_asistencia_general
+            WHERE id_empleado = $1
+                AND fecha_horario BETWEEN $2 AND $2 
+            ORDER BY horario ASC`
+            , [codigo, fecha_inicio]
+        );
+        const horarios: any[] = response.rows;
+
+        if (horarios.length === 0) return res.status(200).jsonp([]);
+        return res.status(200).jsonp(horarios);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+};
+
+
+
 }
 
 export const EMPLEADO_CONTROLADOR = new EmpleadoControlador();
