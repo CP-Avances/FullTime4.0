@@ -144,7 +144,6 @@ export class EditarContratoComponent implements OnInit {
     this.regimenLaboral = [];
     this.restRegimen.ConsultarRegimenPais(pais).subscribe(datos => {
       this.regimenLaboral = datos;
-      console.log('ver id de regimen', this.regimenLaboral)
     }, error => {
       this.toastr.info('Pais seleccionado no tiene registros de Régimen Laboral.', '', {
         timeOut: 6000,

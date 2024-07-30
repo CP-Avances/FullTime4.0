@@ -48,7 +48,7 @@ class EmpleadoRutas {
         this.router.get('/encontrarDato/codigo/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerMAXCodigo);
         // METODO PARA ACTUALIZAR CODIGO VALOR TOTAL   **USADO
         this.router.put('/cambiarValores', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarCodigoTotal);
-        // METODO DE ACTUALIZACION DE CODIGO
+        // METODO DE ACTUALIZACION DE CODIGO   **USADO
         this.router.put('/cambiarCodigo', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarCodigo);
 
 
@@ -60,25 +60,25 @@ class EmpleadoRutas {
         this.router.get('/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleado);
         // LISTAR EMPLEADOS REGISTRADOS
         this.router.get('/buscador/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ListarBusquedaEmpleados);
-        // REGISTRO DE EMPLEADOS
+        // REGISTRO DE EMPLEADOS   **USADO
         this.router.post('/', TokenValidation, EMPLEADO_CONTROLADOR.InsertarEmpleado);
-        // EDICION DE EMPLEADOS
+        // EDICION DE EMPLEADOS   **USUARIO
         this.router.put('/:id/usuario', TokenValidation, EMPLEADO_CONTROLADOR.EditarEmpleado);
-        // METODO PARA LISTAR EMPLEADOS ACTIVOS
+        // METODO PARA LISTAR EMPLEADOS ACTIVOS   **USADO
         this.router.get('/', TokenValidation, EMPLEADO_CONTROLADOR.Listar);
-        // METODO PARA LISTAR EMPLEADOS INACTIVOS
+        // METODO PARA LISTAR EMPLEADOS INACTIVOS   **USADO
         this.router.get('/desactivados/empleados', TokenValidation, EMPLEADO_CONTROLADOR.ListarEmpleadosDesactivados);
-        // METODO PARA DESACTIVAR EMPLEADOS
+        // METODO PARA DESACTIVAR EMPLEADOS    **USADO
         this.router.put('/desactivar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.DesactivarMultiplesEmpleados);
-        // METODO PARA ACTIVAR EMPLEADOS
+        // METODO PARA ACTIVAR EMPLEADOS   **USADO
         this.router.put('/activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ActivarMultiplesEmpleados);
-        // METODO PARA REACTIVAR EMPLEADOS
+        // METODO PARA REACTIVAR EMPLEADOS   **USADO VERIFICAR FUNCIONAMIENTO
         this.router.put('/re-activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ReactivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
         this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
-        // METODO PARA ELIMINAR EMPLEADOS
+        // METODO PARA ELIMINAR EMPLEADOS   **USADO
         this.router.delete('/eliminar', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
 
 
@@ -90,11 +90,11 @@ class EmpleadoRutas {
 
         // METODO PARA BUSCAR TITULO DEL USUARIO   **USADO
         this.router.get('/emplTitulos/:id_empleado', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTitulosEmpleado);
-        // METODO PARA REGISTRAR TITULO PROFESIONAL
+        // METODO PARA REGISTRAR TITULO PROFESIONAL   **USADO
         this.router.post('/emplTitulos/', TokenValidation, EMPLEADO_CONTROLADOR.CrearEmpleadoTitulos);
-        // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+        // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
         this.router.post('/emplTitulos/usuario', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTituloEspecifico);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO   **USADO
         this.router.put('/:id_empleado_titulo/titulo', TokenValidation, EMPLEADO_CONTROLADOR.EditarTituloEmpleado);
         // METODO PARA ELIMINAR TITULO   **USADO
         this.router.delete('/eliminar/titulo/:id_empleado_titulo', TokenValidation, EMPLEADO_CONTROLADOR.EliminarTituloEmpleado);
@@ -117,20 +117,21 @@ class EmpleadoRutas {
         // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
         this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.CodificarImagenBase64);
 
-        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
+        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMATICA     **USADO
         this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
-        //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
+        // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
         this.router.post('/cargar_automatico/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
 
-        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
+        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL   **USADO
         this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
-        //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
+        // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
         /** **************************************************************************************** **
          ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
          ** **************************************************************************************** **/
+        // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
         this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
     }

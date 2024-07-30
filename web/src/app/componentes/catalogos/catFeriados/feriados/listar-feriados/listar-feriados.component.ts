@@ -1,10 +1,11 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -24,7 +25,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { Router } from '@angular/router';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableFeriados } from 'src/app/model/reportes.model';
@@ -40,7 +40,6 @@ export class ListarFeriadosComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   feriadosEliminar: any = [];
-
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('');
@@ -92,13 +91,12 @@ export class ListarFeriadosComponent implements OnInit {
   constructor(
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private toastr: ToastrService, // VARIABLE MANEJO DE MENSAJES DE NOTIFICACIONES
+    private router: Router,
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: FeriadosService, // SERVICIO DATOS DE FERIADOS
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    private router: Router,
-
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -257,8 +255,6 @@ export class ListarFeriadosComponent implements OnInit {
     this.ver_lista = false;
   }
 
-
-
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
   FileChange(element: any) {
@@ -277,7 +273,6 @@ export class ListarFeriadosComponent implements OnInit {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
-        //this.Revisarplantilla_feriado_ciudad();
       } else {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
@@ -306,13 +301,12 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
 
-      this.DataFeriados.sort((a, b) => {
+      this.DataFeriados.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -322,7 +316,7 @@ export class ListarFeriadosComponent implements OnInit {
         return 0;
       });
 
-      this.DataFerieados_ciudades.sort((a, b) => {
+      this.DataFerieados_ciudades.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -364,19 +358,15 @@ export class ListarFeriadosComponent implements OnInit {
             this.listaFerediadCiudadCorrectos.push(item);
           }
         });
-
       }
-
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-    }, () => {
-
     });
   }
 
+  // METODO PARA REGISTRAR FERIADO CIUDAD PLANTILLA
   DataFerieados_ciudades: any = [];
   messajeExcel2: string = '';
   Crear_feriado_ciudad() {
@@ -394,21 +384,21 @@ export class ListarFeriadosComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarFeriados();
+          this.RegistrarFeriados();
         }
       });
   }
 
+  // METODO PARA REGISTRAR DATOS
   listFeriadosCorrectos: any = [];
   listaFerediadCiudadCorrectos: any = [];
-  registrarFeriados() {
+  RegistrarFeriados() {
     if (this.listFeriadosCorrectos?.length > 0) {
       const data = {
         plantilla: this.listFeriadosCorrectos,
         user_name: this.user_name,
         ip: this.ip
       }
-
       this.rest.Crear_feriados(data).subscribe({
         next: (response) => {
           this.toastr.success('Plantilla de Feriados importada.', 'Operación exitosa.', {
@@ -440,52 +430,9 @@ export class ListarFeriadosComponent implements OnInit {
 
   }
 
-
-  // METODO PARA ASIGNAR CIUDADES A FERIADO
-  contadorc: number = 0;
-  ingresarc: number = 0;
-  /*
- InsertarFeriadoCiudad(id: number) {
-   this.ingresar = 0;
-   this.contadorc = 0;
-
-   // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
-
-   this.ciudadesSeleccionadas.map((obj: any) => {
-     var buscarCiudad = {
-       id_feriado: id,
-       id_ciudad: obj.id
-     }
-     // BUSCAR ID DE CIUDADES EXISTENTES
-     this.ciudadFeriados = [];
-     this.restF.BuscarIdCiudad(buscarCiudad).subscribe(datos => {
-       this.contadorc = this.contadorc + 1;
-       this.ciudadFeriados = datos;
-       this.VerMensaje(id);
-       this.toastr.info('',
-         'Se indica que ' + obj.descripcion + ' ya fue asignada a este Feriado.', {
-         timeOut: 7000,
-       })
-     }, error => {
-       this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
-         this.contadorc = this.contadorc + 1;
-         this.ingresar = this.ingresar + 1;
-         this.VerMensaje(id);
-       }, error => {
-         this.contadorc = this.contadorc + 1;
-         this.VerMensaje(id);
-         this.toastr.error('Verificar asignación de ciudades.', 'Ups!!! algo salio mal.', {
-           timeOut: 6000,
-         })
-       });
-     });
-   });
- }*/
-
-
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Fecha duplicada') {
       return 'rgb(170, 129, 236)';
@@ -527,7 +474,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -553,7 +500,6 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -681,7 +627,6 @@ export class ListarFeriadosComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -727,8 +672,11 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
 
-  // METODOS PARA LA SELECCION MULTIPLE
+  /** ************************************************************************************************** **
+   ** **                          METODO DE SELECCION MULTIPLE DE DATOS                               ** **
+   ** ************************************************************************************************** **/
 
+  // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -745,14 +693,11 @@ export class ListarFeriadosComponent implements OnInit {
 
   selectionFeriados = new SelectionModel<ITableFeriados>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionFeriados.selected.length;
     return numSelected === this.feriados.length;
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -761,15 +706,12 @@ export class ListarFeriadosComponent implements OnInit {
       this.feriados.forEach((row: any) => this.selectionFeriados.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableFeriados): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.feriadosEliminar = this.selectionFeriados.selected;
-
-
 
     return `${this.selectionFeriados.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
 

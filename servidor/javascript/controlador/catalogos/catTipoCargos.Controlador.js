@@ -13,14 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPOSCARGOSCONTROLADOR = void 0;
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class TiposCargosControlador {
-    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE   **USADO
     BuscarTipoCargoNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;

@@ -12,7 +12,7 @@ export class UsuarioService {
     private http: HttpClient,
   ) { }
 
-  // REGISTRAR USUARIO
+  // REGISTRAR USUARIO    **USADO
   RegistrarUsuario(data: any) {
     return this.http.post(`${environment.url}/usuarios`, data)
       .pipe(
@@ -34,7 +34,7 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-ids-usuarios-departamento`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO    **USADO
   ActualizarDatos(data: any) {
     return this.http.put(`${environment.url}/usuarios/actualizarDatos`, data).pipe(
       catchError(data));
@@ -137,7 +137,7 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-sucursal`, id_empleado);
   }
 
-  //REGISTRAR USUARIO - DEPARTAMENTO
+  //REGISTRAR USUARIO - DEPARTAMENTO    **USADO
   RegistrarUsuarioDepartamento(data: any) {
     return this.http.post(`${environment.url}/usuarios/usuario-departamento`, data)
       .pipe(
@@ -150,7 +150,7 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
   BuscarAsignacionUsuarioDepartamento(data: any) {
     return this.http.post(`${environment.url}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }

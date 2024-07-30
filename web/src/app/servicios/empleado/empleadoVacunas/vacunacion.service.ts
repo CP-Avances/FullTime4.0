@@ -18,37 +18,37 @@ export class VacunacionService {
     return this.http.get(`${environment.url}/vacunas/${id_empleado}`);
   }
 
-  // LISTAR TIPO DE VACUNAS
+  // LISTAR TIPO DE VACUNAS    **USADO
   ListarTiposVacuna() {
     return this.http.get(`${environment.url}/vacunas/lista/tipo_vacuna`);
   }
 
-  // SERVICIO REGISTROS DE VACUNACION
+  // SERVICIO REGISTROS DE VACUNACION   **USADO
   RegistrarVacunacion(data: any) {
     return this.http.post<any>(`${environment.url}/vacunas`, data);
   }
 
-  // SERVICIO PARA BUSCAR VACUNA FECHA - TIPO
+  // SERVICIO PARA BUSCAR VACUNA FECHA - TIPO   **USADO
   BuscarVacunaFechaTipo(data: any) {
     return this.http.post<any>(`${environment.url}/vacunas/fecha_nombre/tipo_vacuna`, data);
   }
 
-  // METODO PARA SUBIR UN DOCUMENTO
+  // METODO PARA SUBIR UN DOCUMENTO    **USADO
   SubirDocumento(formData: any, id: number, id_empleado: any) {
     return this.http.put<any>(`${environment.url}/vacunas/${id}/documento/${id_empleado}`, formData)
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO   **USADO
   ActualizarVacunacion(id: number, data: any) {
     return this.http.put<any>(`${environment.url}/vacunas/${id}`, data);
   }
 
-  // ELIMINAR CARNET DE VACUNA DEL SERVIDOR
+  // ELIMINAR CARNET DE VACUNA DEL SERVIDOR    **USADO
   EliminarArchivoServidor(datos: any) {
     return this.http.put(`${environment.url}/vacunas/eliminar_carnet/servidor`, datos)
   }
 
-  // ELIMINAR CARNET DE VACUNA
+  // ELIMINAR CARNET DE VACUNA    **USADO
   EliminarArchivo(datos: any) {
     return this.http.put(`${environment.url}/vacunas/eliminar_carnet/base_servidor`, datos)
   }

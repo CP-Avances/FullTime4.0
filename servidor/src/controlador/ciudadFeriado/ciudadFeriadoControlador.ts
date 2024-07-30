@@ -23,7 +23,7 @@ class CiudadFeriadoControlador {
         }
     }
 
-    // METODO PARA BUSCAR NOMBRES DE CIUDADES
+    // METODO PARA BUSCAR NOMBRES DE CIUDADES    **USADO
     public async EncontrarCiudadesFeriado(req: Request, res: Response): Promise<any> {
         const { idferiado } = req.params;
         const CIUDAD_FERIADO = await pool.query(
@@ -42,7 +42,7 @@ class CiudadFeriadoControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarCiudadFeriado(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -52,7 +52,7 @@ class CiudadFeriadoControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOS ORIGINALES
-            const ciudad = await pool.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+            const ciudad = await pool.query(`SELECT * FROM ef_ciudad_feriado WHERE id = $1`, [id]);
             const [datosOriginales] = ciudad.rows;
 
             if (!datosOriginales) {
@@ -92,6 +92,7 @@ class CiudadFeriadoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -99,7 +100,7 @@ class CiudadFeriadoControlador {
         }
     }
 
-    // METODO PARA BUSCAR ID DE CIUDADES
+    // METODO PARA BUSCAR ID DE CIUDADES   **USADO
     public async ObtenerIdCiudades(req: Request, res: Response): Promise<any> {
         const { id_feriado, id_ciudad } = req.body;
         const CIUDAD_FERIADO = await pool.query(
@@ -115,7 +116,7 @@ class CiudadFeriadoControlador {
         }
     }
 
-    // METODO PARA ASIGNAR CIUDADES A FERIADO
+    // METODO PARA ASIGNAR CIUDADES A FERIADO   **USADO
     public async AsignarCiudadFeriado(req: Request, res: Response) {
         try {
             const { id_feriado, id_ciudad, user_name, ip } = req.body;
@@ -144,33 +145,33 @@ class CiudadFeriadoControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             if (feriado) {
                 return res.status(200).jsonp({ message: 'OK', reloj: feriado })
             }
             else {
                 return res.status(404).jsonp({ message: 'error' })
             }
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' })
         }
-
     }
 
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO    **USADO
     public async ActualizarCiudadFeriado(req: Request, res: Response): Promise<Response> {
         try {
             const { id_feriado, id_ciudad, id, user_name, ip } = req.body;
-    
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             // CONSULTAR DATOS ORIGINALES
-            const ciudad = await pool.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+            const ciudad = await pool.query(`SELECT * FROM ef_ciudad_feriado WHERE id = $1`, [id]);
             const [datosOriginales] = ciudad.rows;
-    
+
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -182,19 +183,19 @@ class CiudadFeriadoControlador {
                     ip,
                     observacion: `Error al actualizar la ciudad con id ${id}. Registro no encontrado.`
                 });
-    
+
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
             }
-    
+
             const actualizacion = await pool.query(
                 `
                 UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3 RETURNING *
                 `
                 , [id_feriado, id_ciudad, id]);
             const [datosNuevos] = actualizacion.rows;
-    
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ef_ciudad_feriado',
@@ -205,10 +206,11 @@ class CiudadFeriadoControlador {
                 ip,
                 observacion: null
             });
-    
+
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro actualizado.' });
+            
         } catch (error) {
             // FINALIZAR TRANSACCION
             await pool.query('ROLLBACK');

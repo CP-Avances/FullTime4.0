@@ -35,17 +35,17 @@ class EmpleadosCargpsRutas {
         this.router.post('/cargo-activo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosActivos);
 
 
-        // METODO PARA CREAR CARGOS DEL USUARIO
+        // METODO PARA CREAR CARGOS DEL USUARIO    **USADO
         this.router.post('/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.Crear);
         // METODO DE BUSQUEDA DE DATOS DE CARGO DEL USUARIO MEDIANTE ID DEL CARGO    **USADO
         this.router.get('/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ObtenerCargoID);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO    **USADO
         this.router.put('/:id_empl_contrato/:id/actualizar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EditarCargo);
         // METODO DE CONSULTA DE DATOS DE CARGO POR ID CONTRATO   **USADO
         this.router.get('/cargoInfo/:id_empl_contrato', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarCargoIDContrato);
-        // METODO PARA BUSCAR CARGOS POR FECHA
+        // METODO PARA BUSCAR CARGOS POR FECHA    **USADO
         this.router.post('/fecha_cargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFecha);
-        // METODO PARA BUSCAR CARGOS POR FECHA EDICION
+        // METODO PARA BUSCAR CARGOS POR FECHA EDICION    **USADO
         this.router.post('/fecha_cargo/editar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFechaEditar);
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
@@ -55,9 +55,9 @@ class EmpleadosCargpsRutas {
          ** **                    METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **     
          ** ****************************************************************************************** **/
 
-        // METODO DE BUSQUEDA DE TIPO DE CARGOS
+        // METODO DE BUSQUEDA DE TIPO DE CARGOS    **USADO
         this.router.get('/listar/tiposCargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ListarTiposCargo);
-        // METODO PARA REGISTRAR TIPO DE CARGO
+        // METODO PARA REGISTRAR TIPO DE CARGO    **USADO
         this.router.post('/tipo_cargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.CrearTipoCargo);
 
         // Crear tipo cargo

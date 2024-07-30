@@ -51,7 +51,7 @@ export class RegimenService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // BUSCAR REGISTRO DE REGIMEN LABORAL POR PAIS
+  // BUSCAR REGISTRO DE REGIMEN LABORAL POR PAIS    **USADO
   ConsultarRegimenPais(nombre: string) {
     return this.http.get(`${environment.url}/regimenLaboral/pais-regimen/${nombre}`);
   }

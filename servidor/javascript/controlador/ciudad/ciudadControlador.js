@@ -160,7 +160,7 @@ class CiudadControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD
+    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD   **USADO
     ConsultarUnaCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

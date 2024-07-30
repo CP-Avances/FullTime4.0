@@ -1,5 +1,5 @@
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
@@ -12,7 +12,7 @@ import fs from 'fs';
 
 class ContratoEmpleadoControlador {
 
-    // REGISTRAR CONTRATOS
+    // REGISTRAR CONTRATOS    **USADO
     public async CrearContrato(req: Request, res: Response): Promise<Response> {
 
         const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla,
@@ -85,6 +85,7 @@ class ContratoEmpleadoControlador {
                 else {
                     return res.status(404).jsonp({ message: 'error' })
                 }
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
@@ -96,7 +97,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // METODO PARA GUARDAR DOCUMENTO
+    // METODO PARA GUARDAR DOCUMENTO    **USADO
     public async GuardarDocumentoContrato(req: Request, res: Response): Promise<Response> {
         try {
             // FECHA DEL SISTEMA
@@ -161,6 +162,7 @@ class ContratoEmpleadoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Documento actualizado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -201,16 +203,16 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO
+    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO    **USADO
     public async BuscarContratoEmpleadoEditar(req: Request, res: Response): Promise<any> {
         const { id_empleado, id_contrato } = req.body;
         const CONTRATO_EMPLEADO = await pool.query(
             `
-                SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
-                FROM eu_empleado_contratos AS ec
-                WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
-                ORDER BY ec.id ASC
-                `
+            SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
+            FROM eu_empleado_contratos AS ec
+            WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
+            ORDER BY ec.id ASC
+            `
             , [id_empleado, id_contrato]);
         if (CONTRATO_EMPLEADO.rowCount != 0) {
             return res.jsonp(CONTRATO_EMPLEADO.rows)
@@ -220,7 +222,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // EDITAR DATOS DE CONTRATO
+    // EDITAR DATOS DE CONTRATO     **USADO
     public async EditarContrato(req: Request, res: Response): Promise<Response> {
 
         const { id } = req.params;
@@ -322,7 +324,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR
+    // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR    **USADO
     public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
         try {
             let { documento, id, user_name, ip } = req.body;
@@ -332,7 +334,7 @@ class ContratoEmpleadoControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOS ORIGINALES
-            const contratoConsulta = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+            const contratoConsulta = await pool.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
             const [datosOriginales] = contratoConsulta.rows;
 
             if (!datosOriginales) {
@@ -389,6 +391,7 @@ class ContratoEmpleadoControlador {
             }
 
             return res.jsonp({ message: 'Documento actualizado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -396,7 +399,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR
+    // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR   **USADO
     public async EliminarDocumentoServidor(req: Request, res: Response): Promise<void> {
         let { documento, id } = req.body;
         let separador = path.sep;
@@ -476,10 +479,10 @@ class ContratoEmpleadoControlador {
 
 
     /** **************************************************************************** ** 
-     ** **          METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
+     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
      ** **************************************************************************** **/
 
-    // LISTAR TIPOS DE MODALIDAD DE TRABAJO
+    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
     public async ListarTiposContratos(req: Request, res: Response) {
         const CONTRATOS = await pool.query(
             `
@@ -494,7 +497,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // REGISTRAR MODALIDAD DE TRABAJO
+    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
     public async CrearTipoContrato(req: Request, res: Response): Promise<Response> {
         try {
             const { descripcion, user_name, ip } = req.body;
@@ -528,6 +531,7 @@ class ContratoEmpleadoControlador {
             else {
                 return res.status(404).jsonp({ message: 'error' })
             }
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -536,7 +540,7 @@ class ContratoEmpleadoControlador {
 
     }
 
-    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE
+    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
     public async BuscarModalidadLaboralNombre(req: Request, res: Response) {
         const { nombre } = req.body;
         const CONTRATOS = await pool.query(
@@ -553,6 +557,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
+    // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
     public async EncontrarFechaContratoId(req: Request, res: Response): Promise<any> {
         const { id_contrato } = req.body;
         const FECHA = await pool.query(

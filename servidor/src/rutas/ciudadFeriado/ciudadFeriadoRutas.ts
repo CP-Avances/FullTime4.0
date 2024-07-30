@@ -13,15 +13,15 @@ class CiudadRutas {
 
         // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE  **USADO
         this.router.get('/:nombre', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.FiltrarCiudadesProvincia);
-        // METODO PARA BUSCAR NOMBRES DE CIUDADES
+        // METODO PARA BUSCAR NOMBRES DE CIUDADES   **USADO
         this.router.get('/nombresCiudades/:idferiado', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.EncontrarCiudadesFeriado);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO    **USADO
         this.router.delete('/eliminar/:id', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.EliminarCiudadFeriado);
-        // METODO PARA BUSCAR ID DE CIUDADES
+        // METODO PARA BUSCAR ID DE CIUDADES    **USADO
         this.router.post('/buscar', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.ObtenerIdCiudades);
-        // METODO PARA REGISTRAR ASIGNACION DE CIUDADES  
+        // METODO PARA REGISTRAR ASIGNACION DE CIUDADES    **USADO
         this.router.post('/insertar', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.AsignarCiudadFeriado);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO    **USADO
         this.router.put('/', TokenValidation, CIUDAD_FERIADO_CONTROLADOR.ActualizarCiudadFeriado);
 
 

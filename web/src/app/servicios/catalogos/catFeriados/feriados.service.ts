@@ -12,12 +12,12 @@ export class FeriadosService {
     private http: HttpClient
   ) { }
 
-  // METODO PARA BUSCAR LISTA DE FERI-	CrearFeriadoPlantillaOS
+  // METODO PARA BUSCAR LISTA DE FERIADOS   **USADO
   ConsultarFeriado() {
     return this.http.get(`${environment.url}/feriados`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarFeriado(id: number, datos: any) {
     const url = `${environment.url}/feriados/delete/${id}`;
     const httpOtions = {
@@ -26,7 +26,7 @@ export class FeriadosService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA CREAR NUEVO REGISTRO DE FERIADO
+  // METODO PARA CREAR NUEVO REGISTRO DE FERIADO   **USADO
   CrearNuevoFeriado(datos: any) {
     return this.http.post<any>(`${environment.url}/feriados`, datos)
       .pipe(
@@ -34,18 +34,18 @@ export class FeriadosService {
       );
   }
 
-  // METODO PARA BUSCAR FERIADOS EXCEPTO REGISTRO EDITADO
+  // METODO PARA BUSCAR FERIADOS EXCEPTO REGISTRO EDITADO    **USADO
   ConsultarFeriadoActualiza(id: number) {
     return this.http.get(`${environment.url}/feriados/listar/${id}`);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO   **USADO
   ActualizarUnFeriado(datos: any) {
     return this.http.put(`${environment.url}/feriados`, datos).pipe(
       catchError(datos));
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UN FERIADO ESPECIFICO
+  // METODO PARA BUSCAR INFORMACION DE UN FERIADO ESPECIFICO   **USADO
   ConsultarUnFeriado(id: number) {
     return this.http.get(`${environment.url}/feriados/${id}`);
   }
@@ -60,16 +60,18 @@ export class FeriadosService {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados-recuperar/ciudad`, datos);
   }
 
-  RevisarFormato(formData) {
+  // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>(environment.url + '/feriados/upload/revision', formData);
   }
 
-  Crear_feriados(form){
-    console.log('form: ',form);
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
+  Crear_feriados(form: any){
     return this.http.post<any>(environment.url + '/feriados/upload/crearFeriado', form);
   }
 
-  Crear_feriados_ciudad(form){
+  // METODO PARA CEAR UN FERIADO CIUDAD  PLANTILLA  **USADO  
+  Crear_feriados_ciudad(form: any){
     return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
   }
 

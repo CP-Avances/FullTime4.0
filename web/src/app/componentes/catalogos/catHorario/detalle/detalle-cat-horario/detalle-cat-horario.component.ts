@@ -4,7 +4,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -56,9 +55,7 @@ export class DetalleCatHorarioComponent implements OnInit {
 
   acciones: boolean = false;
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   value = 10;
   color: ThemePalette = 'primary';
@@ -75,7 +72,6 @@ export class DetalleCatHorarioComponent implements OnInit {
     public rest: DetalleCatHorariosService,
     private empre: EmpresaService,
     private toastr: ToastrService,
-    private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -100,7 +96,6 @@ export class DetalleCatHorarioComponent implements OnInit {
       else {
         this.acciones = false;
       }
-      //console.log('ver acciones', this.acciones)
     });
   }
 
@@ -171,7 +166,6 @@ export class DetalleCatHorarioComponent implements OnInit {
       detalle.min_antes = parseInt(form.min_antesForm);
       detalle.min_despues = parseInt(form.min_despuesForm);
     }
-    //console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].minutos_comida === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);

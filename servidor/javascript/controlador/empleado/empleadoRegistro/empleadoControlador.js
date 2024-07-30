@@ -14,17 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
+const settingsMail_1 = require("../../../libs/settingsMail");
 const ts_md5_1 = require("ts-md5");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../../libs/settingsMail");
 const sharp = require('sharp');
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
@@ -144,7 +144,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO
+    // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO   **USADO
     ActualizarCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -197,7 +197,7 @@ class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** **
      ** ** ********************************************************************************************* **/
-    // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS
+    // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
     InsertarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -239,7 +239,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // ACTUALIZAR INFORMACION EL EMPLEADO
+    // ACTUALIZAR INFORMACION EL EMPLEADO    **USADO
     EditarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -302,10 +302,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                     fs_1.default.access(carpetaPermisosAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaPermisosAnterior, carpetaPermisos, (err) => {
                                 if (err) {
                                     verificar_permisos = 1;
@@ -322,10 +322,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
                     fs_1.default.access(carpetaImagenesAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaImagenesAnterior, carpetaImagenes, (err) => {
                                 if (err) {
                                     verificar_imagen = 1;
@@ -342,10 +342,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                     fs_1.default.access(carpetaVacunasAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaVacunasAnterior, carpetaVacunas, (err) => {
                                 if (err) {
                                     verificar_vacunas = 1;
@@ -362,10 +362,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
                     fs_1.default.access(carpetaContratosAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaContratosAnterior, carpetaContratos, (err) => {
                                 if (err) {
                                     verificar_contrato = 1;
@@ -387,7 +387,6 @@ class EmpleadoControlador {
                 const verificaciones = [verificar_permisos, verificar_imagen, verificar_vacunas, verificar_contrato];
                 const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
                 if (mensajesError.length > 0) {
-                    console.log('error empleado ', mensajesError);
                     yield database_1.default.query('ROLLBACK');
                     return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
                 }
@@ -398,7 +397,6 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                console.log('error empleado 500', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
@@ -436,7 +434,7 @@ class EmpleadoControlador {
             res.jsonp(empleado);
         });
     }
-    // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA
+    // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
     Listar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
@@ -445,7 +443,7 @@ class EmpleadoControlador {
             res.jsonp(empleado.rows);
         });
     }
-    // METODO QUE LISTA EMPLEADOS INHABILITADOS
+    // METODO QUE LISTA EMPLEADOS INHABILITADOS   **USADO
     ListarEmpleadosDesactivados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
@@ -454,7 +452,7 @@ class EmpleadoControlador {
             res.jsonp(empleado.rows);
         });
     }
-    // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
+    // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
     DesactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
@@ -539,7 +537,7 @@ class EmpleadoControlador {
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
         });
     }
-    // METODO PARA HABILITAR EMPLEADOS
+    // METODO PARA HABILITAR EMPLEADOS    *USADO
     ActivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
@@ -624,7 +622,7 @@ class EmpleadoControlador {
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
         });
     }
-    // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO
+    // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
     ReactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
@@ -898,7 +896,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
     ObtenerTituloEspecifico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, id_titulo } = req.body;
@@ -915,7 +913,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO
+    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     CrearEmpleadoTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -950,7 +948,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO
+    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     EditarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -959,7 +957,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1145,7 +1143,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleados, user_name, ip } = req.body;
@@ -1156,9 +1154,9 @@ class EmpleadoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // CONSULTAR DATOS ORIGINALES
-                    const usuario = yield database_1.default.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    const usuario = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
                     const [datosOriginalesUsuarios] = usuario.rows;
-                    const empleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [e.id]);
+                    const empleado = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE id = $1`, [e.id]);
                     const [datosOriginalesEmpleado] = empleado.rows;
                     if (!datosOriginalesUsuarios || !datosOriginalesEmpleado) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1183,22 +1181,22 @@ class EmpleadoControlador {
                         yield database_1.default.query('COMMIT');
                         continue;
                     }
-                    const datosActuales = yield database_1.default.query('SELECT * FROM informacion_general WHERE id = $1', [e.id]);
+                    const datosActuales = yield database_1.default.query(`SELECT * FROM informacion_general WHERE id = $1`, [e.id]);
                     const [datosActualesEmpleado] = datosActuales.rows;
-                    const contratos = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
+                    const contratos = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1`, [e.id]);
                     const [datosContratos] = contratos.rows;
-                    const titulos = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+                    const titulos = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1`, [e.id]);
                     const [datosTitulos] = titulos.rows;
-                    const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+                    const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [e.id]);
                     const [datosDiscapacidad] = discapacidad.rows;
-                    const vacunas = yield database_1.default.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+                    const vacunas = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1`, [e.id]);
                     const [datosVacunas] = vacunas.rows;
                     if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
                         empleadosRegistrados = true;
                         continue;
                     }
                     // ELIMINAR USUARIO
-                    yield database_1.default.query('DELETE FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    yield database_1.default.query(`DELETE FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_usuarios',
@@ -1210,7 +1208,7 @@ class EmpleadoControlador {
                         observacion: null
                     });
                     // ELIMINAR EMPLEADO
-                    yield database_1.default.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
+                    yield database_1.default.query(`DELETE FROM eu_empleados WHERE id = $1`, [e.id]);
                     const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesEmpleado.fecha_nacimiento, 'ddd');
                     datosOriginalesEmpleado.fecha_nacimiento = fechaNacimientoO;
                     // AUDITORIA
@@ -1249,6 +1247,7 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/
+    // METODO PARA VERIFICAR PLANTILLA CODIGO AUTOMATICO    **USADO
     VerificarPlantilla_Automatica(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -1292,7 +1291,6 @@ class EmpleadoControlador {
                     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
                     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleados = [];
-                    var duplicados = [];
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var mensaje = 'correcto';
@@ -1332,7 +1330,6 @@ class EmpleadoControlador {
                                 }
                                 else {
                                     if (!valiContra.test(data.contrasena.toString())) {
-                                        //console.log('entro ', data.contrasena.toString().length);
                                         if (data.contrasena.toString().length <= 10) {
                                             if (estadoCivilArray.includes(data.estado_civil)) {
                                                 if (tipogenero.includes(data.genero.toLowerCase())) {
@@ -1346,7 +1343,6 @@ class EmpleadoControlador {
                                                         }
                                                         // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                                                         if (TELEFONO != undefined) {
-                                                            //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                                             if (regex.test(data.telefono.toString())) {
                                                                 if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                                                     data.observacion = 'El teléfono ingresado no es válido';
@@ -1490,10 +1486,8 @@ class EmpleadoControlador {
                                                                                 }
                                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                                 if (TELEFONO != undefined) {
-                                                                                    //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                                                                     if (regex.test(data.telefono.toString())) {
                                                                                         if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                            //console.log('ent: ', data.telefono);
                                                                                             data.observacion = 'El teléfono ingresado no es válido';
                                                                                         }
                                                                                     }
@@ -1574,7 +1568,6 @@ class EmpleadoControlador {
                                                 if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
                                                     // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                                     if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                                        //valor.observacion = 'ok'
                                                         duplicados2.push(valor);
                                                     }
                                                     else {
@@ -1651,7 +1644,6 @@ class EmpleadoControlador {
                         if (mensaje == 'error') {
                             listEmpleados = undefined;
                         }
-                        //console.log('empleados: ', listEmpleados);
                         return res.jsonp({ message: mensaje, data: listEmpleados });
                     }, tiempo);
                 }
@@ -1661,13 +1653,11 @@ class EmpleadoControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const { plantilla, user_name, ip } = req.body;
-            // Expresión regular para validar la latitud y longitud
-            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
@@ -1791,7 +1781,6 @@ class EmpleadoControlador {
                     });
                     // OBTENER EL ID DEL EMPLEADO INGRESADO
                     const id_empleado = empleado.id;
-                    //console.log('id ', id_empleado)
                     // REGISTRO DE LOS DATOS DE USUARIO
                     yield database_1.default.query(`
           INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
@@ -1848,7 +1837,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
+    // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL    **USADO
     VerificarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -1893,7 +1882,6 @@ class EmpleadoControlador {
                     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
                     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleadosManual = [];
-                    var duplicados = [];
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var duplicados3 = [];
@@ -1939,9 +1927,7 @@ class EmpleadoControlador {
                                             data.observacion = 'El código debe tener máximo 10 caracteres';
                                         }
                                         else {
-                                            //console.log(!valiContra.test(data.contrasena));
                                             if (!valiContra.test(data.contrasena.toString())) {
-                                                //console.log('entro ', data.contrasena.toString().length);
                                                 if (data.contrasena.toString().length > 10) {
                                                     data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                 }
@@ -2178,34 +2164,34 @@ class EmpleadoControlador {
                         if (valor.observacion == 'no registrado') {
                             var VERIFICAR_CEDULA = yield database_1.default.query(`
               SELECT * FROM eu_empleados WHERE cedula = $1
-            `, [valor.cedula]);
+              `, [valor.cedula]);
                             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                                 valor.observacion = 'Cédula ya existe en el sistema';
                             }
                             else {
                                 var VERIFICAR_CODIGO = yield database_1.default.query(`
-              SELECT * FROM eu_empleados WHERE codigo = $1
-              `, [valor.codigo]);
+                SELECT * FROM eu_empleados WHERE codigo = $1
+                `, [valor.codigo]);
                                 if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
                                     valor.observacion = 'Código ya existe en el sistema';
                                 }
                                 else {
                                     var VERIFICAR_USUARIO = yield database_1.default.query(`
-                SELECT * FROM eu_usuarios WHERE usuario = $1
-                `, [valor.usuario]);
+                  SELECT * FROM eu_usuarios WHERE usuario = $1
+                  `, [valor.usuario]);
                                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                                         valor.observacion = 'Usuario ya existe en el sistema';
                                     }
                                     else {
                                         if (valor.rol != 'No registrado') {
                                             var VERIFICAR_ROL = yield database_1.default.query(`
-                    SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                    `, [valor.rol.toUpperCase()]);
+                      SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+                      `, [valor.rol.toUpperCase()]);
                                             if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                                                 if (valor.nacionalidad != 'No registrado') {
                                                     var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`
-                        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                        `, [valor.nacionalidad.toUpperCase()]);
+                          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+                          `, [valor.nacionalidad.toUpperCase()]);
                                                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                                                         // DISCRIMINACION DE ELEMENTOS IGUALES
                                                         if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
@@ -2306,12 +2292,10 @@ class EmpleadoControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
-            // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
-            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             var contador = 1;
             let ocurrioError = false;
             let mensajeError = '';
@@ -2477,6 +2461,7 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           **
      ** **************************************************************************************** **/
+    // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
     CrearCarpetasEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleados, permisos, vacaciones, horasExtras } = req.body;

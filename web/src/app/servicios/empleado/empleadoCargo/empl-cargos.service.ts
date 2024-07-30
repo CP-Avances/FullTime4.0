@@ -13,12 +13,12 @@ export class EmplCargosService {
    ** **                      METODO DE CONSULTA DE TIPOS DE CARGOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO DE BUSQUEDA DE TIPO DE CONTRATOS
+  // METODO DE BUSQUEDA DE TIPO DE CARGOS    **USADO
   ObtenerTipoCargos() {
     return this.http.get(`${environment.url}/empleadoCargos/listar/tiposCargo`);
   }
 
-  // METODO PARA REGISTRAR TIPO DE CARGO
+  // METODO PARA REGISTRAR TIPO DE CARGO    **USADO
   CrearTipoCargo(data: any) {
     return this.http.post<any>(`${environment.url}/empleadoCargos/tipo_cargo`, data);
   }
@@ -41,7 +41,7 @@ export class EmplCargosService {
 
 
 
-  // METODO PARA REGISTRAR CARGO
+  // METODO PARA REGISTRAR CARGO   **USADO
   RegistrarCargo(data: any) {
     return this.http.post(`${environment.url}/empleadoCargos`, data);
   }
@@ -51,7 +51,7 @@ export class EmplCargosService {
     return this.http.get<any>(`${environment.url}/empleadoCargos/${id}`);
   }
 
-  // METODO DE ACTUALIZACION DE CARGO
+  // METODO DE ACTUALIZACION DE CARGO    **USADO
   ActualizarContratoEmpleado(id: number, id_empl_contrato: number, data: any) {
     return this.http.put(`${environment.url}/empleadoCargos/${id_empl_contrato}/${id}/actualizar`, data);
   }
@@ -61,12 +61,12 @@ export class EmplCargosService {
     return this.http.get<any>(`${environment.url}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
   }
 
-  // METODO PARA BUSCAR CARGOS POR FECHA
+  // METODO PARA BUSCAR CARGOS POR FECHA    **USADO
   BuscarCargoFecha(data: any) {
     return this.http.post(`${environment.url}/empleadoCargos/fecha_cargo`, data);
   }
 
-  // METODO PARA BUSCAR CARGOS POR FECHA EDITAR
+  // METODO PARA BUSCAR CARGOS POR FECHA EDITAR    **USADO
   BuscarCargoFechaEditar(data: any) {
     return this.http.post(`${environment.url}/empleadoCargos/fecha_cargo/editar`, data);
   }

@@ -38,7 +38,7 @@ class VacunasControlador {
             }
         });
     }
-    // LISTAR REGISTRO TIPO DE VACUNA
+    // LISTAR REGISTRO TIPO DE VACUNA    **USADO
     ListarTipoVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VACUNA = yield database_1.default.query(`
@@ -52,7 +52,7 @@ class VacunasControlador {
             }
         });
     }
-    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO   **USADO
     BuscarVacunaFechaTipo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, id_vacuna, fecha } = req.body;
@@ -67,7 +67,7 @@ class VacunasControlador {
             }
         });
     }
-    // CREAR REGISTRO DE VACUNACION
+    // CREAR REGISTRO DE VACUNACION    **USADO
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
@@ -76,7 +76,6 @@ class VacunasControlador {
             if (subir_documento === true) {
                 // RUTA DE LA CARPETA VACUNAS DEL USUARIO
                 const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id_empleado);
-                //console.log('ruta vacuna ', carpetaVacunas)
                 fs_1.default.access(carpetaVacunas, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
@@ -107,7 +106,6 @@ class VacunasControlador {
                     VALUES ($1, $2, $3, $4, $5) RETURNING *
                     `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
                     const [vacuna] = response.rows;
-                    console.log('vacuna ', vacuna);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_vacunas',
@@ -138,11 +136,10 @@ class VacunasControlador {
             }
         });
     }
-    // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
+    // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION    **USADO
     GuardarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            //console.log('ingresa aqui')
             try {
                 // FECHA DEL SISTEMA
                 var fecha = (0, moment_1.default)();
@@ -155,14 +152,14 @@ class VacunasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                    SELECT codigo FROM eu_empleados WHERE id = $1
-                    `, [id_empleado]);
+                SELECT codigo FROM eu_empleados WHERE id = $1
+                `, [id_empleado]);
                 const [vacuna] = response.rows;
                 let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
                 // CONSULTAR DATOSORIGINALES
                 const vacuna1 = yield database_1.default.query(`
-                    SELECT * FROM eu_empleado_vacunas WHERE id = $1
-                    `, [id]);
+                SELECT * FROM eu_empleado_vacunas WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = vacuna1.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -179,8 +176,8 @@ class VacunasControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
-                    `, [id, documento]);
+                UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
+                `, [id, documento]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
@@ -196,14 +193,13 @@ class VacunasControlador {
                 return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                console.log('vacuna error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al guardar registro.' });
             }
         });
     }
-    // ACTUALIZAR REGISTRO DE VACUNACION
+    // ACTUALIZAR REGISTRO DE VACUNACION   **USADO
     ActualizarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -213,7 +209,6 @@ class VacunasControlador {
             if (subir_documento === true) {
                 // RUTA DE LA CARPETA VACUNAS DEL USUARIO
                 const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id_empleado);
-                //console.log('ruta vacuna ', carpetaVacunas)
                 fs_1.default.access(carpetaVacunas, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
@@ -283,7 +278,7 @@ class VacunasControlador {
             }
         });
     }
-    // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR
+    // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR    **USADO
     EliminarDocumentoServidor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento, id } = req.body;
@@ -303,7 +298,7 @@ class VacunasControlador {
             res.jsonp({ message: 'Documento actualizado.' });
         });
     }
-    // ELIMINAR DOCUMENTO CARNET DE VACUNACION
+    // ELIMINAR DOCUMENTO CARNET DE VACUNACION    **USADO
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -312,7 +307,7 @@ class VacunasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const vacunaconsulta = yield database_1.default.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
+                const vacunaconsulta = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
                 const [datosOriginales] = vacunaconsulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

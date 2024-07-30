@@ -78,7 +78,7 @@ export class DatosGeneralesService {
     return this.http.get(`${environment.url}/generalidades/info_actual`);
   }
 
-  // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+  // METODO PARA LISTAR ID ACTUALES DE USUARIOS    **USADO
   ListarIdInformacionActual() {
     return this.http.get(`${environment.url}/generalidades/info_actual_id`);
   }

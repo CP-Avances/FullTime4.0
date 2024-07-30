@@ -213,7 +213,7 @@ class RegimenControlador {
             }
         });
     }
-    // BUSCAR REGISTRO DE REGIMEN LABORAL POR ID DE PAIS
+    // BUSCAR REGISTRO DE REGIMEN LABORAL POR ID DE PAIS   **USADO
     ListarRegimenPais(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;

@@ -1,9 +1,10 @@
 // SECCION LIBRERIAS
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerRuta, ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
 import moment from 'moment';
@@ -11,7 +12,6 @@ import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 const sharp = require('sharp');
 
@@ -153,7 +153,7 @@ class EmpleadoControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO
+  // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO   **USADO
   public async ActualizarCodigo(req: Request, res: Response): Promise<Response> {
     try {
       const { valor, id, user_name, ip } = req.body;
@@ -205,6 +205,7 @@ class EmpleadoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -217,7 +218,7 @@ class EmpleadoControlador {
    ** ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** ** 
    ** ** ********************************************************************************************* **/
 
-  // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS
+  // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
   public async InsertarEmpleado(req: Request, res: Response) {
     try {
       const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
@@ -261,6 +262,7 @@ class EmpleadoControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
+
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -269,7 +271,7 @@ class EmpleadoControlador {
     }
   }
 
-  // ACTUALIZAR INFORMACION EL EMPLEADO
+  // ACTUALIZAR INFORMACION EL EMPLEADO    **USADO
   public async EditarEmpleado(req: Request, res: Response) {
     try {
       const id = req.params.id;
@@ -322,7 +324,6 @@ class EmpleadoControlador {
       datosOriginales.fecha_nacimiento = fechaNacimientoO;
       datosNuevos.rows[0].fecha_nacimiento = fechaNacimientoN;
 
-
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleados',
@@ -349,9 +350,9 @@ class EmpleadoControlador {
         // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
         fs.access(carpetaPermisosAnterior, fs.constants.F_OK, (err) => {
           if (err) {
-            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
           } else {
-            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
             fs.rename(carpetaPermisosAnterior, carpetaPermisos, (err) => {
               if (err) {
                 verificar_permisos = 1;
@@ -362,7 +363,6 @@ class EmpleadoControlador {
           }
         });
 
-
         // RUTA DE LA CARPETA IMAGENES DEL USUARIO
         const carpetaImagenesAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'imagenesEmpleados');
         const carpetaImagenes = await ObtenerRutaUsuario(id);
@@ -370,9 +370,9 @@ class EmpleadoControlador {
         // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
         fs.access(carpetaImagenesAnterior, fs.constants.F_OK, (err) => {
           if (err) {
-            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
           } else {
-            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
             fs.rename(carpetaImagenesAnterior, carpetaImagenes, (err) => {
               if (err) {
                 verificar_imagen = 1;
@@ -383,7 +383,6 @@ class EmpleadoControlador {
           }
         });
 
-
         // RUTA DE LA CARPETA VACUNAS DEL USUARIO
         const carpetaVacunasAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'carnetVacuna');
         const carpetaVacunas = await ObtenerRutaVacuna(id);
@@ -391,9 +390,9 @@ class EmpleadoControlador {
         // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
         fs.access(carpetaVacunasAnterior, fs.constants.F_OK, (err) => {
           if (err) {
-            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
           } else {
-            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
             fs.rename(carpetaVacunasAnterior, carpetaVacunas, (err) => {
               if (err) {
                 verificar_vacunas = 1;
@@ -404,7 +403,6 @@ class EmpleadoControlador {
           }
         });
 
-
         // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
         const carpetaContratosAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'contratos');
         const carpetaContratos = await ObtenerRutaContrato(id);
@@ -412,9 +410,9 @@ class EmpleadoControlador {
         // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
         fs.access(carpetaContratosAnterior, fs.constants.F_OK, (err) => {
           if (err) {
-            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
           } else {
-            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
             fs.rename(carpetaContratosAnterior, carpetaContratos, (err) => {
               if (err) {
                 verificar_contrato = 1;
@@ -424,7 +422,6 @@ class EmpleadoControlador {
             });
           }
         });
-
       }
 
       // METODO DE VERIFICACION DE MODIFICACION DE DIRECTORIOS
@@ -439,9 +436,9 @@ class EmpleadoControlador {
       const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
 
       if (mensajesError.length > 0) {
-        console.log('error empleado ', mensajesError)
         await pool.query('ROLLBACK');
         return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
+
       } else {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
@@ -450,7 +447,6 @@ class EmpleadoControlador {
 
     }
     catch (error) {
-      console.log('error empleado 500', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
@@ -491,7 +487,7 @@ class EmpleadoControlador {
     res.jsonp(empleado);
   }
 
-  // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA
+  // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
   public async Listar(req: Request, res: Response) {
     const empleado = await pool.query(
       `
@@ -501,7 +497,7 @@ class EmpleadoControlador {
     res.jsonp(empleado.rows);
   }
 
-  // METODO QUE LISTA EMPLEADOS INHABILITADOS
+  // METODO QUE LISTA EMPLEADOS INHABILITADOS   **USADO
   public async ListarEmpleadosDesactivados(req: Request, res: Response) {
     const empleado = await pool.query(
       `
@@ -512,7 +508,7 @@ class EmpleadoControlador {
   }
 
 
-  // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
+  // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
   public async DesactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
 
@@ -607,6 +603,7 @@ class EmpleadoControlador {
 
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
+
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -619,7 +616,7 @@ class EmpleadoControlador {
     return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
   }
 
-  // METODO PARA HABILITAR EMPLEADOS
+  // METODO PARA HABILITAR EMPLEADOS    *USADO
   public async ActivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
 
@@ -681,7 +678,6 @@ class EmpleadoControlador {
 
           const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
 
-
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_empleados',
@@ -714,6 +710,7 @@ class EmpleadoControlador {
 
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
+
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -725,7 +722,7 @@ class EmpleadoControlador {
     return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
   }
 
-  // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO
+  // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
   public async ReactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
     if (arrayIdsEmpleados.length > 0) {
@@ -733,7 +730,7 @@ class EmpleadoControlador {
         try {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
-
+          
           // CONSULTAR DATOSORIGINALES
           const empleado = await pool.query(
             `
@@ -818,6 +815,7 @@ class EmpleadoControlador {
 
           // REVISAR
           //EstadoHorarioPeriVacacion(obj);
+
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -1049,7 +1047,7 @@ class EmpleadoControlador {
     }
   }
 
-  // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
   public async ObtenerTituloEspecifico(req: Request, res: Response): Promise<any> {
     const { id_empleado, id_titulo } = req.body;
     const unEmpleadoTitulo = await pool.query(
@@ -1067,7 +1065,7 @@ class EmpleadoControlador {
     }
   }
 
-  // INGRESAR TITULO PROFESIONAL DEL EMPLEADO
+  // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
   public async CrearEmpleadoTitulos(req: Request, res: Response): Promise<void> {
     try {
       const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
@@ -1104,6 +1102,7 @@ class EmpleadoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1111,7 +1110,7 @@ class EmpleadoControlador {
     }
   }
 
-  // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO
+  // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
   public async EditarTituloEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id_empleado_titulo;
@@ -1121,7 +1120,7 @@ class EmpleadoControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 
       if (!datosOriginales) {
@@ -1160,6 +1159,7 @@ class EmpleadoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1323,8 +1323,7 @@ class EmpleadoControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTROS
-
+  // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarEmpleado(req: Request, res: Response) {
     const { empleados, user_name, ip } = req.body;
     let empleadosRegistrados: boolean = false;
@@ -1336,10 +1335,10 @@ class EmpleadoControlador {
         await pool.query('BEGIN');
 
         // CONSULTAR DATOS ORIGINALES
-        const usuario = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+        const usuario = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
         const [datosOriginalesUsuarios] = usuario.rows;
 
-        const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [e.id]);
+        const empleado = await pool.query(`SELECT * FROM eu_empleados WHERE id = $1`, [e.id]);
         const [datosOriginalesEmpleado] = empleado.rows;
 
         if (!datosOriginalesUsuarios || !datosOriginalesEmpleado) {
@@ -1368,19 +1367,19 @@ class EmpleadoControlador {
           continue;
         }
 
-        const datosActuales = await pool.query('SELECT * FROM informacion_general WHERE id = $1', [e.id]);
+        const datosActuales = await pool.query(`SELECT * FROM informacion_general WHERE id = $1`, [e.id]);
         const [datosActualesEmpleado] = datosActuales.rows;
 
-        const contratos = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
+        const contratos = await pool.query(`SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1`, [e.id]);
         const [datosContratos] = contratos.rows;
 
-        const titulos = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+        const titulos = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1`, [e.id]);
         const [datosTitulos] = titulos.rows;
 
-        const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+        const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [e.id]);
         const [datosDiscapacidad] = discapacidad.rows;
 
-        const vacunas = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+        const vacunas = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1`, [e.id]);
         const [datosVacunas] = vacunas.rows;
 
         if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
@@ -1389,7 +1388,7 @@ class EmpleadoControlador {
         }
 
         // ELIMINAR USUARIO
-        await pool.query('DELETE FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+        await pool.query(`DELETE FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1403,7 +1402,7 @@ class EmpleadoControlador {
         });
 
         // ELIMINAR EMPLEADO
-        await pool.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
+        await pool.query(`DELETE FROM eu_empleados WHERE id = $1`, [e.id]);
 
         const fechaNacimientoO = await FormatearFecha2(datosOriginalesEmpleado.fecha_nacimiento, 'ddd')
         datosOriginalesEmpleado.fecha_nacimiento = fechaNacimientoO;
@@ -1447,6 +1446,7 @@ class EmpleadoControlador {
    ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            ** 
    ** **************************************************************************************** **/
 
+  // METODO PARA VERIFICAR PLANTILLA CODIGO AUTOMATICO    **USADO
   public async VerificarPlantilla_Automatica(req: Request, res: Response) {
     try {
       const documento = req.file?.originalname;
@@ -1457,8 +1457,8 @@ class EmpleadoControlador {
       let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS');
       if (verificador === false) {
         return res.jsonp({ message: 'no_existe', data: undefined });
-      } else {
-
+      }
+      else {
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
 
@@ -1493,7 +1493,6 @@ class EmpleadoControlador {
         const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
         var listEmpleados: any = [];
-        var duplicados: any = [];
         var duplicados1: any = [];
         var duplicados2: any = [];
         var mensaje: string = 'correcto';
@@ -1502,7 +1501,6 @@ class EmpleadoControlador {
           // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
           var { ITEM, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO,
             LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD } = dato;
-
           // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
           if ((ITEM != undefined && ITEM != '') &&
             (CEDULA != undefined) && (APELLIDO != undefined) &&
@@ -1531,64 +1529,61 @@ class EmpleadoControlador {
             data.telefono = TELEFONO;
             data.nacionalidad = NACIONALIDAD;
             data.observacion = 'no registrado';
-
-
-
             if (regex.test(data.cedula)) {
               if (data.cedula.toString().length != 10) {
                 data.observacion = 'La cédula ingresada no es válida';
-              } else {
+              }
+              else {
                 if (!valiContra.test(data.contrasena.toString())) {
-                  //console.log('entro ', data.contrasena.toString().length);
                   if (data.contrasena.toString().length <= 10) {
                     if (estadoCivilArray.includes(data.estado_civil)) {
                       if (tipogenero.includes(data.genero.toLowerCase())) {
                         // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                         if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-
                           // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                           if (LONGITUD != undefined || LATITUD != undefined) {
                             if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                               data.observacion = 'Verificar ubicación';
                             }
                           }
-
                           // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                           if (TELEFONO != undefined) {
-                            //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                             if (regex.test(data.telefono.toString())) {
                               if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                 data.observacion = 'El teléfono ingresado no es válido';
                               }
-
-                            } else {
+                            }
+                            else {
                               data.observacion = 'El teléfono ingresado no es válido';
                             }
                           }
-
                         } else {
                           data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                         }
-                      } else {
+                      }
+                      else {
                         data.observacion = 'Género no es válido';
                       }
-
-                    } else {
+                    }
+                    else {
                       data.observacion = 'Estado civil no es válido';
                     }
-                  } else {
+                  }
+                  else {
                     data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                   }
-                } else {
+                }
+                else {
                   data.observacion = 'La contraseña ingresada no es válida';
                 }
               }
-            } else {
+            }
+            else {
               data.observacion = 'La cédula ingresada no es válida';
             }
             listEmpleados.push(data);
-
-          } else {
+          }
+          else {
             data.fila = ITEM;
             data.cedula = CEDULA;
             data.nombre = NOMBRE;
@@ -1611,7 +1606,6 @@ class EmpleadoControlador {
               data.fila = 'error';
               mensaje = 'error'
             }
-
             if (APELLIDO == undefined) {
               data.apellido = 'No registrado';
               data.observacion = 'Apellido ' + data.observacion;
@@ -1672,12 +1666,13 @@ class EmpleadoControlador {
             if (CEDULA == undefined) {
               data.cedula = 'No registrado'
               data.observacion = 'Cédula ' + data.observacion;
-            } else {
-
+            }
+            else {
               if (regex.test(data.cedula)) {
                 if (data.cedula.toString().length != 10) {
                   data.observacion = 'La cédula ingresada no es válida';
-                } else {
+                }
+                else {
                   if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
                     if (data.contrasena != 'No registrado') {
                       if (!valiContra.test(data.contrasena.toString())) {
@@ -1689,57 +1684,54 @@ class EmpleadoControlador {
                                   // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                                   if (data.fec_nacimiento != 'No registrado') {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                       if (LONGITUD != undefined && LATITUD != undefined) {
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                           data.observacion = 'Verificar ubicación';
                                         }
                                       }
-
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                       if (TELEFONO != undefined) {
-                                        //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                         if (regex.test(data.telefono.toString())) {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                            //console.log('ent: ', data.telefono);
                                             data.observacion = 'El teléfono ingresado no es válido';
                                           }
-
-                                        } else {
+                                        }
+                                        else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
                                       }
-
-                                    } else {
+                                    }
+                                    else {
                                       data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
                                   }
-
-                                } else {
+                                }
+                                else {
                                   data.observacion = 'Género no es válido';
                                 }
                               }
-
-                            } else {
+                            }
+                            else {
                               data.observacion = 'Estado civil no es válido';
                             }
                           }
-                        } else {
+                        }
+                        else {
                           data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                         }
-                      } else {
+                      }
+                      else {
                         data.observacion = 'La contraseña ingresada no es válida';
                       }
                     }
                   }
                 }
-              } else {
+              }
+              else {
                 data.observacion = 'La cédula ingresada no es válida';
               }
-
             }
-
             listEmpleados.push(data);
           }
           data = {}
@@ -1747,12 +1739,12 @@ class EmpleadoControlador {
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(ruta, fs.constants.F_OK, (err) => {
           if (err) {
-          } else {
+          }
+          else {
             // ELIMINAR DEL SERVIDOR
             fs.unlinkSync(ruta);
           }
         });
-
         listEmpleados.forEach(async (valor: any) => {
           var VERIFICAR_CEDULA = await pool.query(
             `
@@ -1761,7 +1753,8 @@ class EmpleadoControlador {
             , [valor.cedula]);
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
             valor.observacion = 'Cédula ya existe en el sistema';
-          } else {
+          }
+          else {
             var VERIFICAR_USUARIO = await pool.query(
               `
               SELECT * FROM eu_usuarios WHERE usuario = $1
@@ -1769,7 +1762,8 @@ class EmpleadoControlador {
               , [valor.usuario]);
             if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
               valor.observacion = 'Usuario ya existe en el sistema';
-            } else {
+            }
+            else {
               if (valor.rol != 'No registrado') {
                 var VERIFICAR_ROL = await pool.query(
                   `
@@ -1784,39 +1778,40 @@ class EmpleadoControlador {
                       `
                       , [valor.nacionalidad.toUpperCase()]);
                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-
                       // DISCRIMINACION DE ELEMENTOS IGUALES
                       if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
                         // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                         if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
-                          //valor.observacion = 'ok'
                           duplicados2.push(valor);
-                        } else {
+                        }
+                        else {
                           valor.observacion = '2';
                         }
                         duplicados1.push(valor);
-                      } else {
+                      }
+                      else {
                         valor.observacion = '1';
                       }
-                    } else {
+                    }
+                    else {
                       valor.observacion = 'Nacionalidad no existe en el sistema';
                     }
                   }
-                } else {
+                }
+                else {
                   valor.observacion = 'Rol no existe en el sistema';
                 }
               }
             }
           }
         })
-
         var tiempo = 2000;
         if (listEmpleados.length > 500 && listEmpleados.length <= 1000) {
           tiempo = 4000;
-        } else if (listEmpleados.length > 1000) {
+        }
+        else if (listEmpleados.length > 1000) {
           tiempo = 7000;
         }
-
         setTimeout(() => {
           listEmpleados.sort((a: any, b: any) => {
             // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -1828,59 +1823,53 @@ class EmpleadoControlador {
             }
             return 0; // SON IGUALES
           });
-
           var filaDuplicada: number = 0;
-
           listEmpleados.forEach((item: any) => {
             if (item.observacion == '1') {
               item.observacion = 'Registro duplicado (cédula)';
-            } else if (item.observacion == '2') {
+            }
+            else if (item.observacion == '2') {
               item.observacion = 'Registro duplicado (usuario)';
-            } else if (item.observacion == '3') {
+            }
+            else if (item.observacion == '3') {
               item.observacion = 'no registrado';
             }
-
             if (item.observacion != undefined) {
               let arrayObservacion = item.observacion.split(" ");
               if (arrayObservacion[0] == 'no' || item.observacion == " ") {
                 item.observacion = 'ok'
               }
-            } else {
+            }
+            else {
               item.observacion = 'Datos no registrado';
             }
-
             // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
             if (typeof item.fila === 'number' && !isNaN(item.fila)) {
               // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
               if (item.fila == filaDuplicada) {
                 mensaje = 'error';
               }
-            } else {
+            }
+            else {
               return mensaje = 'error';
             }
-
             filaDuplicada = item.fila;
-
           });
-
           if (mensaje == 'error') {
             listEmpleados = undefined;
           }
-          //console.log('empleados: ', listEmpleados);
           return res.jsonp({ message: mensaje, data: listEmpleados });
         }, tiempo)
       }
+
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
   }
 
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body;
-    // Expresión regular para validar la latitud y longitud
-    const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-    const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
-
     const VALOR = await pool.query(
       `
       SELECT * FROM e_codigo
@@ -1913,8 +1902,6 @@ class EmpleadoControlador {
           let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
           nombreE = name1
         }
-
-
         var apellidoE: any;
         let apellidos = data.apellido.split(' ');
         if (apellidos.length > 1) {
@@ -2033,7 +2020,6 @@ class EmpleadoControlador {
 
         // OBTENER EL ID DEL EMPLEADO INGRESADO
         const id_empleado = empleado.id;
-        //console.log('id ', id_empleado)
         // REGISTRO DE LOS DATOS DE USUARIO
         await pool.query(
           `
@@ -2097,22 +2083,20 @@ class EmpleadoControlador {
     }
   }
 
-  // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
+  // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL    **USADO
   public async VerificarPlantilla_Manual(req: Request, res: Response) {
     try {
       const documento = req.file?.originalname;
       let separador = path.sep;
       let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
       const workbook = excel.readFile(ruta);
-
       let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS');
       if (verificador === false) {
         return res.jsonp({ message: 'no_existe', data: undefined });
-      } else {
-
+      }
+      else {
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
-
         let data: any = {
           fila: '',
           cedula: '',
@@ -2145,7 +2129,6 @@ class EmpleadoControlador {
         const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
         var listEmpleadosManual: any = [];
-        var duplicados: any = [];
         var duplicados1: any = [];
         var duplicados2: any = [];
         var duplicados3: any = [];
@@ -2186,21 +2169,21 @@ class EmpleadoControlador {
             data.nacionalidad = NACIONALIDAD;
             data.observacion = 'no registrado';
 
-
             if (regex.test(data.cedula)) {
               if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
                 data.observacion = 'La cédula ingresada no es válida';
-              } else {
+              }
+              else {
                 if (regex.test(data.codigo)) {
                   if (data.codigo.toString().length > 10) {
                     data.observacion = 'El código debe tener máximo 10 caracteres';
-                  } else {
-                    //console.log(!valiContra.test(data.contrasena));
+                  }
+                  else {
                     if (!valiContra.test(data.contrasena.toString())) {
-                      //console.log('entro ', data.contrasena.toString().length);
                       if (data.contrasena.toString().length > 10) {
                         data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                      } else {
+                      }
+                      else {
                         if (estadoCivilArray.includes(data.estado_civil)) {
                           if (tipogenero.includes(data.genero.toLowerCase())) {
                             // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
@@ -2220,37 +2203,41 @@ class EmpleadoControlador {
                                     data.observacion = 'El teléfono ingresado no es válido';
                                   }
 
-                                } else {
+                                }
+                                else {
                                   data.observacion = 'El teléfono ingresado no es válido';
                                 }
                               }
-                            } else {
+                            }
+                            else {
                               data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                             }
-                          } else {
+                          }
+                          else {
                             data.observacion = 'Género no es válido';
                           }
-
-                        } else {
+                        }
+                        else {
                           data.observacion = 'Estado civil no es válido';
                         }
-
                       }
-                    } else {
+                    }
+                    else {
                       data.observacion = 'La contraseña ingresada no es válida';
                     }
-
                   }
-                } else {
+                }
+                else {
                   data.observacion = 'Formato de código incorrecto';
                 }
               }
-            } else {
+            }
+            else {
               data.observacion = 'La cédula ingresada no es válida';
             }
             listEmpleadosManual.push(data);
-
-          } else {
+          }
+          else {
             data.fila = ITEM;
             data.cedula = CEDULA;
             data.apellido = APELLIDO;
@@ -2274,7 +2261,6 @@ class EmpleadoControlador {
               data.fila = 'error';
               mensaje = 'error'
             }
-
             if (APELLIDO == undefined) {
               data.apellido = 'No registrado';
               data.observacion = 'Apellido ' + data.observacion;
@@ -2335,13 +2321,14 @@ class EmpleadoControlador {
             }
 
             if (CODIGO != undefined) {
-
               if (!regex.test(data.codigo)) {
                 data.observacion = 'Formato de código incorrecto';
-              } else {
+              }
+              else {
                 if (data.codigo.toString().length > 10) {
                   data.observacion = 'El código debe tener máximo 10 caracteres';
-                } else {
+                }
+                else {
                   if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
                     if (CONTRASENA != undefined) {
                       //console.log('data: ', data.contrasena);
@@ -2349,7 +2336,8 @@ class EmpleadoControlador {
                         //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
                         if (data.contrasena.toString().length > 10) {
                           data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                        } else {
+                        }
+                        else {
                           if (data.estado_civil != 'No registrado') {
                             if (estadoCivilArray.includes(data.estado_civil)) {
                               if (data.genero != 'No registrado') {
@@ -2372,48 +2360,50 @@ class EmpleadoControlador {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                             data.observacion = 'El teléfono ingresado no es válido';
                                           }
-                                        } else {
+                                        }
+                                        else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
                                       }
-
-
-                                    } else {
+                                    }
+                                    else {
                                       data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
                                   }
-                                } else {
+                                }
+                                else {
                                   data.observacion = 'Género no es válido';
                                 }
                               }
-
-                            } else {
+                            }
+                            else {
                               data.observacion = 'Estado civil no es válido';
                             }
                           }
                         }
-                      } else {
+                      }
+                      else {
                         data.observacion = 'La contraseña ingresada no es válida';
                       }
                     }
                   }
                 }
-
-
               }
             }
 
             if (CEDULA == undefined) {
               data.cedula = 'No registrado'
               data.observacion = 'Cédula no registrada';
-            } else {
+            }
+            else {
               // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
               const rege = /^[0-9]+$/;
               if (rege.test(data.cedula)) {
                 if (data.cedula.toString().length != 10) {
                   data.observacion = 'La cédula ingresada no es válida';
                 }
-              } else {
+              }
+              else {
                 data.observacion = 'La cédula ingresada no es válida';
               }
             }
@@ -2425,7 +2415,8 @@ class EmpleadoControlador {
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(ruta, fs.constants.F_OK, (err) => {
           if (err) {
-          } else {
+          }
+          else {
             // ELIMINAR DEL SERVIDOR
             fs.unlinkSync(ruta);
           }
@@ -2436,43 +2427,45 @@ class EmpleadoControlador {
             var VERIFICAR_CEDULA = await pool.query(
               `
               SELECT * FROM eu_empleados WHERE cedula = $1
-            `
+              `
               , [valor.cedula]);
             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
               valor.observacion = 'Cédula ya existe en el sistema'
-            } else {
+            }
+            else {
 
               var VERIFICAR_CODIGO = await pool.query(
                 `
-              SELECT * FROM eu_empleados WHERE codigo = $1
-              `
+                SELECT * FROM eu_empleados WHERE codigo = $1
+                `
                 , [valor.codigo]);
               if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
                 valor.observacion = 'Código ya existe en el sistema'
-              } else {
+              }
+              else {
                 var VERIFICAR_USUARIO = await pool.query(
                   `
-                SELECT * FROM eu_usuarios WHERE usuario = $1
-                `
+                  SELECT * FROM eu_usuarios WHERE usuario = $1
+                  `
                   , [valor.usuario]);
                 if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                   valor.observacion = 'Usuario ya existe en el sistema'
-                } else {
+                }
+                else {
                   if (valor.rol != 'No registrado') {
                     var VERIFICAR_ROL = await pool.query(
                       `
-                    SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                    `
+                      SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+                      `
                       , [valor.rol.toUpperCase()]);
                     if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                       if (valor.nacionalidad != 'No registrado') {
                         var VERIFICAR_NACIONALIDAD = await pool.query(
                           `
-                        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                        `
+                          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+                          `
                           , [valor.nacionalidad.toUpperCase()]);
                         if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-
                           // DISCRIMINACION DE ELEMENTOS IGUALES
                           if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
                             // DISCRIMINACIÓN DE ELEMENTOS IGUALES
@@ -2481,22 +2474,27 @@ class EmpleadoControlador {
                               if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
                                 //valor.observacion = 'ok'
                                 duplicados2.push(valor);
-                              } else {
+                              }
+                              else {
                                 valor.observacion = '2';
                               }
                               duplicados3.push(valor);
-                            } else {
+                            }
+                            else {
                               valor.observacion = '3';
                             }
                             duplicados1.push(valor);
-                          } else {
+                          }
+                          else {
                             valor.observacion = '1';
                           }
-                        } else {
+                        }
+                        else {
                           valor.observacion = 'Nacionalidad no existe en el sistema';
                         }
                       }
-                    } else {
+                    }
+                    else {
                       valor.observacion = 'Rol no existe en el sistema';
                     }
                   }
@@ -2504,16 +2502,14 @@ class EmpleadoControlador {
               }
             }
           }
-
         })
-
         var tiempo = 2000;
         if (listEmpleadosManual.length > 500 && listEmpleadosManual.length <= 1000) {
           tiempo = 4000;
-        } else if (listEmpleadosManual.length > 1000) {
+        }
+        else if (listEmpleadosManual.length > 1000) {
           tiempo = 7000;
         }
-
         setTimeout(() => {
           listEmpleadosManual.sort((a: any, b: any) => {
             // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -2530,28 +2526,30 @@ class EmpleadoControlador {
           listEmpleadosManual.forEach((item: any) => {
             if (item.observacion == '1') {
               item.observacion = 'Registro duplicado (cédula)';
-            } else if (item.observacion == '2') {
+            }
+            else if (item.observacion == '2') {
               item.observacion = 'Registro duplicado (usuario)';
-            } else if (item.observacion == '3') {
+            }
+            else if (item.observacion == '3') {
               item.observacion = 'Registro duplicado (código)';
-            } else if (item.observacion == '4') {
+            }
+            else if (item.observacion == '4') {
               item.observacion = 'no registrado';
             }
-
             if (item.observacion != undefined) {
               let arrayObservacion = item.observacion.split(" ");
               if (arrayObservacion[0] == 'no' || item.observacion == " ") {
                 item.observacion = 'ok';
               }
             }
-
             // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
             if (typeof item.fila === 'number' && !isNaN(item.fila)) {
               // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
               if (item.fila == filaDuplicada) {
                 mensaje = 'error';
               }
-            } else {
+            }
+            else {
               return mensaje = 'error';
             }
 
@@ -2564,17 +2562,15 @@ class EmpleadoControlador {
           return res.jsonp({ message: mensaje, data: listEmpleadosManual });
         }, tiempo)
       }
+
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
   }
 
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body
-    // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
-    const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-    const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
-
     var contador = 1;
     let ocurrioError = false;
     let mensajeError = '';
@@ -2761,6 +2757,7 @@ class EmpleadoControlador {
         codigoError = 500;
         break;
       }
+
     }
     if (ocurrioError) {
       res.status(500).jsonp({ message: mensajeError });
@@ -2773,6 +2770,7 @@ class EmpleadoControlador {
    ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           ** 
    ** **************************************************************************************** **/
 
+// METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
   public async CrearCarpetasEmpleado(req: Request, res: Response) {
     const { empleados, permisos, vacaciones, horasExtras } = req.body;
     let errorOccurred = false;

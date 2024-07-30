@@ -46,7 +46,7 @@ export class CiudadService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD
+  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD   **USADO
   BuscarUnaCiudad(id: number) {
     return this.http.get(`${environment.url}/ciudades/${id}`);
   }

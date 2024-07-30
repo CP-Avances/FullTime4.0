@@ -168,7 +168,7 @@ class CiudadControlador {
         }
     }
 
-    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD
+    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD   **USADO
     public async ConsultarUnaCiudad(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const CIUDAD = await pool.query(

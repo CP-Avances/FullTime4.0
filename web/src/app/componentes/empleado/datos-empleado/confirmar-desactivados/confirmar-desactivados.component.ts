@@ -89,4 +89,5 @@ export class ConfirmarDesactivadosComponent implements OnInit {
       this.ventana.close(true);
     }
   }
+  
 }

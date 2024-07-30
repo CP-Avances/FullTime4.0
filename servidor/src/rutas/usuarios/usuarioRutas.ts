@@ -11,13 +11,13 @@ class UsuarioRutas {
 
     configuracion(): void {
 
-        // CREAR REGISTRO DE USUARIOS
+        // CREAR REGISTRO DE USUARIOS    **USADO
         this.router.post('/', TokenValidation, USUARIO_CONTROLADOR.CrearUsuario);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
         this.router.get('/datos/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDatosUsuario);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
         this.router.get('/dato/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
-        // METODO PARA ACTUALIZAR DATOS DE USUARIO
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
         this.router.put('/actualizarDatos', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuario);
         // METODO PARA ACTUALIZAR CONTRASEÑA
         this.router.put('/', TokenValidation, USUARIO_CONTROLADOR.CambiarPasswordUsuario);
@@ -59,13 +59,13 @@ class UsuarioRutas {
 
         // METODO PARA BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACIONES USUARIO - DEPARTAMENTO
         this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
-        // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS
+        // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS    **USADO
         this.router.post('/usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioDepartamento);
         // METODO PARA BUSCAR DATOS DE USUARIO - DEPARTAMENTOS - ASIGNACION DE INFORMACION **USADO
         this.router.post('/buscar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioDepartamento);
         // METODO PARA OBTENER IDS DE USUARIO MEDIANTE DEPARTAMENTO VIGENTE **USADO
         this.router.post('/buscar-ids-usuarios-departamento', TokenValidation, USUARIO_CONTROLADOR.ObtenerIdUsuariosDepartamento);
-        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO    **USADO
         this.router.post('/buscar-asignacion-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO   **USADO
         this.router.put('/actualizar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);

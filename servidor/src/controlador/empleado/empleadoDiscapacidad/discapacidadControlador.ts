@@ -23,7 +23,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA REGISTRAR DISCAPACIDAD
+  // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
   public async RegistrarDiscapacidad(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
@@ -59,6 +59,7 @@ class DiscapacidadControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Discapacidad guardada' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -66,7 +67,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR DATOS DE REGISTRO
+  // METODO PARA ACTUALIZAR DATOS DE REGISTRO   **USADO
   public async ActualizarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
       const id_empleado = req.params.id_empleado;
@@ -76,7 +77,7 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+      const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
       if (!datosOriginales) {
@@ -111,8 +112,8 @@ class DiscapacidadControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -225,7 +226,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
+  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD   **USADO
   public async ListarTipo(req: Request, res: Response) {
     const TIPO_DISCAPACIDAD = await pool.query(
       `
@@ -240,7 +241,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE   **USADO
   public async BuscarDiscapacidadNombre(req: Request, res: Response) {
     const { nombre } = req.body;
     const TIPO_DISCAPACIDAD = await pool.query(

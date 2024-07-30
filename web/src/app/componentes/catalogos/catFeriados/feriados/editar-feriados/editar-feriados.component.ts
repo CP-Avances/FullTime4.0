@@ -78,6 +78,7 @@ export class EditarFeriadosComponent implements OnInit {
     })
   }
 
+  // METODO PARA ACTUALIZAR FERIADO
   contador: number = 0;
   ActualizarFeriados(form: any) {
     this.contador = 0;

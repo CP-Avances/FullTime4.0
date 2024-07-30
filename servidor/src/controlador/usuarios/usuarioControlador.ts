@@ -14,7 +14,7 @@ interface IPayload {
 
 class UsuarioControlador {
 
-  // CREAR REGISTRO DE USUARIOS
+  // CREAR REGISTRO DE USUARIOS    **USADO
   public async CrearUsuario(req: Request, res: Response) {
     try {
       const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
@@ -42,8 +42,8 @@ class UsuarioControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       res.jsonp({ message: 'Usuario Guardado' });
+      
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -105,7 +105,7 @@ class UsuarioControlador {
   }
 
 
-  // METODO PARA ACTUALIZAR DATOS DE USUARIO
+  // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
     try {
       const { usuario, contrasena, id_rol, id_empleado, user_name, ip } = req.body;
@@ -153,9 +153,9 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     }
     catch (error) {
-      console.log('error *** ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
@@ -1661,7 +1661,7 @@ class UsuarioControlador {
   }
 
 
-  // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+  // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
       const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body
@@ -1690,6 +1690,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
+      
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -1722,7 +1723,7 @@ class UsuarioControlador {
     }
   }
 
-  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
   public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(

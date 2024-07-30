@@ -12,7 +12,7 @@ class NacionalidadRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR NACIONALIDADES
+        // METODO PARA LISTAR NACIONALIDADES   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, nacionalidadControlador_1.default.ListarNacionalidades);
     }
 }

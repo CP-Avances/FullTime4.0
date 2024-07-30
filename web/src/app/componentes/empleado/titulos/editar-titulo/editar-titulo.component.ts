@@ -73,7 +73,7 @@ export class EditarTituloComponent implements OnInit {
   // METODO PARA ALMACENAR DATOS EN EL SISTEMA
   AlmacenarTitulo(titulo: any) {
     this.rest.ActualizarTitulo(this.titulo.id, titulo).subscribe(data => {
-      this.toastr.success('Actualización Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Actualización exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.ventana.close(data);

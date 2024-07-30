@@ -53,7 +53,7 @@ export class ProvinciaService {
     return this.http.get(`${environment.url}/provincia/buscar/${id}`);
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UN PAIS
+  // METODO PARA BUSCAR INFORMACION DE UN PAIS    **USADO
   BuscarPaisId(id: number) {
     return this.http.get(`${environment.url}/provincia/buscar/pais/${id}`);
   }

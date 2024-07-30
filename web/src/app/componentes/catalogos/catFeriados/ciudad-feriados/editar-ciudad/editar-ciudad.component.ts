@@ -4,7 +4,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
 
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
@@ -43,15 +42,13 @@ export class EditarCiudadComponent implements OnInit {
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public asignarCiudadForm = new FormGroup({
+    nombreContinenteForm: this.nombreContinenteF,
     nombreCiudadForm: this.nombreCiudadF,
     idProvinciaForm: this.idProvinciaF,
-    nombreContinenteForm: this.nombreContinenteF,
     nombrePaisForm: this.nombrePaisF,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   value = 10;
   color: ThemePalette = 'primary';
@@ -66,7 +63,6 @@ export class EditarCiudadComponent implements OnInit {
     private restF: CiudadFeriadosService,
     private restP: ProvinciaService,
     private toastr: ToastrService,
-    private router: Router,
     public ventana: MatDialogRef<EditarCiudadComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }

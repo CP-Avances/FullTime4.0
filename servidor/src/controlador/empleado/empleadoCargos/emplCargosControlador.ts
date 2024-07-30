@@ -125,12 +125,11 @@ class EmpleadoCargosControlador {
 
   }
 
-  // METODO DE REGISTRO DE CARGO
+  // METODO DE REGISTRO DE CARGO    **USADO
   public async Crear(req: Request, res: Response): Promise<void> {
     try {
       const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo,
         user_name, ip, jefe } = req.body;
-
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -151,7 +150,6 @@ class EmpleadoCargosControlador {
       empleadoCargo.fecha_inicio = fechaIngresoN;
       empleadoCargo.fecha_final = fechaSalidaN;
 
-
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
@@ -165,17 +163,16 @@ class EmpleadoCargosControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       res.jsonp({ message: 'Registro guardado.' });
+
     } catch (error) {
-      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar el registro.' });
     }
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO    **USADO
   public async EditarCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empl_contrato, id } = req.params;
@@ -246,6 +243,7 @@ class EmpleadoCargosControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -273,7 +271,7 @@ class EmpleadoCargosControlador {
   }
 
 
-  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
   public async BuscarCargosFecha(req: Request, res: Response): Promise<any> {
     const { id_empleado, fecha_verificar } = req.body;
     const CARGOS = await pool.query(
@@ -292,7 +290,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
   public async BuscarCargosFechaEditar(req: Request, res: Response): Promise<any> {
     const { id_empleado, fecha_verificar, id_cargo } = req.body;
     const CARGOS = await pool.query(
@@ -417,7 +415,7 @@ class EmpleadoCargosControlador {
    ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** ** 
    ** **************************************************************************************** **/
 
-  // METODO DE BUSQUEDA DE TIPO DE CARGOS
+  // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
   public async ListarTiposCargo(req: Request, res: Response) {
     const Cargos = await pool.query(
       `
@@ -432,7 +430,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO DE REGISTRO DE TIPO DE CARGO
+  // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { cargo, user_name, ip } = req.body;
@@ -468,6 +466,7 @@ class EmpleadoCargosControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

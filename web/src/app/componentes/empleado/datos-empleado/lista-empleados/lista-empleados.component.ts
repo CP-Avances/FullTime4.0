@@ -1,13 +1,13 @@
 // IMPORTACION DE LIBRERIAS
 import { firstValueFrom, forkJoin, map, Observable } from 'rxjs';
-import { Validators, FormControl } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Validators, FormControl } from '@angular/forms';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
@@ -30,7 +30,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { EmpleadoElemento } from '../../../../model/empleado.model';
 
@@ -109,10 +108,9 @@ export class ListaEmpleadosComponent implements OnInit {
     public rest: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private validar: ValidacionesService,
-    private usuario: UsuarioService,
+    private funciones: MainNavService,
     private asignaciones: AsignacionesService,
     private datosGenerales: DatosGeneralesService,
-    private funciones: MainNavService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -280,7 +278,6 @@ export class ListaEmpleadosComponent implements OnInit {
         data: { opcion: opcion, lista: EmpleadosSeleccionados }
       })
         .afterClosed().subscribe(item => {
-          //console.log('ver item ', item)
           if (item === true) {
             this.empleado = [];
             this.GetEmpleados();
@@ -453,9 +450,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        //console.log('itemName: ', itemName)
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-          //console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
@@ -470,9 +465,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        //console.log('itemName: ', itemName)
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-          //console.log('entra_manual');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
@@ -508,12 +501,11 @@ export class ListaEmpleadosComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.progreso = true;
-    this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
-      //console.log('plantilla 1', res);
+    this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
-      this.DataEmpleados.sort((a, b) => {
+      this.DataEmpleados.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -536,7 +528,6 @@ export class ListaEmpleadosComponent implements OnInit {
         });
       }
     }, error => {
-      //console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -544,7 +535,6 @@ export class ListaEmpleadosComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
-
   }
 
   // METODO PARA VERIFICAR LA PLANTILLA CON CODIGO MODO MANUAL
@@ -557,12 +547,10 @@ export class ListaEmpleadosComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.progreso = true;
-    this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
-      //console.log('plantilla manual', res);
+    this.rest.VerificarArchivoExcel_Manual(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-
-      this.DataEmpleados.sort((a, b) => {
+      this.DataEmpleados.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -586,7 +574,6 @@ export class ListaEmpleadosComponent implements OnInit {
         this.datosManuales = true;
       }
     }, error => {
-      //console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -595,7 +582,6 @@ export class ListaEmpleadosComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
-
   }
 
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
@@ -619,7 +605,7 @@ export class ListaEmpleadosComponent implements OnInit {
         ip: this.ip
       };
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        this.rest.subirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
+        this.rest.SubirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
@@ -629,7 +615,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
         });
       } else {
-        this.rest.subirArchivoExcel_Manual(datos).subscribe(datos_archivo => {
+        this.rest.SubirArchivoExcel_Manual(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
@@ -689,7 +675,6 @@ export class ListaEmpleadosComponent implements OnInit {
     else {
       return 'rgb(251, 73, 18)';
     }
-
   }
 
   // METODO DE ESTILO DE COLORES EN CELDAS
@@ -735,7 +720,6 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   GetDocumentDefinicion(numero: any) {
-
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -938,7 +922,6 @@ export class ListaEmpleadosComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloEmpleado);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -966,12 +949,12 @@ export class ListaEmpleadosComponent implements OnInit {
 
   ExportToCVS(numero: any) {
     if (numero === 1) {
-      var arreglo = this.empleado
+      var arreglo = this.empleado;
     }
     else {
-      arreglo = this.desactivados
+      arreglo = this.desactivados;
     }
-    // const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo);
+
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {

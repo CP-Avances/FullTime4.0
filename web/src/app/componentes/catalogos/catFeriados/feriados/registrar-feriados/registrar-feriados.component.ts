@@ -165,7 +165,6 @@ export class RegistrarFeriadosComponent implements OnInit {
       this.habilitarprogress = true;
       this.rest.CrearNuevoFeriado(datos).subscribe(response => {
         this.habilitarprogress = false;
-        //console.log('ver ', response, 'response ', response.message)
         if (response.message === 'error') {
           this.toastr.error('Verificar que los datos sean los correctos.', 'Upss!!! algo salio mal.', {
             timeOut: 6000,

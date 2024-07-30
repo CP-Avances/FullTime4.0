@@ -3,6 +3,7 @@ import pool from '../../database';
 
 class NacionalidadControlador {
 
+  // METODO PARA BUSCAR NACIONALIDADES   **USADO
   public async ListarNacionalidades(req: Request, res: Response) {
     const nacinalidad = await pool.query(
       `

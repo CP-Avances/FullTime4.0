@@ -17,7 +17,7 @@ export class EmpresaService {
     return this.http.get(`${environment.url}/empresas/navegar`);
   }
 
-  // CONSULTAR DATOS DE EMPRESA **USADO
+  // CONSULTAR DATOS DE EMPRESA             **USADO
   ConsultarDatosEmpresa(id: number) {
     return this.http.get(`${environment.url}/empresas/buscar/datos/${id}`);
   }
@@ -48,7 +48,7 @@ export class EmpresaService {
    * @param id_empresa ID DE LA EMPRESA
    */
 
-  // METODO PARA OBTENER LOGO DE EMPRESA **USADO
+  // METODO PARA OBTENER LOGO DE EMPRESA              **USADO
   LogoEmpresaImagenBase64(id_empresa: string) {
     return this.http.get<any>(`${environment.url}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }

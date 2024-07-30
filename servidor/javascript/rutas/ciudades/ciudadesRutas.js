@@ -24,7 +24,7 @@ class CiudadRutas {
         this.router.get('/', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarNombreCiudad);
         // METODO PARA ELIMINAR REGISTRO  **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.EliminarCiudad);
-        // METODO PARA BUSCAR DATOS DE UNA CIUDAD
+        // METODO PARA BUSCAR DATOS DE UNA CIUDAD   **USADO
         this.router.get('/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.ConsultarUnaCiudad);
     }
 }

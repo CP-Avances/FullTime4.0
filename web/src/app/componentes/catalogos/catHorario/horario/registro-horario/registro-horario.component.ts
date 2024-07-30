@@ -202,17 +202,15 @@ export class RegistroHorarioComponent implements OnInit {
     }
   }
 
-  // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO
+  // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO   
   SubirRespaldo(id: number, codigo: any) {
     this.habilitarprogress = true;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
-
     this.rest.SubirArchivo(formData, id, null, codigo).subscribe(res => {
       this.habilitarprogress = false;
       this.archivoForm.reset();

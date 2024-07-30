@@ -219,12 +219,12 @@
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(f.observacion)"></div>
+                                        [style.background-color]="EstiloCelda(f.observacion)"></div>
                                     {{f.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
-                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
+                            <td [style.color]="EstiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
                                 {{f.descripcion}}</td>
                             <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
                         </tr>
@@ -232,8 +232,9 @@
                 </table>
             </div>
             <div>
-                <div *ngIf="listFeriadosCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
-                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div *ngIf="listFeriadosCorrectos.length > 0" class="item" style="float: left; margin: 5px;">
+                    <div class="icon" slot="start" id="t-editar" class="circulo"
+                        style="background-color: rgb(159, 221, 154);"></div>
                     <div class="text">items 'OK' - {{listFeriadosCorrectos.length}}</div>
                 </div>
                 <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
@@ -241,7 +242,7 @@
                     showFirstLastButtons>
                 </mat-paginator>
             </div>
-            
+
         </div>
     </div>
 
@@ -269,23 +270,24 @@
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(fc.observacion)"></div>
+                                        [style.background-color]="EstiloCelda(fc.observacion)"></div>
                                     {{fc.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="stiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}
+                            <td [style.color]="EstiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;">
                                 {{fc.ciudad}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;">
                                 {{fc.feriado}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div>
-                <div *ngIf="listaFerediadCiudadCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
-                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div *ngIf="listaFerediadCiudadCorrectos.length > 0" class="item" style="float: left; margin: 5px;">
+                    <div class="icon" slot="start" id="t-editar" class="circulo"
+                        style="background-color: rgb(159, 221, 154);"></div>
                     <div class="text">items 'OK' - {{listaFerediadCiudadCorrectos.length}}</div>
                 </div>
                 <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
@@ -293,7 +295,7 @@
                     showFirstLastButtons>
                 </mat-paginator>
             </div>
-            
+
         </div>
     </div>
 </div>

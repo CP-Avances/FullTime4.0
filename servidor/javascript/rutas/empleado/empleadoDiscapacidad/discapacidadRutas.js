@@ -14,9 +14,9 @@ class DiscapacidadRutas {
     configuracion() {
         // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO   **USADO
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.BuscarDiscapacidadUsuario);
-        // METODO PARA REGISTRAR DISCAPACIDAD
+        // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
         this.router.post('/', verificarToken_1.TokenValidation, discapacidadControlador_1.default.RegistrarDiscapacidad);
-        // METODO PARA ACTUALIZAR DATOS DISCAPACIDAD
+        // METODO PARA ACTUALIZAR DATOS DISCAPACIDAD   **USADO
         this.router.put('/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ActualizarDiscapacidad);
         // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id_empleado', verificarToken_1.TokenValidation, discapacidadControlador_1.default.EliminarDiscapacidad);
@@ -25,9 +25,9 @@ class DiscapacidadRutas {
          ** *************************************************************************************** **/
         // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD
         this.router.post('/buscarTipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.RegistrarTipo);
-        // METODO PARA BUSCAR LISTA DE TIPOS DE DISCAPACIDAD
+        // METODO PARA BUSCAR LISTA DE TIPOS DE DISCAPACIDAD   **USADO
         this.router.get('/buscarTipo/tipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ListarTipo);
-        // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+        // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE   **USADO
         this.router.post('/buscarTipo/nombre', verificarToken_1.TokenValidation, discapacidadControlador_1.default.BuscarDiscapacidadNombre);
         this.router.get('/', verificarToken_1.TokenValidation, discapacidadControlador_1.default.list);
     }

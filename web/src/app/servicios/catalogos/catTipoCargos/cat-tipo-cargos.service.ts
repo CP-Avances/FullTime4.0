@@ -12,7 +12,7 @@ export class CatTipoCargosService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA BUSCAR TIPO DE CARGO POR SU NOMBRE
+  // METODO PARA BUSCAR TIPO DE CARGO POR SU NOMBRE    **USADO
   BuscarTipoCargoNombre(datos: any) {
     return this.http.post<any>(`${environment.url}/tipoCargos/buscar/tipo_cargo/nombre`, datos);
   }

@@ -1,11 +1,9 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
-import { environment } from 'src/environments/environment';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -18,7 +16,9 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
+import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
@@ -31,8 +31,6 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableHorarios } from 'src/app/model/reportes.model';
-import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-principal-horario',
@@ -107,6 +105,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
+    public parametro: ParametrosService,
     public validar: ValidacionesService, // VARIABLE USADA PARA CONTROL DE VALIDACIONES
     public ventana: MatDialog, // VARIABLES MANEJO DE VENTANAS
     public router: Router, // VARIABLE DE MANEJO DE RUTAS
@@ -114,7 +113,6 @@ export class PrincipalHorarioComponent implements OnInit {
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
     private restD: DetalleCatHorariosService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
-    public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -214,17 +212,17 @@ export class PrincipalHorarioComponent implements OnInit {
 
       this.restD.ConsultarDetalleHorarios({}).subscribe((data: any) => {
         this.detallesHorarios = data.map((detalle: any) => {
-          // Formatear la hora del detalle
+          // FORMATEAR LA HORA DEL DETALLE
           detalle.hora = this.validar.FormatearHora(detalle.hora, this.formato_hora);
           return detalle;
         });
-
         this.horarios.forEach((horario: any) => {
           horario.detalles = this.detallesHorarios.filter((detalle: any) => detalle.id_horario === horario.id);
         });
       });
     });
   }
+
   // METODO PARA ABRIR VENTANA REGISTRAR HORARIO
   AbrirVentanaRegistrarHorario(): void {
     this.ventana.open(RegistroHorarioComponent, { width: '1000px' })
@@ -263,7 +261,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
-    if(this.paginator) {
+    if (this.paginator) {
       this.paginator.firstPage();
     }
     if (this.paginatorH) {
@@ -325,6 +323,7 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
+  // METODO PARA LEER DATOS DE PLANTILLA
   CargarPlantillaGeneral(element: any) {
     if (element.target.files && element.target.files[0]) {
       this.archivoSubido = element.target.files;
@@ -332,7 +331,6 @@ export class PrincipalHorarioComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
@@ -354,16 +352,14 @@ export class PrincipalHorarioComponent implements OnInit {
     this.LimpiarCamposPlantilla();
   }
 
+  // METODO PARA VERIFICAR DATOS DE PLANTILLA
   VerificarPlantilla() {
     this.listaHorariosCorrectos = [];
     this.listaDetalleCorrectos = [];
-
     let formData = new FormData();
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
-
     }
-
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
       this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
@@ -378,7 +374,6 @@ export class PrincipalHorarioComponent implements OnInit {
       });
       this.OrdenarHorarios();
       this.OrdenarDetalles();
-
       this.horariosCorrectos = this.listaHorariosCorrectos.length;
       this.detallesCorrectos = this.listaDetalleCorrectos.length;
     });
@@ -429,6 +424,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
   }
 
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
   RegistrarHorariosDetalles() {
     const data = {
       horarios: this.listaHorariosCorrectos,
@@ -436,7 +432,6 @@ export class PrincipalHorarioComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
         timeOut: 6000,
@@ -503,7 +498,6 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // DEFINICION DEL DOCUMENTO PDF
   EstructurarPDF() {
-
     return {
       // ENCABEZADO DE PÁGINA
       pageSize: 'A4',
@@ -559,7 +553,7 @@ export class PrincipalHorarioComponent implements OnInit {
       n.push({
         style: 'tableMarginCabeceraHorario',
         table: {
-          widths: ['*','*', '*'],
+          widths: ['*', '*', '*'],
           headerRows: 3,
           body: [
             [
@@ -585,10 +579,10 @@ export class PrincipalHorarioComponent implements OnInit {
         n.push({
           style: 'tableMargin',
           table: {
-            widths: [ '*'],
+            widths: ['*'],
             headerRows: 1,
             body: [
-              [{ rowSpan: 1, text: 'DETALLES', style: 'tableHeader', border: [true, true, true, false]  }],
+              [{ rowSpan: 1, text: 'DETALLES', style: 'tableHeader', border: [true, true, true, false] }],
             ]
           }
         });
@@ -611,7 +605,7 @@ export class PrincipalHorarioComponent implements OnInit {
                 return [
                   { text: detalle.orden, style: 'itemsTableCentrado' },
                   { text: detalle.hora, style: 'itemsTableCentrado' },
-                  { text: detalle.tolerancia !=null ? detalle.tolerancia : '', style: 'itemsTableCentrado' },
+                  { text: detalle.tolerancia != null ? detalle.tolerancia : '', style: 'itemsTableCentrado' },
                   { text: detalle.tipo_accion_show, style: 'itemsTableCentrado' },
                   { text: detalle.segundo_dia == true ? 'Sí' : 'No', style: 'itemsTableCentrado' },
                   { text: detalle.minutos_antes, style: 'itemsTableCentrado' },
@@ -628,7 +622,6 @@ export class PrincipalHorarioComponent implements OnInit {
         });
       }
     });
-
     return n;
   }
 
@@ -705,7 +698,6 @@ export class PrincipalHorarioComponent implements OnInit {
         });
       });
     });
-
     return datos;
   }
 
@@ -750,7 +742,6 @@ export class PrincipalHorarioComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloHorarios);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -785,7 +776,7 @@ export class PrincipalHorarioComponent implements OnInit {
     }
 
     if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple')
-        || (observacion.startsWith('Horas')) || observacion.startsWith('Minutos de alimentación no')) {
+      || (observacion.startsWith('Horas')) || observacion.startsWith('Minutos de alimentación no')) {
       return 'rgb(238, 34, 207)';
     }
 
@@ -809,8 +800,11 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
-  // METODOS PARA LA SELECCION MULTIPLE
+  /** ************************************************************************************************* **
+   ** **                          METODO DE SELECCION MULTIPLE DE DATOS                              ** **
+   ** ************************************************************************************************* **/
 
+  // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -942,7 +936,6 @@ export class PrincipalHorarioComponent implements OnInit {
           this.router.navigate(['/horario']);
         }
       });
-
   }
 
 }

@@ -1,5 +1,5 @@
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import fs from 'fs';
@@ -9,7 +9,7 @@ import excel from 'xlsx';
 
 class TiposCargosControlador {
 
-    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE   **USADO
     public async BuscarTipoCargoNombre(req: Request, res: Response) {
         const { nombre } = req.body;
         const CARGOS = await pool.query(

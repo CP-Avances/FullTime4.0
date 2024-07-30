@@ -1111,7 +1111,7 @@ class DatosGeneralesControlador {
         }
     }
 
-    // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+    // METODO PARA LISTAR ID ACTUALES DE USUARIOS   **USADO
     public async ListarIdDatosActualesEmpleado(req: Request, res: Response) {
         const DATOS = await pool.query(
             `

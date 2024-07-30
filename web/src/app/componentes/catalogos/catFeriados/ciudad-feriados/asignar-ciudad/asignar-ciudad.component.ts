@@ -1,6 +1,6 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, Input } from '@angular/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
@@ -58,9 +58,7 @@ export class AsignarCiudadComponent implements OnInit {
     tipoForm: this.tipoF,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

@@ -19,7 +19,7 @@ const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UsuarioControlador {
-    // CREAR REGISTRO DE USUARIOS
+    // CREAR REGISTRO DE USUARIOS    **USADO
     CrearUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -100,7 +100,7 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE USUARIO
+    // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -142,7 +142,6 @@ class UsuarioControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                console.log('error *** ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
@@ -1423,7 +1422,7 @@ class UsuarioControlador {
             }
         });
     }
-    // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+    // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
     CrearUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1477,7 +1476,7 @@ class UsuarioControlador {
             }
         });
     }
-    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
     BuscarAsignacionUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;

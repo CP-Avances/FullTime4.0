@@ -27,7 +27,7 @@ class RegimenRuta {
         this.router.get('/:id', verificarToken_1.TokenValidation, catRegimenControlador_1.default.ListarUnRegimen);
         // ELIMINAR REGISTRO DE REGIMEN LABORAL  **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catRegimenControlador_1.default.EliminarRegistros);
-        // BUSCAR REGIMEN LABORAL POR ID DE PAIS
+        // BUSCAR REGIMEN LABORAL POR ID DE PAIS   **USADO
         this.router.get('/pais-regimen/:nombre', verificarToken_1.TokenValidation, catRegimenControlador_1.default.ListarRegimenPais);
         /** ** ******************************************************************************************* **
          ** **                           CONSULTA PERIODO DE VACACIONES                                 ** **

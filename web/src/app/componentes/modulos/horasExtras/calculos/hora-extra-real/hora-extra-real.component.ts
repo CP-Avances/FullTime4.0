@@ -531,13 +531,6 @@ export class HoraExtraRealComponent implements OnInit {
       arregloEmpleado.push(objeto)
     });
 
-    this.rest.CrearXML(arregloEmpleado).subscribe(res => {
-      console.log(arregloEmpleado)
-      this.data = res;
-      console.log("prueba-empleado", res)
-      this.urlxml = `${environment.url}/empleado/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
   }
 
   /****************************************************************************************************** 

@@ -26,7 +26,7 @@ class TiposCargosRutas {
 
     configuracion(): void {
 
-        // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE
+        // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE   **USADO
         this.router.post('/buscar/tipo_cargo/nombre', TokenValidation, TIPOSCARGOSCONTROLADOR.BuscarTipoCargoNombre);
         // METODO PARA LISTAR TIPO CARGOS   **USADO
         this.router.get('/', TokenValidation, TIPOSCARGOSCONTROLADOR.ListaTipoCargos);

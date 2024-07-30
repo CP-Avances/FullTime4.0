@@ -915,7 +915,7 @@ class DatosGeneralesControlador {
             }
         });
     }
-    // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+    // METODO PARA LISTAR ID ACTUALES DE USUARIOS   **USADO
     ListarIdDatosActualesEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query(`

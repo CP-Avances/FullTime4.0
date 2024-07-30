@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));
@@ -22,7 +22,7 @@ const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class ContratoEmpleadoControlador {
-    // REGISTRAR CONTRATOS
+    // REGISTRAR CONTRATOS    **USADO
     CrearContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip, subir_documento } = req.body;
@@ -95,7 +95,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA GUARDAR DOCUMENTO
+    // METODO PARA GUARDAR DOCUMENTO    **USADO
     GuardarDocumentoContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -188,16 +188,16 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO
+    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO    **USADO
     BuscarContratoEmpleadoEditar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, id_contrato } = req.body;
             const CONTRATO_EMPLEADO = yield database_1.default.query(`
-                SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
-                FROM eu_empleado_contratos AS ec
-                WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
-                ORDER BY ec.id ASC
-                `, [id_empleado, id_contrato]);
+            SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
+            FROM eu_empleado_contratos AS ec
+            WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
+            ORDER BY ec.id ASC
+            `, [id_empleado, id_contrato]);
             if (CONTRATO_EMPLEADO.rowCount != 0) {
                 return res.jsonp(CONTRATO_EMPLEADO.rows);
             }
@@ -206,7 +206,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // EDITAR DATOS DE CONTRATO
+    // EDITAR DATOS DE CONTRATO     **USADO
     EditarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -294,7 +294,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR
+    // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR    **USADO
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -303,7 +303,7 @@ class ContratoEmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
-                const contratoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+                const contratoConsulta = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
                 const [datosOriginales] = contratoConsulta.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -359,7 +359,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR
+    // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR   **USADO
     EliminarDocumentoServidor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento, id } = req.body;
@@ -438,9 +438,9 @@ class ContratoEmpleadoControlador {
         });
     }
     /** **************************************************************************** **
-     ** **          METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
+     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
      ** **************************************************************************** **/
-    // LISTAR TIPOS DE MODALIDAD DE TRABAJO
+    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
     ListarTiposContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CONTRATOS = yield database_1.default.query(`
@@ -454,7 +454,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // REGISTRAR MODALIDAD DE TRABAJO
+    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
     CrearTipoContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -489,7 +489,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE
+    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
     BuscarModalidadLaboralNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
@@ -504,6 +504,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
+    // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
     EncontrarFechaContratoId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_contrato } = req.body;

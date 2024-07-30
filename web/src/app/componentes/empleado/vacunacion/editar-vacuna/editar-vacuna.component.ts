@@ -29,9 +29,9 @@ export class EditarVacunaComponent implements OnInit {
   constructor(
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE VACUNACIÓN
     public validar: ValidacionesService, // VARIABLE USADA EN VALIDACIONES
+    public ventana: MatDialog,
     public toastr: ToastrService, // VARIABLE USADA EN NOTIFICACIONES
     private ventana_: MatDialogRef<EditarVacunaComponent>,
-    public ventana: MatDialog,
     @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 

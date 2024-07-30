@@ -116,7 +116,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO DE REGISTRO DE CARGO
+    // METODO DE REGISTRO DE CARGO    **USADO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -148,14 +148,13 @@ class EmpleadoCargosControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar el registro.' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO    **USADO
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -237,7 +236,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar } = req.body;
@@ -255,7 +254,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFechaEditar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar, id_cargo } = req.body;
@@ -361,7 +360,7 @@ class EmpleadoCargosControlador {
     /** **************************************************************************************** **
      ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **
      ** **************************************************************************************** **/
-    // METODO DE BUSQUEDA DE TIPO DE CARGOS
+    // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
     ListarTiposCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Cargos = yield database_1.default.query(`
@@ -375,7 +374,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO DE REGISTRO DE TIPO DE CARGO
+    // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
     CrearTipoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

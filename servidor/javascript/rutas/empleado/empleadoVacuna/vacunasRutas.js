@@ -54,19 +54,19 @@ class VacunaRutas {
     configuracion() {
         // METODO PARA LISTAR REGISTROS DE UN USUARIO   **USADO
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarUnRegistro);
-        // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS
+        // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS   **USADO
         this.router.get('/lista/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarTipoVacuna);
-        // METODO REGISTRO DE VACUNACION
+        // METODO REGISTRO DE VACUNACION   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, vacunasControlador_1.default.CrearRegistro);
-        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO   **USADO
         this.router.post('/fecha_nombre/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.BuscarVacunaFechaTipo);
-        // METODO PARA GUARDAR DOCUMENTO 
+        // METODO PARA GUARDAR DOCUMENTO      **USADO
         this.router.put('/:id/documento/:id_empleado', [verificarToken_1.TokenValidation, upload.single('uploads')], vacunasControlador_1.default.GuardarDocumento);
-        // METODO ACTUALIZACION DE REGISTROS DE VACUNACION
+        // METODO ACTUALIZACION DE REGISTROS DE VACUNACION   **USADO
         this.router.put('/:id', verificarToken_1.TokenValidation, vacunasControlador_1.default.ActualizarRegistro);
-        // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR
+        // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR   **USADO
         this.router.put('/eliminar_carnet/servidor', [verificarToken_1.TokenValidation], vacunasControlador_1.default.EliminarDocumentoServidor);
-        // ELIMINAR DOCUMENTO DE VACUNAS
+        // ELIMINAR DOCUMENTO DE VACUNAS   **USADO
         this.router.put('/eliminar_carnet/base_servidor', [verificarToken_1.TokenValidation], vacunasControlador_1.default.EliminarDocumento);
         // METODO DE ELIMINACION DE REGISTRO DE VACUNA   **USADO
         this.router.delete('/eliminar/:id/:documento', verificarToken_1.TokenValidation, vacunasControlador_1.default.EliminarRegistro);

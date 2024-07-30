@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -14,8 +16,6 @@ import { EditarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriad
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
 import { EditarCiudadComponent } from 'src/app/componentes/catalogos/catFeriados/ciudad-feriados/editar-ciudad/editar-ciudad.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
 
 export interface Feriado {
   idciudad_asignada: number
@@ -264,7 +264,5 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     }
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.idciudad_asignada + 1}`;
   }
-
-
 
 }

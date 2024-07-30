@@ -17,12 +17,12 @@ export class DiscapacidadService {
     return this.http.get(`${environment.url}/discapacidad/${id}`);
   }
 
-  // METODO PARA REGISTRAR DISCAPACIDAD
+  // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
   RegistroDiscapacidad(data: any) {
     return this.http.post(`${environment.url}/discapacidad`, data);
   }
 
-  // METODO PARA ACTUALIZACION DE REGISTRO
+  // METODO PARA ACTUALIZACION DE REGISTRO   **USADO
   ActualizarDiscapacidad(id: number, data: any) {
     return this.http.put(`${environment.url}/discapacidad/${id}`, data);
   }
@@ -45,12 +45,12 @@ export class DiscapacidadService {
     return this.http.post<any>(`${environment.url}/discapacidad/buscarTipo`, data);
   }
 
-  // BUSCAR TIPO DE DISCAPACIDAD
+  // BUSCAR TIPO DE DISCAPACIDAD    **USADO
   ListarTipoDiscapacidad() {
     return this.http.get(`${environment.url}/discapacidad/buscarTipo/tipo`);
   }
 
-  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE    **USADO
   BuscarDiscapacidadNombre(data: any) {
     return this.http.post<any>(`${environment.url}/discapacidad/buscarTipo/nombre`, data);
   }
