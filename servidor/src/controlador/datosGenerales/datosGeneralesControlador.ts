@@ -488,7 +488,7 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(empleados);
     }
 
-        // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+     // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR POR ROL **USADO
      public async BuscarDataGeneralRol(req: Request, res: Response) {
             let estado = req.params.estado;
             let informacion = await pool.query(

@@ -220,14 +220,28 @@ class RolesControlador {
     UpdateRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { rol, listUsuarios } = req.body;
-                for (const user of listUsuarios) {
-                    yield database_1.default.query(`
+                const { idRol, listaUsuarios } = req.body;
+                var cont = 0;
+                listaUsuarios.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    let res = yield database_1.default.query(`
           UPDATE eu_usuarios
-          SET id_rol = $1, 
+          SET id_rol = $1 
           WHERE id = $2
-        `, [rol, user.id]);
-                }
+        `, [idRol, item.id]);
+                    console.log('res.rowCount: ', res.rowCount);
+                    if (res.rowCount != 0) {
+                        cont = cont + 1;
+                    }
+                }));
+                setTimeout(() => {
+                    console.log('cont: ', cont, ' - listaUsuarios.length: ', listaUsuarios.length);
+                    if (cont == listaUsuarios.length) {
+                        return res.jsonp({ message: 'Se a actualizado todos los usuarios' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+                    }
+                }, 1500);
             }
             catch (error) {
                 // FINALIZAR TRANSACCION

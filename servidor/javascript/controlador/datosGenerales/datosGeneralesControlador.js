@@ -427,7 +427,7 @@ class DatosGeneralesControlador {
             return res.status(200).jsonp(empleados);
         });
     }
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR POR ROL **USADO
     BuscarDataGeneralRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;

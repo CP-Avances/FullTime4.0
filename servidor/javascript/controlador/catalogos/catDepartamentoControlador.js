@@ -1079,6 +1079,26 @@ class DepartamentoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
+    //CONSULTA PARA actualizar roles a varios usuarios
+    UpdateRoles(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { rol, listUsuarios } = req.body;
+                for (const user of listUsuarios) {
+                    yield database_1.default.query(`
+          UPDATE eu_usuarios
+          SET id_rol = $1, 
+          WHERE id = $2
+        `, [rol, user.id]);
+                }
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
+        });
+    }
 }
 exports.DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();
 exports.default = exports.DEPARTAMENTO_CONTROLADOR;

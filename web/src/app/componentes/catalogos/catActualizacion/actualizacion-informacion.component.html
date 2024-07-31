@@ -18,10 +18,24 @@
                     <form>
                         <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccionRol">
                             <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
-                                (change)="BuscarPorTipo($event)">
+                                (change)="BuscarPorTipo($event, 'rol')">
                                 <label id="textoradiobtn">{{c.valor}}</label>
                             </mat-radio-button>
                         </mat-radio-group>
+                    </form>
+                    <br/>
+                    <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+                    <form *ngIf="_booleanOptions.bool_suc">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 1)"
+                                [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </form>
                     <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
                     <form *ngIf="_booleanOptions.bool_reg">
@@ -171,77 +185,79 @@
                             </div>
                         </div>
                     </form>
+                    <br/>
 
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Seleccionar el rol</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de roles.">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="nombreRolF" required>
+                                <mat-option *ngFor="let rol of listaRoles" [value]="rol.id">
+                                    {{rol.nombre}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                         <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltro(0, 'e')">
                             Actualizar Rol
                         </button>
                     </div>
+
                     <hr *ngIf="mostrarTablas">
 
-
-                    <!--  ****************************  TABLA USUARIOS ROLES ****************************  -->
-                    <!--
-                    <div *ngIf="listaUsuariosRol.length > 0" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO USUARIOS ROLES
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="MostrarLista()">Mostrar lista</button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead class="thead-light">
-                                <tr style="text-align: center;">
-                                    <th>
-                                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
-                                            matTooltipPosition="right"
-                                            matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
-                                            (click)="HabilitarSeleccion()">
-                                            library_add_check
-                                        </mat-icon>
-                                        <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleRol() : null"
-                                            [checked]="selectionRol.hasValue() && isAllSelectedRol()"
-                                            [indeterminate]="selectionRol.hasValue() && !isAllSelectedRol()"
-                                            [aria-label]="checkboxLabelRol()">
-                                        </mat-checkbox>
-                                    </th>
-                                    <th scope="col">Codigo</th>
-                                    <th scope="col">Cédula</th>
-                                    <th scope="col">Nombres</th>
-                                    <th scope="col">Sucursal</th>
-                                    <th scope="col">Departamento</th>
-                                    <th scope="col">Rol</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="text-center" style="text-align: center; vertical-align: middle; font-size: small;"
-                                *ngFor="let usu of listaUsuariosRol | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_rol:numero_pagina_rol">
-                                    <td>
-                                        <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                            (change)="$event ? selectionRol.toggle(usu) : null"
-                                            [checked]="selectionRol.isSelected(usu)" [aria-label]="checkboxLabelRol(usu)">
-                                        </mat-checkbox>
-                                    </td>
-                                    <td>{{usu.codigo}}</td>
-                                    <td>{{usu.cedula}}</td>
-                                    <td>{{usu.nombre}}</td>
-                                    <td>{{usu.sucursal}}</td>
-                                    <td>{{usu.departamento}}</td>
-                                    <td>{{usu.rol}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <mat-paginator id="pagina" [length]="listaUsuariosRol.length" [pageSize]="tamanio_pagina_rol"
-                        [pageSizeOptions]="pageSizeOptions_rol" (page)="ManejarPaginaResultados($event)"
-                        showFirstLastButtons>
-                    </mat-paginator>
-                    <br>
-                    </div>
-                    -->
-
+                    <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
+            <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO SUCURSALES
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">
+                        Mostrar lista
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th>
+                                    <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                        (click)="HabilitarSeleccion()">
+                                        library_add_check
+                                    </mat-icon>
+                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleSuc() : null"
+                                        [checked]="selectionSucRol.hasValue() && isAllSelectedSuc()"
+                                        [indeterminate]="selectionSucRol.hasValue() && !isAllSelectedSuc()"
+                                        [aria-label]="checkboxLabelSuc()">
+                                    </mat-checkbox>
+                                </th>
+                                <th scope="col">Nombre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                                <td>
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                        (change)="$event ? selectionSucRol.toggle(s) : null"
+                                        [checked]="selectionSucRol.isSelected(s)" [aria-label]="checkboxLabelSuc(s)">
+                                    </mat-checkbox>
+                                </td>
+                                <td>{{s.sucursal}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
+                    [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+                <br>
+            </div>
 
                     <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                     <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
@@ -478,6 +494,197 @@
                         <span>CRÍTERIOS DE BÚSQUEDA</span>
                     </div>
                     <br>
+                    <form>
+                        <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccionDep">
+                            <mat-radio-button class="example-radio-button" *ngFor="let cd of checkDep" [value]="cd.opcion"
+                                (change)="BuscarPorTipo($event, 'depa')">
+                                <label id="textoradiobtn">{{cd.valor}}</label>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </form>
+                    <br/>
+                    <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+                    <form *ngIf="_booleanOptionsDep.bool_suc">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 1)"
+                                [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </form>
+                    <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
+                    <form *ngIf="_booleanOptionsDep.bool_reg">
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Sucursal</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                            [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de sucursales por nombre.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Régimen laboral</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_regRol.value, 7)"
+                                            [formControl]="nombre_regRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de régimen laboral por nombre.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+                    <form *ngIf="_booleanOptionsDep.bool_cargo">
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Sucursal</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                            [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de sucursales por nombre.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Cargo</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_cargRol.value, 1)"
+                                            [formControl]="nombre_cargRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de cargos por su descripción.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--  *************************  FORM PARA DEPARTAMENTOS  **************************  -->
+                    <form *ngIf="_booleanOptionsDep.bool_dep">
+                        <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Sucursal</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                        [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de sucursales por nombre.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Departamento</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_depRol.value, 2)"
+                                        [formControl]="nombre_depRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de departamentos por nombre.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        </div>
+                    </form>
+                    <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
+                    <form *ngIf="_booleanOptionsDep.bool_emp">
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Sucursal</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucDep.value, 6)"
+                                            [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de sucursales por nombre.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Nombres</mat-label>
+                                        <input matInput placeholder="Buscar"
+                                            (input)="Filtrar(nombre_empDep.value, 5)" [formControl]="nombre_empDep" type="text"
+                                            (keypress)="IngresarSoloLetras($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de datos de empleado por nombre.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Código</mat-label>
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(codigoDep.value, 3)"
+                                            [formControl]="codigoDep" (keypress)="IngresarSoloNumeros($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de datos de empleado por código.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Cédula</mat-label>
+                                        <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedulaDep.value, 4)"
+                                            oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                            [formControl]="cedulaDep" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                        <mat-icon matSuffix matTooltipPosition="right"
+                                            matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
+                                            help_outline
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <br/>
+
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Seleccionar el rol</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de roles.">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="nombreRolF" required>
+                                <mat-option *ngFor="let rol of listaRoles" [value]="rol.id">
+                                    {{rol.nombre}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
+                        <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltro(0, 'e')">
+                            Actualizar Rol
+                        </button>
+                    </div>
+
+                    <hr *ngIf="mostrarTablas">
                 </mat-card-content>
             </mat-card>
         </div>
