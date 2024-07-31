@@ -199,16 +199,23 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     if (data.planificacionHoraria.length > 0) {
       data.planificacionHoraria.forEach((planificacion: any) => {
-        this.dias_mes.forEach((dia: any) => {
-          // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
-          if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
-            // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
-            planificacion.dias[dia.fecha] = {
-              horarios: [],
-              observacion: ''
-            };
-          }
-        });
+          this.dias_mes.forEach((dia: any) => {
+              // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
+              if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
+                  // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
+                  planificacion.dias[dia.fecha] = {
+                      horarios: [],
+                      observacion: ''
+                  };
+              }
+
+              // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
+              if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
+                  planificacion.dias[dia.fecha].observacion = 'FD';
+              }
+
+
+          });
 
         // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
         planificacion.dias = Object.keys(planificacion.dias)
