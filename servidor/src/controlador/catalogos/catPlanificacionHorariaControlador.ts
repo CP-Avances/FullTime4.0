@@ -473,7 +473,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
                     dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
                     dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
                     dias[dia].horarios[i].minutos_alimentacion = horarioVerificado[1].minutos_comida;
-
+                    dias[dia].horarios[i].feriado = esFeriado;
 
                     // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                     if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
@@ -626,7 +626,10 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                 for (let j = 0; j < horariosPlanificacion.length; j++) {
                     const horario2 = horariosPlanificacion[j];
                     if (horario2.codigo !== 'DEFAULT-LIBRE' && horario2.codigo !== 'DEFAULT-FERIADO') {
-                        if (SeSuperponen(horario1, horario2)) {
+                        if (horario1.feriado && horario2.tipo_dia == 'N' && horario1.dia === horario2.dia) {
+                            dias[horario1.dia].observacion6 = `Existe una planificación que no corresponde para un día feriado`;
+                        } 
+                        else if (SeSuperponen(horario1, horario2)) {
                             ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
                         }
                     }
@@ -676,12 +679,12 @@ async function ListarPlanificacionHoraria(id_empleado: number, fecha_inicio: str
 
         const horario = await pool.query(`
             SELECT p_g.id_empleado AS id_e, fecha_horario AS fecha, id_horario AS id, 
-            horario.codigo AS codigo_dia 
+            horario.codigo AS codigo_dia, horario.default_ AS tipo_dia
             FROM eu_asistencia_general p_g 
             INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado = $3 
             INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario 
             WHERE fecha_horario BETWEEN $1 AND $2 
-            GROUP BY id_e, fecha, codigo_dia, p_g.id_horario 
+            GROUP BY id_e, fecha, codigo_dia, p_g.id_horario, horario.default_
             ORDER BY p_g.id_empleado, fecha, p_g.id_horario
         `, [fecha_inicio, fecha_final, id_empleado]);
 
