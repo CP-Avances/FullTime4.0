@@ -6,9 +6,8 @@ import { Router } from '@angular/router';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 
 @Component({
   selector: 'app-relojes',
@@ -66,13 +65,12 @@ export class RelojesComponent implements OnInit {
   constructor(
     private restCatDepartamento: DepartamentosService,
     private restSucursales: SucursalService,
-    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
     private formulario: FormBuilder,
     private validar: ValidacionesService,
     private toastr: ToastrService,
     private router: Router,
     private rest: RelojesService,
-    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -178,10 +176,8 @@ export class RelojesComponent implements OnInit {
       user_ip: this.ip,
     };
     // VALIDAR DIRECCION MAC
-    console.log('mac ', reloj.mac)
     if (reloj.mac != '') {
       if (direccMac.test(reloj.mac.toString())) {
-        console.log('ingresa aqui mac')
         this.GuardarSistema(reloj);
       } else {
         this.toastr.warning('MAC ingresada no es válida.',
@@ -191,7 +187,6 @@ export class RelojesComponent implements OnInit {
       }
     }
     else {
-      console.log('ingresa aqui')
       this.GuardarSistema(reloj);
     }
   }
@@ -199,7 +194,6 @@ export class RelojesComponent implements OnInit {
   // METODO PARA ALMACENAR LOS DATOS EN LA BASE
   GuardarSistema(reloj: any) {
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
-      console.log('ver response', response)
       if (response.message === 'guardado') {
         this.LimpiarCampos();
         this.VerDatosReloj(response.reloj.id);

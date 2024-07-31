@@ -24,21 +24,21 @@ class RelojesRuta {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR DISPOSITIVOS
+        // METODO PARA BUSCAR DISPOSITIVOS   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ListarRelojes);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS      **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catRelojesControlador_1.default.EliminarRegistros);
-        // METODO PARA REGISTRAR DISPOSITIVO
+        // METODO PARA REGISTRAR DISPOSITIVO   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.CrearRelojes);
-        // METODO PARA VER DATOS DE UN DISPOSITIVO
+        // METODO PARA VER DATOS DE UN DISPOSITIVO    **USADO
         this.router.get('/:id', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ListarUnReloj);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ActualizarReloj);
-        // METODO PARA BUSCAR DATOS GENERALES DE DISPOSITIVOS
+        // METODO PARA BUSCAR DATOS GENERALES DE DISPOSITIVOS   **USADO
         this.router.get('/datosReloj/:id', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ListarDatosUnReloj);
-        //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
-        // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA
+        // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catRelojesControlador_1.default.VerificarPlantilla);
+        // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
         this.router.post('/plantillaExcel/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.CargaPlantillaRelojes);
     }
 }

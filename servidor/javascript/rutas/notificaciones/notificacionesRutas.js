@@ -12,7 +12,7 @@ class NotificacionTiempoRealRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA CONTROLAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+        // METODO PARA CONTROLAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
         this.router.get('/config/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerConfigEmpleado);
         // RUTA PARA CREAR NOTIFICACION
         this.router.post('/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.CrearNotificacion);
@@ -21,8 +21,9 @@ class NotificacionTiempoRealRutas {
         this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EliminarMultiplesNotificaciones);
         // NOTIFICACIONES RECIBIDAS POR UN USUARIO
         this.router.get('/receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListarNotificacionUsuario);
-        // RUTAS CONFIGURACION DE RECEPCION DE NOTIFICACIONES CONFIGURAR_ALERTAS 
+        // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
         this.router.post('/config/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.CrearConfiguracion);
+        // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
         this.router.put('/config/noti-put/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ActualizarConfigEmpleado);
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
         this.router.post('/mail-comunicado-movil/:id_empresa/', notificacionesControlador_1.default.EnviarCorreoComunicadoMovil);

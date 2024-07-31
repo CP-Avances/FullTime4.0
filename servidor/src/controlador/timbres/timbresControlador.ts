@@ -169,7 +169,7 @@ class TimbresControlador {
         }
     }
 
-    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
+    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA     **USADO
     public async ObtenertimbreFechaEmple(req: Request, res: Response): Promise<any> {
         try {
             let { codigo, cedula, fecha } = req.query;
@@ -220,9 +220,6 @@ class TimbresControlador {
                     }
                 }
                 );
-            //console.log('respuesta: ', timbresRows)
-            //generarTimbres('1', '2024-01-01', '2024-01-06');
-
             if (timbresRows == 0) {
                 return res.status(400).jsonp({ message: "No se encontraron registros." })
             }
@@ -233,21 +230,14 @@ class TimbresControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
+    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO   **USADO
     public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any> {
         try {
             let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
-            console.log('id: ', id);
-            console.log('codigo: ', id_empleado);
-            console.log('accion: ', accion);
-            console.log('tecla: ', tecla);
-            console.log('observacion: ', observacion);
-            console.log('fecha: ', fecha);
-
             await pool.query(
                 `
                 SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
-                        $3::character varying, $4::integer, $5::character varying) 
+                    $3::character varying, $4::integer, $5::character varying) 
                 `
                 , [fecha, id_empleado, tecla, id, observacion])
                 .then((result: any) => {
@@ -256,7 +246,6 @@ class TimbresControlador {
 
         } catch (err) {
             const message = 'Ups!!! algo salio mal con la peticion al servidor.'
-            console.log('error ----- ', err)
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
@@ -328,13 +317,11 @@ class TimbresControlador {
         }
     }
 
-    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
-
+    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
                 id_empleado, id_reloj, tipo, ip, user_name } = req.body
-
 
             var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
@@ -400,11 +387,10 @@ class TimbresControlador {
     }
 
 
-    // METODO PARA BUSCAR TIMBRES
+    // METODO PARA BUSCAR TIMBRES   **USADO
     public async BuscarTimbresPlanificacion(req: Request, res: Response) {
 
         const { codigo, fec_inicio, fec_final } = req.body;
-        console.log('ver datos timbres ', codigo, fec_inicio, fec_final)
 
         const TIMBRES = await pool.query(
             "SELECT * FROM eu_timbres " +
@@ -419,13 +405,7 @@ class TimbresControlador {
         else {
             var contador = 0;
             TIMBRES.rows.forEach(async obj => {
-                console.log('fecha ', obj.fecha_hora_timbre_servidor)
-                console.log('codigo ', obj.codigo)
-                console.log('funcion ', obj.tecla_funcion)
-                console.log('id ', obj.id)
-                console.log('observacion ', obj.observacion)
                 contador = contador + 1;
-                // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
                 await pool.query(
                     `
                     SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
@@ -610,9 +590,7 @@ class TimbresControlador {
         }
     }
 
-
-
-
+    // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USAD
     public async ObtenerTimbresEmpleado(req: Request, res: Response): Promise<any> {
         try {
             const { id } = req.params;
@@ -653,7 +631,7 @@ class TimbresControlador {
     }
 
 
-    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)    **USADO
     public async BuscarTimbresAsistencia(req: Request, res: Response): Promise<any> {
 
         const { fecha, funcion, codigo } = req.body;

@@ -63,9 +63,9 @@ class FeriadosRuta {
         this.router.put('/', TokenValidation, FERIADOS_CONTROLADOR.ActualizarFeriado);
         // METODO PARA BUSCAR INFORMACION DE UN FERIADO   **USADO
         this.router.get('/:id', TokenValidation, FERIADOS_CONTROLADOR.ObtenerUnFeriado);
-        // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS  --**VERIFICADO
+        // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados/ciudad', TokenValidation, FERIADOS_CONTROLADOR.FeriadosCiudad);
-        // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  --**VERIFICADO
+        // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados-recuperar/ciudad', TokenValidation, FERIADOS_CONTROLADOR.FeriadosRecuperacionCiudad);
         // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos);

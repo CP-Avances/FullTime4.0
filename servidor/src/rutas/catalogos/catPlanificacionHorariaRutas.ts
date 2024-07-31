@@ -28,12 +28,13 @@ class PlanificacionHorariaRutas{
     }
 
     configuracion(): void {
-        // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
+        // VERIFICAR DATOS DE LA PLANIFICACION HORARIA   **USADO
         this.router.post('/verificarDatos', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.VerificarDatosPlanificacionHoraria);
-        // CARGAR PLANIFICACION HORARIA
+        // CARGAR PLANIFICACION HORARIA   **USADO
         this.router.post('/registrarPlanificacion', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.RegistrarPlanificacionHoraria);
     }
 }
 
 const PLANIFICACION_HORARIA_RUTAS = new PlanificacionHorariaRutas();
+
 export default PLANIFICACION_HORARIA_RUTAS.router;

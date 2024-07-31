@@ -27,7 +27,7 @@ export class ParametrosService {
     return this.http.get<any>(`${environment.url}/parametrizacion/ver-parametro/${id}`);
   }
 
-  // METODO PARA LISTAR DETALLES DE PARAMETRO **USADO
+  // METODO PARA LISTAR DETALLES DE PARAMETRO   **USADO
   ListarDetalleParametros(id: number) {
     return this.http.get<any>(`${environment.url}/parametrizacion/${id}`);
   }

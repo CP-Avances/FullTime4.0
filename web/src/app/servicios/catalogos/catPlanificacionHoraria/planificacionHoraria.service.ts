@@ -11,13 +11,13 @@ export class PlanificacionHorariaService {
     private http: HttpClient,
   ) { }
 
-  // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
+  // VERIFICAR DATOS DE LA PLANIFICACION HORARIA   **USADO
   VerificarDatosPlanificacionHoraria(formData: any) {
     console.log(formData);
     return this.http.post<any>(`${environment.url}/planificacionHoraria/verificarDatos`, formData);
   }
 
-  // CARGAR PLANIFICACION HORARIA
+  // CARGAR PLANIFICACION HORARIA   **USADO
   RegistrarPlanificacionHoraria(formData: any) {
     return this.http.post<any>(`${environment.url}/planificacionHoraria/registrarPlanificacion`, formData);
   }

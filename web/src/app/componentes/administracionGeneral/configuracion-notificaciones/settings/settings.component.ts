@@ -23,10 +23,10 @@ export class SettingsComponent implements OnInit {
   formGroup: FormGroup;
 
   constructor(
-    public formBuilder: FormBuilder,
     private avisos: RealTimeService,
     private toaster: ToastrService,
     public ventana: MatDialogRef<SettingsComponent>,
+    public formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.formGroup = formBuilder.group({

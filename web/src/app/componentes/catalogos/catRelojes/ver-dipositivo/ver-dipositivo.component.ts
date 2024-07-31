@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service'
+import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
+
 import { ListarRelojesComponent } from '../listar-relojes/listar-relojes.component';
 
 @Component({

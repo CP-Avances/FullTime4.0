@@ -252,49 +252,51 @@
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(d.observacion)">
+                                        [style.background-color]="EstiloCelda(d.observacion)">
                                     </div>
                                     {{d.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.establecimiento)" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(d.establecimiento)" style="font-size: 12px;">
                                 {{d.establecimiento}}</td>
-                            <td [style.color]="stiloTextoCelda(d.departamento)" id="letras">
+                            <td [style.color]="EstiloTextoCelda(d.departamento)" id="letras">
                                 {{d.departamento}}</td>
-                            <td [style.color]="stiloTextoCelda(d.nombre_dispo)" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(d.nombre_dispo)" style="font-size: 12px;">
                                 {{d.nombre_dispo}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.codigo)" id="letras">{{d.codigo}}
+                            <td [style.color]="EstiloTextoCelda(d.codigo)" id="letras">{{d.codigo}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.direccion_ip)" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(d.direccion_ip)" style="font-size: 12px;">
                                 {{d.direccion_ip}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.puerto)" id="letras">{{d.puerto}}
+                            <td [style.color]="EstiloTextoCelda(d.puerto)" id="letras">{{d.puerto}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.acciones)" style="font-size: 12px;">{{d.acciones}}</td>
-                            <td [style.color]="stiloTextoCelda(d.numero_acciones)" id="letras">
+                            <td [style.color]="EstiloTextoCelda(d.acciones)" style="font-size: 12px;">{{d.acciones}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.numero_acciones)" id="letras">
                                 {{d.numero_acciones}}</td>
-                            <td [style.color]="stiloTextoCelda(d.marca)" style="font-size: 12px;">{{d.marca}}</td>
-                            <td [style.color]="stiloTextoCelda(d.modelo)" id="letras">{{d.modelo}}
+                            <td [style.color]="EstiloTextoCelda(d.marca)" style="font-size: 12px;">{{d.marca}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.modelo)" id="letras">{{d.modelo}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.id_fabricante)" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(d.id_fabricante)" style="font-size: 12px;">
                                 {{d.id_fabricante}}</td>
-                            <td [style.color]="stiloTextoCelda(d.fabricante)" id="letras">
+                            <td [style.color]="EstiloTextoCelda(d.fabricante)" id="letras">
                                 {{d.fabricante}}</td>
-                            <td [style.color]="stiloTextoCelda(d.numero_serie)" style="font-size: 12px;">
+                            <td [style.color]="EstiloTextoCelda(d.numero_serie)" style="font-size: 12px;">
                                 {{d.numero_serie}}
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.direccion_mac)" id="letras">
+                            <td [style.color]="EstiloTextoCelda(d.direccion_mac)" id="letras">
                                 {{d.direccion_mac}}</td>
-                            <td [style.color]="stiloTextoCelda(d.contrasena)" id="letras">
+                            <td [style.color]="EstiloTextoCelda(d.contrasena)" id="letras">
                                 {{d.contrasena}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div>
-                <div *ngIf="listaDispositivosCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
-                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div *ngIf="listaDispositivosCorrectos.length > 0" class="item" style="float: left; margin: 5px;">
+                    <div class="icon" slot="start" id="t-editar" class="circulo"
+                        style="background-color: rgb(159, 221, 154);"></div>
                     <div class="text">items 'OK' - {{listaDispositivosCorrectos.length}}</div>
                 </div>
                 <mat-paginator [length]="DataDispositivos.length" [pageSize]="tamanio_paginaMul"
@@ -302,7 +304,7 @@
                     showFirstLastButtons>
                 </mat-paginator>
             </div>
-            
+
         </div>
     </div>
 </div>

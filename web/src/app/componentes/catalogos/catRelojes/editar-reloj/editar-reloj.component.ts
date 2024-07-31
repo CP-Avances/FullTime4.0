@@ -40,8 +40,6 @@ export class EditarRelojComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
-
   // PRIMER FORMULARIO
   ipF = new FormControl('', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/)]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
@@ -227,7 +225,6 @@ export class EditarRelojComponent implements OnInit {
   // METODO PARA GUARDAR EN LA BASE DE DATOS
   GuardarSistema(datosReloj: any) {
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
-      //console.log('ver respuesta ', response)
       if (response.message === 'actualizado') {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,

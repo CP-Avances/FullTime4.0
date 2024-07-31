@@ -14,10 +14,10 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
@@ -161,9 +161,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    //console.log('ver original ', this.origen)
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
@@ -546,9 +544,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         }
       })
     }
-
-    console.log('ver usuarios ', usuarios);
-
     this.SeleccionarProceso(tipo, usuarios);
   }
 
@@ -641,7 +636,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   plan_rotativo: boolean = false;
   data_rotativo: any = []
   PlanificarRotativos(data: any) {
-    console.log('data rotativos ', data)
     this.data_horario = [];
     if (data.length > 0) {
       this.data_horario = {
@@ -661,21 +655,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   cargar_plantilla: boolean = false;
   data_cargar: any = [];
   CargarPlantilla(data: any) {
-    console.log('data cargar ', data)
     this.data_cargar = [];
-    // if (data.length > 0) {
     this.data_cargar = {
       usuariosSeleccionados: data,
       pagina: 'cargar-plantilla',
     }
     this.seleccionar = false;
     this.cargar_plantilla = true;
-    // }
-    // else {
-    //   this.toastr.warning('No ha seleccionado usuarios.', '', {
-    //     timeOut: 6000,
-    //   });
-    // }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -783,7 +769,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA VER PLANIFICACION
   resultados: any = [];
   VerPlanificacion(data: any) {
-    console.log('VerPlanificacion', data);
     if (data.length > 0) {
       this.resultados = data;
       this.seleccionar = false;
@@ -835,7 +820,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   rotativo: any = []
   registrar_rotativo: boolean = false;
   AbrirMultipleIndividual(usuario: any): void {
-    //console.log('ver usuario ', usuario)
     this.rotativo = {
       idCargo: usuario.id_cargo,
       codigo: usuario.codigo,
@@ -878,7 +862,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
   CargarTimbres(data: any) {
-    //console.log('ver data timbres ', data)
     if (data.length > 0) {
 
       var inicio = moment(this.fechaInicioF.value).format('YYYY-MM-DD');
@@ -905,7 +888,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         };
 
         this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-          //console.log('datos ', datos)
           if (datos.message === 'vacio') {
             this.toastr.info(
               'No se han encontrado registros de marcaciones.', '', {

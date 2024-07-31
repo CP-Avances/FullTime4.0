@@ -249,7 +249,7 @@ export class EmpleadoService {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato/${id}`);
   }
 
-  // METODO PARA BUSCAR FECHA DE CONTRATOS   --**VERIFICADO
+  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
   BuscarFechaContrato(datos: any) {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha`, datos);
   }

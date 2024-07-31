@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
+const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const settingsMail_1 = require("../../libs/settingsMail");
 class PlanGeneralControlador {
-    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
+    // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let errores = 0;
@@ -30,11 +30,11 @@ class PlanGeneralControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const result = yield database_1.default.query(`
-                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
-                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [
+                    INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                        minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `, [
                         plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
                         plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
                         plan_general[i].tipo_entr_salida, plan_general[i].id_empleado, plan_general[i].id_horario, plan_general[i].tipo_dia,
@@ -287,7 +287,7 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO  **USADO
     ListarHorariosUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -310,16 +310,13 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
-    // METODO PARA BUSCAR ASISTENCIAS
+    // METODO PARA BUSCAR ASISTENCIAS   **USADO
     BuscarAsistencia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
-                console.log('ver datos ', cedula, ' ', codigo, ' ', inicio, ' ', fin, ' ', nombre, ' ', apellido);
                 let ids = [];
                 if (codigo !== '' && codigo !== null) {
-                    console.log('ver codigo ', codigo);
                     const empleado = yield BuscarEmpleadoPorParametro('codigo', codigo);
                     if (empleado.rowCount > 0) {
                         ids = empleado.rows.map(row => row.id);
@@ -339,7 +336,6 @@ class PlanGeneralControlador {
                     else if (nombre !== '' && nombre !== null) {
                         empleado = yield BuscarEmpleadoPorParametro('nombre', nombre);
                     }
-                    console.log('ver empleado ', empleado);
                     if (empleado && empleado.rowCount > 0) {
                         ids = empleado.rows.map(row => row.id);
                     }
@@ -347,12 +343,13 @@ class PlanGeneralControlador {
                 if (ids.length > 0) {
                     const ASISTENCIA = yield database_1.default.query(`
                     SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
-                    p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                    empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
+                        p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                        empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
                     FROM eu_asistencia_general p_g
                     INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
                     WHERE p_g.fecha_horario BETWEEN $1 AND $2
-                    ORDER BY p_g.fecha_hora_horario ASC`, [inicio, fin, ids]);
+                    ORDER BY p_g.fecha_hora_horario ASC
+                    `, [inicio, fin, ids]);
                     if (ASISTENCIA.rowCount === 0) {
                         return res.status(404).jsonp({ message: 'vacio' });
                     }
@@ -369,16 +366,14 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
+    // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
-                console.log('ver datos ', id_empleado, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `, [fecha, id_empleado]);
-                //console.log('ver asignado ', ASIGNADO)
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES

@@ -123,8 +123,8 @@
                         <td>{{d.codigo}}</td>
                         <td>{{d.cedula}}</td>
                         <td>{{d.apellido}} {{d.nombre}}</td>
-                        <td>{{d.departamento | titlecase}}</td>
-                        <td>{{d.cargo}}</td>
+                        <td>{{d.name_dep | titlecase}}</td>
+                        <td>{{d.name_cargo}}</td>
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de timbres del empleado."
                                 class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)">

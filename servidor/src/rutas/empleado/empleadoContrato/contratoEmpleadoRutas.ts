@@ -97,7 +97,7 @@ class DepartamentoRutas {
         this.router.get('/contratoActual/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContratoActual);
         // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
         this.router.get('/contrato/:id', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarDatosUltimoContrato);
-        // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
+        // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);
 
 

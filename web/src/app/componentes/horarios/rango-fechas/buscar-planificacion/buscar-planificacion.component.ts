@@ -119,7 +119,6 @@ export class BuscarPlanificacionComponent {
   ids_empleado: string = '';
   VerPlanificacion() {
     this.ids_empleado = '';
-    console.log('resultados .... ', this.resultados)
     this.resultados.forEach((obj: any) => {
       if (this.ids_empleado === '') {
         this.ids_empleado = '\'' + obj.id + '\''
@@ -183,7 +182,6 @@ export class BuscarPlanificacionComponent {
             }
           })
         })
-        console.log('ver datos de horario ', this.horariosEmpleado)
         if (this.asignar_multiple === true || this.ventana_horario_individual === true) {
           this.multiple = false;
           // EDITAR HORARIO
@@ -226,7 +224,6 @@ export class BuscarPlanificacionComponent {
   data_horario: any = [];
   ventana_horario_individual: boolean = false;
   PlanificarIndividual(usuario: any): void {
-    console.log('ver usuario ', usuario, ' ver resultados ', this.resultados)
     for (var i = 0; i < this.resultados.length; i++) {
       if (this.resultados[i].codigo === usuario.codigo || this.resultados[i].codigo === usuario.codigo_e) {
         this.data_horario = {
@@ -251,7 +248,6 @@ export class BuscarPlanificacionComponent {
   rotativo: any = []
   registrar_rotativo: boolean = false;
   PlanificarMultipleI(usuario: any): void {
-    console.log('ver usuario ', usuario, ' ver resultados ', this.resultados)
     for (var i = 0; i < this.resultados.length; i++) {
       if (this.resultados[i].codigo === usuario.codigo || this.resultados[i].codigo === usuario.codigo_e) {
         this.rotativo = {
@@ -272,8 +268,6 @@ export class BuscarPlanificacionComponent {
     }
   }
 
-
-
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   multiple: boolean = false;
   buscar_fechas: boolean = true;
@@ -282,7 +276,6 @@ export class BuscarPlanificacionComponent {
   asignar_multiple: boolean = false;
   // METODO DE VALIDACION DE SELECCION MULTIPLE HORARIOS FIJOS
   PlanificarFija() {
-    console.log('ver resultados ', this.resultados.length)
     this.auto_individual = false;
     this.multiple = false;
     // EDITAR HORARIO
@@ -301,7 +294,6 @@ export class BuscarPlanificacionComponent {
   // METODO DE VALIDACION DE SELECCION MULTIPLE HORARIOS MULTIPLES
   rotativo_multiple: boolean = false;
   PlanificarMultiple() {
-    console.log('ver resultados ', this.resultados.length)
     this.auto_individual = false;
     this.multiple = false;
     // EDITAR HORARIO
@@ -497,12 +489,10 @@ export class BuscarPlanificacionComponent {
     let fecha = anio + '-' + mes + '-' + dia;
     let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
     let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
-    console.log('resultado ', verificar)
     // VERIFICAR QUE EL DIA SEA VALIDO
     if (verificar === true) {
       this.horariosEmpleado[index].color = 'ok';
       this.horariosEmpleado[index].seleccionado = dia;
-      console.log('index ', index)
       this.datos_editar = {
         idEmpleado: id_empleado,
         datosPlan: horario,

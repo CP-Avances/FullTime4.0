@@ -179,7 +179,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
+    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA     **USADO
     ObtenertimbreFechaEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -221,8 +221,6 @@ class TimbresControlador {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 });
-                //console.log('respuesta: ', timbresRows)
-                //generarTimbres('1', '2024-01-01', '2024-01-06');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron registros." });
                 }
@@ -233,20 +231,14 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
+    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO   **USADO
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
-                console.log('id: ', id);
-                console.log('codigo: ', id_empleado);
-                console.log('accion: ', accion);
-                console.log('tecla: ', tecla);
-                console.log('observacion: ', observacion);
-                console.log('fecha: ', fecha);
                 yield database_1.default.query(`
                 SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
-                        $3::character varying, $4::integer, $5::character varying) 
+                    $3::character varying, $4::integer, $5::character varying) 
                 `, [fecha, id_empleado, tecla, id, observacion])
                     .then((result) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
@@ -254,7 +246,6 @@ class TimbresControlador {
             }
             catch (err) {
                 const message = 'Ups!!! algo salio mal con la peticion al servidor.';
-                console.log('error ----- ', err);
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
@@ -309,7 +300,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
+    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -361,11 +352,10 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TIMBRES
+    // METODO PARA BUSCAR TIMBRES   **USADO
     BuscarTimbresPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo, fec_inicio, fec_final } = req.body;
-            console.log('ver datos timbres ', codigo, fec_inicio, fec_final);
             const TIMBRES = yield database_1.default.query("SELECT * FROM eu_timbres " +
                 "WHERE fecha_hora_timbre_servidor BETWEEN $1 AND $2 " +
                 "AND codigo IN (" + codigo + ") " +
@@ -376,13 +366,7 @@ class TimbresControlador {
             else {
                 var contador = 0;
                 TIMBRES.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    console.log('fecha ', obj.fecha_hora_timbre_servidor);
-                    console.log('codigo ', obj.codigo);
-                    console.log('funcion ', obj.tecla_funcion);
-                    console.log('id ', obj.id);
-                    console.log('observacion ', obj.observacion);
                     contador = contador + 1;
-                    // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
                     yield database_1.default.query(`
                     SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
                             $3::character varying, $4::integer, $5::character varying)  
@@ -539,6 +523,7 @@ class TimbresControlador {
             }
         });
     }
+    // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USAD
     ObtenerTimbresEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -601,7 +586,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)    **USADO
     BuscarTimbresAsistencia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fecha, funcion, codigo } = req.body;

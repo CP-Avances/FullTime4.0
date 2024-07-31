@@ -5,11 +5,10 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { EditarTimbreComponent } from '../editar-timbre/editar-timbre.component';
@@ -140,7 +139,6 @@ export class BuscarTimbreComponent implements OnInit {
         cedula: form.cedulaForm,
         fecha: moment(form.fechaForm).format('YYYY-MM-DD')
       }
-
       this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(async timbres => {
         if (timbres.timbres.length > 0) {
           this.existenTimbres = true;

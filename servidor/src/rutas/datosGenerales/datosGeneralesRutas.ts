@@ -49,7 +49,7 @@ class CiudadRutas {
         this.router.post('/informacion-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGenerales);
         // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS DE COLABORADORES ACTIVOS E INACTIVOS
         this.router.post('/informacion-general-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargo);
-        // METODO PARA LISTAR INFORMACION ACTUAL DEL USUARIO
+        // METODO PARA LISTAR INFORMACION ACTUAL DEL USUARIO  
         this.router.get('/info_actual', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarDatosActualesEmpleado);
         // METODO PARA LISTAR ID ACTUALES DE USUARIOS    **USADO
         this.router.get('/info_actual_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarIdDatosActualesEmpleado);

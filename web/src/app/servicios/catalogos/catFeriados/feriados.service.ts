@@ -50,12 +50,12 @@ export class FeriadosService {
     return this.http.get(`${environment.url}/feriados/${id}`);
   }
 
-  // METODO PARA LISTAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS   --**VERIFICADO
+  // METODO PARA LISTAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS   **USADO
   ListarFeriadosCiudad(datos: any) {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados/ciudad`, datos);
   }
 
-  // METODO PARA LISTAR FECHAS DE RECUPERACION DE FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  --**VERIFICADO
+  // METODO PARA LISTAR FECHAS DE RECUPERACION DE FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
   ListarFeriadosRecuperarCiudad(datos: any) {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados-recuperar/ciudad`, datos);
   }

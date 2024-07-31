@@ -420,7 +420,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
+    // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
     EncontrarFechaContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;

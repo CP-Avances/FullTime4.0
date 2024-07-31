@@ -92,7 +92,7 @@ class DepartamentoRutas {
         this.router.get('/contratoActual/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarIdContratoActual);
         // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
         this.router.get('/contrato/:id', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarDatosUltimoContrato);
-        // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
+        // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContrato);
         /** ********************************************************************************************* **
          ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **

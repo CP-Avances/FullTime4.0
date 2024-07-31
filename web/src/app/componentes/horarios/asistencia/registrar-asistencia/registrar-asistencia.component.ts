@@ -3,16 +3,16 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
 import { BuscarAsistenciaComponent } from '../buscar-asistencia/buscar-asistencia.component';
-
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { MatDialog } from '@angular/material/dialog';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-registrar-asistencia',
@@ -39,7 +39,6 @@ export class RegistrarAsistenciaComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-
   constructor(
     public componneteb: BuscarAsistenciaComponent,
     public parametro: ParametrosService,
@@ -51,7 +50,6 @@ export class RegistrarAsistenciaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('informacion ', this.informacion)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
@@ -98,19 +96,14 @@ export class RegistrarAsistenciaComponent implements OnInit {
   VerificarManual() {
     this.timbres = [];
     var funcion = '';
-
     funcion = this.VerificarFuncion();
-
     let datos = {
       codigo: this.informacion.detalle.codigo,
       funcion: funcion,
       fecha: this.informacion.detalle.fecha_horario
     }
-
     this.timbre.BuscarTimbresAsistencia(datos).subscribe(data => {
-      console.log('ver datos ', data)
       if (data.message === 'OK') {
-        console.log('ver respuesta ', data.respuesta)
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
           //console.log('ver fecha ', moment(obj.t_fec_timbre).format('YYYY-MM-DD'))
@@ -148,7 +141,6 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   // METODO PARA REASIGNAR TIMBRE
   ReasignarTimbre(seleccionado: any) {
-    //console.log('ver datos timbres ', moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'))
     this.progreso = true;
     let datos = {
       id: this.informacion.detalle.id,
@@ -159,12 +151,9 @@ export class RegistrarAsistenciaComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     }
-    console.log('datos enviados ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {
-      console.log('ver datos ', data)
       if (data.message === 'OK') {
         this.progreso = false;
-        console.log('ver respuesta ', data.respuesta);
         this.toastr.success('Registro asignado a la asistencia.', '', {
           timeOut: 6000,
         });
@@ -197,12 +186,9 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   // METODO PARA ASIGNACION DESDE EL SISTEMA
   ReasignarSistema() {
-
     this.timbres = [];
     var funcion = '';
     funcion = this.VerificarFuncion();
-    //console.log('ver funcion ', funcion)
-
     let datos = {
       codigo: this.informacion.detalle.codigo,
       funcion: funcion,
@@ -211,9 +197,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
     let diferencias: any = [];
     this.timbre.BuscarTimbresAsistencia(datos).subscribe(data => {
-      //console.log('ver datos ', data)
       if (data.message === 'OK') {
-        console.log('ver respuesta ', data.respuesta)
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
           var h_horario = moment(obj.t_hora_timbre, 'HH:mm:ss');
@@ -233,13 +217,11 @@ export class RegistrarAsistenciaComponent implements OnInit {
           }
           diferencias = diferencias.concat(proceso);
         })
-        //console.log('ver duracion ', diferencias)
         // ENCUENTRA EL VALOR MINIMO
         var minValue = Math.min(...diferencias.map((x: any) => x.duracion))
         // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
         var resultado = diferencias.filter(x => x.duracion == minValue)
         // IMPRIME EL RESULTADO
-        console.log(' resultado menor', resultado[0].duracion);
         this.ReasignarTimbre(resultado[0]);
       }
       else {

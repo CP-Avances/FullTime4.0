@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -9,15 +9,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-
-// SERVICIOS FILTROS DE BUSQUEDA
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
@@ -131,6 +129,7 @@ export class TimbreMultipleComponent implements OnInit {
   constructor(
     public loginService: LoginService,
     public informacion: DatosGeneralesService,
+    private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
     private restEmpresa: EmpresaService,
     private restUsuario: UsuarioService,
@@ -139,7 +138,6 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
-    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -179,7 +177,6 @@ export class TimbreMultipleComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
@@ -689,7 +686,6 @@ export class TimbreMultipleComponent implements OnInit {
   RegistrarTimbre(empleado: any) {
     this.ventana.open(CrearTimbreComponent, { width: '400px', data: empleado })
       .afterClosed().subscribe(dataT => {
-        console.log('timbres ', dataT)
         if (dataT) {
           if (!dataT.close) {
             this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
@@ -706,7 +702,6 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   RegistrarMultiple(data: any) {
-    console.log('ver data ', data)
     if (data.length > 0) {
       this.VerificarSeguridad(data);
     }
@@ -776,7 +771,6 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(valor: any) {
-    console.log('ver valor ', valor)
     if (this.opcion === 's') {
       this.ModelarSucursal(valor.id);
     }

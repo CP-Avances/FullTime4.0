@@ -79,7 +79,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+    // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
     ObtenerConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_empleado = req.params.id;
@@ -233,7 +233,7 @@ class NotificacionTiempoRealControlador {
     /** *********************************************************************************************** **
      **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
      ** *********************************************************************************************** **/
-    // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+    // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -270,7 +270,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+    // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -279,7 +279,7 @@ class NotificacionTiempoRealControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1', [id_empleado]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

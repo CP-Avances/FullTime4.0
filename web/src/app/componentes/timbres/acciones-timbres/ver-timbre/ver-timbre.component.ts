@@ -29,13 +29,13 @@ export class VerTimbreComponent implements OnInit {
   ]
 
   constructor(
+    public parametro: ParametrosService,
     public ventana: MatDialogRef<VerTimbreComponent>,
     private validar: ValidacionesService,
-    public parametro: ParametrosService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
-  accion: string = ''
+  accion: string = '';
   ngOnInit() {
     this.timbre = [];
     this.accion = '';
@@ -48,7 +48,6 @@ export class VerTimbreComponent implements OnInit {
     })
     this.BuscarParametro();
   }
-
   fecha_timbre: any;
   hora_timbre: any;
   ObtenerTimbre(formato_fecha: string, formato_hora: string) {

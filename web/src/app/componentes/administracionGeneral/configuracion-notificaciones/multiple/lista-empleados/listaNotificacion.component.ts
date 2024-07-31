@@ -15,7 +15,6 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
 
@@ -119,11 +118,10 @@ export class ListaNotificacionComponent implements OnInit {
     constructor(
         public informacion: DatosGeneralesService,
         public restR: ReportesService,
+        private asignaciones: AsignacionesService,
         private ventana: MatDialog,
-        private restUsuario: UsuarioService,
         private validar: ValidacionesService,
         private toastr: ToastrService,
-        private asignaciones: AsignacionesService,
     ) {
         this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -163,9 +161,7 @@ export class ListaNotificacionComponent implements OnInit {
 
     // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
     ProcesarDatos(informacion: any) {
-        //console.log('ver original ', this.origen)
         informacion.forEach((obj: any) => {
-            //console.log('ver obj ', obj)
             this.sucursales.push({
                 id: obj.id_suc,
                 sucursal: obj.name_suc

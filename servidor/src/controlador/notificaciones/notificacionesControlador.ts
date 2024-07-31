@@ -84,7 +84,7 @@ class NotificacionTiempoRealControlador {
 
   }
 
-  // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+  // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
     if (id_empleado != 'NaN') {
@@ -267,7 +267,7 @@ class NotificacionTiempoRealControlador {
    **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
    ** *********************************************************************************************** **/
 
-  // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+  // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
@@ -303,6 +303,7 @@ class NotificacionTiempoRealControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Configuracion guardada' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -310,7 +311,7 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+  // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
@@ -321,7 +322,7 @@ class NotificacionTiempoRealControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1', [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -367,6 +368,7 @@ class NotificacionTiempoRealControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Configuración actualizada.' });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

@@ -22,11 +22,13 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/`, datos);
   }
 
-  // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
+  // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
   RegistrarTimbreAdmin(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/admin/`, datos);
   }
 
+
+  // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
@@ -36,18 +38,19 @@ export class TimbresService {
   }
 
 
+  // METODO PARA EDITAR TIMBRES    **USADO
   EditarTimbreEmpleado(data: any) {
     return this.http.put(`${environment.url}/timbres/timbre/editar`, data);
   }
 
 
-  // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+  // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
   BuscarTimbresAsistencia(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-asistencia`, datos);
   }
 
 
-  // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)
+  // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)   **USADO
   BuscarTimbresPlanificacion(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-planificacion`, datos);
   }
@@ -80,6 +83,8 @@ export class TimbresService {
     return this.http.put<any>(`${environment.url}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
 
+
+  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
   ObtenerTimbresEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/timbres/ver/timbres/${id}`);
   }

@@ -254,7 +254,7 @@ class FeriadosControlador {
             res.status(404).jsonp({ text: 'Registros no encontrados.' });
         });
     }
-    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS   --**VERIFICADO
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS    **USADO
     FeriadosCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -278,7 +278,7 @@ class FeriadosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS   --**VERIFICADO
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
     FeriadosRecuperacionCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

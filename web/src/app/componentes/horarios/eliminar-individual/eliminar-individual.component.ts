@@ -124,15 +124,12 @@ export class EliminarIndividualComponent implements OnInit {
     busqueda.id_empleado = this.ids_usuario;
 
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios ', datos)
       if (datos.message === 'OK') {
-
         this.lista_horarios = datos.data;
         this.ver_horarios = true;
         if (this.horariosSeleccionados.length != 0) {
           (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
         }
-        //console.log('ver datos horarios ', this.lista_horarios)
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {

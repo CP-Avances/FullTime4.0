@@ -11,7 +11,7 @@ export class PlanGeneralService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA CREAR PLAN GENERAL   --**VERIFICADO
+  // METODO PARA CREAR PLAN GENERAL   **USADO
   CrearPlanGeneral(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
   }
@@ -41,18 +41,18 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-detalle`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO   **USADO
   BuscarHorariosUsuario(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista`, datos);
   }
 
 
-  // METODO PARA CONSULTAR ASISTENCIA
+  // METODO PARA CONSULTAR ASISTENCIA    **USADO
   ConsultarAsistencia(data: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/buscar-asistencia`, data);
   }
 
-  // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
+  // METODO PARA ACTUALIZAR ASISTENCIA MANUAL    **USADO
   ActualizarAsistenciaManual(data: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/actualizar-asistencia/manual`, data);
   }

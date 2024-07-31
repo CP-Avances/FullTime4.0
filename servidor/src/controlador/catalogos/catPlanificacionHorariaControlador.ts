@@ -9,54 +9,53 @@ import moment from "moment";
 
 class PlanificacionHorariaControlador {
 
-    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
         try {
             const documento = req.file?.originalname;
-    
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
             const workbook = excel.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantillaPlanificacionHoraria: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             const plantillaPlanificacionHorariaHeaders: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
-    
+
             // OBTENER FECHA DE LA PLANTILLA
             const terceraColumna = plantillaPlanificacionHorariaHeaders[0][2];
 
             if (!terceraColumna) {
                 throw new Error('Estructura de la plantilla de planificación horaria incorrecta');
             }
-    
-            let [diaSemana, fecha] = terceraColumna.split(', ');
+
+            let [fecha] = terceraColumna.split(', ');
             let [dia, mes, ano] = fecha.split('/');
             let fechaFormateada: string = `${dia}/${mes}/${ano}`;
             let fechaInicial: string;
             let fechaFinal: string;
-    
+
             try {
                 let fechaEntrada = moment.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
-    
+
                 // RESTAR 1 DIA A LA FECHA DE ENTRADA
                 fechaInicial = moment.utc(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
-    
+
                 // SUMAR 1 MES A LA FECHA DE ENTRADA
                 fechaFinal = moment.utc(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
-    
+
             } catch (error) {
                 res.json({ error: 'Fecha no valida' });
                 return;
             }
-    
+
             // FILTRAR PLANTILLA PLANIFICACION HORARIA PARA ELIMINAR LOS REGISTROS VACIOS
             const plantillaPlanificacionHorariaFiltrada = plantillaPlanificacionHoraria.filter((data: any) => {
                 return Object.keys(data).length > 1;
             });
-    
+
             // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
             let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
                 let nuevoObjeto: { cedula: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { cedula: data.CEDULA, dias: {} };
-    
+
                 // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
                 for (let propiedad in data) {
                     if (propiedad !== 'EMPLEADO' && propiedad !== 'CEDULA') {
@@ -66,31 +65,31 @@ class PlanificacionHorariaControlador {
                         nuevoObjeto.dias[fechaFormateada] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
                     }
                 }
-    
+
                 return nuevoObjeto;
             });
-    
+
             // VERIFICAR EMPLEADO, HORARIOS Y SOBREPOSICION DE HORARIOS
             for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
                 let { cedula: cedula } = data;
-    
+
                 cedula = cedula.toString();
-    
+
                 // VERIFICAR DATO REQUERIDO EMPLEADO
                 if (!cedula) {
                     data.observacion = 'Datos no registrados: CEDULA';
                     continue;
                 }
-    
+
                 // VERIFICAR EMPLEADO DUPLICADO
                 if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === cedula).length > 1) {
                     data.observacion = 'Empleado duplicado';
                     continue;
                 }
-    
+
                 // VERIFICAR EXISTENCIA DE EMPLEADO
                 const empleadoVerificado = await VerificarEmpleado(cedula);
-    
+
                 if (!empleadoVerificado[0]) {
                     data.observacion = empleadoVerificado[2];
                     data.dias = {};
@@ -103,7 +102,7 @@ class PlanificacionHorariaControlador {
                     data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
                     data.cedula_empleado = empleadoVerificado[1].cedula;
                 }
-    
+
                 // VERIFICAR HORARIOS
                 const datosVerificacionHorarios: DatosVerificacionHorarios = {
                     dias: data.dias,
@@ -112,11 +111,11 @@ class PlanificacionHorariaControlador {
                     id_empleado: data.id_empleado,
                     hora_trabaja: data.hora_trabaja
                 };
-    
+
                 const result = await VerificarHorarios(datosVerificacionHorarios);
                 data.dias = result.dias;
                 data.feriados = result.feriados;
-    
+
                 // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
                 const datosVerificacionSobreposicionHorarios: DatosVerificacionSuperposicionHorarios = {
                     dias: data.dias,
@@ -124,25 +123,23 @@ class PlanificacionHorariaControlador {
                     fecha_inicio: fechaInicial,
                     fecha_final: fechaFinal
                 };
-    
+
                 data.dias = await VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
             }
-    
-    
+
             const fechaInicioMes = moment.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
             const fechaFinalMes = moment.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
-    
+
             res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
+
         } catch (error) {
-            console.log(error.message);
             return res.status(404).jsonp({ message: error.message });
-            
+
         }
     }
 
-    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS  **USADO
     public async RegistrarPlanificacionHoraria(req: Request, res: Response): Promise<Response> {
-
         try {
             const { planificacionHoraria, user_name, ip } = req.body;
             const datosUsuario: DatosUsuario = { user_name, ip };
@@ -254,9 +251,11 @@ class PlanificacionHorariaControlador {
                         } else if (horario.observacion === 'DEFAULT-LIBRE') {
 
                             // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA
-                            const horarioRegistrado = await pool.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
-                        `, [data.id_empleado, horario.dia]);
+                            const horarioRegistrado = await pool.query(
+                                `
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
+                                `
+                                , [data.id_empleado, horario.dia]);
 
                             if (horarioRegistrado.rowCount != 0) {
                                 continue;
@@ -313,26 +312,31 @@ class PlanificacionHorariaControlador {
                         } else if (horario.observacion === 'DEFAULT-FERIADO') {
 
                             // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL EMPLEADO EN ESA FECHA
-                            const horarioDefaultRegistrado = await pool.query(`
+                            const horarioDefaultRegistrado = await pool.query(
+                                `
                                 SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
-                                `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
+                                `
+                                , [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
 
                             if (horarioDefaultRegistrado.rowCount != 0) {
                                 continue;
                             }
 
                             // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA QUE NO SEA DE TIPO FERIADO
-                            const horarioRegistrado = await pool.query(`
+                            const horarioRegistrado = await pool.query(
+                                `
                                 SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
-                                `, [data.id_emeplado, horario.dia]);
-    
-                                if (horarioRegistrado.rowCount != 0) {
-                                    // SI YA EXISTE ELIMINAR HORARIO REGISTRADO
-                                    await pool.query(`
-                                    DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
-                                    `, [data.id_empleado, horario.dia]);
-                                }
+                                `
+                                , [data.id_emeplado, horario.dia]);
 
+                            if (horarioRegistrado.rowCount != 0) {
+                                // SI YA EXISTE ELIMINAR HORARIO REGISTRADO
+                                await pool.query(
+                                    `
+                                    DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                    `
+                                    , [data.id_empleado, horario.dia]);
+                            }
 
                             const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
                             const fecha_horario_salida = `${horario.dia} ${horarioDefaultFeriado.salida.hora}`;
@@ -353,7 +357,6 @@ class PlanificacionHorariaControlador {
                                 estado_origen: 'DFD',
                                 minutos_alimentacion: horarioDefaultFeriado.entrada.minutos_comida
                             };
-
 
                             salida = {
                                 id_empleado: data.id_empleado,
@@ -386,20 +389,14 @@ class PlanificacionHorariaControlador {
                     }
                 }
             }
-
             if (planificacionesImportadas === 0) {
                 return res.status(200).jsonp({ message: 'No existen datos para registrar' });
             }
-
             return res.status(200).jsonp({ message: 'correcto' })
-
         } catch (error) {
             return res.status(500).jsonp({ message: error });
-
         }
-
     }
-
 }
 
 // FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS
@@ -496,7 +493,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
             }
 
         }
-        return {dias, feriados};
+        return { dias, feriados };
     } catch (error) {
         throw error;
     }
@@ -724,7 +721,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
 async function ConsultarHorarioDefault(codigo: string): Promise<any> {
     try {
         const horario: any = await pool.query(
-        `
+            `
         SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.minutos_comida, d.id AS id_det_horario, d.*
         FROM eh_cat_horarios AS h
         INNER JOIN eh_detalle_horarios AS d ON h.id = d.id_horario
@@ -758,7 +755,6 @@ async function ConsultarHorarioDefault(codigo: string): Promise<any> {
 // FUNCION PARA CREAR PLANIFICACION HORARIA
 async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, datosUsuario: DatosUsuario): Promise<any> {
     try {
-
         // DESESCTRUCTURAR PLANIFICACION HORARIA
         let {
             entrada,
@@ -775,17 +771,21 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         await pool.query('BEGIN');
 
         // CONSULTAR SI EXISTE HORARIO REGISTRADO PARA EL EMPLEADO EN ESA FECHA CON CODIGO DEFAULT-LIBRE O DEFAULT-FERIADO Y ELIMINARLO
-        const consultaHorarioDefault = await pool.query(`
+        const consultaHorarioDefault = await pool.query(
+            `
             SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario IN (1,2)
-        `, [entrada.id_empleado, entrada.fec_horario]);
+            `
+            , [entrada.id_empleado, entrada.fec_horario]);
 
         const asistenciasGeneralDefault = consultaHorarioDefault.rows;
 
         if (asistenciasGeneralDefault) {
             for (const asistencia of asistenciasGeneralDefault) {
-                await pool.query(`
+                await pool.query(
+                    `
                     DELETE FROM eu_asistencia_general WHERE id = $1
-                `, [asistencia.id]);
+                    `
+                    , [asistencia.id]);
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -800,7 +800,6 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
             }
         }
 
-
         // CREAR ENTRADA
         const registroEntrada = await pool.query(
             `
@@ -808,9 +807,10 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-            `, [entrada.id_empleado, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
-        entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.minutos_antes, entrada.minutos_despues,
-        entrada.estado_origen, entrada.minutos_alimentacion]
+            `
+            , [entrada.id_empleado, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
+            entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.minutos_antes, entrada.minutos_despues,
+            entrada.estado_origen, entrada.minutos_alimentacion]
         );
 
         const [datosNuevosEntrada] = registroEntrada.rows;
@@ -819,7 +819,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         const fechaEntrada = await FormatearFecha2(entrada.fec_hora_horario, 'ddd');
         const fechaHoraEntrada = `${fechaEntrada} ${horaEntrada}`;
 
-        const fechaHorarioEntrada = await FormatearFecha2(entrada.fec_horario, 'ddd');        
+        const fechaHorarioEntrada = await FormatearFecha2(entrada.fec_horario, 'ddd');
 
         datosNuevosEntrada.fecha_hora_horario = fechaHoraEntrada;
         datosNuevosEntrada.fecha_horario = fechaHorarioEntrada;
@@ -843,9 +843,10 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-                `, [inicioAlimentacion.id_empleado, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
-            inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.minutos_antes, inicioAlimentacion.minutos_despues,
-            inicioAlimentacion.estado_origen, inicioAlimentacion.minutos_alimentacion]
+                `
+                , [inicioAlimentacion.id_empleado, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
+                inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.minutos_antes, inicioAlimentacion.minutos_despues,
+                inicioAlimentacion.estado_origen, inicioAlimentacion.minutos_alimentacion]
             );
 
             const [datosNuevosInicioAlimentacion] = registroInicioAlimentacion.rows;
@@ -879,9 +880,10 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-                `, [finAlimentacion.id_empleado, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
-            finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.minutos_antes, finAlimentacion.minutos_despues,
-            finAlimentacion.estado_origen, finAlimentacion.minutos_alimentacion]
+                `
+                , [finAlimentacion.id_empleado, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
+                finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.minutos_antes, finAlimentacion.minutos_despues,
+                finAlimentacion.estado_origen, finAlimentacion.minutos_alimentacion]
             );
 
             const [datosNuevosFinAlimentacion] = registroFinAlimentacion.rows;
@@ -914,9 +916,10 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-            `, [salida.id_empleado, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia,
-        salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.minutos_antes, salida.minutos_despues,
-        salida.estado_origen, salida.minutos_alimentacion]
+            `
+            , [salida.id_empleado, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia,
+            salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.minutos_antes, salida.minutos_despues,
+            salida.estado_origen, salida.minutos_alimentacion]
         );
 
         const [datosNuevosSalida] = registroSalida.rows;
@@ -945,12 +948,12 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         await pool.query('COMMIT');
 
     } catch (error) {
-        console.log(error);
         await pool.query('ROLLBACK');
         throw error;
     }
 }
 
+// FUNCION PARA CONVERTIR HORAS A MINUTOS
 function ConvertirHorasAMinutos(hora: string): number {
     const partes = hora.split(':');
     const horas = parseInt(partes[0], 10);
@@ -958,6 +961,7 @@ function ConvertirHorasAMinutos(hora: string): number {
     return horas * 60 + minutos;
 }
 
+// FUNCION PARA CONVERTIR MINUT0S A HORAS
 function ConvertirMinutosAHoras(minutos: number): string {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;

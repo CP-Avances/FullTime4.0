@@ -1,7 +1,9 @@
 //IMPORTAR LIBRERIAS
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import moment, { Moment } from 'moment';
 import * as XLSX from 'xlsx';
 
@@ -11,18 +13,17 @@ import { ToastrService } from 'ngx-toastr';
 
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
-import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion.component';
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
   styleUrls: ['./cargar-plantilla-planificacion.component.css']
 })
-export class CargarPlantillaPlanificacionComponent  implements OnInit{
+
+export class CargarPlantillaPlanificacionComponent implements OnInit {
 
   @Input() datosSeleccionados: any;
   usuarios: any;
@@ -71,7 +72,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 
@@ -86,7 +86,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   /** **************************************************************************************** **
    ** **                              FORMATO DE FECHAS Y HORAS                             ** **
    ** **************************************************************************************** **/
-
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>) {
@@ -103,10 +102,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.dias_mes = [];
     let dia_inicio = moment(this.dia_inicio, 'YYYYY-MM-DD');
     let dia_fin = moment(this.dia_fin, 'YYYYY-MM-DD');
-
     this.mes = dia_inicio.format('MMMM').toUpperCase();
-
-
     while (dia_inicio <= dia_fin) {
       let dia = {
         fecha: dia_inicio.format('YYYY-MM-DD'),
@@ -116,8 +112,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       dia_inicio = dia_inicio.add(1, 'days');
     }
   }
-
-
 
 
   /** ************************************************************************************************* **
@@ -143,13 +137,12 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA CARGAR PLANTILLA
   CargarPlantilla(plantilla: any) {
-    if(plantilla.target.files && plantilla.target.files[0]){
+    if (plantilla.target.files && plantilla.target.files[0]) {
       this.archivo = plantilla.target.files;
       this.nombreArchivo = this.archivo[0].name;
       let arrayItems = this.nombreArchivo.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-
       if (itemExtencion === 'xlsx' || itemExtencion === 'xls') {
         if (itemName.toLowerCase().startsWith('plantillaplanificacionmultiple')) {
           this.VerificarPlantilla();
@@ -183,12 +176,12 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe({
       next: (res: any) => {
         this.OrganizarDatosPlanificacion(res);
-        this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
+        this.toastr.success('Plantilla verificada correctamente.', 'Plantilla verificada.', {
           timeOut: 6000,
         });
       },
       error: (error: any) => {
-        this.toastr.error('Error al verificar la plantilla de planificación horaria', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al verificar la plantilla de planificación horaria.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -206,35 +199,34 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     if (data.planificacionHoraria.length > 0) {
       data.planificacionHoraria.forEach((planificacion: any) => {
-          this.dias_mes.forEach((dia: any) => {
-              // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
-              if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
-                  // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
-                  planificacion.dias[dia.fecha] = {
-                      horarios: [],
-                      observacion: ''
-                  };
-              }
-          });
+        this.dias_mes.forEach((dia: any) => {
+          // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
+          if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
+            // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
+            planificacion.dias[dia.fecha] = {
+              horarios: [],
+              observacion: ''
+            };
+          }
+        });
 
-          // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
-          planificacion.dias = Object.keys(planificacion.dias)
+        // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
+        planificacion.dias = Object.keys(planificacion.dias)
           .sort()
           .map(key => ({
-              fecha: key,
-              ...planificacion.dias[key]
+            fecha: key,
+            ...planificacion.dias[key]
           }));
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
-      console.log(this.planificacionesHorarias);
     }
   }
 
   // METODO PARA SOLICITAR CONFIRMACION DE REGISTRO DE PLANIFICACIONES
   ConfirmarRegistroPlanificaciones() {
     const mensaje = 'registro-planificacion';
-    this.ventana.open(MetodosComponent, { width: '450px', data:  mensaje  }).afterClosed().subscribe((confimado: Boolean) => {
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed().subscribe((confimado: Boolean) => {
       if (confimado) {
         this.RegistrarPlanificaciones();
       }
@@ -255,7 +247,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
           if (!existePlanificacion) {
             dia.observacion = dia.observacion3 ? 'DEFAULT-FERIADO' : 'DEFAULT-LIBRE';
-            dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT-FERIADO', dia: dia.fecha ,observacion: 'DEFAULT-FERIADO' }] : [{codigo:'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE'}];
+            dia.horarios = dia.observacion3 ? [{ codigo: 'DEFAULT-FERIADO', dia: dia.fecha, observacion: 'DEFAULT-FERIADO' }] : [{ codigo: 'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE' }];
           }
         }
         return dia;
@@ -269,19 +261,18 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       ip: this.ip
     };
 
-    this.restP.RegistrarPlanificacionHoraria(datos).subscribe( (res: any) => {
-
+    this.restP.RegistrarPlanificacionHoraria(datos).subscribe((res: any) => {
       if (res.message === 'No existen datos para registrar') {
         this.toastr.warning('No existen datos para registrar', 'Plantilla no importada.', {
           timeOut: 6000,
         });
       } else {
-        this.toastr.success('Plantilla de planificaciones horarias importada', 'Operación exitosa', {
+        this.toastr.success('Plantilla de planificaciones horarias importada.', 'Operación exitosa.', {
           timeOut: 6000,
         });
-    }
+      }
     }, (error: any) => {
-      this.toastr.error('Error al importar la plantilla de planificaciones horarias', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al importar la plantilla de planificaciones horarias.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     });
@@ -310,7 +301,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     const filas: any[] = [];
 
     // CREAR LA FILA DE ENCABEZADOS
-    const encabezados = ['CEDULA','EMPLEADO'];
+    const encabezados = ['CEDULA', 'EMPLEADO'];
     for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
       // CONVERTIR FECHA A ESTE FORMATO VIERNES 26/01/2024
       const opciones: Intl.DateTimeFormatOptions = {
@@ -354,7 +345,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
    ** ************************************************************************************************* **/
 
   MostrarVisualizarObservacion(dia: any): boolean {
-    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2) || Boolean(dia.observacion3) || Boolean(dia.observacion4) ;
+    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2) || Boolean(dia.observacion3) || Boolean(dia.observacion4);
   }
 
 
@@ -370,7 +361,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA OBTENER EL COLOR DE LA OBSERVACION
   ObtenerColorObservacion(observacion: string) {
-    if(observacion && observacion.startsWith('Jornada superada')) return 'rgb(19, 192, 163)';
+    if (observacion && observacion.startsWith('Jornada superada')) return 'rgb(19, 192, 163)';
 
     switch (observacion) {
       case 'OK':
@@ -384,7 +375,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA OBTENER EL COLOR DEL USUARIO
   ObtenerColorEmpleado(observacion: string) {
-    if(observacion === 'Empleado no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
+    if (observacion === 'Empleado no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
   }
 
   // OBTENER NOMBRE DE USUARIO
@@ -400,9 +391,9 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-      this.componentem.seleccionar = true;
-      this.componentem.cargar_plantilla = false;
-      this.componentem.LimpiarFormulario();
+    this.componentem.seleccionar = true;
+    this.componentem.cargar_plantilla = false;
+    this.componentem.LimpiarFormulario();
 
   }
 

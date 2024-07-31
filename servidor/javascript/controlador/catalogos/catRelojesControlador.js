@@ -19,7 +19,7 @@ const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class RelojesControlador {
-    // METODO PARA BUSCAR DISPOSITIVOS
+    // METODO PARA BUSCAR DISPOSITIVOS    **USADO
     ListarRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const RELOJES = yield database_1.default.query(`
@@ -39,7 +39,7 @@ class RelojesControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -48,7 +48,7 @@ class RelojesControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const reloj = yield database_1.default.query('SELECT * FROM ed_relojes WHERE id = $1', [id]);
+                const reloj = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE id = $1`, [id]);
                 const [datosOriginales] = reloj.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -89,12 +89,11 @@ class RelojesControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR DISPOSITIVO
+    // METODO PARA REGISTRAR DISPOSITIVO   **USADO
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
-                console.log('ver req.body ', req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 var VERIFICAR_CODIGO;
@@ -108,7 +107,6 @@ class RelojesControlador {
                     SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 OR UPPER(serie) = $2
                     `, [codigo.toUpperCase(), serie.toUpperCase()]);
                 }
-                console.log('ver rows ', VERIFICAR_CODIGO.rows);
                 if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
@@ -142,14 +140,13 @@ class RelojesControlador {
                 }
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA VER DATOS DE UN DISPOSITIVO
+    // METODO PARA VER DATOS DE UN DISPOSITIVO    **USADO
     ListarUnReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -164,7 +161,7 @@ class RelojesControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO   **USADO
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -236,7 +233,7 @@ class RelojesControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR DATOS GENERALES DE DISPOSITIVO
+    // METODO PARA CONSULTAR DATOS GENERALES DE DISPOSITIVO    **USADO
     ListarDatosUnReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -358,6 +355,7 @@ class RelojesControlador {
             });
         });
     }
+    // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
     VerificarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -398,11 +396,11 @@ class RelojesControlador {
                     var duplicados2 = [];
                     var duplicados3 = [];
                     var mensaje = 'correcto';
-                    //Exprecion regular para validar el formato de una IPv4.
+                    // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE UNA IPV4.
                     const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
-                    //Exprecion regular para validar el formato de una direccion mac
+                    // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE UNA DIRECCION MAC
                     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
-                    //Exprecion regular para validar el formato de solo números.
+                    // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE SOLO NUMEROS.
                     const regex = /^[0-9]+$/;
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla_dispositivos.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
@@ -435,11 +433,11 @@ class RelojesControlador {
                             data.observacion = 'no registrado';
                             // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
                             if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
-                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                                // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
                                 if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
-                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
                                     if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
-                                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
+                                        // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
                                         if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
                                             duplicados3.push(data);
                                         }
@@ -541,10 +539,10 @@ class RelojesControlador {
                                 if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
                                     // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
                                     if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
-                                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                                        // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
                                         if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
                                             if (data.numero_serie != ' - ') {
-                                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                                // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
                                                 if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
                                                     duplicados2.push(data);
                                                 }
@@ -553,7 +551,7 @@ class RelojesControlador {
                                                 }
                                             }
                                             if (data.direccion_mac != ' - ') {
-                                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
+                                                // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
                                                 if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
                                                     duplicados3.push(data);
                                                 }
@@ -589,16 +587,26 @@ class RelojesControlador {
                     listDispositivos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado' || item.observacion == '1' ||
                             item.observacion == '2' || item.observacion == '3' || item.observacion == '4') {
-                            var validEstablecimiento = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [item.establecimiento.toUpperCase()]);
+                            var validEstablecimiento = yield database_1.default.query(`
+                            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                            `, [item.establecimiento.toUpperCase()]);
                             if (validEstablecimiento.rows[0] != undefined && validEstablecimiento.rows[0] != '') {
-                                var validDeparta = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [item.departamento.toUpperCase()]);
+                                var validDeparta = yield database_1.default.query(`
+                                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                                `, [item.departamento.toUpperCase()]);
                                 if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
-                                    var VERIFICAR_DEP_SUC = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`, [validEstablecimiento.rows[0].id, item.departamento.toUpperCase()]);
+                                    var VERIFICAR_DEP_SUC = yield database_1.default.query(`
+                                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                                    `, [validEstablecimiento.rows[0].id, item.departamento.toUpperCase()]);
                                     if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
-                                        var validCodigo = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`, [item.codigo.toString().toUpperCase()]);
+                                        var validCodigo = yield database_1.default.query(`
+                                        SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
+                                        `, [item.codigo.toString().toUpperCase()]);
                                         if (validCodigo.rows[0] == undefined || validCodigo.rows[0] == '') {
                                             if (ipv4Regex.test(item.direccion_ip.toString())) {
-                                                var validDireccIP = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE ip = $1`, [item.direccion_ip]);
+                                                var validDireccIP = yield database_1.default.query(`
+                                                SELECT * FROM ed_relojes WHERE ip = $1
+                                                `, [item.direccion_ip]);
                                                 if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == '') {
                                                     if (regex.test(item.puerto)) {
                                                         if (item.puerto.toString().length > 6) {
@@ -738,11 +746,11 @@ class RelojesControlador {
             }
         });
     }
+    // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
     CargaPlantillaRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { plantilla, user_name, ip } = req.body;
-                console.log('plantilla: ', plantilla.length);
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
@@ -751,9 +759,10 @@ class RelojesControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // BUSCAR ID DE LA SUCURSAL INGRESADA
-                    const id_sucursal = yield database_1.default.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [establecimiento.toUpperCase()]);
-                    const id_departamento = yield database_1.default.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                        'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+                    const id_sucursal = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [establecimiento.toUpperCase()]);
+                    const id_departamento = yield database_1.default.query(`
+                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                    `, [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
                     if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -779,13 +788,12 @@ class RelojesControlador {
                     }
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
-                        INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                            id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                        `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca,
+                    INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca,
                         modelo, numero_serie, id_fabricante, fabricante, direccion_mac, acciones_boolean, num_accion, codigo]);
                     const [reloj_ingre] = response.rows;
-                    console.log('response.rows: ', response.rows);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ed_relojes',
@@ -798,9 +806,7 @@ class RelojesControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    console.log('contador: ', contador, ' plantilla: ', plantilla.length);
                     if (contador === plantilla.length) {
-                        console.log('reloj: ', reloj_ingre);
                         if (reloj_ingre) {
                             return respuesta = res.status(200).jsonp({ message: 'ok' });
                         }

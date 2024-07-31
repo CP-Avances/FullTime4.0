@@ -101,21 +101,36 @@ export class CrearTimbreComponent implements OnInit {
         }, (objPositionError) => {
           switch (objPositionError.code) {
             case objPositionError.PERMISSION_DENIED:
-              console.log('NO SE HA PERMITIDO ACCEDER A POSICIÓN DEL USUARIO.');
+              this.toastr.warning(
+                'No se ha permitido el acceso a la posición del usuario.', '', {
+                timeOut: 6000,
+              })
               break;
             case objPositionError.POSITION_UNAVAILABLE:
-              console.log('NO SE HA PODIDO ACCEDER A INFORMACIÓN DE SU POSICIÓN.');
+              this.toastr.warning(
+                'No se ha podido acceder a la información de su posición.', '', {
+                timeOut: 6000,
+              })
               break;
             case objPositionError.TIMEOUT:
-              console.log('EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER.');
+              this.toastr.warning(
+                'El servicio ha tardado demasiado tiempo en responder.', '', {
+                timeOut: 6000,
+              })
               break;
             default:
-              console.log('ERROR DESCONOCIDO.');
+              this.toastr.warning(
+                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                timeOut: 6000,
+              })
           }
         }, this.options);
     }
     else {
-      console.log('SU NAVEGADOR NO SOPORTA API DE GEOLOCALIZACIÓN.');
+      this.toastr.warning(
+        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        timeOut: 6000,
+      })
     }
   }
 
@@ -158,9 +173,7 @@ export class CrearTimbreComponent implements OnInit {
       ip: this.ip,
     }
     if (this.data.length === undefined) {
-      //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
-      //console.log('timbre ', timbre)
       this.ventana.close(timbre);
     }
     else {

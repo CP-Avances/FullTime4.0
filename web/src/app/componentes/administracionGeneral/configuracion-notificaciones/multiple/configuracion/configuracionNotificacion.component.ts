@@ -4,7 +4,6 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { use } from 'echarts';
 
 @Component({
     selector: 'app-configuracionNotificacion',

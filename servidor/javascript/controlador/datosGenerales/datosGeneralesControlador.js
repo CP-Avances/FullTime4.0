@@ -890,7 +890,7 @@ class DatosGeneralesControlador {
             return res.status(200).jsonp(respuesta);
         });
     }
-    // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO
+    // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO  
     ListarDatosActualesEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query(`
@@ -898,13 +898,12 @@ class DatosGeneralesControlador {
                 e_datos.genero, e_datos.correo, e_datos.fecha_nacimiento, e_datos.estado, 
                 e_datos.domicilio, e_datos.telefono, e_datos.id_nacionalidad, e_datos.imagen, 
                 e_datos.codigo, e_datos.id_contrato, e_datos.id_regimen, e_datos.name_regimen AS regimen,
-                e_datos.id_cargo, e_datos.id_cargo_ AS id_tipo_cargo, e_datos.name_cargo AS cargo, e_datos.id_departamento, 
-                e_datos.name_dep AS departamento, e_datos.id_suc AS id_sucursal, e_datos.name_suc AS sucursal, s.id_empresa, 
-                empre.nombre AS empresa, e_datos.id_ciudad, e_datos.ciudad, e_datos.hora_trabaja
-            FROM informacion_general AS e_datos, 
-                e_sucursales AS s, e_empresa AS empre
-            WHERE s.id = e_datos.id_suc AND 
-                s.id_empresa = empre.id 
+                e_datos.id_cargo, e_datos.id_cargo_ AS id_tipo_cargo, e_datos.name_cargo AS cargo, 
+                e_datos.id_depa AS id_departamento, e_datos.name_dep AS departamento, e_datos.id_suc AS id_sucursal, 
+                e_datos.name_suc AS sucursal, s.id_empresa, empre.nombre AS empresa, e_datos.id_ciudad, e_datos.ciudad, 
+                e_datos.hora_trabaja
+            FROM informacion_general AS e_datos, e_sucursales AS s, e_empresa AS empre
+            WHERE s.id = e_datos.id_suc AND s.id_empresa = empre.id 
             ORDER BY e_datos.nombre ASC
             `);
             if (DATOS.rowCount != 0) {

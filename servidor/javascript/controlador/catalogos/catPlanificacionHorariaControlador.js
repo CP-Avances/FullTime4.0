@@ -21,7 +21,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
 class PlanificacionHorariaControlador {
-    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     VerificarDatosPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -38,7 +38,7 @@ class PlanificacionHorariaControlador {
                 if (!terceraColumna) {
                     throw new Error('Estructura de la plantilla de planificación horaria incorrecta');
                 }
-                let [diaSemana, fecha] = terceraColumna.split(', ');
+                let [fecha] = terceraColumna.split(', ');
                 let [dia, mes, ano] = fecha.split('/');
                 let fechaFormateada = `${dia}/${mes}/${ano}`;
                 let fechaInicial;
@@ -126,12 +126,11 @@ class PlanificacionHorariaControlador {
                 res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
             }
             catch (error) {
-                console.log(error.message);
                 return res.status(404).jsonp({ message: error.message });
             }
         });
     }
-    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS  **USADO
     RegistrarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -231,8 +230,8 @@ class PlanificacionHorariaControlador {
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO UN HORARIO PARA EL EMPLEADO EN ESA FECHA
                                 const horarioRegistrado = yield database_1.default.query(`
-                            SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
-                        `, [data.id_empleado, horario.dia]);
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2
+                                `, [data.id_empleado, horario.dia]);
                                 if (horarioRegistrado.rowCount != 0) {
                                     continue;
                                 }
@@ -676,13 +675,13 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             // CONSULTAR SI EXISTE HORARIO REGISTRADO PARA EL EMPLEADO EN ESA FECHA CON CODIGO DEFAULT-LIBRE O DEFAULT-FERIADO Y ELIMINARLO
             const consultaHorarioDefault = yield database_1.default.query(`
             SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario IN (1,2)
-        `, [entrada.id_empleado, entrada.fec_horario]);
+            `, [entrada.id_empleado, entrada.fec_horario]);
             const asistenciasGeneralDefault = consultaHorarioDefault.rows;
             if (asistenciasGeneralDefault) {
                 for (const asistencia of asistenciasGeneralDefault) {
                     yield database_1.default.query(`
                     DELETE FROM eu_asistencia_general WHERE id = $1
-                `, [asistencia.id]);
+                    `, [asistencia.id]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_asistencia_general',
@@ -807,18 +806,19 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             yield database_1.default.query('COMMIT');
         }
         catch (error) {
-            console.log(error);
             yield database_1.default.query('ROLLBACK');
             throw error;
         }
     });
 }
+// FUNCION PARA CONVERTIR HORAS A MINUTOS
 function ConvertirHorasAMinutos(hora) {
     const partes = hora.split(':');
     const horas = parseInt(partes[0], 10);
     const minutos = parseInt(partes[1], 10);
     return horas * 60 + minutos;
 }
+// FUNCION PARA CONVERTIR MINUT0S A HORAS
 function ConvertirMinutosAHoras(minutos) {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;

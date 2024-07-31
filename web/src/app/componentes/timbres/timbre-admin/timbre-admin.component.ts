@@ -7,10 +7,9 @@ import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTACION DE SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
@@ -58,7 +57,6 @@ export class TimbreAdminComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
-    private restUsuario: UsuarioService,
     private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -107,7 +105,7 @@ export class TimbreAdminComponent implements OnInit {
   // LISTA DE DATOS DE EMPLEADOS
   VerDatosEmpleado() {
     this.datosEmpleado = [];
-    this.restD.ListarInformacionActual().subscribe(data => {
+    this.restD.ObtenerInformacionGeneral(1).subscribe(data => {
       this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
     });
   }
@@ -129,7 +127,6 @@ export class TimbreAdminComponent implements OnInit {
     this.restTimbres.ObtenerTimbresEmpleado(id).subscribe(res => {
       this.dataSource = new MatTableDataSource(res.timbres);
       this.timbres = this.dataSource.data;
-      console.log('ver timbres ', this.timbres)
       this.lista = true;
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach((data: any) => {
