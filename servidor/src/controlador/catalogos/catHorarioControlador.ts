@@ -736,10 +736,12 @@ class HorarioControlador {
 
       if (verificador_horario === false) {
         const mensaje = 'Estructura de plantilla incorrecta';
+        EliminarPlantilla(ruta);
         res.status(404).jsonp({ mensaje });
       }
       else if (verificador_detalle === false) {
         const mensaje = 'Estructura de plantilla incorrecta';
+        EliminarPlantilla(ruta);
         res.status(404).jsonp({ mensaje });
       }
       else if (verificador_horario != false && verificador_detalle != false) {
@@ -909,6 +911,7 @@ class HorarioControlador {
         EliminarPlantilla(rutaPlantilla);
       }
     } catch (error) {
+      console.log('ruta ', rutaPlantilla)
       EliminarPlantilla(rutaPlantilla);
       console.log('error ', error)
       return res.status(500).jsonp({ message: error });
