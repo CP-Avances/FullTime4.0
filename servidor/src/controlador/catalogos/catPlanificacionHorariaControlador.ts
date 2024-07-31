@@ -6,15 +6,18 @@ import path from 'path';
 import excel from 'xlsx';
 import pool from '../../database';
 import moment from "moment";
+import fs from 'fs';
 
 class PlanificacionHorariaControlador {
 
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
+        let rutaPlantilla: string = '';
         try {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+            rutaPlantilla = ruta;
             const workbook = excel.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantillaPlanificacionHoraria: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -27,11 +30,12 @@ class PlanificacionHorariaControlador {
                 throw new Error('Estructura de la plantilla de planificación horaria incorrecta');
             }
 
-            let [fecha] = terceraColumna.split(', ');
-            let [dia, mes, ano] = fecha.split('/');
+            let fecha = terceraColumna.split(', ');
+            let [dia, mes, ano] = fecha[1].split('/');
             let fechaFormateada: string = `${dia}/${mes}/${ano}`;
             let fechaInicial: string;
             let fechaFinal: string;
+
 
             try {
                 let fechaEntrada = moment.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
@@ -131,8 +135,10 @@ class PlanificacionHorariaControlador {
             const fechaFinalMes = moment.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
 
             res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
-
+            EliminarPlantilla(ruta);
         } catch (error) {
+            console.log(error);
+            EliminarPlantilla(rutaPlantilla);
             return res.status(404).jsonp({ message: error.message });
 
         }
@@ -687,6 +693,7 @@ async function ListarPlanificacionHoraria(id_empleado: number, fecha_inicio: str
         }
     }
     catch (error) {
+        console.log('listarplanificacionhoraria')
         throw error;
     }
 }
@@ -966,6 +973,18 @@ function ConvertirMinutosAHoras(minutos: number): string {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;
     return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
+}
+
+function EliminarPlantilla(ruta: string) {
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        }
+        else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
+        }
+      });
 }
 
 interface DatosVerificacionHorarios {

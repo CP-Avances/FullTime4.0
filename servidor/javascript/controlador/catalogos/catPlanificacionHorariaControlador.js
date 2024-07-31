@@ -20,15 +20,18 @@ const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
+const fs_1 = __importDefault(require("fs"));
 class PlanificacionHorariaControlador {
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     VerificarDatosPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            let rutaPlantilla = '';
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                rutaPlantilla = ruta;
                 const workbook = xlsx_1.default.readFile(ruta);
                 const sheet_name_list = workbook.SheetNames;
                 const plantillaPlanificacionHoraria = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -38,8 +41,8 @@ class PlanificacionHorariaControlador {
                 if (!terceraColumna) {
                     throw new Error('Estructura de la plantilla de planificación horaria incorrecta');
                 }
-                let [fecha] = terceraColumna.split(', ');
-                let [dia, mes, ano] = fecha.split('/');
+                let fecha = terceraColumna.split(', ');
+                let [dia, mes, ano] = fecha[1].split('/');
                 let fechaFormateada = `${dia}/${mes}/${ano}`;
                 let fechaInicial;
                 let fechaFinal;
@@ -124,8 +127,11 @@ class PlanificacionHorariaControlador {
                 const fechaInicioMes = moment_1.default.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
                 const fechaFinalMes = moment_1.default.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
                 res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
+                EliminarPlantilla(ruta);
             }
             catch (error) {
+                console.log(error);
+                EliminarPlantilla(rutaPlantilla);
                 return res.status(404).jsonp({ message: error.message });
             }
         });
@@ -605,6 +611,7 @@ function ListarPlanificacionHoraria(id_empleado, fecha_inicio, fecha_final) {
             }
         }
         catch (error) {
+            console.log('listarplanificacionhoraria');
             throw error;
         }
     });
@@ -823,6 +830,17 @@ function ConvertirMinutosAHoras(minutos) {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;
     return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
+}
+function EliminarPlantilla(ruta) {
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+        if (err) {
+        }
+        else {
+            // ELIMINAR DEL SERVIDOR
+            fs_1.default.unlinkSync(ruta);
+        }
+    });
 }
 exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
 exports.default = exports.PLANIFICACION_HORARIA_CONTROLADOR;
