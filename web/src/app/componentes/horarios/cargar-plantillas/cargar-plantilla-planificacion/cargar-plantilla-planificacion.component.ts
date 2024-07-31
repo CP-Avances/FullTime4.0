@@ -215,6 +215,13 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
                       observacion: ''
                   };
               }
+
+              // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
+              if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
+                  planificacion.dias[dia.fecha].observacion = 'FD';
+              }
+
+
           });
 
           // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
