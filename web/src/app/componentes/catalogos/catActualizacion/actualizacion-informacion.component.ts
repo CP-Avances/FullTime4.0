@@ -17,6 +17,8 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { EditarRolUserComponent } from './editar-rol-user/editar-rol-user.component';
 import { EditarDepaUserComponent } from './editar-depa-user/editar-depa-user.component';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { Observable, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-actualizacion-informacion',
@@ -125,6 +127,8 @@ export class ActualizacionInformacionComponent implements OnInit {
   regimenDep: any = [];
   cargosDep: any = [];
 
+  lissucursale: any = [];
+
   selectionSucDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionRolDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionCargDep = new SelectionModel<ITableEmpleados>(true, []);
@@ -174,6 +178,7 @@ export class ActualizacionInformacionComponent implements OnInit {
   listaRoles: any = [];
 
   constructor(
+    private restSuc: SucursalService,
     private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public restCargo: EmplCargosService,
@@ -202,8 +207,40 @@ export class ActualizacionInformacionComponent implements OnInit {
 
     this.BuscarInformacionGeneral();
     this.BuscarInformacionGeneralDepa();
+    this.ObtenerSucursales();
 
   }
+  sucursalForm = new FormControl('', Validators.required);
+  filteredOptions: Observable<any[]>;
+  sucursal: any = [];
+  // METODO DE FILTRACION DE DATOS DE SUCURSALES
+  private _filter(value: string): any {
+    if (value != null) {
+      const filterValue = value.toLowerCase();
+      return this.sucursal.filter((sucursal: any) => sucursal.nombre.toLowerCase().includes(filterValue));
+    }
+  }
+  // METODO PARA BUSCAR SUCURSALES
+  ObtenerSucursales() {
+    this.restSuc.BuscarSucursal().subscribe(res => {
+      this.lissucursale = res;
+      this.filteredOptions = this.sucursalForm.valueChanges
+        .pipe(
+          startWith(''),
+          map((value: any) => this._filter(value))
+        );
+    });
+  }
+   // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
+   limpiarData: any = [];
+   QuitarTodos() {
+
+   }
+    // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
+    Listdepartamentos: any = [];
+    ObtenerDepartamentos() {
+      this.QuitarTodos();
+    }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
   BuscarInformacionGeneral() {
@@ -824,6 +861,14 @@ export class ActualizacionInformacionComponent implements OnInit {
      return `${this.selectionSucRol.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
    }
 
+   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+   checkboxLabelSucDep(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedSucDep() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionSucDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
   isAllSelectedRol() {
     const numSelected = this.selectionRol.selected.length;
     return numSelected === this.listaUsuariosRol.length
@@ -953,6 +998,33 @@ export class ActualizacionInformacionComponent implements OnInit {
       this.numero_pagina_rol = e.pageIndex + 1;
     }
   }
+  // EVENTO DE PAGINACION DE TABLAS
+  ManejarPaginaResultadosDep(e: PageEvent) {
+    if (this._booleanOptionsDep.bool_suc === true) {
+      this.tamanio_pagina_suc = e.pageSize;
+      this.numero_pagina_suc = e.pageIndex + 1;
+    }
+    if (this._booleanOptionsDep.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
+    else if (this._booleanOptionsDep.bool_dep === true) {
+      this.tamanio_pagina_dep = e.pageSize;
+      this.numero_pagina_dep = e.pageIndex + 1;
+    }
+    else if (this._booleanOptionsDep.bool_emp === true) {
+      this.tamanio_pagina_emp = e.pageSize;
+      this.numero_pagina_emp = e.pageIndex + 1;
+    }
+    else if (this._booleanOptionsDep.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    }
+    else if (this._booleanOptionsDep.bool_rol === true) {
+      this.tamanio_pagina_rol = e.pageSize;
+      this.numero_pagina_rol = e.pageIndex + 1;
+    }
+  }
 
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, tipo: string, sucursal: any) {
@@ -1038,7 +1110,91 @@ export class ActualizacionInformacionComponent implements OnInit {
     this.SeleccionarProceso(tipo, respuesta);
   }
 
-  // METODO DE SELECCTION DE TIPO DE PROCESO
+   // CONSULTA DE LOS DATOS REGIMEN DEP
+   ModelarRegimenDep(id: number, tipo: string, sucursal: any) {
+    let usuarios: any = [];
+    if (id === 0 || id === undefined) {
+      this.empleadosDep.forEach((empl: any) => {
+        this.selectionRegDep.selected.find(selec => {
+          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      this.empleadosDep.forEach((empl: any) => {
+        if (empl.id_regimen === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
+    this.SeleccionarProcesoDep(tipo, usuarios);
+  }
+
+  // METODO PARA MOSTRAR DATOS DE CARGOS DEP
+  ModelarCargoDep(id: number, tipo: string, sucursal: number) {
+    let usuarios: any = [];
+    if (id === 0 || id === undefined) {
+      this.empleadosDep.forEach((empl: any) => {
+        this.selectionCargDep.selected.find(selec => {
+          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      this.empleadosDep.forEach((empl: any) => {
+        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
+
+    this.SeleccionarProcesoDep(tipo, usuarios);
+  }
+
+  // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS DEP
+  ModelarDepartamentosDep(id: number, tipo: string, sucursal: number) {
+    let usuarios: any = [];
+    if (id === 0 || id === undefined) {
+      this.empleadosDep.forEach((empl: any) => {
+        this.selectionDepDep.selected.find(selec => {
+          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_depa === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
+
+    console.log('ver usuarios ', usuarios);
+
+    this.SeleccionarProceso(tipo, usuarios);
+  }
+
+  // METODO PARA MOSTRAR DATOS DE EMPLEADOS DEP
+  ModelarEmpleadosDep(tipo: string) {
+    let respuesta: any = [];
+    this.empleadosDep.forEach((obj: any) => {
+      this.selectionEmpDep.selected.find(obj1 => {
+        if (obj1.id === obj.id) {
+          respuesta.push(obj)
+        }
+      })
+    })
+
+    this.SeleccionarProceso(tipo, respuesta);
+  }
+
+  // METODO DE SELECCTION DE TIPO DE PROCESO DEP
   SeleccionarProceso(tipo: string, datos: any) {
     if (tipo === 'p') {
       this.abriEditarRolUser(datos);
@@ -1060,6 +1216,26 @@ export class ActualizacionInformacionComponent implements OnInit {
     }
   }
 
+  SeleccionarProcesoDep(tipo: string, datos: any) {
+    if (tipo === 'p') {
+      this.abriEditarDepaUser(datos);
+    }
+    else if (tipo === 'b') {
+      this.abriEditarDepaUser(datos);
+    }
+    else if (tipo === 'e') {
+      this.abriEditarDepaUser(datos);
+    }
+    else if (tipo === 'm') {
+      this.abriEditarDepaUser(datos);
+    }
+    else if (tipo === 't') {
+      this.abriEditarDepaUser(datos);
+    }
+    else if (tipo === 'c') {
+      this.abriEditarDepaUser(datos);
+    }
+  }
 
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -1075,6 +1251,23 @@ export class ActualizacionInformacionComponent implements OnInit {
     }
     else {
       this.ModelarEmpleados(tipo);
+    }
+
+  }
+
+  // METODO PARA TOMAR DATOS SELECCIONADOS DEP
+  MetodosFiltroDep(valor: any, tipo: string) {
+    if (this.opcion === 'c') {
+      this.ModelarCargoDep(valor.id, tipo, valor.id_suc);
+    }
+    else if (this.opcion === 'd') {
+      this.ModelarDepartamentosDep(valor.id, tipo, valor.id_suc);
+    }
+    else if (this.opcion === 'r') {
+      this.ModelarRegimenDep(valor.id, tipo, valor.id_suc);
+    }
+    else {
+      this.ModelarEmpleadosDep(tipo);
     }
 
   }
@@ -1101,7 +1294,7 @@ export class ActualizacionInformacionComponent implements OnInit {
 
   }
 
-  abriEditarDepaUser() {
+  abriEditarDepaUser(datos: any) {
     this.ventana.open(EditarDepaUserComponent, { width: '600px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
