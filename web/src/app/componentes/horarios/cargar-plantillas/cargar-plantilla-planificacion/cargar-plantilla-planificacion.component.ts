@@ -197,7 +197,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     this.GenerarDiasMes();
 
-
     if (data.planificacionHoraria.length > 0) {
       data.planificacionHoraria.forEach((planificacion: any) => {
           this.dias_mes.forEach((dia: any) => {

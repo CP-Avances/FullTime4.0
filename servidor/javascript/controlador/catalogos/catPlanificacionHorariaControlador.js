@@ -103,17 +103,6 @@ class PlanificacionHorariaControlador {
                         data.nombre_usuario = `${empleadoVerificado[1].nombre} ${empleadoVerificado[1].apellido}`;
                         data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
                         data.cedula_empleado = empleadoVerificado[1].cedula;
-                        const feriados = yield ConsultarFeriados(fechaInicial, fechaFinal, empleadoVerificado[1].id);
-                        // consultar fechas del mes desde inicil hasta final si en data.dias falta alguna fecha agregarla con el codigo DEFAULT-FERIADO si es feriado si no omitir y no agregar a data.dias
-                        let fechasMes = ObtenerFechasMes(fechaInicial, fechaFinal);
-                        for (let fecha of fechasMes) {
-                            if (!data.dias[fecha]) {
-                                let esFeriado = feriados ? feriados.find((feriado) => feriado.fecha === fecha) : false;
-                                if (esFeriado) {
-                                    data.dias[fecha] = { horarios: [{ codigo: 'DEFAULT-FERIADO' }], defaultIngresado: true };
-                                }
-                            }
-                        }
                     }
                     // VERIFICAR HORARIOS
                     const datosVerificacionHorarios = {
@@ -159,9 +148,6 @@ class PlanificacionHorariaControlador {
                 // CREAR PLANIFICACION HORARIA
                 for (const data of planificacionHoraria) {
                     for (const [dia, { horarios }] of Object.entries(data.dias)) {
-                        if (data.dias[dia].eliminarPlanificacionExistente) {
-                            yield EliminarPlanificacionNormalDiaFeriado(data.id_empleado, data.dias[dia].fecha);
-                        }
                         for (const horario of horarios) {
                             let planificacion;
                             let entrada;
@@ -301,8 +287,8 @@ class PlanificacionHorariaControlador {
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL EMPLEADO EN ESA FECHA
                                 const horarioDefaultRegistrado = yield database_1.default.query(`
-                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND (id_horario = $3 OR tipo_dia = 'FD')
-                                `, [data.id_empleado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
+                                SELECT * FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND id_horario = $3
+                                `, [data.id_emeplado, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
                                 if (horarioDefaultRegistrado.rowCount != 0) {
                                     continue;
                                 }
@@ -312,7 +298,9 @@ class PlanificacionHorariaControlador {
                                 `, [data.id_emeplado, horario.dia]);
                                 if (horarioRegistrado.rowCount != 0) {
                                     // SI YA EXISTE ELIMINAR HORARIO REGISTRADO
-                                    yield EliminarPlanificacionNormalDiaFeriado(data.id_empleado, horario.dia);
+                                    yield database_1.default.query(`
+                                    DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
+                                    `, [data.id_empleado, horario.dia]);
                                 }
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultFeriado.salida.hora}`;
@@ -417,7 +405,6 @@ function VerificarHorarios(datos) {
                 }
                 // VERIFICAR SI LA EL DIAS[DIA] ES FERIADO
                 let esFeriado = feriados ? feriados.find((feriado) => feriado.fecha === dia) : false;
-                dias[dia].feriado = esFeriado ? true : false;
                 for (let i = 0; i < horarios.length; i++) {
                     const horario = horarios[i];
                     horario.codigo = horario.codigo.toString();
@@ -435,6 +422,7 @@ function VerificarHorarios(datos) {
                         dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
                         dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
                         dias[dia].horarios[i].minutos_alimentacion = horarioVerificado[1].minutos_comida;
+                        dias[dia].horarios[i].feriado = esFeriado;
                         // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                         if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
                             dias[dia].horarios[i].observacion = `Horario no válido para día feriado`;
@@ -451,7 +439,7 @@ function VerificarHorarios(datos) {
                 }
                 dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no válidos` : 'OK';
                 // VERIFICAR HORAS TOTALES DE HORARIOS
-                if (!dias[dia].feriado && horasTotales > hora_trabaja) {
+                if (horasTotales > hora_trabaja) {
                     const horas = ConvertirMinutosAHoras(horasTotales);
                     dias[dia].observacion4 = `Jornada superada: ${horas} tiempo total`;
                 }
@@ -560,21 +548,15 @@ function VerificarSuperposicionHorarios(datos) {
                         }
                     }
                     // VERIFICAR SOBREPOSICIÓN CON HORARIOSPLANIFICACION
-                    for (const horario2 of horariosPlanificacion) {
-                        if (dias[horario1.dia].defaultIngresado && horario1.codigo === 'DEFAULT-FERIADO' && horario2.tipo_dia === 'FD' && horario1.dia === horario2.dia) {
-                            // SI YA EXISTE UN HORARIO DE TIPO FERIADO REGISTRADO OMITIR ESTE DIA
-                            delete dias[horario1.dia];
-                            break;
-                        }
-                        if (horario2.codigo === 'DEFAULT-LIBRE' || horario2.codigo === 'DEFAULT-FERIADO') {
-                            continue;
-                        }
-                        if (dias[horario1.dia].feriado && (horario2.tipo_dia === 'N' || horario2.tipo_dia === 'L') && horario1.dia === horario2.dia) {
-                            dias[horario1.dia].observacion6 = `Existe una planificación que no corresponde para un día feriado`;
-                            dias[horario1.dia].eliminarPlanificacionExistente = true;
-                        }
-                        else if (SeSuperponen(horario1, horario2)) {
-                            ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                    for (let j = 0; j < horariosPlanificacion.length; j++) {
+                        const horario2 = horariosPlanificacion[j];
+                        if (horario2.codigo !== 'DEFAULT-LIBRE' && horario2.codigo !== 'DEFAULT-FERIADO') {
+                            if (horario1.feriado && horario2.tipo_dia == 'N' && horario1.dia === horario2.dia) {
+                                dias[horario1.dia].observacion6 = `Existe una planificación que no corresponde para un día feriado`;
+                            }
+                            else if (SeSuperponen(horario1, horario2)) {
+                                ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
+                            }
                         }
                     }
                 }
@@ -633,6 +615,7 @@ function ListarPlanificacionHoraria(id_empleado, fecha_inicio, fecha_final) {
             }
         }
         catch (error) {
+            console.log('listarplanificacionhoraria');
             throw error;
         }
     });
@@ -839,13 +822,6 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
         }
     });
 }
-function EliminarPlanificacionNormalDiaFeriado(id_empleado, fecha) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield database_1.default.query(`
-        DELETE FROM eu_asistencia_general WHERE id_empleado = $1 AND fecha_horario = $2 AND tipo_dia != 'FD'
-        `, [id_empleado, fecha]);
-    });
-}
 // FUNCION PARA CONVERTIR HORAS A MINUTOS
 function ConvertirHorasAMinutos(hora) {
     const partes = hora.split(':');
@@ -858,16 +834,6 @@ function ConvertirMinutosAHoras(minutos) {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;
     return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
-}
-function ObtenerFechasMes(fechaInicial, fechaFinal) {
-    let fechas = [];
-    let fechaInicio = moment_1.default.utc(fechaInicial);
-    let fechaFin = moment_1.default.utc(fechaFinal);
-    while (fechaInicio <= fechaFin) {
-        fechas.push(fechaInicio.format('YYYY-MM-DD'));
-        fechaInicio = fechaInicio.add(1, 'days');
-    }
-    return fechas;
 }
 function EliminarPlantilla(ruta) {
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO

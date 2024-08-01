@@ -801,6 +801,7 @@ class HorarioControlador {
                 }
             }
             catch (error) {
+                console.log('ruta ', rutaPlantilla);
                 EliminarPlantilla(rutaPlantilla);
                 console.log('error ', error);
                 return res.status(500).jsonp({ message: error });
