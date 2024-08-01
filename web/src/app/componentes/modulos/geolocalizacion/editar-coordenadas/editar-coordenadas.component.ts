@@ -6,8 +6,9 @@ import { ToastrService } from 'ngx-toastr';
 
 // SECCION SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
-import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+
+import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 
 @Component({
   selector: 'app-editar-coordenadas',

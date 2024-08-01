@@ -20,7 +20,7 @@ const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
 class LoginControlador {
-    // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA
+    // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
@@ -134,7 +134,7 @@ class LoginControlador {
             }
         });
     }
-    // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO
+    // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO    **USADO
     EnviarCorreoContrasena(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const correo = req.body.correo;

@@ -54,7 +54,6 @@ export class RegistrarBirthdayComponent implements OnInit {
       ip: this.ip
     }
     this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
-      //console.log('ver res ', res)
       this.SubirRespaldo(res[0].id)
       this.ventana.close(true);
     })

@@ -54,9 +54,9 @@ class NotificacionTiempoRealRutas {
          ** **                    MANEJO DE DATOS DE COMUNICADOS                                 ** ** 
          ** *************************************************************************************** **/
 
-        // METODO PARA ENVIAR CORREO DE COMUNICADOS
+        // METODO PARA ENVIAR CORREO DE COMUNICADOS    **USADO
         this.router.post('/mail-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoComunicado);
-        // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS
+        // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS    **USADO
         this.router.post('/noti-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
 
     }

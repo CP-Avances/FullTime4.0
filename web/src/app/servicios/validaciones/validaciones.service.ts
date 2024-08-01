@@ -134,7 +134,7 @@ export class ValidacionesService {
       valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
         moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
         ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-    } else if (dia==='no') {
+    } else if (dia === 'no') {
       valor = moment(fecha, 'YYYY/MM/DD').format(formato);
     } else {
       valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
@@ -147,6 +147,74 @@ export class ValidacionesService {
   FormatearHora(hora: string, formato: string) {
     let valor = moment(hora, 'HH:mm:ss').format(formato);
     return valor;
+  }
+
+
+  /** ******************************************************************** **
+   ** **                  METODO PARA OMITIR DUPLICADOS                    **
+   ** ** ***************************************************************** **/
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicadosSucursales(sucursales: any) {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados_suc = sucursales.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    sucursales = verificados_suc;
+    return sucursales;
+  }
+
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicadosRegimen(regimen: any) {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
+    let verificados_reg = regimen.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    regimen = verificados_reg;
+    return regimen;
+  }
+
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicadosDepartamentos(departamentos: any) {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
+    let verificados_dep = departamentos.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    departamentos = verificados_dep;
+    return departamentos;
+  }
+
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicadosCargos(cargos: any) {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
+    let verificados_car = cargos.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    cargos = verificados_car;
+    return cargos;
   }
 
 }

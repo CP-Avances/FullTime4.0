@@ -161,11 +161,7 @@ export class MainNavComponent implements OnInit {
 
   // METODO DE NAVEGACION SEGUN ROL DE ACCESO
   irHome() {
-    if (this.inicio.getRol() === 1) {
-      this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
-    } else {
-      this.router.navigate(['/estadisticas'], { relativeTo: this.route, skipLocationChange: false });
-    }
+    this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
   }
 
   // CONTROL DE FUNCIONES DEL SISTEMA
@@ -185,36 +181,21 @@ export class MainNavComponent implements OnInit {
   }
 
   // METODO DE SELECCION DE MENU
-  superadmin: boolean = false;
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
-
-    if (this.inicio.getRol() === 1) {
-      this.superadmin = true;
-    }
-    else {
-      this.superadmin = false;
-    }
-
     if (name_emp !== null) {
       this.MetodoSubSelectMenu(name_emp)
     } else {
       this.restEmpresa.ConsultarEmpresas().subscribe(res => {
         localStorage.setItem('name_empresa', res[0].nombre);
         this.MetodoSubSelectMenu(res[0].nombre)
-        //console.log("Informacion: ", res)
-        //console.log("Estado: ", this.HabilitarAlimentacion);
       })
     }
   }
 
   // METODO DE LLMANADO DE MENU
   MetodoSubSelectMenu(nombre: string) {
-    if (this.inicio.getRolMenu() === true) {
-      this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
-    } else {
-      this.dataSource.data = this.MenuEmpleado() as MenuNode[];
-    }
+    this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
   }
 
   // MENU PERFIL ADMINISTRADOR
@@ -277,7 +258,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
           { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true },
-          { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: this.superadmin },
+          { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: true },
         ]
       },
       {
@@ -687,199 +668,4 @@ export class MainNavComponent implements OnInit {
     ];
   }
 
-  // SELECCION MENU DE EMPLEADO
-  MenuEmpleado() {
-    return [
-      {
-        name: 'Perfil',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'account_circle',
-        children: [
-          { name: 'Datos Personales', url: '/datosEmpleado', color: true, ver: true },
-          { name: 'Datos Laborales', url: '/cargoEmpleado', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Asistencia',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'event',
-        children: [
-          { name: 'Planificación Horaria', url: '/horariosEmpleado', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Módulos',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'games',
-        children: [
-          {
-            name: 'Permisos',
-            accion: this.HabilitarPermisos,
-            estado: this.HabilitarPermisos,
-            color: true,
-            subtitulo: true,
-            icono: 'transfer_within_a_station',
-            children: [
-              { name: 'Solicitar Permiso', url: '/solicitarPermiso', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Permisos',
-            accion: !this.HabilitarPermisos,
-            estado: !this.HabilitarPermisos,
-            activo: this.HabilitarPermisos,
-            color: false,
-            icono: 'transfer_within_a_station',
-            url: '/solicitarPermiso'
-          },
-          {
-            name: 'Vacaciones',
-            accion: this.HabilitarVacaciones,
-            estado: this.HabilitarVacaciones,
-            color: true,
-            subtitulo: true,
-            icono: 'flight',
-            children: [
-              { name: 'Solicitar Vacaciones', url: '/vacacionesEmpleado', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Vacaciones',
-            accion: !this.HabilitarVacaciones,
-            estado: !this.HabilitarVacaciones,
-            activo: this.HabilitarVacaciones,
-            color: false,
-            icono: 'flight',
-            url: '/vacacionesEmpleado'
-          },
-          {
-            name: 'Horas Extras',
-            accion: this.HabilitarHoraExtra,
-            estado: this.HabilitarHoraExtra,
-            subtitulo: true,
-            color: true,
-            icono: 'hourglass_full',
-            children: [
-              { name: 'Solicitar Hora Extra', url: '/horaExtraEmpleado', color: true, ver: true },
-              { name: 'Planificación HorasExtras', url: '/horasPlanEmpleado', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Horas Extras',
-            accion: !this.HabilitarHoraExtra,
-            estado: !this.HabilitarHoraExtra,
-            activo: this.HabilitarHoraExtra,
-            color: false,
-            icono: 'hourglass_full',
-            url: '/horaExtraEmpleado'
-          },
-          {
-            name: 'Alimentación',
-            accion: this.HabilitarAlimentacion,
-            estado: this.HabilitarAlimentacion,
-            subtitulo: true,
-            color: true,
-            icono: 'restaurant',
-            children: [
-              { name: 'Solicitar Servicio', url: '/comidasEmpleado', color: true, ver: true },
-              { name: 'Planificación Alimentación', url: '/comidasPlanEmpleado', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Alimentación',
-            accion: !this.HabilitarAlimentacion,
-            estado: !this.HabilitarAlimentacion,
-            activo: this.HabilitarAlimentacion,
-            color: false,
-            icono: 'restaurant',
-            url: '/comidasEmpleado'
-          },
-          {
-            name: 'Acción Personal',
-            accion: this.HabilitarAccion,
-            estado: this.HabilitarAccion,
-            color: true,
-            subtitulo: true,
-            icono: 'how_to_reg',
-            children: [
-              { name: 'Procesos', url: '/procesosEmpleado', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Acción Personal',
-            accion: !this.HabilitarAccion,
-            estado: !this.HabilitarAccion,
-            activo: this.HabilitarAccion,
-            color: false,
-            icono: 'how_to_reg',
-            url: '/procesosEmpleado'
-          },
-          {
-            name: 'Timbre Virtual',
-            accion: this.HabilitarTimbreWeb,
-            estado: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Timbre Virtual', url: '/timbres-personal', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Timbre Virtual',
-            accion: !this.HabilitarTimbreWeb,
-            estado: !this.HabilitarTimbreWeb,
-            activo: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            color: false,
-            url: '/timbres-personal'
-          },
-        ]
-      },
-      {
-        name: 'Timbres',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'fingerprint',
-        children: [
-          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Información',
-        accion: true,
-        estado: true,
-        icono: 'check_circle_outline',
-        color: true,
-        subtitulo: false,
-        children: [
-          { name: 'Jefes', url: '/informacion', color: true, ver: true },
-          { name: 'Documentos', url: '/verDocumentacion', color: true, ver: true },
-          { name: 'Aprobación departamental', url: '/autorizaEmpleado', color: true, ver: true },
-        ]
-      },
-      /*  {
-          name: 'Notificaciones',
-          accion: true,
-          estado: true,
-          color: true,
-          subtitulo: false,
-          icono: 'notifications',
-          children: [
-            { name: 'Lista notificaciones', url: '/lista-notificaciones', color: true, ver: true },
-          ]
-        },*/
-    ]
-  }
 }

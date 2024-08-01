@@ -37,9 +37,9 @@ export class CrearCoordenadasComponent implements OnInit {
   constructor(
     private rest: EmpleadoUbicacionService,
     private toastr: ToastrService,
+    public restP: ParametrosService,
     public ventanap: MatDialogRef<CrearCoordenadasComponent>,
     public ventanas: MatDialog,
-    public restP: ParametrosService,
   ) { }
 
   ngOnInit(): void {

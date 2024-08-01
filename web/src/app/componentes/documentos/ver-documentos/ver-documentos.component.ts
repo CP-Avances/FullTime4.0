@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 
 import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
 

@@ -16,11 +16,11 @@ class TimbresRutas {
         this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
         // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
         this.router.post('/buscar/timbres-asistencia', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresAsistencia);
-        // METODO PARA BUSCAR MARCACIONES
+        // METODO PARA BUSCAR MARCACIONES   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbres);
         // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA   **USADO
         this.router.get('/timbresfechaemple', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenertimbreFechaEmple);
-        // METODO PARA REGISTRAR TIMBRES PERSONALES
+        // METODO PARA REGISTRAR TIMBRES PERSONALES    **USADO
         this.router.post('/', verificarToken_1.TokenValidation, timbresControlador_1.default.CrearTimbreWeb);
         // METODO PARA REGISTRAR TIMBRE ADMINISTRADOR    **USADO
         this.router.post('/admin/', verificarToken_1.TokenValidation, timbresControlador_1.default.CrearTimbreWebAdmin);

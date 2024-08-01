@@ -7,10 +7,12 @@
 </div>
 <mat-card-content style="margin-bottom: -2%;">
     <div style="text-align: center; margin: 2%;">
-        <p *ngIf="usuarios.length > 1">Los dispositivos seleccionados se eliminaran. <br>
+        <p *ngIf="usuarios.length > 1">
+            Los dispositivos seleccionados se eliminaran. <br>
             <b>Los usuarios no podrán realizar marcaciones desde estos dispositivos.</b>
         </p>
-        <p *ngIf="usuarios.length < 2">Se eliminara el dispositivo seleccionado. <br>
+        <p *ngIf="usuarios.length < 2">
+            Se eliminara el dispositivo seleccionado. <br>
             <b>El usuario no podrán realizar marcaciones desde este dispositivo.</b>
         </p>
         <p id="mensaje" *ngIf="usuarios.length > 1">¿ESTÁ SEGURO DE ELIMINAR ESTOS REGISTROS?</p>
@@ -20,7 +22,8 @@
 <mat-dialog-content *ngIf="usuarios.length < 2">
     <mat-list>
         <mat-list-item *ngFor="let d of dispositivos" style="height: max-content;">
-            <div style="float: left; height: max-content; width: max-content; margin-right: 5%; padding-top: 2%; padding-bottom: 2%;">
+            <div
+                style="float: left; height: max-content; width: max-content; margin-right: 5%; padding-top: 2%; padding-bottom: 2%;">
                 <mat-icon color="primary" style="font-size: 30px;">perm_identity</mat-icon>
             </div>
             <div>
@@ -37,5 +40,4 @@
 
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 5px; margin-bottom: 3%;">
     <button mat-raised-button id="btn-raised" class="float-right" [mat-dialog-close]="dispositivos">Eliminar</button>
-    <!--button class="btn btn-sm float-right" mat-dialog-close>Cancelar</button-->
 </div>

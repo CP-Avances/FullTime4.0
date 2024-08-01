@@ -128,7 +128,6 @@ export class TimbreWebComponent implements OnInit {
       this.cuenta = res.cuenta;
       this.info = res.info;
       this.timbres.forEach((data: any) => {
-        //console.log('ver data ', data)
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
         if (data.tecla_funcion === '0') {
@@ -157,7 +156,6 @@ export class TimbreWebComponent implements OnInit {
         }
       })
     }, err => {
-      console.log('err ', err)
       this.toastr.info(err.error.message)
     })
   }

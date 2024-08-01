@@ -21,7 +21,7 @@ const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const moment_1 = __importDefault(require("moment"));
 class DocumentosControlador {
-    // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR
+    // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR    **USADO
     Carpetas(req, res) {
         let carpetas = [
             { nombre: 'Contratos', filename: 'contratos' },
@@ -31,28 +31,28 @@ class DocumentosControlador {
         ];
         res.jsonp(carpetas);
     }
-    // METODO PARA LISTAR DOCUMENTOS 
+    // METODO PARA LISTAR DOCUMENTOS    **USADO
     ListarCarpetaDocumentos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.ListarDocumentos)(nombre));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA CONTRATOS
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA CONTRATOS    **USADO
     ListarCarpetaContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.ListarContratos)(nombre));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS           **USADO
     ListarCarpetaPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.ListarPermisos)(nombre));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
+    // METODO PARA LISTAR ARCHIVOS INDIVIDUALES       **USADO
     ListarArchivosIndividuales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
@@ -60,21 +60,21 @@ class DocumentosControlador {
             res.jsonp(yield (0, listarArchivos_1.ListarDocumentosIndividuales)(nombre, tipo));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS            **USADO
     ListarCarpetaHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.ListarHorarios)(nombre));
         });
     }
-    // METODO LISTAR ARCHIVOS DE CARPETAS
+    // METODO LISTAR ARCHIVOS DE CARPETAS             **USADO
     ListarArchivosCarpeta(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.listaCarpetas)(nombre));
         });
     }
-    // METODO PARA DESCARGAR ARCHIVOS
+    // METODO PARA DESCARGAR ARCHIVOS     **USADO
     DownLoadFile(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
@@ -89,7 +89,7 @@ class DocumentosControlador {
             });
         });
     }
-    // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
+    // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES     **USADO
     DescargarArchivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
@@ -105,7 +105,7 @@ class DocumentosControlador {
             });
         });
     }
-    // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
+    // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION     **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -114,7 +114,7 @@ class DocumentosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const doc = yield database_1.default.query('SELECT * FROM e_documentacion WHERE id = $1', [id]);
+                const doc = yield database_1.default.query(`SELECT * FROM e_documentacion WHERE id = $1`, [id]);
                 const [datosOriginales] = doc.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -166,12 +166,11 @@ class DocumentosControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
+    // METODO PARA REGISTRAR UN DOCUMENTO    **USADO
     CrearDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 // FECHA DEL SISTEMA
                 var fecha = (0, moment_1.default)();

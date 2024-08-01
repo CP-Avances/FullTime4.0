@@ -104,7 +104,7 @@ class EmpleadoRutas {
          ** **               CONSULTAS DE GEOLOCALIZACION DEL USUARIO                                  ** ** 
          ** ********************************************************************************************* **/
 
-        // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO
+        // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO    **USADO
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
         this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
 

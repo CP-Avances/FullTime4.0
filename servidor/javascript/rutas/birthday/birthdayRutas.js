@@ -30,15 +30,15 @@ class BirthdayRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS
+        // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS    **USADO
         this.router.get('/:id_empresa', verificarToken_1.TokenValidation, birthdayControlador_1.default.MensajeEmpresa);
-        // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS
+        // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, birthdayControlador_1.default.CrearMensajeBirthday);
-        // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   --**VERIFICADO
+        // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   **USADO
         this.router.put('/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('uploads')], birthdayControlador_1.default.CrearImagenCumpleanios);
-        // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS
-        this.router.get('/img/:imagen', birthdayControlador_1.default.getImagen);
-        // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS
+        // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS    **USADO FRONT
+        this.router.get('/img/:imagen', birthdayControlador_1.default.ObtenerImagen);
+        // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS   **USADO
         this.router.put('/editar/:id', verificarToken_1.TokenValidation, birthdayControlador_1.default.EditarMensajeBirthday);
     }
 }

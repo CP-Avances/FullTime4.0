@@ -242,7 +242,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
-  // METODO PARA TOMAR DATOS DE MARCACION
+  // METODO PARA TOMAR DATOS DE MARCACION 
   RegistrarDatosTimbre(form: any, ubicacion: any) {
     // OBTENER LA FECHA Y HORA ACTUAL
     var now = moment();
@@ -260,7 +260,6 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
-    //console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 
@@ -269,10 +268,8 @@ export class RegistrarTimbreComponent implements OnInit {
   ubicacion: string = '';
   sin_ubicacion: number = 0;
   CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
-    //console.log('verificar informacion ', informacion)
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
-        //console.log('verificar res ', res)
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
@@ -295,7 +292,6 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
-    //console.log('ver coordenadas ', longitud, latitud)
     var longitud_ = '';
     var latitud_ = '';
 
@@ -315,7 +311,6 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     this.restU.ListarCoordenadasUsuario(this.id_empl).subscribe(
       res => {
-        //console.log(' res ', res)
         datosUbicacion = res;
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;

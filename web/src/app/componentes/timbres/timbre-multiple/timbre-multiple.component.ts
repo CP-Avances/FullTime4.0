@@ -220,7 +220,11 @@ export class TimbreMultipleComponent implements OnInit {
       })
     })
 
-    this.OmitirDuplicados();
+    // RETIRAR DUPLICADOS DE LA LISTA
+    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
+    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
+    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
+    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
@@ -242,56 +246,6 @@ export class TimbreMultipleComponent implements OnInit {
     this.mostrarTablas = true;
   }
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
-  }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;

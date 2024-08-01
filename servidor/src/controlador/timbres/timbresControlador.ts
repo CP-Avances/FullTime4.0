@@ -78,7 +78,7 @@ class TimbresControlador {
 
     }
 
-    // METODO PARA LISTAR MARCACIONES
+    // METODO PARA LISTAR MARCACIONES    **USADO
     public async ObtenerTimbres(req: Request, res: Response): Promise<any> {
         try {
             const id = req.userIdEmpleado;
@@ -250,18 +250,19 @@ class TimbresControlador {
         }
     }
 
-    // METODO DE REGISTRO DE TIMBRES PERSONALES
+    // METODO DE REGISTRO DE TIMBRES PERSONALES    **USADO
     public async CrearTimbreWeb(req: Request, res: Response): Promise<any> {
-        console.log('ingresa aqui timbre personal')
         try {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip } = req.body;
 
-            // Obtener la fecha y hora actual
+            // OBTENER LA FECHA Y HORA ACTUAL
             var now = moment();
-
-            // Formatear la fecha y hora actual en el formato deseado
+            // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
             var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+
+            // FORMATEAR HORA Y FECHA DEL TIMBRE
+            var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
             const id_empleado = req.userIdEmpleado;
 
@@ -275,18 +276,16 @@ class TimbresControlador {
 
             var codigo = parseInt(code[0].codigo);
 
-            console.log('codigo ', codigo)
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             pool.query(
                 `
-                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
-                    codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
-                VALUES(to_timestamp($1, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $2, $3, $4, $5, $6, $7, to_timestamp($8, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $9, $10, $11) RETURNING id
-                `,
-                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    fecha_hora, id_reloj, ubicacion, 'APP_WEB'],
+                SELECT * FROM public.timbres_web ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                `
+                , [codigo, id_empleado, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
+                    observacion, 'APP_WEB'],
 
                 async (error, results) => {
                     const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
@@ -310,7 +309,6 @@ class TimbresControlador {
             )
 
         } catch (error) {
-            console.log('error ------- ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });
@@ -333,7 +331,7 @@ class TimbresControlador {
             let servidor: any;
 
             if (tipo === 'administrar') {
-                servidor = fec_hora_timbre;
+                servidor = hora_fecha_timbre;
             }
             else {
                 servidor = fecha_hora;

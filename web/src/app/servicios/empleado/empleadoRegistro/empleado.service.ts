@@ -175,7 +175,7 @@ export class EmpleadoService {
     return this.http.put<any>(`${environment.url}/empleado/geolocalizacion/${id}`, data)
   }
 
-  // METODO PARA OBTENER LA UBICACION DE DOMICILIO DEL USUARIO
+  // METODO PARA OBTENER LA UBICACION DE DOMICILIO DEL USUARIO    **USADO
   BuscarUbicacion(id: number) {
     return this.http.get<any>(`${environment.url}/empleado/ubicacion/${id}`);
   }

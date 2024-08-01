@@ -40,7 +40,7 @@ export class UsuarioService {
       catchError(data));
   }
 
-  // METODO PARA CAMBIAR PASSWORD
+  // METODO PARA CAMBIAR PASSWORD      **USADO
   ActualizarPassword(data: any) {
     return this.http.put(`${environment.url}/usuarios`, data);
   }
@@ -55,23 +55,23 @@ export class UsuarioService {
     return this.http.put(`${environment.url}/usuarios/frase`, data);
   }
 
-  // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB
+  // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB    **USADO
   ActualizarEstadoTimbreWeb(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-web/`, data);
   }
 
 
-  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
+  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   ActualizarEstadoTimbreMovil(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-app-movil/`, data);
   }
 
-  // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS
+  // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS     **USADO
   BuscarDispositivoMovill() {
     return this.http.get<any>(`${environment.url}/usuarios/registro-dispositivos`);
   }
 
-  // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS
+  // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS    **USADO
   EliminarDispositivoMovil(data: any, datos: any) {
     const url = `${environment.url}/usuarios/delete-registro-dispositivos/${data}`;
     const httpOptions = {
@@ -95,37 +95,15 @@ export class UsuarioService {
    ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **
    ** *********************************************************************************************** */
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
-  UsuariosTimbreWeb_SUPERADMIN(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-web-superior/${estado}/activo/${habilitado}`);
+  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE WEB       **USADO
+  UsuariosTimbreWebGeneral(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-web-general/${estado}/activo/${habilitado}`);
   }
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMNISTRADOR
-  UsuariosTimbreWeb_ADMIN(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${environment.url}/usuarios/lista-web-general/${estado}/activo/${habilitado}`, datos);
+  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE MOVIL    **USADO
+  UsuariosTimbreMovilGeneral(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`);
   }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-  UsuariosTimbreWeb_JEFE(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${environment.url}/usuarios/lista-web-jefe/${estado}/activo/${habilitado}`, datos);
-  }
-
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
-  UsuariosTimbreMovil_SUPERADMIN(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-superior/${estado}/activo/${habilitado}`);
-  }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
-  UsuariosTimbreMovil_ADMIN(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${environment.url}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`, datos);
-  }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR JEFE
-  UsuariosTimbreMovil_JEFE(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${environment.url}/usuarios/lista-app-movil-jefe/${estado}/activo/${habilitado}`, datos);
-  }
-
 
 
   /** *********************************************************************************************** **

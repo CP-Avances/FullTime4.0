@@ -12,12 +12,12 @@ export class TimbresService {
   ) { }
 
 
-  // METODO PARA LISTAR MARCACIONES
+  // METODO PARA LISTAR MARCACIONES    **USADO
   ObtenerTimbres() {
     return this.http.get<any>(`${environment.url}/timbres/`);
   }
 
-  // METODO PARA REGISTRAR TIMBRE PERSONAL
+  // METODO PARA REGISTRAR TIMBRE PERSONAL     **USADO
   RegistrarTimbreWeb(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/`, datos);
   }
