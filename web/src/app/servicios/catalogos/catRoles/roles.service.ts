@@ -57,5 +57,9 @@ export class RolesService {
     );
   }
 
+  actualizarRoles(data: any){
+    return this.http.put(`${environment.url}/rol/updateUsers`, data);
+  }
+
 
 }

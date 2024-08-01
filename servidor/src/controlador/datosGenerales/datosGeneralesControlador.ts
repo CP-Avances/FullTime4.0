@@ -60,11 +60,12 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(resultados);
     }
 
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
-    public async BuscarDataGeneralRol(req: Request, res: Response) {
-        let estado = req.params.estado;
-        let informacion = await pool.query(
-            `
+
+     // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR POR ROL **USADO
+     public async BuscarDataGeneralRol(req: Request, res: Response) {
+            let estado = req.params.estado;
+            let informacion = await pool.query(
+                `
                 SELECT * FROM informacion_general AS ig, eu_usuario_departamento AS ud
                 WHERE ig.estado = $1 AND 
 	   		        ig.jefe = false AND
