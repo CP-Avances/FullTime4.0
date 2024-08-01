@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 // SEGURIDAD
 import { AuthGuard } from "./servicios/guards/auth.guard";
-
 // ACCESO A RUTAS DE INICIO DE SESION
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
 import { OlvidarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/olvidar-contrasenia/olvidar-contrasenia.component';
@@ -64,16 +63,21 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
+// MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
+// MODULO  --TIMBRE VIRTUAL
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
+// MODULO  --APLICACION MOVIL
 import { ListaAppComponent } from './componentes/modulos/appMovil/lista-app/lista-app.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
+// TIMBRES
 import { ListarRelojesComponent } from './componentes/catalogos/catRelojes/listar-relojes/listar-relojes.component';
 import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/relojes.component';
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
+// NOTIFICACIONES
 import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
 import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/lista-archivos.component';
@@ -86,8 +90,10 @@ import { RealtimeAvisosComponent } from './componentes/notificaciones/realtime-a
 import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
 import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
 import { VerPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/ver-pedido-hora-extra/ver-pedido-hora-extra.component';
+// REPORTES  --GENERALES
 import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna-multiple/vacuna-multiple.component';
+// REPORTES  --ASISTENCIA
 import { ReporteFaltasComponent } from './componentes/reportes/asistencia/reporte-faltas/reporte-faltas.component';
 import { ReporteAtrasosMultiplesComponent } from './componentes/reportes/asistencia/reporte-atrasos-multiples/reporte-atrasos-multiples.component';
 import { ReporteHorasTrabajadasComponent } from './componentes/reportes/asistencia/reporte-horas-trabajadas/reporte-horas-trabajadas.component';
@@ -95,24 +101,34 @@ import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asist
 import { SalidasAntesComponent } from './componentes/reportes/asistencia/salidas-antes/salidas-antes.component';
 import { ReporteResumenAsistenciaComponent } from './componentes/reportes/asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { ReportePlanificacionHorariaComponent } from './componentes/reportes/asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
+// REPORTE  --TIMBRES
 import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 import { TimbreMrlComponent } from './componentes/reportes/timbres/timbre-mrl/timbre-mrl.component';
 import { TimbreAbiertosComponent } from './componentes/reportes/timbres/timbre-abiertos/timbre-abiertos.component';
 import { TimbreIncompletoComponent } from './componentes/reportes/timbres/timbre-incompleto/timbre-incompleto.component';
+// REPORTE  --MODULO PERMISOS
 import { ReportePermisosComponent } from './componentes/reportes/modulos/reporte-permisos/reporte-permisos.component';
+// REPORTE  --MODULO VACACIONES
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
+// REPORTE  --MODULO HORAS EXTRAS
 import { ReporteHorasPedidasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
 import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
 import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
+// REPORTE  --MODULO APLICACION MOVIL
 import { TimbreVirtualComponent } from './componentes/reportes/timbres/timbre-virtual/timbre-virtual.component';
+// REPORTE  --MODULO TIMBRE VIRTUAL
 import { TimbreSistemaComponent } from './componentes/reportes/timbres/timbre-sistema/timbre-sistema.component';
+// REPORTE  --MODULO ALIMENTACION
 import { AlimentosGeneralComponent } from './componentes/reportes/modulos/alimentacion/alimentos-general/alimentos-general.component';
 import { DetallePlanificadosComponent } from './componentes/reportes/modulos/alimentacion/detalle-planificados/detalle-planificados.component';
 import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
+// REPORTE  --ANALISIS DATOS
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
+// REPORTE  --AUDITORIA
 import { ReporteAuditoriaComponent } from './componentes/reportes/reporte-auditoria/reporte-auditoria.component';
+// VERIFICAR SU USO
 import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
 import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
 import { MetricaPermisosComponent } from './componentes/graficas/graficas-micro/metrica-permisos/metrica-permisos.component';
@@ -126,12 +142,6 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
-
-
-
-
-
-
 
 const routes: Routes = [
 
@@ -287,10 +297,9 @@ const routes: Routes = [
 
   // REPORTE  --ANALISIS DATOS
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard] },
+
+  // REPORTE  --AUDITORIA
   { path: 'reporte-auditoria', component: ReporteAuditoriaComponent, canActivate: [AuthGuard] },
-
-
-
 
 
   // VERIFICAR SU USO
