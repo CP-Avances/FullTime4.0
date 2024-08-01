@@ -119,6 +119,19 @@ export class ActualizacionInformacionComponent implements OnInit {
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg = new SelectionModel<ITableEmpleados>(true, []);
 
+  departamentosDep: any = [];
+  sucursalesDep: any = [];
+  empleadosDep: any = [];
+  regimenDep: any = [];
+  cargosDep: any = [];
+
+  selectionSucDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionRolDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCargDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionDepDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionEmpDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionRegDep = new SelectionModel<ITableEmpleados>(true, []);
+
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc = [5, 10, 20, 50];
   tamanio_pagina_suc: number = 5;
@@ -182,7 +195,14 @@ export class ActualizacionInformacionComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
+    this,this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+      this.listaRoles = respuesta
+      console.log('this.listaRoles: ',this.listaRoles)
+    })
+
     this.BuscarInformacionGeneral();
+    this.BuscarInformacionGeneralDepa();
+
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
@@ -198,10 +218,19 @@ export class ActualizacionInformacionComponent implements OnInit {
     }, err => {
       this.toastr.error(err.error.message)
     })
+  }
 
-    this,this.restRol.BuscarRoles().subscribe((respuesta: any) => {
-      this.listaRoles = respuesta
-      console.log('this.listaRoles: ',this.listaRoles)
+  BuscarInformacionGeneralDepa(){
+    // LIMPIAR DATOS DE ALMACENAMIENTO
+    this.departamentosDep = [];
+    this.sucursalesDep = [];
+    this.empleadosDep = [];
+    this.regimenDep = [];
+    this.cargosDep = [];
+    this.informacion.ObtenerInformacionGeneralDep(1).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
     })
   }
 
@@ -332,6 +361,80 @@ export class ActualizacionInformacionComponent implements OnInit {
     console.log('regimen ', this.regimen)
   }
 
+  ProcesarDatosDep(informacion: any) {
+    console.log('ver original ', informacion)
+    informacion.forEach((obj: any) => {
+      //console.log('ver obj ', obj)
+      this.sucursalesDep.push({
+        id: obj.id_suc,
+        sucursal: obj.name_suc
+      })
+
+      this.regimenDep.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      this.departamentosDep.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+      })
+
+      this.cargosDep.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      this.empleadosDep.push({
+        id: obj.id,
+        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        correo: obj.correo,
+        id_cargo: obj.id_cargo,
+        id_contrato: obj.id_contrato,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+        hora_trabaja: obj.hora_trabaja,
+      })
+    })
+
+    this.OmitirDuplicados();
+    console.log('regimen ---', this.regimen)
+
+    // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+    // SI ES SUPERADMINISTRADOR NO FILTRAR
+    console.log('id rol ', this.rolEmpleado)
+    if (this.rolEmpleado !== 1) {
+      console.log('ingresa')
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso.add(empleado.id_cargo_);
+      });
+
+      this.cargos = this.cargos.filter((cargo: any) =>
+        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      );
+    }
+
+    this.mostrarTablas = true;
+    console.log('regimen ', this.regimen)
+  }
+
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
   OmitirDuplicados() {
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
@@ -381,6 +484,56 @@ export class ActualizacionInformacionComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.cargos = verificados_car;
+  }
+
+  OmitirDuplicadosDep() {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados_suc = this.sucursalesDep.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.sucursalesDep = verificados_suc;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
+    let verificados_reg = this.regimenDep.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.regimenDep = verificados_reg;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
+    let verificados_dep = this.departamentosDep.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.departamentosDep = verificados_dep;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
+    let verificados_car = this.cargosDep.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.cargosDep = verificados_car;
   }
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
@@ -652,6 +805,16 @@ export class ActualizacionInformacionComponent implements OnInit {
        this.selectionSucRol.clear() :
        this.sucursales.forEach((row: any) => this.selectionSucRol.select(row));
    }
+
+  isAllSelectedSucDep() {
+    const numSelected = this.selectionSucDep.selected.length;
+    return numSelected === this.sucursalesDep.length
+  }
+  masterToggleSucDep() {
+    this.isAllSelectedSuc() ?
+      this.selectionSucDep.clear() :
+      this.sucursalesDep.forEach((row: any) => this.selectionSucDep.select(row));
+  }
  
    // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
    checkboxLabelSuc(row?: ITableEmpleados): string {
@@ -898,89 +1061,6 @@ export class ActualizacionInformacionComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************** **
-  ** **                     METODOS DE PLANIFICACION DE HORARIOS                         ** **
-  ** ************************************************************************************** **/
-
-  // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
-  idCargo: any;
-  data_horario: any = [];
-  PlanificarIndividual(usuario: any, tipo: string): void {
-    if (tipo === 'p') {
-      this.seleccionarRol = false;
-      this.data_horario = {
-        pagina: 'rango_fecha',
-        codigo: usuario.codigo,
-        idCargo: usuario.id_cargo,
-        idEmpleado: usuario.id,
-        horas_trabaja: usuario.hora_trabaja,
-      }
-    }
-    else {
-      this.VerPlanificacion([usuario]);
-    }
-  }
-
-  // METODO DE VALIDACION DE SELECCION MULTIPLE
-  PlanificarMultiple(data: any) {
-    if (data.length > 0) {
-      this.Planificar(data);
-    }
-    else {
-      this.toastr.warning('No ha seleccionado usuarios.', '', {
-        timeOut: 6000,
-      });
-    }
-  }
-
-  // METODO PARA INGRESAR PLANIFICACION DE HORARIOS A VARIOS EMPLEADOS
-  seleccionados: any = [];
-  Planificar(seleccionados: any) {
-    if (seleccionados.length === 1) {
-      this.PlanificarIndividual(seleccionados[0], 'p');
-    } else {
-      this.seleccionados = seleccionados;
-      this.seleccionarRol = false;
-      this.asignarRol = true;
-    }
-  }
-
-  // METODO DE VALIDACION DE SELECCION MULTIPLE - ROTATIVOS
-  plan_rotativo: boolean = false;
-  data_rotativo: any = []
-  PlanificarRotativos(data: any) {
-    console.log('data rotativos ', data)
-    this.data_horario = [];
-    if (data.length > 0) {
-      this.data_horario = {
-        usuarios: data,
-        pagina: 'multiple-empleado',
-      }
-      this.seleccionarRol = false;
-      this.plan_rotativo = true;
-    }
-    else {
-      this.toastr.warning('No ha seleccionado usuarios.', '', {
-        timeOut: 6000,
-      });
-    }
-  }
-
-  // METODO PARA VER PLANIFICACION
-  resultados: any = [];
-  VerPlanificacion(data: any) {
-    console.log('VerPlanificacion', data);
-    if (data.length > 0) {
-      this.resultados = data;
-      this.seleccionarRol = false;
-      this.ventana_busquedaRol = true;
-    }
-    else {
-      this.toastr.warning('No ha seleccionado usuarios.', '', {
-        timeOut: 6000,
-      });
-    }
-  }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   MetodosFiltro(valor: any, tipo: string) {

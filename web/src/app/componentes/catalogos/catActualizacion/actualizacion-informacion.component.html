@@ -508,7 +508,7 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 1)"
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucDep.value, 1)"
                                 [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
                                     help_outline
@@ -523,7 +523,7 @@
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <mat-form-field>
                                         <mat-label>Sucursal</mat-label>
-                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucDep.value, 6)"
                                             [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Búsqueda de sucursales por nombre.">
@@ -536,7 +536,7 @@
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <mat-form-field>
                                         <mat-label>Régimen laboral</mat-label>
-                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_regRol.value, 7)"
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_regDep.value, 7)"
                                             [formControl]="nombre_regRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Búsqueda de régimen laboral por nombre.">
@@ -554,7 +554,7 @@
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <mat-form-field>
                                         <mat-label>Sucursal</mat-label>
-                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucDep.value, 6)"
                                             [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Búsqueda de sucursales por nombre.">
@@ -567,7 +567,7 @@
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <mat-form-field>
                                         <mat-label>Cargo</mat-label>
-                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_cargRol.value, 1)"
+                                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_cargDep.value, 1)"
                                             [formControl]="nombre_cargRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Búsqueda de cargos por su descripción.">
@@ -585,7 +585,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucRol.value, 6)"
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_sucDep.value, 6)"
                                         [formControl]="nombre_sucRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
@@ -598,7 +598,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Departamento</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_depRol.value, 2)"
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_depDep.value, 2)"
                                         [formControl]="nombre_depRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
@@ -685,6 +685,59 @@
                     </div>
 
                     <hr *ngIf="mostrarTablas">
+
+                     <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
+                    <div *ngIf="_booleanOptionsDep.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="resultados">
+                            <span class="w-100 bd-highlight">
+                                RESULTADO SUCURSALES
+                            </span>
+                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                                (click)="MostrarListaDep()">
+                                Mostrar lista
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="thead-light">
+                                    <tr style="text-align: center;">
+                                        <th>
+                                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                                matTooltipPosition="right"
+                                                matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                                (click)="HabilitarSeleccion()">
+                                                library_add_check
+                                            </mat-icon>
+                                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleSuc() : null"
+                                                [checked]="selectionSucRol.hasValue() && isAllSelectedSuc()"
+                                                [indeterminate]="selectionSucRol.hasValue() && !isAllSelectedSuc()"
+                                                [aria-label]="checkboxLabelSuc()">
+                                            </mat-checkbox>
+                                        </th>
+                                        <th scope="col">Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                                        <td>
+                                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                                (change)="$event ? selectionSucRol.toggle(s) : null"
+                                                [checked]="selectionSucRol.isSelected(s)" [aria-label]="checkboxLabelSuc(s)">
+                                            </mat-checkbox>
+                                        </td>
+                                        <td>{{s.sucursal}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
+                            [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
+                            showFirstLastButtons>
+                        </mat-paginator>
+                        <br>
+                    </div>
+
                 </mat-card-content>
             </mat-card>
         </div>

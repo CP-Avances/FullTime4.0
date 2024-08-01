@@ -228,13 +228,11 @@ class RolesControlador {
           SET id_rol = $1 
           WHERE id = $2
         `, [idRol, item.id]);
-                    console.log('res.rowCount: ', res.rowCount);
                     if (res.rowCount != 0) {
                         cont = cont + 1;
                     }
                 }));
                 setTimeout(() => {
-                    console.log('cont: ', cont, ' - listaUsuarios.length: ', listaUsuarios.length);
                     if (cont == listaUsuarios.length) {
                         return res.jsonp({ message: 'Se a actualizado todos los usuarios' });
                     }
