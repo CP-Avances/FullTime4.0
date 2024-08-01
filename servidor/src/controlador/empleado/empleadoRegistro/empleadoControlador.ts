@@ -1229,7 +1229,7 @@ class EmpleadoControlador {
    ** **               CONSULTAS DE COORDENADAS DE UBICACION DEL USUARIO                       ** ** 
    ** ******************************************************************************************* **/
 
-  // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO
+  // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
   public async BuscarCoordenadas(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const UBICACION = await pool.query(

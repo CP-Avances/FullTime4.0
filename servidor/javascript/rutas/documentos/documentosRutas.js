@@ -30,27 +30,27 @@ class DoumentosRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA REGISTRAR DOCUMENTOS   --**VERIFICADO
+        // METODO PARA REGISTRAR DOCUMENTOS   **USADO
         this.router.post('/registrar/:doc_nombre', verificarToken_1.TokenValidation, upload.single('uploads'), documentosControlador_1.default.CrearDocumento);
-        // METODO PARA LISTAR CARPETAS
+        // METODO PARA LISTAR CARPETAS    **USADO
         this.router.get('/carpetas/', documentosControlador_1.default.Carpetas);
-        // METODO PARA LISTAR ARCHIVOS DE CARPETAS
+        // METODO PARA LISTAR ARCHIVOS DE CARPETAS     **USADO
         this.router.get('/lista-carpetas/:nom_carpeta', documentosControlador_1.default.ListarArchivosCarpeta);
-        // METODO PARA LISTAR DOCUMENTOS DE DOCUMENTACION  --**VERIFICADO
+        // METODO PARA LISTAR DOCUMENTOS DE DOCUMENTACION  **USADO
         this.router.get('/documentacion/:nom_carpeta', documentosControlador_1.default.ListarCarpetaDocumentos);
-        // METODO PARA LISTAR DOCUMENTOS DE CONTRATOS
+        // METODO PARA LISTAR DOCUMENTOS DE CONTRATOS     **USADO
         this.router.get('/lista-contratos/:nom_carpeta', documentosControlador_1.default.ListarCarpetaContratos);
-        // METODO PARA LISTAR DOCUMENTOS DE PERMISOS
+        // METODO PARA LISTAR DOCUMENTOS DE PERMISOS            **USADO
         this.router.get('/lista-permisos/:nom_carpeta', documentosControlador_1.default.ListarCarpetaPermisos);
-        // METODO PARA LISTAR ARCHIVOS DE PERMISOS
+        // METODO PARA LISTAR ARCHIVOS INDIVIDUALES     **USADO
         this.router.get('/lista-archivos-individuales/:nom_carpeta/tipo/:tipo', documentosControlador_1.default.ListarArchivosIndividuales);
-        // METODO PARA LISTAR DOCUMENTOS DE HORARIOS
+        // METODO PARA LISTAR DOCUMENTOS DE HORARIOS    **USADO
         this.router.get('/lista-horarios/:nom_carpeta', documentosControlador_1.default.ListarCarpetaHorarios);
-        // METODO PARA DESCARGAR ARCHIVOS
+        // METODO PARA DESCARGAR ARCHIVOS     **USADO
         this.router.get('/download/files/:nom_carpeta/:filename', documentosControlador_1.default.DownLoadFile);
-        // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
+        // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES    **USADO
         this.router.get('/download/files/:nom_carpeta/:filename/tipo/:tipo', documentosControlador_1.default.DescargarArchivos);
-        // METODO PARA ELIMINAR ARCHIVOS
+        // METODO PARA ELIMINAR ARCHIVOS     **USADO
         this.router.delete('/eliminar/:id/:documento', verificarToken_1.TokenValidation, documentosControlador_1.default.EliminarRegistros);
     }
 }

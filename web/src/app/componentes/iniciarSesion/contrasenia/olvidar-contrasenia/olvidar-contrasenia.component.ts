@@ -15,7 +15,6 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 export class OlvidarContraseniaComponent implements OnInit {
 
   cadena: string;
-
   correo = new FormControl('', [Validators.required, Validators.email]);
 
   public formulario = new FormGroup({

@@ -41,18 +41,12 @@ export class RelojesService {
     return this.http.get(`${environment.url}/relojes/datosReloj/${id}`);
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXMLIdDispositivos(data: any) {
-    return this.http.post(`${environment.url}/relojes/xmlDownloadIdDispositivos`, data);
-  }
-
-
   // METODO PARA CONSULTAR DATOS DE UN BIOMETRICO   **USADO
   ConsultarUnReloj(id: number) {
     return this.http.get(`${environment.url}/relojes/${id}`);
   }
 
-  // METODO PARA REGISTRAR DATOS DE PLANTILLA         **USADO
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA    **USADO
   SubirArchivoExcel(formData: any) {
     return this.http.post<any>(`${environment.url}/relojes/plantillaExcel/`, formData);
   }

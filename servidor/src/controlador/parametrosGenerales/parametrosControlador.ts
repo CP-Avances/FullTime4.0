@@ -260,25 +260,25 @@ class ParametrosControlador {
     }
 
 
-    // METODO PARA COMPARAR COORDENADAS
+    // METODO PARA COMPARAR COORDENADAS    **USADO
     public async CompararCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { lat1, lng1, lat2, lng2, valor } = req.body;
-            const RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+            const RADIO_TIERRA = 6371; // RADIO DE LA TIERRA EN KILOMETROS
 
-        const VALIDACION = await pool.query(
-            `
-            SELECT CASE 
-                WHEN (
-                    ${RADIO_TIERRA} * ACOS(
-                        COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
-                        SIN(RADIANS($1)) * SIN(RADIANS($3))
-                    ) * 1000 -- Convertir a metros
-                ) <= $5 THEN 'ok'
-                ELSE 'vacio'
-            END AS verificar
-            `,
-            [lat1, lng1, lat2, lng2, valor]);
+            const VALIDACION = await pool.query(
+                `
+                SELECT CASE 
+                    WHEN (
+                        ${RADIO_TIERRA} * ACOS(
+                            COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
+                            SIN(RADIANS($1)) * SIN(RADIANS($3))
+                        ) * 1000 -- Convertir a metros
+                        ) <= $5 THEN 'ok'
+                    ELSE 'vacio'
+                    END AS verificar
+                `
+                , [lat1, lng1, lat2, lng2, valor]);
 
             return res.jsonp(VALIDACION.rows);
         } catch (error) {

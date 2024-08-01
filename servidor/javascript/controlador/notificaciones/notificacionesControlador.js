@@ -455,7 +455,7 @@ class NotificacionTiempoRealControlador {
     /** ***************************************************************************************** **
      ** **                          MANEJO DE COMUNICADOS                                      ** **
      ** ***************************************************************************************** **/
-    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
+    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB      **USADO
     EnviarCorreoComunicado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -533,7 +533,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // NOTIFICACIONES GENERALES
+    // NOTIFICACIONES GENERALES    **USADO
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

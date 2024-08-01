@@ -51,7 +51,7 @@ export class ParametrosService {
     return this.http.put(`${environment.url}/parametrizacion/actual-detalle`, datos);
   }
 
-  // METODO PARA COMPARAR CORDENADAS
+  // METODO PARA COMPARAR CORDENADAS    **USADO
   ObtenerCoordenadas(data: any) {
     return this.http.post<any>(`${environment.url}/parametrizacion/coordenadas`, data);;
   }

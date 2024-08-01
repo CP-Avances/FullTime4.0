@@ -1049,7 +1049,7 @@ class EmpleadoControlador {
     /** ******************************************************************************************* **
      ** **               CONSULTAS DE COORDENADAS DE UBICACION DEL USUARIO                       ** **
      ** ******************************************************************************************* **/
-    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO
+    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
     BuscarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

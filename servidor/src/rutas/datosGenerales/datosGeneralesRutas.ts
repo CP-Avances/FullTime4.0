@@ -23,14 +23,8 @@ class CiudadRutas {
         this.router.post('/datos-actuales-usuario-rol', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarInformacionUserRol);
 
 
-        // LISTA DE DATOS ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS SUPERADMIN
-        this.router.get('/datos_generales_comunicados-superior/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesComunicados_SUPERADMIN);
-
-        // LISTA DE DATOS ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS ADMIN
-        this.router.post('/datos_generales_comunicados-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesComunicados_ADMIN);
-
-        // LISTA DE DATOS ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS JEFE
-        this.router.post('/datos_generales_comunicados-jefe/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesComunicados_JEFE);
+        // LISTA DE DATOS ACTIVOS O INACTIVOS QUE RECIBEN COMUNICADOS  **USADO
+        this.router.get('/datos_generales_comunicados/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesComunicados);
 
 
 
@@ -61,10 +55,8 @@ class CiudadRutas {
         this.router.get('/info-configuracion/:id_empleado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarConfigEmpleado);
 
 
-        // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ASIGNADOS UBICACION
+        // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ASIGNADOS UBICACION   **USADO
         this.router.post('/informacion-general-ubicacion/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesUbicacion);
-        // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
-        this.router.post('/informacion-general-ubicacion-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargoUbicacion);
 
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);

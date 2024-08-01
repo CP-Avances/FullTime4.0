@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 // LIBRERIAS DE ARCHIVOS
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -76,7 +77,6 @@ export class RegistroDispositivosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
-
 
   constructor(
     private usuariosService: UsuarioService,
@@ -167,9 +167,7 @@ export class RegistroDispositivosComponent implements OnInit {
   ObtenerDispositivosRegistrados() {
     this.usuariosService.BuscarDispositivoMovill().subscribe(res => {
       this.dispositivosRegistrados = res;
-      console.log('ver res ', res)
     }, err => {
-      console.log('ver res ', err)
       this.toastr.info(err.error.message)
     })
   }
@@ -300,9 +298,7 @@ export class RegistroDispositivosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -441,8 +437,8 @@ export class RegistroDispositivosComponent implements OnInit {
   data: any = [];
   exportToXML() {
     var objeto: any;
-    var count: number = 1;
     var arregloDispositivos: any = [];
+    let count: number = 0;
     this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
         "dispositivo_moviles": {
@@ -456,12 +452,32 @@ export class RegistroDispositivosComponent implements OnInit {
       }
       arregloDispositivos.push(objeto)
     });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
+    const xml = xmlBuilder.buildObject(arregloDispositivos);
 
-    this.rest.CrearXMLIdDispositivos(arregloDispositivos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/relojes/downloadIdDispositivos/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Dipositivos.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+    this.ObtenerDispositivosRegistrados();
   }
 
 

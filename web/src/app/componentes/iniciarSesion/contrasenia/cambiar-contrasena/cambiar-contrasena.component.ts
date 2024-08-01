@@ -50,6 +50,7 @@ export class CambiarContrasenaComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
   }
 
+  // METODO PARA CONPARAR CONTRASEÑAS
   CompararContrasenia(form: any) {
     // CIFRADO DE CONTRASEÑA
     const md5 = new Md5();

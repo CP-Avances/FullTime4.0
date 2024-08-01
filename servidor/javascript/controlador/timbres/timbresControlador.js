@@ -81,7 +81,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA LISTAR MARCACIONES
+    // METODO PARA LISTAR MARCACIONES    **USADO
     ObtenerTimbres(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -250,16 +250,17 @@ class TimbresControlador {
             }
         });
     }
-    // METODO DE REGISTRO DE TIMBRES PERSONALES
+    // METODO DE REGISTRO DE TIMBRES PERSONALES    **USADO
     CrearTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('ingresa aqui timbre personal');
             try {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip } = req.body;
-                // Obtener la fecha y hora actual
+                // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
-                // Formatear la fecha y hora actual en el formato deseado
+                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+                // FORMATEAR HORA Y FECHA DEL TIMBRE
+                var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM eu_empleados WHERE id = $1
@@ -267,15 +268,13 @@ class TimbresControlador {
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
                 var codigo = parseInt(code[0].codigo);
-                console.log('codigo ', codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 database_1.default.query(`
-                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
-                    codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
-                VALUES(to_timestamp($1, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $2, $3, $4, $5, $6, $7, to_timestamp($8, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $9, $10, $11) RETURNING id
-                `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    fecha_hora, id_reloj, ubicacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                SELECT * FROM public.timbres_web ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                `, [codigo, id_empleado, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
+                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -293,7 +292,6 @@ class TimbresControlador {
                 }));
             }
             catch (error) {
-                console.log('error ------- ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: error });
@@ -312,7 +310,7 @@ class TimbresControlador {
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
                 let servidor;
                 if (tipo === 'administrar') {
-                    servidor = fec_hora_timbre;
+                    servidor = hora_fecha_timbre;
                 }
                 else {
                     servidor = fecha_hora;

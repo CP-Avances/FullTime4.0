@@ -368,7 +368,7 @@ class NotificacionTiempoRealControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Configuración actualizada.' });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -528,7 +528,7 @@ class NotificacionTiempoRealControlador {
    ** **                          MANEJO DE COMUNICADOS                                      ** ** 
    ** ***************************************************************************************** **/
 
-  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB      **USADO
   public async EnviarCorreoComunicado(req: Request, res: Response): Promise<void> {
 
     var tiempo = fechaHora();
@@ -615,7 +615,7 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-  // NOTIFICACIONES GENERALES
+  // NOTIFICACIONES GENERALES    **USADO
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
@@ -660,13 +660,14 @@ class NotificacionTiempoRealControlador {
         `
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
-        `,
-        [id_empl_envia]);
+        `
+        , [id_empl_envia]);
 
       notificiacion.usuario = USUARIO.rows[0].usuario;
 
       return res.status(200)
         .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

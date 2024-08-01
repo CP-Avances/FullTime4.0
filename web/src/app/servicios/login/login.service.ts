@@ -14,59 +14,51 @@ export class LoginService {
     public router: Router) { }
 
 
-  // VALIDACIONES DE INGRESO AL SISTEMA 
+  // VALIDACIONES DE INGRESO AL SISTEMA     **USADO
   ValidarCredenciales(data: any) {
     return this.http.post<any>(`${environment.url}/login`, data);
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA
+  // METODO PARA CAMBIAR CONTRASEÑA    **USADO
   EnviarCorreoContrasena(data: any) {
     return this.http.post(`${environment.url}/login/recuperar-contrasenia/`, data)
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA
+  // METODO PARA CAMBIAR CONTRASEÑA   **USADO
   ActualizarContrasenia(data: any) {
     return this.http.post(`${environment.url}/login/cambiar-contrasenia`, data)
   }
 
-
+  // VERIFICAR EXISTENCIA DE INICIO DE SESION
   loggedIn() {
     return !!localStorage.getItem('token');
   }
 
+  // OBTENER TOKEN
   getToken() {
     return localStorage.getItem('token');
   }
 
+  // OBTENER ROL
   getRol() {
-    //console.log(' ver rol ', parseInt(localStorage.getItem('rol') as string))
     return parseInt(localStorage.getItem('rol') as string);//Empleado
   }
 
-  getEstado() {
-    let estado = localStorage.getItem('autoriza');
-    if (estado == 'true') {
-      return true;
-    }
-    return false;
-  }
-
+  // REVISAR ROL (VERIFICAR)
   loggedRol() {
     return !!localStorage.getItem('rol');
   }
 
+  // ACCEDER AL MENU -- PRUEBAS
   getRolMenu() {
-    let rol = parseInt(localStorage.getItem('rol') as string);
-    if (rol === 1 || rol === 3) {
-      return true; // SUPER-ADMIN - ADMINISTRADOR - ADMINISTRADOR-JEF
-    }
-    return false; // EMPLEADO
+    return true;
   }
 
+  // METODO PARA SALIR DEL SISTEMA
   logout() {
     localStorage.clear();
     sessionStorage.clear();
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
- 
+
 }

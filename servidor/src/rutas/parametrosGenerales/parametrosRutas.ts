@@ -25,7 +25,7 @@ class ParametrosRutas {
         this.router.post('/detalle', TokenValidation, PARAMETROS_CONTROLADOR.IngresarDetalleParametro);
         // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO **USADO
         this.router.put('/actual-detalle', TokenValidation, PARAMETROS_CONTROLADOR.ActualizarDetalleParametro);
-        // METODO PARA COMPARAR COORDENADAS
+        // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', TokenValidation, PARAMETROS_CONTROLADOR.CompararCoordenadas);
 
     }

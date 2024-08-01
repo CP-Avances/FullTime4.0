@@ -21,7 +21,7 @@ interface IPayload {
 
 class LoginControlador {
 
-  // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA
+  // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
 
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
@@ -45,6 +45,7 @@ class LoginControlador {
       
         // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
+
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
         let ACTIVO = await pool.query(
           `
@@ -85,11 +86,11 @@ class LoginControlador {
         const FileLicencias = JSON.parse(data);
 
         const ok_licencias = FileLicencias.filter((o: Licencias) => {
-          return o.public_key === public_key
+          return o.public_key === public_key;
         }).map((o: Licencias) => {
           o.fec_activacion = new Date(o.fec_activacion),
             o.fec_desactivacion = new Date(o.fec_desactivacion)
-          return o
+          return o;
         })
 
         if (ok_licencias.length === 0) return res.status(404)
@@ -158,7 +159,7 @@ class LoginControlador {
     }
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO
+  // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO    **USADO
   public async EnviarCorreoContrasena(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;

@@ -14,9 +14,8 @@ export class RealTimeService {
   ) {
   }
 
-  // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL
+  // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL    **USADO
   RecibirNuevosAvisos(data: any) {
-    //console.log('ingresa ', data)
     this.socket.emit('nuevo_aviso', data);
   }
 
@@ -77,12 +76,12 @@ export class RealTimeService {
    ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
-  // METODO PARA ENVIO DE CORREO DE COMUNICADOS
+  // METODO PARA ENVIO DE CORREO DE COMUNICADOS    **USADO
   EnviarCorreoComunicado(datos: any) {
     return this.http.post<any>(`${environment.url}/noti-real-time/mail-comunicado`, datos);
   }
 
-  // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS
+  // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS   **USADO
   EnviarMensajeGeneral(data: any) {
     return this.http.post<any>(`${environment.url}/noti-real-time/noti-comunicado/`, data);
   }

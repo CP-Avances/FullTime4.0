@@ -10,10 +10,10 @@ class LoginRuta {
 
     configuracion(): void {
 
-        // VALIDAR CREDENCIALES DE ACCESO AL SISTEMA
+        // VALIDAR CREDENCIALES DE ACCESO AL SISTEMA    **USADO
         this.router.post('/', LOGIN_CONTROLADOR.ValidarCredenciales);
 
-        // METODO PARA ENVIAR CORREO PARA CAMBIAR CONTRASEÑA
+        // METODO PARA ENVIAR CORREO PARA CAMBIAR CONTRASEÑA    **USADO
         this.router.post('/recuperar-contrasenia/', LOGIN_CONTROLADOR.EnviarCorreoContrasena);
 
         // METODO PARA CAMBIAR CONTRASEÑA

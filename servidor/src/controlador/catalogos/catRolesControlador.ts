@@ -232,15 +232,29 @@ class RolesControlador {
   public async UpdateRoles(req: Request, res: Response){
     try{
 
-      const { rol, listUsuarios} = req.body;
-
-      for (const user of listUsuarios) {
-        await pool.query(`
+      const { idRol, listaUsuarios} = req.body;
+      var cont = 0;
+      listaUsuarios.forEach(async (item: any) => {
+        let res = await pool.query(`
           UPDATE eu_usuarios
-          SET id_rol = $1, 
+          SET id_rol = $1 
           WHERE id = $2
-        `, [rol, user.id]);
-      }
+        `, [idRol, item.id]);
+
+        if(res.rowCount != 0){
+          cont = cont + 1;
+        }
+      })
+
+      
+      setTimeout(() => {
+        if (cont == listaUsuarios.length) {
+          return res.jsonp({message: 'Se a actualizado todos los usuarios'})
+        } else {
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+        }
+      }, 1500)
+      
 
     } catch (error) {
       // FINALIZAR TRANSACCION
