@@ -51,6 +51,7 @@ export class ListaEmpleadosComponent implements OnInit {
   empleadoD: any = [];
   empleado: any = [];
   idUsuariosAcceso: Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
+  idDepartamentosAcceso: Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE DEPARTAMENTOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
 
   mostarTabla: boolean = false;
   mostrarCrearCarpeta: boolean = false;
@@ -121,6 +122,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -380,7 +382,7 @@ export class ListaEmpleadosComponent implements OnInit {
   FiltrarEmpleados(empleados$: Observable<any>, idsEmpleadosActuales: Set<unknown>): Observable<any> {
     return empleados$.pipe(
       map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
+        this.idUsuariosAcceso.has(empleado.id) || (this.idDepartamentosAcceso.size>0 && !idsEmpleadosActuales.has(empleado.id))
       ))
     );
   }
@@ -587,7 +589,6 @@ export class ListaEmpleadosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

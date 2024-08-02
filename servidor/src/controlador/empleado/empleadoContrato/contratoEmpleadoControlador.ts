@@ -427,7 +427,7 @@ class ContratoEmpleadoControlador {
             `
             , [id_empleado]);
         if (CONTRATO.rowCount != 0) {
-            if (CONTRATO.rows[0]['max'] != null) {
+            if (CONTRATO.rows[0]['id_contrato'] != null) {
                 return res.jsonp(CONTRATO.rows)
             }
             else {
