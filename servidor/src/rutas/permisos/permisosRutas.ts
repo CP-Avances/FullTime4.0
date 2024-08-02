@@ -38,6 +38,8 @@ const storage = multer.diskStorage({
     }
 });
 
+
+
 const storage2 = multer.diskStorage({
     
         destination: async function (req, file, cb) {
@@ -61,6 +63,7 @@ const storage2 = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const upload2 = multer({ storage: storage2 });
+
 
 class PermisosRutas {
     public router: Router = Router();
@@ -86,7 +89,7 @@ class PermisosRutas {
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR HORAS ACTUALIZAR
         this.router.post('/permisos-solicitados-horas-editar', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosHorasEditar);
         // CREAR PERMISO
-        this.router.post('/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.CrearPermisos);
+        this.router.post('/', [TokenValidation, ModuloPermisosValidation,upload2.single('uploads')], PERMISOS_CONTROLADOR.CrearPermisos);
         // ACTUALIZAR PERMISO
         this.router.put('/:id/permiso-solicitado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EditarPermiso);
 

@@ -157,8 +157,53 @@ class PermisosControlador {
     // METODO PARA CREAR PERMISOS
     CrearPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const data = req.body;
+            const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let errorPermisos = false;
             const { message, error, permiso } = yield CrearPermiso(data);
+            if (error) {
+                console.error('Error al crear permiso:', message);
+                errorPermisos = true;
+            }
+            const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
+            const separador = path_1.default.sep;
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+            const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+            console.log("ver subir documento", data.subir_documento);
+            if (nombreArchivo) {
+                try {
+                    console.log("entrando a subir documento");
+                    const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(permiso.codigo);
+                    const consulta = yield database_1.default.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                    const numeroPermiso = consulta.rows[0].numero_permiso;
+                    const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                    permiso.nombreArchivo = nombreArchivo;
+                    fs_1.default.copyFileSync(documentoTemporal, documento);
+                    const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = yield RegistrarDocumentoPermiso(permiso);
+                    if (errorDoc) {
+                        console.error('Error al registrar documento:', messageDoc);
+                        errorPermisos = true;
+                    }
+                    permiso.documento = nombreDocumento;
+                }
+                catch (error) {
+                    console.error('Error al copiar el archivo:', error);
+                    errorPermisos = true;
+                }
+            }
+            try {
+                if (fs_1.default.existsSync(documentoTemporal)) {
+                    fs_1.default.unlinkSync(documentoTemporal);
+                }
+            }
+            catch (error) {
+                console.error('Error al eliminar el archivo temporal:', error);
+            }
+            data.documento = nombreArchivo;
             if (error) {
                 return res.status(400).jsonp({ message });
             }
@@ -555,6 +600,7 @@ class PermisosControlador {
             // TRATAMIENTO DE RUTAS
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + docs;
+            console.log("ver ruta", ruta);
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
@@ -1624,7 +1670,7 @@ const generarTablaHTMLWeb = function (datos, tipo) {
 function CrearPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento, codigo } = datos;
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = datos;
             let codigoEmpleado = codigo || '';
             if (subir_documento) {
                 try {
@@ -1651,12 +1697,12 @@ function CrearPermiso(datos) {
             const response = yield database_1.default.query(`
             INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
                 legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, 
-                numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) 
+                numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, documento) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
                 RETURNING * 
             `, [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
-                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
+                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, documento]);
             const [objetoPermiso] = response.rows;
             const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');
             const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');

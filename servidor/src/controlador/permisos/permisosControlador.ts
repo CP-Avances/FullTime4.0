@@ -158,14 +158,61 @@ class PermisosControlador {
     public async CrearPermisos(req: Request, res: Response): Promise<Response> {
         const data = req.body;
 
-        const { message, error, permiso } = await CrearPermiso(data);
+        const nombreArchivo = req.file?.originalname;
+        let errorPermisos: boolean = false;
 
+        const { message, error, permiso } = await CrearPermiso(data);
+        if (error) {
+            console.error('Error al crear permiso:', message);
+            errorPermisos = true;
+        }
+        const carpetaPermisos = await ObtenerRutaPermisosGeneral();
+        const separador = path.sep;
+        const fecha = moment();
+        const anio = fecha.format('YYYY');
+        const mes = fecha.format('MM');
+        const dia = fecha.format('DD');
+
+        const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+
+        console.log("ver subir documento",data.subir_documento )
+        if (nombreArchivo) {
+            try {
+                console.log("entrando a subir documento")
+                const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
+                const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                const numeroPermiso = consulta.rows[0].numero_permiso;
+
+                const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                permiso.nombreArchivo = nombreArchivo;
+                fs.copyFileSync(documentoTemporal, documento);
+                const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = await RegistrarDocumentoPermiso(permiso);
+                if (errorDoc) {
+                    console.error('Error al registrar documento:', messageDoc);
+                    errorPermisos = true;
+                }
+                permiso.documento = nombreDocumento;
+
+            }
+            catch (error) {
+                console.error('Error al copiar el archivo:', error);
+                errorPermisos = true;
+            }
+        }
+
+        try {
+            if (fs.existsSync(documentoTemporal)) {
+                fs.unlinkSync(documentoTemporal);
+            }
+        } catch (error) {
+            console.error('Error al eliminar el archivo temporal:', error);
+        }
+
+        data.documento = nombreArchivo;
         if (error) {
             return res.status(400).jsonp({ message });
         }
-
         return res.status(200).jsonp({ message, permiso });
-
     }
 
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
@@ -621,6 +668,7 @@ class PermisosControlador {
         // TRATAMIENTO DE RUTAS
         let separador = path.sep;
         let ruta = await ObtenerRutaPermisos(codigo) + separador + docs;
+        console.log("ver ruta" , ruta);
         fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
@@ -1812,7 +1860,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
             id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
             estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
-            depa_user_loggin, user_name, ip, subir_documento, codigo } = datos;
+            depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = datos;
 
         let codigoEmpleado = codigo || '';
 
@@ -1843,13 +1891,13 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             `
             INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
                 legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, 
-                numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) 
+                numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, documento) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
                 RETURNING * 
             `,
             [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
-                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
+                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, documento]);
 
         const [objetoPermiso] = response.rows;
         const fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');

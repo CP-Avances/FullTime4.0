@@ -89,7 +89,7 @@ class PermisosRutas {
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR HORAS ACTUALIZAR
         this.router.post('/permisos-solicitados-horas-editar', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.BuscarPermisosHorasEditar);
         // CREAR PERMISO
-        this.router.post('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.CrearPermisos);
+        this.router.post('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.CrearPermisos);
         // ACTUALIZAR PERMISO
         this.router.put('/:id/permiso-solicitado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EditarPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
