@@ -228,7 +228,7 @@ class RolesControlador {
     }
   }
 
-  //CONSULTA PARA actualizar roles a varios usuarios
+  //CONSULTA PARA actualizar roles a varios usuarios **USADO
   public async UpdateRoles(req: Request, res: Response){
     try{
 

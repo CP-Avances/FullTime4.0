@@ -33,6 +33,7 @@ import { EmplDepaPipe } from './empleado/nombreDepartamento/empl-depa.pipe';
 import { EmplEstadoPipe } from './empleado/filtroEmpEstado/empl-estado.pipe';
 import { EmplUsuarioPipe } from './empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { FitroNivelPipe } from './catTitulos/filtroNivel/fitro-nivel.pipe';
+import { EmplRolPipe } from './empleado/filtroEmpRol/empl-rol.pipe';
 import { SucEmpresaPipe } from './sucursales/filtroSucEmpresa/suc-empresa.pipe';
 import { FiltroEmpresaRPipe } from './catRelojes/filtroEmpresa/filtro-empresa-r.pipe';
 import { FiltroSucursalRPipe } from './catRelojes/filtroSucursal/filtro-sucursal-r.pipe';
@@ -118,6 +119,7 @@ import { OrdenarAsignacionesPipe } from './administrarInformacion/ordenarAsignac
     SucRolEmpleadoPipe,
     SucDepEmpleadoPipe,
     OrdenarAsignacionesPipe,
+    EmplRolPipe,
   ],
   exports: [
     DepartamentoPipe,
@@ -178,6 +180,7 @@ import { OrdenarAsignacionesPipe } from './administrarInformacion/ordenarAsignac
     SucRolEmpleadoPipe,
     SucDepEmpleadoPipe,
     OrdenarAsignacionesPipe,
+    EmplRolPipe,
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

@@ -216,7 +216,7 @@ class RolesControlador {
             }
         });
     }
-    //CONSULTA PARA actualizar roles a varios usuarios
+    //CONSULTA PARA actualizar roles a varios usuarios **USADO
     UpdateRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

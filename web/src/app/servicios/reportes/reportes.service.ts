@@ -158,6 +158,7 @@ export class ReportesService {
   private _filtroCodigo: string = '';
   private _filtroCedula: string = '';
   private _filtroNombreEmp: string = '';
+  private _filtroRolEmp: string = '';
 
   get filtroCodigo() { return this._filtroCodigo; }
   setFiltroCodigo(arr: any) { this._filtroCodigo = arr; }
@@ -167,6 +168,9 @@ export class ReportesService {
 
   get filtroNombreEmp() { return this._filtroNombreEmp; }
   setFiltroNombreEmp(arr: any) { this._filtroNombreEmp = arr; }
+
+  get filtroRolEmp(){return this._filtroRolEmp;}
+  setFiltroRolEmp(arr: any){this._filtroRolEmp = arr; }
 
   // FILTRO FORMULARIO DE TABULACION
   private _filtroCodigo_tab: number = 0;
@@ -209,6 +213,7 @@ export class ReportesService {
     this._filtroCedula_tab = '';
     this._filtroCedula_inc = '';
     this._filtroCodigo = '';
+    this._filtroRolEmp = '';
     this._filtroCodigo_tab = 0;
     this._filtroCodigo_inc = 0;
   }

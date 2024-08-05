@@ -1079,18 +1079,32 @@ class DepartamentoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    //CONSULTA PARA actualizar roles a varios usuarios
-    UpdateRoles(req, res) {
+    //CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
+    UpdateDepartamentosMul(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { rol, listUsuarios } = req.body;
-                for (const user of listUsuarios) {
-                    yield database_1.default.query(`
-          UPDATE eu_usuarios
-          SET id_rol = $1, 
-          WHERE id = $2
-        `, [rol, user.id]);
-                }
+                const { idDepartamento, listaUsuarios } = req.body;
+                console.log('idDepa: ', idDepartamento);
+                console.log('listaUsuarios: ', listaUsuarios);
+                var cont = 0;
+                listaUsuarios.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    let res = yield database_1.default.query(`
+          UPDATE eu_usuario_departamento
+          SET id_departamento = $1 
+          WHERE id_empleado = $2
+        `, [idDepartamento, item.id]);
+                    if (res.rowCount != 0) {
+                        cont = cont + 1;
+                    }
+                }));
+                setTimeout(() => {
+                    if (cont == listaUsuarios.length) {
+                        return res.jsonp({ message: 'Se a actualizado todos los usuarios' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+                    }
+                }, 1500);
             }
             catch (error) {
                 // FINALIZAR TRANSACCION
