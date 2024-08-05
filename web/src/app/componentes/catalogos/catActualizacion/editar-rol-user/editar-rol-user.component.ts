@@ -328,7 +328,7 @@ export class EditarRolUserComponent implements OnInit {
       })
 
       this.empleados.push({
-        id: obj.id_empleado,
+        id: obj.id,
         nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
         codigo: obj.codigo,
         cedula: obj.cedula,
@@ -851,7 +851,6 @@ export class EditarRolUserComponent implements OnInit {
   }
 
   abriEditarRolUser(datos: any) {
-    console.log('roles seleccionados: ', datos)
     if (datos.length > 0) {
       const data = {
         idRol: this.formulario.get('nombreRolF')?.value,
@@ -876,7 +875,6 @@ export class EditarRolUserComponent implements OnInit {
         timeOut: 4000,
       });
     }
-
   }
 
 }

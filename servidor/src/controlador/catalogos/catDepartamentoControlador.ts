@@ -1249,8 +1249,6 @@ class DepartamentoControlador {
   public async UpdateDepartamentosMul(req: Request, res: Response){
     try{
       const { idDepartamento, listaUsuarios} = req.body;
-      console.log('idDepa: ',idDepartamento);
-      console.log('listaUsuarios: ',listaUsuarios);
       var cont = 0;
       listaUsuarios.forEach(async (item: any) => {
         let res = await pool.query(`

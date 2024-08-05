@@ -842,7 +842,7 @@ export class EditarDepaUserComponent implements OnInit {
 
   }
 
-  abriEditarDepaUser(datos: any) {
+  abriEditarDepaUser(datos: any) {    
     if (datos.length > 0) {
       const data = {
         idSucursal: this.formularioDep.get('sucursal')?.value,

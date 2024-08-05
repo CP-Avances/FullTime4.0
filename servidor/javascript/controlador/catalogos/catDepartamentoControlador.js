@@ -1084,8 +1084,6 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { idDepartamento, listaUsuarios } = req.body;
-                console.log('idDepa: ', idDepartamento);
-                console.log('listaUsuarios: ', listaUsuarios);
                 var cont = 0;
                 listaUsuarios.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     let res = yield database_1.default.query(`
