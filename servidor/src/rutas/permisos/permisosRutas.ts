@@ -91,7 +91,7 @@ class PermisosRutas {
         // CREAR PERMISO
         this.router.post('/', [TokenValidation, ModuloPermisosValidation,upload2.single('uploads')], PERMISOS_CONTROLADOR.CrearPermisos);
         // ACTUALIZAR PERMISO
-        this.router.put('/:id/permiso-solicitado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EditarPermiso);
+        this.router.put('/:id/permiso-solicitado', [TokenValidation, ModuloPermisosValidation, upload2.single('uploads')], PERMISOS_CONTROLADOR.EditarPermiso);
 
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
         this.router.put('/:id/archivo/:archivo/validar/:codigo', [TokenValidation, ModuloPermisosValidation, upload.single('uploads')], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
@@ -145,10 +145,11 @@ class PermisosRutas {
         // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoEditarMovil);
         //-------------------------------------RUTAS APP MOVIL ----------------------------------------------------------
-        this.router.get('/lista-permisos',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByCodigo)
-        this.router.get('/lista-permisosfechas',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByFechasyCodigo)
-        this.router.get('/lista-permisoshoras', TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByHorasyCodigo)
-        this.router.post('/insert-permiso', TokenValidation, PERMISOS_CONTROLADOR.postNuevoPermiso)
+        this.router.get('/lista-permisos',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByCodigo);
+        this.router.get('/lista-permisosfechas',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByFechasyCodigo);
+        this.router.get('/lista-permisoshoras', TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByHorasyCodigo);
+        this.router.post('/insert-permiso', TokenValidation, PERMISOS_CONTROLADOR.postNuevoPermiso);
+        this.router.get('/obtener-permiso', TokenValidation, PERMISOS_CONTROLADOR.getPermisoByIdyCodigo);
 
 
     }

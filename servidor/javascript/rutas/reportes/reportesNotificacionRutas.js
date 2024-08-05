@@ -44,7 +44,6 @@ class NotificacionesRutas {
         this.router.get('/usuario_extras_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarSolicitudHoraExtraEnviadas_UsuarioFecha);
         this.router.get('/usuario_comidas_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarPlanificaComidaEnviadas_UsuarioFecha);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);
-        this.router.get('/noti-tim/all-noti', reporteNotificacionControlador_1.default.getNotificacionTimbres);
     }
 }
 const NOTIFICACION_RUTAS = new NotificacionesRutas();

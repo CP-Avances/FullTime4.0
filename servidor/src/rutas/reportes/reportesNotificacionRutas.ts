@@ -53,7 +53,6 @@ class NotificacionesRutas {
 
         this.router.get('/usuario_comidas_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', NOTIFICACIONES_CONTROLADOR.ListarPlanificaComidaEnviadas_UsuarioFecha);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);
-        this.router.get('/noti-tim/all-noti', NOTIFICACIONES_CONTROLADOR.getNotificacionTimbres);
 
     }
 }

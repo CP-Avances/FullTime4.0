@@ -213,9 +213,18 @@ class PermisosControlador {
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
     EditarPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
+            const separador = path_1.default.sep;
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dias = fecha.format('DD');
+            const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dias}_${nombreArchivo}`;
             try {
                 const id = req.params.id;
-                const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip } = req.body;
+                const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -238,10 +247,56 @@ class PermisosControlador {
                 const response = yield database_1.default.query(`
                 UPDATE mp_solicitud_permiso SET descripcion = $1, fecha_inicio = $2, fecha_final = $3, dias_permiso = $4, 
                     dia_libre = $5, id_tipo_permiso = $6, horas_permiso = $7, numero_permiso = $8, hora_salida = $9, 
-                    hora_ingreso = $10, id_periodo_vacacion = $11, fecha_edicion = $12
+                    hora_ingreso = $10, id_periodo_vacacion = $11, fecha_edicion = $12, documento = $14
                 WHERE id = $13 RETURNING *
                 `, [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
-                    hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
+                    hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id, documento]);
+                let codigoEmpleado = codigo || '';
+                console.log("ver campos que se ingresaran: ", req.body);
+                if (subir_documento) {
+                    try {
+                        const { carpetaPermisos, codigo } = yield (0, accesoCarpetas_1.ObtenerRutaPermisosIdEmpleado)(id_empleado);
+                        codigoEmpleado = codigo;
+                        //METODO PARA CREAR LA CARPETA DE EMPLEADOS
+                        fs_1.default.access(carpetaPermisos, fs_1.default.constants.F_OK, (err) => {
+                            if (err) {
+                                // METODO MKDIR PARA CREAR LA CARPETA
+                                fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err2) => {
+                                    if (err2) {
+                                        console.log('Error al intentar crear carpeta de permisos.', err2);
+                                        throw new Error('Error al intentar crear carpeta de permisos.');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    catch (error) {
+                        throw new Error('Error al intentar acceder a la carpeta de permisos.');
+                    }
+                }
+                if (nombreArchivo) {
+                    try {
+                        // CARPETA DEPERMISOS DE EMPLEADO CODIGO_CEDULA
+                        const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
+                        const consulta = yield database_1.default.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [id]);
+                        const numeroPermiso = consulta.rows[0].numero_permiso;
+                        const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${codigo}_${anio}_${mes}_${dias}_${nombreArchivo}`;
+                        datosOriginales.nombreArchivo = nombreArchivo;
+                        datosOriginales.codigo = codigo;
+                        fs_1.default.copyFileSync(documentoTemporal, documento);
+                        console.log("Ver datos originales: ", datosOriginales);
+                        const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = yield RegistrarDocumentoPermiso(datosOriginales);
+                        if (errorDoc) {
+                            console.error('Error al registrar documento:', messageDoc);
+                        }
+                        datosOriginales.documento = nombreDocumento;
+                    }
+                    catch (error) {
+                        console.error('Error al copiar el archivo:', error);
+                        //errorPermisos = true;
+                    }
+                }
+                //AQUI PONER LO DEL ARCHIVO
                 const [objetoPermiso] = response.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
@@ -1614,6 +1669,22 @@ class PermisosControlador {
             }
         });
     }
+    getPermisoByIdyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo, id } = req.query;
+                const query = `SELECT p.* FROM mp_solicitud_permiso p WHERE p.id_empleado = '${codigo}' AND p.id = ${id}`;
+                const response = yield database_1.default.query(query);
+                const permisos = response.rows;
+                return res.status(200).jsonp(permisos);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 // METODO PARA CREAR TABLA DE USUARIOS
 const generarTablaHTMLWeb = function (datos, tipo) {

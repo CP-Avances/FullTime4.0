@@ -755,21 +755,7 @@ class NotificacionesControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
-    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
-    public async getNotificacionTimbres(req: Request, res: Response): Promise<Response>  {
-        try {
-            const { id_empleado } = req.query;
-            const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
-            const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
-            const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`
-            const response: QueryResult = await pool.query(query);
-            const notificacion: any[] = response.rows;
-            return res.status(200).jsonp(notificacion);
-        } catch (error) {
-            console.log(error);
-            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-        }
-    };
+  
 }
 
 export const NOTIFICACIONES_CONTROLADOR = new NotificacionesControlador();

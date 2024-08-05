@@ -678,15 +678,16 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
+    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
     getInfoEmpleadoByCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { codigo } = req.query;
                 const query = `
-            SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
-            da.correo, da.codigo, da.estado, da.id_sucursal, da.id_contrato,
-            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
-            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal
             FROM informacion_general AS da, eu_configurar_alertas AS cn            
             WHERE da.id = ${codigo} AND cn.id_empleado = da.id
             `;
@@ -695,6 +696,42 @@ class NotificacionTiempoRealControlador {
                 console.log("ver", response.rows);
                 console.log(infoEmpleado);
                 return res.status(200).jsonp(infoEmpleado);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getNotificacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado } = req.query;
+                const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`;
+                const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`;
+                const query = `SELECT r.*, ${subquery1}, ${subquery2} FROM ecm_realtime_notificacion r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 40`;
+                const response = yield database_1.default.query(query);
+                const notificacion = response.rows;
+                return res.status(200).jsonp(notificacion);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getNotificacionTimbres(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado } = req.query;
+                const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`;
+                const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`;
+                const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`;
+                const response = yield database_1.default.query(query);
+                const notificacion = response.rows;
+                return res.status(200).jsonp(notificacion);
             }
             catch (error) {
                 console.log(error);
