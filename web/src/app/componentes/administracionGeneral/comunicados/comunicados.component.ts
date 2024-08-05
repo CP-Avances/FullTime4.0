@@ -242,9 +242,11 @@ export class ComunicadosComponent implements OnInit {
 
       // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
       const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
-      this.idSucursalesAcceso.add(empleadoSesion.id_suc);
-      this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
-      this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
 
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));

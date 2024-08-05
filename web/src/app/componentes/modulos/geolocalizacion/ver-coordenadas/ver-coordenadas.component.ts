@@ -22,6 +22,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -75,6 +76,14 @@ export class VerCoordenadasComponent implements OnInit {
   respuesta: any = [];
   regimen: any = [];
   cargos: any = [];
+
+  idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc = [5, 10, 20, 50];
@@ -140,13 +149,20 @@ export class VerCoordenadasComponent implements OnInit {
     private validar: ValidacionesService,
     public informacion: DatosGeneralesService,
     public componentec: ListarCoordenadasComponent,
+    private asignaciones: AsignacionesService,
   ) { }
 
   ngOnInit(): void {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
     this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.ConsultarDatos();
   }
 
@@ -194,8 +210,10 @@ export class VerCoordenadasComponent implements OnInit {
   // METODO PARA BUSCAR COORDENADAS DE UBICACION DE USUARIO
   ListarUsuarios(id: number) {
     this.datosUsuarios = [];
-    this.restU.ListarCoordenadasUsuarioU(id).subscribe(datos => {
-      this.datosUsuarios = datos;
+    this.restU.ListarCoordenadasUsuarioU(id).subscribe((datos: any) => {
+      // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
+      this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
+
     })
   }
 
@@ -310,6 +328,30 @@ export class VerCoordenadasComponent implements OnInit {
     this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
     this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
     this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
+
+    if (this.rolEmpleado !== 1) {
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
+
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso.add(empleado.id_cargo_);
+      });
+
+      this.cargos = this.cargos.filter((cargo: any) =>
+        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      );
+    }
 
   }
 
