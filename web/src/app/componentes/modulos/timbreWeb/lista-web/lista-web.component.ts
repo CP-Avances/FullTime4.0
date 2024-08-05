@@ -140,6 +140,11 @@ export class ListaWebComponent implements OnInit {
   regimen_dh: any = [];
   cargos_dh: any = [];
 
+  idCargosAcceso_dh: Set<any> = new Set();
+  idUsuariosAcceso_dh: Set<any> = new Set();
+  idSucursalesAcceso_dh: Set<any> = new Set();
+  idDepartamentosAcceso_dh: Set<any> = new Set();
+
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg_dh = new SelectionModel<ITableEmpleados>(true, []);
@@ -246,9 +251,9 @@ export class ListaWebComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    console.log('this.idUsuariosAcceso', this.idUsuariosAcceso);
-    console.log('this.idDepartamentosAcceso', this.idDepartamentosAcceso);
-    console.log('this.idSucursalesAcceso', this.idSucursalesAcceso);
+    this.idUsuariosAcceso_dh = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso_dh = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso_dh = this.asignaciones.idSucursalesAcceso;
   }
 
   // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
@@ -360,7 +365,22 @@ export class ListaWebComponent implements OnInit {
           this.idSucursalesAcceso.add(empleadoSesion.id_suc);
           this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
           this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+        } else {
+           // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso.forEach((id_suc: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso.delete(id_suc);
+            }
+          });
+
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso.forEach((id_depa: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso.delete(id_depa);
+            }
+          });
         }
+
 
         this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
         this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
@@ -395,21 +415,36 @@ export class ListaWebComponent implements OnInit {
         // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
         const empleadoSesion = this.empleados_dh.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
         if (empleadoSesion) {
-          this.idSucursalesAcceso.add(empleadoSesion.id_suc);
-          this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
-          this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+          this.idSucursalesAcceso_dh.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso_dh.add(empleadoSesion.id_depa);
+          this.idCargosAcceso_dh.add(empleadoSesion.id_cargo_);
+        } else {
+          // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso_dh.forEach((id_suc: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso_dh.delete(id_suc);
+            }
+          });
+
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso_dh.forEach((id_depa: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso_dh.delete(id_depa);
+            }
+          });
+
         }
 
-        this.departamentos_dh = this.departamentos_dh.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
-        this.sucursales_dh = this.sucursales_dh.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
-        this.regimen_dh = this.regimen_dh.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+        this.departamentos_dh = this.departamentos_dh.filter((departamento: any) => this.idDepartamentosAcceso_dh.has(departamento.id));
+        this.sucursales_dh = this.sucursales_dh.filter((sucursal: any) => this.idSucursalesAcceso_dh.has(sucursal.id));
+        this.regimen_dh = this.regimen_dh.filter((regimen: any) => this.idSucursalesAcceso_dh.has(regimen.id_suc));
 
         this.empleados_dh.forEach((empleado: any) => {
-          this.idCargosAcceso.add(empleado.id_cargo_);
+          this.idCargosAcceso_dh.add(empleado.id_cargo_);
         });
 
         this.cargos_dh = this.cargos_dh.filter((cargo: any) =>
-          this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+          this.idSucursalesAcceso_dh.has(cargo.id_suc) && this.idCargosAcceso_dh.has(cargo.id)
         );
       }
       if (this.empleados_dh.length > 0) {

@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-lista-app',
@@ -52,6 +53,13 @@ export class ListaAppComponent implements OnInit {
   empleados: any = [];
   regimen: any = [];
   cargos: any = [];
+
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -133,6 +141,11 @@ export class ListaAppComponent implements OnInit {
   regimen_dh: any = [];
   cargos_dh: any = [];
 
+  idCargosAcceso_dh: Set<any> = new Set();
+  idUsuariosAcceso_dh: Set<any> = new Set();
+  idSucursalesAcceso_dh: Set<any> = new Set();
+  idDepartamentosAcceso_dh: Set<any> = new Set();
+
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep_dh = new SelectionModel<ITableEmpleados>(true, []);
@@ -198,6 +211,7 @@ export class ListaAppComponent implements OnInit {
     public informacion: UsuarioService,
     public general: DatosGeneralesService,
     public restR: ReportesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -213,6 +227,7 @@ export class ListaAppComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
@@ -226,6 +241,17 @@ export class ListaAppComponent implements OnInit {
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
   }
+
+  ObtenerAsignaciones() {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+
+    this.idUsuariosAcceso_dh = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso_dh = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso_dh = this.asignaciones.idSucursalesAcceso;
+  }
+
 
   // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
   AdministrarInformacion() {
@@ -315,19 +341,115 @@ export class ListaAppComponent implements OnInit {
 
     })
 
+    this.ObtenerAsignaciones();
+
+
     // RETIRAR DUPLICADOS DE LA LISTA
     if (estado === true) {
       this.cargos = this.validar.OmitirDuplicadosCargos(cargos_);
       this.regimen = this.validar.OmitirDuplicadosRegimen(regimenes_);
       this.sucursales = this.validar.OmitirDuplicadosSucursales(sucursales_);
       this.departamentos = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
+
+      // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+      // SI ES SUPERADMINISTRADOR NO FILTRAR
+      if (this.rolEmpleado !== 1) {
+        this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+        // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+        const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+        if (empleadoSesion) {
+          this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+          this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+        } else {
+           // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso.forEach((id_suc: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso.delete(id_suc);
+            }
+          });
+
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso.forEach((id_depa: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso.delete(id_depa);
+            }
+          });
+        }
+
+        this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+        this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+        this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+        this.empleados.forEach((empleado: any) => {
+          this.idCargosAcceso.add(empleado.id_cargo_);
+        });
+
+        this.cargos = this.cargos.filter((cargo: any) =>
+          this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+        );
+      }
+      if (this.empleados.length > 0) {
+        this.activar = true;
+      } else {
+        this.activar = false;
+      }
     }
     else {
       this.cargos_dh = this.validar.OmitirDuplicadosCargos(cargos_);
       this.regimen_dh = this.validar.OmitirDuplicadosRegimen(regimenes_);
       this.sucursales_dh = this.validar.OmitirDuplicadosSucursales(sucursales_);
       this.departamentos_dh = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
+      this.ObtenerAsignaciones();
+
+      // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+      // SI ES SUPERADMINISTRADOR NO FILTRAR
+      if (this.rolEmpleado !== 1) {
+        this.empleados_dh = this.empleados_dh.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+        // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+        const empleadoSesion = this.empleados_dh.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+        if (empleadoSesion) {
+          this.idSucursalesAcceso_dh.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso_dh.add(empleadoSesion.id_depa);
+          this.idCargosAcceso_dh.add(empleadoSesion.id_cargo_);
+        } else {
+          // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso_dh.forEach((id_suc: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso_dh.delete(id_suc);
+            }
+          });
+
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso_dh.forEach((id_depa: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso_dh.delete(id_depa);
+            }
+          });
+
+        }
+
+        this.departamentos_dh = this.departamentos_dh.filter((departamento: any) => this.idDepartamentosAcceso_dh.has(departamento.id));
+        this.sucursales_dh = this.sucursales_dh.filter((sucursal: any) => this.idSucursalesAcceso_dh.has(sucursal.id));
+        this.regimen_dh = this.regimen_dh.filter((regimen: any) => this.idSucursalesAcceso_dh.has(regimen.id_suc));
+
+        this.empleados_dh.forEach((empleado: any) => {
+          this.idCargosAcceso_dh.add(empleado.id_cargo_);
+        });
+
+        this.cargos_dh = this.cargos_dh.filter((cargo: any) =>
+          this.idSucursalesAcceso_dh.has(cargo.id_suc) && this.idCargosAcceso_dh.has(cargo.id)
+        );
+      }
+      if (this.empleados_dh.length > 0) {
+        this.inactivar = true;
+      } else {
+        this.inactivar = false;
+      }
     }
+
   }
 
   // CONTROL DE BOTONES
@@ -1086,10 +1208,10 @@ export class ListaAppComponent implements OnInit {
     this.activar_habilitados = false;
     this.ver_imagen = true;
 
-    if (this.sucursales.length > 0) {
+    if (this.empleados.length > 0) {
       this.activar = true;
     }
-    if (this.sucursales_dh.length > 0) {
+    if (this.empleados_dh.length > 0) {
       this.inactivar = true;
     }
 
