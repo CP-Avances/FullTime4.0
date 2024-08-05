@@ -17,9 +17,9 @@ class PruebasRutas {
         this.router.delete('/eliminar/:id', TokenValidation, ROLES_CONTROLADOR.EliminarRol);
         // METODO PARA REGISTRAR ROL
         this.router.post('/', TokenValidation, ROLES_CONTROLADOR.CrearRol);
-
+        // METODO PARA ACTUALIZAR ROLES DE MANERA MASIVA  **USADO
         this.router.put('/updateUsers', TokenValidation, ROLES_CONTROLADOR.UpdateRoles);
-
+        // METODO PARA LISTAR ROLES  **USADO
         this.router.get('/listausuariosroles', TokenValidation, ROLES_CONTROLADOR.ListarRolesUsuario);
 
 

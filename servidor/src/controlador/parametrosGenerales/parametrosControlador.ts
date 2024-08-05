@@ -252,6 +252,7 @@ class ParametrosControlador {
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro exitoso.' });
+            
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -264,6 +265,11 @@ class ParametrosControlador {
     public async CompararCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { lat1, lng1, lat2, lng2, valor } = req.body;
+
+            if (isNaN(lat1) || isNaN(lng1) || isNaN(lat2) || isNaN(lng2) || isNaN(valor)) {
+                return res.status(400).jsonp({ message: 'error' });
+            }
+
             const RADIO_TIERRA = 6371; // RADIO DE LA TIERRA EN KILOMETROS
 
             const VALIDACION = await pool.query(
@@ -282,6 +288,7 @@ class ParametrosControlador {
 
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
+            console.log('error --> ', error)
             return res.status(500)
                 .jsonp({ message: 'error_500' });
         }

@@ -315,7 +315,7 @@ export class RegistrarTimbreComponent implements OnInit {
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;
           informacion.lng2 = obj.longitud;
-          //console.log(informacion.lat1, ' ---------- ', informacion.lng1)
+          console.log(informacion.lat1, ' ---------- ', informacion.lng1)
           if (informacion.lat1 && informacion.lng1) {
             this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
           }
@@ -337,6 +337,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
+    console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango, form);
     }
@@ -349,11 +350,10 @@ export class RegistrarTimbreComponent implements OnInit {
   ValidarDomicilio(informacion: any, form: any) {
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
       if (res[0].longitud != null && res[0].latitud != null) {
-
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
-
-        if (informacion.lat1 && informacion.lng1) {
+        console.log('lat ', informacion.lat1, ' long ', informacion.lng1, 'res ', res, 'informacion ', informacion)
+        if (informacion.lat2 && informacion.lng2) {
           this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
             if (resu[0].verificar === 'ok') {
               this.ubicacion = 'DOMICILIO';

@@ -73,6 +73,8 @@ export class VerParametroComponent implements OnInit {
   conectividad_internet: boolean = false;
   // PARAMETRO TOMAR FOTO MOVIL
   foto_movil: boolean = false;
+  // PARAMETRO TOMAR FOTO WEB
+  foto_web: boolean = false;
   // PARAMETRO LIMITE CORREO
   limite_correo: boolean = false;
 
@@ -124,7 +126,6 @@ export class VerParametroComponent implements OnInit {
     }
     // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
     if (this.idParametro === '5') {
-      this.ver_formulario = true;
       this.ubicacion_desconocida = true;
     }
     // DISPOSITIVOS MOVILES
@@ -136,17 +137,14 @@ export class VerParametroComponent implements OnInit {
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '7') {
       this.certificados = true;
-      this.ver_formulario = true;
     }
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '8') {
       this.cumpleanios = true;
-      this.ver_formulario = true;
     }
     // CONSIDERAR SEGUNDOS MARCACIONES
     if (this.idParametro === '9') {
       this.segundos_timbres = true;
-      this.ver_formulario = true;
     }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '10') {
@@ -163,12 +161,19 @@ export class VerParametroComponent implements OnInit {
     // FORMATO CONECTIVIDAD INTERNET
     if (this.idParametro === '13') {
       this.conectividad_internet = true;
-      this.ver_formulario = true;
     }
-    // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
+    // FORMATO FOTO MOVIL
     if (this.idParametro === '14') {
-      this.ver_formulario = true;
       this.foto_movil = true;
+    }
+    // FORMATO FOTO WEB
+    if (this.idParametro === '15') {
+      this.foto_web = true;
+    }
+    // PARAMETROS CON FORMULARIO
+    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9'
+      || this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
+      this.ver_formulario = true;
     }
     // LIMITE CORREO
     if (this.idParametro === '33') {
@@ -241,7 +246,7 @@ export class VerParametroComponent implements OnInit {
 
       // PARAMETROS CON DETALLES
       if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9' ||
-        this.idParametro === '13' || this.idParametro === '14') {
+        this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
         this.VerConfiguracionRegistro();
       }
     }, vacio => {

@@ -245,6 +245,9 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { lat1, lng1, lat2, lng2, valor } = req.body;
+                if (isNaN(lat1) || isNaN(lng1) || isNaN(lat2) || isNaN(lng2) || isNaN(valor)) {
+                    return res.status(400).jsonp({ message: 'error' });
+                }
                 const RADIO_TIERRA = 6371; // RADIO DE LA TIERRA EN KILOMETROS
                 const VALIDACION = yield database_1.default.query(`
                 SELECT CASE 
@@ -260,6 +263,7 @@ class ParametrosControlador {
                 return res.jsonp(VALIDACION.rows);
             }
             catch (error) {
+                console.log('error --> ', error);
                 return res.status(500)
                     .jsonp({ message: 'error_500' });
             }

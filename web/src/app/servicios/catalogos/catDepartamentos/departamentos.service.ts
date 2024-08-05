@@ -122,4 +122,9 @@ export class DepartamentosService {
     return this.http.post<any>(`${environment.url}/departamento/cargar_plantillaNivel/`, formData);
   }
 
+  // METODO PARA ACTUALIZAR EL DEPARTAMENTO DEL USUARIO  **USADO
+  ActualizarUserDepa(Data: any){
+    return this.http.put<any>(`${environment.url}/departamento/actualizarUserDepa`, Data);
+  }
+
 }

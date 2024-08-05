@@ -1245,19 +1245,32 @@ class DepartamentoControlador {
   }
 
 
-  //CONSULTA PARA actualizar roles a varios usuarios
-  public async UpdateRoles(req: Request, res: Response){
+  //CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
+  public async UpdateDepartamentosMul(req: Request, res: Response){
     try{
+      const { idDepartamento, listaUsuarios} = req.body;
+      var cont = 0;
+      listaUsuarios.forEach(async (item: any) => {
+        let res = await pool.query(`
+          UPDATE eu_usuario_departamento
+          SET id_departamento = $1 
+          WHERE id_empleado = $2
+        `, [idDepartamento, item.id]);
 
-      const { rol, listUsuarios} = req.body;
+        if(res.rowCount != 0){
+          cont = cont + 1;
+        }
+      })
 
-      for (const user of listUsuarios) {
-        await pool.query(`
-          UPDATE eu_usuarios
-          SET id_rol = $1, 
-          WHERE id = $2
-        `, [rol, user.id]);
-      }
+      
+      setTimeout(() => {
+        if (cont == listaUsuarios.length) {
+          return res.jsonp({message: 'Se a actualizado todos los usuarios'})
+        } else {
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+        }
+      }, 1500)
+      
 
     } catch (error) {
       // FINALIZAR TRANSACCION

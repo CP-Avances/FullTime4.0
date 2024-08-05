@@ -206,9 +206,14 @@
                         NOTA: Permitir realizar timbres desde la aplicación móvil sin conectividad a internet.
                     </span>
 
-                    <!-- CONTENIDO USAR CONECTIVIDAD INTERNET (14) -->
+                    <!-- CONTENIDO CAPTURAR FOTO EN APP MOVIL (14) -->
                     <span *ngIf="foto_movil">
                         NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación móvil.
+                    </span>
+
+                    <!-- CONTENIDO CAPTURAR FOTO EN APP WEB (15) -->
+                    <span *ngIf="ubicacion_desconocida">
+                        NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación web.
                     </span>
                 </div>
                 <form [formGroup]="formulario">

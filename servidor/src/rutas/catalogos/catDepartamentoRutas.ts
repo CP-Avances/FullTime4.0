@@ -41,6 +41,8 @@ class DepartamentoRutas {
         this.router.get('/infodepartamento/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamento);
         // BUSCAR DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamentosSucursal_);
+        //ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MASIVA   **USADO
+        this.router.put('/actualizarUserDepa', TokenValidation, DEPARTAMENTO_CONTROLADOR.UpdateDepartamentosMul);
         // ACTUALIZAR DEPARTAMENTO    **USADO
         this.router.put('/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarDepartamento);
         // LISTAR DEPARTAMENTOS  **USADO
