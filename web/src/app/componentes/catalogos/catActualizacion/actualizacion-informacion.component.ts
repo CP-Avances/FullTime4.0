@@ -377,10 +377,15 @@ export class ActualizacionInformacionComponent implements OnInit {
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
-    console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
-      console.log('ingresa')
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+      this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+      this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
@@ -451,10 +456,15 @@ export class ActualizacionInformacionComponent implements OnInit {
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
-    console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
-      console.log('ingresa')
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+      this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+      this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
@@ -707,7 +717,7 @@ export class ActualizacionInformacionComponent implements OnInit {
           break;
       }
     }
-    
+
 
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
     this.restR.GuardarCheckOpcion(this.opcion)
@@ -835,7 +845,7 @@ export class ActualizacionInformacionComponent implements OnInit {
      const numSelected = this.selectionSucRol.selected.length;
      return numSelected === this.sucursales.length
    }
- 
+
    // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
    masterToggleSuc() {
      this.isAllSelectedSuc() ?
@@ -852,7 +862,7 @@ export class ActualizacionInformacionComponent implements OnInit {
       this.selectionSucDep.clear() :
       this.sucursalesDep.forEach((row: any) => this.selectionSucDep.select(row));
   }
- 
+
    // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
    checkboxLabelSuc(row?: ITableEmpleados): string {
      if (!row) {

@@ -207,14 +207,13 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
                       horarios: [],
                       observacion: ''
                   };
+
+                  // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
+                  if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
+                      planificacion.dias[dia.fecha].observacion = 'FD';
+                      planificacion.dias[dia.fecha].observacion3 = 'DEFAULT-FERIADO';
+                  }
               }
-
-              // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
-              if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
-                  planificacion.dias[dia.fecha].observacion = 'FD';
-              }
-
-
           });
 
         // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
@@ -352,7 +351,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   MostrarVisualizarObservacion(dia: any): boolean {
-    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2) || Boolean(dia.observacion3) || Boolean(dia.observacion4);
+    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2) || Boolean(dia.observacion3) || Boolean(dia.observacion4) || Boolean(dia.observacion6);
   }
 
 

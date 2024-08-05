@@ -644,19 +644,23 @@ class HorarioControlador {
     VerificarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            let rutaPlantilla = '';
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                rutaPlantilla = ruta;
                 const workbook = xlsx_1.default.readFile(ruta);
                 let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
                 let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
                 if (verificador_horario === false) {
                     const mensaje = 'Estructura de plantilla incorrecta';
+                    EliminarPlantilla(ruta);
                     res.status(404).jsonp({ mensaje });
                 }
                 else if (verificador_detalle === false) {
                     const mensaje = 'Estructura de plantilla incorrecta';
+                    EliminarPlantilla(ruta);
                     res.status(404).jsonp({ mensaje });
                 }
                 else if (verificador_horario != false && verificador_detalle != false) {
@@ -791,20 +795,13 @@ class HorarioControlador {
                         }
                     });
                     const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (err) {
-                        }
-                        else {
-                            // ELIMINAR DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
-                    });
                     const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
                     res.json({ plantillaHorarios, plantillaDetalles, mensaje });
+                    EliminarPlantilla(rutaPlantilla);
                 }
             }
             catch (error) {
+                EliminarPlantilla(rutaPlantilla);
                 console.log('error ', error);
                 return res.status(500).jsonp({ message: error });
             }
@@ -976,6 +973,17 @@ function ValidarHorasTotales(horario) {
         horario.MINUTOS_ALIMENTACION = 0;
     }
     return horario;
+}
+function EliminarPlantilla(ruta) {
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+        if (err) {
+        }
+        else {
+            // ELIMINAR DEL SERVIDOR
+            fs_1.default.unlinkSync(ruta);
+        }
+    });
 }
 exports.HORARIO_CONTROLADOR = new HorarioControlador();
 exports.default = exports.HORARIO_CONTROLADOR;

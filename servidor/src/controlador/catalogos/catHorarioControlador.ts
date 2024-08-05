@@ -723,10 +723,12 @@ class HorarioControlador {
 
   // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES   **USADO
   public async VerificarDatos(req: Request, res: Response) {
+    let rutaPlantilla: string = '';
     try {
       const documento = req.file?.originalname;
       let separador = path.sep;
       let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+      rutaPlantilla = ruta;
       const workbook = excel.readFile(ruta);
 
       let verificador_horario: any = ObtenerIndicePlantilla(workbook, 'HORARIOS');
@@ -734,10 +736,12 @@ class HorarioControlador {
 
       if (verificador_horario === false) {
         const mensaje = 'Estructura de plantilla incorrecta';
+        EliminarPlantilla(ruta);
         res.status(404).jsonp({ mensaje });
       }
       else if (verificador_detalle === false) {
         const mensaje = 'Estructura de plantilla incorrecta';
+        EliminarPlantilla(ruta);
         res.status(404).jsonp({ mensaje });
       }
       else if (verificador_horario != false && verificador_detalle != false) {
@@ -902,18 +906,12 @@ class HorarioControlador {
 
         const horariosOk = plantillaHorarios.filter((horario: any) => horario.OBSERVACION === 'Ok');
 
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(ruta, fs.constants.F_OK, (err) => {
-          if (err) {
-          } else {
-            // ELIMINAR DEL SERVIDOR
-            fs.unlinkSync(ruta);
-          }
-        });
         const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
         res.json({ plantillaHorarios, plantillaDetalles, mensaje });
+        EliminarPlantilla(rutaPlantilla);
       }
     } catch (error) {
+      EliminarPlantilla(rutaPlantilla);
       console.log('error ', error)
       return res.status(500).jsonp({ message: error });
     }
@@ -1108,6 +1106,18 @@ function ValidarHorasTotales(horario: Horario): Horario {
     horario.MINUTOS_ALIMENTACION = 0;
   }
   return horario;
+}
+
+function EliminarPlantilla(ruta: string) {
+  // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+  fs.access(ruta, fs.constants.F_OK, (err) => {
+      if (err) {
+      }
+      else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(ruta);
+      }
+    });
 }
 
 interface Horario {

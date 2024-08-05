@@ -43,13 +43,13 @@ class VacacionesControlador {
             const { estado } = req.body;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_depa, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
       FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da, 
         ed_departamentos AS depa   
       WHERE dc.id_empleado = e.id  
 	      AND da.id_contrato = dc.contrato_id
-        AND depa.id = da.id_departamento
+        AND depa.id = da.id_depa
 	      AND (v.estado = 1 OR v.estado = 2) 
         AND da.estado = $1
       ORDER BY id DESC

@@ -26,7 +26,7 @@ class DatosGeneralesControlador {
         const { id_empleado } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT da.id, da.nombre, da.apellido, da.id_departamento, 
+            SELECT da.id, da.nombre, da.apellido, da.id_depa, 
                 da.jefe, da.name_rol AS rol, da.id_rol
             FROM informacion_general AS da
             WHERE NOT da.id_rol = 2 AND da.id = $1
@@ -564,7 +564,7 @@ class DatosGeneralesControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
+                SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
                     da.cedula, da.correo, da.codigo, da.estado, da.id_sucursal, 
                     da.id_contrato, 
                     da.name_dep AS ndepartamento,
