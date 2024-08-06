@@ -225,6 +225,7 @@ class PermisosControlador {
             try {
                 const id = req.params.id;
                 const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
+                console.log("ver datos a editar", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -274,6 +275,20 @@ class PermisosControlador {
                         throw new Error('Error al intentar acceder a la carpeta de permisos.');
                     }
                 }
+                if (nombreArchivo != datosOriginales.nombreArchivo) {
+                    const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
+                    const archivoAnterior = datosOriginales.documento;
+                    if (archivoAnterior) {
+                        const archivoAnteriorRuta = path_1.default.join(carpetaEmpleado, archivoAnterior);
+                        fs_1.default.unlink(archivoAnteriorRuta, (err) => {
+                            if (err) {
+                                console.error('Error al intentar borrar el archivo anterior:', err);
+                                throw new Error('Error al intentar borrar el archivo anterior.');
+                            }
+                            console.log('Archivo anterior borrado:', archivoAnterior);
+                        });
+                    }
+                }
                 if (nombreArchivo) {
                     try {
                         // CARPETA DEPERMISOS DE EMPLEADO CODIGO_CEDULA
@@ -295,6 +310,8 @@ class PermisosControlador {
                         console.error('Error al copiar el archivo:', error);
                         //errorPermisos = true;
                     }
+                }
+                else {
                 }
                 //AQUI PONER LO DEL ARCHIVO
                 const [objetoPermiso] = response.rows;

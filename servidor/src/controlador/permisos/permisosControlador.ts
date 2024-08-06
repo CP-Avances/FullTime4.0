@@ -234,6 +234,9 @@ class PermisosControlador {
             const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                 hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
 
+                console.log("ver datos a editar", req.body)
+                
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -287,13 +290,29 @@ class PermisosControlador {
                             });
                         }
                     });
-			    } catch (error) {
+                } catch (error) {
                     throw new Error('Error al intentar acceder a la carpeta de permisos.');
-                }	
-			}
+                }
+            }
+
+            if (nombreArchivo!=datosOriginales.nombreArchivo) {
+                const carpetaEmpleado = await ObtenerRutaPermisos(codigo);
+
+                const archivoAnterior = datosOriginales.documento;
+                if (archivoAnterior) {
+                    const archivoAnteriorRuta = path.join(carpetaEmpleado, archivoAnterior);
+                    fs.unlink(archivoAnteriorRuta, (err) => {
+                        if (err) {
+                            console.error('Error al intentar borrar el archivo anterior:', err);
+                            throw new Error('Error al intentar borrar el archivo anterior.');
+                        }
+                        console.log('Archivo anterior borrado:', archivoAnterior);
+                    });
+                }
+            }
 
             if (nombreArchivo) {
-				try {        
+                try {
                     // CARPETA DEPERMISOS DE EMPLEADO CODIGO_CEDULA
                     const carpetaEmpleado = await ObtenerRutaPermisos(codigo);
                     const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [id]);
@@ -304,19 +323,21 @@ class PermisosControlador {
                     datosOriginales.codigo = codigo
 
                     fs.copyFileSync(documentoTemporal, documento);
-                    console.log("Ver datos originales: ",datosOriginales )
+                    console.log("Ver datos originales: ", datosOriginales)
                     const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = await RegistrarDocumentoPermiso(datosOriginales);
                     if (errorDoc) {
                         console.error('Error al registrar documento:', messageDoc);
                     }
                     datosOriginales.documento = nombreDocumento
-                }  
-				catch (error) {
-					console.error('Error al copiar el archivo:', error);
-					//errorPermisos = true;
-				}
-            }				
-					
+                }
+                catch (error) {
+                    console.error('Error al copiar el archivo:', error);
+                    //errorPermisos = true;
+                }
+            } else {
+
+            }
+
             //AQUI PONER LO DEL ARCHIVO
 
 

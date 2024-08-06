@@ -41,7 +41,7 @@ class TimbresRutas {
         this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
         this.router.post('/atraso', verificarToken_1.TokenValidation, timbresControlador_1.default.justificarAtraso);
-        this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreById);
+        this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
     }
 }
 const TIMBRES_RUTAS = new TimbresRutas();

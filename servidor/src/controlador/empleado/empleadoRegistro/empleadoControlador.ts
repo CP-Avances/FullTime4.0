@@ -1548,10 +1548,10 @@ class EmpleadoControlador {
                         if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
 
                           // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                          if(LONGITUD != undefined || LATITUD != undefined){
+                          if (LONGITUD != undefined || LATITUD != undefined) {
                             if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                               data.observacion = 'Verificar ubicación';
-                            }                               
+                            }
                           }
 
                           // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
@@ -1560,8 +1560,8 @@ class EmpleadoControlador {
                             if (regex.test(data.telefono.toString())) {
                               if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                 data.observacion = 'El teléfono ingresado no es válido';
-                              } 
-                              
+                              }
+
                             } else {
                               data.observacion = 'El teléfono ingresado no es válido';
                             }
@@ -1690,14 +1690,14 @@ class EmpleadoControlador {
                                   // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                                   if (data.fec_nacimiento != 'No registrado') {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                      
+
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                      if(LONGITUD != undefined && LATITUD != undefined){
+                                      if (LONGITUD != undefined && LATITUD != undefined) {
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                           data.observacion = 'Verificar ubicación';
-                                        }                              
+                                        }
                                       }
-                                      
+
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                       if (TELEFONO != undefined) {
                                         //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
@@ -1705,8 +1705,8 @@ class EmpleadoControlador {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                             //console.log('ent: ', data.telefono);
                                             data.observacion = 'El teléfono ingresado no es válido';
-                                          } 
-                                          
+                                          }
+
                                         } else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
@@ -1965,12 +1965,12 @@ class EmpleadoControlador {
 
         var _longitud = null;
         if (longitud != 'No registrado') {
-            _longitud = longitud;
+          _longitud = longitud;
         }
 
         var _latitud = null
         if (latitud != 'No registrado') {
-            _latitud = latitud;
+          _latitud = latitud;
         }
 
         //OBTENER ID DEL ESTADO
@@ -2001,12 +2001,6 @@ class EmpleadoControlador {
         }
 
         console.log('Estado civil: ', id_estado_civil);
-
-        /*console.log('codigo: ', codigo)
-        console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
-        console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
-        console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
-        console.log('longitud: ', _longitud, ' latitud: ', _latitud)*/
 
         // REGISTRO DE NUEVO EMPLEADO
         const response: QueryResult = await pool.query(
@@ -2207,11 +2201,11 @@ class EmpleadoControlador {
                             // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                             if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
 
-                               // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                               if(LONGITUD != undefined || LATITUD != undefined){
+                              // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                              if (LONGITUD != undefined || LATITUD != undefined) {
                                 if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                   data.observacion = 'Verificar ubicación';
-                                } 
+                                }
                               }
 
                               // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
@@ -2219,7 +2213,7 @@ class EmpleadoControlador {
                                 if (regex.test(data.telefono)) {
                                   if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                     data.observacion = 'El teléfono ingresado no es válido';
-                                  } 
+                                  }
 
                                 } else {
                                   data.observacion = 'El teléfono ingresado no es válido';
@@ -2360,19 +2354,19 @@ class EmpleadoControlador {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
 
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                      if(LONGITUD != undefined && LATITUD != undefined){
+                                      if (LONGITUD != undefined && LATITUD != undefined) {
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                           data.observacion = 'Verificar ubicación';
-                                        }                                  
+                                        }
                                       }
-                                      
+
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                       if (TELEFONO != undefined) {
                                         const regex = /^[0-9]+$/;
                                         if (regex.test(data.telefono)) {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                             data.observacion = 'El teléfono ingresado no es válido';
-                                          } 
+                                          }
                                         } else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
@@ -2433,79 +2427,79 @@ class EmpleadoControlador {
         });
 
         listEmpleadosManual.forEach(async (valor: any) => {
-         if(valor.observacion == 'no registrado'){
+          if (valor.observacion == 'no registrado') {
             var VERIFICAR_CEDULA = await pool.query(
-            `
+              `
               SELECT * FROM eu_empleados WHERE cedula = $1
             `
               , [valor.cedula]);
             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-            valor.observacion = 'Cédula ya existe en el sistema'
+              valor.observacion = 'Cédula ya existe en el sistema'
             } else {
 
-            var VERIFICAR_CODIGO = await pool.query(
-              `
+              var VERIFICAR_CODIGO = await pool.query(
+                `
               SELECT * FROM eu_empleados WHERE codigo = $1
               `
-              , [valor.codigo]);
-            if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
-              valor.observacion = 'Código ya existe en el sistema'
-            } else {
-              var VERIFICAR_USUARIO = await pool.query(
-                `
+                , [valor.codigo]);
+              if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
+                valor.observacion = 'Código ya existe en el sistema'
+              } else {
+                var VERIFICAR_USUARIO = await pool.query(
+                  `
                 SELECT * FROM eu_usuarios WHERE usuario = $1
                 `
-                , [valor.usuario]);
-              if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                valor.observacion = 'Usuario ya existe en el sistema'
-              } else {
-                if (valor.rol != 'No registrado') {
-                  var VERIFICAR_ROL = await pool.query(
-                    `
+                  , [valor.usuario]);
+                if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                  valor.observacion = 'Usuario ya existe en el sistema'
+                } else {
+                  if (valor.rol != 'No registrado') {
+                    var VERIFICAR_ROL = await pool.query(
+                      `
                     SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
                     `
-                    , [valor.rol.toUpperCase()]);
-                  if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
-                    if (valor.nacionalidad != 'No registrado') {
-                      var VERIFICAR_NACIONALIDAD = await pool.query(
-                        `
+                      , [valor.rol.toUpperCase()]);
+                    if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
+                      if (valor.nacionalidad != 'No registrado') {
+                        var VERIFICAR_NACIONALIDAD = await pool.query(
+                          `
                         SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
                         `
-                        , [valor.nacionalidad.toUpperCase()]);
-                      if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
+                          , [valor.nacionalidad.toUpperCase()]);
+                        if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
 
-                        // DISCRIMINACION DE ELEMENTOS IGUALES
-                        if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
-                          // DISCRIMINACIÓN DE ELEMENTOS IGUALES
-                          if (duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined) {
-                            // DISCRIMINACION DE ELEMENTOS IGUALES
-                            if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
-                              //valor.observacion = 'ok'
-                              duplicados2.push(valor);
+                          // DISCRIMINACION DE ELEMENTOS IGUALES
+                          if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                            if (duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined) {
+                              // DISCRIMINACION DE ELEMENTOS IGUALES
+                              if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
+                                //valor.observacion = 'ok'
+                                duplicados2.push(valor);
+                              } else {
+                                valor.observacion = '2';
+                              }
+                              duplicados3.push(valor);
                             } else {
-                              valor.observacion = '2';
+                              valor.observacion = '3';
                             }
-                            duplicados3.push(valor);
+                            duplicados1.push(valor);
                           } else {
-                            valor.observacion = '3';
+                            valor.observacion = '1';
                           }
-                          duplicados1.push(valor);
                         } else {
-                          valor.observacion = '1';
+                          valor.observacion = 'Nacionalidad no existe en el sistema';
                         }
-                      } else {
-                        valor.observacion = 'Nacionalidad no existe en el sistema';
                       }
+                    } else {
+                      valor.observacion = 'Rol no existe en el sistema';
                     }
-                  } else {
-                    valor.observacion = 'Rol no existe en el sistema';
                   }
                 }
               }
             }
-            }
-         }
-      
+          }
+
         })
 
         var tiempo = 2000;
@@ -2646,12 +2640,12 @@ class EmpleadoControlador {
 
         var _longitud = null;
         if (longitud != 'No registrado') {
-            _longitud = longitud;
+          _longitud = longitud;
         }
 
         var _latitud = null
         if (latitud != 'No registrado') {
-            _latitud = latitud;
+          _latitud = latitud;
         }
 
         // OBTENER ID DEL ESTADO
@@ -2827,12 +2821,13 @@ class EmpleadoControlador {
       res.jsonp({ message: 'Carpetas creadas con éxito.' });
     }
   }
+  //------------------------------ Metodos de APP MOVIL -----------------------------------------------------------------------------
 
-  public async getHorariosEmpleadoByCodigo(req: Request, res: Response): Promise<Response>{
+  public async getHorariosEmpleadoByCodigo(req: Request, res: Response): Promise<Response> {
     try {
-        const { codigo, fecha_inicio} = req.query;
-        const response: QueryResult = await pool.query(
-            `
+      const { codigo, fecha_inicio } = req.query;
+      const response: QueryResult = await pool.query(
+        `
             SELECT id, id_empleado AS empl_codigo, id_empleado_cargo, id_horario,
                 fecha_horario AS fecha, fecha_hora_horario::time AS horario,
                 tipo_dia, tipo_accion AS tipo_hora, id_detalle_horario
@@ -2840,18 +2835,93 @@ class EmpleadoControlador {
             WHERE id_empleado = $1
                 AND fecha_horario BETWEEN $2 AND $2 
             ORDER BY horario ASC`
-            , [codigo, fecha_inicio]
-        );
-        const horarios: any[] = response.rows;
+        , [codigo, fecha_inicio]
+      );
+      const horarios: any[] = response.rows;
 
-        if (horarios.length === 0) return res.status(200).jsonp([]);
-        return res.status(200).jsonp(horarios);
+      if (horarios.length === 0) return res.status(200).jsonp([]);
+      return res.status(200).jsonp(horarios);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
+
+
+  public async getListaEmpleados(req: Request, res: Response): Promise<Response> {
+    try {
+      const response: QueryResult = await pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
+      const empleados: any[] = response.rows;
+      console.log(empleados);
+
+      return res.status(200).jsonp(empleados);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
+
+
+  public async getPlanificacionMesesCodigoEmple (req: Request, res: Response): Promise<Response>  {
+    try {
+        const { codigo } = req.query;
+        const HORARIO: QueryResult = await pool.query(
+            "SELECT codigo_e, nombre_e, anio, mes, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') ELSE '-' END AS dia3, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 4 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 4 THEN codigo_dia end,', ') ELSE '-' END AS dia4, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 5 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 5 THEN codigo_dia end,', ') ELSE '-' END AS dia5, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 6 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 6 THEN codigo_dia end,', ') ELSE '-' END AS dia6, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 7 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 7 THEN codigo_dia end,', ') ELSE '-' END AS dia7, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 8 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 8 THEN codigo_dia end,', ') ELSE '-' END AS dia8, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 9 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 9 THEN codigo_dia end,', ') ELSE '-' END AS dia9, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 10 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 10 THEN codigo_dia end,', ') ELSE '-' END AS dia10, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 11 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 11 THEN codigo_dia end,', ') ELSE '-' END AS dia11, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 12 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 12 THEN codigo_dia end,', ') ELSE '-' END AS dia12, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 13 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 13 THEN codigo_dia end,', ') ELSE '-' END AS dia13, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 14 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 14 THEN codigo_dia end,', ') ELSE '-' END AS dia14, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 15 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 15 THEN codigo_dia end,', ') ELSE '-' END AS dia15, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 16 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 16 THEN codigo_dia end,', ') ELSE '-' END AS dia16, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 17 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 17 THEN codigo_dia end,', ') ELSE '-' END AS dia17, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 18 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 18 THEN codigo_dia end,', ') ELSE '-' END AS dia18, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 19 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 19 THEN codigo_dia end,', ') ELSE '-' END AS dia19, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 20 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 20 THEN codigo_dia end,', ') ELSE '-' END AS dia20, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 21 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 21 THEN codigo_dia end,', ') ELSE '-' END AS dia21, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 22 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 22 THEN codigo_dia end,', ') ELSE '-' END AS dia22, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 23 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 23 THEN codigo_dia end,', ') ELSE '-' END AS dia23, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 24 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 24 THEN codigo_dia end,', ') ELSE '-' END AS dia24, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 25 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 25 THEN codigo_dia end,', ') ELSE '-' END AS dia25, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 26 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 26 THEN codigo_dia end,', ') ELSE '-' END AS dia26, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 27 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 27 THEN codigo_dia end,', ') ELSE '-' END AS dia27, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 28 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 28 THEN codigo_dia end,', ') ELSE '-' END AS dia28, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 29 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 29 THEN codigo_dia end,', ') ELSE '-' END AS dia29, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
+                "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
+                "FROM ( " +
+                "SELECT p_g.id_empleado AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                "FROM eu_asistencia_general p_g " +
+                "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN ($1) " +
+                "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
+                "ORDER BY p_g.id_empleado,anio, mes , dia, p_g.id_horario " +
+                ") AS datos " +
+                "GROUP BY codigo_e, nombre_e, anio, mes " +
+                "ORDER BY 1,3,4"
+                , [codigo]);
+
+            if (HORARIO.rowCount != 0) {
+                return res.jsonp(HORARIO.rows)
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
 };
-
 
 
 }

@@ -6,18 +6,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_pool_1 = __importDefault(require("pg-pool"));
 const pool = new pg_pool_1.default({
+    /*
     user: 'fulltime',
     host: 'localhost', //'186.4.226.49',
     port: 5432,
     database: 'fulltime_empresa_4.0',
     password: 'fulltime'
-    /*
-      user: 'fulltime',
-      host: '192.168.0.156',
-      password: 'fulltime',
-      database: 'fulltime4_empresa1',
-      port: 5432
-    */
+  */
+    user: 'fulltime',
+    host: '192.168.0.156',
+    password: 'fulltime',
+    database: 'prueba_empresa',
+    port: 5432
 });
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {

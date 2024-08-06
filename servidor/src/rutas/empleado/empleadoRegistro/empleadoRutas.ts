@@ -135,7 +135,10 @@ class EmpleadoRutas {
 
         //--------------------------------------------------------------- METODO APP MOVIL -------------------------------------------------------------------
         this.router.get('/horarios/horariosEmpleado', TokenValidation, EMPLEADO_CONTROLADOR.getHorariosEmpleadoByCodigo);
-    }
+        this.router.get('/todosempleados/lista', TokenValidation, EMPLEADO_CONTROLADOR.getListaEmpleados);
+        this.router.get('/horariosempleado/planificacionHorarioEmplCodigo',TokenValidation, EMPLEADO_CONTROLADOR.getPlanificacionMesesCodigoEmple);
+    }        
+
 
 }
 

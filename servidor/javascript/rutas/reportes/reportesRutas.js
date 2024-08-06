@@ -17,6 +17,7 @@ class CiudadRutas {
         this.router.post('/horasExtrasReales/entradaSalida/total/timbres', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarEntradaSalidaTodos);
         this.router.post('/horasExtrasReales/listaPedidos/total/solicitudes', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPedidosTodos);
         this.router.get('/reportePermisos/horarios/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoHorarioEmpleado);
+        this.router.get('/timbres', verificarToken_1.TokenValidation, reportesControlador_1.default.getInfoReporteTimbres);
     }
 }
 const REPORTES_RUTAS = new CiudadRutas();
