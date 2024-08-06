@@ -337,7 +337,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
-    console.log('coordenadas ', latitud, ' long ', longitud)
+    //console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango, form);
     }
