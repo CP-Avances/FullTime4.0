@@ -197,6 +197,7 @@ label {
     font-size: 14px;
     border-radius: 10px;
     transition: transform 0.3s;
+    margin: 6px;
 }
 
 .card-inactivo:hover {
@@ -275,7 +276,7 @@ label {
         margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
         height: min-content;
       }
-    
+
       .col-md-6 {
         flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
         margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
