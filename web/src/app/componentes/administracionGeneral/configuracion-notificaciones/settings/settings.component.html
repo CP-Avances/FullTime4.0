@@ -9,28 +9,28 @@
     <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
         <br>
         <div class="d-flex flex-wrap" style="margin-left: 4%;">
-            <div class="caja">
+            <div class="caja" *ngIf="habilitarPermisos">
                 <p>PERMISOS</p>
                 <div class="d-flex flex-wrap justify-content-start">
                     <mat-slide-toggle formControlName="permisoMail">Correo </mat-slide-toggle>
                     <mat-slide-toggle formControlName="permisoNoti">Notificaciones</mat-slide-toggle>
                 </div>
             </div>
-            <div class="caja">
+            <div class="caja" *ngIf="habilitarVacaciones">
                 <p>VACACIONES</p>
                 <div class="d-flex flex-wrap justify-content-start">
                     <mat-slide-toggle formControlName="vacaMail">Correo </mat-slide-toggle>
                     <mat-slide-toggle formControlName="vacaNoti">Notificaciones</mat-slide-toggle>
                 </div>
             </div>
-            <div class="caja">
+            <div class="caja" *ngIf="habilitarHorasExtras">
                 <p>HORAS EXTRAS</p>
                 <div class="d-flex flex-wrap justify-content-start">
                     <mat-slide-toggle formControlName="horaExtraMail">Correo </mat-slide-toggle>
                     <mat-slide-toggle formControlName="horaExtraNoti">Notificaciones</mat-slide-toggle>
                 </div>
             </div>
-            <div class="caja">
+            <div class="caja" *ngIf="habilitarAlimentacion">
                 <p>ALIMENTACIÓN</p>
                 <div class="d-flex flex-wrap justify-content-start">
                     <mat-slide-toggle formControlName="comidaMail">Correo </mat-slide-toggle>

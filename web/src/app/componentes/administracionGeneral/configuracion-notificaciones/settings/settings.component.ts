@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { MainNavService } from '../../main-nav/main-nav.service';
 
 @Component({
   selector: 'app-settings',
@@ -22,11 +23,18 @@ export class SettingsComponent implements OnInit {
 
   formGroup: FormGroup;
 
+  // BUSQUEDA DE MODULOS ACTIVOS
+  get habilitarPermisos(): boolean { return this.funciones.permisos; }
+  get habilitarVacaciones(): boolean { return this.funciones.vacaciones; }
+  get habilitarHorasExtras(): boolean { return this.funciones.horasExtras; }
+  get habilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
+
   constructor(
     private avisos: RealTimeService,
     private toaster: ToastrService,
     public ventana: MatDialogRef<SettingsComponent>,
     public formBuilder: FormBuilder,
+    private funciones: MainNavService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.formGroup = formBuilder.group({
