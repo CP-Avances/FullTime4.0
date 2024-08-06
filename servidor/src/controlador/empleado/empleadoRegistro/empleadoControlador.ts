@@ -458,7 +458,10 @@ class EmpleadoControlador {
     const { id } = req.params;
     const EMPLEADO = await pool.query(
       `
-      SELECT * FROM eu_empleados WHERE id = $1
+      SELECT e.*, r.nombre AS rol FROM eu_empleados e
+      INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
+      INNER JOIN ero_cat_roles r ON u.id_rol = r.id
+      WHERE e.id = $1
       `
       , [id]);
     if (EMPLEADO.rowCount != 0) {
