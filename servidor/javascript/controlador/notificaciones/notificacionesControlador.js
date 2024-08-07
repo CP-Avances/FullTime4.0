@@ -139,6 +139,7 @@ class NotificacionTiempoRealControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("Ver Error notificacion", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });

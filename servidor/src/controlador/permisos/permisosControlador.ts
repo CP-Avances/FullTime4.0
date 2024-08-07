@@ -234,8 +234,8 @@ class PermisosControlador {
             const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                 hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
 
-                console.log("ver datos a editar", req.body)
-                
+            console.log("ver datos a editar", req.body)
+
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -295,7 +295,7 @@ class PermisosControlador {
                 }
             }
 
-            if (nombreArchivo!=datosOriginales.nombreArchivo) {
+            if (documento != datosOriginales.documento) {
                 const carpetaEmpleado = await ObtenerRutaPermisos(codigo);
 
                 const archivoAnterior = datosOriginales.documento;
@@ -334,13 +334,17 @@ class PermisosControlador {
                     console.error('Error al copiar el archivo:', error);
                     //errorPermisos = true;
                 }
-            } else {
+            }
 
+            try {
+                if (fs.existsSync(documentoTemporal)) {
+                    fs.unlinkSync(documentoTemporal);
+                }
+            } catch (error) {
+                console.error('Error al eliminar el archivo temporal:', error);
             }
 
             //AQUI PONER LO DEL ARCHIVO
-
-
             const [objetoPermiso] = response.rows;
             const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
             const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
@@ -1824,59 +1828,7 @@ class PermisosControlador {
         }
     };
 
-    public async postNuevoPermiso(req: Request, res: Response): Promise<Response> {
-        try {
-
-            const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
-                id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso,
-                documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
-
-            await pool.query('BEGIN');
-
-
-
-            const response: QueryResult = await pool.query(
-                'INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
-                'dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
-                'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
-                'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) ' +
-                'RETURNING * ',
-                [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
-                    id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso,
-                    documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
-            const fechaCreacionN = await FormatearFecha2(fecha_creacion.toLocaleString(), 'ddd');
-            const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
-            const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
-            const horaIngresoN = await FormatearHora(hora_ingreso);
-            const horaSalidaN = await FormatearHora(hora_salida);
-            const horasPermisoN = await FormatearHora(horas_permiso);
-
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'mp_solicitud_permiso',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{ id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
-                ip: ip,
-                observacion: null
-            });
-
-
-            await pool.query('COMMIT');
-
-
-            const [objetoPermiso] = response.rows;
-
-            if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
-
-            const permiso: any = objetoPermiso
-            return res.status(200).jsonp(permiso);
-
-        } catch (error) {
-            console.log(error);
-            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-        }
-    }
+   
 
     public async getPermisoByIdyCodigo(req: Request, res: Response): Promise<Response> {
         try {

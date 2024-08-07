@@ -275,7 +275,7 @@ class PermisosControlador {
                         throw new Error('Error al intentar acceder a la carpeta de permisos.');
                     }
                 }
-                if (nombreArchivo != datosOriginales.nombreArchivo) {
+                if (documento != datosOriginales.documento) {
                     const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                     const archivoAnterior = datosOriginales.documento;
                     if (archivoAnterior) {
@@ -311,7 +311,13 @@ class PermisosControlador {
                         //errorPermisos = true;
                     }
                 }
-                else {
+                try {
+                    if (fs_1.default.existsSync(documentoTemporal)) {
+                        fs_1.default.unlinkSync(documentoTemporal);
+                    }
+                }
+                catch (error) {
+                    console.error('Error al eliminar el archivo temporal:', error);
                 }
                 //AQUI PONER LO DEL ARCHIVO
                 const [objetoPermiso] = response.rows;
@@ -1646,46 +1652,6 @@ class PermisosControlador {
         });
     }
     ;
-    postNuevoPermiso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query('INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
-                    'dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
-                    'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
-                    'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) ' +
-                    'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
-                    id_tipo_permiso, id_periodo_vacacion, horas_permiso, numero_permiso,
-                    documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
-                const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fecha_creacion.toLocaleString(), 'ddd');
-                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
-                const fechaFinN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
-                const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
-                const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
-                const horasPermisoN = yield (0, settingsMail_1.FormatearHora)(horas_permiso);
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mp_solicitud_permiso',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{ id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
-                    ip: ip,
-                    observacion: null
-                });
-                yield database_1.default.query('COMMIT');
-                const [objetoPermiso] = response.rows;
-                if (!objetoPermiso)
-                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-                const permiso = objetoPermiso;
-                return res.status(200).jsonp(permiso);
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
     getPermisoByIdyCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

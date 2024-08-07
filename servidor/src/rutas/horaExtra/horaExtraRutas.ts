@@ -2,6 +2,34 @@ import { ModuloHoraExtraValidation } from '../../libs/Modulos/verificarHoraExtra
 import { TokenValidation } from '../../libs/verificarToken';
 import { Router } from 'express';
 import HorasExtrasPedidasControlador from '../../controlador/horaExtra/horaExtraControlador';
+import { ObtenerRutaHorasExtraGeneral } from '../../libs/accesoCarpetas';
+import pool from '../../database';
+
+import moment from 'moment';
+import multer from 'multer';
+
+moment.locale('es');
+const storage2 = multer.diskStorage({
+    
+    destination: async function (req, file, cb) {
+        const ruta = await ObtenerRutaHorasExtraGeneral();
+        cb(null, ruta)
+    },
+    filename: async function (req, file, cb) {
+
+        // FECHA DEL SISTEMA
+        const fecha = moment();
+        const anio = fecha.format('YYYY');
+        const mes = fecha.format('MM');
+        const dia = fecha.format('DD');
+
+        const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
+        console.log('documento', documento);
+
+        cb(null, documento)
+    }
+});
+const upload2 = multer({ storage: storage2 });
 
 const multipart = require('connect-multiparty');
 
@@ -40,7 +68,7 @@ class HorasExtrasPedidasRutas {
          ** ************************************************************************************************* **/
 
         // CREAR REGISTRO DE HORAS EXTRAS
-        this.router.post('/', [TokenValidation, ModuloHoraExtraValidation], HorasExtrasPedidasControlador.CrearHoraExtraPedida);
+        this.router.post('/', [TokenValidation, ModuloHoraExtraValidation,upload2.single('uploads')], HorasExtrasPedidasControlador.CrearHoraExtraPedida);
         // ELIMINAR REGISTRO DE HORAS EXTRAS
         this.router.delete('/eliminar/:id_hora_extra/:documento', [TokenValidation, ModuloHoraExtraValidation], HorasExtrasPedidasControlador.EliminarHoraExtra);
         // EDITAR REGISTRO DE HORA EXTRA
@@ -66,7 +94,9 @@ class HorasExtrasPedidasRutas {
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS WEB
         this.router.delete('/eliminar-documento-web/:documento', [TokenValidation, ModuloHoraExtraValidation], HorasExtrasPedidasControlador.EliminarArchivoMovil);
 
+        //------------------------------- Metodos APP MOVIL --------------------------------------------------------
         this.router.get('/horas-extras/lista-horas-extrasfechas', TokenValidation, HorasExtrasPedidasControlador.getlistaHorasExtrasByFechasyCodigo);
+        this.router.get('/horas-extras/lista-horas-extras',TokenValidation, HorasExtrasPedidasControlador.getlistaHorasExtrasByCodigo)
 
 
         /** ************************************************************************************************** ** 

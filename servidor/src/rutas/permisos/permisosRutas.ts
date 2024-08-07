@@ -148,7 +148,6 @@ class PermisosRutas {
         this.router.get('/lista-permisos',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByCodigo);
         this.router.get('/lista-permisosfechas',TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByFechasyCodigo);
         this.router.get('/lista-permisoshoras', TokenValidation, PERMISOS_CONTROLADOR.getlistaPermisosByHorasyCodigo);
-        this.router.post('/insert-permiso', TokenValidation, PERMISOS_CONTROLADOR.postNuevoPermiso);
         this.router.get('/obtener-permiso', TokenValidation, PERMISOS_CONTROLADOR.getPermisoByIdyCodigo);
 
 
