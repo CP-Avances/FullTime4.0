@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import pool from '../../database';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import { Request, Response } from 'express';
 import moment from 'moment';
-
+import pool from '../../database';
 
 class TimbresControlador {
 
@@ -21,7 +20,6 @@ class TimbresControlador {
                     // CONSULTAR DATOSORIGINALES
                     const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                     const [datosOriginales] = consulta.rows;
-
 
                     if (!datosOriginales) {
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -233,18 +231,19 @@ class TimbresControlador {
     // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO   **USADO
     public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any> {
         try {
-            let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
+            let { id, codigo, tecla, observacion, fecha } = req.body;
             await pool.query(
                 `
-                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                     $3::character varying, $4::integer, $5::character varying) 
                 `
-                , [fecha, id_empleado, tecla, id, observacion])
+                , [fecha, codigo, tecla, id, observacion])
                 .then((result: any) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
 
         } catch (err) {
+            console.log('timbre error ', err)
             const message = 'Ups!!! algo salio mal con la peticion al servidor.'
             return res.status(500).jsonp({ error: err, message: message })
         }
@@ -282,9 +281,9 @@ class TimbresControlador {
             pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
                 `
-                , [codigo, id_empleado, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
+                , [codigo, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
                     observacion, 'APP_WEB'],
 
                 async (error, results) => {
@@ -321,6 +320,8 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
                 id_empleado, id_reloj, tipo, ip, user_name } = req.body
 
+            console.log('datos ', req.body)
+
             var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
             // OBTENER LA FECHA Y HORA ACTUAL
@@ -352,9 +353,9 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
                 `
-                , [codigo, id_empleado, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
+                , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
                     observacion, 'APP_WEB']
 
                 , async (error, results) => {
@@ -367,7 +368,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, id_empleado: ${id_empleado}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
                         ip,
                         observacion: null
                     });
@@ -406,10 +407,10 @@ class TimbresControlador {
                 contador = contador + 1;
                 await pool.query(
                     `
-                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                             $3::character varying, $4::integer, $5::character varying)  
                     `
-                    , [obj.fecha_hora_timbre_servidor, obj.id_empleado, obj.tecla_funcion, obj.id, obj.observacion]);
+                    , [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
             })
 
             if (contador === TIMBRES.rowCount) {

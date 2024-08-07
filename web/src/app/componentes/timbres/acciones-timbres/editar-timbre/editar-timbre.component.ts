@@ -155,8 +155,7 @@ export class EditarTimbreComponent implements OnInit {
   EnviarDatosTimbre(formTimbre: any) {
     let data = {
       id: this.datosTimbre.id,
-      id_empleado: this.datosTimbre.id_empleado,
-      accion: formTimbre.accionTimbre,
+      codigo: this.datosTimbre.codigo,
       tecla: formTimbre.teclaFunTimbre,
       observacion: this.simbolo_ + formTimbre.ObservacionForm,
       fecha: this.datosTimbre.fecha_hora_timbre_servidor,

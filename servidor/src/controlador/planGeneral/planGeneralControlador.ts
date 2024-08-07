@@ -394,12 +394,12 @@ class PlanGeneralControlador {
     // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
     public async ActualizarManual(req: Request, res: Response) {
         try {
-            const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+            const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
             const ASIGNADO = await pool.query(
                 `
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `
-                , [fecha, id_empleado]);
+                , [fecha, codigo]);
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');

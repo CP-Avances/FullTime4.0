@@ -142,6 +142,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    public validar: ValidacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -167,7 +168,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-// METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
   BuscarInformacionGeneral(opcion: any) {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
@@ -184,13 +185,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
-
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
+
       this.sucursales.push({
         id: obj.id_suc,
-        sucursal: obj.name_suc
+        sucursal: obj.name_suc,
+        ciudad: obj.ciudad,
       })
 
       this.regimen.push({
@@ -237,66 +237,20 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       })
     })
 
-    this.OmitirDuplicados();
+    // RETIRAR DUPLICADOS DE LA LISTA
+    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
+    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
+    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
+    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
 
-    console.log('ver sucursales ', this.sucursales)
-    console.log('ver regimenes ', this.regimen)
-    console.log('ver departamentos ', this.departamentos)
-    console.log('ver cargos ', this.cargos)
-    console.log('ver empleados ', this.empleados)
+    /* console.log('ver sucursales ', this.sucursales)
+     console.log('ver regimenes ', this.regimen)
+     console.log('ver departamentos ', this.departamentos)
+     console.log('ver cargos ', this.cargos)
+     console.log('ver empleados ', this.empleados)*/
   }
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
-  }
-
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -372,15 +326,26 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // TRATAMIENTO DE DATOS DE SUCURSALES
   ModelarSucursal(accion: any) {
-    let respuesta = JSON.parse(this.origen);
-    let suc = respuesta.filter((empl: any) => {
-      var bool = this.selectionSuc.selected.find(selec => {
-        return empl.id_suc === selec.id
-      })
-      return bool != undefined
-    })
+    let seleccionados: any = [];
+    this.sucursales.forEach((res: any) => {
+      this.selectionSuc.selected.find((selec: any) => {
+        if (selec.id === res.id) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((sucursales: any) => {
+      sucursales.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_suc === sucursales.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+
     this.data_pdf = [];
-    this.data_pdf = suc;
+    this.data_pdf = seleccionados;
+    //console.log('data final ', seleccionados)
     switch (accion) {
       case 'excel': this.ExportarExcel(); break;
       case 'ver': this.VerDatos(); break;
@@ -390,36 +355,26 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // TRAMIENTO DE DATOS POR REGIMEN
   ModelarRegimen(accion: any) {
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.regimen.forEach((res: any) => {
       this.selectionReg.selected.find((selec: any) => {
-        objeto = {
-          regimen: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_regimen && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
       });
     });
+    seleccionados.forEach((regimen: any) => {
+      regimen.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_regimen === regimen.id && selec.id_suc === regimen.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+
     this.data_pdf = [];
-    this.data_pdf = reg;
+    this.data_pdf = seleccionados;
+    //console.log('data reg ', seleccionados)
     switch (accion) {
       case 'excel': this.ExportarExcelCargoRegimen(); break;
       case 'ver': this.VerDatos(); break;
@@ -429,11 +384,10 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // TRATAMIENTO DE DATOS POR CARGO
   ModelarCargo(accion: any) {
-    let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
     let car: any = [];
     let objeto: any;
-    respuesta.forEach((res: any) => {
+    this.empleados.forEach((res: any) => {
       this.selectionCar.selected.find((selec: any) => {
         objeto = {
           cargo: {
@@ -442,17 +396,9 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
           },
         };
         empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_cargo_ && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
+        if (selec.id === res.id_cargo_ && selec.id_suc === res.id_suc) {
+          empleados.push(res);
+        }
         objeto.empleados = empleados;
         car.push(objeto);
       });
@@ -470,36 +416,26 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // TRATAMIENTO DE DATOS POR DEPARTAMENTO
   ModelarDepartamento(accion: any) {
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let dep: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.departamentos.forEach((res: any) => {
       this.selectionDep.selected.find((selec: any) => {
-        objeto = {
-          depa: {
-            id: selec.id,
-            nombre: selec.departamento,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_depa && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        dep.push(objeto);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
       });
     });
+    seleccionados.forEach((departamento: any) => {
+      departamento.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_depa === departamento.id && selec.id_suc === departamento.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+
     this.data_pdf = [];
-    this.data_pdf = dep;
+    this.data_pdf = seleccionados;
+    //console.log('seleccionados*** ', seleccionados)
     switch (accion) {
       case 'excel': this.ExportarExcelCargoRegimen(); break;
       case 'ver': this.VerDatos(); break;
@@ -509,33 +445,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // TRATAMIENTO DE DATOS POR EMPLEADO
   ModelarEmpleados(accion: any) {
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos.forEach((cargo: any) => {
-            cargo.empleado = cargo.empleado.filter((o: any) => {
-              var bool = this.selectionEmp.selected.find(selec => {
-                return (selec.id === o.id && selec.id_suc === o.id_suc)
-              })
-              return bool != undefined
-            })
-          })
-        });
+    let emp = this.empleados.filter((o: any) => {
+      var bool = this.selectionEmp.selected.find(selec => {
+        return (selec.id === o.id && selec.id_suc === o.id_suc)
       })
+      return bool != undefined
     })
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos = departamento.cargos.filter((e: any) => {
-            return e.empleado.length > 0
-          })
-        });
-      });
-    });
-    let emp = respuesta.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
     this.data_pdf = [];
     this.data_pdf = emp;
     switch (accion) {
@@ -641,316 +556,105 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-    let arr_emp: any = [];
 
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true || this.bool.bool_dep) {
-      data.forEach((selec: any) => {
-        arr_emp = [];
-        if (this.bool.bool_cargo === true) {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    bold: true,
-                    text: 'CARGO: ' + selec.cargo.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'N° Registros: ' + selec.empleados.length,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else if (this.bool.bool_reg === true) {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + selec.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'N° Registros: ' + selec.empleados.length,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    text: 'DEPARTAMENTO: ' + selec.depa.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'N° REGISTROS: ' + selec.empleados.length,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
+    data.forEach((selec: any) => {
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      if (this.bool.bool_reg === true) {
+        descripcion = 'REGIMEN: ' + selec.nombre;
+      }
+      if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+      }
+      if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO';
+      }
+      if (this.bool.bool_suc === true || this.bool.bool_emp === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+      }
 
-        selec.empleados.forEach((empl: any) => {
-          arr_emp.push(empl)
-        });
-
-        arr_emp.sort(function (a: any, b: any) {
-          return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
-        });
-
-        if (this.bool.bool_cargo) {
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'CÉDULA', style: 'tableHeader' },
-                  { text: 'EMPLEADO', style: 'tableHeader' },
-                  { text: 'CÓDIGO', style: 'tableHeader' },
-                  { text: 'GÉNERO', style: 'tableHeader' },
-                  { text: 'CIUDAD', style: 'tableHeader' },
-                  { text: 'SUCURSAL', style: 'tableHeader' },
-                  { text: 'RÉGIMEN', style: 'tableHeader' },
-                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
-                  { text: 'CORREO', style: 'tableHeader' }
-                ],
-                ...arr_emp.map((usu: any) => {
-                  return [
-                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                    { style: 'itemsTable', text: usu.cedula },
-                    { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                    { style: 'itemsTableCentrado', text: usu.codigo },
-                    { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                    { style: 'itemsTable', text: usu.ciudad },
-                    { style: 'itemsTable', text: usu.name_suc },
-                    { style: 'itemsTable', text: usu.name_regimen },
-                    { style: 'itemsTable', text: usu.name_dep },
-                    { style: 'itemsTable', text: usu.correo },
-                  ]
-                }),
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        }
-        else if (this.bool.bool_reg) {
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'CÉDULA', style: 'tableHeader' },
-                  { text: 'EMPLEADO', style: 'tableHeader' },
-                  { text: 'CÓDIGO', style: 'tableHeader' },
-                  { text: 'GÉNERO', style: 'tableHeader' },
-                  { text: 'CIUDAD', style: 'tableHeader' },
-                  { text: 'SUCURSAL', style: 'tableHeader' },
-                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
-                  { text: 'CARGO', style: 'tableHeader' },
-                  { text: 'CORREO', style: 'tableHeader' }
-                ],
-                ...arr_emp.map((usu: any) => {
-                  return [
-                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                    { style: 'itemsTable', text: usu.cedula },
-                    { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                    { style: 'itemsTableCentrado', text: usu.codigo },
-                    { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                    { style: 'itemsTable', text: usu.ciudad },
-                    { style: 'itemsTable', text: usu.name_suc },
-                    { style: 'itemsTable', text: usu.name_dep },
-                    { style: 'itemsTable', text: usu.name_cargo },
-                    { style: 'itemsTable', text: usu.correo },
-                  ]
-                }),
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        }
-        else {
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'CÉDULA', style: 'tableHeader' },
-                  { text: 'EMPLEADO', style: 'tableHeader' },
-                  { text: 'CÓDIGO', style: 'tableHeader' },
-                  { text: 'GÉNERO', style: 'tableHeader' },
-                  { text: 'CIUDAD', style: 'tableHeader' },
-                  { text: 'SUCURSAL', style: 'tableHeader' },
-                  { text: 'RÉGIMEN', style: 'tableHeader' },
-                  { text: 'CARGO', style: 'tableHeader' },
-                  { text: 'CORREO', style: 'tableHeader' }
-                ],
-                ...arr_emp.map((usu: any) => {
-                  return [
-                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                    { style: 'itemsTable', text: usu.cedula },
-                    { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                    { style: 'itemsTableCentrado', text: usu.codigo },
-                    { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                    { style: 'itemsTable', text: usu.ciudad },
-                    { style: 'itemsTable', text: usu.name_suc },
-                    { style: 'itemsTable', text: usu.name_regimen },
-                    { style: 'itemsTable', text: usu.name_cargo },
-                    { style: 'itemsTable', text: usu.correo },
-                  ]
-                }),
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        }
-      })
-    }
-    else {
-      // PRESENTACION SUCURSALES
-      data.forEach((selec: any) => {
-        let arr_suc: any = 0;
-        selec.regimenes.map(regimen => {
-          regimen.departamentos.map(departamento => {
-            departamento.cargos.map(cargo => {
-              arr_suc = arr_suc + cargo.empleado.length;
-              return arr_suc;
-            })
-          })
-        })
-        arr_emp = [];
-
-        n.push({
-          style: 'tableMarginCabecera',
-          table: {
-            widths: ['*', '*', '*'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, false],
-                  bold: true,
-                  text: 'CIUDAD: ' + selec.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, false, false],
-                  text: 'SUCURSAL: ' + selec.name_suc,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, false],
-                  text: 'N° Registros: ' + arr_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        });
-
-        selec.regimenes.forEach((regimen) => {
-          regimen.departamentos.forEach((departamento) => {
-            departamento.cargos.forEach((empl) => {
-              empl.empleado.forEach(e => {
-                arr_emp.push(e)
-              });
-            });
-          });
-        });
-        arr_emp.sort(function (a: any, b: any) {
-          return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
-        });
-
-        n.push({
-          style: 'tableMargin',
-          table: {
-            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-            headerRows: 1,
-            body: [
-              [
-                { text: 'N°', style: 'tableHeader' },
-                { text: 'CÉDULA', style: 'tableHeader' },
-                { text: 'EMPLEADO', style: 'tableHeader' },
-                { text: 'CÓDIGO', style: 'tableHeader' },
-                { text: 'GÉNERO', style: 'tableHeader' },
-                { text: 'CIUDAD', style: 'tableHeader' },
-                { text: 'RÉGIMEN', style: 'tableHeader' },
-                { text: 'DEPARTAMENTO', style: 'tableHeader' },
-                { text: 'CARGO', style: 'tableHeader' },
-                { text: 'CORREO', style: 'tableHeader' }
-              ],
-              ...arr_emp.map((usu: any) => {
-                return [
-                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                  { style: 'itemsTable', text: usu.cedula },
-                  { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                  { style: 'itemsTableCentrado', text: usu.codigo },
-                  { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                  { style: 'itemsTable', text: usu.ciudad },
-                  { style: 'itemsTable', text: usu.name_regimen },
-                  { style: 'itemsTable', text: usu.name_dep },
-                  { style: 'itemsTable', text: usu.name_cargo },
-                  { style: 'itemsTable', text: usu.correo },
-                ]
-              }),
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, false],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, false, false],
+                bold: true,
+                text: 'SUCURSAL: ' + selec.sucursal,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, false],
+                text: 'N° Registros: ' + selec.empleados.length,
+                style: 'itemsTableInfo',
+              },
+            ],
+          ],
+        },
       });
-    }
+
+      // PRESENTACION DE LA INFORMACION
+      let arr_emp: any = [];
+      selec.empleados.forEach((empl: any) => {
+        arr_emp.push(empl)
+      });
+
+      arr_emp.sort(function (a: any, b: any) {
+        return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
+      });
+
+      n.push({
+        style: 'tableMargin',
+        table: {
+          widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+          headerRows: 1,
+          body: [
+            [
+              { text: 'N°', style: 'tableHeader' },
+              { text: 'CÉDULA', style: 'tableHeader' },
+              { text: 'CÓDIGO', style: 'tableHeader' },
+              { text: 'EMPLEADO', style: 'tableHeader' },
+              { text: 'GÉNERO', style: 'tableHeader' },
+              { text: 'CIUDAD', style: 'tableHeader' },
+              { text: 'SUCURSAL', style: 'tableHeader' },
+              { text: 'RÉGIMEN', style: 'tableHeader' },
+              { text: 'DEPARTAMENTO', style: 'tableHeader' },
+              { text: 'CARGO', style: 'tableHeader' },
+              { text: 'CORREO', style: 'tableHeader' }
+            ],
+            ...arr_emp.map((usu: any) => {
+              return [
+                { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
+                { style: 'itemsTable', text: usu.cedula },
+                { style: 'itemsTableCentrado', text: usu.codigo },
+                { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
+                { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
+                { style: 'itemsTable', text: usu.ciudad },
+                { style: 'itemsTable', text: usu.sucursal },
+                { style: 'itemsTable', text: usu.regimen },
+                { style: 'itemsTable', text: usu.departamento },
+                { style: 'itemsTable', text: usu.cargo },
+                { style: 'itemsTable', text: usu.correo },
+              ]
+            }),
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex: any) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
+        }
+      });
+    })
     return n;
   }
 
@@ -981,29 +685,21 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     let nuevo: Array<any> = [];
     let usuarios: any[] = [];
     let c = 0;
-    array.forEach((suc: any) => {
-      suc.regimenes.forEach(depa => {
-        depa.departamentos.forEach((car: any) => {
-          car.cargos.forEach((empl: any) => {
-            empl.empleado.forEach((usu: any) => {
-              let ele = {
-                'Cédula': usu.cedula,
-                'Apellido': usu.apellido,
-                'Nombre': usu.nombre,
-                'Código': usu.codigo,
-                'Género': usu.genero == 1 ? 'M' : 'F',
-                'Ciudad': usu.ciudad,
-                'Sucursal': usu.name_suc,
-                'Régimen': usu.name_regimen,
-                'Departamento': usu.name_dep,
-                'Cargo': usu.name_cargo,
-                'Correo': usu.correo,
-              }
-              nuevo.push(ele);
-            })
-          })
-        })
-      })
+    array.forEach((usu: any) => {
+      let ele = {
+        'Cédula': usu.cedula,
+        'Apellido': usu.apellido,
+        'Nombre': usu.nombre,
+        'Código': usu.codigo,
+        'Género': usu.genero == 1 ? 'M' : 'F',
+        'Ciudad': usu.ciudad,
+        'Sucursal': usu.name_suc,
+        'Régimen': usu.name_regimen,
+        'Departamento': usu.name_dep,
+        'Cargo': usu.name_cargo,
+        'Correo': usu.correo,
+      }
+      nuevo.push(ele);
     });
     nuevo.sort(function (a: any, b: any) {
       return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
@@ -1025,7 +721,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    console.log('entra en reg')
+    console.log('entra en reg ', array)
     let nuevo: Array<any> = [];
     let usuarios: any[] = [];
     let c = 0;
@@ -1066,16 +762,10 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   ExtraerDatos() {
     this.arr_emp = [];
     let n = 0;
-    this.data_pdf.forEach((sucursal: any) => {
-      sucursal.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos.forEach((cargo: any) => {
-            cargo.empleado.forEach((empl: any) => {
-              this.arr_emp.push(empl);
-            });
-          });
-        });
-      });
+    console.log('ver data ', this.data_pdf)
+    this.data_pdf.forEach((empl: any) => {
+      this.arr_emp.push(empl);
+
     });
     this.arr_emp.sort(function (a: any, b: any) {
       return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))

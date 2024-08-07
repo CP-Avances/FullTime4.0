@@ -370,10 +370,10 @@ class PlanGeneralControlador {
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+                const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
-                `, [fecha, id_empleado]);
+                `, [fecha, codigo]);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES

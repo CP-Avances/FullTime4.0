@@ -147,7 +147,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
       fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
       accion: this.informacion.detalle.tipo_entr_salida,
       id_timbre: seleccionado.id,
-      id_empleado: parseInt(this.informacion.detalle.id_empleado),
+      codigo: this.informacion.detalle.codigo,
       user_name: this.user_name,
       ip: this.ip
     }

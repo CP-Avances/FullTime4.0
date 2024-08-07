@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
-const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const moment_1 = __importDefault(require("moment"));
+const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
@@ -235,16 +235,17 @@ class TimbresControlador {
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
+                let { id, codigo, tecla, observacion, fecha } = req.body;
                 yield database_1.default.query(`
-                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                     $3::character varying, $4::integer, $5::character varying) 
-                `, [fecha, id_empleado, tecla, id, observacion])
+                `, [fecha, codigo, tecla, id, observacion])
                     .then((result) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
             }
             catch (err) {
+                console.log('timbre error ', err);
                 const message = 'Ups!!! algo salio mal con la peticion al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
@@ -272,8 +273,8 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
-                `, [codigo, id_empleado, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                `, [codigo, id_reloj, hora_fecha_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
                     observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
@@ -303,6 +304,7 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name } = req.body;
+                console.log('datos ', req.body);
                 var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
@@ -325,8 +327,8 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
-                `, [codigo, id_empleado, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
                     observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
@@ -335,7 +337,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, id_empleado: ${id_empleado}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
                         ip,
                         observacion: null
                     });
@@ -366,9 +368,9 @@ class TimbresControlador {
                 TIMBRES.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     contador = contador + 1;
                     yield database_1.default.query(`
-                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                             $3::character varying, $4::integer, $5::character varying)  
-                    `, [obj.fecha_hora_timbre_servidor, obj.id_empleado, obj.tecla_funcion, obj.id, obj.observacion]);
+                    `, [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
                 }));
                 if (contador === TIMBRES.rowCount) {
                     return res.jsonp({ message: 'OK', respuesta: TIMBRES.rows });
