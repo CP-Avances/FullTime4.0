@@ -31,3 +31,7 @@ td {
   justify-content: center; /* Centrar horizontalmente */
   align-items: center;    /* Centrar verticalmente */
 }
+
+:host ::ng-deep .mat-expansion-indicator::after {
+  color: white;
+}
