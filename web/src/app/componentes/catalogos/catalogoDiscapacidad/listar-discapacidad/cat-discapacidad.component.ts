@@ -78,6 +78,8 @@ export class CatDiscapacidadComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  tiposDiscapacidadCorrectos: number = 0;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -277,6 +279,8 @@ export class CatDiscapacidadComponent implements OnInit {
             this.listaDiscapacidadCorrectas.push(item);
           }
         });
+
+        this.tiposDiscapacidadCorrectos = this.listaDiscapacidadCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
