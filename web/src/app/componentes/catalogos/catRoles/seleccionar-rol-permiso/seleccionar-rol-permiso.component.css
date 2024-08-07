@@ -25,3 +25,9 @@ td {
 .centra {
     text-align: center;
 }
+
+.panel-title {
+  display: flex;
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center;    /* Centrar verticalmente */
+}
