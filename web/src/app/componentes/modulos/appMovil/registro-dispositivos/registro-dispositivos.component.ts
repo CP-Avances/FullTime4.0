@@ -28,6 +28,7 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-registro-dispositivos',
@@ -44,6 +45,9 @@ export class RegistroDispositivosComponent implements OnInit {
   // DATOS DE EMPLEADO
   empleado: any = [];
   idEmpleado: number;
+
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+  idUsuariosAcceso: Set<any> = new Set();
 
   // VALIDAR ELIMINAR PROCESO CON FILTROS
   ocultar: boolean = false;
@@ -87,6 +91,7 @@ export class RegistroDispositivosComponent implements OnInit {
     private rest: RelojesService,
     public restEmpre: EmpresaService,
     public restE: EmpleadoService,
+    private asignaciones: AsignacionesService,
   ) { this.idEmpleado = parseInt(localStorage.getItem('empleado') as string); }
 
   ngOnInit(): void {
@@ -100,8 +105,12 @@ export class RegistroDispositivosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.ObtenerLogo();
       this.ObtenerColores();
       this.ObtenerEmpleados(this.idEmpleado);
@@ -167,6 +176,9 @@ export class RegistroDispositivosComponent implements OnInit {
   ObtenerDispositivosRegistrados() {
     this.usuariosService.BuscarDispositivoMovill().subscribe(res => {
       this.dispositivosRegistrados = res;
+      if (this.rolEmpleado !==1) {
+        this.dispositivosRegistrados = this.dispositivosRegistrados.filter((item: any) => this.idUsuariosAcceso.has(item.id_empleado));
+      }
     }, err => {
       this.toastr.info(err.error.message)
     })

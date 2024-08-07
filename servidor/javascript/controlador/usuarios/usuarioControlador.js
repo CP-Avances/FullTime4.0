@@ -459,7 +459,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const DISPOSITIVOS = yield database_1.default.query(`
-        SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
+        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
         INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
