@@ -1341,6 +1341,9 @@ class EmpleadoControlador {
                                                                 data.observacion = 'Verificar ubicación';
                                                             }
                                                         }
+                                                        else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                            data.observacion = 'Verificar ubicación';
+                                                        }
                                                         // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                                                         if (TELEFONO != undefined) {
                                                             if (regex.test(data.telefono.toString())) {
@@ -1483,6 +1486,9 @@ class EmpleadoControlador {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
+                                                                                }
+                                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                                    data.observacion = 'Verificar ubicación';
                                                                                 }
                                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                                 if (TELEFONO != undefined) {
@@ -1942,6 +1948,9 @@ class EmpleadoControlador {
                                                                         data.observacion = 'Verificar ubicación';
                                                                     }
                                                                 }
+                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                    data.observacion = 'Verificar ubicación';
+                                                                }
                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                 if (TELEFONO != undefined) {
                                                                     if (regex.test(data.telefono)) {
@@ -2093,6 +2102,9 @@ class EmpleadoControlador {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
+                                                                                }
+                                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                                    data.observacion = 'Verificar ubicación';
                                                                                 }
                                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                                 if (TELEFONO != undefined) {

@@ -888,6 +888,13 @@ class EmpleadoCargosControlador {
         if (admini_depa.toLowerCase() == 'si') {
           admin_dep = true;
         }
+
+        const id_last_cargo = await pool.query(
+          `
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
+          `
+          , [id_contrato]);
+
         const response: QueryResult = await pool.query(
           `
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
@@ -907,12 +914,6 @@ class EmpleadoCargosControlador {
           , [id_empleado, id_departamento, true, true, admin_dep]);
 
         const [usuarioDep] = response2.rows;
-
-        const id_last_cargo = await pool.query(
-          `
-           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1
-          `
-          , [id_contrato]);
 
         await pool.query(
           `

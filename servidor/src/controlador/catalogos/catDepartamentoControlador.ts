@@ -1257,9 +1257,17 @@ class DepartamentoControlador {
           WHERE id_empleado = $2
         `, [idDepartamento, item.id]);
 
+        await pool.query(
+          `
+          UPDATE eu_empleado_cargos
+          SET id_departamento = $1 
+          WHERE id_contrato = $2
+        `, [idDepartamento, item.id_contrato]);
+
         if(res.rowCount != 0){
           cont = cont + 1;
         }
+
       })
 
       
