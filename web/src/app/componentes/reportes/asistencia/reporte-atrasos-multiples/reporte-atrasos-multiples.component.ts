@@ -46,7 +46,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
-  origen: any = [];
 
   // VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
   tiempoDepartamentos: any = [];
@@ -119,12 +118,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private validacionService: ValidacionesService,
     private reportesAtrasos: AtrasosService,
     private reporteService: ReportesService,
     private informacion: DatosGeneralesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
   ) {
@@ -204,12 +203,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
     informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
-        sucursal: obj.name_suc
+        sucursal: obj.name_suc,
+        ciudad: obj.ciudad,
       })
 
       this.regimen.push({
@@ -255,69 +254,15 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         hora_trabaja: obj.hora_trabaja
       })
     })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
+    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
+    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
+    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
 
-    // RETIRAR DATOS DUPLICADOS
-    this.OmitirDuplicados();
-
-    console.log('ver sucursales ', this.sucursales)
-    console.log('ver regimenes ', this.regimen)
-    console.log('ver departamentos ', this.departamentos)
-    console.log('ver cargos ', this.cargos)
-    console.log('ver empleados ', this.empleados)
   }
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
-  }
-
-
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -369,217 +314,126 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     }
   }
 
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-    let suc = respuesta.filter((empl: any) => {
-      var bool = this.selectionSuc.selected.find(selec => {
-        return empl.id_suc === selec.id
-      })
-      return bool != undefined;
-    });
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
-    this.reportesAtrasos.ReporteAtrasos(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.reportesAtrasos.ReporteAtrasos(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       if (this.tolerancia !== '1') {
         this.FiltrarTolerancia();
       }
       switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
+        case 'excel': this.ExportarExcel(); break;
         case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
+  }
+
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
+    let seleccionados: any = [];
+    this.sucursales.forEach((res: any) => {
+      this.selectionSuc.selected.find((selec: any) => {
+        if (selec.id === res.id) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((sucursales: any) => {
+      sucursales.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_suc === sucursales.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR REGIMEN
   ModelarRegimen(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.regimen.forEach((res: any) => {
       this.selectionReg.selected.find((selec: any) => {
-        objeto = {
-          regimen: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_regimen && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
       });
     });
-    this.data_pdf = [];
-    this.reportesAtrasos.ReporteAtrasosRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      if (this.tolerancia !== '1') {
-        this.FiltrarToleranciaRegimenCargo();
-      };
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    seleccionados.forEach((regimen: any) => {
+      regimen.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_regimen === regimen.id && selec.id_suc === regimen.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR DEPARTAMENTO
   ModelarDepartamento(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let dep: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.departamentos.forEach((res: any) => {
       this.selectionDep.selected.find((selec: any) => {
-        objeto = {
-          depa: {
-            id: selec.id,
-            nombre: selec.departamento,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_depa && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        dep.push(objeto);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
       });
     });
-    this.data_pdf = []
-    this.reportesAtrasos.ReporteAtrasosRegimenCargo(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      if (this.tolerancia !== '1') {
-        this.FiltrarToleranciaRegimenCargo();
-      };
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    seleccionados.forEach((departamento: any) => {
+      departamento.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_depa === departamento.id && selec.id_suc === departamento.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR CARGO
   ModelarCargo(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let car: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.cargos.forEach((res: any) => {
       this.selectionCar.selected.find((selec: any) => {
-        objeto = {
-          cargo: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_cargo_ && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        car.push(objeto);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
       });
     });
-    this.data_pdf = [];
-    this.reportesAtrasos.ReporteAtrasosRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      if (this.tolerancia !== '1') {
-        this.FiltrarToleranciaRegimenCargo();
-      };
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    seleccionados.forEach((cargo: any) => {
+      cargo.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_cargo_ === cargo.id && selec.id_suc === cargo.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR EMPLEADO
   ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos.forEach((cargo: any) => {
-            cargo.empleado = cargo.empleado.filter((o: any) => {
-              var bool = this.selectionEmp.selected.find(selec => {
-                return (selec.id === o.id && selec.id_suc === o.id_suc)
-              })
-              return bool != undefined
-            })
-          })
-        });
-      })
-    })
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos = departamento.cargos.filter((e: any) => {
-            return e.empleado.length > 0
-          })
-        });
+    let seleccionados: any = [{ nombre: 'Empleados' }];
+    let datos: any = [];
+    this.empleados.forEach((res: any) => {
+      this.selectionEmp.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          datos.push(res);
+        }
       });
     });
-    let emp = respuesta.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-    this.data_pdf = []
-    this.reportesAtrasos.ReporteAtrasos(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      if (this.tolerancia !== '1') {
-        this.FiltrarTolerancia();
-      };
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    seleccionados[0].empleados = datos;
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
 
@@ -607,16 +461,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
-
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
-    };
-
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -627,7 +475,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -664,6 +512,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
         tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 5, 0, 0] },
@@ -688,9 +537,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
+    let totalTiempoEmpleado: number = 0;
+    let totalTiempo = 0;
+    let resumen = '';
     let n: any = []
     let c = 0;
-    let totalTiempoEmpleado: number = 0;
+
     let totalTiempoSucursal: number = 0;
     let totalTiempoCargo = 0;
     let totalTiempoRegimen = 0;
@@ -699,6 +551,75 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.tiempoSucursales = [];
     this.tiempoRegimen = [];
     this.tiempoCargos = [];
+
+    data.forEach((selec: any) => {
+      let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length });
+      totalTiempo = 0;
+      let tiempo = selec.empleados.map((o: any) => {
+        const minutos_ = this.SegundosAMinutosConDecimales(Number(o.diferencia));
+        totalTiempo += Number(minutos_);
+        return totalTiempo;
+      })
+      let reg = this.validar.SumarRegistros(arr_reg);
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      let opcion = selec.nombre;
+      if (this.bool.bool_reg === true) {
+        descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
+        resumen = 'TOTAL RÉGIMEN LABORAL';
+      }
+      else if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
+      }
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
+        resumen = 'TOTAL CARGOS';
+      }
+      else if (this.bool.bool_suc === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+
+      // CABECERA PRINCIPAL
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
+      });
+
+    })
+
+
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true || this.bool.bool_dep === true) {
       data.forEach((selec: any) => {
@@ -714,7 +635,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   {
                     border: [true, true, true, true],
                     bold: true,
-                    text: 'CARGO: ' + selec.cargo.nombre,
+                    text: 'CARGO: ' + selec.nombre,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -734,7 +655,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   {
                     border: [true, true, true, true],
                     bold: true,
-                    text: 'RÉGIMEN: ' + selec.regimen.nombre,
+                    text: 'RÉGIMEN: ' + selec.nombre,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -753,7 +674,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 [
                   {
                     border: [true, true, true, true],
-                    text: 'DEPARTAMENTO: ' + selec.depa.nombre,
+                    text: 'DEPARTAMENTO: ' + selec.nombre,
                     style: 'itemsTableInfo'
                   },
                 ]
@@ -844,21 +765,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
                   ],
                   ...empl.atrasos.map((usu: any) => {
-                    const fechaHorario = this.validacionService.FormatearFecha(
+                    const fechaHorario = this.validar.FormatearFecha(
                       usu.fecha_hora_horario.split(' ')[0],
                       this.formato_fecha,
-                      this.validacionService.dia_abreviado);
+                      this.validar.dia_abreviado);
 
-                    const fechaTimbre = this.validacionService.FormatearFecha(
+                    const fechaTimbre = this.validar.FormatearFecha(
                       usu.fecha_hora_timbre.split(' ')[0],
                       this.formato_fecha,
-                      this.validacionService.dia_abreviado);
+                      this.validar.dia_abreviado);
 
-                    const horaHorario = this.validacionService.FormatearHora(
+                    const horaHorario = this.validar.FormatearHora(
                       usu.fecha_hora_horario.split(' ')[1],
                       this.formato_hora);
 
-                    const horaTimbre = this.validacionService.FormatearHora(
+                    const horaTimbre = this.validar.FormatearHora(
                       usu.fecha_hora_timbre.split(' ')[1],
                       this.formato_hora);
 
@@ -978,21 +899,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   ],
                   ...empl.atrasos.map((usu: any) => {
 
-                    const fechaHorario = this.validacionService.FormatearFecha(
+                    const fechaHorario = this.validar.FormatearFecha(
                       usu.fecha_hora_horario.split(' ')[0],
                       this.formato_fecha,
-                      this.validacionService.dia_abreviado);
+                      this.validar.dia_abreviado);
 
-                    const fechaTimbre = this.validacionService.FormatearFecha(
+                    const fechaTimbre = this.validar.FormatearFecha(
                       usu.fecha_hora_timbre.split(' ')[0],
                       this.formato_fecha,
-                      this.validacionService.dia_abreviado);
+                      this.validar.dia_abreviado);
 
-                    const horaHorario = this.validacionService.FormatearHora(
+                    const horaHorario = this.validar.FormatearHora(
                       usu.feha_hora_horario.split(' ')[1],
                       this.formato_hora);
 
-                    const horaTimbre = this.validacionService.FormatearHora(
+                    const horaTimbre = this.validar.FormatearHora(
                       usu.fecha_hora_timbre.split(' ')[1],
                       this.formato_hora);
 
@@ -1075,7 +996,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
         if (this.bool.bool_cargo) {
           let cargo = {
-            cargo: selec.cargo.nombre,
+            cargo: selec.nombre,
             minutos: totalTiempoCargo.toFixed(2),
             tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoCargo.toFixed(2)))
           }
@@ -1084,7 +1005,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
         if (this.bool.bool_reg) {
           let regimen = {
-            regimen: selec.regimen.nombre,
+            regimen: selec.nombre,
             minutos: totalTiempoRegimen.toFixed(2),
             tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoRegimen.toFixed(2)))
           }
@@ -1093,7 +1014,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
         if (this.bool.bool_dep) {
           let departamento = {
-            departamento: selec.depa.nombre,
+            departamento: selec.nombre,
             minutos: totalTiempoDepartamento.toFixed(2),
             tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoDepartamento.toFixed(2)))
           }
@@ -1342,21 +1263,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
                         ],
                         ...empl.atrasos.map((usu: any) => {
-                          const fechaHorario = this.validacionService.FormatearFecha(
+                          const fechaHorario = this.validar.FormatearFecha(
                             usu.fecha_hora_horario.split(' ')[0],
                             this.formato_fecha,
-                            this.validacionService.dia_abreviado);
+                            this.validar.dia_abreviado);
 
-                          const fechaTimbre = this.validacionService.FormatearFecha(
+                          const fechaTimbre = this.validar.FormatearFecha(
                             usu.fecha_hora_timbre.split(' ')[0],
                             this.formato_fecha,
-                            this.validacionService.dia_abreviado);
+                            this.validar.dia_abreviado);
 
-                          const horaHorario = this.validacionService.FormatearHora(
+                          const horaHorario = this.validar.FormatearHora(
                             usu.fecha_hora_horario.split(' ')[1],
                             this.formato_hora);
 
-                          const horaTimbre = this.validacionService.FormatearHora(
+                          const horaTimbre = this.validar.FormatearHora(
                             usu.fecha_hora_timbre.split(' ')[1],
                             this.formato_hora);
 
@@ -1465,21 +1386,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
                         ],
                         ...empl.atrasos.map((usu: any) => {
-                          const fechaHorario = this.validacionService.FormatearFecha(
+                          const fechaHorario = this.validar.FormatearFecha(
                             usu.fecha_hora_horario.split(' ')[0],
                             this.formato_fecha,
-                            this.validacionService.dia_abreviado);
+                            this.validar.dia_abreviado);
 
-                          const fechaTimbre = this.validacionService.FormatearFecha(
+                          const fechaTimbre = this.validar.FormatearFecha(
                             usu.fecha_hora_timbre.split(' ')[0],
                             this.formato_fecha,
-                            this.validacionService.dia_abreviado);
+                            this.validar.dia_abreviado);
 
-                          const horaHorario = this.validacionService.FormatearHora(
+                          const horaHorario = this.validar.FormatearHora(
                             usu.fecha_hora_horario.split(' ')[1],
                             this.formato_hora);
 
-                          const horaTimbre = this.validacionService.FormatearHora(
+                          const horaTimbre = this.validar.FormatearHora(
                             usu.fecha_hora_timbre.split(' ')[1],
                             this.formato_hora);
 
@@ -1608,149 +1529,46 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(tipo: string): void {
-    switch (tipo) {
-      case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
-        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Atrasos');
-        xlsx.writeFile(wb_regimen_cargo, `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-      default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-        const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Atrasos');
-        xlsx.writeFile(wb, `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-    }
+  ExportarExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Atrasos');
+    xlsx.writeFile(wb, `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let n = 0;
     array.forEach((suc: any) => {
-      suc.regimenes.forEach((reg: any) => {
-        reg.departamentos.forEach((dep: any) => {
-          dep.cargos.forEach((car: any) => {
-            car.empleado.forEach((empl: any) => {
-              empl.atrasos.forEach((usu: any) => {
-                n++;
-                const horaHorario = this.validacionService.FormatearHora(
-                  usu.fecha_hora_horario.split(' ')[1],
-                  this.formato_hora);
-
-                const horaTimbre = this.validacionService.FormatearHora(
-                  usu.fecha_hora_timbre.split(' ')[1],
-                  this.formato_hora);
-
-                const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                let ele: any;
-                if (this.tolerancia !== '1') {
-                  const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                  ele = {
-                    'N°': n,
-                    'Cédula': empl.cedula,
-                    'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-                    'Código': empl.codigo,
-                    'Ciudad': empl.ciudad,
-                    'Sucursal': empl.name_suc,
-                    'Régimen': empl.name_regimen,
-                    'Departamento': empl.name_dep,
-                    'Cargo': empl.name_cargo,
-                    'Fecha Horario': new Date(usu.fecha_hora_horario),
-                    'Hora Horario': horaHorario,
-                    'Fecha Timbre': new Date(usu.fecha_hora_timbre),
-                    'Hora Timbre': horaTimbre,
-                    'Tolerancia': tolerancia,
-                    'Atraso HH:MM:SS': tiempo,
-                    'Atraso Minutos': minutos.toFixed(2),
-                  }
-                } else {
-                  ele = {
-                    'N°': n,
-                    'Cédula': empl.cedula,
-                    'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-                    'Código': empl.codigo,
-                    'Ciudad': empl.ciudad,
-                    'Sucursal': empl.name_suc,
-                    'Régimen': empl.name_regimen,
-                    'Departamento': empl.name_dep,
-                    'Cargo': empl.name_crago,
-                    'Fecha Horario': new Date(usu.fecha_hora_horario),
-                    'Hora Horario': horaHorario,
-                    'Fecha Timbre': new Date(usu.fecha_hora_timbre),
-                    'Hora Timbre': horaTimbre,
-                    'Atraso HH:MM:SS': tiempo,
-                    'Atraso Minutos': minutos.toFixed(2),
-                  }
-                }
-                nuevo.push(ele);
-              })
-            })
-          })
-        })
-      })
-    })
-    return nuevo;
-  }
-
-  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
         empl.atrasos.forEach((usu: any) => {
           n++;
-          const horaHorario = this.validacionService.FormatearHora(
-            usu.fecha_hora_horario.split(' ')[1],
-            this.formato_hora);
-
-          const horaTimbre = this.validacionService.FormatearHora(
-            usu.fecha_hora_timbre.split(' ')[1],
-            this.formato_hora);
-
+          const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele: any;
+          var tolerancia = '00:00:00';
           if (this.tolerancia !== '1') {
-            const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-            ele = {
-              'N°': n,
-              'Cédula': empl.cedula,
-              'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-              'Código': empl.codigo,
-              'Ciudad': empl.ciudad,
-              'Sucursal': empl.name_suc,
-              'Régimen': empl.name_regimen,
-              'Departamento': empl.name_dep,
-              'Cargo': empl.name_cargo,
-              'Fecha Horario': new Date(usu.fecha_hora_horario),
-              'Hora Horario': horaHorario,
-              'Fecha Timbre': new Date(usu.fecha_hora_timbre),
-              'Hora Timbre': horaTimbre,
-              'Tolerancia': tolerancia,
-              'Atraso HH:MM:SS': tiempo,
-              'Atraso Minutos': minutos.toFixed(2),
-            }
-          } else {
-            ele = {
-              'N°': n,
-              'Cédula': empl.cedula,
-              'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-              'Código': empl.codigo,
-              'Ciudad': empl.ciudad,
-              'Sucursal': empl.name_suc,
-              'Régimen': empl.name_cargo,
-              'Departamento': empl.name_dep,
-              'Cargo': empl.name_cargo,
-              'Fecha Horario': new Date(usu.fecha_hora_horario),
-              'Hora Horario': horaHorario,
-              'Fecha Timbre': new Date(usu.fecha_hora_timbre),
-              'Hora Timbre': horaTimbre,
-              'Atraso HH:MM:SS': tiempo,
-              'Atraso Minutos': minutos.toFixed(2),
-            }
+            tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
+          }
+          ele = {
+            'N°': n,
+            'Cédula': empl.cedula,
+            'Código': empl.codigo,
+            'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
+            'Ciudad': empl.ciudad,
+            'Sucursal': empl.sucursal,
+            'Régimen': empl.regimen,
+            'Departamento': empl.departamento,
+            'Cargo': empl.cargo,
+            'Fecha Horario': new Date(usu.fecha_hora_horario),
+            'Hora Horario': horaHorario,
+            'Fecha Timbre': new Date(usu.fecha_hora_timbre),
+            'Hora Timbre': horaTimbre,
+            'Tolerancia': tolerancia,
+            'Atraso HH:MM:SS': tiempo,
+            'Atraso Minutos': minutos.toFixed(2),
           }
           nuevo.push(ele);
         })
@@ -1762,102 +1580,29 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
-
-  ExtraerTimbres() {
-    this.timbres = [];
-    let n = 0;
-    this.data_pdf.forEach((suc: any) => {
-      suc.regimenes.forEach((reg: any) => {
-        reg.departamentos.forEach((dep: any) => {
-          dep.cargos.forEach((car: any) => {
-            car.empleado.forEach((empl: any) => {
-              empl.atrasos.forEach((usu: any) => {
-
-                const fechaHorario = this.validacionService.FormatearFecha(
-                  usu.fecha_hora_horario.split(' ')[0],
-                  this.formato_fecha,
-                  this.validacionService.dia_abreviado);
-
-                const fechaTimbre = this.validacionService.FormatearFecha(
-                  usu.fecha_hora_timbre.split(' ')[0],
-                  this.formato_fecha,
-                  this.validacionService.dia_abreviado);
-
-                const horaHorario = this.validacionService.FormatearHora(
-                  usu.fecha_hora_horario.split(' ')[1],
-                  this.formato_hora);
-
-                const horaTimbre = this.validacionService.FormatearHora(
-                  usu.fecha_hora_timbre.split(' ')[1],
-                  this.formato_hora);
-
-                const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                n = n + 1;
-                let ele = {
-                  n: n,
-                  ciudad: empl.ciudad,
-                  sucursal: empl.name_suc,
-                  regimen: empl.name_regimen,
-                  departamento: empl.name_dep,
-                  cedula: empl.cedula,
-                  empleado: empl.apellido + ' ' + empl.nombre,
-                  codigo: empl.codigo,
-                  tolerancia,
-                  fechaHorario,
-                  horaHorario,
-                  fechaTimbre,
-                  horaTimbre,
-                  atrasoM: minutos.toFixed(2), atrasoT: tiempo,
-                }
-                this.timbres.push(ele);
-              })
-            })
-          })
-        })
-      })
-    })
-  }
-
-  ExtraerTimbresRegimenCargo() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
         empl.atrasos.forEach((usu: any) => {
-
-          const fechaHorario = this.validacionService.FormatearFecha(
-            usu.fecha_hora_horario.split(' ')[0],
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-
-          const fechaTimbre = this.validacionService.FormatearFecha(
-            usu.fecha_hora_timbre.split(' ')[0],
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-
-          const horaHorario = this.validacionService.FormatearHora(
-            usu.fecha_hora_horario.split(' ')[1],
-            this.formato_hora);
-
-          const horaTimbre = this.validacionService.FormatearHora(
-            usu.fecha_hora_timbre.split(' ')[1],
-            this.formato_hora);
-
+          const fechaHorario = this.validar.FormatearFecha(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const fechaTimbre = this.validar.FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           n = n + 1;
           let ele = {
             n: n,
+            cedula: empl.cedula,
+            codigo: empl.codigo,
+            empleado: empl.apellido + ' ' + empl.nombre,
             ciudad: empl.ciudad,
             sucursal: empl.sucursal,
-            regimen: empl.name_regimen,
-            departamento: empl.name_dep,
-            cedula: empl.cedula,
-            empleado: empl.apellido + ' ' + empl.nombre,
-            codigo: empl.codigo,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
             tolerancia,
             fechaHorario,
             horaHorario,
@@ -1874,34 +1619,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                              METODOS PARA FILTRAR TOLERANCIA                         ** **
    ** ****************************************************************************************** **/
-
   FiltrarTolerancia() {
-    this.data_pdf = this.data_pdf.filter((suc: any) => {
-      suc.regimenes = suc.regimenes.filter((reg: any) => {
-        reg.departamentos = reg.departamentos.filter((dep: any) => {
-          dep.cargos = dep.cargos.filter((car: any) => {
-            car.empleado = car.empleado.filter((empl: any) => {
-              empl.atrasos = empl.atrasos && empl.atrasos.filter((usu: any) => {
-                let diferencia = usu.diferencia;
-                const tolerancia = usu.tolerancia * 60;
-                return (diferencia <= tolerancia) ? false : (this.tolerancia === '2-1' ? (usu.diferencia = diferencia, true) : (usu.diferencia = diferencia - tolerancia, true));
-              });
-              return empl.atrasos && empl.atrasos.length > 0;
-            });
-            return car.empleado && car.empleado.length > 0;
-          });
-          return dep.cargos && dep.cargos.length > 0;
-        });
-        return reg.departamentos && reg.departamentos.length > 0;
-      })
-      return suc.regimenes && suc.regimenes.length > 0;
-    })
-    if (this.data_pdf.length === 0) {
-      this.toastr.error('No se han encontrado registros de timbres.');
-    }
-  }
-
-  FiltrarToleranciaRegimenCargo() {
     this.data_pdf = this.data_pdf.filter((suc: any) => {
       suc.empleados = suc.empleados.filter((empl: any) => {
         empl.atrasos = empl.atrasos && empl.atrasos.filter((usu: any) => {
@@ -1915,7 +1633,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     });
 
     if (this.data_pdf.length === 0) {
-      this.toastr.error('No se han encontrado registros de timbres');
+      this.toastr.error('No se han encontrado registros de timbres.');
     }
   }
 
@@ -2082,21 +1800,17 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   // METODOS PARA VALIDAR INGRESO DE LETRAS Y NUMEROS
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e)
   }
 
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
   VerDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg || this.bool.bool_dep) {
-      this.ExtraerTimbresRegimenCargo();
-    } else {
-      this.ExtraerTimbres();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

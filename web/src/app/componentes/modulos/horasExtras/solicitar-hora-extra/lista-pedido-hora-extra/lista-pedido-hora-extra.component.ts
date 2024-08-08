@@ -703,7 +703,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open", opcion: string) {
-    const documentDefinition = this.getDocumentDefinicion(opcion);
+    const documentDefinition = this.DefinirInformacionPDF(opcion);
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -720,7 +720,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion(opcion: string) {
+  DefinirInformacionPDF(opcion: string) {
     if (opcion == "Solicitudes de horas extras") {
       sessionStorage.setItem(
         "HorasExtrasSolicitadas",

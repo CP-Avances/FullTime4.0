@@ -382,7 +382,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
    *                                         METODO PARA EXPORTAR A PDF                                   *
    * **************************************************************************************************** */
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -393,7 +393,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
   fila1firmas: any = [];
   fila2firmas: any = [];
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     this.fila1firmas = [];
     this.fila2firmas = [];
 

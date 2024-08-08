@@ -180,7 +180,7 @@ export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
   }
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_TiempoJ_VS_HoraE" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -192,7 +192,7 @@ export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

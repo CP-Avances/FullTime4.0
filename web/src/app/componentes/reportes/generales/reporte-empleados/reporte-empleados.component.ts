@@ -50,7 +50,6 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   sucursales: any = [];
   empleados: any = [];
   regimen: any = [];
-  origen: any = [];
   cargos: any = [];
   arr_emp: any = [];
 
@@ -160,7 +159,6 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.origen = [];
     this.arr_emp = [];
   }
 
@@ -222,6 +220,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         codigo: obj.codigo,
         cedula: obj.cedula,
         correo: obj.correo,
+        genero: obj.genero,
         id_cargo: obj.id_cargo,
         id_contrato: obj.id_contrato,
         sucursal: obj.name_suc,
@@ -242,12 +241,6 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
     this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
     this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
-
-    /* console.log('ver sucursales ', this.sucursales)
-     console.log('ver regimenes ', this.regimen)
-     console.log('ver departamentos ', this.departamentos)
-     console.log('ver cargos ', this.cargos)
-     console.log('ver empleados ', this.empleados)*/
   }
 
   // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
@@ -324,6 +317,18 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     }
   }
 
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
+    this.data_pdf = [];
+    this.data_pdf = seleccionados;
+    //console.log('data final ', seleccionados)
+    switch (accion) {
+      case 'excel': this.ExportarExcel(); break;
+      case 'ver': this.VerDatos(); break;
+      default: this.GenerarPDF(accion); break;
+    }
+  }
+
   // TRATAMIENTO DE DATOS DE SUCURSALES
   ModelarSucursal(accion: any) {
     let seleccionados: any = [];
@@ -342,15 +347,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         return false;
       });
     });
-
-    this.data_pdf = [];
-    this.data_pdf = seleccionados;
-    //console.log('data final ', seleccionados)
-    switch (accion) {
-      case 'excel': this.ExportarExcel(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
-    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRAMIENTO DE DATOS POR REGIMEN
@@ -371,47 +369,30 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         return false;
       });
     });
-
-    this.data_pdf = [];
-    this.data_pdf = seleccionados;
-    //console.log('data reg ', seleccionados)
-    switch (accion) {
-      case 'excel': this.ExportarExcelCargoRegimen(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
-    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR CARGO
   ModelarCargo(accion: any) {
-    let empleados: any = [];
-    let car: any = [];
-    let objeto: any;
-    this.empleados.forEach((res: any) => {
+    let seleccionados: any = [];
+    this.cargos.forEach((res: any) => {
       this.selectionCar.selected.find((selec: any) => {
-        objeto = {
-          cargo: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        if (selec.id === res.id_cargo_ && selec.id_suc === res.id_suc) {
-          empleados.push(res);
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
         }
-        objeto.empleados = empleados;
-        car.push(objeto);
       });
     });
-
-    this.data_pdf = [];
-    this.data_pdf = car;
-    console.log('ver cargo ', this.data_pdf)
-    switch (accion) {
-      case 'excel': this.ExportarExcelCargoRegimen(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
-    }
+    seleccionados.forEach((cargo: any) => {
+      cargo.empleados = this.empleados.filter((selec: any) => {
+        if (selec.id_cargo_ === cargo.id && selec.id_suc === cargo.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR DEPARTAMENTO
@@ -432,32 +413,24 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         return false;
       });
     });
-
-    this.data_pdf = [];
-    this.data_pdf = seleccionados;
-    //console.log('seleccionados*** ', seleccionados)
-    switch (accion) {
-      case 'excel': this.ExportarExcelCargoRegimen(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
-    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   // TRATAMIENTO DE DATOS POR EMPLEADO
   ModelarEmpleados(accion: any) {
-    let emp = this.empleados.filter((o: any) => {
-      var bool = this.selectionEmp.selected.find(selec => {
-        return (selec.id === o.id && selec.id_suc === o.id_suc)
-      })
-      return bool != undefined
-    })
-    this.data_pdf = [];
-    this.data_pdf = emp;
-    switch (accion) {
-      case 'excel': this.ExportarExcel(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
-    }
+    let seleccionados: any = [{ nombre: 'Empleados' }];
+    let datos: any = [];
+    this.empleados.forEach((res: any) => {
+      this.selectionEmp.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          datos.push(res);
+        }
+      });
+    });
+    seleccionados[0].empleados = datos;
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    this.MostrarInformacion(seleccionados, accion);
   }
 
   /** ****************************************************************************************** **
@@ -484,11 +457,11 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                         METODO DE CREACION DE  PDF                                   ** **
    ** ****************************************************************************************** **/
 
   GenerarPDF(action: any) {
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -498,7 +471,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     }
   }
 
-  GetDocumentDefinicion() {
+  // METODO PARA ARMAR LA INFORMACION DEL PDF
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -553,24 +527,28 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     };
   }
 
-  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  // METODO PARA ESTRUCTURAR LOS DATOS DE LA CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-
     data.forEach((selec: any) => {
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
       let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
       if (this.bool.bool_reg === true) {
         descripcion = 'REGIMEN: ' + selec.nombre;
       }
-      if (this.bool.bool_dep === true) {
+      else if (this.bool.bool_dep === true) {
         descripcion = 'DEPARTAMENTO: ' + selec.departamento;
       }
-      if (this.bool.bool_cargo === true) {
-        descripcion = 'CARGO';
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
       }
-      if (this.bool.bool_suc === true || this.bool.bool_emp === true) {
+      else if (this.bool.bool_suc === true) {
         descripcion = 'CIUDAD: ' + selec.ciudad;
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
       }
 
       n.push({
@@ -589,7 +567,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
               {
                 border: [false, true, false, false],
                 bold: true,
-                text: 'SUCURSAL: ' + selec.sucursal,
+                text: establecimiento,
                 style: 'itemsTableInfo',
               },
               {
@@ -663,65 +641,14 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ValidarExcel() {
-    console.log('ingresa aqui 6633333')
-    console.log('ver validador *****', this.bool.bool_dep)
-    if (this.bool.bool_cargo || this.bool.bool_reg || this.bool.bool_dep) {
-      this.ExportarExcelCargoRegimen();
-    } else {
-      this.ExportarExcel();
-    }
-  }
-
   ExportarExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-  }
-
-  EstructurarDatosExcel(array: Array<any>) {
-    console.log('entra en normal')
-    let nuevo: Array<any> = [];
-    let usuarios: any[] = [];
-    let c = 0;
-    array.forEach((usu: any) => {
-      let ele = {
-        'Cédula': usu.cedula,
-        'Apellido': usu.apellido,
-        'Nombre': usu.nombre,
-        'Código': usu.codigo,
-        'Género': usu.genero == 1 ? 'M' : 'F',
-        'Ciudad': usu.ciudad,
-        'Sucursal': usu.name_suc,
-        'Régimen': usu.name_regimen,
-        'Departamento': usu.name_dep,
-        'Cargo': usu.name_cargo,
-        'Correo': usu.correo,
-      }
-      nuevo.push(ele);
-    });
-    nuevo.sort(function (a: any, b: any) {
-      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
-    });
-    nuevo.forEach((u: any) => {
-      c = c + 1;
-      const usuarioNuevo = Object.assign({ 'N°': c }, u);
-      usuarios.push(usuarioNuevo);
-    });
-
-    return usuarios;
-  }
-
-  ExportarExcelCargoRegimen(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
     xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xls`);
   }
 
-  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    console.log('entra en reg ', array)
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let usuarios: any[] = [];
     let c = 0;
@@ -729,15 +656,15 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       empl.empleados.forEach((usu: any) => {
         let ele = {
           'Cédula': usu.cedula,
+          'Código': usu.codigo,
           'Apellido': usu.apellido,
           'Nombre': usu.nombre,
-          'Código': usu.codigo,
           'Género': usu.genero == 1 ? 'M' : 'F',
           'Ciudad': usu.ciudad,
-          'Sucursal': usu.name_suc,
-          'Régimen': usu.name_regimen,
-          'Departamento': usu.name_dep,
-          'Cargo': usu.name_cargo,
+          'Sucursal': usu.sucursal,
+          'Régimen': usu.regimen,
+          'Departamento': usu.departamento,
+          'Cargo': usu.cargo,
           'Correo': usu.correo,
         }
         nuevo.push(ele)
@@ -762,25 +689,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   ExtraerDatos() {
     this.arr_emp = [];
     let n = 0;
-    console.log('ver data ', this.data_pdf)
-    this.data_pdf.forEach((empl: any) => {
-      this.arr_emp.push(empl);
-
-    });
-    this.arr_emp.sort(function (a: any, b: any) {
-      return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
-    });
-    this.arr_emp.forEach((u: any) => {
-      n = n + 1;
-      u['n'] = n;
-    });
-  }
-
-  ExtraerDatosRegimenCargoDepa() {
-    this.arr_emp = [];
-    let n = 0;
     this.data_pdf.forEach((selec: any) => {
-      selec.empleados.forEach(e => {
+      selec.empleados.forEach((e: any) => {
         this.arr_emp.push(e);
       })
     });
@@ -945,11 +855,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   //ENVIAR DATOS A LA VENTANA DE DETALLE
   VerDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg || this.bool.bool_dep) {
-      this.ExtraerDatosRegimenCargoDepa();
-    } else {
-      this.ExtraerDatos();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

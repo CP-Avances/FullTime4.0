@@ -724,7 +724,7 @@ export class EditarDepaUserComponent implements OnInit {
       let usuarios: any = [];
       if (id === 0 || id === undefined) {
         this.empleadosDep.forEach((empl: any) => {
-          this.selectionRegDep.selected.find(selec => {
+          this.selectionRegDep.selected.find((selec: any) => {
             if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
               usuarios.push(empl)
             }
@@ -746,7 +746,7 @@ export class EditarDepaUserComponent implements OnInit {
       let usuarios: any = [];
       if (id === 0 || id === undefined) {
         this.empleadosDep.forEach((empl: any) => {
-          this.selectionCargDep.selected.find(selec => {
+          this.selectionCargDep.selected.find((selec: any) => {
             if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
               usuarios.push(empl)
             }
@@ -769,7 +769,7 @@ export class EditarDepaUserComponent implements OnInit {
       let usuarios: any = [];
       if (id === 0 || id === undefined) {
         this.empleadosDep.forEach((empl: any) => {
-          this.selectionDepDep.selected.find(selec => {
+          this.selectionDepDep.selected.find((selec: any) => {
             if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
               usuarios.push(empl)
             }
@@ -793,7 +793,7 @@ export class EditarDepaUserComponent implements OnInit {
     ModelarEmpleadosDep(tipo: string) {
       let respuesta: any = [];
       this.empleadosDep.forEach((obj: any) => {
-        this.selectionEmpDep.selected.find(obj1 => {
+        this.selectionEmpDep.selected.find((obj1: any) => {
           if (obj1.id === obj.id) {
             respuesta.push(obj)
           }

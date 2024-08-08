@@ -350,7 +350,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen);
     let suc = respuesta.filter((o: any) => {
-      var bool = this.selectionSuc.selected.find(obj1 => {
+      var bool = this.selectionSuc.selected.find((obj1: any) => {
         return obj1.id === o.id_suc
       })
       return bool != undefined
@@ -442,7 +442,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter((o: any) => {
-        var bool = this.selectionDep.selected.find(obj1 => {
+        var bool = this.selectionDep.selected.find((obj1: any) => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -472,7 +472,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((departamento: any) => {
         departamento.empleado = departamento.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find(obj1 => {
+          var bool = this.selectionEmp.selected.find((obj1: any) => {
             return obj1.id === o.id
           })
           return bool != undefined
@@ -534,7 +534,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   GenerarPDF(action: any) {
     let documentDefinition: any;
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
+      documentDefinition = this.DefinirInformacionPDF();
     }
     let doc_name = `Timbres_incompleto_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
@@ -545,7 +545,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     }
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

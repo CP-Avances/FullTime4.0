@@ -2811,7 +2811,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** ****************************************************************************************** **/
 
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -2820,7 +2820,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].estado_civil - 1];
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];

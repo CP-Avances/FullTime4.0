@@ -352,7 +352,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen)
 
     let suc = respuesta.filter((o: any) => {
-      let bool = this.selectionSuc.selected.find(obj1 => {
+      let bool = this.selectionSuc.selected.find((obj1: any) => {
         return obj1.id === o.id_suc
       });
       return bool != undefined
@@ -421,7 +421,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter((o: any) => {
-        let bool = this.selectionDep.selected.find(obj1 => {
+        let bool = this.selectionDep.selected.find((obj1: any) => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -475,7 +475,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((departamento: any) => {
         departamento.empleado = departamento.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find(obj1 => {
+          var bool = this.selectionEmp.selected.find((obj1: any) => {
             return obj1.id === o.id
           })
           return bool != undefined
@@ -536,7 +536,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
+      documentDefinition = this.DefinirInformacionPDF();
     };
 
     let doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
@@ -549,7 +549,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

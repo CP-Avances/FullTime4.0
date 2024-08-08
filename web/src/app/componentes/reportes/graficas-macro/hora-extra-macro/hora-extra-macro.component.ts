@@ -182,7 +182,7 @@ export class HoraExtraMacroComponent implements OnInit {
   }
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_hora_extra_" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -194,7 +194,7 @@ export class HoraExtraMacroComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

@@ -301,7 +301,7 @@ export class AlimentosGeneralComponent implements OnInit {
       }
     }
     else {
-      const documentDefinition = this.getDocumentDefinicion();
+      const documentDefinition = this.DefinirInformacionPDF();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;
         case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -312,7 +312,7 @@ export class AlimentosGeneralComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
 

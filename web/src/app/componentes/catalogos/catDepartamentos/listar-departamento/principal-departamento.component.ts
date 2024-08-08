@@ -414,7 +414,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -426,7 +426,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',

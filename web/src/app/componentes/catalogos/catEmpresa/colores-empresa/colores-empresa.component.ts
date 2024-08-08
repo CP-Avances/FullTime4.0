@@ -195,7 +195,7 @@ export class ColoresEmpresaComponent implements OnInit {
 
   // GENERACION DE REPORTE DE PDF
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -207,7 +207,7 @@ export class ColoresEmpresaComponent implements OnInit {
   }
 
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     return {
 

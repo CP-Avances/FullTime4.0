@@ -12,10 +12,8 @@ class ReportesAtrasosRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
-        this.router.put('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasos);
-        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[empleados]]
-        this.router.put('/atrasos-empleados-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasosRegimenCargo);
+        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA
+        this.router.post('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasos);
     }
 }
 const REPORTES_ATRASOS_RUTAS = new ReportesAtrasosRutas();

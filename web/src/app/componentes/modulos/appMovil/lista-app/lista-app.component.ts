@@ -363,7 +363,7 @@ export class ListaAppComponent implements OnInit {
           this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
           this.idCargosAcceso.add(empleadoSesion.id_cargo_);
         } else {
-           // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
           this.idSucursalesAcceso.forEach((id_suc: any) => {
             if (!this.empleados.some((empleado: any) => empleado.id_suc === id_suc)) {
               this.idSucursalesAcceso.delete(id_suc);
@@ -1041,7 +1041,7 @@ export class ListaAppComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -1063,7 +1063,7 @@ export class ListaAppComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1085,7 +1085,7 @@ export class ListaAppComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1107,7 +1107,7 @@ export class ListaAppComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1128,7 +1128,7 @@ export class ListaAppComponent implements OnInit {
   ModelarEmpleados(tipo: any, lista: any, selector: any) {
     let respuesta: any = [];
     lista.forEach((obj: any) => {
-      selector.selected.find(obj1 => {
+      selector.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }

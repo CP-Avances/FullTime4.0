@@ -501,7 +501,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionSuc.selected.find(selec => {
+        this.selectionSuc.selected.find((selec: any) => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -523,7 +523,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find(selec => {
+        this.selectionReg.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -546,7 +546,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find(selec => {
+        this.selectionDep.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -568,7 +568,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find(selec => {
+        this.selectionCarg.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -589,7 +589,7 @@ export class TimbreMultipleComponent implements OnInit {
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+      this.selectionEmp.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }

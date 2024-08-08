@@ -489,7 +489,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.feriados);
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -499,7 +499,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

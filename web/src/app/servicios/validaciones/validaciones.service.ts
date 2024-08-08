@@ -217,6 +217,17 @@ export class ValidacionesService {
     return cargos;
   }
 
+  /** ******************************************************************** **
+   ** **                   METODO PARA SUMAR REGISTROS                  ** **
+   ** ** ***************************************************************** **/
+  SumarRegistros(array: any[]) {
+    let valor = 0;
+    for (let i = 0; i < array.length; i++) {
+      valor = valor + array[i];
+    }
+    return valor;
+  }
+
 }
 
 

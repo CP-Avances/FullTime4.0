@@ -159,7 +159,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   ** **                                      METODO PARA EXPORTAR A PDF                              ** **
   ** ************************************************************************************************** **/
   generarPdf(action = "open") {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case "open":
@@ -178,7 +178,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     return {
       // ENCABEZADO DE LA PAGINA

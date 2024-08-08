@@ -752,7 +752,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open") {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -769,7 +769,7 @@ export class ListarPlanificacionComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     return {
       // ENCABEZADO DE LA PAGINA

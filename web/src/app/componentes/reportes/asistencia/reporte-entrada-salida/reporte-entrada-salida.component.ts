@@ -358,7 +358,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
    * ****************************************************************************************************/
 
   generarPdf(action = 'open', id_seleccionado, form, fechasTotales: any) {
-    const documentDefinition = this.getDocumentDefinicion(id_seleccionado, form, fechasTotales);
+    const documentDefinition = this.DefinirInformacionPDF(id_seleccionado, form, fechasTotales);
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -369,7 +369,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion(id_seleccionado: number, form, fechasTotales: any) {
+  DefinirInformacionPDF(id_seleccionado: number, form, fechasTotales: any) {
 
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
 

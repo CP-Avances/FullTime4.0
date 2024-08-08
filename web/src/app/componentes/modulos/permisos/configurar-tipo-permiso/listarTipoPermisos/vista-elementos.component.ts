@@ -198,7 +198,7 @@ export class VistaElementosComponent implements OnInit {
    ** **                                  METODO PARA EXPORTAR A PDF                                  ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -210,7 +210,7 @@ export class VistaElementosComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     return {
 

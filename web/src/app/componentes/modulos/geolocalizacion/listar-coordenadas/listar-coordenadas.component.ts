@@ -207,7 +207,7 @@ export class ListarCoordenadasComponent implements OnInit {
    ** **                              METODO PARA EXPORTAR A PDF                                      ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -218,7 +218,7 @@ export class ListarCoordenadasComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',

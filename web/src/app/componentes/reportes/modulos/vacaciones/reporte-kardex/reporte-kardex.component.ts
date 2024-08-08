@@ -160,7 +160,7 @@ export class ReporteKardexComponent implements OnInit {
     let documentDefinition;
 
     if (pdf === 3) {
-      documentDefinition = this.getDocumentDefinicionKardex();
+      documentDefinition = this.DefinirInformacionPDFKardex();
     }
 
     switch (action) {
@@ -175,7 +175,7 @@ export class ReporteKardexComponent implements OnInit {
   /**********************************************
    *  METODOS PARA IMPRIMIR EL KARDEX
    **********************************************/
-  getDocumentDefinicionKardex() {
+  DefinirInformacionPDFKardex() {
     // sessionStorage.setItem('Empleado', this.empleados);
     var f = new Date();
     f.setUTCHours(f.getHours())

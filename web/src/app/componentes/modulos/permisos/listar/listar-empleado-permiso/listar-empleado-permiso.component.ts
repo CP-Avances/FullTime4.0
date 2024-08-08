@@ -518,7 +518,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open", opcion: string) {
-    const documentDefinition = this.getDocumentDefinicion(opcion);
+    const documentDefinition = this.DefinirInformacionPDF(opcion);
 
     switch (action) {
       case "open":
@@ -536,7 +536,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion(opcion: string) {
+  DefinirInformacionPDF(opcion: string) {
     if (opcion == "Permisos solicitados") {
       sessionStorage.setItem(
         "PermisosSolicitados",

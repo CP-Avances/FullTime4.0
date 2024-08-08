@@ -237,7 +237,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     let documentDefinition;
 
     if (pdf === 1) {
-      documentDefinition = this.getDocumentDefinicionAsistencia();
+      documentDefinition = this.DefinirInformacionPDFAsistencia();
     }
 
     switch (action) {
@@ -254,7 +254,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
    *  METODOS PARA IMPRIMIR LA ASISTENCIA
    **********************************************/
   fechaHoy: string;
-  getDocumentDefinicionAsistencia() {
+  DefinirInformacionPDFAsistencia() {
 
     var f = new Date();
     f.setUTCHours(f.getHours())

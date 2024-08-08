@@ -711,7 +711,7 @@ export class ListaEmpleadosComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   GenerarPdf(action = 'open', numero: any) {
-    const documentDefinition = this.GetDocumentDefinicion(numero);
+    const documentDefinition = this.DefinirInformacionPDF(numero);
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -720,7 +720,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-  GetDocumentDefinicion(numero: any) {
+  DefinirInformacionPDF(numero: any) {
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

@@ -9,14 +9,9 @@ export class FaltasService {
 
   constructor(private http: HttpClient) { }
 
-  // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
+  // METODO DE BUSQUEDA DE DATOS DE ATRASOS 
   BuscarFaltas(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
-  }
-
-  // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[empleados]]
-  BuscarFaltasRegimenCargo(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/reporte-faltas/faltas-regimen-cargo/${inicio}/${fin}`, data);
+    return this.http.post<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
   }
 
 }

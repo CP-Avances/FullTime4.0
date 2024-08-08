@@ -251,7 +251,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     if (Object.keys(this.horasExtras).length === 0) {
       this.toastr.error('No se ha encontrado registro de horas extras.')
     } else {
-      const documentDefinition = this.getDocumentDefinicion();
+      const documentDefinition = this.DefinirInformacionPDF();
 
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -264,7 +264,7 @@ export class ListaHorasExtrasComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
 
     return {
 

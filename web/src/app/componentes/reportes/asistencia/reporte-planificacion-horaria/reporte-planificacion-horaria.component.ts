@@ -381,7 +381,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     let usuarios: any = [];
 
     respuesta.forEach((obj: any) => {
-      this.selectionSuc.selected.find(obj1 => {
+      this.selectionSuc.selected.find((obj1: any) => {
         if (obj1.id === obj.id_suc) {
           obj.departamentos.forEach((obj2: any) => {
             obj2.empleado.forEach((obj3: any) => {
@@ -452,7 +452,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen_cargo);
     let usuarios: any = [];
     respuesta.forEach((obj: any) => {
-      this.selectionCar.selected.find(obj1 => {
+      this.selectionCar.selected.find((obj1: any) => {
         if (obj.id_cargo === obj1.id) {
           obj.empleados.forEach((obj3: any) => {
             usuarios.push(obj3)
@@ -704,7 +704,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
+      documentDefinition = this.DefinirInformacionPDF();
     };
 
     let doc_name = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
@@ -717,7 +717,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',

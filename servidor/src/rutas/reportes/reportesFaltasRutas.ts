@@ -11,11 +11,8 @@ class FaltasRutas {
 
     configuracion(): void {
 
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
-        this.router.put('/faltas/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltas);
-
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[empleados]]
-        this.router.put('/faltas-regimen-cargo/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltasRegimenCargo);
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS
+        this.router.post('/faltas/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltas);
 
     }
 }

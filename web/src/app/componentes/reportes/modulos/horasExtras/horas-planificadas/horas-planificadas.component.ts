@@ -166,7 +166,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
   ModelarSucursal(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     let suc = respuesta.filter((o: any) => {
-      var bool = this.selectionSuc.selected.find(obj1 => {
+      var bool = this.selectionSuc.selected.find((obj1: any) => {
         return obj1.id === o.id_suc
       })
       return bool != undefined
@@ -188,7 +188,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter((o: any) => {
-        var bool = this.selectionDep.selected.find(obj1 => {
+        var bool = this.selectionDep.selected.find((obj1: any) => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -215,7 +215,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find(obj1 => {
+          var bool = this.selectionEmp.selected.find((obj1: any) => {
             return obj1.id === o.id
           })
           return bool != undefined
@@ -270,7 +270,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
     let documentDefinition;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.DefinirInformacionPDF();
     }
 
     var f = new Date()
@@ -284,7 +284,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
