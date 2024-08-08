@@ -55,6 +55,12 @@ class UsuarioRutas {
         this.router.delete('/eliminar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
         // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS    **USADO
         this.router.post('/usuario-departamento/multiple', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
+        //--------------------------------------------------------------------------------------------------------------------------------------
+        // METODOS PARA APP MOVIL
+        this.router.get('/IDdispositivos/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getidDispositivo);
+        this.router.post('/ingresarIDdispositivo', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ingresarIDdispositivo);
+        this.router.get('/usuarioEmpresa', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getEmpleadosActivos);
+        this.router.get('/usuario/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getUserById);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

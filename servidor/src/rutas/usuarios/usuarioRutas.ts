@@ -63,6 +63,16 @@ class UsuarioRutas {
         // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS    **USADO
         this.router.post('/usuario-departamento/multiple', TokenValidation, USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
 
+        //--------------------------------------------------------------------------------------------------------------------------------------
+        // METODOS PARA APP MOVIL
+        this.router.get('/IDdispositivos/:id_empleado',TokenValidation,  USUARIO_CONTROLADOR.getidDispositivo);
+
+        this.router.post('/ingresarIDdispositivo',TokenValidation, USUARIO_CONTROLADOR.ingresarIDdispositivo);
+
+        this.router.get('/usuarioEmpresa', TokenValidation, USUARIO_CONTROLADOR.getEmpleadosActivos);
+        this.router.get('/usuario/:id', TokenValidation, USUARIO_CONTROLADOR.getUserById);
+
+
     }
 }
 

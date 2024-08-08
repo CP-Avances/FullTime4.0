@@ -523,7 +523,7 @@ class FeriadosControlador {
                         var OBTENER_IDPROVINCI = yield database_1.default.query(`
                         SELECT id FROM e_provincias 
                         WHERE UPPER(nombre) = $1
-                        `, [value.provincia.toUpperCase()]);
+                                `, [value.provincia.toUpperCase()]);
                         if (OBTENER_IDPROVINCI.rows[0] != undefined && OBTENER_IDPROVINCI.rows[0] != '') {
                             var id_provincia = OBTENER_IDPROVINCI.rows[0].id;
                             if (value.ciudad != 'No registrado') {
@@ -538,13 +538,13 @@ class FeriadosControlador {
                                     var id_ciudad = VERIFICAR_CIUDAD.rows[0].id;
                                     var VERIFICAR_CIUDAD_PRO = yield database_1.default.query(`
                                     SELECT * FROM e_ciudades 
-                                    WHERE id_provincia = $1 AND UPPER (descripcion) = $2
-                                    `, [id_provincia, value.ciudad.toUpperCase()]);
+                                    WHERE id_provincia = $1 AND UPPER(descripcion) = $2
+                                `, [id_provincia, value.ciudad.toUpperCase()]);
                                     if (VERIFICAR_CIUDAD_PRO.rows[0] != undefined && VERIFICAR_CIUDAD.rows[0] != '') {
                                         const VERIFICAR_DESCRIP = yield database_1.default.query(`
                                         SELECT id FROM ef_cat_feriados 
                                         WHERE UPPER(descripcion) = $1
-                                        `, [value.feriado.toUpperCase()]);
+                                `, [value.feriado.toUpperCase()]);
                                         if (VERIFICAR_DESCRIP.rowCount === 0) {
                                             value.observacion = 'registrado';
                                         }
@@ -760,6 +760,29 @@ class FeriadosControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
+    /** ********************************************************************************************* **
+     ** **                          METODOS DE APLICACION MOVIL                                    ** **
+     ** ********************************************************************************************* **/
+    // METODO PARA LEER FERIADOS   **USADO
+    LeerFeriados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const fecha = new Date();
+                const response = yield database_1.default.query(`
+                SELECT id, descripcion, CAST(fecha AS VARCHAR), CAST(fecha_recuperacion AS VARCHAR) 
+                FROM ef_cat_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || '%' 
+                ORDER BY descripcion ASC
+                `, [fecha.toJSON().split("-")[0]]);
+                const cg_feriados = response.rows;
+                return res.status(200).jsonp(cg_feriados);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 const FERIADOS_CONTROLADOR = new FeriadosControlador();
 exports.default = FERIADOS_CONTROLADOR;

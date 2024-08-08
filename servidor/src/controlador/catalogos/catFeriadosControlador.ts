@@ -599,7 +599,7 @@ class FeriadosControlador {
                         `
                         SELECT id FROM e_provincias 
                         WHERE UPPER(nombre) = $1
-                        `
+                                `
                         , [value.provincia.toUpperCase()]);
                     if (OBTENER_IDPROVINCI.rows[0] != undefined && OBTENER_IDPROVINCI.rows[0] != '') {
                         var id_provincia = OBTENER_IDPROVINCI.rows[0].id;
@@ -618,15 +618,15 @@ class FeriadosControlador {
                                 var VERIFICAR_CIUDAD_PRO = await pool.query(
                                     `
                                     SELECT * FROM e_ciudades 
-                                    WHERE id_provincia = $1 AND UPPER (descripcion) = $2
-                                    `
+                                    WHERE id_provincia = $1 AND UPPER(descripcion) = $2
+                                `
                                     , [id_provincia, value.ciudad.toUpperCase()]);
                                 if (VERIFICAR_CIUDAD_PRO.rows[0] != undefined && VERIFICAR_CIUDAD.rows[0] != '') {
                                     const VERIFICAR_DESCRIP = await pool.query(
                                         `
                                         SELECT id FROM ef_cat_feriados 
                                         WHERE UPPER(descripcion) = $1
-                                        `
+                                `
                                         , [value.feriado.toUpperCase()]);
                                     if (VERIFICAR_DESCRIP.rowCount === 0) {
                                         value.observacion = 'registrado'
@@ -879,6 +879,29 @@ class FeriadosControlador {
 
         return res.status(200).jsonp({ message: 'ok' });
     }
+
+    /** ********************************************************************************************* **
+     ** **                          METODOS DE APLICACION MOVIL                                    ** **
+     ** ********************************************************************************************* **/
+
+     // METODO PARA LEER FERIADOS   **USADO
+    public async LeerFeriados(req: Request, res: Response): Promise<Response> {
+        try {
+            const fecha = new Date();
+            const response: QueryResult = await pool.query(
+                `
+                SELECT id, descripcion, CAST(fecha AS VARCHAR), CAST(fecha_recuperacion AS VARCHAR) 
+                FROM ef_cat_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || '%' 
+                ORDER BY descripcion ASC
+                `
+                , [fecha.toJSON().split("-")[0]]);
+            const cg_feriados: any[] = response.rows;
+            return res.status(200).jsonp(cg_feriados);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
 
 }
 

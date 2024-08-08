@@ -7,6 +7,8 @@ import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import path from 'path';
 import pool from '../../database';
 import jwt from 'jsonwebtoken';
+//IMPORTACIONES PARA AOO MOVIL
+import { QueryResult } from 'pg';
 
 interface IPayload {
   _id: number,
@@ -1056,6 +1058,93 @@ class UsuarioControlador {
 
   }
 
+  //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
+
+  public async getidDispositivo(req: Request, res: Response): Promise<Response> {
+    try {
+      const id_empleado = req.params.id_empleado;
+      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `);
+      const IdDispositivos = response.rows;
+      return res.jsonp(IdDispositivos);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).jsonp({
+        message: 'Ups! Problemas para conectar con el servidor' +
+          '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+      });
+    }
+  };
+
+  public async ingresarIDdispositivo(req: Request, res: Response) {
+    try {
+      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+      await pool.query('BEGIN');
+
+      const response: QueryResult = await pool.query(
+        'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
+        'VALUES ($1, $2, $3) RETURNING *',
+        [id_empleado, id_celular, modelo_dispositivo]
+      )
+      const [objetoDispositivos] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: "mrv_dispositivos",
+        usuario: user_name,
+        accion: "I",
+        datosOriginales: "",
+        datosNuevos: JSON.stringify(objetoDispositivos),
+        ip: ip,
+        observacion: null,
+      });
+
+      await pool.query('COMMIT');
+      if (!Response) return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
+
+      return res.status(200).jsonp({
+        body: {
+          mensaje: "Celular Registrado ",
+          response: response.rowCount
+        }
+      })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Error para registrar el celular, Revise su conexion a la red.' });
+    }
+  };
+
+  async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
+    try {
+      const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo, ' +
+        '( e.apellido || \' \' || e.nombre) as fullname, e.id, u.id_rol, u.usuario ' +
+        'FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+      const usuarios = response.rows;
+      console.log(usuarios);
+      return res.jsonp(usuarios);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).
+        jsonp({
+          message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+            'o https://casapazmino.com.ec'
+        });
+    }
+  };
+  public async getUserById(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = parseInt(req.params.id);
+      const response: QueryResult = await pool.query("SELECT * FROM eu_usuarios WHERE id = $1", [id]);
+      const usuarios: any[] = response.rows;
+      return res.jsonp(usuarios[0]);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({
+        message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+          'o https://casapazmino.com.ec'
+      });
+    }
+  };
+  
 }
 
 /* @return
@@ -1199,6 +1288,8 @@ interface Datos {
   user_name: string;
   ip: string;
 }
+
+
 
 export const USUARIO_CONTROLADOR = new UsuarioControlador();
 

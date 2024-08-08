@@ -21,6 +21,8 @@ class VacacionesRutas {
 
         this.router.get('/datosSolicitud/:id_emple_vacacion', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacaciones);
         this.router.get('/datosAutorizacion/:id_vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerAutorizacionVacaciones);
+        this.router.get('/lista-vacacionesfechas/fechas/',TokenValidation, VACACIONES_CONTROLADOR.getlistaVacacionesByFechasyCodigo)
+
 
         /** ************************************************************************************************* **
          ** **                          METODOS PARA MANEJO DE VACACIONES                                  ** ** 
@@ -48,6 +50,9 @@ class VacacionesRutas {
         this.router.post('/mail-noti/', TokenValidation, VACACIONES_CONTROLADOR.EnviarCorreoVacacion);
         // ENVIO DE CORREO DE VACACIONES DESDE APLICACION MOVIL
         this.router.post('/mail-noti-vacacion-movil/:id_empresa', VACACIONES_CONTROLADOR.EnviarCorreoVacacionesMovil);
+
+
+
 
     }
 }

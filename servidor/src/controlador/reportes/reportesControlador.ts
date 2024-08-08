@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
+import { QueryResult } from 'pg';
 
 class ReportesControlador {
 
@@ -120,6 +121,21 @@ class ReportesControlador {
             return res.status(404).jsonp({ text: 'error' });
         }
     }
+
+    public async getInfoReporteTimbres(req: Request, res: Response): Promise<Response> {
+        try {
+            const { codigo, fec_inicio, fec_final } = req.query;
+            const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+            const timbres: any[] = response.rows;
+            // console.log(timbres);
+            if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
+
+            return res.status(200).jsonp(timbres);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
 
 
 }

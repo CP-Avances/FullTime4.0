@@ -108,6 +108,10 @@ class EmpleadoRutas {
          ** **************************************************************************************** **/
         // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
         this.router.post('/crear_carpetas/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearCarpetasEmpleado);
+        //--------------------------------------------------------------- METODO APP MOVIL -------------------------------------------------------------------
+        this.router.get('/horarios/horariosEmpleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.getHorariosEmpleadoByCodigo);
+        this.router.get('/todosempleados/lista', verificarToken_1.TokenValidation, empleadoControlador_1.default.getListaEmpleados);
+        this.router.get('/horariosempleado/planificacionHorarioEmplCodigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.getPlanificacionMesesCodigoEmple);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

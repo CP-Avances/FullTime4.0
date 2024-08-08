@@ -1,46 +1,20 @@
-import { Router } from 'express';
 import FERIADOS_CONTROLADOR from '../../controlador/catalogos/catFeriadosControlador';
-import { TokenValidation } from '../../libs/verificarToken';
-
-import multer from 'multer';
-import moment from 'moment';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
-
+import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
 
 const storage = multer.diskStorage({
-
     destination: function (req, file, cb) {
         cb(null, ObtenerRutaLeerPlantillas())
     },
     filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
-        let documento = file.originalname;
-        cb(null, documento);
-    }
-})
-
-const storage1 = multer.diskStorage({
-
-    destination: function (req, file, cb) {
-        cb(null, ObtenerRutaLeerPlantillas())
-    },
-    filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
         let documento = file.originalname;
         cb(null, documento);
     }
 })
 
 const upload = multer({ storage: storage });
-const upload1 = multer({ storage: storage1 });
 
 class FeriadosRuta {
     public router: Router = Router();
@@ -70,10 +44,17 @@ class FeriadosRuta {
         // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos);
         // METODO PARA REGISTRAR DATOS DE FERIADOS DE PLANTILLA   **USADO
-        this.router.post('/upload/crearFeriado', [TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado);
+        this.router.post('/upload/crearFeriado', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado);
         // METODO PARA REGISTRAR DATOS DE FERIADOS CIUDADES DE PLANTILLA   **USADO
-        this.router.post('/upload/crearFeriadoCiudad', [TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado_Ciudad);
+        this.router.post('/upload/crearFeriadoCiudad', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado_Ciudad);
 
+
+
+        /** ************************************************************************************* **
+         ** **                         METODO DE APLICACION MOVIL                              ** **
+         ** ************************************************************************************* **/
+        // METODO PARA LEER FERIADOS   **USADO
+        this.router.get('/cg-feriados', TokenValidation, FERIADOS_CONTROLADOR.LeerFeriados)
     }
 }
 

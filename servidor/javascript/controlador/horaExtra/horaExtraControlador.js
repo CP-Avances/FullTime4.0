@@ -14,10 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraPedidasControlador = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
 class HorasExtrasPedidasControlador {
     // verificar uso de estado
     ListarHorasExtrasPedidas(req, res) {
@@ -233,16 +235,70 @@ class HorasExtrasPedidasControlador {
     // CREACIÓN DE HORAS EXTRAS
     CrearHoraExtraPedida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
+                console.log("ver el cuerpo", req.body);
+                const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+                var { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = req.body;
+                console.log;
+                let codigoEmpleado = codigo || '';
+                if (subir_documento) {
+                    try {
+                        const { carpetaHorasExtra, codigo } = yield (0, accesoCarpetas_1.ObtenerRutaHorasExtraIdEmpleado)(id_usua_solicita);
+                        codigoEmpleado = codigo;
+                        fs_1.default.access(carpetaHorasExtra, fs_1.default.constants.F_OK, (err) => {
+                            if (err) {
+                                // METODO MKDIR PARA CREAR LA CARPETA
+                                fs_1.default.mkdir(carpetaHorasExtra, { recursive: true }, (err2) => {
+                                    if (err2) {
+                                        console.log('Error al intentar crear carpeta de permisos.', err2);
+                                        throw new Error('Error al intentar crear carpeta de permisos.');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    catch (error) {
+                        throw new Error('Error al intentar acceder a la carpeta de permisos.');
+                    }
+                }
+                const carpetaHorasExtra = yield (0, accesoCarpetas_1.ObtenerRutaHorasExtraGeneral)();
+                const separador = path_1.default.sep;
+                const fecha = (0, moment_1.default)();
+                const anio = fecha.format('YYYY');
+                const mes = fecha.format('MM');
+                const dia = fecha.format('DD');
+                const documentoTemporal = `${carpetaHorasExtra}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+                if (nombreArchivo) {
+                    try {
+                        console.log("entrando a subir documento");
+                        const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaHorasExtra)(codigo);
+                        const documento = `${carpetaEmpleado}${separador}${codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                        fs_1.default.copyFileSync(documentoTemporal, documento);
+                    }
+                    catch (error) {
+                        console.error('Error al copiar el archivo:', error);
+                        // errorPermisos = true;
+                    }
+                    const documento1 = `${codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                    documento = documento1;
+                }
+                try {
+                    if (fs_1.default.existsSync(documentoTemporal)) {
+                        fs_1.default.unlinkSync(documentoTemporal);
+                    }
+                }
+                catch (error) {
+                    console.error('Error al eliminar el archivo temporal:', error);
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mhe_solicitud_hora_extra (id_empleado_cargo, id_empleado_solicita, fecha_inicio, fecha_final, 
-          fecha_solicita, horas_solicitud, descripcion, estado, observacion, tipo_funcion) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+          fecha_solicita, horas_solicitud, descripcion, estado, observacion, tipo_funcion, documento) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `, [id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion,
-                    estado, observacion, tipo_funcion]);
+                    estado, observacion, tipo_funcion, documento]);
                 const [objetoHoraExtra] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -263,6 +319,7 @@ class HorasExtrasPedidasControlador {
             }
             catch (error) {
                 // REVERTIR TRNASACCION
+                console.log("Ver error", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -995,6 +1052,49 @@ class HorasExtrasPedidasControlador {
             }
         });
     }
+    //----------------------------------------------------------------- METODOS APP MOVIL------------------------------------------------------------------------------------------------------
+    getlistaHorasExtrasByFechasyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_inicio, fecha_final, codigo } = req.query;
+                const query = `SELECT h.* FROM mhe_solicitud_hora_extra h WHERE h.id_empleado_solicita = '${codigo}' AND (
+            ((\'${fecha_inicio}\' BETWEEN h.fecha_inicio AND h.fecha_final ) OR 
+             (\'${fecha_final}\' BETWEEN h.fecha_inicio AND h.fecha_final)) 
+            OR
+            ((h.fecha_inicio BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\') OR 
+             (h.fecha_final BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\'))
+            )`;
+                const response = yield database_1.default.query(query);
+                const horas_extras = response.rows;
+                return res.status(200).jsonp(horas_extras);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getlistaHorasExtrasByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo } = req.query;
+                const subquery1 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = h.id_empleado_cargo and i.id_tipo_cargo = t.id) as ncargo ';
+                const subquery2 = '( SELECT da.id_contrato FROM informacion_general AS da WHERE da.id = h.id_empleado_solicita ) AS id_contrato ';
+                const query = `SELECT h.*, ${subquery1}, ${subquery2} 
+            FROM mhe_solicitud_hora_extra h WHERE h.id_empleado_solicita = '${codigo}' 
+            ORDER BY h.fecha_inicio DESC LIMIT 100`;
+                const response = yield database_1.default.query(query);
+                const horas_extras = response.rows;
+                return res.status(200).jsonp(horas_extras);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.horaExtraPedidasControlador = new HorasExtrasPedidasControlador();
 exports.default = exports.horaExtraPedidasControlador;

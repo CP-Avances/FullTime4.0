@@ -36,6 +36,13 @@ class TimbresRutas {
         this.router.put('/noti-timbres/vista/:id_noti_timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarVista);
         // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USADO
         this.router.get('/ver/timbres/:id', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbresEmpleado);
+        //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+        this.router.post('/timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbre);
+        this.router.post('/timbreSinConexion', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreDesconectado);
+        this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
+        this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
+        this.router.post('/atraso', verificarToken_1.TokenValidation, timbresControlador_1.default.justificarAtraso);
+        this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
     }
 }
 const TIMBRES_RUTAS = new TimbresRutas();
