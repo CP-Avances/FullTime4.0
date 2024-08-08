@@ -12,6 +12,7 @@ class ParametrosRutas {
         this.configuracion();
     }
     configuracion() {
+        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
         // METODO PARA ACTUALIZAR PARAMETRO  **USADO
