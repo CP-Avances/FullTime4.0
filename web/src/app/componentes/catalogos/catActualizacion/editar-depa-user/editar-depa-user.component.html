@@ -136,6 +136,8 @@
                                 </mat-icon>
                             </mat-form-field>
                         </div>
+                    </div>
+                    <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Nombres</mat-label>
@@ -148,6 +150,8 @@
                                 </mat-icon>
                             </mat-form-field>
                         </div>
+                    </div>
+                    <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
@@ -160,6 +164,8 @@
                             </mat-form-field>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
@@ -173,17 +179,6 @@
                                 </mat-icon>
                             </mat-form-field>
                         </div>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Rol</mat-label>
-                                <input matInput placeholder="Buscar" (input)="FiltrarDep(nombre_rolDep.value, 8)"
-                                    [formControl]="nombre_rolDep" type="text" (keypress)="IngresarSoloLetras($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de roles.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
                     </div>
                 </div>
             </form>
@@ -191,7 +186,7 @@
             <!--  **************************  BOTON PARA ACTUALIZAR  ***************************  -->
             <br/>
             <div class="row">
-                <div class="col-4">
+                <div class="col-6">
                     <div class="container d-flex flex-wrap justify-content-center">
                         <mat-form-field>
                             <mat-label>Seleccionar la sucursal</mat-label>
@@ -205,7 +200,7 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-6">
                     <div class="container d-flex flex-wrap justify-content-center">
                         <mat-form-field>
                             <mat-label>Seleccionar el departamento</mat-label>
@@ -214,20 +209,6 @@
                             <mat-select [formControl]="idDepa" required>
                                 <mat-option *ngFor="let dep of Ldepatamentos" [value]="dep.id">
                                     {{dep.nombre}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Seleccionar el rol</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de roles.">
-                                help_outline</mat-icon>
-                            <mat-select [formControl]="nombreRolDepF" required>
-                                <mat-option *ngFor="let rol of listaRoles" [value]="rol.id">
-                                    {{rol.nombre}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -483,7 +464,7 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Codigo</th>
-                                <th scope="col">rol</th>
+                                <th scope="col">Departamento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -499,7 +480,7 @@
                                 <td>{{e.nombre}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
-                                <td>{{e.rol}}</td>
+                                <td>{{e.dep}}</td>
                             </tr>
                         </tbody>
                     </table>

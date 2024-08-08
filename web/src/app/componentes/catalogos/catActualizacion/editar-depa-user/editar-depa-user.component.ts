@@ -342,7 +342,7 @@ export class EditarDepaUserComponent implements OnInit {
         id_depa: obj.id_depa,
         id_cargo_: obj.id_cargo_, // TIPO DE CARGO
         hora_trabaja: obj.hora_trabaja,
-        rol: obj.name_rol
+        dep: obj.name_dep
       })
     })
   
@@ -843,11 +843,12 @@ export class EditarDepaUserComponent implements OnInit {
   }
 
   abriEditarDepaUser(datos: any) {    
+    console.log('datos: ',datos)
+    
     if (datos.length > 0) {
       const data = {
         idSucursal: this.formularioDep.get('sucursal')?.value,
         idDepartamento: this.formularioDep.get('idDepa')?.value,
-        idRol: this.formularioDep.get('nombreRolDepF')?.value,
         listaUsuarios: datos
       }
 
@@ -859,16 +860,13 @@ export class EditarDepaUserComponent implements OnInit {
         this.toastr.warning('Seleccione el departamento.', '', {
           timeOut: 4000,
         });
-      }else if(data.idRol == ''){
-        this.toastr.warning('Seleccione el rol.', '', {
-          timeOut: 4000,
-        });
       }else{
         this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
           this.toastr.success(res.message, '', {
             timeOut: 4000,
           });
           this.LimpiarFormularioDep();
+          this.formularioDep.reset();
         }, (error: any) => {
           this.toastr.error(error, '', {
             timeOut: 4000,
@@ -881,6 +879,7 @@ export class EditarDepaUserComponent implements OnInit {
         timeOut: 4000,
       });
     }
+    
   }
 
 
