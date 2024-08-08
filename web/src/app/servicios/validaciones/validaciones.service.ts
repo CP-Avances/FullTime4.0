@@ -1,5 +1,4 @@
 import { ToastrService } from 'ngx-toastr';
-import { LoginService } from '../login/login.service';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
@@ -13,7 +12,6 @@ export class ValidacionesService {
   constructor(
     private toastr: ToastrService,
     private router: Router,
-    private audit: LoginService,
   ) { }
 
 
@@ -411,6 +409,7 @@ export class ValidacionesService {
         codigo: obj.codigo,
         cedula: obj.cedula,
         correo: obj.correo,
+        genero: obj.genero,
         id_cargo: obj.id_cargo,
         id_contrato: obj.id_contrato,
         sucursal: obj.name_suc,
