@@ -37,7 +37,7 @@ class LoginControlador {
 
     try {
       const { nombre_usuario, pass } = req.body;
-      console.log('req body ', req.body)
+      //console.log('req body ', req.body)
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
@@ -85,7 +85,7 @@ class LoginControlador {
         const { public_key, id_empresa } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         let archivo_licencia = ObtenerRutaLicencia();
-        console.log('licencia ', archivo_licencia)
+        //console.log('licencia ', archivo_licencia)
         const data = fs.readFileSync(archivo_licencia, 'utf8')
         const FileLicencias = JSON.parse(data);
 

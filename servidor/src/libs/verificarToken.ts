@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Licencias, Modulos } from '../class/Licencia';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import { ObtenerRutaLicencia } from './accesoCarpetas';
 
 interface IPayload {
     _id: number,
@@ -37,8 +38,8 @@ export const TokenValidation = (req: Request, res: Response, next: NextFunction)
         const payload = jwt.verify(token, process.env.TOKEN_SECRET || 'llaveSecreta') as IPayload;
         // CUANDO SE EXTRAE LOS DATOS SE GUARDA EN UNA PROPIEDAD REQ.USERID PARA Q LAS DEMAS FUNCIONES PUEDAN UTILIZAR ESE ID 
         if (!payload._web_access) return res.status(401).send('No tiene acceso a los recursos de la aplicacion.');
-
-        fs.readFile('licencia.conf.json', 'utf8', function (err, data) {
+        let archivo_licencia = ObtenerRutaLicencia();
+        fs.readFile(archivo_licencia, 'utf8', function (err, data) {
             const FileLicencias = JSON.parse(data);
             if (err) return res.status(401).send('No existe registro de licencias.');
 

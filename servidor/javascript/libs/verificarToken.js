@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenValidation = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
+const accesoCarpetas_1 = require("./accesoCarpetas");
 const TokenValidation = (req, res, next) => {
     // VERIFICA SI EN LA PETICION EXISTE LA CABECERA AUTORIZACION 
     if (!req.headers.authorization) {
@@ -24,7 +25,8 @@ const TokenValidation = (req, res, next) => {
         // CUANDO SE EXTRAE LOS DATOS SE GUARDA EN UNA PROPIEDAD REQ.USERID PARA Q LAS DEMAS FUNCIONES PUEDAN UTILIZAR ESE ID 
         if (!payload._web_access)
             return res.status(401).send('No tiene acceso a los recursos de la aplicacion.');
-        fs_1.default.readFile('licencia.conf.json', 'utf8', function (err, data) {
+        let archivo_licencia = (0, accesoCarpetas_1.ObtenerRutaLicencia)();
+        fs_1.default.readFile(archivo_licencia, 'utf8', function (err, data) {
             const FileLicencias = JSON.parse(data);
             if (err)
                 return res.status(401).send('No existe registro de licencias.');

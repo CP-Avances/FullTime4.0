@@ -34,7 +34,7 @@ class LoginControlador {
             }
             try {
                 const { nombre_usuario, pass } = req.body;
-                console.log('req body ', req.body);
+                //console.log('req body ', req.body)
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
@@ -68,7 +68,7 @@ class LoginControlador {
                     const { public_key, id_empresa } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
                     let archivo_licencia = (0, accesoCarpetas_1.ObtenerRutaLicencia)();
-                    console.log('licencia ', archivo_licencia);
+                    //console.log('licencia ', archivo_licencia)
                     const data = fs_1.default.readFileSync(archivo_licencia, 'utf8');
                     const FileLicencias = JSON.parse(data);
                     const ok_licencias = FileLicencias.filter((o) => {
