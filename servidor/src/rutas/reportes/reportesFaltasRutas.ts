@@ -11,7 +11,7 @@ class FaltasRutas {
 
     configuracion(): void {
 
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
         this.router.post('/faltas/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltas);
 
     }

@@ -166,6 +166,14 @@ export const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 }
 
+// METODO DE BUSQUEDA DE ARCHIVO LICENCIA
+export const ObtenerRutaLicencia = function () {
+    let ruta = '';
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'licencia.conf.json';
+}
+
 // METODO PARA OBTENER POSICION DE PLANTILLA
 export const ObtenerIndicePlantilla = function (libroExcel: any, hoja: string) {
     const sheet_name_list = libroExcel.SheetNames;

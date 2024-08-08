@@ -12,6 +12,7 @@ import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import { ObtenerRutaLicencia } from '../../libs/accesoCarpetas';
 
 interface IPayload {
   _id: number,
@@ -36,14 +37,15 @@ class LoginControlador {
 
     try {
       const { nombre_usuario, pass } = req.body;
+      console.log('req body ', req.body)
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `
         , [nombre_usuario, pass]);
-      
-        // SI EXISTE USUARIOS
+
+      // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
 
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
@@ -82,7 +84,9 @@ class LoginControlador {
 
         const { public_key, id_empresa } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
-        const data = fs.readFileSync('licencia.conf.json', 'utf8')
+        let archivo_licencia = ObtenerRutaLicencia();
+        console.log('licencia ', archivo_licencia)
+        const data = fs.readFileSync(archivo_licencia, 'utf8')
         const FileLicencias = JSON.parse(data);
 
         const ok_licencias = FileLicencias.filter((o: Licencias) => {

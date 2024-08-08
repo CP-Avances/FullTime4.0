@@ -11,7 +11,7 @@ class ReportesTiempoLaboradoRutas {
 
   configuracion(): void {
 
-    // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO
+    // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO    **USADO
     this.router.post('/tiempo-laborado-empleados/:desde/:hasta', TokenValidation, REPORTES_TIEMPO_LABORADO_CONTROLADOR.ReporteTiempoLaborado);
 
   }

@@ -4,7 +4,7 @@ mat-form-field {
 
 table {
   width: 100%;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 tr {
@@ -27,9 +27,10 @@ p {
 }
 
 mat-icon {
-cursor: pointer;
-width: 1.625rem;
+  cursor: pointer;
+  width: 1.625rem;
 }
+
 #codigoColoresTabla {
   width: auto;
   font-size: 12px;
@@ -37,7 +38,7 @@ width: 1.625rem;
   margin-top: 2rem;
 }
 
-#coloresTitulo{
+#coloresTitulo {
   background-color: #e9ecef;
 }
 
@@ -45,7 +46,7 @@ width: 1.625rem;
   color: indianred;
 }
 
-.colores{
+.colores {
   width: 2.5rem;
   min-width: 1rem;
 }
@@ -58,8 +59,6 @@ width: 1.625rem;
   background-color: #EE4444;
 }
 
-
-
 #busqueda {
   margin-top: 10px;
 }
@@ -69,7 +68,10 @@ width: 1.625rem;
   font-size: 12px;
   border-collapse: collapse;
 }
-#detalle .t_horarios, .coloresItem, .colores{
+
+#detalle .t_horarios,
+.coloresItem,
+.colores {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: center;
@@ -81,12 +83,12 @@ width: 1.625rem;
 }
 
 #detalle th,
-#detalle td{
+#detalle td {
   border-right: 1px solid #ccc;
   border-left: 1px solid #ccc;
 }
 
-#detalle tbody tr{
+#detalle tbody tr {
   background-color: #fbfbfb;
 }
 

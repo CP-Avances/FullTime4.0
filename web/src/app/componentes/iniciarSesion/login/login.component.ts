@@ -114,6 +114,7 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
+      console.log('res login ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';

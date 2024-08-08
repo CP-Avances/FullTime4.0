@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import NIVEL_TITULO_CONTROLADOR from '../../controlador/nivelTitulo/nivelTituloControlador';
-import { TokenValidation } from '../../libs/verificarToken'
+import { TokenValidation } from '../../libs/verificarToken';
 
 import multer from 'multer';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';

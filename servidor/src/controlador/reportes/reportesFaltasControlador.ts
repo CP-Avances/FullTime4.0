@@ -3,7 +3,7 @@ import pool from '../../database';
 
 class FaltasControlador {
 
-    // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[empleados]
+    // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
     public async ReporteFaltas(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
@@ -46,4 +46,5 @@ const BuscarFaltas = async function (fec_inicio: string, fec_final: string, id_e
 }
 
 const FALTAS_CONTROLADOR = new FaltasControlador();
+
 export default FALTAS_CONTROLADOR;

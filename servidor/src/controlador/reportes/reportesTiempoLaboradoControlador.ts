@@ -3,7 +3,7 @@ import pool from '../../database';
 
 class ReportesTiempoLaboradoControlador {
 
-    // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO LISTA
+    // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO    **USADO
     public async ReporteTiempoLaborado(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;

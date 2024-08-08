@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
@@ -185,6 +185,14 @@ const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 };
 exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
+// METODO DE BUSQUEDA DE ARCHIVO LICENCIA
+const ObtenerRutaLicencia = function () {
+    let ruta = '';
+    let separador = path_1.default.sep;
+    ruta = path_1.default.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'licencia.conf.json';
+};
+exports.ObtenerRutaLicencia = ObtenerRutaLicencia;
 // METODO PARA OBTENER POSICION DE PLANTILLA
 const ObtenerIndicePlantilla = function (libroExcel, hoja) {
     const sheet_name_list = libroExcel.SheetNames;

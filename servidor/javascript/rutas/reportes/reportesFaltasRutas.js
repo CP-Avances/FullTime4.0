@@ -12,7 +12,7 @@ class FaltasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
         this.router.post('/faltas/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltas);
     }
 }

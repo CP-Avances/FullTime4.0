@@ -3,7 +3,7 @@ import pool from '../../database';
 
 class ReportesAtrasosControlador {
 
-    // METODO DE BUSQUEDA DE DATOS DE ATRASOS
+    // METODO DE BUSQUEDA DE DATOS DE ATRASOS    **USADO
     public async ReporteAtrasos(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;

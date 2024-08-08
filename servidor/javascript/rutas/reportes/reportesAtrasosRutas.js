@@ -12,7 +12,7 @@ class ReportesAtrasosRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA
+        // METODO DE BUSQUEDA DE DATOS DE ATRASOS   **USADO
         this.router.post('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasos);
     }
 }

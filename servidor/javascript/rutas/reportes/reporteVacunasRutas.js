@@ -12,7 +12,7 @@ class ReportesAsistenciasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE VACUNAS
+        // METODO DE BUSQUEDA DE DATOS DE VACUNAS    **USADO
         this.router.post('/vacunas-multiples/', verificarToken_1.TokenValidation, reporteVacunasControlador_1.default.ReporteVacunasMultiple);
     }
 }

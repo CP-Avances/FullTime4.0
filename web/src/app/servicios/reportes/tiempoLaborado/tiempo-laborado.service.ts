@@ -9,7 +9,7 @@ export class TiempoLaboradoService {
 
   constructor(private http: HttpClient) { }
 
-  // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO
+  // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO    **USADO
   ReporteTiempoLaborado(data: any, desde: string, hasta: string) {
     return this.http.post<any>(`${environment.url}/reporte-tiempo-laborado/tiempo-laborado-empleados/${desde}/${hasta}`, data);
   }

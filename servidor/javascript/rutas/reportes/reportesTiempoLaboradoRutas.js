@@ -12,7 +12,7 @@ class ReportesTiempoLaboradoRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO
+        // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO    **USADO
         this.router.post('/tiempo-laborado-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesTiempoLaboradoControlador_1.default.ReporteTiempoLaborado);
     }
 }

@@ -19,6 +19,7 @@ const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
@@ -33,6 +34,7 @@ class LoginControlador {
             }
             try {
                 const { nombre_usuario, pass } = req.body;
+                console.log('req body ', req.body);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
@@ -65,7 +67,9 @@ class LoginControlador {
           `);
                     const { public_key, id_empresa } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
-                    const data = fs_1.default.readFileSync('licencia.conf.json', 'utf8');
+                    let archivo_licencia = (0, accesoCarpetas_1.ObtenerRutaLicencia)();
+                    console.log('licencia ', archivo_licencia);
+                    const data = fs_1.default.readFileSync(archivo_licencia, 'utf8');
                     const FileLicencias = JSON.parse(data);
                     const ok_licencias = FileLicencias.filter((o) => {
                         return o.public_key === public_key;

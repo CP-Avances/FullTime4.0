@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class ReportesAtrasosControlador {
-    // METODO DE BUSQUEDA DE DATOS DE ATRASOS
+    // METODO DE BUSQUEDA DE DATOS DE ATRASOS    **USADO
     ReporteAtrasos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;

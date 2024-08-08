@@ -3,7 +3,7 @@ import pool from '../../database'
 
 class ReportesVacunasControlador {
 
-    // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA
+    // METODO DE BUSQUEDA DE DATOS DE VACUNAS     **USADO
     public async ReporteVacunasMultiple(req: Request, res: Response) {
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
