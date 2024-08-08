@@ -155,7 +155,7 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions" 
+            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
                 id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <!--  *************************  DESCARGAR REPORTES  *****************************  -->
@@ -229,12 +229,12 @@
                     </tbody>
                 </table>
             </div>
-            <div>
-                <div *ngIf="listSucursalesCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                    <div class="text">items 'OK' - {{listSucursalesCorrectas.length}}</div>
-                </div>
-                <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{establecimientosCorrectos}}</div>
+              </div>
+              <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                     showFirstLastButtons>
                 </mat-paginator>

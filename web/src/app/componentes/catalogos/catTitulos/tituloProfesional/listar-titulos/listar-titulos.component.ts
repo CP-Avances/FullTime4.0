@@ -79,6 +79,8 @@ export class ListarTitulosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  titulosCorrectos: number = 0;
+
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
     public router: Router, // VARIABLE USADA PARA MANEJO DE PÁGINAS CON URL
@@ -280,6 +282,8 @@ export class ListarTitulosComponent implements OnInit {
             this.listTitulosCorrectos.push(titulo);
           }
         });
+
+        this.titulosCorrectos = this.listTitulosCorrectos.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {

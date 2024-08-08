@@ -55,6 +55,7 @@ export class ListaSucursalesComponent implements OnInit {
   archivoForm = new FormControl('', Validators.required);
 
   sucursales: any = [];
+  establecimientosCorrectos: number = 0;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -511,6 +512,8 @@ export class ListaSucursalesComponent implements OnInit {
             this.listSucursalesCorrectas.push(sucursal);
           }
         });
+
+        this.establecimientosCorrectos = this.listSucursalesCorrectas.length;
 
         if (this.listSucursalesCorrectas.length > 0) {
           this.btn_registrar = false;

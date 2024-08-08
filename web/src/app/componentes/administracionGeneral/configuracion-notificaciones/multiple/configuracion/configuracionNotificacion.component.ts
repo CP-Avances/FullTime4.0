@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { MainNavService } from '../../../main-nav/main-nav.service';
 
 @Component({
     selector: 'app-configuracionNotificacion',
@@ -20,11 +21,19 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     user_name: string | null;
     ip: string | null;
 
+    // BUSQUEDA DE MODULOS ACTIVOS
+    get habilitarPermisos(): boolean { return this.funciones.permisos; }
+    get habilitarVacaciones(): boolean { return this.funciones.vacaciones; }
+    get habilitarHorasExtras(): boolean { return this.funciones.horasExtras; }
+    get habilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
+
+
     constructor(
         private toaster: ToastrService,
         private avisos: RealTimeService,
         public formBuilder: FormBuilder,
         public ventana: MatDialogRef<ConfiguracionNotificacionComponent>,
+        private funciones: MainNavService,
         @Inject(MAT_DIALOG_DATA) public empleados: any
     ) {
         this.ValidarFormulario();

@@ -50,6 +50,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
+  departamentosCorrectos: number = 0;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -324,6 +325,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.listDepartamentosCorrectos.push(item);
           }
         });
+
+        this.departamentosCorrectos = this.listDepartamentosCorrectos.length;
       }
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);

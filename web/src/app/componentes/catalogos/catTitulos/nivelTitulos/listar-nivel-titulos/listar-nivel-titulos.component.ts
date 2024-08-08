@@ -77,6 +77,8 @@ export class ListarNivelTitulosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  nivelesCorrectos: number = 0;
+
   constructor(
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
@@ -209,6 +211,8 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.listNivelesCorrectos.push(nivel);
           }
         });
+
+        this.nivelesCorrectos = this.listNivelesCorrectos.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
