@@ -519,7 +519,15 @@ export class EditarDepaUserComponent implements OnInit {
 
   // METODO PARA MOSTRAR METODOS DE CONSULTAS DEPA
   MostrarListaDep(){
-    if (this.opcion === 'r') {
+    if (this.opcion === 's') {
+      this.nombre_regDep.reset();
+      this.nombre_sucDep.reset();
+      this.selectionDepDep.clear();
+      this.selectionCargDep.clear();
+      this.selectionEmpDep.clear();
+      this.FiltrarDep('', 1);
+    }
+    else if (this.opcion === 'r') {
       this.nombre_regDep.reset();
       this.nombre_sucDep.reset();
       this.selectionDepDep.clear();
@@ -740,6 +748,28 @@ export class EditarDepaUserComponent implements OnInit {
       }
       this.SeleccionarProcesoDep(tipo, usuarios);
     }
+
+    // METODO PARA MOSTRAR DATOS DE SUCURSAL DEP
+    ModelarSucursal(id: number, tipo: string) {
+      let usuarios: any = [];
+      if (id === 0 || id === undefined) {
+        this.empleadosDep.forEach((empl: any) => {
+          this.selectionSucDep.selected.find((selec: any) => {
+            if (empl.id_suc === selec.id) {
+              usuarios.push(empl)
+            }
+          })
+        })
+      }
+      else {
+        this.empleadosDep.forEach((empl: any) => {
+          if (empl.id_suc === id) {
+            usuarios.push(empl)
+          }
+        })
+      }
+      this.SeleccionarProcesoDep(tipo, usuarios);
+    }
   
     // METODO PARA MOSTRAR DATOS DE CARGOS DEP
     ModelarCargoDep(id: number, tipo: string, sucursal: number) {
@@ -827,7 +857,10 @@ export class EditarDepaUserComponent implements OnInit {
 
     // METODO PARA TOMAR DATOS SELECCIONADOS DEP
   MetodosFiltroDep(valor: any, tipo: string) {
-    if (this.opcion === 'c') {
+    if (this.opcion === 's') {
+      this.ModelarSucursal(valor.id, tipo);
+    }
+    else if (this.opcion === 'c') {
       this.ModelarCargoDep(valor.id, tipo, valor.id_suc);
     }
     else if (this.opcion === 'd') {

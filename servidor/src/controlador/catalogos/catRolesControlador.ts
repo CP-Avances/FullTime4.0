@@ -249,9 +249,9 @@ class RolesControlador {
       
       setTimeout(() => {
         if (cont == listaUsuarios.length) {
-          return res.jsonp({message: 'Se a actualizado todos los usuarios'})
+          return res.status(200).jsonp({message: 'Se a actualizado todos los usuarios', status: 200})
         } else {
-          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron', status: 404 });
         }
       }, 1500)
       
@@ -259,7 +259,7 @@ class RolesControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.', status:500 });
     }
   }
 
