@@ -81,6 +81,8 @@ class UsuarioRutas {
         this.router.post('/ingresarIDdispositivo',TokenValidation, USUARIO_CONTROLADOR.ingresarIDdispositivo);
 
         this.router.get('/usuarioEmpresa', TokenValidation, USUARIO_CONTROLADOR.getEmpleadosActivos);
+        this.router.get('/usuario/:id', TokenValidation, USUARIO_CONTROLADOR.getUserById);
+
 
     }
 }

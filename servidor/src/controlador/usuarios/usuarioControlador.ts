@@ -1905,7 +1905,7 @@ class UsuarioControlador {
 
   }
 
-  // METODOS PARA APP_MOVIL
+  //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
 
   public async getidDispositivo(req: Request, res: Response): Promise<Response> {
     try {
@@ -1977,9 +1977,21 @@ class UsuarioControlador {
         });
     }
   };
-
-
-
+  public async getUserById(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = parseInt(req.params.id);
+      const response: QueryResult = await pool.query("SELECT * FROM eu_usuarios WHERE id = $1", [id]);
+      const usuarios: any[] = response.rows;
+      return res.jsonp(usuarios[0]);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({
+        message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+          'o https://casapazmino.com.ec'
+      });
+    }
+  };
+  
 }
 
 /* @return
