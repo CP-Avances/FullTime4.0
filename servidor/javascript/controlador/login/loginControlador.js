@@ -42,14 +42,16 @@ class LoginControlador {
                 // SI EXISTE USUARIOS
                 if (USUARIO.rowCount != 0) {
                     const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
-                    let ACTIVO = yield database_1.default.query(`
-          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
+                    let ACTIVO = yield database_1.default.query(
+                    //FIXME
+                    `
+          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `, [USUARIO.rows[0].id])
                         .then((result) => {
                         return result.rows;
                     });
-                    const { empleado, usuario, codigo, web_access } = ACTIVO[0];
+                    const { empleado, usuario, codigo, web_access, nombre, apellido, cedula } = ACTIVO[0];
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });
@@ -62,10 +64,11 @@ class LoginControlador {
           SELECT * FROM e_funciones LIMIT 1
           `).then((result) => { return result.rows; });
                     // BUSQUEDA DE CLAVE DE LICENCIA
+                    //FIXME
                     const EMPRESA = yield database_1.default.query(`
-          SELECT public_key, id AS id_empresa FROM e_empresa
+          SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `);
-                    const { public_key, id_empresa } = EMPRESA.rows[0];
+                    const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
                     let archivo_licencia = (0, accesoCarpetas_1.ObtenerRutaLicencia)();
                     //console.log('licencia ', archivo_licencia)
@@ -109,7 +112,7 @@ class LoginControlador {
                             caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                             departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                             empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
-                            id_contrato: id_contrato
+                            id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version: '4.0.0'
                         });
                     }
                     else {
