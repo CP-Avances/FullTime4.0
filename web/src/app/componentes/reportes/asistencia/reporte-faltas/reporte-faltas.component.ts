@@ -5,11 +5,11 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -182,63 +182,11 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc,
-        ciudad: obj.ciudad,
-      })
-
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: obj.nombre,
-        apellido: obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        ciudad: obj.ciudad,
-        regimen: obj.name_regimen,
-        departamento: obj.name_dep,
-        cargo: obj.name_cargo,
-        hora_trabaja: obj.hora_trabaja
-      })
-    })
-    // RETIRAR DUPLICADOS DE LA LISTA
-    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
-    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
-    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
-    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
-
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
   }
 
   // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
@@ -254,41 +202,76 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
+
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
         if (this.selectionReg.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
         if (this.selectionCar.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups!!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
@@ -306,111 +289,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       this.toastr.error(err.error.message)
     })
   }
-
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    let seleccionados: any = [];
-    this.sucursales.forEach((res: any) => {
-      this.selectionSuc.selected.find((selec: any) => {
-        if (selec.id === res.id) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((sucursales: any) => {
-      sucursales.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_suc === sucursales.id) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    let seleccionados: any = [];
-    this.regimen.forEach((res: any) => {
-      this.selectionReg.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((regimen: any) => {
-      regimen.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_regimen === regimen.id && selec.id_suc === regimen.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    let seleccionados: any = [];
-    this.departamentos.forEach((res: any) => {
-      this.selectionDep.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((departamento: any) => {
-      departamento.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_depa === departamento.id && selec.id_suc === departamento.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    let seleccionados: any = [];
-    this.cargos.forEach((res: any) => {
-      this.selectionCar.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((cargo: any) => {
-      cargo.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_cargo_ === cargo.id && selec.id_suc === cargo.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    let seleccionados: any = [{ nombre: 'Empleados' }];
-    let datos: any = [];
-    this.empleados.forEach((res: any) => {
-      this.selectionEmp.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          datos.push(res);
-        }
-      });
-    });
-    seleccionados[0].empleados = datos;
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **

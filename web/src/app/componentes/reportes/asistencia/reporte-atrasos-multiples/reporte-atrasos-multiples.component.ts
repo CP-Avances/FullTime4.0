@@ -47,14 +47,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   timbres: any = [];
   cargos: any = [];
 
-  // VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
-  tiempoDepartamentos: any = [];
-  tiempoSucursales: any = [];
-  tiempoRegimen: any = [];
-  tiempoCargos: any = [];
-
   // VARIABLES PARA MOSTRAR DETALLES
-  tipo: string;
   verDetalle: boolean = false;
 
   // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
@@ -203,63 +196,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc,
-        ciudad: obj.ciudad,
-      })
-
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: obj.nombre,
-        apellido: obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        ciudad: obj.ciudad,
-        regimen: obj.name_regimen,
-        departamento: obj.name_dep,
-        cargo: obj.name_cargo,
-        hora_trabaja: obj.hora_trabaja
-      })
-    })
-    // RETIRAR DUPLICADOS DE LA LISTA
-    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
-    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
-    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
-    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
-
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
   }
 
   // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
@@ -275,42 +216,76 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
 
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
         if (this.selectionReg.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
         if (this.selectionCar.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups!!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
@@ -330,110 +305,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     }, err => {
       this.toastr.error(err.error.message)
     })
-  }
-
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    let seleccionados: any = [];
-    this.sucursales.forEach((res: any) => {
-      this.selectionSuc.selected.find((selec: any) => {
-        if (selec.id === res.id) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((sucursales: any) => {
-      sucursales.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_suc === sucursales.id) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    let seleccionados: any = [];
-    this.regimen.forEach((res: any) => {
-      this.selectionReg.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((regimen: any) => {
-      regimen.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_regimen === regimen.id && selec.id_suc === regimen.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    let seleccionados: any = [];
-    this.departamentos.forEach((res: any) => {
-      this.selectionDep.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((departamento: any) => {
-      departamento.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_depa === departamento.id && selec.id_suc === departamento.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    let seleccionados: any = [];
-    this.cargos.forEach((res: any) => {
-      this.selectionCar.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          seleccionados.push(res);
-        }
-      });
-    });
-    seleccionados.forEach((cargo: any) => {
-      cargo.empleados = this.empleados.filter((selec: any) => {
-        if (selec.id_cargo_ === cargo.id && selec.id_suc === cargo.id_suc) {
-          return true;
-        }
-        return false;
-      });
-    });
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    let seleccionados: any = [{ nombre: 'Empleados' }];
-    let datos: any = [];
-    this.empleados.forEach((res: any) => {
-      this.selectionEmp.selected.find((selec: any) => {
-        if (selec.id === res.id && selec.id_suc === res.id_suc) {
-          datos.push(res);
-        }
-      });
-    });
-    seleccionados[0].empleados = datos;
-    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
-    this.MostrarInformacion(seleccionados, accion);
   }
 
 
@@ -540,27 +411,22 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     let totalTiempoEmpleado: number = 0;
     let totalTiempo = 0;
     let resumen = '';
+    let general: any = [];
     let n: any = []
     let c = 0;
-
-    let totalTiempoSucursal: number = 0;
-    let totalTiempoCargo = 0;
-    let totalTiempoRegimen = 0;
-    let totalTiempoDepartamento = 0;
-    this.tiempoDepartamentos = [];
-    this.tiempoSucursales = [];
-    this.tiempoRegimen = [];
-    this.tiempoCargos = [];
-
     data.forEach((selec: any) => {
-      let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length });
-      totalTiempo = 0;
-      let tiempo = selec.empleados.map((o: any) => {
-        const minutos_ = this.SegundosAMinutosConDecimales(Number(o.diferencia));
-        totalTiempo += Number(minutos_);
-        return totalTiempo;
-      })
+      // CONTAR REGISTROS
+      let arr_reg = selec.empleados.map((o: any) => { return o.atrasos.length });
       let reg = this.validar.SumarRegistros(arr_reg);
+      // CONTAR MINUTOS DE ATRASOS
+      totalTiempo = 0;
+      selec.empleados.forEach((o: any) => {
+        o.atrasos.map((a: any) => {
+          const minutos_ = this.SegundosAMinutosConDecimales(Number(a.diferencia));
+          totalTiempo += Number(minutos_);
+          return totalTiempo;
+        })
+      })
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -586,7 +452,14 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
-
+      // DATOS DE RESUMEN GENERAL
+      let informacion = {
+        sucursal: selec.sucursal,
+        nombre: opcion,
+        formato_general: this.MinutosAHorasMinutosSegundos(Number(totalTiempo.toFixed(2))),
+        formato_decimal: totalTiempo.toFixed(2),
+      }
+      general.push(informacion);
       // CABECERA PRINCIPAL
       n.push({
         style: 'tableMarginCabecera',
@@ -616,900 +489,220 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           ],
         },
       });
-
-    })
-
-
-
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true || this.bool.bool_dep === true) {
-      data.forEach((selec: any) => {
-        if (this.bool.bool_cargo === true) {
-          totalTiempoCargo = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'CARGO: ' + selec.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else if (this.bool.bool_reg === true) {
-          totalTiempoRegimen = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + selec.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else {
-          totalTiempoDepartamento = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    text: 'DEPARTAMENTO: ' + selec.nombre,
-                    style: 'itemsTableInfo'
-                  },
-                ]
-              ]
-            }
-          })
-        }
-
-        selec.empleados.forEach((empl: any) => {
-          n.push({
-            style: 'tableMarginCabeceraEmpleado',
-            table: {
-              widths: ['*', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  {
-                    border: [false, true, false, false],
-                    text: 'C.C.: ' + empl.cedula,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [true, true, false, false],
-                    text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'COD: ' + empl.codigo,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                ],
-                [
-                  {
-                    border: [true, false, false, false],
-                    text: 'DEPARTAMENTO: ' + empl.name_dep,
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: this.bool.bool_reg || this.bool.bool_dep ? 'CARGO: ' + empl.name_cargo : '',
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, true, false],
-                    text: '',
-                    style: 'itemsTableInfoEmpleado'
-                  }
-                ]
-              ],
-            },
-          });
-          c = 0;
-          totalTiempoEmpleado = 0;
-          if (this.tolerancia !== '1') {
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                headerRows: 2,
-                body: [
-                  [
-                    { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                    {},
-                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                    {},
-                    { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                    {}
-                  ],
-                  [
-                    {},
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                    {}, {}, {}, {},
-                    {},
-                    {},
-                    {},
-                    {},
-
-                  ],
-                  ...empl.atrasos.map((usu: any) => {
-                    const fechaHorario = this.validar.FormatearFecha(
-                      usu.fecha_hora_horario.split(' ')[0],
-                      this.formato_fecha,
-                      this.validar.dia_abreviado);
-
-                    const fechaTimbre = this.validar.FormatearFecha(
-                      usu.fecha_hora_timbre.split(' ')[0],
-                      this.formato_fecha,
-                      this.validar.dia_abreviado);
-
-                    const horaHorario = this.validar.FormatearHora(
-                      usu.fecha_hora_horario.split(' ')[1],
-                      this.formato_hora);
-
-                    const horaTimbre = this.validar.FormatearHora(
-                      usu.fecha_hora_timbre.split(' ')[1],
-                      this.formato_hora);
-
-                    const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                    const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                    const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                    totalTiempoDepartamento += Number(minutos);
-                    totalTiempoEmpleado += Number(minutos);
-                    totalTiempoRegimen += Number(minutos);
-                    totalTiempoCargo += Number(minutos);
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: fechaHorario },
-                      { style: 'itemsTableCentrado', text: horaHorario },
-                      { style: 'itemsTableCentrado', text: fechaTimbre },
-                      { style: 'itemsTableCentrado', text: horaTimbre },
-                      {}, {}, {}, {}, {},
-                      { style: 'itemsTableCentrado', text: tolerancia },
-                      { style: 'itemsTableCentrado', text: tiempo },
-                      { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
-                    ];
-                  }),
-                  [
-                    {
-                      border: [true, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                    {
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
-                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
-                  ],
-                ],
-              },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
-              }
-            });
-          } else {
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                headerRows: 2,
-                body: [
-                  [
-                    { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                    {},
-                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                    {},
-                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                    {}
-                  ],
-                  [
-                    {},
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                    {}, {}, {},
-                    {},
-                    {},
-                    {},
-                    {},
-
-                  ],
-                  ...empl.atrasos.map((usu: any) => {
-
-                    const fechaHorario = this.validar.FormatearFecha(
-                      usu.fecha_hora_horario.split(' ')[0],
-                      this.formato_fecha,
-                      this.validar.dia_abreviado);
-
-                    const fechaTimbre = this.validar.FormatearFecha(
-                      usu.fecha_hora_timbre.split(' ')[0],
-                      this.formato_fecha,
-                      this.validar.dia_abreviado);
-
-                    const horaHorario = this.validar.FormatearHora(
-                      usu.feha_hora_horario.split(' ')[1],
-                      this.formato_hora);
-
-                    const horaTimbre = this.validar.FormatearHora(
-                      usu.fecha_hora_timbre.split(' ')[1],
-                      this.formato_hora);
-
-                    const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                    const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                    totalTiempoDepartamento += Number(minutos);
-                    totalTiempoEmpleado += Number(minutos);
-                    totalTiempoRegimen += Number(minutos);
-                    totalTiempoCargo += Number(minutos);
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: fechaHorario },
-                      { style: 'itemsTableCentrado', text: horaHorario },
-                      { style: 'itemsTableCentrado', text: fechaTimbre },
-                      { style: 'itemsTableCentrado', text: horaTimbre },
-                      {}, {}, {}, {}, {},
-                      { style: 'itemsTableCentrado', text: tiempo },
-                      { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
-                    ];
-                  }),
-                  [
-                    {
-                      border: [true, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                    {
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
-                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
-                  ],
-                ],
-              },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
-              }
-            });
-          }
-        });
-
-        if (this.bool.bool_cargo) {
-          let cargo = {
-            cargo: selec.nombre,
-            minutos: totalTiempoCargo.toFixed(2),
-            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoCargo.toFixed(2)))
-          }
-          this.tiempoCargos.push(cargo);
-        };
-
-        if (this.bool.bool_reg) {
-          let regimen = {
-            regimen: selec.nombre,
-            minutos: totalTiempoRegimen.toFixed(2),
-            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoRegimen.toFixed(2)))
-          }
-          this.tiempoRegimen.push(regimen);
-        };
-
-        if (this.bool.bool_dep) {
-          let departamento = {
-            departamento: selec.nombre,
-            minutos: totalTiempoDepartamento.toFixed(2),
-            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoDepartamento.toFixed(2)))
-          }
-          this.tiempoDepartamentos.push(departamento);
-        };
-      });
-
-      if (this.bool.bool_cargo) {
+      // PRESENTACION DE LA INFORMACION
+      selec.empleados.forEach((empl: any) => {
         n.push({
-          style: 'tableMarginCabeceraTotal',
+          style: 'tableMarginCabeceraEmpleado',
           table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
             body: [
               [
                 {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL CARGOS',
-                  style: 'itemsTableInfoTotal'
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
                 },
-                { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'ATRASO', style: 'itemsTableInfoTotal' },
-                {},
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
               ],
-              ...this.tiempoCargos.map((cargo: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: cargo.cargo,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: '', style: 'itemsTableDerecha' },
-                  { text: '', style: 'itemsTableCentrado' },
-                  { text: cargo.tiempo, style: 'itemsTableCentrado' },
-                  { text: cargo.minutos, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_reg) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
-            body: [
               [
                 {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL REGIMENES',
-                  style: 'itemsTableInfoTotal'
-                },
-                { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'ATRASO', style: 'itemsTableInfoTotal' },
-                {},
-              ],
-              ...this.tiempoRegimen.map((regimen: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: regimen.regimen,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: '', style: 'itemsTableDerecha' },
-                  { text: '', style: 'itemsTableCentrado' },
-                  { text: regimen.tiempo, style: 'itemsTableCentrado' },
-                  { text: regimen.minutos, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_dep) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL DEPARTAMENTOS',
-                  style: 'itemsTableInfoTotal'
-                },
-                { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'ATRASO', style: 'itemsTableInfoTotal' },
-                {},
-              ],
-              ...this.tiempoDepartamentos.map((departamento: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: departamento.departamento,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: '', style: 'itemsTableDerecha' },
-                  { text: '', style: 'itemsTableCentrado' },
-                  { text: departamento.tiempo, style: 'itemsTableCentrado' },
-                  { text: departamento.minutos, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-    } else {
-
-      data.forEach((suc: any) => {
-        totalTiempoSucursal = 0;
-        n.push({
-          style: 'tableMarginCabecera',
-          table: {
-            widths: ['*', '*'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + suc.ciudad,
-                  style: 'itemsTableInfo'
+                  border: [true, false, true, false],
+                  text: 'RÉGIMEN LABORAL ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
                 },
                 {
-                  border: [false, true, true, true],
-                  text: 'SUCURSAL: ' + suc.name_suc,
-                  style: 'itemsTableInfo'
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
                 }
               ]
-            ]
-          }
-        })
-
-        suc.regimenes.forEach((reg: any) => {
-          reg.departamentos.forEach((dep: any) => {
-            dep.cargos.forEach((car: any) => {
-              car.empleado.forEach((empl: any) => {
-                n.push({
-                  style: 'tableMarginCabeceraEmpleado',
-                  table: {
-                    widths: ['*', 'auto', 'auto',],
-                    headerRows: 2,
-                    body: [
-                      [
-                        {
-                          border: [false, true, false, false],
-                          text: 'C.C.: ' + empl.cedula,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [true, true, false, false],
-                          text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, true, true, false],
-                          text: 'COD: ' + empl.codigo,
-                          style: 'itemsTableInfoEmpleado'
-                        }
-                      ],
-                      [
-                        {
-                          border: [true, false, false, false],
-                          text: 'DEPARTAMENTO: ' + empl.name_dep,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, false, false, false],
-                          text: 'CARGO: ' + empl.name_cargo,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, false, true, false],
-                          text: '',
-                          style: 'itemsTableInfoEmpleado'
-                        }
-                      ]
-                    ]
-                  }
-                });
-                c = 0;
-                totalTiempoEmpleado = 0;
+            ],
+          },
+        });
+        // ENCERAR VARIABLES
+        c = 0;
+        totalTiempoEmpleado = 0;
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                { rowSpan: 2, text: 'N°', style: 'centrado' },
+                { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                {},
+                { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                {},
+                { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                {},
+                { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
+                { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
+                {}
+              ],
+              [
+                {},
+                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
+                { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
+                {}, {}, {}, {},
+                {},
+                {},
+                {},
+                {},
+              ],
+              ...empl.atrasos.map((usu: any) => {
+                // FORMATEAR FECHAS
+                const fechaHorario = this.validar.FormatearFecha(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+                const fechaTimbre = this.validar.FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+                const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+                const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+                var tolerancia = '00:00:00';
                 if (this.tolerancia !== '1') {
-                  n.push({
-                    style: 'tableMargin',
-                    table: {
-                      widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                      headerRows: 2,
-                      body: [
-                        [
-                          { rowSpan: 2, text: 'N°', style: 'centrado' },
-                          { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                          {},
-                          { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                          {},
-                          { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                          { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                          { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                          { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                          {},
-                          { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                          { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                          {}
-                        ],
-                        [
-                          {},
-                          { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                          { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                          { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                          { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                          {}, {}, {}, {},
-                          {},
-                          {},
-                          {},
-                          {},
-
-                        ],
-                        ...empl.atrasos.map((usu: any) => {
-                          const fechaHorario = this.validar.FormatearFecha(
-                            usu.fecha_hora_horario.split(' ')[0],
-                            this.formato_fecha,
-                            this.validar.dia_abreviado);
-
-                          const fechaTimbre = this.validar.FormatearFecha(
-                            usu.fecha_hora_timbre.split(' ')[0],
-                            this.formato_fecha,
-                            this.validar.dia_abreviado);
-
-                          const horaHorario = this.validar.FormatearHora(
-                            usu.fecha_hora_horario.split(' ')[1],
-                            this.formato_hora);
-
-                          const horaTimbre = this.validar.FormatearHora(
-                            usu.fecha_hora_timbre.split(' ')[1],
-                            this.formato_hora);
-
-                          const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                          const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                          const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                          totalTiempoEmpleado += Number(minutos);
-                          totalTiempoSucursal += Number(minutos);
-                          totalTiempoDepartamento += Number(minutos);
-                          c = c + 1
-                          return [
-                            { style: 'itemsTableCentrado', text: c },
-                            { style: 'itemsTableCentrado', text: fechaHorario },
-                            { style: 'itemsTableCentrado', text: horaHorario },
-                            { style: 'itemsTableCentrado', text: fechaTimbre },
-                            { style: 'itemsTableCentrado', text: horaTimbre },
-                            {}, {}, {}, {}, {},
-                            { style: 'itemsTableCentrado', text: tolerancia },
-                            { style: 'itemsTableCentrado', text: tiempo },
-                            { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
-                          ];
-                        }),
-                        [
-                          {
-                            border: [true, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                          { text: '', style: 'itemsTableCentradoTotal' },
-                          { text: '', style: 'itemsTableCentradoTotal' },
-                          { text: '', style: 'itemsTableCentradoTotal' },
-                          { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
-                          { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      fillColor: function (rowIndex: any) {
-                        return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                      }
-                    }
-                  });
-                } else {
-                  n.push({
-                    style: 'tableMargin',
-                    table: {
-                      widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                      headerRows: 2,
-                      body: [
-                        [
-                          { rowSpan: 2, text: 'N°', style: 'centrado' },
-                          { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                          {},
-                          { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                          {},
-                          { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                          { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                          { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                          { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                          {},
-                          { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                          {}
-                        ],
-                        [
-                          {},
-                          { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                          { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                          { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                          { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                          {}, {}, {},
-                          {},
-                          {},
-                          {},
-                          {},
-
-                        ],
-                        ...empl.atrasos.map((usu: any) => {
-                          const fechaHorario = this.validar.FormatearFecha(
-                            usu.fecha_hora_horario.split(' ')[0],
-                            this.formato_fecha,
-                            this.validar.dia_abreviado);
-
-                          const fechaTimbre = this.validar.FormatearFecha(
-                            usu.fecha_hora_timbre.split(' ')[0],
-                            this.formato_fecha,
-                            this.validar.dia_abreviado);
-
-                          const horaHorario = this.validar.FormatearHora(
-                            usu.fecha_hora_horario.split(' ')[1],
-                            this.formato_hora);
-
-                          const horaTimbre = this.validar.FormatearHora(
-                            usu.fecha_hora_timbre.split(' ')[1],
-                            this.formato_hora);
-
-                          const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
-                          const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-                          totalTiempoEmpleado += Number(minutos);
-                          totalTiempoSucursal += Number(minutos);
-                          totalTiempoDepartamento += Number(minutos);
-                          c = c + 1
-                          return [
-                            { style: 'itemsTableCentrado', text: c },
-                            { style: 'itemsTableCentrado', text: fechaHorario },
-                            { style: 'itemsTableCentrado', text: horaHorario },
-                            { style: 'itemsTableCentrado', text: fechaTimbre },
-                            { style: 'itemsTableCentrado', text: horaTimbre },
-                            {}, {}, {}, {}, {},
-                            { style: 'itemsTableCentrado', text: tiempo },
-                            { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
-                          ];
-                        }),
-                        [
-                          {
-                            border: [true, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          {
-                            border: [false, true, false, true],
-                            text: '',
-                            style: 'itemsTableCentradoTotal'
-                          },
-                          { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                          { text: '', style: 'itemsTableCentradoTotal' },
-                          { text: '', style: 'itemsTableCentradoTotal' },
-                          { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
-                          { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      fillColor: function (rowIndex: any) {
-                        return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                      }
-                    }
-                  });
+                  tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
                 }
-              });
-            })
-          });
-        })
-      });
-    }
-
-    if (this.bool.bool_suc) {
+                const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
+                const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
+                totalTiempoEmpleado += Number(minutos);
+                c = c + 1
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTableCentrado', text: fechaHorario },
+                  { style: 'itemsTableCentrado', text: horaHorario },
+                  { style: 'itemsTableCentrado', text: fechaTimbre },
+                  { style: 'itemsTableCentrado', text: horaTimbre },
+                  {}, {}, {}, {}, {},
+                  { style: 'itemsTableCentrado', text: tolerancia },
+                  { style: 'itemsTableCentrado', text: tiempo },
+                  { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
+                ];
+              }),
+              [
+                {
+                  border: [true, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                {
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
+                { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
+              ],
+            ],
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
+          }
+        });
+      })
+    })
+    // RESUMEN TOTALES DE REGISTRSO
+    if (this.bool.bool_emp === false) {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
-          widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+          widths: ['*', '*', 'auto', 'auto', 'auto', 'auto'],
           headerRows: 1,
           body: [
             [
               {
                 border: [true, true, false, true],
                 bold: true,
-                text: 'TOTAL SUCURSALES',
-                style: 'itemsTableInfoTotal'
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
               },
+              {},
               { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
               {},
               { colSpan: 2, text: 'ATRASO', style: 'itemsTableInfoTotal' },
               {},
             ],
-            ...this.tiempoSucursales.map((sucursal: any) => {
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (this.bool.bool_suc === true) {
+                valor = 2;
+              }
               return [
                 {
                   border: [true, true, false, true],
                   bold: true,
-                  text: sucursal.sucursal,
-                  style: 'itemsTableCentrado'
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
+                },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: sucursal.tiempo, style: 'itemsTableCentrado' },
-                { text: sucursal.minutos, style: 'itemsTableDerecha' },
+                { text: info.formato_general, style: 'itemsTableCentrado' },
+                { text: info.formato_decimal, style: 'itemsTableDerecha' },
               ]
             })
           ]
@@ -1520,8 +713,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           }
         }
       });
-    };
-
+    }
     return n;
   }
 

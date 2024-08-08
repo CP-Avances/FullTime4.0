@@ -228,6 +228,206 @@ export class ValidacionesService {
     return valor;
   }
 
+
+  /** ******************************************************************** **
+   ** **              MODELAMIENTO DE DATOS DE REPORTES                 ** **
+   ** ** ***************************************************************** **/
+
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(array_general: any, array_modelado: any, datos_seleccionados: any) {
+    let seleccionados: any = [];
+    array_modelado.forEach((res: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === res.id) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((sucursales: any) => {
+      sucursales.empleados = array_general.filter((selec: any) => {
+        if (selec.id_suc === sucursales.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(array_general: any, array_modelado: any, datos_seleccionados: any) {
+    let seleccionados: any = [];
+    array_modelado.forEach((res: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((regimen: any) => {
+      regimen.empleados = array_general.filter((selec: any) => {
+        if (selec.id_regimen === regimen.id && selec.id_suc === regimen.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(array_general: any, array_modelado: any, datos_seleccionados: any) {
+    let seleccionados: any = [];
+    array_modelado.forEach((res: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((departamento: any) => {
+      departamento.empleados = array_general.filter((selec: any) => {
+        if (selec.id_depa === departamento.id && selec.id_suc === departamento.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(array_general: any, array_modelado: any, datos_seleccionados: any) {
+    let seleccionados: any = [];
+    array_modelado.forEach((res: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          seleccionados.push(res);
+        }
+      });
+    });
+    seleccionados.forEach((cargo: any) => {
+      cargo.empleados = array_general.filter((selec: any) => {
+        if (selec.id_cargo_ === cargo.id && selec.id_suc === cargo.id_suc) {
+          return true;
+        }
+        return false;
+      });
+    });
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(array_modelado: any, datos_seleccionados: any) {
+    let seleccionados: any = [{ nombre: 'Empleados' }];
+    let datos: any = [];
+    array_modelado.forEach((res: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === res.id && selec.id_suc === res.id_suc) {
+          datos.push(res);
+        }
+      });
+    });
+    seleccionados[0].empleados = datos;
+    return seleccionados;
+  }
+
+  /** ******************************************************************** **
+   ** **                PROCESAMIENTO DE LA INFORMACION                 ** **
+   ** ** ***************************************************************** **/
+
+  // METODO PARA PROCESAR LA INFORMACION DE SUCURSALES
+  ProcesarDatosSucursales(informacion: any) {
+    let arreglo_procesar: any = [];
+    informacion.forEach((obj: any) => {
+      arreglo_procesar.push({
+        id: obj.id_suc,
+        sucursal: obj.name_suc,
+        ciudad: obj.ciudad,
+      })
+    })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    arreglo_procesar = this.OmitirDuplicadosSucursales(arreglo_procesar);
+    return arreglo_procesar;
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE REGIMEN
+  ProcesarDatosRegimen(informacion: any) {
+    let arreglo_procesar: any = [];
+    informacion.forEach((obj: any) => {
+      arreglo_procesar.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+    })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    arreglo_procesar = this.OmitirDuplicadosRegimen(arreglo_procesar);
+    return arreglo_procesar;
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE DEPARTAMENTOS
+  ProcesarDatosDepartamentos(informacion: any) {
+    let arreglo_procesar: any = [];
+    informacion.forEach((obj: any) => {
+      arreglo_procesar.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+      })
+    })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    arreglo_procesar = this.OmitirDuplicadosDepartamentos(arreglo_procesar);
+    return arreglo_procesar;
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE CARGOS
+  ProcesarDatosCargos(informacion: any) {
+    let arreglo_procesar: any = [];
+    informacion.forEach((obj: any) => {
+      arreglo_procesar.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+    })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    arreglo_procesar = this.OmitirDuplicadosCargos(arreglo_procesar);
+    return arreglo_procesar;
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatosEmpleados(informacion: any) {
+    let arreglo_procesar: any = [];
+    informacion.forEach((obj: any) => {
+      arreglo_procesar.push({
+        id: obj.id,
+        nombre: obj.nombre,
+        apellido: obj.apellido,
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        correo: obj.correo,
+        id_cargo: obj.id_cargo,
+        id_contrato: obj.id_contrato,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+        ciudad: obj.ciudad,
+        regimen: obj.name_regimen,
+        departamento: obj.name_dep,
+        cargo: obj.name_cargo,
+        hora_trabaja: obj.hora_trabaja
+      })
+    })
+    return arreglo_procesar;
+  }
+
 }
 
 

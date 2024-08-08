@@ -325,9 +325,9 @@
                                 <td [ngClass]="ObtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
                                 <td>{{ t.tiempoPlanificado }}</td>
                                 <td>{{ t.minutosPlanificados }}</td>
-                                <td [ngClass]="obtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
+                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
                                     t.tiempoLaborado }}</td>
-                                <td [ngClass]="obtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
+                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
                                     t.minutosLaborados }}</td>
                             </tr>
                         </tbody>
@@ -344,7 +344,7 @@
                     <p>PDF</p>
                 </i>
                 <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel(tipo)">
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel()">
                     <p>XLSL</p>
                 </i>
             </div>

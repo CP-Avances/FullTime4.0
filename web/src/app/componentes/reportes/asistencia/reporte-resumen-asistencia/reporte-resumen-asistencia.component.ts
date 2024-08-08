@@ -415,7 +415,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.reportesTiempoLaborado.ReporteTiempoLaborado(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.ExportarExcel('RegimenCargo'); break;
@@ -468,7 +468,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.reportesTiempoLaborado.ReporteTiempoLaborado(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       console.log('data pdf cargo', this.data_pdf);
       switch (accion) {
