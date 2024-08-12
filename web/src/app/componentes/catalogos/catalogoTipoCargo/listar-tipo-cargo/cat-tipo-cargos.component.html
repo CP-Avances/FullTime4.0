@@ -209,15 +209,16 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <div *ngIf="listaCargosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                <div class="text">items 'OK' - {{listaCargosCorrectas.length}}</div>
-            </div>
-            <mat-paginator [length]="Datos_tipo_cargos.length" [pageSize]="tamanio_paginaMul"
+        <div style="display: flex; align-items: center;">
+          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+            <div id="t-editar" class="circulo circuloTotal"></div>
+            <div>{{tiposCargosCorrectos}}</div>
+          </div>
+          <mat-paginator [length]="Datos_tipo_cargos.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
             </mat-paginator>
         </div>
+
 
     </div>
 </div>
