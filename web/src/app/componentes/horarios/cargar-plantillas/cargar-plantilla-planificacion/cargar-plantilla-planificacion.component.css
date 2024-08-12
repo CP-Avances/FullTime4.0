@@ -181,3 +181,11 @@ mat-progress-spinner {
   color: indianred;
   cursor: pointer;
 }
+
+.circulo {
+  margin-right: -50px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  float: left;
+}
