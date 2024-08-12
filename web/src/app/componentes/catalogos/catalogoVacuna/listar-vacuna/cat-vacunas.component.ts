@@ -74,6 +74,8 @@ export class CatVacunasComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  vacunasCorrectas: number = 0;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -272,6 +274,8 @@ export class CatVacunasComponent implements OnInit {
             this.listaVacunasCorrectas.push(item);
           }
         });
+
+        this.vacunasCorrectas = this.listaVacunasCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
