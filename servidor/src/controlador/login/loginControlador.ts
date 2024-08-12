@@ -35,7 +35,7 @@ class LoginControlador {
     }
 
     try {
-      const { nombre_usuario, pass } = req.body;
+      const { nombre_usuario, pass, movil } = req.body;
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
@@ -119,23 +119,45 @@ class LoginControlador {
           , [USUARIO.rows[0].id_empleado]);
 
         // VALIDACION DE ACCESO CON LICENCIA 
-        if (INFORMACION.rowCount != 0) {
-          const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
-            public_key: licencia } = INFORMACION.rows[0];
+        if (INFORMACION.rowCount != 0 ) {
+          if(movil == true){
+            const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
+              public_key: licencia } = INFORMACION.rows[0];
+  
+            const token = jwt.sign({
+              _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
+              _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
+              _empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+              id_contrato: id_contrato
+            },
+              process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: '365d', algorithm: 'HS512' });
+            return res.status(200).jsonp({
+              caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
+              departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
+              empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+              id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version:'4.0.0'
+            });
 
-          const token = jwt.sign({
-            _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-            _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-            _empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
-            id_contrato: id_contrato
-          },
-            process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
-          return res.status(200).jsonp({
-            caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-            departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-            empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
-            id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version:'4.0.0'
-          });
+          }else{
+            const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
+              public_key: licencia } = INFORMACION.rows[0];
+  
+            const token = jwt.sign({
+              _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
+              _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
+              _empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+              id_contrato: id_contrato
+            },
+              process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
+            return res.status(200).jsonp({
+              caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
+              departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
+              empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+              id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, codigo: codigo, ruc: ruc, version:'4.0.0'
+            });
+
+          }
+    
         }
         else {
           // VALIDAR SI EL USUARIO QUE ACCEDE ES ADMINISTRADOR
