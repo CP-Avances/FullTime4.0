@@ -48,6 +48,10 @@ export class CargarPlantillaComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  nivelesDepartamentoCorrectos: number = 0;
+  contratosCorrectos: number = 0;
+  cargosCorrectos: number = 0;
+
   constructor(
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public restCa: EmplCargosService,
@@ -155,6 +159,7 @@ export class CargarPlantillaComponent implements OnInit {
             this.listaNivelesCorrectas.push(item);
           }
         });
+        this.nivelesDepartamentoCorrectos = this.listaNivelesCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
@@ -288,6 +293,7 @@ export class CargarPlantillaComponent implements OnInit {
             this.listaContratosCorrectas.push(item);
           }
         });
+        this.contratosCorrectos = this.listaContratosCorrectas.length;
       }
 
     }, error => {
@@ -546,6 +552,7 @@ export class CargarPlantillaComponent implements OnInit {
             this.listaCargosCorrectas.push(item);
           }
         });
+        this.cargosCorrectos = this.listaCargosCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
