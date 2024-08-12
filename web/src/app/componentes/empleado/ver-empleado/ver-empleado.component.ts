@@ -89,6 +89,7 @@ import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.co
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { MatRadioChange } from '@angular/material/radio';
+import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -167,6 +168,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     private activatedRoute: ActivatedRoute,
     private restPlanGeneral: PlanGeneralService, // SERVICIO DATOS DE PLANIFICACION
     private aprobar: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIONES
+    private perfil: PerfilEmpleadoService, // SERVICIO DE DATOS DE PERFIL DE EMPLEADO
 
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -475,6 +477,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.perfil.SetImagen(this.urlImagen);
         this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
@@ -1432,7 +1435,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
- 
+
   /** ********************************************************************************************* **
    ** **                               ELIMINAR PLANIFICACIONES HORARIAS                         ** **
    ** ********************************************************************************************* **/
