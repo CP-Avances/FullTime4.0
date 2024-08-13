@@ -4,7 +4,7 @@ import Pool from 'pg-pool';
 
 const pool = new Pool({
     user: 'fulltime',
-    host: 'localhost', //186.4.226.49
+    host: '192.168.0.156', //186.4.226.49
     password: 'fulltime',
     database: 'prueba_empresa',
     port: 5432
