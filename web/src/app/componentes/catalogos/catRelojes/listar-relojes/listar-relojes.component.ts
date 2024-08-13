@@ -26,7 +26,6 @@ import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-listar-relojes',
@@ -79,6 +78,8 @@ export class ListarRelojesComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+  dispositivosCorrectos: number = 0;
 
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
@@ -322,6 +323,8 @@ export class ListarRelojesComponent implements OnInit {
             this.listaDispositivosCorrectos.push(item);
           }
         });
+
+        this.dispositivosCorrectos = this.listaDispositivosCorrectos.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {

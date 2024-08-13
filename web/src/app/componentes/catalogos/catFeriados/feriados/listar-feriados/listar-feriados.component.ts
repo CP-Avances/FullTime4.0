@@ -82,6 +82,9 @@ export class ListarFeriadosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  feriadosCorrectos: number = 0;
+  feriadosCiudadesCorrectos: number = 0;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -358,6 +361,8 @@ export class ListarFeriadosComponent implements OnInit {
             this.listaFerediadCiudadCorrectos.push(item);
           }
         });
+        this.feriadosCorrectos = this.listFeriadosCorrectos.length;
+        this.feriadosCiudadesCorrectos = this.listaFerediadCiudadCorrectos.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {

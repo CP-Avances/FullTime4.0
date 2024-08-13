@@ -102,6 +102,8 @@ export class ListaEmpleadosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  usuariosCorrectos: number = 0;
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS DE DIÁLOGO
@@ -528,6 +530,8 @@ export class ListaEmpleadosComponent implements OnInit {
             this.listUsuariosCorrectas.push(item);
           }
         });
+
+        this.usuariosCorrectos = this.listUsuariosCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
@@ -574,6 +578,7 @@ export class ListaEmpleadosComponent implements OnInit {
           }
         });
         this.datosManuales = true;
+        this.usuariosCorrectos = this.listUsuariosCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {

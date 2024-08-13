@@ -68,6 +68,8 @@ export class CatModalidaLaboralComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  modalidadesCorrectas: number = 0;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarModalidad = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
@@ -270,6 +272,7 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.listaModalidadCorrectas.push(item);
           }
         });
+        this.modalidadesCorrectas = this.listaModalidadCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {

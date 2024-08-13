@@ -59,6 +59,7 @@ export class CatTipoCargosComponent {
   value = 10;
 
   listaTipoCargos: any;
+  tiposCargosCorrectos: number = 0;
 
   empleado: any = [];
   idEmpleado: number;
@@ -308,6 +309,7 @@ export class CatTipoCargosComponent {
             this.listaCargosCorrectas.push(item);
           }
         });
+        this.tiposCargosCorrectos = this.listaCargosCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {

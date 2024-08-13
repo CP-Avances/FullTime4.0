@@ -231,18 +231,16 @@
                     </tbody>
                 </table>
             </div>
-            <div>
-                <div *ngIf="listFeriadosCorrectos.length > 0" class="item" style="float: left; margin: 5px;">
-                    <div class="icon" slot="start" id="t-editar" class="circulo"
-                        style="background-color: rgb(159, 221, 154);"></div>
-                    <div class="text">items 'OK' - {{listFeriadosCorrectos.length}}</div>
-                </div>
-                <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{feriadosCorrectos}}</div>
+              </div>
+              <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                     showFirstLastButtons>
-                </mat-paginator>
+              </mat-paginator>
             </div>
-
         </div>
     </div>
 
@@ -284,18 +282,16 @@
                     </tbody>
                 </table>
             </div>
-            <div>
-                <div *ngIf="listaFerediadCiudadCorrectos.length > 0" class="item" style="float: left; margin: 5px;">
-                    <div class="icon" slot="start" id="t-editar" class="circulo"
-                        style="background-color: rgb(159, 221, 154);"></div>
-                    <div class="text">items 'OK' - {{listaFerediadCiudadCorrectos.length}}</div>
-                </div>
-                <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{feriadosCiudadesCorrectos}}</div>
+              </div>
+              <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti2($event)"
                     showFirstLastButtons>
-                </mat-paginator>
+              </mat-paginator>
             </div>
-
         </div>
     </div>
 </div>

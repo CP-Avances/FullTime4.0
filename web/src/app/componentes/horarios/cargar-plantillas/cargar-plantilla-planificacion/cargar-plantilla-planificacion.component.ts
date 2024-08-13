@@ -56,6 +56,8 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   // VARIABLES PARA LAS PLANIFICACIONES HORARIAS DE LOS USUARIOS
   planificacionesHorarias: any;
   planificacionesCorrectas: any;
+  numeroPlanificacionesCorrectas: number = 0;
+
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -226,6 +228,18 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
+
+      // Filtrar planificaciones que no tienen observaciones inválidas
+      const planificacionesFiltradas = this.planificacionesHorarias.filter((planificacion) => {
+        return planificacion.observacion !== 'Usuario no válido' && planificacion.observacion !== 'No tiene un cargo asignado';
+      });
+
+      // Contar el número de días con observación 'OK' sin modificar this.planificacionesHorarias
+      this.numeroPlanificacionesCorrectas = planificacionesFiltradas.reduce((count, planificacion) => {
+        const diasOk = planificacion.dias.filter((dia: any) => dia.observacion === 'OK').length;
+        return count + diasOk;
+      }, 0);
+
     }
   }
 

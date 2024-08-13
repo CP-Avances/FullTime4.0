@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
 
 import { environment } from 'src/environments/environment';
 
@@ -19,10 +20,15 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private empleadoService: EmpleadoService,
+    private perfil: PerfilEmpleadoService,
   ) {}
 
   ngOnInit(): void {
     this.infoUser();
+    this.perfil.urlImagen$.subscribe(url => {
+      this.urlImagen = url;
+      this.mostrarImagen = !!url;
+    });
   }
 
   infoUser() {
@@ -47,7 +53,7 @@ export class NavbarComponent implements OnInit {
         if (res[0]['imagen'] != null) {
           localStorage.setItem('view_imagen', `${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen'])
           //this.urlImagen = localStorage.getItem('view_imagen');
-          this.urlImagen = `${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen'];
+          this.perfil.SetImagen(`${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen']);
           this.mostrarImagen = true;
         } else {
           localStorage.setItem('iniciales', res[0].nombre.split(" ")[0].slice(0, 1) + res[0].apellido.split(" ")[0].slice(0, 1))

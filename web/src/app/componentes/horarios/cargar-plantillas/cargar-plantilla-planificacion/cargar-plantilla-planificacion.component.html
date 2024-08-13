@@ -133,11 +133,16 @@
 
               </table>
             </div>
-            <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
-              [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
-              showFirstLastButtons>
-            </mat-paginator>
-
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{numeroPlanificacionesCorrectas}}</div>
+              </div>
+              <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
+                [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
+                showFirstLastButtons>
+              </mat-paginator>
+            </div>
           </div>
 
       </mat-card-content>
