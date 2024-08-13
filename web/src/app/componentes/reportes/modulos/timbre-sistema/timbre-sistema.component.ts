@@ -1,7 +1,6 @@
 // IMPORTAR LIBRERIAS
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
@@ -11,30 +10,32 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+// IMPORTAR MODELOS
+import { ITableEmpleados } from 'src/app/model/reportes.model';
+
 // IMPORTAR SERVICIOS
+import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
 
 @Component({
-  selector: 'app-reporte-faltas',
-  templateUrl: './reporte-faltas.component.html',
-  styleUrls: ['./reporte-faltas.component.css']
+  selector: 'app-timbre-sistema',
+  templateUrl: './timbre-sistema.component.html',
+  styleUrls: ['./timbre-sistema.component.css']
 })
 
-export class ReporteFaltasComponent implements OnInit, OnDestroy {
+export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
-  // CRITERIOS DE BUSQUEDA POR FECHAS
+  get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
+
   get rangoFechas() { return this.reporteService.rangoFechas };
 
-  // SELECCIÓN DE BUSQUEDA DE DATOS SEGÚN OPCIÓN
   get opcion() { return this.reporteService.opcion };
 
-  // CRITERIOS DE BUSQUEDA SEGÚN OPCIÓN SELECCIONADA
   get bool() { return this.reporteService.criteriosBusqueda };
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
@@ -42,10 +43,13 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  data_pdf: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
+  data_pdf: any = [];
+
+  // ESTADO HORA SERVIDOR
+  dispositivo: boolean = false;
 
   //VARIABLES PARA MOSTRAR DETALLES
   verDetalle: boolean = false;
@@ -93,7 +97,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
-  //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
   get filtroNombreDep() { return this.reporteService.filtroNombreDep };
@@ -106,13 +109,14 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
+
   constructor(
-    private validar: ValidacionesService,
     private reporteService: ReportesService,
+    private R_asistencias: ReportesAsistenciasService,
     private informacion: DatosGeneralesService,
-    private restFaltas: FaltasService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
   ) {
@@ -122,13 +126,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (parseInt(localStorage.getItem('rol') as string) === 1) {
+      this.dispositivo = true;
+    }
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
     this.BuscarHora();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     this.departamentos = [];
     this.sucursales = [];
     this.empleados = [];
@@ -140,6 +147,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -165,14 +173,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  // METODO DE BUSQUEDA DE DATOS GENERALES
   BuscarInformacionGeneral(opcion: any) {
-    // LIMPIAR DATOS DE ALMACENAMIENTO
-    this.departamentos = [];
-    this.sucursales = [];
-    this.empleados = [];
-    this.regimen = [];
-    this.cargos = [];
     this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
@@ -278,7 +280,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = [];
-    this.restFaltas.BuscarFaltas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.R_asistencias.ReporteTimbreSistema(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
         case 'excel': this.ExportarExcel(); break;
@@ -289,6 +291,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       this.toastr.error(err.error.message)
     })
   }
+
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -316,10 +319,10 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
+
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-    documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+    const documentDefinition = this.DefinirInformacionPDF();
+    let doc_name = `Timbres_virtuales_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -329,20 +332,27 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   }
 
   DefinirInformacionPDF() {
+    // DEFINIR ORIENTACION DE LA PAGINA
+    let orientacion = 'portrait';
+    if (this.timbreDispositivo) {
+      orientacion = 'landscape'
+    }
     return {
       pageSize: 'A4',
-      pageOrientation: 'portrait',
+      pageOrientation: orientacion,
       pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      footer: function (currentPage: any, pageCount: any, fecha: any) {
-        let f = moment();
+
+      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        let time = f.format('HH:mm:ss');
+        hora = f.format('HH:mm:ss');
+
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -357,8 +367,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: `FALTAS - USUARIOS ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: `TIMBRES VIRTUALES - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
@@ -366,20 +376,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       ],
       styles: {
         derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
-        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 1, 0, 1] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        itemsTableDerecha: { fontSize: 8, alignment: 'right' },
-        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color },
-        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
-        itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
         tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -388,48 +394,30 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
-    let totalFaltasEmpleado: number = 0;
-    let resumen = '';
-    let general: any = [];
     let n: any = [];
     let c = 0;
     data.forEach((selec: any) => {
-      let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length })
+      let arr_reg = selec.empleados.map((o: any) => { return o.timbres.length })
       let reg = this.validar.SumarRegistros(arr_reg);
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
-      let opcion = selec.nombre;
       if (this.bool.bool_reg === true) {
         descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
-        resumen = 'TOTAL RÉGIMEN LABORAL';
       }
       else if (this.bool.bool_dep === true) {
         descripcion = 'DEPARTAMENTO: ' + selec.departamento;
-        resumen = 'TOTAL DEPARTAMENTOS';
-        opcion = selec.departamento;
       }
       else if (this.bool.bool_cargo === true) {
         descripcion = 'CARGO: ' + selec.nombre;
-        resumen = 'TOTAL CARGOS';
       }
       else if (this.bool.bool_suc === true) {
         descripcion = 'CIUDAD: ' + selec.ciudad;
-        resumen = 'TOTAL SUCURSALES';
       }
       else if (this.bool.bool_emp === true) {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
-
-      // DATOS DE RESUMEN GENERAL
-      let informacion = {
-        sucursal: selec.sucursal,
-        nombre: opcion,
-        faltas: reg,
-      }
-      general.push(informacion);
-
       // CABECERA PRINCIPAL
       n.push({
         style: 'tableMarginCabecera',
@@ -459,7 +447,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           ],
         },
       });
-
       // PRESENTACION DE LA INFORMACION USUARIO
       selec.empleados.forEach((empl: any) => {
         n.push({
@@ -506,92 +493,103 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           },
         });
         // ENCERAR VARIABLES
-        totalFaltasEmpleado = 0;
         c = 0;
-        // LEER DATOS DE FALTAS
-        n.push({
+        // ESTRUCTURAR PRESENTACION
+        const CrearFilaEncabezado = (conDispositivo: boolean) => [
+          [
+            { rowSpan: 2, text: 'N°', style: 'centrado' },
+            { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+            {},
+            ...(conDispositivo
+              ? [
+                { rowSpan: 1, colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                {},
+              ]
+              : []),
+            { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
+            { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+            { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
+            { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
+            { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+          ],
+          [
+            {},
+            { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+            { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+            ...(conDispositivo
+              ? [
+                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                { rowSpan: 1, text: 'HORA', style: 'tableHeader' }
+              ]
+              : []),
+            {}, {}, {}, {}, {}
+          ]
+        ];
+        // LEER ACCIONES DE LOS TIMBRES
+        const ObtenerAccionTexto = (accion: string) => {
+          const acciones = {
+            'EoS': 'Entrada o salida',
+            'AES': 'Inicio o fin alimentación',
+            'PES': 'Inicio o fin permiso',
+            'E': 'Entrada',
+            'S': 'Salida',
+            'I/A': 'Inicio alimentación',
+            'F/A': 'Fin alimentación',
+            'I/P': 'Inicio permiso',
+            'F/P': 'Fin permiso',
+            'HA': 'Timbre libre',
+          };
+          return acciones[accion] || 'Desconocido';
+        };
+        // LEER DATOS
+        const CrearFilasCuerpo = (timbres: any[], conDispositivo: boolean) => timbres.map((t: any) => {
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_servidor) {
+            [servidor_fecha, servidor_hora] = [
+              this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado),
+              this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora)
+            ];
+          }
+          const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          const accionT = ObtenerAccionTexto(t.accion);
+          c++;
+          return [
+            { style: 'itemsTableCentrado', text: c },
+            { style: 'itemsTable', text: servidor_fecha },
+            { style: 'itemsTable', text: servidor_hora },
+            ...(conDispositivo ? [
+              { style: 'itemsTable', text: fechaTimbre },
+              { style: 'itemsTable', text: horaTimbre }
+            ] : []),
+            { style: 'itemsTableCentrado', text: t.id_reloj },
+            { style: 'itemsTableCentrado', text: accionT },
+            { style: 'itemsTable', text: t.observacion },
+            { style: 'itemsTable', text: t.longitud },
+            { style: 'itemsTable', text: t.latitud },
+          ];
+        });
+        // ELABORAR TABLA
+        const crearTabla = (conDispositivo: any) => ({
           style: 'tableMargin',
           table: {
-            widths: ['*', '*'],
-            headerRows: 1,
+            widths: conDispositivo
+              ? ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto']
+              : ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+            headerRows: 2,
             body: [
-              [
-                { text: 'N°', style: 'tableHeader' },
-                { text: 'FECHA', style: 'tableHeader' },
-              ],
-              ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
-                totalFaltasEmpleado++;
-                c = c + 1;
-                return [
-                  { style: 'itemsTableCentrado', text: c },
-                  { style: 'itemsTableCentrado', text: fecha },
-                ];
-              }),
-              [
-                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
-              ],
-            ],
+              ...CrearFilaEncabezado(conDispositivo),
+              ...CrearFilasCuerpo(empl.timbres, conDispositivo),
+            ]
           },
           layout: {
-            fillColor: function (rowIndex: any) {
-              return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-            },
-          },
-        });
-      });
-    })
-    // RESUMEN TOTALES DE REGISTROS
-    if (this.bool.bool_emp === false) {
-      n.push({
-        style: 'tableMarginCabeceraTotal',
-        table: {
-          widths: ['*', '*', '*'],
-          headerRows: 1,
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                bold: true,
-                text: resumen,
-                style: 'itemsTableInfoTotal',
-                colSpan: 2
-              },
-              {},
-              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
-            ],
-            ...general.map((info: any) => {
-              let valor = 0;
-              if (this.bool.bool_suc === true) {
-                valor = 2;
-              }
-              return [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: info.sucursal,
-                  style: 'itemsTableCentrado',
-                  colSpan: valor
-                },
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: info.nombre,
-                  style: 'itemsTableCentrado',
-                },
-                { text: info.faltas, style: 'itemsTableCentrado' },
-              ]
-            })
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            fillColor: (rowIndex: any) => (rowIndex % 2 === 0) ? '#E5E7E9' : null,
           }
-        }
-      });
-    }
+        });
+        n.push(crearTabla(this.timbreDispositivo));
+      })
+    })
     return n;
   }
 
@@ -600,32 +598,68 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   ExportarExcel(): void {
-    const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Faltas');
-    xlsx.writeFile(wb_regimen_cargo, `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`)
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
+    xlsx.writeFile(wb, `Timbres_virtuales_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let accionT = '';
     let n = 0;
-    array.forEach((suc: any) => {
-      suc.empleados.forEach((empl: any) => {
-        empl.faltas.forEach((obj3: any) => {
+    array.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
           n++;
-          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
-          let ele = {
-            'N°': n,
-            'Cédula': empl.cedula,
-            'Código': empl.codigo,
-            'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-            'Ciudad': empl.ciudad,
-            'Sucursal': empl.sucursal,
-            'Régimen': empl.regimen,
-            'Departamento': empl.departamento,
-            'Cargo': empl.cargo,
-            'Fecha': fecha,
+          let ele: any;
+          let servidor_fecha: any = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_servidor != '' && t.fecha_hora_timbre_servidor != null) {
+            servidor_fecha = new Date(t.fecha_hora_timbre_servidor);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          };
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
           }
+          // OBJETO BASE COMUN PARA AMBAS RAMAS DEL IF-ELSE
+          ele = {
+            'N°': n,
+            'Cédula': usu.cedula,
+            'Código': usu.codigo,
+            'Nombre Empleado': `${usu.apellido} ${usu.nombre}`,
+            'Ciudad': usu.ciudad,
+            'Sucursal': usu.sucursal,
+            'Régimen': usu.regimen,
+            'Departamento': usu.departamento,
+            'Cargo': usu.cargo,
+            'Fecha Timbre': servidor_fecha,
+            'Hora Timbre': servidor_hora,
+            'Reloj': t.id_reloj,
+            'Acción': accionT,
+            'Observación': t.observacion,
+            'Latitud': t.latitud,
+            'Longitud': t.longitud
+          };
+          // AÑADIR PROPIEDADES ADICIONALES SI this.timbreDispositivo ES TRUE
+          if (this.timbreDispositivo) {
+            Object.assign(ele, {
+              'Fecha Timbre Dispositivo': new Date(t.fecha_hora_timbre),
+              'Hora Timbre Dispositivo': horaTimbre
+            });
+          }
+          // AGREGAR EL OBJETO AL ARRAY NUEVO
           nuevo.push(ele);
         })
       })
@@ -640,21 +674,48 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   ExtraerDatos() {
     this.timbres = [];
     let n = 0;
-    this.data_pdf.forEach((suc: any) => {
-      suc.empleados.forEach((empl: any) => {
-        empl.faltas.forEach((usu: any) => {
-          const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+    let accionT = '';
+    this.data_pdf.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
           n = n + 1;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_servidor != '' && t.fecha_hora_timbre_servidor != null) {
+            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          }
+          const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
+          }
           let ele = {
             n: n,
-            cedula: empl.cedula,
-            codigo: empl.codigo,
-            empleado: empl.apellido + ' ' + empl.nombre,
-            ciudad: empl.ciudad,
-            sucursal: empl.sucursal,
-            departamento: empl.departamento,
-            cargo: empl.cargo,
-            fecha
+            codigo: usu.codigo,
+            cedula: usu.cedula,
+            empleado: usu.apellido + ' ' + usu.nombre,
+            ciudad: usu.ciudad,
+            sucursal: usu.sucursal,
+            departamento: usu.departamento,
+            fechaTimbre, horaTimbre,
+            fechaTimbreServidor: servidor_fecha,
+            horaTimbreServidor: servidor_hora,
+            accion: accionT,
+            reloj: t.id_reloj,
+            latitud: t.latitud,
+            longitud: t.longitud,
+            observacion: t.observacion
           }
           this.timbres.push(ele);
         })
@@ -772,8 +833,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
-  // METODO PARA EVENTOS DE PAGINACION
+  // METODO PARA MANEJAR EVENTO DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
@@ -803,15 +863,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // METODO PARA VER UBICACION DE TIMBRE
+  AbrirMapa(latitud: string, longitud: string) {
+    const rutaMapa = "https://www.google.com/maps/search/+" + latitud + "+" + longitud;
+    window.open(rutaMapa);
+  }
+
+  // METODOS PARA CONTROLAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    return this.validar.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e);
   }
 
+  // METODOS PARA CONTROLAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validar.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
-  // MOSTRAR DETALLES
+  //MOSTRAR DETALLES
   VerDatos() {
     this.verDetalle = true;
     this.ExtraerDatos();
@@ -822,4 +890,5 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.verDetalle = false;
     this.paginatorDetalle.firstPage();
   }
+
 }

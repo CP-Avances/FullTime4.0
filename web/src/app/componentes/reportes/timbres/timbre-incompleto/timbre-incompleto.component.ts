@@ -1,15 +1,15 @@
 
 // IMPORTACION DE LIBRERIAS
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR MODELOS
 import { ITableEmpleados, IReporteTimbres } from 'src/app/model/reportes.model';
@@ -31,9 +31,9 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
-  // METODO PARA VERIFICACIÓN DE INGRESO DE FECHAS
+  // METODO PARA VERIFICACION DE INGRESO DE FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
-  // VARIABLE QUE INDICA NÚMERO DE OPCIONES DE BUSQUEDA
+  // VARIABLE QUE INDICA NUMERO DE OPCIONES DE BUSQUEDA
   get opcion() { return this.reporteService.opcion };
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() { return this.reporteService.criteriosBusqueda };
@@ -43,11 +43,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
-  origen: any = [];
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS PARA PDF
   data_pdf: any = [];
@@ -114,12 +112,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private R_asistencias: ReportesAsistenciasService, // SERVICIO DATOS DE TIMBRES
-    private validacionService: ValidacionesService, // VALIDACIONES LETRAS Y NÚMEROS
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService, // SERVICIO DATOS DE FILTRADOS
+    private R_asistencias: ReportesAsistenciasService, // SERVICIO DATOS DE TIMBRES
+    private informacion: DatosGeneralesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
+    private validar: ValidacionesService, // VALIDACIONES LETRAS Y NÚMEROS
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     public restUsuario: UsuarioService,
   ) {
@@ -130,7 +128,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
     this.BuscarHora();
     this.BuscarHora();
@@ -139,7 +137,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.timbres = [];
@@ -175,130 +172,31 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarSucursalesUsuario(opcion: number) {
-    let empleado = { id_empleado: this.idEmpleadoLogueado };
-
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      console.log('ver sucursales ', codigos);
-      this.usua_sucursales = { id_sucursal: codigos };
-      this.BuscarInformacion(opcion, this.usua_sucursales);
-      this.BuscarCargos(opcion, this.usua_sucursales);
-    });
-  }
-
-  // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number, buscar: any) {
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral(opcion: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
-    this.origen = [];
-    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen = JSON.stringify(res);
-        res.forEach((obj: any) => {
-          this.sucursales.push({
-            id: obj.id_suc,
-            nombre: obj.name_suc,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            this.departamentos.push({
-              id: departamento.id_depa,
-              departamento: departamento.name_dep,
-              nombre: departamento.sucursal,
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((r: any) => {
-              let elemento = {
-                id: r.id,
-                nombre: r.name_empleado,
-                codigo: r.codigo,
-                cedula: r.cedula,
-                correo: r.correo,
-                cargo: r.cargo,
-                id_contrato: r.id_contrato,
-                hora_trabaja: r.hora_trabaja,
-                sucursal: r.sucursal,
-                departamento: r.departamento,
-                ciudad: r.ciudad,
-                regimen: r.regimen,
-              };
-              this.empleados.push(elemento);
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((reg: any) => {
-              reg.regimen.forEach((r: any) => {
-                this.regimen.push({
-                  id: r.id_regimen,
-                  nombre: r.name_regimen,
-                });
-              });
-            });
-          });
-        });
-
-        this.regimen = this.regimen.filter(
-          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
-        );
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  BuscarCargos(opcion: number, buscar: any) {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen_cargo = JSON.stringify(res);
-
-        res.forEach((obj: any) => {
-          this.cargos.push({
-            id: obj.id_cargo,
-            nombre: obj.name_cargo,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.empleados.forEach((r: any) => {
-            this.empleados_cargos.push({
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              ciudad: r.ciudad,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-              hora_trabaja: r.hora_trabaja,
-            });
-          });
-        });
-      });
+    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any) {
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
+  }
+
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -308,102 +206,89 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES REPORTES
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.')
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
-    // console.log('opcion:', this.opcion);
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
+
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+        if (this.selectionSuc.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+        if (this.selectionReg.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+        if (this.selectionCar.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+        if (this.selectionEmp.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-    let suc = respuesta.filter((o: any) => {
-      var bool = this.selectionSuc.selected.find((obj1: any) => {
-        return obj1.id === o.id_suc
-      })
-      return bool != undefined
-    })
-    this.data_pdf = []
-    this.R_asistencias.ReporteTimbresIncompletos(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      console.log(this.data_pdf);
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen: any) => {
-        objeto = {
-          regimen: {
-            id: regimen.id,
-            nombre: regimen.nombre,
-          },
-        };
-        empleados = [];
-        obj.departamentos.forEach((departamento: any) => {
-          departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r: any) => {
-              if (regimen.id === r.id_regimen) {
-                empleados.push(empleado);
-              }
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
-      });
-    });
-
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = [];
-    this.R_asistencias.ReporteTimbresIncompletosRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.R_asistencias.ReporteTimbresIncompletos(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'excel': this.ExportarExcel(); break;
         case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -411,103 +296,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       this.toastr.error(err.error.message)
     })
   }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o: any) => {
-      var bool = this.selectionCar.selected.find((obj1) => {
-        return obj1.id === o.id_cargo;
-      });
-      return bool != undefined;
-    });
-
-    this.data_pdf = [];
-    this.R_asistencias.ReporteTimbresIncompletosRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((o: any) => {
-        var bool = this.selectionDep.selected.find((obj1: any) => {
-          return obj1.id === o.id_depa
-        })
-        return bool != undefined
-      })
-    })
-    let dep = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-    this.data_pdf = [];
-    this.R_asistencias.ReporteTimbresIncompletos(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((departamento: any) => {
-        departamento.empleado = departamento.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find((obj1: any) => {
-            return obj1.id === o.id
-          })
-          return bool != undefined
-        })
-      });
-    })
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((e: any) => {
-        return e.empleado.length > 0
-      })
-    });
-
-    let emp = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-
-    this.data_pdf = [];
-    this.R_asistencias.ReporteTimbresIncompletos(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
-
   logo: any = String;
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
@@ -528,14 +320,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
-
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.DefinirInformacionPDF();
-    }
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Timbres_incompleto_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -582,6 +370,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
@@ -600,422 +389,182 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
-    let n: any = []
-    let c = 0;
     var accionT: string = '';
-
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
-        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
-        let reg = this.SumarRegistros(arr_reg);
-        if (this.bool.bool_cargo === true) {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        } else {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-
-        obj1.empleados.forEach((obj2: any) => {
-          n.push({
-            style: 'tableMarginCabeceraEmpleado',
-            table: {
-              widths: ['*', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, false, false],
-                    text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                ],
-                [
-                  {
-                    border: [true, false, false, false],
-                    text: 'DEPARTAMENTO: ' + obj2.departamento,
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, true, false],
-                    text: '',
-                    style: 'itemsTableInfoEmpleado'
-                  }
-                ]
-              ],
-            },
-          });
-          c = 0;
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', '*', '*', '*'],
-              headerRows: 2,
-              body: [
-                [
-                  { rowSpan: 2, text: 'N°', style: 'centrado' },
-                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                  {},
-                  { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
-                ],
-                [
-                  {},
-                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                  {},
-
-                ],
-                ...obj2.timbres.map((obj3: any) => {
-
-                  const fecha = this.validacionService.FormatearFecha(
-                    obj3.fecha_hora_horario.split(' ')[0],
-                    this.formato_fecha,
-                    this.validacionService.dia_abreviado);
-
-                  const hora = this.validacionService.FormatearHora(
-                    obj3.fecha_hora_horario.split(' ')[1],
-                    this.formato_hora);
-
-                  switch (obj3.accion) {
-                    case 'EoS': accionT = 'Entrada o salida'; break;
-                    case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                    case 'PES': accionT = 'Inicio o fin permiso'; break;
-                    case 'E': accionT = 'Entrada'; break;
-                    case 'S': accionT = 'Salida'; break;
-                    case 'I/A': accionT = 'Inicio alimentación'; break;
-                    case 'F/A': accionT = 'Fin alimentación'; break;
-                    case 'I/P': accionT = 'Inicio permiso'; break;
-                    case 'F/P': accionT = 'Fin permiso'; break;
-                    case 'HA': accionT = 'Timbre libre'; break;
-                    default: accionT = 'Desconocido'; break;
-                  }
-                  c = c + 1
-                  return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: fecha },
-                    { style: 'itemsTableCentrado', text: hora },
-                    { style: 'itemsTableCentrado', text: accionT },
-                  ]
-                })
-
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        });
-      });
-    } else {
-      data.forEach((obj: IReporteTimbres) => {
-
-        if (this.bool.bool_suc === true) {
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo'
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo'
-                  }
-                ]
-              ]
-            }
-          })
-        }
-
-        obj.departamentos.forEach((obj1: any) => {
-
-          // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
-          if (this.bool.bool_dep === true) {
-            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-            let reg = this.SumarRegistros(arr_reg);
-            n.push({
-              style: 'tableMarginCabecera',
-              table: {
-                widths: ['*', '*'],
-                headerRows: 1,
-                body: [
-                  [
-                    {
-                      border: [true, true, false, true],
-                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfo'
-                    },
-                    {
-                      border: [false, true, true, true],
-                      text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfo'
-                    }
-                  ]
-                ]
-              }
-            })
-          }
-
-          obj1.empleado.forEach((obj2: any) => {
-
-            n.push({
-              style: 'tableMarginCabeceraEmpleado',
-              table: {
-                widths: ['*', 'auto', 'auto',],
-                headerRows: 2,
-                body: [
-                  [
-                    {
-                      border: [true, true, false, false],
-                      text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, false, false],
-                      text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, true, false],
-                      text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ],
-                  [
-                    {
-                      border: [true, false, false, false],
-                      text: this.bool.bool_suc || this.bool.bool_emp ? 'DEPARTAMENTO: ' + obj2.departamento : '',
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: 'CARGO: ' + obj2.cargo,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, true, false],
-                      text: '',
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ]
-                ]
-              }
-            });
-            c = 0;
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', '*', '*', '*'],
-                headerRows: 2,
-                body: [
-                  [
-                    { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
-                  ],
-                  [
-                    {},
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    {},
-
-                  ],
-                  ...obj2.timbres.map((obj3: any) => {
-                    const fecha = this.validacionService.FormatearFecha(
-                      obj3.fecha_hora_horario.split(' ')[0],
-                      this.formato_fecha,
-                      this.validacionService.dia_abreviado);
-
-                    const hora = this.validacionService.FormatearHora(
-                      obj3.fecha_hora_horario.split(' ')[1],
-                      this.formato_hora);
-
-                    switch (obj3.accion) {
-                      case 'EoS': accionT = 'Entrada o salida'; break;
-                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                      case 'PES': accionT = 'Inicio o fin permiso'; break;
-                      case 'E': accionT = 'Entrada'; break;
-                      case 'S': accionT = 'Salida'; break;
-                      case 'I/A': accionT = 'Inicio alimentación'; break;
-                      case 'F/A': accionT = 'Fin alimentación'; break;
-                      case 'I/P': accionT = 'Inicio permiso'; break;
-                      case 'F/P': accionT = 'Fin permiso'; break;
-                      case 'HA': accionT = 'Timbre libre'; break;
-                      default: accionT = 'Desconocido'; break;
-                    }
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: fecha },
-                      { style: 'itemsTableCentrado', text: hora },
-                      { style: 'itemsTableCentrado', text: accionT },
-                    ]
-                  })
-
-                ]
+    let n: any = [];
+    let c = 0;
+    data.forEach((selec: any) => {
+      let arr_reg = selec.empleados.map((o: any) => { return o.timbres.length })
+      let reg = this.validar.SumarRegistros(arr_reg);
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      if (this.bool.bool_reg === true) {
+        descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
+      }
+      else if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+      }
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
+      }
+      else if (this.bool.bool_suc === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+      // CABECERA PRINCIPAL
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
               },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
-              }
-            })
-          });
-        });
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
       });
-    }
+      // PRESENTACION DE LA INFORMACION USUARIO
+      selec.empleados.forEach((empl: any) => {
+        n.push({
+          style: 'tableMarginCabeceraEmpleado',
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                {
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
+              ],
+              [
+                {
+                  border: [true, false, false, false],
+                  text: 'RÉGIMEN LABORAL: ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
+                }
+              ],
+            ],
+          },
+        });
+        c = 0;
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', '*', '*', '*'],
+            headerRows: 2,
+            body: [
+              [
+                { rowSpan: 2, text: 'N°', style: 'centrado' },
+                { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                {},
+                { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+              ],
+              [
+                {},
+                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                {},
+              ],
+              ...empl.timbres.map((t: any) => {
+                const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+                const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
+                switch (t.accion) {
+                  case 'EoS': accionT = 'Entrada o salida'; break;
+                  case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                  case 'PES': accionT = 'Inicio o fin permiso'; break;
+                  case 'E': accionT = 'Entrada'; break;
+                  case 'S': accionT = 'Salida'; break;
+                  case 'I/A': accionT = 'Inicio alimentación'; break;
+                  case 'F/A': accionT = 'Fin alimentación'; break;
+                  case 'I/P': accionT = 'Inicio permiso'; break;
+                  case 'F/P': accionT = 'Fin permiso'; break;
+                  case 'HA': accionT = 'Timbre libre'; break;
+                  default: accionT = 'Desconocido'; break;
+                }
+                c = c + 1
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTableCentrado', text: fecha },
+                  { style: 'itemsTableCentrado', text: hora },
+                  { style: 'itemsTableCentrado', text: accionT },
+                ]
+              })
+            ]
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
+          }
+        });
+      })
+    })
     return n;
   }
-
-  // METODO PARA SUMAR REGISTROS
-  SumarRegistros(array: any[]) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-      valor = valor + array[i];
-    }
-    return valor;
-  }
-
 
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(tipo: string): void {
-    switch (tipo) {
-      case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
-        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Timbres');
-        xlsx.writeFile(wb_regimen_cargo, `Timbres_incompletos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-      default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-        const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
-        xlsx.writeFile(wb, `Timbres_incompletos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-    }
+  ExportarExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
+    xlsx.writeFile(wb, `Timbres_incompletos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let accionT = '';
     let n = 0;
-    array.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach((obj2: any) => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: any) => {
-            n++;
-            const hora = this.validacionService.FormatearHora(
-              obj4.fecha_hora_horario.split(' ')[1],
-              this.formato_hora);
-
-            switch (obj4.accion) {
-              case 'EoS': accionT = 'Entrada o salida'; break;
-              case 'AES': accionT = 'Inicio o fin alimentación'; break;
-              case 'PES': accionT = 'Inicio o fin permiso'; break;
-              case 'E': accionT = 'Entrada'; break;
-              case 'S': accionT = 'Salida'; break;
-              case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
-              case 'I/P': accionT = 'Inicio permiso'; break;
-              case 'F/P': accionT = 'Fin permiso'; break;
-              case 'HA': accionT = 'Timbre libre'; break;
-              default: accionT = 'Desconocido'; break;
-            }
-            let ele = {
-              'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
-              'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
-              'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
-              'Fecha Timbre': new Date(obj4.fecha_hora_horario), 'Hora Timbre': hora,
-              'Acción': accionT
-            }
-            nuevo.push(ele);
-          })
-        })
-      })
-    })
-    return nuevo;
-  }
-
-  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let accionT = '';
-    let n = 0;
-    array.forEach((obj1: any) => {
-      obj1.empleados.forEach((obj2: any) => {
-        obj2.timbres.forEach((obj3: any) => {
+    array.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
           n++;
-          const hora = this.validacionService.FormatearHora(
-            obj3.fecha_hora_horario.split(' ')[1],
-            this.formato_hora);
-          switch (obj3.accion) {
+          const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
             case 'PES': accionT = 'Inicio o fin permiso'; break;
@@ -1029,11 +578,17 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             default: accionT = 'Desconocido'; break;
           }
           let ele = {
-            'N°': n, 'Código': obj2.codigo, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula,
-            'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
-            'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
-            'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
-            'Fecha Timbre': new Date(obj3.fecha_hora_horario), 'Hora Timbre': hora,
+            'N°': n,
+            'Cédula': usu.cedula,
+            'Código': usu.codigo,
+            'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
+            'Ciudad': usu.ciudad,
+            'Sucursal': usu.sucursal,
+            'Régimen': usu.regimen,
+            'Departamento': usu.departamento,
+            'Cargo': usu.cargo,
+            'Fecha Timbre': new Date(t.fecha_hora_horario),
+            'Hora Timbre': hora,
             'Acción': accionT
           }
           nuevo.push(ele);
@@ -1046,72 +601,17 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
     ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
     ** ****************************************************************************************** **/
-
-  ExtraerTimbres() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
-    this.data_pdf.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach((obj2: any) => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: any) => {
-            const fecha = this.validacionService.FormatearFecha(
-              obj4.fecha_hora_horario.split(' ')[0],
-              this.formato_fecha,
-              this.validacionService.dia_abreviado);
-
-            const hora = this.validacionService.FormatearHora(
-              obj4.fecha_hora_horario.split(' ')[1],
-              this.formato_hora);
-
-            n = n + 1;
-            switch (obj4.accion) {
-              case 'EoS': accionT = 'Entrada o salida'; break;
-              case 'AES': accionT = 'Inicio o fin alimentación'; break;
-              case 'PES': accionT = 'Inicio o fin permiso'; break;
-              case 'E': accionT = 'Entrada'; break;
-              case 'S': accionT = 'Salida'; break;
-              case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
-              case 'I/P': accionT = 'Inicio permiso'; break;
-              case 'F/P': accionT = 'Fin permiso'; break;
-              case 'HA': accionT = 'Timbre libre'; break;
-              default: accionT = 'Desconocido'; break;
-            }
-
-            let ele = {
-              n: n,
-              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-              departamento: obj2.name_dep,
-              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-              fechaTimbre: fecha, horaTimbre: hora,
-              accion: accionT
-            }
-            this.timbres.push(ele);
-          })
-        })
-      })
-    })
-  }
-
-  ExtraerTimbresRegimenCargo() {
-    this.timbres = [];
-    let n = 0;
-    let accionT = '';
-    this.data_pdf.forEach((obj1: any) => {
-      obj1.empleados.forEach((obj2: any) => {
-        obj2.timbres.forEach((obj3: any) => {
-          const fecha = this.validacionService.FormatearFecha(
-            obj3.fecha_hora_horario.split(' ')[0],
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-
-          const hora = this.validacionService.FormatearHora(
-            obj3.fecha_hora_horario.split(' ')[1],
-            this.formato_hora);
-
+    this.data_pdf.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
+          const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
           n = n + 1;
-          switch (obj3.accion) {
+          switch (t.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
             case 'PES': accionT = 'Inicio o fin permiso'; break;
@@ -1126,10 +626,14 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
           }
           let ele = {
             n: n,
-            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-            departamento: obj2.departamento,
-            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-            fechaTimbre: fecha, horaTimbre: hora,
+            codigo: usu.codigo,
+            cedula: usu.cedula,
+            empleado: usu.apellido + ' ' + usu.nombre,
+            ciudad: usu.ciudad,
+            sucursal: usu.sucursal,
+            departamento: usu.departamento,
+            fechaTimbre: fecha,
+            horaTimbre: hora,
             accion: accionT
           }
           this.timbres.push(ele);
@@ -1286,21 +790,18 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   // METODOS DE VALIDACIONES DE INGRESO DE LETRAS Y NUMEROS
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e);
   }
 
+  // METODOS DE VALIDACIONES DE INGRESO DE LETRAS Y NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   //MOSTRAR DETALLES
   VerDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.ExtraerTimbresRegimenCargo();
-    } else {
-      this.ExtraerTimbres();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PANTALLA ANTERIOR

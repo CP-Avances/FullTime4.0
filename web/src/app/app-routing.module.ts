@@ -116,9 +116,9 @@ import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/hora
 import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
 import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
 // REPORTE  --MODULO APLICACION MOVIL
-import { TimbreVirtualComponent } from './componentes/reportes/timbres/timbre-virtual/timbre-virtual.component';
+import { TimbreVirtualComponent } from './componentes/reportes/modulos/timbre-virtual/timbre-virtual.component';
 // REPORTE  --MODULO TIMBRE VIRTUAL
-import { TimbreSistemaComponent } from './componentes/reportes/timbres/timbre-sistema/timbre-sistema.component';
+import { TimbreSistemaComponent } from './componentes/reportes/modulos/timbre-sistema/timbre-sistema.component';
 // REPORTE  --MODULO ALIMENTACION
 import { AlimentosGeneralComponent } from './componentes/reportes/modulos/alimentacion/alimentos-general/alimentos-general.component';
 import { DetallePlanificadosComponent } from './componentes/reportes/modulos/alimentacion/detalle-planificados/detalle-planificados.component';

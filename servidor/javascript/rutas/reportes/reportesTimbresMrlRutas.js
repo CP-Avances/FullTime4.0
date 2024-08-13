@@ -12,9 +12,8 @@ class ReportesTimbresMrlRutas {
         this.configuracion();
     }
     configuracion() {
-        // REPORTES DE TIMBRES MRL
-        this.router.put('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesTimbresMrlControlador_1.default.ReporteTimbresMrl);
-        this.router.put('/timbres-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesTimbresMrlControlador_1.default.ReporteTimbresMrlRegimenCargo);
+        // REPORTES DE TIMBRES MRL    **USADO
+        this.router.post('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesTimbresMrlControlador_1.default.ReporteTimbresMrl);
     }
 }
 const REPORTES_TIMBRES_MRL_RUTAS = new ReportesTimbresMrlRutas();
