@@ -212,7 +212,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1075,15 +1075,35 @@ class UsuarioControlador {
     }
   };
 
+  public async getDispositivoPorIdDispositivo(req: Request, res: Response): Promise<Response> {
+    try {
+      const {id_dispositivo} = req.body;
+      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`);
+      const idDispositivo = response.rows[0];
+      if (response.rows.length === 0) {
+        return res.status(404).jsonp({
+          message: 'Dispositivo no encontrado'
+        });
+      }
+      return res.jsonp(idDispositivo);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).jsonp({
+        message: 'Ups! Problemas para conectar con el servidor' +
+          '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+      });
+    }
+  };
+
   public async ingresarIDdispositivo(req: Request, res: Response) {
     try {
-      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
-        'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
-        'VALUES ($1, $2, $3) RETURNING *',
-        [id_empleado, id_celular, modelo_dispositivo]
+        'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo, terminos_condiciones)' +
+        'VALUES ($1, $2, $3, $4) RETURNING *',
+        [id_empleado, id_celular, modelo_dispositivo, terminos_condiciones]
       )
       const [objetoDispositivos] = response.rows;
 
@@ -1144,7 +1164,7 @@ class UsuarioControlador {
       });
     }
   };
-  
+
 }
 
 /* @return
