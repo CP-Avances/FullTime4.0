@@ -2446,7 +2446,7 @@ class EmpleadoControlador {
         });
 
         listEmpleadosManual.forEach(async (valor: any) => {
-          if (valor.observacion == 'no registrado') {
+          if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
             var VERIFICAR_CEDULA = await pool.query(
               `
               SELECT * FROM eu_empleados WHERE cedula = $1

@@ -2184,7 +2184,7 @@ class EmpleadoControlador {
                         }
                     });
                     listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                        if (valor.observacion == 'no registrado') {
+                        if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
                             var VERIFICAR_CEDULA = yield database_1.default.query(`
               SELECT * FROM eu_empleados WHERE cedula = $1
               `, [valor.cedula]);
