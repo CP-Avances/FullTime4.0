@@ -108,10 +108,10 @@ class EmpleadoRutas {
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
         this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
 
-        // INFORMACIÓN TÍTULO PROFESIONALES
+        // INFORMACION TITULO PROFESIONALES
         this.router.post('/buscarDepartamento', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerDepartamentoEmpleado);
 
-        // INFORMACIÓN DE LA IMAGEN
+        // INFORMACION DE LA IMAGEN
         this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
 
         // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO

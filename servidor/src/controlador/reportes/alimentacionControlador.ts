@@ -238,7 +238,7 @@ class AlimentacionControlador {
         }));
 
         let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            e.empleados = e.empleados.filter((t: any) => { return t.alimentacion.length > 0 })
             return e
         }).filter(e => { return e.empleados.length > 0 })
 

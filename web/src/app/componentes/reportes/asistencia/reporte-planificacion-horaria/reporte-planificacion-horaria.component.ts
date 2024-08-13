@@ -5,13 +5,14 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
-
+import { FormControl } from '@angular/forms';
 import { default as _rollupMoment, Moment } from 'moment';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -20,20 +21,19 @@ import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.s
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { FormControl } from '@angular/forms';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-
 
 @Component({
   selector: 'app-reporte-planificacion-horaria',
   templateUrl: './reporte-planificacion-horaria.component.html',
   styleUrls: ['./reporte-planificacion-horaria.component.css']
 })
+
 export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
-  // SELECCIÓN DE BUSQUEDA DE DATOS SEGÚN OPCIÓN
+  // SELECCION DE BUSQUEDA DE DATOS SEGÚN OPCIÓN
   get opcion() { return this.reporteService.opcion };
 
   // CRITERIOS DE BUSQUEDA SEGÚN OPCIÓN SELECCIONADA
@@ -63,19 +63,15 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
+  resultados: any = [];
   empleados: any = [];
-  respuesta: any = [];
   regimen: any = [];
   horarios: any = [];
   cargos: any = [];
-  origen: any = [];
-
-  resultados: any = [];
   idsEmpleado: string = '';
   accion: any;
 
   // VARIABLES PARA MOSTRAR DETALLES
-  tipo: string;
   verDetalle: boolean = false;
 
   // METODO PARA OBTENER DETALLE DE PLANIFICACION
@@ -144,13 +140,13 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   ]
 
   constructor(
-    private validacionService: ValidacionesService,
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
+    private informacion: DatosGeneralesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
-    private plan: PlanGeneralService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
+    private plan: PlanGeneralService,
     public restUsuario: UsuarioService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -160,7 +156,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
     this.BuscarHora();
   }
@@ -168,7 +164,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.horarios = [];
@@ -204,130 +199,31 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarSucursalesUsuario(opcion: number) {
-    let empleado = { id_empleado: this.idEmpleadoLogueado };
-
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      console.log('ver sucursales ', codigos);
-      this.usua_sucursales = { id_sucursal: codigos };
-      this.BuscarInformacion(opcion, this.usua_sucursales);
-      this.BuscarCargos(opcion, this.usua_sucursales);
-    });
-  }
-
-  // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number, buscar: any) {
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral(opcion: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
-    this.origen = [];
-    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen = JSON.stringify(res);
-        res.forEach((obj: any) => {
-          this.sucursales.push({
-            id: obj.id_suc,
-            nombre: obj.name_suc,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            this.departamentos.push({
-              id: departamento.id_depa,
-              departamento: departamento.name_dep,
-              nombre: departamento.sucursal,
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((r: any) => {
-              let elemento = {
-                id: r.id,
-                nombre: r.name_empleado,
-                codigo: r.codigo,
-                cedula: r.cedula,
-                correo: r.correo,
-                cargo: r.cargo,
-                id_contrato: r.id_contrato,
-                hora_trabaja: r.hora_trabaja,
-                sucursal: r.sucursal,
-                departamento: r.departamento,
-                ciudad: r.ciudad,
-                regimen: r.regimen,
-              };
-              this.empleados.push(elemento);
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((reg: any) => {
-              reg.regimen.forEach((r: any) => {
-                this.regimen.push({
-                  id: r.id_regimen,
-                  nombre: r.name_regimen,
-                });
-              });
-            });
-          });
-        });
-
-        this.regimen = this.regimen.filter(
-          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
-        );
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  BuscarCargos(opcion: number, buscar: any) {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen_cargo = JSON.stringify(res);
-
-        res.forEach((obj: any) => {
-          this.cargos.push({
-            id: obj.id_cargo,
-            nombre: obj.name_cargo,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.empleados.forEach((r: any) => {
-            this.empleados_cargos.push({
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              ciudad: r.ciudad,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-              hora_trabaja: r.hora_trabaja,
-            });
-          });
-        });
-      });
+    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any) {
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
+  }
+
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -337,171 +233,99 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.fechaInicialF.value == null && this.fechaFinalF.value == null) return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.fechaInicialF.value == null && this.fechaFinalF.value == null) return this.toastr.error('Ingresar fechas de búsqueda.'); if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
+
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
+    this.accion = accion;
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+        if (this.selectionSuc.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+        if (this.selectionReg.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+        if (this.selectionCar.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+        if (this.selectionEmp.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
     }
-  }
-
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    this.accion = accion;
-    let respuesta = JSON.parse(this.origen);
-    let usuarios: any = [];
-
-    respuesta.forEach((obj: any) => {
-      this.selectionSuc.selected.find((obj1: any) => {
-        if (obj1.id === obj.id_suc) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3);
-            })
-          })
-        }
-      })
-    });
-    this.VerPlanificacion(usuarios);
-  }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    this.accion = accion;
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let objeto: any;
-    respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen: any) => {
-        objeto = {
-          regimen: {
-            id: regimen.id,
-            nombre: regimen.nombre,
-          },
-        };
-        obj.departamentos.forEach((departamento: any) => {
-          departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r: any) => {
-              if (regimen.id === r.id_regimen) {
-                empleados.push(empleado);
-              }
-            });
-          });
-        });
-      });
-    });
-
-    this.VerPlanificacion(empleados);
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    this.tipo = 'default';
-    this.accion = accion;
-    let respuesta = JSON.parse(this.origen);
-    let usuarios: any = [];
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((obj1: any) => {
-        this.selectionDep.selected.find(obj2 => {
-          if (obj1.id_depa === obj2.id) {
-            obj1.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          }
-        })
-      })
-    });
-    this.VerPlanificacion(usuarios);
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    this.accion = accion;
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen_cargo);
-    let usuarios: any = [];
-    respuesta.forEach((obj: any) => {
-      this.selectionCar.selected.find((obj1: any) => {
-        if (obj.id_cargo === obj1.id) {
-          obj.empleados.forEach((obj3: any) => {
-            usuarios.push(obj3)
-          })
-        }
-      })
-    })
-
-    this.VerPlanificacion(usuarios);
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    this.accion = accion;
-    let respuesta = JSON.parse(this.origen);
-    let emp: any = [];
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((obj1: any) => {
-        obj1.empleado.forEach((obj2: any) => {
-          this.selectionEmp.selected.find(obj3 => {
-            if (obj2.id === obj3.id) {
-              emp.push(obj2);
-            }
-          });
-        });
-      })
-    });
-    this.VerPlanificacion(emp);
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.VerPlanificacion(seleccionados);
+    }
   }
 
   // METODO PARA VER PLANIFICACION
   VerPlanificacion(data: any) {
-    this.resultados = data;
+    this.resultados = [];
     this.idsEmpleado = '';
-    this.resultados.forEach((obj: any) => {
-      if (this.idsEmpleado === '') {
-        this.idsEmpleado = '\'' + obj.id + '\''
-      }
-      else {
-        this.idsEmpleado = this.idsEmpleado + ', \'' + obj.id + '\''
-      }
+    data.forEach((info: any) => {
+      info.empleados.forEach((usu: any) => {
+        this.resultados.push(usu);
+        if (this.idsEmpleado === '') {
+          this.idsEmpleado = '\'' + usu.id + '\''
+        }
+        else {
+          this.idsEmpleado = this.idsEmpleado + ', \'' + usu.id + '\''
+        }
+      })
     })
-
     this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, this.idsEmpleado);
-
   }
-
 
   // METODO PARA MOSTRAR DATOS DE HORARIO
   horariosEmpleado: any = [];
@@ -511,50 +335,39 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     this.horariosEmpleado = [];
     this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
     this.mes_fin = fec_final.format("YYYY-MM-DD");
-
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
       id_empleado: id_empleado
     }
-
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe((datos: any) => {
       if (datos.message === 'OK') {
         const horarios = datos.data;
-        console.log('horarios', horarios);
         const horariosPorEmpleado = {};
-
 
         //AGRUPAMIENTO DE LOS HORIOS POR CODIGO DE EMPLEADO
         horarios.forEach((h: any) => {
           horariosPorEmpleado[h.codigo_e] = horariosPorEmpleado[h.codigo_e] || [];
           horariosPorEmpleado[h.codigo_e].push(h);
         });
-
         this.resultados.forEach((r: any) => {
           r.horarios = horariosPorEmpleado[r.codigo];
         });
-
-
         this.resultados = this.resultados.filter((r: any) => {
           return r.horarios !== undefined && r.horarios !== null;
         });
-
-        console.log('resultado', this.resultados);
-
         this.horariosEmpleado = this.resultados;
         this.ObtenerDetallesPlanificacion();
-
       }
       else {
-        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
+        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe planificación.', {
           timeOut: 6000,
         });
       }
     })
   }
 
-
+  // METODO PARA OBTENER PLANIFICACION HORARIA
   ObtenerDetallesPlanificacion() {
     this.detalles = [];
     // DATOS DE BUSQUEDA DE DETALLES DE PLANIFICACION
@@ -575,7 +388,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.ver_acciones = true;
         this.detalle_acciones = [];
         this.detalles = datos.data;
-
         datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
@@ -620,29 +432,29 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           salida: this.salida,
         }]
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
-
         // FORMATEAR HORAS
         this.detalle_acciones.forEach((detalle: any) => {
-          detalle.entrada_ = this.validacionService.FormatearHora(detalle.entrada, this.formato_hora);
+          detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
-            detalle.inicio_comida = this.validacionService.FormatearHora(detalle.inicio_comida, this.formato_hora);
+            detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
           }
           if (detalle.fin_comida != '') {
-            detalle.fin_comida = this.validacionService.FormatearHora(detalle.fin_comida, this.formato_hora);
+            detalle.fin_comida = this.validar.FormatearHora(detalle.fin_comida, this.formato_hora);
           }
-          detalle.salida_ = this.validacionService.FormatearHora(detalle.salida, this.formato_hora);
+          detalle.salida_ = this.validar.FormatearHora(detalle.salida, this.formato_hora);
         })
-
         // METODO PARA VER PAGINACION
         if (this.detalle_acciones.length > 8) {
           this.paginar = true;
-        } else {
+        }
+        else {
           this.paginar = false;
         }
         this.EjecutarAccion();
-      } else {
+      }
+      else {
         this.EjecutarAccion();
-        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -697,16 +509,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
-
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.DefinirInformacionPDF();
-    };
-
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -714,7 +520,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   DefinirInformacionPDF() {
@@ -879,7 +684,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
             [
               {
                 border: [true, true, false, false],
-                text: 'EMPLEADO: ' + e.name_empleado,
+                text: 'EMPLEADO: ' + e.apellido + ' ' + e.nombre,
                 style: 'itemsTableInfoEmpleado'
               },
               {
@@ -1016,7 +821,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         });
       })
     })
-
     return n;
   }
 
@@ -1036,7 +840,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
   ConstruirTablaHorarioEmpleados() {
-
     let n = 0;
     const tableData = [
       [
@@ -1056,9 +859,15 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       empleado.horarios.forEach((h: any) => {
         n++;
         tableData.push([
-          n, empleado.codigo, empleado.name_empleado, empleado.cedula,
-          empleado.sucursal, empleado.ciudad, this.bool.bool_cargo ? empleado.regimen : empleado.regimen[0].name_regimen,
-          empleado.departamento, empleado.cargo,
+          n,
+          empleado.codigo,
+          empleado.apelido + ' ' + empleado.nombre,
+          empleado.cedula,
+          empleado.sucursal,
+          empleado.ciudad,
+          empleado.regimen,
+          empleado.departamento,
+          empleado.cargo,
           h.anio, h.mes,
           h.dia1, h.dia2, h.dia3, h.dia4,
           h.dia5, h.dia6, h.dia7, h.dia8,
@@ -1069,15 +878,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           h.dia25, h.dia26, h.dia27, h.dia28,
           h.dia29, h.dia30, h.dia31
         ]);
-      })
-
-
+      });
     });
     return tableData;
   }
 
   ConstruirTablaDetalleHorarios() {
-
     const tableData = [
       [
         'CÓDIGO', 'ENTRADA (E)',
@@ -1096,7 +902,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
   ConstruirTablaDefiniciones() {
-
     const tableData = [
       [
         'NOMENCLATURA', 'DESCRIPCIÓN'
@@ -1114,7 +919,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                 METODO PARA EXTRAER HORARIOS PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
-
   ExtraerHorarioEmpleados() {
     this.horarios = [];
     let n = 0;
@@ -1123,9 +927,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         n++;
         const horario = {
           n,
-          ciudad: empleado.ciudad, sucursal: empleado.sucursal, departamento: empleado.departamento,
-          regimen: empleado.regimen[0].name_regimen, empleado: empleado.name_empleado,
-          cedula: empleado.cedula, codigo: empleado.codigo, anio: h.anio, mes: h.mes,
+          cedula: empleado.cedula,
+          codigo: empleado.codigo,
+          empleado: empleado.apellido + ' ' + empleado.nombre,
+          ciudad: empleado.ciudad,
+          sucursal: empleado.sucursal,
+          departamento: empleado.departamento,
+          regimen: empleado.regimen[0].name_regimen,
+          anio: h.anio, mes: h.mes,
           dia1: h.dia1, dia2: h.dia2, dia3: h.dia3, dia4: h.dia4,
           dia5: h.dia5, dia6: h.dia6, dia7: h.dia7, dia8: h.dia8,
           dia9: h.dia9, dia10: h.dia10, dia11: h.dia11, dia12: h.dia12,
@@ -1138,7 +947,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.horarios.push(horario);
       })
     });
-    console.log('extraidos', this.horarios)
   }
 
 
@@ -1252,7 +1060,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
   // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
@@ -1288,13 +1095,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     this.tamanio_pagina_res = e.pageSize;
   }
 
-
+  // METODO PARA VALIDAR LETRAS
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e)
   }
 
+  // METODO PARA VALIDAR NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
@@ -1320,8 +1128,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     }
   }
 
-  fecHorario: boolean = true;
   // METODO PARA MOSTRAR FECHA SELECCIONADA
+  fecHorario: boolean = true;
   FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
     const ctrlValue = fecha;
     if (opcion === 1) {

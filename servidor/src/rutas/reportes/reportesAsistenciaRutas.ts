@@ -13,9 +13,8 @@ class ReportesAsistenciasRutas {
 
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesUsuarios);
-        // REPORTES DE TIMBRES MULTIPLE
-        this.router.put('/timbres/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultiple);
-        this.router.put('/timbres-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultipleRegimenCargo);
+        // REPORTES DE TIMBRES MULTIPLE      **USADO
+        this.router.post('/timbres/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultiple);
 
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA 
         this.router.put('/timbres-sistema/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreSistema);

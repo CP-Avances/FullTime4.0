@@ -1,7 +1,7 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
@@ -25,6 +25,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   templateUrl: './reporte-tiempo-alimentacion.component.html',
   styleUrls: ['./reporte-tiempo-alimentacion.component.css']
 })
+
 export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   // CRITERIOS DE BUSQUEDA POR FECHAS
@@ -41,17 +42,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   data_pdf: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
-
-  //VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
-  excesoDepartamentos: any = [];
-  excesoSucursales: any = [];
-  excesoRegimen: any = [];
-  excesoCargos: any = [];
 
   //VARIABLES PARA MOSTRAR DETALLES
   verDetalle: boolean = false;
@@ -137,7 +131,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.timbres = [];
@@ -372,6 +365,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 1, 0, 1], },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
@@ -398,18 +392,13 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
+    let totalExcesoEmpleado: number = 0;
+    let totalExceso: number = 0;
+    let resumen: string = '';
+    let general: any = [];
     let n: any = []
     let c = 0;
-    let totalExcesoEmpleado: number = 0;
-    let totalExcesoSucursal: number = 0;
-    let totalExcesoCargo = 0;
-    let totalExcesoRegimen = 0;
-    let totalExcesoDepartamento = 0;
-    this.excesoDepartamentos = [];
-    this.excesoSucursales = [];
-    this.excesoRegimen = [];
-    this.excesoCargos = [];
-
+    // CODIGO DE COLORES
     n.push({
       style: 'tableMarginColores',
       table: {
@@ -442,489 +431,232 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       }
     });
 
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1: any) => {
-        if (this.bool.bool_cargo === true) {
-          totalExcesoCargo = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        } else {
-          totalExcesoRegimen = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-
-        obj1.empleados.forEach((obj2: any) => {
-          n.push({
-            style: 'tableMarginCabeceraEmpleado',
-            table: {
-              widths: ['*', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, false, false],
-                    text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                ],
-                [
-                  {
-                    border: [true, false, false, false],
-                    text: 'DEPARTAMENTO: ' + obj2.departamento,
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, true, false],
-                    text: '',
-                    style: 'itemsTableInfoEmpleado'
-                  }
-                ]
-              ],
-            },
-          });
-          c = 0;
-          totalExcesoEmpleado = 0;
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'FECHA', style: 'tableHeader' },
-                  { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'M. TOMADOS', style: 'tableHeader' },
-                  { text: 'M. EXCESO', style: 'tableHeader' },
-                ],
-                ...obj2.alimentacion.map((obj3: any) => {
-
-                  const fecha = this.validar.FormatearFecha(obj3.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
-
-                  const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-                    ? this.validar.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : 'FT';
-                  const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-                    ? this.validar.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : 'FT';
-
-                  const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-                  const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
-                  const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-                  totalExcesoEmpleado += exceso;
-                  totalExcesoRegimen += exceso;
-                  totalExcesoCargo += exceso;
-                  c = c + 1
-                  return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: fecha },
-                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                    { style: 'itemsTableCentrado', text: minAlimentacion },
-                    { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
-                    { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
-                  ];
-                }),
-                [
-                  {}, {}, {}, {}, {},
-                  { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                  { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
-                ],
-              ],
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        });
-        if (this.bool.bool_cargo) {
-          let cargo = {
-            cargo: obj1.name_cargo,
-            exceso: totalExcesoCargo,
-          }
-          this.excesoCargos.push(cargo);
-        };
-
-        if (this.bool.bool_reg) {
-          let regimen = {
-            regimen: obj1.nombre,
-            exceso: totalExcesoRegimen,
-          }
-          this.excesoRegimen.push(regimen);
-        };
-      });
-
-      if (this.bool.bool_cargo) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL CARGOS',
-                  style: 'itemsTableInfoTotal'
-                },
-                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-              ],
-              ...this.excesoCargos.map((cargo: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: cargo.cargo,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: cargo.exceso, style: 'itemsTableCentrado' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_reg) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL REGIMENES',
-                  style: 'itemsTableInfoTotal'
-                },
-                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-              ],
-              ...this.excesoRegimen.map((regimen: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: regimen.regimen,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: regimen.exceso, style: 'itemsTableCentrado' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-    } else {
-      data.forEach((obj: IReporteFaltas) => {
-        if (this.bool.bool_suc === true) {
-          totalExcesoSucursal = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo'
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo'
-                  }
-                ]
-              ]
-            }
-          })
-        }
-
-        obj.departamentos.forEach((obj1: any) => {
-          totalExcesoDepartamento = 0;
-          // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
-          if (this.bool.bool_dep === true) {
-            n.push({
-              style: 'tableMarginCabecera',
-              table: {
-                widths: ['*'],
-                headerRows: 1,
-                body: [
-                  [
-                    {
-                      border: [true, true, true, true],
-                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfo'
-                    },
-                  ]
-                ]
-              }
-            })
-          }
-
-          obj1.empleado.forEach((obj2: any) => {
-            n.push({
-              style: 'tableMarginCabeceraEmpleado',
-              table: {
-                widths: ['*', 'auto', 'auto',],
-                headerRows: 2,
-                body: [
-                  [
-                    {
-                      border: [true, true, false, false],
-                      text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, false, false],
-                      text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, true, false],
-                      text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ],
-                  [
-                    {
-                      border: [true, false, false, false],
-                      text: this.bool.bool_suc || this.bool.bool_emp ? 'DEPARTAMENTO: ' + obj2.departamento : '',
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: 'CARGO: ' + obj2.cargo,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, true, false],
-                      text: '',
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ]
-                ]
-              }
-            });
-            c = 0;
-            totalExcesoEmpleado = 0;
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-                headerRows: 1,
-                body: [
-                  [
-                    { text: 'N°', style: 'tableHeader' },
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'M. TOMADOS', style: 'tableHeader' },
-                    { text: 'M. EXCESO', style: 'tableHeader' },
-                  ],
-                  ...obj2.alimentacion.map((obj3: any) => {
-                    const fecha = this.validar.FormatearFecha(
-                      obj3.inicioAlimentacion.fecha_horario,
-                      this.formato_fecha,
-                      this.validar.dia_abreviado);
-
-                    const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-                      ? this.validar.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : 'FT';
-                    const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-                      ? this.validar.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : 'FT';
-
-                    const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-                    const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
-                    const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-                    totalExcesoEmpleado += exceso;
-                    totalExcesoSucursal += exceso;
-                    totalExcesoDepartamento += exceso;
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: fecha },
-                      { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                      { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                      { style: 'itemsTableCentrado', text: minAlimentacion },
-                      { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
-                      { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
-                    ];
-                  }),
-                  [
-                    {}, {}, {}, {}, {},
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                    { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
-                  ],
-                ],
+    data.forEach((selec: any) => {
+      // CONTAR REGISTROS
+      let arr_reg = selec.empleados.map((o: any) => { return o.alimentacion.length });
+      let reg = this.validar.SumarRegistros(arr_reg);
+      // CONTAR MINUTOS DE EXCESO DE ALIMENTACION 
+      totalExceso = 0;
+      selec.empleados.forEach((o: any) => {
+        o.alimentacion.map((usu: any) => {
+          const minAlimentacion = usu.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(usu.inicioAlimentacion.fecha_hora_timbre, usu.finAlimentacion.fecha_hora_timbre);
+          const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
+          totalExceso += exceso;
+        })
+      })
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      let opcion = selec.nombre;
+      if (this.bool.bool_reg === true) {
+        descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
+        resumen = 'TOTAL RÉGIMEN LABORAL';
+      }
+      else if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
+      }
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
+        resumen = 'TOTAL CARGOS';
+      }
+      else if (this.bool.bool_suc === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+      // DATOS DE RESUMEN GENERAL
+      let informacion = {
+        sucursal: selec.sucursal,
+        nombre: opcion,
+        totalMinExceso: totalExceso,
+      }
+      general.push(informacion);
+      // CABECERA PRINCIPAL
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
               },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
+      });
+      // PRESENTACION DE LA INFORMACION
+      selec.empleados.forEach((empl: any) => {
+        n.push({
+          style: 'tableMarginCabeceraEmpleado',
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                {
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
+              ],
+              [
+                {
+                  border: [true, false, true, false],
+                  text: 'RÉGIMEN LABORAL ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
                 }
-              }
-            });
-          });
-          if (this.bool.bool_dep) {
-            let departamento = {
-              departamento: obj1.name_dep,
-              exceso: totalExcesoDepartamento,
-            }
-            this.excesoDepartamentos.push(departamento);
-          };
+              ]
+            ],
+          },
         });
-
-        if (this.bool.bool_suc) {
-          let sucursal = {
-            sucursal: obj.name_suc,
-            exceso: totalExcesoSucursal,
+        // ENCERAR VARIABLES
+        c = 0;
+        totalExcesoEmpleado = 0;
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            headerRows: 1,
+            body: [
+              [
+                { text: 'N°', style: 'tableHeader' },
+                { text: 'FECHA', style: 'tableHeader' },
+                { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'M. TOMADOS', style: 'tableHeader' },
+                { text: 'M. EXCESO', style: 'tableHeader' },
+              ],
+              ...empl.alimentacion.map((usu: any) => {
+                const fecha = this.validar.FormatearFecha(usu.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const inicioAlimentacion = usu.inicioAlimentacion.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : 'FT';
+                const finAlimentacion = usu.finAlimentacion.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : 'FT';
+                const minAlimentacion = usu.inicioAlimentacion.minutos_alimentacion;
+                const minutosTomados = this.CalcularDiferenciaFechas(usu.inicioAlimentacion.fecha_hora_timbre, usu.finAlimentacion.fecha_hora_timbre);
+                const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
+                totalExcesoEmpleado += exceso;
+                c = c + 1
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTableCentrado', text: fecha },
+                  { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                  { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                  { style: 'itemsTableCentrado', text: minAlimentacion },
+                  { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
+                  { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
+                ];
+              }),
+              [
+                {}, {}, {}, {}, {},
+                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
+              ],
+            ],
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
-          this.excesoSucursales.push(sucursal);
-        };
+        });
+      })
+    })
+    // RESUMEN TOTALES DE REGISTROS
+    if (this.bool.bool_emp === false) {
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
+              },
+              {},
+              { text: 'MINUTOS EXCESO', style: 'itemsTableInfoTotal' },
+            ],
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (this.bool.bool_suc === true) {
+                valor = 2;
+              }
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
+                },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
+                },
+                { text: info.totalMinExceso, style: 'itemsTableDerecha' },
+              ]
+            })
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex: any) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
+        }
       });
     }
-
-    if (this.bool.bool_dep) {
-      n.push({
-        style: 'tableMarginCabeceraTotal',
-        table: {
-          widths: ['*', 'auto'],
-          headerRows: 1,
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                bold: true,
-                text: 'TOTAL DEPARTAMENTOS',
-                style: 'itemsTableInfoTotal'
-              },
-              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-            ],
-            ...this.excesoDepartamentos.map((departamento: any) => {
-              return [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: departamento.departamento,
-                  style: 'itemsTableCentrado'
-                },
-                { text: departamento.exceso, style: 'itemsTableCentrado' },
-              ]
-            })
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
-    };
-
-    if (this.bool.bool_suc) {
-      n.push({
-        style: 'tableMarginCabeceraTotal',
-        table: {
-          widths: ['*', 'auto'],
-          headerRows: 1,
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                bold: true,
-                text: 'TOTAL SUCURSALES',
-                style: 'itemsTableInfoTotal'
-              },
-              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-            ],
-            ...this.excesoSucursales.map((sucursal: any) => {
-              return [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: sucursal.sucursal,
-                  style: 'itemsTableCentrado'
-                },
-                { text: sucursal.exceso, style: 'itemsTableCentrado' },
-              ]
-            })
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
-    };
-
     return n;
   }
 
@@ -1005,11 +737,12 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             n: n,
             cedula: usu.cedula,
             codigo: usu.codigo,
-            empleado: usu.name_empleado,
+            empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,
             regimen: usu.regimen,
             departamento: usu.departamento,
+            cargo: usu.cargo,
             fecha,
             inicio: inicioAlimentacion,
             fin: finAlimentacion,
@@ -1187,10 +920,12 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // METODO DE VALIDACION DE LETRAS
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e)
   }
 
+  // METODO DE VALIDACION DE NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt)
   }
@@ -1211,7 +946,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   ObtenerClaseCeldas(valor: any) {
     if (valor > 0) {
       return 'verde';
-    } else if (valor == 'FT') {
+    }
+    else if (valor == 'FT') {
       return 'rojo';
     }
   }

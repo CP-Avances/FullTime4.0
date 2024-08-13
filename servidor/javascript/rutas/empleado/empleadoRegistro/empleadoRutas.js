@@ -89,9 +89,9 @@ class EmpleadoRutas {
         // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO    **USADO
         this.router.get('/ubicacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.BuscarCoordenadas);
         this.router.post('/buscar/informacion', verificarToken_1.TokenValidation, empleadoControlador_1.default.BuscarEmpleadoNombre);
-        // INFORMACIÓN TÍTULO PROFESIONALES
+        // INFORMACION TITULO PROFESIONALES
         this.router.post('/buscarDepartamento', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerDepartamentoEmpleado);
-        // INFORMACIÓN DE LA IMAGEN
+        // INFORMACION DE LA IMAGEN
         this.router.get('/img/:id/:imagen', empleadoControlador_1.default.BuscarImagen);
         // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
         this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.CodificarImagenBase64);

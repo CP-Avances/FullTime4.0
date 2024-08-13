@@ -475,6 +475,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        console.log('ver imagen ', this.urlImagen)
         this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
@@ -1432,7 +1433,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
- 
+
   /** ********************************************************************************************* **
    ** **                               ELIMINAR PLANIFICACIONES HORARIAS                         ** **
    ** ********************************************************************************************* **/

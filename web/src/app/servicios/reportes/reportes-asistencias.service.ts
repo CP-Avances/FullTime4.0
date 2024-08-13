@@ -25,12 +25,9 @@ export class ReportesAsistenciasService {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/puntualidad/${desde}/${hasta}`, data, { params });
   }
 
+  // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO
   ReporteTimbresMultiple(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
-  }
-
-  ReporteTimbresMultipleRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-regimen-cargo/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
   }
 
   ReporteTimbreSistema(data: any, desde: string, hasta: string) {

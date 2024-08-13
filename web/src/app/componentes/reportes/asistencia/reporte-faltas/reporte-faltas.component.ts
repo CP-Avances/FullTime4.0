@@ -543,7 +543,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         });
       });
     })
-    // RESUMEN TOTALES DE REGISTRSO
+    // RESUMEN TOTALES DE REGISTROS
     if (this.bool.bool_emp === false) {
       n.push({
         style: 'tableMarginCabeceraTotal',

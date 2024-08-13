@@ -14,9 +14,8 @@ class ReportesAsistenciasRutas {
     configuracion() {
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
-        // REPORTES DE TIMBRES MULTIPLE
-        this.router.put('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
-        this.router.put('/timbres-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultipleRegimenCargo);
+        // REPORTES DE TIMBRES MULTIPLE      **USADO
+        this.router.post('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA 
         this.router.put('/timbres-sistema/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistema);
         this.router.put('/timbres-sistema-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistemaRegimenCargo);

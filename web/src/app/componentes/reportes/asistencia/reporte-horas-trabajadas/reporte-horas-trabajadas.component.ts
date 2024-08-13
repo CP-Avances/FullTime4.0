@@ -555,6 +555,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             ],
           },
         });
+        // ENCERAR VARIABLES
         c = 0;
         totalTiempoLaboradoEmpleado = 0;
         totalTiempoPlanificadoEmpleado = 0;
@@ -707,7 +708,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         });
       })
     })
-    // RESUMEN TOTALES DE REGISTRSO
+    // RESUMEN TOTALES DE REGISTROS
     if (this.bool.bool_emp === false) {
       n.push({
         style: 'tableMarginCabeceraTotal',

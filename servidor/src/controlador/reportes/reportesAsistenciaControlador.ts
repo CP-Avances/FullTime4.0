@@ -134,49 +134,8 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(respuesta)
     }
 
+// METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO     **USADO
     public async ReporteTimbresMultiple(req: Request, res: Response) {
-
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        //El reporte funciona para relojs de 6, 3 y sin acciones.        
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-
-        let nuevo = n.map((obj: IReporteTimbres) => {
-
-            obj.departamentos = obj.departamentos.map((e) => {
-
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                // console.log('Empleados: ',e);
-                return e
-
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-
-    }
-
-    public async ReporteTimbresMultipleRegimenCargo(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -451,7 +410,7 @@ class ReportesAsistenciaControlador {
 const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
 export default REPORTE_A_CONTROLADOR
 
-
+// FUNCION DE BUSQUEDA DE TIMBRES
 const BuscarTimbres = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `

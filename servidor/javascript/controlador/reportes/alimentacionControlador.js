@@ -239,7 +239,7 @@ class AlimentacionControlador {
                 return obj;
             })));
             let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                e.empleados = e.empleados.filter((t) => { return t.alimentacion.length > 0; });
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)

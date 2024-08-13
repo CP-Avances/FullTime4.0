@@ -5,11 +5,11 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -343,7 +343,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   DefinirInformacionPDF() {
@@ -658,7 +657,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         });
       })
     })
-    // RESUMEN TOTALES DE REGISTRSO
+    // RESUMEN TOTALES DE REGISTROS
     if (this.bool.bool_emp === false) {
       n.push({
         style: 'tableMarginCabeceraTotal',

@@ -4,12 +4,13 @@ mat-form-field {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 tr {
     text-align: center;
 }
+
 th {
     text-align: center;
     vertical-align: middle !important;
@@ -26,9 +27,10 @@ p {
 }
 
 mat-icon {
-  cursor: pointer;
-  width: 1.625rem;
+    cursor: pointer;
+    width: 1.625rem;
 }
+
 .ver {
     color: indianred;
 }
@@ -43,6 +45,7 @@ mat-icon {
     border-spacing: 0;
     border-collapse: collapse;
 }
+
 #detalle .t_horarios {
     border: 1px solid #ccc;
     padding: 8px;
@@ -51,12 +54,12 @@ mat-icon {
 }
 
 #detalle th,
-#detalle td{
+#detalle td {
     border-right: 1px solid #ccc;
     border-left: 1px solid #ccc;
 }
 
-#detalle tbody tr{
+#detalle tbody tr {
     background-color: #fbfbfb;
 }
 
@@ -64,6 +67,6 @@ mat-icon {
     background-color: #e6f3ff;
 }
 
-.timbre{
-  background-color: #dadeec !important;
+.timbre {
+    background-color: #dadeec !important;
 }

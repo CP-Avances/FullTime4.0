@@ -12,12 +12,10 @@ export class SalidasAntesService {
     private http: HttpClient
   ) { }
 
+  // METODO PARA BUSCAR REGISTROS DE SALIDAS ANTICIPADAS   **USADO
   BuscarTimbresSalidasAnticipadas(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/reporte-salidas-antes/timbre-salida-anticipada/${inicio}/${fin}`, data);
+    return this.http.post<any>(`${environment.url}/reporte-salidas-antes/timbre-salida-anticipada/${inicio}/${fin}`, data);
   }
 
-  BuscarTimbresSalidasAnticipadasRegimenCargo(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/reporte-salidas-antes/timbre-salida-anticipada-regimen-cargo/${inicio}/${fin}`, data);
-  }
 
 }
