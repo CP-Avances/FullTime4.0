@@ -18,6 +18,7 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { Observable, map, startWith } from 'rxjs';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 
 @Component({
@@ -154,6 +155,7 @@ export class EditarRolUserComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     private asignaciones: AsignacionesService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public loginService: LoginService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string);
@@ -297,7 +299,6 @@ export class EditarRolUserComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    console.log('ver original ', informacion)
     informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
@@ -346,13 +347,9 @@ export class EditarRolUserComponent implements OnInit {
     })
 
     this.OmitirDuplicados();
-    console.log('regimen ---', this.regimen)
-
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
-    console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
-      console.log('ingresa')
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
@@ -368,7 +365,6 @@ export class EditarRolUserComponent implements OnInit {
     }
 
     this.mostrarTablas = true;
-    console.log('regimen ', this.regimen)
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -522,7 +518,15 @@ export class EditarRolUserComponent implements OnInit {
 
   // METODO PARA MOSTRAR METODOS DE CONSULTAS ROL
   MostrarLista() {
-    if (this.opcion === 'r') {
+    if (this.opcion === 's') {
+      this.nombre_regRol.reset();
+      this.nombre_sucRol.reset();
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
+      this.Filtrar('', 1);
+    }
+    else if (this.opcion === 'r') {
       this.nombre_regRol.reset();
       this.nombre_sucRol.reset();
       this.selectionDep.clear();
@@ -726,6 +730,27 @@ export class EditarRolUserComponent implements OnInit {
     }
   }
 
+  ModelarSucursal(id: number, tipo: string) {
+    let usuarios: any = [];
+    if (id === 0 || id === undefined) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionSucRol.selected.find((selec: any) => {
+          if (empl.id_suc === selec.id) {
+            usuarios.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_suc === id) {
+          usuarios.push(empl)
+        }
+      })
+    }
+    this.SeleccionarProceso(tipo, usuarios);
+  }
+
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, tipo: string, sucursal: any) {
     let usuarios: any = [];
@@ -835,7 +860,10 @@ export class EditarRolUserComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   MetodosFiltro(valor: any, tipo: string) {
-    if (this.opcion === 'c') {
+    if (this.opcion === 's') {
+      this.ModelarSucursal(valor.id, tipo);
+    }
+    else if (this.opcion === 'c') {
       this.ModelarCargo(valor.id, tipo, valor.id_suc);
     }
     else if (this.opcion === 'd') {
@@ -850,7 +878,7 @@ export class EditarRolUserComponent implements OnInit {
 
   }
 
-  abriEditarRolUser(datos: any) {
+  abriEditarRolUser(datos: any) {    
     if (datos.length > 0) {
       const data = {
         idRol: this.formulario.get('nombreRolF')?.value,
@@ -862,11 +890,23 @@ export class EditarRolUserComponent implements OnInit {
           timeOut: 4000,
         });
       }else{
+        var existeUserLogueado = false;
+        datos.forEach(item => {
+          if(item.id == this.idEmpleadoLogueado){
+            existeUserLogueado = true;
+          }
+        })
+
         this.restRol.actualizarRoles( data).subscribe((res: any) => {
           this.toastr.success(res.message, '', {
             timeOut: 4000,
           });
-          this.LimpiarFormulario();
+          this.LimpiarFormulario();          
+          this.BuscarInformacionGeneral();
+          if(res.status == 200 && existeUserLogueado == true){
+            this.loginService.logout()
+          };
+          
         })
       }
       
@@ -875,6 +915,7 @@ export class EditarRolUserComponent implements OnInit {
         timeOut: 4000,
       });
     }
+      
   }
 
 }

@@ -519,18 +519,22 @@ export class CargarPlantillaComponent implements OnInit {
       formData.append("uploads", this.archivoSubidoCargo[i], this.archivoSubidoCargo[i].name);
     }
     this.progreso = true;
+    console.log('formData: ',formData);
     this.restCa.RevisarFormato(formData).subscribe(res => {
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
-      this.DatosCargos.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
+      if(this.DatosCargos?.length > 0){
+        this.DatosCargos.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+      }
+      
       if (this.messajeExcelCargos == 'error') {
         this.DatosCargos = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -574,6 +578,7 @@ export class CargarPlantillaComponent implements OnInit {
       }
       this.restCa.SubirArchivoExcelCargo(datos).subscribe({
         next: (response) => {
+          console.log('respuesta: ',response)
           this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });

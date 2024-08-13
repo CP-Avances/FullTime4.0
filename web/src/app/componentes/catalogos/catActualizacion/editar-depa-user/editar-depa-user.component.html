@@ -140,20 +140,6 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Nombres</mat-label>
-                                <input matInput placeholder="Buscar"
-                                    (input)="FiltrarDep(nombre_empDep.value, 5)" [formControl]="nombre_empDep" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por nombre.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
                                 <mat-label>Código</mat-label>
                                 <input matInput placeholder="Buscar" (input)="FiltrarDep(codigoDep.value, 3)"
                                     [formControl]="codigoDep" (keypress)="IngresarSoloNumeros($event)">
@@ -166,6 +152,20 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombres</mat-label>
+                                <input matInput placeholder="Buscar"
+                                    (input)="FiltrarDep(nombre_empDep.value, 5)" [formControl]="nombre_empDep" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
@@ -217,7 +217,7 @@
             </div>  
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                 <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltroDep(0, 'e')">
-                    Actualizar Rol
+                    Actualizar Departamento
                 </button>
             </div>
 
@@ -461,15 +461,15 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Nombre</th>
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Código</th>
+                                <th scope="col">Nombre</th>
                                 <th scope="col">Departamento</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | emplCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | emplNombre: filtroNombreEmpDep | emplRol: filtroRolEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
+                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | emplCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | emplNombre: filtroNombreEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_Dep" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmpDep.toggle(e) : null"
@@ -477,9 +477,9 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{e.sucursal}}</td>
-                                <td>{{e.nombre}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
+                                <td>{{e.nombre}}</td>
                                 <td>{{e.dep}}</td>
                             </tr>
                         </tbody>

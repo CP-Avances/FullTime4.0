@@ -1744,6 +1744,14 @@ class EmpleadoControlador {
                     if (latitud != 'No registrado') {
                         _latitud = latitud;
                     }
+                    var _telefono = null;
+                    if (telefono != 'No registrado') {
+                        _telefono = telefono;
+                    }
+                    var _domicilio = null;
+                    if (domicilio != 'No registrado') {
+                        _domicilio = domicilio;
+                    }
                     //OBTENER ID DEL ESTADO
                     var id_estado = 1;
                     var estado_user = true;
@@ -1771,7 +1779,7 @@ class EmpleadoControlador {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `, [cedula, apellidoE, nombreE,
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                        _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -2171,7 +2179,7 @@ class EmpleadoControlador {
                         }
                     });
                     listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                        if (valor.observacion == 'no registrado') {
+                        if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
                             var VERIFICAR_CEDULA = yield database_1.default.query(`
               SELECT * FROM eu_empleados WHERE cedula = $1
               `, [valor.cedula]);
@@ -2375,6 +2383,14 @@ class EmpleadoControlador {
                     if (latitud != 'No registrado') {
                         _latitud = latitud;
                     }
+                    var _telefono = null;
+                    if (telefono != 'No registrado') {
+                        _telefono = telefono;
+                    }
+                    var _domicilio = null;
+                    if (domicilio != 'No registrado') {
+                        _domicilio = domicilio;
+                    }
                     // OBTENER ID DEL ESTADO
                     var id_estado = 1;
                     var estado_user = true;
@@ -2400,7 +2416,7 @@ class EmpleadoControlador {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `, [cedula, apellidoE, nombreE,
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                        _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({

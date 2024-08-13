@@ -140,35 +140,6 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Nombres</mat-label>
-                                <input matInput placeholder="Buscar"
-                                    (input)="Filtrar(nombre_empRol.value, 5)" [formControl]="nombre_empRol" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por nombre.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Código</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(codigoRol.value, 3)"
-                                    [formControl]="codigoRol" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por código.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
                                 <mat-label>Cédula</mat-label>
                                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedulaRol.value, 4)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
@@ -191,6 +162,41 @@
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombres</mat-label>
+                                <input matInput placeholder="Buscar"
+                                    (input)="Filtrar(nombre_empRol.value, 5)" [formControl]="nombre_empRol" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Código</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(codigoRol.value, 3)"
+                                    [formControl]="codigoRol" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por código.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
                         </div>
                     </div>
                 </div>
@@ -455,15 +461,15 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Código</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | emplRol: filtroRolEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null"
@@ -471,9 +477,9 @@
                             </mat-checkbox>
                         </td>
                         <td>{{e.sucursal}}</td>
-                        <td>{{e.nombre}}</td>
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
+                        <td>{{e.nombre}}</td>
                         <td>{{e.rol}}</td>
                     </tr>
                 </tbody>

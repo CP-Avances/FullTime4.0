@@ -1968,6 +1968,16 @@ class EmpleadoControlador {
           _latitud = latitud;
         }
 
+        var _telefono = null
+        if(telefono != 'No registrado'){
+          _telefono = telefono
+        }
+
+        var _domicilio = null
+        if(domicilio != 'No registrado'){
+          _domicilio = domicilio
+        }
+
         //OBTENER ID DEL ESTADO
         var id_estado = 1;
         var estado_user = true;
@@ -2006,7 +2016,7 @@ class EmpleadoControlador {
           `
           , [cedula, apellidoE, nombreE,
             id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-            domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+            _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
         const [empleado] = response.rows;
 
@@ -2430,7 +2440,7 @@ class EmpleadoControlador {
         });
 
         listEmpleadosManual.forEach(async (valor: any) => {
-          if (valor.observacion == 'no registrado') {
+          if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
             var VERIFICAR_CEDULA = await pool.query(
               `
               SELECT * FROM eu_empleados WHERE cedula = $1
@@ -2656,6 +2666,17 @@ class EmpleadoControlador {
           _latitud = latitud;
         }
 
+        var _telefono = null
+        if(telefono != 'No registrado'){
+          _telefono = telefono
+        }
+
+        var _domicilio = null
+        if(domicilio != 'No registrado'){
+          _domicilio = domicilio
+        }
+
+
         // OBTENER ID DEL ESTADO
         var id_estado = 1;
         var estado_user = true;
@@ -2693,7 +2714,7 @@ class EmpleadoControlador {
           `
           , [cedula, apellidoE, nombreE,
             id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-            domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+            _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
         const [empleado] = response.rows;
 

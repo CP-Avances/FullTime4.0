@@ -267,7 +267,7 @@
                                         </form>
                                 </div>
                                 <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                                    <div *ngIf="DatosCargos.length == 0" class="d-flex flex-wrap justify-content-around">
+                                    <div *ngIf="DatosCargos?.length == 0" class="d-flex flex-wrap justify-content-around">
                                         <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                             style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                             href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -275,7 +275,7 @@
                                             Descargar plantilla usuarios
                                         </a>
                                     </div>
-                                    <div *ngIf="DatosCargos.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                    <div *ngIf="DatosCargos?.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm"
                                              matSuffix matTooltipPosition="right" (click)="ConfirmarRegistroMultipleCargos()"
                                              matTooltip="Guardar registro multiple.">
@@ -296,7 +296,7 @@
             </div>
 
             <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CARGOS ------------------------------------------------->
-            <div *ngIf="DatosCargos.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div *ngIf="DatosCargos?.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo">REGISTRO MULTIPLE</div>
                     <div class="table-responsive">

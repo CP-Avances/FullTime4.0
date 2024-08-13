@@ -255,7 +255,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
-          { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
+          { name: 'Modalidad Laboral', url: '/modalidaLaboral', color: true, ver: true },
           { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true },
           { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: true },
