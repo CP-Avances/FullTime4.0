@@ -79,7 +79,6 @@ export class CrearTimbreComponent implements OnInit {
       this.nombre = this.data.name_empleado;
     }
     this.VerDatosEmpleado(this.idEmpleadoLogueado);
-    this.Geolocalizar();
   }
 
   // METODO DE BUSQUEDA DE DATOS DE EMPLEADO
@@ -89,49 +88,6 @@ export class CrearTimbreComponent implements OnInit {
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleadoUno = data;
     })
-  }
-
-  // METODO PARA TOMAR CORDENAS DE UBICACIÓN
-  Geolocalizar() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (objPosition) => {
-          this.latitud = objPosition.coords.latitude;
-          this.longitud = objPosition.coords.longitude;
-        }, (objPositionError) => {
-          switch (objPositionError.code) {
-            case objPositionError.PERMISSION_DENIED:
-              this.toastr.warning(
-                'No se ha permitido el acceso a la posición del usuario.', '', {
-                timeOut: 6000,
-              })
-              break;
-            case objPositionError.POSITION_UNAVAILABLE:
-              this.toastr.warning(
-                'No se ha podido acceder a la información de su posición.', '', {
-                timeOut: 6000,
-              })
-              break;
-            case objPositionError.TIMEOUT:
-              this.toastr.warning(
-                'El servicio ha tardado demasiado tiempo en responder.', '', {
-                timeOut: 6000,
-              })
-              break;
-            default:
-              this.toastr.warning(
-                'Ups!!! algo salio mal.', 'Volver a intentar.', {
-                timeOut: 6000,
-              })
-          }
-        }, this.options);
-    }
-    else {
-      this.toastr.warning(
-        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
-        timeOut: 6000,
-      })
-    }
   }
 
   // METODO DE INGRESO DE ACCIONES DEL TIMBRE
