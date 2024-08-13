@@ -110,6 +110,7 @@ export class LoginComponent implements OnInit {
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
       pass: clave,
+      movil: false
     };
 
     // VALIDACION DEL LOGIN
