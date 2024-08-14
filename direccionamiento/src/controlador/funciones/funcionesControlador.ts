@@ -9,7 +9,7 @@ class FuncionesControlador {
             let { direccion } = req.body;
             let empresasRows: any = 0;
             let empresas = await pool.query(
-                "SELECT emp.empresa_id as id, emp.hora_extra, emp.accion_personal, emp.alimentacion, emp.permisos, emp.geolocalizacion, emp.vacaciones, emp.app_movil, emp.timbre_web FROM empresa AS emp WHERE emp.empresa_direccion = $1", [direccion]
+                "SELECT emp.empresa_id as id, emp.hora_extra, emp.accion_personal, emp.alimentacion, emp.permisos, emp.geolocalizacion, emp.vacaciones, emp.app_movil, emp.timbre_web, emp.numero_relojes FROM empresa AS emp WHERE emp.empresa_direccion = $1", [direccion]
             ).then(
                 (result: any) => {
                     empresasRows = result.rowCount;

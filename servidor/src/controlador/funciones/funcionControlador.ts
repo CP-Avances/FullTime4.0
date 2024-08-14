@@ -19,7 +19,6 @@ class FuncionesControlador {
         }
     }
 
-
 }
 
 export const FUNCIONES_CONTROLADOR = new FuncionesControlador();

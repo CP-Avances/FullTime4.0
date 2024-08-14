@@ -21,7 +21,7 @@ class FuncionesControlador {
                 //CONSULTA DE EMPRESA EN BASE A CODIGO ENCRIPTADO
                 let { direccion } = req.body;
                 let empresasRows = 0;
-                let empresas = yield database_1.default.query("SELECT emp.empresa_id as id, emp.hora_extra, emp.accion_personal, emp.alimentacion, emp.permisos, emp.geolocalizacion, emp.vacaciones, emp.app_movil, emp.timbre_web FROM empresa AS emp WHERE emp.empresa_direccion = $1", [direccion]).then((result) => {
+                let empresas = yield database_1.default.query("SELECT emp.empresa_id as id, emp.hora_extra, emp.accion_personal, emp.alimentacion, emp.permisos, emp.geolocalizacion, emp.vacaciones, emp.app_movil, emp.timbre_web, emp.numero_relojes FROM empresa AS emp WHERE emp.empresa_direccion = $1", [direccion]).then((result) => {
                     empresasRows = result.rowCount;
                     if (result.rowCount > 0) {
                         return res.status(200).jsonp(result.rows);
