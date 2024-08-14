@@ -485,6 +485,95 @@ class DatosGeneralesControlador {
             }
         });
     }
+    //-------------------------------------------------------------------- METODOS PARA APP MOVIL -------------------------------------------------------------------------
+    DatosGeneralesParaMovil(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let estado = req.params.estado;
+                console.log('Estado: ', estado);
+                let suc = yield database_1.default.query(`
+                SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM e_sucursales AS s, 
+                e_ciudades AS c WHERE s.id_ciudad = c.id ORDER BY s.id
+                `).then(result => { return result.rows; });
+                if (suc.length === 0)
+                    return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+                let departamentos = yield Promise.all(suc.map((ele) => __awaiter(this, void 0, void 0, function* () {
+                    ele.departamentos = yield database_1.default.query(`
+                    SELECT d.id as id_depa, d.nombre as name_dep FROM ed_departamentos AS d
+                    WHERE d.id_sucursal = $1
+                    `, [ele.id_suc])
+                        .then(result => {
+                        return result.rows.filter(obj => {
+                            return obj.name_dep != 'Ninguno';
+                        });
+                    });
+                    return ele;
+                })));
+                let depa = departamentos.filter(obj => {
+                    return obj.departamentos.length > 0;
+                });
+                if (depa.length === 0)
+                    return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+                let lista = yield Promise.all(depa.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                    obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
+                        if (estado === '1') {
+                            ele.empleado = yield database_1.default.query(`
+                            SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido) 
+                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
+                            cn.comunicado_notificacion 
+                            FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
+                            eu_configurar_alertas AS cn 
+                            WHERE ca.id = (SELECT MAX(id_cargo) AS cargo_id FROM cargos_empleado WHERE 
+                            codigo = e.codigo) 
+                            AND ca.id_departamento = $1 
+                            AND co.id = (SELECT MAX(id_contrato) AS contrato_id FROM contrato_cargo_vigente WHERE 
+                            id_empleado = e.id) 
+                            AND e.id = cn.id_empleado 
+                            AND co.id_regimen = r.id AND e.estado = $2
+                            `, [ele.id_depa, estado])
+                                .then(result => { return result.rows; });
+                        }
+                        else {
+                            ele.empleado = yield database_1.default.query(`
+                            SELECT DISTINCT e.id, CONCAT(nombre, \' \', apellido) 
+                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
+                            cn.comunicado_notificacion, ca.fecha_final 
+                            FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
+                            eu_configurar_alertas AS cn 
+                            WHERE ca.id = (SELECT MAX(id_cargo) AS cargo_id FROM cargos_empleado WHERE 
+                            codigo = e.codigo) AND ca.id_departamento = $1 
+                            AND co.id = (SELECT MAX(id_contrato) AS contrato_id FROM contrato_cargo_vigente WHERE 
+                            id_empleado = e.id) 
+                            AND e.id = cn.id_empleado 
+                            AND co.id_regimen = r.id AND e.estado = $2
+                            `, [ele.id_depa, estado])
+                                .then(result => { return result.rows; });
+                        }
+                        return ele;
+                    })));
+                    return obj;
+                })));
+                if (lista.length === 0)
+                    return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+                let respuesta = lista.map(obj => {
+                    obj.departamentos = obj.departamentos.filter((ele) => {
+                        return ele.empleado.length > 0;
+                    });
+                    return obj;
+                }).filter(obj => {
+                    return obj.departamentos.length > 0;
+                });
+                if (respuesta.length === 0)
+                    return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+                return res.status(200).jsonp(respuesta);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'No se han encontrado datos.' });
+            }
+        });
+    }
+    ;
 }
 const DATOS_GENERALES_CONTROLADOR = new DatosGeneralesControlador();
 exports.default = DATOS_GENERALES_CONTROLADOR;
