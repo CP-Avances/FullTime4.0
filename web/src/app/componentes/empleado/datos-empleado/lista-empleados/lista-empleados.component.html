@@ -137,20 +137,49 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let e of desactivados  | paginate:tamanio_paginaDes:numero_paginaDes">
-                        <td>
-                            <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
-                                [aria-label]="checkboxLabelDos(e)">
-                            </mat-checkbox>
-                        </td>
-                        <td scope="row">{{e.codigo}}</td>
-                        <td>{{e.nombre}}</td>
-                        <td>{{e.apellido}}</td>
-                        <td>{{e.cedula}}</td>
-                        <td *ngIf="e.estado === 1">Activo</td>
-                        <td *ngIf="e.estado === 2">Inactivo</td>
-                    </tr>
+                  <tr>
+                      <td></td>
+                      <td>
+                          <mat-form-field class="input-tables codigo">
+                              <input matInput placeholder="Buscar" [formControl]="codigo"
+                                  (keypress)="IngresarSoloNumeros($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                  (keypress)="IngresarSoloLetras($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                  (keypress)="IngresarSoloLetras($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" maxlength="10"
+                                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                  [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                          </mat-form-field>
+                      </td>
+                      <td></td>
+                  </tr>
+                  <tr *ngFor="let e of desactivados | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value |  paginate:tamanio_paginaDes:numero_paginaDes">
+                      <td>
+                          <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
+                              (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
+                              [aria-label]="checkboxLabelDos(e)">
+                          </mat-checkbox>
+                      </td>
+                      <td scope="row">{{e.codigo}}</td>
+                      <td>{{e.nombre}}</td>
+                      <td>{{e.apellido}}</td>
+                      <td>{{e.cedula}}</td>
+                      <td *ngIf="e.estado === 1">Activo</td>
+                      <td *ngIf="e.estado === 2">Inactivo</td>
+                  </tr>
                 </tbody>
             </table>
         </div>
