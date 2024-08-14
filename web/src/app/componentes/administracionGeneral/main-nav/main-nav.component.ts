@@ -626,7 +626,7 @@ export class MainNavComponent implements OnInit {
           },
           {
             name: 'Análisis Datos',
-            accion: this.HabilitarAlimentacion,
+            accion: true,
             estado: true,
             icono: 'dashboard',
             subtitulo: true,

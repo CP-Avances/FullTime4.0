@@ -74,7 +74,8 @@
             <div class="d-flex bd-highlight" id="titulo">
                 <div class="w-100 bd-highlight">
                     <h5>
-                        LISTA DE FERIADOS </h5>
+                        LISTA DE FERIADOS
+                    </h5>
                 </div>
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
@@ -97,7 +98,7 @@
                                     [aria-label]="checkboxLabelPag()">
                                 </mat-checkbox>
                             </th>
-                            <th scope="col">Descripción</th>
+                            <th scope="col">Feriado</th>
                             <th scope="col">Fecha</th>
                             <th scope="col">Fecha recuperación</th>
                             <th scope="col">Acciones</th>
@@ -208,7 +209,7 @@
                             <th scope="col">Item</th>
                             <th scope="col">Observación</th>
                             <th scope="col">Fecha</th>
-                            <th scope="col">Descripción</th>
+                            <th scope="col">Feriado</th>
                             <th scope="col">Fecha recuperación</th>
                         </tr>
                     </thead>
@@ -232,19 +233,19 @@
                 </table>
             </div>
             <div style="display: flex; align-items: center;">
-              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{feriadosCorrectos}}</div>
-              </div>
-              <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{feriadosCorrectos}}</div>
+                </div>
+                <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                     showFirstLastButtons>
-              </mat-paginator>
+                </mat-paginator>
             </div>
         </div>
     </div>
 
-    <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS_CIUDADES ------------------------------------------------->
+    <!--  ****************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS_CIUDADES  ****************************  -->
     <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
         *ngIf="DataFeriados && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
@@ -283,14 +284,14 @@
                 </table>
             </div>
             <div style="display: flex; align-items: center;">
-              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{feriadosCiudadesCorrectos}}</div>
-              </div>
-              <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{feriadosCiudadesCorrectos}}</div>
+                </div>
+                <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti2($event)"
                     showFirstLastButtons>
-              </mat-paginator>
+                </mat-paginator>
             </div>
         </div>
     </div>

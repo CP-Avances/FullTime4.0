@@ -99,8 +99,8 @@
                                     [aria-label]="checkboxLabelPag()">
                                 </mat-checkbox>
                             </th>
-                            <th scope="col">Sucursal</th>
                             <th scope="col">Ciudad</th>
+                            <th scope="col">Sucursal</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -133,8 +133,8 @@
                                     [checked]="selectionSucursales.isSelected(s)" [aria-label]="checkboxLabelPag(s)">
                                 </mat-checkbox>
                             </td>
-                            <td>{{s.nombre}}</td>
                             <td>{{s.descripcion}}</td>
+                            <td>{{s.nombre}}</td>
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
@@ -206,8 +206,8 @@
                         <tr style="text-align: center;">
                             <th scope="col">Item</th>
                             <th scope="col">Observación</th>
-                            <th scope="col">Sucursal</th>
                             <th scope="col">Ciudad</th>
+                            <th scope="col">Sucursal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,8 +222,8 @@
                                     {{ data.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="EstiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="EstiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
+                            <td [style.color]="EstiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
 
                         </tr>
                     </tbody>

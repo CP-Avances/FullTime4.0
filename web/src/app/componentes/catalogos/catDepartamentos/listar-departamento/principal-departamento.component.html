@@ -106,7 +106,7 @@
                             <th scope="col">Sucursal</th>
                             <th scope="col">Departamento</th>
                             <th scope="col">Niveles</th>
-                            <th scope="col">Departamento superior</th>
+                            <th scope="col">Departamento Superior</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -218,8 +218,8 @@
                         <tr style="text-align: center; font-size: 13px;">
                             <th scope="col">Item</th>
                             <th scope="col">Observación</th>
-                            <th scope="col">Departamento</th>
                             <th scope="col">Sucursal</th>
+                            <th scope="col">Departamento</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -234,23 +234,23 @@
                                     {{d.observacion}}
                                 </div>
                             </td>
-                            <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
                             <td [style.color]="stiloTextoCelda(d.sucursal)" id="letras" style="font-size: 12px;">
                                 {{d.sucursal}}
                             </td>
+                            <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div style="display: flex; align-items: center;">
-              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{departamentosCorrectos}}</div>
-              </div>
-              <mat-paginator [length]="DataDepartamentos.length" [pageSize]="tamanio_paginaMul"
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{departamentosCorrectos}}</div>
+                </div>
+                <mat-paginator [length]="DataDepartamentos.length" [pageSize]="tamanio_paginaMul"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                     showFirstLastButtons>
-              </mat-paginator>
+                </mat-paginator>
             </div>
         </div>
     </div>

@@ -88,7 +88,7 @@
     <div *ngIf="bool.bool_reg" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
             <span class="w-100 bd-highlight">
-                RESULTADO REGIMEN LABORAL
+                RESULTADO RÉGIMEN LABORAL
             </span>
         </div>
         <div class="table-responsive">
@@ -103,7 +103,7 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Régimen laboral</th>
+                        <th scope="col">Régimen Laboral</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -277,8 +277,8 @@
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CORREO</th>
@@ -292,8 +292,8 @@
                             <tr *ngFor="let v of arr_vac | paginate : tamanio_pagina : numero_pagina">
                                 <td class="t_horarios">{{ v.n }}</td>
                                 <td class="t_horarios">{{ v.cedula }}</td>
-                                <td class="t_horarios">{{ v.empleado.toUpperCase() }}</td>
                                 <td class="t_horarios">{{ v.codigo }}</td>
+                                <td class="t_horarios">{{ v.empleado.toUpperCase() }}</td>
                                 <td class="t_horarios">{{ v.departamento }}</td>
                                 <td class="t_horarios">{{ v.cargo }}</td>
                                 <td class="t_horarios">{{ v.correo }}</td>

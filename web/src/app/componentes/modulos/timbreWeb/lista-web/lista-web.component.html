@@ -51,7 +51,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
-                                    <mat-label>Regimen laboral</mat-label>
+                                    <mat-label>Régimen Laboral</mat-label>
                                     <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 13)"
                                         [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
@@ -215,7 +215,7 @@
                                             [aria-label]="checkboxLabelSuc()">
                                         </mat-checkbox>
                                     </th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Sucursal</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -250,7 +250,7 @@
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
-                            RESULTADO REGIMEN LABORAL
+                            RESULTADO RÉGIMEN LABORAL
                         </span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                             (click)="MostrarLista()">Mostrar lista</button>
@@ -273,7 +273,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Régimen Laboral</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -332,7 +332,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Cargo</th>
                                     <th scope="col">Planificar</th>
                                 </tr>
                             </thead>
@@ -391,8 +391,8 @@
                                             [aria-label]="checkboxLabelDep()">
                                         </mat-checkbox>
                                     </th>
-                                    <th scope="col">Establecimientos</th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Sucursal</th>
+                                    <th scope="col">Departamento</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -452,9 +452,9 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Código</th>
+                                    <th scope="col">Nombre</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -468,9 +468,9 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.nombre}}</td>
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
+                                    <td>{{e.nombre}}</td>
                                     <td class="d-flex justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 2)" id="plan" *ngIf="individual"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
@@ -543,7 +543,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
-                                    <mat-label>Regimen laboral</mat-label>
+                                    <mat-label>Régimen Laboral</mat-label>
                                     <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_reg_dh.value, 12)"
                                         [formControl]="nombre_reg_dh" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
@@ -722,7 +722,7 @@
                                             [aria-label]="checkboxLabelSuc_DH()">
                                         </mat-checkbox>
                                     </th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Sucursal</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -759,7 +759,7 @@
                 <div *ngIf="_booleanOptions_dh.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
-                            RESULTADO REGIMEN LABORAL
+                            RESULTADO RÉGIMEN LABORAL
                         </span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;" matSuffix
                             matTooltipPosition="right"
@@ -785,7 +785,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Régimen Laboral</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -847,7 +847,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Cargo</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -909,7 +909,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Departamento</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -971,9 +971,9 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Código</th>
+                                    <th scope="col">Nombre</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
@@ -988,9 +988,9 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.nombre}}</td>
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
+                                    <td>{{e.nombre}}</td>
                                     <td class="d-flex justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 1)" id="plan_dh" *ngIf="individual_dh"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"

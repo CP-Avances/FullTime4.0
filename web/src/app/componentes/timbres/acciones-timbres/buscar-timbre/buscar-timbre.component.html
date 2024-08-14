@@ -71,8 +71,8 @@
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">
                                 <tr style="text-align: center;">
-                                    <th scope="col" rowspan="2">Empleado</th>
                                     <th scope="col" rowspan="2">Código</th>
+                                    <th scope="col" rowspan="2">Empleado</th>
                                     <th scope="col" colspan="2">Timbre</th>
                                     <th scope="col" rowspan="2">Código reloj</th>
                                     <th scope="col" rowspan="2">Acción</th>
@@ -89,8 +89,8 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let t of timbres | paginate:tamanio_pagina_e:numero_pagina_e">
-                                    <td>{{t.empleado}}</td>
                                     <td>{{t.codigo}}</td>
+                                    <td>{{t.empleado}}</td>
                                     <td>{{t.fecha}}</td>
                                     <td>{{t.hora}}</td>
                                     <td>{{t.id_reloj}}</td>

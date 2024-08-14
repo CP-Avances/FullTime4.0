@@ -125,26 +125,26 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Código</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
+                        <th scope="col">Régimen Laboral</th>
                         <th scope="col">Departamento</th>
                         <th scope="col">Cargo</th>
-                        <th scope="col">Régimen</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let d of datosTotales | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value  | paginate:tamanio_pagina:numero_pagina">
-                        <th scope="row">{{d.codigo}}</th>
                         <td>{{d.cedula}}</td>
+                        <th scope="row">{{d.codigo}}</th>
                         <td>{{d.apellido}}</td>
                         <td>{{d.nombre}}</td>
+                        <td>{{d.regimen | titlecase}}</td>
                         <td>{{d.departamento | titlecase}}</td>
                         <td>{{d.cargo}}</td>
-                        <td>{{d.regimen | titlecase}}</td>
                         <td class="d-flex justify-content-center">
                             <i matSuffix  matTooltipPosition="right"
                                 matTooltip="Ver datos generales de este empleado" class="fas fa-calculator" id="ver"

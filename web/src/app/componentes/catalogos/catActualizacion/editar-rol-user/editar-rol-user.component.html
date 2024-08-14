@@ -47,7 +47,7 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Régimen laboral</mat-label>
+                                <mat-label>Régimen Laboral</mat-label>
                                 <input matInput placeholder="Buscar" (input)="Filtrar(nombre_regRol.value, 7)"
                                     [formControl]="nombre_regRol" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
@@ -279,7 +279,7 @@
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
             <span class="w-100 bd-highlight">
-                RESULTADO REGIMEN LABORAL
+                RESULTADO RÉGIMEN LABORAL
             </span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="MostrarLista()">Mostrar lista</button>
@@ -302,7 +302,7 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Régimen laboral</th>
+                        <th scope="col">Régimen Laboral</th>
                     </tr>
                 </thead>
                 <tbody>

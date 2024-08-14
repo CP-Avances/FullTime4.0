@@ -61,7 +61,7 @@
                     </mat-radio-button>
                 </mat-radio-group>
             </form>
-             <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+            <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
             <form *ngIf="_booleanOptions.bool_suc">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field id="campos">
@@ -93,7 +93,7 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field id="campos">
-                                <mat-label>Regimen laboral</mat-label>
+                                <mat-label>Régimen Laboral</mat-label>
                                 <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 7)"
                                     [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
@@ -105,7 +105,7 @@
                     </div>
                 </div>
             </form>
-             <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+            <!--  *********************************  FORM PARA CARGOS  ****************************  -->
             <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="row">
                     <div class="col-md">
@@ -226,7 +226,8 @@
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
-                        RESULTADO SUCURSALES</span>
+                        RESULTADO SUCURSALES
+                    </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                         (click)="MostrarLista()">Mostrar lista</button>
                 </div>
@@ -247,7 +248,7 @@
                                         [aria-label]="checkboxLabelSuc()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Sucursal</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,7 +275,7 @@
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
-                        RESULTADO REGIMEN LABORAL
+                        RESULTADO RÉGIMEN LABORAL
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                         (click)="MostrarLista()">
@@ -299,7 +300,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Régimen Laboral</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -353,6 +354,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
+                                <th scope="col">Cargo</th>
                                 <th scope="col">Nombre</th>
                             </tr>
                         </thead>
@@ -377,7 +379,7 @@
                 </mat-paginator>
                 <br>
             </div>
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+            <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
@@ -403,7 +405,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Departamento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -456,9 +458,9 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Nombre</th>
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Código</th>
+                                <th scope="col">Nombre</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -471,9 +473,9 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{e.sucursal}}</td>
-                                <td>{{e.nombre}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
+                                <td>{{e.nombre}}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -84,7 +84,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
-                                    <mat-label>Regimen laboral</mat-label>
+                                    <mat-label>Régimen Laboral</mat-label>
                                     <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 7)"
                                         [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
@@ -243,7 +243,7 @@
                                             [aria-label]="checkboxLabelSuc()">
                                         </mat-checkbox>
                                     </th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Sucursal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -270,7 +270,7 @@
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
-                            RESULTADO REGIMEN LABORAL
+                            RESULTADO RÉGIMEN LABORAL
                         </span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                             (click)="MostrarLista()">
@@ -295,7 +295,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Régimen Laboral</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -348,7 +348,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Cargo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -401,7 +401,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Departamento</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -454,10 +454,9 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Nombre</th>
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Código</th>
-                                    <th scope="col">Código</th>
+                                    <th scope="col">Nombre</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -470,9 +469,9 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.nombre}}</td>
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
+                                    <td>{{e.nombre}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -520,8 +519,8 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Código</th>
-                                    <th scope="col">Nombre</th>
                                     <th scope="col">Apellido</th>
+                                    <th scope="col">Nombre</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
@@ -534,8 +533,8 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{dp.codigo}}</td>
-                                    <td>{{dp.nombre}}</td>
                                     <td>{{dp.apellido}}</td>
+                                    <td>{{dp.nombre}}</td>
                                     <td>
                                         <i *ngIf="auto_individual" matSuffix matTooltipPosition="right"
                                             matTooltip="Eliminar registro." class="far fa-trash-alt"
