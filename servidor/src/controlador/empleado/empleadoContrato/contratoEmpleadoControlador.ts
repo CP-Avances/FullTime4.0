@@ -973,6 +973,37 @@ class ContratoEmpleadoControlador {
 
         return res.status(200).jsonp({ message: 'ok' });
     }
+
+    //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
+    public async EliminarContrato(req: Request, res: Response): Promise<any>{
+        const { idContrato } = req.body;
+        try {
+
+            const contrato_vigente: any = await pool.query(
+                `
+                SELECT id FROM contrato_cargo_vigente WHERE id_contrato = $1
+                `
+                , [idContrato]);
+            if(contrato_vigente.rows[0] == undefined || contrato_vigente.rows[0] == ""){
+                await pool.query(
+                    `
+                    DELETE FROM eu_empleado_contratos WHERE id_contrato = $1
+                    `
+                    , [idContrato]);
+
+                    return res.status(200).jsonp({ message: 'Registro eliminado correctamente' });
+
+            }else{
+                return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro' });
+            }
+
+        }catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            error = true;
+            return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+        }
+    }
 }
 
 const CONTRATO_EMPLEADO_CONTROLADOR = new ContratoEmpleadoControlador();

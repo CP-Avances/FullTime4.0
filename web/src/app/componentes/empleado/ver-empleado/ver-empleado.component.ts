@@ -944,6 +944,30 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.btnActualizarCargo = true;
   }
 
+  EliminarDatos(dataContrato: any){
+    console.log('va a eliminar datos contrato: ',dataContrato)
+  }
+
+  EliminarDatosCargos(dataCargo: any){
+    console.log('va a eliminar datos cargo: ',dataCargo)
+  }
+
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+  ConfirmarEliminacionDatos(data: any, tipo: string) {
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if(tipo === 'contrato'){
+            this.EliminarDatos(data);
+          }else{
+            this.EliminarDatosCargos(data);
+          }
+          
+        }
+      });
+  }
+
   // METODO PARA MOSTRAR VENTANA DE EDICION DE CONTRATO
   btnActualizarContrato: boolean = true;
   VerContratoEdicion(value: boolean) {
