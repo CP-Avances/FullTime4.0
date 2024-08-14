@@ -647,7 +647,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA INGRESAR TIMBRE DE UN USUARIO
   RegistrarTimbre(empleado: any) {
-    this.ventana.open(CrearTimbreComponent, { width: '400px', data: empleado })
+    this.ventana.open(CrearTimbreComponent, { width: '500px', data: empleado })
       .afterClosed().subscribe(dataT => {
         if (dataT) {
           if (!dataT.close) {
@@ -705,7 +705,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA REGISTRAR VARIOS TIMBRES
   TimbrarVarios(seleccionados: any) {
-    this.ventana.open(CrearTimbreComponent, { width: '400px', data: seleccionados })
+    this.ventana.open(CrearTimbreComponent, { width: '500px', data: seleccionados })
       .afterClosed().subscribe(dataT => {
         this.auto_individual = true;
         this.LimpiarFormulario();

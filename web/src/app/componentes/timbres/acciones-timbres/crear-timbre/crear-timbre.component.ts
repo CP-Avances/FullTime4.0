@@ -23,6 +23,14 @@ export class CrearTimbreComponent implements OnInit {
   FechaF = new FormControl('', Validators.required);
   HoraF = new FormControl('', Validators.required);
 
+  // VARIABLES DE ALMACENAMIENTO DE ARCHIVO
+  nombreDocumento = new FormControl('');
+  archivoForm = new FormControl('');
+  nameFile: string;
+  archivoSubido: Array<File>;
+  documento: boolean = false;
+  HabilitarBtn: boolean = false;
+
   // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
   idEmpleadoLogueado: any;
   nombre: string;
@@ -52,6 +60,7 @@ export class CrearTimbreComponent implements OnInit {
     accionForm: this.accionF,
     teclaFuncionForm: this.teclaFuncionF,
     observacionForm: this.observacionF,
+    nombreDocumentoForm: this.nombreDocumento,
   });
 
   constructor(
@@ -141,6 +150,40 @@ export class CrearTimbreComponent implements OnInit {
         })
       })
     }
+  }
+
+  // SUBIR ARCHIVO DE JUSTIFICACION DE TIMBRES
+  fileChange(element: any) {
+    this.archivoSubido = element.target.files;
+    if (this.archivoSubido.length != 0) {
+      // VALIDAR QUE EL DOCUEMNTO SUBIDO CUMPLA CON EL TAMAÑO ESPECIFICADO
+      if (this.archivoSubido[0].size <= 2e+6) {
+        const name = this.archivoSubido[0].name;
+        this.formulario.patchValue({ nombreDocumentoForm: name });
+
+        this.HabilitarBtn = true;
+      }
+      else {
+        this.toastr.info('El archivo ha excedido el tamaño permitido.', 'Tamaño de archivos permitido máximo 2MB.', {
+          timeOut: 6000,
+        });
+      }
+    }
+  }
+
+  // LIMPIAR EL NOMBRE DEL ARCHIVO
+  LimpiarNombreArchivo() {
+    this.formulario.patchValue({
+      nombreDocumentoForm: '',
+    });
+  }
+
+  // METODO PARA QUITAR ARCHIVO SELECCIONADO
+  RetirarArchivo() {
+    this.archivoSubido = [];
+    this.HabilitarBtn = false;
+    this.LimpiarNombreArchivo();
+    this.archivoForm.patchValue('');
   }
 
 }
