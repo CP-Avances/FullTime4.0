@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -85,27 +85,37 @@ export class EmpleadoService {
 
   // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO
   ListarEmpleadosActivos() {
-    return this.http.get(`${environment.url}/empleado`);
+    const headers = new HttpHeaders({
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    return this.http.get<any>(`${environment.url}/empleado`, { headers });
   }
 
   // METODO PARA LISTAR EMPLEADOS DESACTIVADOS    **USADO
   ListaEmpleadosDesactivados() {
-    return this.http.get<any>(`${environment.url}/empleado/desactivados/empleados`);
+    const headers = new HttpHeaders({
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    return this.http.get<any>(`${environment.url}/empleado/desactivados/empleados`, { headers });
   }
 
   // DESACTIVAR VARIOS EMPLEADOS SELECCIONADOS   **USADO
-  DesactivarVariosUsuarios(data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/desactivar/masivo`, data)
+  async DesactivarVariosUsuarios(data: any): Promise<any> {
+    return firstValueFrom(this.http.put<any>(`${environment.url}/empleado/desactivar/masivo`, data));
   }
 
   // ACTIVAR VARIOS EMPLEADOS    **USADO
-  ActivarVariosUsuarios(data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/activar/masivo`, data)
+  async ActivarVariosUsuarios(data: any): Promise<any> {
+    return firstValueFrom(this.http.put<any>(`${environment.url}/empleado/activar/masivo`, data));
   }
 
   // METODO PARA REACTIVAR USUARIOS   **USADO VERIFICAR FUNCIONAMIENTO
-  ReActivarVariosUsuarios(data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/re-activar/masivo`, data)
+  async ReActivarVariosUsuarios(data: any): Promise<any> {
+    return firstValueFrom(this.http.put<any>(`${environment.url}/empleado/re-activar/masivo`, data));
   }
 
   // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
