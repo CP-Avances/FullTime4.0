@@ -14,8 +14,8 @@ class RelojesControlador {
         const RELOJES = await pool.query(
             `
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
-                cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
+                cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
@@ -92,7 +92,7 @@ class RelojesControlador {
     public async CrearRelojes(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
+                tipo_conexion, id_sucursal, id_departamento, codigo, user_name, user_ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -118,12 +118,11 @@ class RelojesControlador {
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
-                        numero_accion )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
                     `
                     , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo]);
 
                 const [reloj] = response.rows;
 
@@ -180,7 +179,7 @@ class RelojesControlador {
     public async ActualizarReloj(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real, user_name, user_ip } = req.body;
+                tipo_conexion, id_sucursal, id_departamento, codigo, id_real, user_name, user_ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -233,12 +232,11 @@ class RelojesControlador {
                     `
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
-                        numero_accion = $15 
-                    WHERE id = $16
+                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14
+                    WHERE id = $15
                     `
                     , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, id_real]);
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -246,7 +244,7 @@ class RelojesControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tiene_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}"}`,
                     ip: user_ip,
                     observacion: null
                 });
@@ -274,8 +272,8 @@ class RelojesControlador {
         const RELOJES = await pool.query(
             `
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
-                cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
+                cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
@@ -290,123 +288,6 @@ class RelojesControlador {
         }
     }
 
-
-
-    public async VerificarDatos(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var contarNombre = 0;
-        var contarAccion = 0;
-        var contarCodigo = 0;
-        var contarIP = 0;
-        var contarSucursal = 0;
-        var contarDepartamento = 0;
-        var contarLlenos = 0;
-        var contador = 1;
-        plantilla.forEach(async (data: any) => {
-            // Datos que se leen de la plantilla ingresada
-            const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
-
-            //Verificar que los datos obligatorios no esten vacios
-            if (nombre != undefined && ip != undefined && puerto != undefined && sucursal != undefined &&
-                departamento != undefined && tiene_funciones != undefined && codigo_reloj != undefined) {
-                contarLlenos = contarLlenos + 1;
-            }
-
-            //Verificar que el codigo no se encuentre registrado
-            const VERIFICAR_CODIGO = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE id = $1
-                `
-                , [codigo_reloj]);
-            if (VERIFICAR_CODIGO.rowCount === 0) {
-                contarCodigo = contarCodigo + 1;
-            }
-
-            //Verificar que el nombre del equipo no se encuentre registrado
-            const VERIFICAR_NOMBRE = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE UPPER(nombre) = $1
-                `
-                , [nombre.toUpperCase()]);
-            if (VERIFICAR_NOMBRE.rowCount === 0) {
-                contarNombre = contarNombre + 1;
-            }
-
-            //Verificar que la IP del dispositivo no se encuentre registrado
-            const VERIFICAR_IP = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE ip = $1
-                `
-                , [ip]);
-            if (VERIFICAR_IP.rowCount === 0) {
-                contarIP = contarIP + 1;
-            }
-
-            //Verificar que la sucursal exista dentro del sistema
-            const VERIFICAR_SUCURSAL = await pool.query(
-                `
-                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-                `
-                , [sucursal.toUpperCase()]);
-            if (VERIFICAR_SUCURSAL.rowCount != 0) {
-                contarSucursal = contarSucursal + 1;
-                // Verificar que el departamento exista dentro del sistema
-                const VERIFICAR_DEPARTAMENTO = await pool.query(
-                    `
-                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
-                    `
-                    , [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
-                if (VERIFICAR_DEPARTAMENTO.rowCount != 0) {
-                    contarDepartamento = contarDepartamento + 1;
-                }
-            }
-
-            // Verificar que se haya ingresado némero de acciones si el dispositivo las tiene
-            if (tiene_funciones === true) {
-                if (numero_accion != undefined || numero_accion != '') {
-                    contarAccion = contarAccion + 1;
-                }
-            }
-            else {
-                contarAccion = contarAccion + 1;
-            }
-
-            // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-            console.log('nombre', contarNombre, plantilla.length, contador);
-            console.log('ip', contarIP, plantilla.length, contador);
-            console.log('sucursal', contarSucursal, plantilla.length, contador);
-            console.log('departamento', contarDepartamento, plantilla.length, contador);
-            console.log('llenos', contarLlenos, plantilla.length, contador);
-            console.log('codigo', contarCodigo, plantilla.length, contador);
-            console.log('accion', contarAccion, plantilla.length, contador);
-            if (contador === plantilla.length) {
-                if (contarNombre === plantilla.length && contarIP === plantilla.length &&
-                    contarSucursal === plantilla.length && contarLlenos === plantilla.length &&
-                    contarDepartamento === plantilla.length && contarCodigo === plantilla.length &&
-                    contarAccion === plantilla.length) {
-                    return res.jsonp({ message: 'correcto' });
-                } else {
-                    return res.jsonp({ message: 'error' });
-                }
-            }
-            contador = contador + 1;
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-    }
 
     // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
     public async VerificarPlantilla(req: Request, res: Response) {
@@ -457,7 +338,7 @@ class RelojesControlador {
                 const regex = /^[0-9]+$/;
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_dispositivos.forEach(async (dato: any, indice: any, array: any) => {
+                plantilla_dispositivos.forEach(async (dato: any) => {
                     var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO,
                         CODIGO, DIRECCION_IP, PUERTO, ACCIONES, NUMERO_ACCIONES, MARCA,
                         MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA
@@ -791,20 +672,20 @@ class RelojesControlador {
                         if (item.observacion != undefined) {
                             let arrayObservacion = item.observacion.split(" ");
                             if (arrayObservacion[0] == 'no' || item.observacion == " ") {
-                                item.observacion = 'ok'
+                                item.observacion = 'ok';
                             }
 
                             if (item.observacion == '1') {
-                                item.observacion = 'Registro duplicado (código)'
+                                item.observacion = 'Registro duplicado (código)';
                             }
                             else if (item.observacion == '2') {
-                                item.observacion = 'Registro duplicado (dirección IP)'
+                                item.observacion = 'Registro duplicado (dirección IP)';
                             }
                             else if (item.observacion == '3') {
-                                item.observacion = 'Registro duplicado (número de serie)'
+                                item.observacion = 'Registro duplicado (número de serie)';
                             }
                             else if (item.observacion == '4') {
-                                item.observacion = 'Registro duplicado (dirección MAC)'
+                                item.observacion = 'Registro duplicado (dirección MAC)';
                             }
                         }
 
@@ -839,7 +720,7 @@ class RelojesControlador {
         try {
             const { plantilla, user_name, ip } = req.body;
             var contador = 1;
-            var respuesta: any
+            var respuesta: any;
 
             plantilla.forEach(async (data: any) => {
                 // DATOS DE LA PLANTILLA INGRESADA
@@ -873,7 +754,7 @@ class RelojesControlador {
                     });
                 }
 
-                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
+                // VERIFICAR QUE SE HAYA INGRESADO NUMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
                 var num_accion;
                 var acciones_boolean;
                 if (acciones.toLowerCase() === 'si') {

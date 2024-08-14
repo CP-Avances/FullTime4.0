@@ -34,9 +34,6 @@ export class RelojesComponent implements OnInit {
   primerFormulario: FormGroup;
   segundoFormulario: FormGroup;
 
-  // ACTIVAR INGRESO DE NUMERO DE ACCIONES
-  activarCampo: boolean = false;
-
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -48,15 +45,14 @@ export class RelojesComponent implements OnInit {
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   puertoF = new FormControl('', [Validators.required]);
   codigoF = new FormControl('', Validators.required);
-  numeroF = new FormControl('', [Validators.required]);
   funcionesF = new FormControl('', [Validators.required]);
   idSucursalF = new FormControl('', Validators.required);
   idDepartamentoF = new FormControl('', [Validators.required]);
 
   // SEGUNDO FORMULARIO
   macF = new FormControl('');
-  marcaF = new FormControl('', [Validators.minLength(2)]);
-  serieF = new FormControl('', Validators.minLength(4));
+  marcaF = new FormControl('', [Validators.required]);
+  serieF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   modeloF = new FormControl('', [Validators.minLength(3)]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
   contraseniaF = new FormControl('', [Validators.minLength(1)]);
@@ -94,7 +90,6 @@ export class RelojesComponent implements OnInit {
       ipForm: this.ipF,
       nombreForm: this.nombreF,
       puertoForm: this.puertoF,
-      numeroForm: this.numeroF,
       codigoForm: this.codigoF,
       funcionesForm: this.funcionesF,
       idSucursalForm: this.idSucursalF,
@@ -160,8 +155,7 @@ export class RelojesComponent implements OnInit {
       nombre: form1.nombreForm,
       puerto: form1.puertoForm,
       id_sucursal: form1.idSucursalForm,
-      numero_accion: form1.numeroForm,
-      tien_funciones: form1.funcionesForm,
+      tipo_conexion: form1.funcionesForm,
       id_departamento: form1.idDepartamentoForm,
 
       // SEGUNDO FORMULARIO
@@ -248,22 +242,6 @@ export class RelojesComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  // METODO PARA VISUALIZAR CAMPO NUMERO DE FUNCIONES
-  ActivarVista() {
-    this.activarCampo = true;
-    this.primerFormulario.patchValue({
-      numeroForm: ''
-    })
-  }
-
-  // METODO PARA OCULTAR CAMPO DE NUMERO DE FUNCIONES
-  DesactivarVista() {
-    this.activarCampo = false;
-    this.primerFormulario.patchValue({
-      numeroForm: 0
-    })
-  }
-
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.primerFormulario.reset();
@@ -275,7 +253,6 @@ export class RelojesComponent implements OnInit {
     this.LimpiarCampos();
     this.router.navigate(['/listarRelojes']);
   }
-
 
   // METODO PARA VER DATOS DE RELOJ
   ver_datos: boolean = false;

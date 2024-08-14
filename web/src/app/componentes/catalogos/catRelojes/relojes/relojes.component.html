@@ -28,7 +28,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <mat-label id="letras">Seleccionar establecimiento</mat-label>
+                                    <mat-label id="letras">Seleccionar sucursal</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar en que sucursal se encuentra el dispositivo.">
                                         help_outline
@@ -100,28 +100,17 @@
 
                                 <mat-radio-group aria-label="Select an option" formControlName="funcionesForm" required>
                                     <label class="d-flex justify-content-start">
-                                        <span style="margin-left: 10px;">Tiene acciones *</span>
+                                        <span style="margin-left: 10px;">Tipo de conexión *</span>
                                     </label>
                                     <div class="d-flex justify-content-around">
-                                        <mat-radio-button value="true" (click)="ActivarVista()">
-                                            <label id="textoradiobtn">Si</label>
+                                        <mat-radio-button value="true">
+                                            <label id="textoradiobtn">Interna</label>
                                         </mat-radio-button>
-                                        <mat-radio-button value="false" (click)="DesactivarVista()">
-                                            <label id="textoradiobtn">No</label>
+                                        <mat-radio-button value="false">
+                                            <label id="textoradiobtn">Externa</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
-                                <mat-form-field *ngIf=(activarCampo)>
-                                    <mat-label>Número de acciones</mat-label>
-                                    <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
-                                        required (keypress)="IngresarSoloNumeros($event)" placeholder="1-8"
-                                        maxlength="1"
-                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el número de acciones que tiene el dispositivo.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
                             </div>
                         </div>
                     </div>
@@ -152,17 +141,21 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label>Marca</mat-label>
-                                    <input matInput placeholder="Ingresar marca" [formControl]="marcaF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar la marca del dispositivo.">help_outline
+                                        matTooltip="Seleccionar el estado civil del colaborador.">
+                                        help_outline
                                     </mat-icon>
-                                    <mat-error *ngIf="marcaF.invalid">Ingresar una marca válida</mat-error>
+                                    <mat-select required formControlName="marcaForm">
+                                        <mat-option value="ZKteco">ZKteco</mat-option>
+                                        <mat-option value="Hikvision">Hikvision</mat-option>
+                                    </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Modelo</mat-label>
                                     <input matInput placeholder="Ingresar modelo" [formControl]="modeloF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el modelo del dispositivo.">help_outline
+                                        matTooltip="Ingresar el modelo del dispositivo.">
+                                        help_outline
                                     </mat-icon>
                                     <mat-error *ngIf="modeloF.invalid">Ingresar un modelo válido</mat-error>
                                 </mat-form-field>
@@ -172,7 +165,8 @@
                                         [formControl]="idFabricacionF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar ID de fabricación del dispositivo.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                     <mat-error id="mensaje" *ngIf="idFabricacionF.invalid">
                                         Ingresar un id de fabricación válido.
                                     </mat-error>
@@ -192,9 +186,10 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label>Serie</mat-label>
-                                    <input matInput placeholder="Ingresar serie" [formControl]="serieF">
+                                    <input matInput placeholder="Ingresar serie" [formControl]="serieF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar la serie del dispositivo.">help_outline
+                                        matTooltip="Ingresar la serie del dispositivo.">
+                                        help_outline
                                     </mat-icon>
                                     <mat-error *ngIf="serieF.invalid">Ingresar una serie válida</mat-error>
                                 </mat-form-field>
@@ -203,14 +198,16 @@
                                     <input matInput placeholder="Ingresar dirección MAC" [formControl]="macF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar dirección física (MAC) del dispositivo ">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                     <mat-error *ngIf="macF.invalid">Ingresar una dirección MAC válida</mat-error>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Contraseña</mat-label>
                                     <input matInput placeholder="Ingresar contraseña" [formControl]="contraseniaF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar contraseña del dispositivo.">vpn_key
+                                        matTooltip="Ingresar contraseña del dispositivo.">
+                                        vpn_key
                                     </mat-icon>
                                     <mat-error *ngIf="contraseniaF.invalid">Ingresar una contraseña válida.</mat-error>
                                 </mat-form-field>
