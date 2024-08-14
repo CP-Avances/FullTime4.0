@@ -222,6 +222,8 @@ export class MainNavComponent implements OnInit {
               { name: 'Correo', url: '/configurarCorreo', color: true, ver: true },
               { name: 'Roles', url: '/roles', color: true, ver: true },
               { name: 'Régimen Laboral', url: '/listarRegimen', color: true, ver: true },
+              { name: 'Modalidad Laboral', url: '/modalidaLaboral', color: true, ver: true },
+              { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
             ]
           },
           {
@@ -255,8 +257,6 @@ export class MainNavComponent implements OnInit {
           { name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
-          { name: 'Modalidad Laboral', url: '/modalidaLaboral', color: true, ver: true },
-          { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true },
           { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: true },
         ]
@@ -349,52 +349,6 @@ export class MainNavComponent implements OnInit {
             url: '/listaHorasExtras'
           },
           {
-            name: 'Alimentación',
-            accion: this.HabilitarAlimentacion,
-            estado: this.HabilitarAlimentacion,
-            subtitulo: true,
-            icono: 'local_dining',
-            color: true,
-            children: [
-              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true, ver: true },
-              { name: 'Planificar Servicio', url: '/alimentacion', color: true, ver: true },
-              { name: 'Listar Planificación', url: '/listaPlanComida', color: true, ver: true },
-              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Alimentación',
-            accion: !this.HabilitarAlimentacion,
-            estado: !this.HabilitarAlimentacion,
-            activo: this.HabilitarAlimentacion,
-            icono: 'local_dining',
-            color: false,
-            url: '/listarTipoComidas'
-          },
-          {
-            name: 'Acción Personal',
-            accion: this.HabilitarAccion,
-            estado: this.HabilitarAccion,
-            icono: 'how_to_reg',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Procesos', url: '/proceso', color: true, ver: true },
-              { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
-              { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
-              { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Acción Personal',
-            accion: !this.HabilitarAccion,
-            estado: !this.HabilitarAccion,
-            activo: this.HabilitarAccion,
-            icono: 'how_to_reg',
-            color: false,
-            url: '/proceso'
-          },
-          {
             name: 'Geolocalización',
             accion: this.HabilitarGeolocalizacion,
             estado: this.HabilitarGeolocalizacion,
@@ -455,6 +409,52 @@ export class MainNavComponent implements OnInit {
             icono: 'phone_android',
             color: false,
             url: '/app-movil'
+          },
+          {
+            name: 'Alimentación',
+            accion: this.HabilitarAlimentacion,
+            estado: this.HabilitarAlimentacion,
+            subtitulo: true,
+            icono: 'local_dining',
+            color: true,
+            children: [
+              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true, ver: true },
+              { name: 'Planificar Servicio', url: '/alimentacion', color: true, ver: true },
+              { name: 'Listar Planificación', url: '/listaPlanComida', color: true, ver: true },
+              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true, ver: true },
+            ]
+          },
+          {
+            name: 'Alimentación',
+            accion: !this.HabilitarAlimentacion,
+            estado: !this.HabilitarAlimentacion,
+            activo: this.HabilitarAlimentacion,
+            icono: 'local_dining',
+            color: false,
+            url: '/listarTipoComidas'
+          },
+          {
+            name: 'Acción Personal',
+            accion: this.HabilitarAccion,
+            estado: this.HabilitarAccion,
+            icono: 'how_to_reg',
+            color: true,
+            subtitulo: true,
+            children: [
+              { name: 'Procesos', url: '/proceso', color: true, ver: true },
+              { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
+              { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
+              { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
+            ]
+          },
+          {
+            name: 'Acción Personal',
+            accion: !this.HabilitarAccion,
+            estado: !this.HabilitarAccion,
+            activo: this.HabilitarAccion,
+            icono: 'how_to_reg',
+            color: false,
+            url: '/proceso'
           },
         ]
       },
@@ -560,7 +560,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             children: [
               { name: 'Kardex', url: '/reporteKardex', color: true, ver: true },
-              { name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: this.HabilitarVacaciones, ver: true },
+              { name: 'Solicitudes Vacaciones', url: '/solicitud-vacacion', color: this.HabilitarVacaciones, ver: true },
             ]
           },
           {
@@ -571,10 +571,10 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Solicitudes Horas Extras', url: '/horas/extras', color: true, ver: true },
-              { name: 'Horas Extras Autorizaciones', url: '/reporteHorasExtras', color: true, ver: true },
+              { name: 'Solicitudes HorasExtras', url: '/horas/extras', color: true, ver: true },
+              { name: 'Aprobación HorasExtras', url: '/reporteHorasExtras', color: true, ver: true },
               { name: 'Horas Extras', url: '/macro/hora-extra', color: true, ver: true },
-              { name: 'Jornada vs Horas extras', url: '/macro/jornada-vs-hora-extra', color: true, ver: true },
+              { name: 'Jornada vs HorasExtras', url: '/macro/jornada-vs-hora-extra', color: true, ver: true },
             ]
           },
           {
@@ -608,8 +608,20 @@ export class MainNavComponent implements OnInit {
             color: true,
             children: [
               { name: 'Tickets Consumidos', url: '/alimentosGeneral', color: true, ver: true },
-              { name: 'Detalle Tickets Consumidos', url: '/alimentosDetallado', color: true, ver: true },
+              { name: 'Detalle TicketsConsumidos', url: '/alimentosDetallado', color: true, ver: true },
               { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true, ver: true },
+            ]
+          },
+          {
+            name: 'Auditoría',
+            accion: true,
+            estado: true,
+            subtitulo: true,
+            icono: 'gavel',
+            color: true,
+            children: [
+              { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
+
             ]
           },
           {
@@ -651,18 +663,6 @@ export class MainNavComponent implements OnInit {
                ]
              },
              */
-          {
-            name: 'Auditoría',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'gavel',
-            color: true,
-            children: [
-              { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
-
-            ]
-          },
         ]
       },
     ];

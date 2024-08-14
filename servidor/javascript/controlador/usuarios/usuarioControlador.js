@@ -927,13 +927,36 @@ class UsuarioControlador {
         });
     }
     ;
+    getDispositivoPorIdDispositivo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_dispositivo } = req.body;
+                const response = yield database_1.default.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`);
+                const idDispositivo = response.rows[0];
+                if (response.rows.length === 0) {
+                    return res.status(404).jsonp({
+                        message: 'Dispositivo no encontrado'
+                    });
+                }
+                return res.jsonp(idDispositivo);
+            }
+            catch (error) {
+                console.log("error", error);
+                return res.status(500).jsonp({
+                    message: 'Ups! Problemas para conectar con el servidor' +
+                        '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+                });
+            }
+        });
+    }
+    ;
     ingresarIDdispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+                const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
                 yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
-                    'VALUES ($1, $2, $3) RETURNING *', [id_empleado, id_celular, modelo_dispositivo]);
+                const response = yield database_1.default.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo, terminos_condiciones)' +
+                    'VALUES ($1, $2, $3, $4) RETURNING *', [id_empleado, id_celular, modelo_dispositivo, terminos_condiciones]);
                 const [objetoDispositivos] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({

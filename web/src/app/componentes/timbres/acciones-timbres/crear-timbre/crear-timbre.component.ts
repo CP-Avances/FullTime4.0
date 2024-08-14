@@ -54,13 +54,6 @@ export class CrearTimbreComponent implements OnInit {
     observacionForm: this.observacionF,
   });
 
-  // METODO DE CONTROL DE MEMORIA
-  private options = {
-    enableHighAccuracy: false,
-    maximumAge: 30000,
-    timeout: 15000
-  };
-
   constructor(
     public ventana: MatDialogRef<CrearTimbreComponent>, // VARIABLE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES

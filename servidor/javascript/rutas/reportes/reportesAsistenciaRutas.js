@@ -16,18 +16,14 @@ class ReportesAsistenciasRutas {
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
         // REPORTES DE TIMBRES MULTIPLE      **USADO
         this.router.post('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA 
-        this.router.put('/timbres-sistema/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistema);
-        this.router.put('/timbres-sistema-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistemaRegimenCargo);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
-        this.router.put('/timbres-reloj-virtual/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtual);
-        this.router.put('/timbres-reloj-virtual-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtualRegimenCargo);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
-        this.router.put('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
-        this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbiertoRegimenCargo);
-        // REPORTES DE TIMBRES INCOMPLETOS
-        this.router.put('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
-        this.router.put('/timbres-incompletos-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletosRegimenCargo);
+        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA      **USADO
+        this.router.post('/timbres-sistema/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistema);
+        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL      **USADO
+        this.router.post('/timbres-reloj-virtual/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtual);
+        // REPORTES DE TIMBRES HORARIO ABIERTO    **USADO
+        this.router.post('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
+        // REPORTES DE TIMBRES INCOMPLETOS     **USADO
+        this.router.post('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
     }
 }
 const REPORTES_A_RUTAS = new ReportesAsistenciasRutas();

@@ -30,36 +30,25 @@ export class ReportesAsistenciasService {
     return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
   }
 
+  // METODO DE BUSQUEDA DE TIMBRES DE TIMBRE VIRTUAL      **USADO
   ReporteTimbreSistema(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-sistema/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres-sistema/${desde}/${hasta}`, data);
   }
 
-  ReporteTimbreSistemaRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-sistema-regimen-cargo/${desde}/${hasta}`, data);
-  }
-
+  // METODO DE BUSQUEDA DE TIMBRES DEL RELOJ VIRTUAL    **USADO
   ReporteTimbreRelojVirtual(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual/${desde}/${hasta}`, data);
   }
 
-  ReporteTimbreRelojVirtualRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual-regimen-cargo/${desde}/${hasta}`, data);
-  }
-
+  // METODO DE BUSQUEDA DE TIMBRES HORARIO ABIERTO    **USADO
   ReporteTimbreHorarioAbierto(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto/${desde}/${hasta}`, data);
   }
 
-  ReporteTimbreHorarioAbiertoRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto-regimen-cargo/${desde}/${hasta}`, data);
-  }
-
+  // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO
   ReporteTimbresIncompletos(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${environment.url}/reportes-asistencias/timbres-incompletos/${desde}/${hasta}`, data);
   }
 
-  ReporteTimbresIncompletosRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos-regimen-cargo/${desde}/${hasta}`, data);
-  }
 
 }

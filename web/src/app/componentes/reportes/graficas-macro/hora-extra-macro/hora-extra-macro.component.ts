@@ -74,7 +74,7 @@ export class HoraExtraMacroComponent implements OnInit {
       echarts.use(
         [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
       );
-      this.llamarGraficaOriginal();
+      //this.llamarGraficaOriginal();
     }
   }
 
@@ -87,6 +87,7 @@ export class HoraExtraMacroComponent implements OnInit {
     this.thisChart = echarts.init(this.chartDom, 'light', { width: 1050, renderer: 'svg', devicePixelRatio: 5 });
 
     if (local === null) {
+      // NO FUNCIONA
       this.restGraficas.MetricaHoraExtraMicro().subscribe(res => {
         // console.log('************* Hora Extra Micro **************');
         // console.log(res);

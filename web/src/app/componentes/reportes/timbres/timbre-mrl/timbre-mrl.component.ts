@@ -5,22 +5,22 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR MODELOS
-import { ITableEmpleados, IReporteTimbres, TimbreMrl } from 'src/app/model/reportes.model';
+import { ITableEmpleados, TimbreMrl } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { MrlService } from 'src/app/servicios/reportes/mrl/mrl.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-
+import { MrlService } from 'src/app/servicios/reportes/mrl/mrl.service';
 
 @Component({
   selector: 'app-timbre-mrl',
   templateUrl: './timbre-mrl.component.html',
   styleUrls: ['./timbre-mrl.component.css']
 })
+
 export class TimbreMrlComponent implements OnInit, OnDestroy {
 
   get rangoFechas() { return this.reporteService.rangoFechas };
@@ -29,22 +29,17 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
   get bool() { return this.reporteService.criteriosBusqueda };
 
-
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   regimen: any = [];
   timbres: TimbreMrl[] = [];
   cargos: any = [];
-  origen: any = [];
-
   data_pdf: any = [];
 
   //VARIABLES PARA MOSTRAR DETALLES
-  tipo: string;
   verDetalle: boolean = false;
 
   // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
@@ -108,11 +103,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
 
   constructor(
-    private validacionService: ValidacionesService,
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
-    private restEmpre: EmpresaService,
+    private informacion: DatosGeneralesService,
     private mrlService: MrlService,
+    private restEmpre: EmpresaService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
   ) {
@@ -123,13 +118,12 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
   ngOnDestroy() {
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.timbres = [];
@@ -140,130 +134,31 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarSucursalesUsuario(opcion: number) {
-    let empleado = { id_empleado: this.idEmpleadoLogueado };
-
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      console.log('ver sucursales ', codigos);
-      this.usua_sucursales = { id_sucursal: codigos };
-      this.BuscarInformacion(opcion, this.usua_sucursales);
-      this.BuscarCargos(opcion, this.usua_sucursales);
-    });
-  }
-
-  // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number, buscar: any) {
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral(opcion: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
-    this.origen = [];
-    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen = JSON.stringify(res);
-        res.forEach((obj: any) => {
-          this.sucursales.push({
-            id: obj.id_suc,
-            nombre: obj.name_suc,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            this.departamentos.push({
-              id: departamento.id_depa,
-              departamento: departamento.name_dep,
-              nombre: departamento.sucursal,
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((r: any) => {
-              let elemento = {
-                id: r.id,
-                nombre: r.name_empleado,
-                codigo: r.codigo,
-                cedula: r.cedula,
-                correo: r.correo,
-                cargo: r.cargo,
-                id_contrato: r.id_contrato,
-                hora_trabaja: r.hora_trabaja,
-                sucursal: r.sucursal,
-                departamento: r.departamento,
-                ciudad: r.ciudad,
-                regimen: r.regimen,
-              };
-              this.empleados.push(elemento);
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((reg: any) => {
-              reg.regimen.forEach((r: any) => {
-                this.regimen.push({
-                  id: r.id_regimen,
-                  nombre: r.name_regimen,
-                });
-              });
-            });
-          });
-        });
-
-        this.regimen = this.regimen.filter(
-          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
-        );
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  BuscarCargos(opcion: number, buscar: any) {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen_cargo = JSON.stringify(res);
-
-        res.forEach((obj: any) => {
-          this.cargos.push({
-            id: obj.id_cargo,
-            nombre: obj.name_cargo,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.empleados.forEach((r: any) => {
-            this.empleados_cargos.push({
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              ciudad: r.ciudad,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-              hora_trabaja: r.hora_trabaja,
-            });
-          });
-        });
-      });
+    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any) {
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
+  }
+
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -273,186 +168,86 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
+
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+        if (this.selectionSuc.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+        if (this.selectionReg.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+        if (this.selectionCar.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+        if (this.selectionEmp.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-
-    let suc = respuesta.filter((o: any) => {
-      var bool = this.selectionSuc.selected.find((obj1: any) => {
-        return obj1.id === o.id_suc
-      });
-      return bool != undefined
-    });
-
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = [];
-    this.mrlService.ReporteTimbresMrl(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'ver': this.ObtenerDatos(true); break;
-        case 'download': this.ObtenerDatos(false); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen: any) => {
-        objeto = {
-          regimen: {
-            id: regimen.id,
-            nombre: regimen.nombre,
-          },
-        };
-        empleados = [];
-        obj.departamentos.forEach((departamento: any) => {
-          departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r: any) => {
-              if (regimen.id === r.id_regimen) {
-                empleados.push(empleado);
-              }
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
-      });
-    });
-
-    this.data_pdf = [];
-    this.mrlService.ReporteTimbresMrlRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'ver': this.ObtenerDatos(true); break;
-        case 'download': this.ObtenerDatos(false); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((o: any) => {
-        var bool = this.selectionDep.selected.find((obj1: any) => {
-          return obj1.id === o.id_depa
-        })
-        return bool != undefined
-      })
-    })
-    let dep = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-    this.data_pdf = [];
-    this.mrlService.ReporteTimbresMrl(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'ver': this.ObtenerDatos(true); break;
-        case 'download': this.ObtenerDatos(false); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o: any) => {
-      var bool = this.selectionCar.selected.find((obj1) => {
-        return obj1.id === o.id_cargo;
-      });
-      return bool != undefined;
-    });
-
-    this.data_pdf = [];
-    this.mrlService.ReporteTimbresMrlRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'ver': this.ObtenerDatos(true); break;
-        case 'download': this.ObtenerDatos(false); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-    console.log('empleados', this.selectionEmp);
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((departamento: any) => {
-        departamento.empleado = departamento.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find((obj1: any) => {
-            return obj1.id === o.id
-          })
-          return bool != undefined
-        })
-      });
-    })
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((e: any) => {
-        return e.empleado.length > 0
-      })
-    });
-
-    let emp = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-
-    this.data_pdf = [];
-    this.mrlService.ReporteTimbresMrl(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.mrlService.ReporteTimbresMrl(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
         case 'ver': this.ObtenerDatos(true); break;
@@ -490,69 +285,17 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
-
-  ExtraerTimbres() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
-    this.data_pdf.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach((obj2: any) => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: any) => {
-            n = n + 1;
-            const servidor_fecha = this.validacionService.FormatearFecha(
-              obj4.fecha_hora_timbre_servidor.split(' ')[0],
-              this.formato_fecha,
-              'no');
-            const servidor_hora = this.validacionService.FormatearHora(
-              obj4.fecha_hora_timbre_servidor.split(' ')[1],
-              this.formato_hora);
-
-            switch (obj4.accion) {
-              case 'EoS': accionT = '1'; break;
-              case 'AES': accionT = '2'; break;
-              case 'PES': accionT = '3'; break;
-              case 'E': accionT = '1'; break;
-              case 'S': accionT = '1'; break;
-              case 'I/A': accionT = '2'; break;
-              case 'F/A': accionT = '2'; break;
-              case 'I/P': accionT = '3'; break;
-              case 'F/P': accionT = '3'; break;
-              default: accionT = '9'; break;
-            }
-            let ele = {
-              cedula: obj3.cedula,
-              fecha_hora: `${servidor_fecha} ${servidor_hora}`,
-              accion: accionT,
-            }
-
-            this.timbres.push(ele);
-          })
-        })
-      })
-    });
-    if (!this.verDetalle) {
-      this.ExportarTimbres();
-    }
-  }
-
-  ExtraerTimbresRegimenCargo() {
-    this.timbres = [];
-    let n = 0;
-    let accionT = '';
-    this.data_pdf.forEach((obj1: any) => {
-      obj1.empleados.forEach((obj2: any) => {
-        obj2.timbres.forEach((obj3: any) => {
+    this.data_pdf.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
           n = n + 1;
-          const servidor_fecha = this.validacionService.FormatearFecha(
-            obj3.fecha_hora_timbre_servidor.split(' ')[0],
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-          const servidor_hora = this.validacionService.FormatearHora(
-            obj3.fecha_hora_timbre_servidor.split(' ')[1],
-            this.formato_hora);
-
-          switch (obj3.accion) {
+          const servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
             case 'EoS': accionT = '1'; break;
             case 'AES': accionT = '2'; break;
             case 'PES': accionT = '3'; break;
@@ -565,7 +308,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
             default: accionT = '9'; break;
           }
           let ele = {
-            cedula: obj2.cedula,
+            cedula: usu.cedula,
             accion: accionT,
             fecha_hora: `${servidor_fecha} ${servidor_hora}`,
           }
@@ -574,16 +317,15 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
       })
     });
     if (!this.verDetalle) {
-      this.ExportarTimbres();
+      this.ExportarDatos();
     }
   }
 
   /** ****************************************************************************************** **
-   **                                              TXT                                           **
+   ** **                               REPORTE EN FORMATO TXT                                 ** **
    ** ****************************************************************************************** **/
-
   // EXPORTAR TIMBRES A TXT
-  ExportarTimbres() {
+  ExportarDatos() {
     const txt = this.timbres.map((timbre: TimbreMrl) => {
       return [
         timbre.cedula,
@@ -754,23 +496,19 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   }
 
   // METODOS PARA CONTROLAR INGRESO DE LETRAS
-
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e)
   }
 
+  // METODOS PARA CONTROLAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   // OBTENER DATOS
   ObtenerDatos(ver: boolean) {
     this.verDetalle = ver;
-    if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.ExtraerTimbresRegimenCargo();
-    } else {
-      this.ExtraerTimbres();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

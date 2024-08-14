@@ -8,22 +8,22 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
   templateUrl: './analisis-datos.component.html',
   styleUrls: ['./analisis-datos.component.css']
 })
-export class AnalisisDatosComponent implements OnInit{
+export class AnalisisDatosComponent implements OnInit {
 
   //URL HERRAMIENTA DE ANALISIS DE DATOS
   urlHerramienta: string;
   urlSafe: SafeUrl;
   cargarHerramienta: boolean = false;
 
-  constructor(private sanitized: DomSanitizer, private parametro: ParametrosService) {}
+  constructor(private sanitized: DomSanitizer, private parametro: ParametrosService) { }
 
   ngOnInit(): void {
     this.BuscarURL();
   }
 
   // METODO PARA BUSCAR PARAMETRO DE URL DE LA HERRAMIENTA DE ANALISIS
-  BuscarURL(){
-    this.parametro.ListarDetalleParametros(3).subscribe(
+  BuscarURL() {
+    this.parametro.ListarDetalleParametros(16).subscribe(
       res => {
         this.urlHerramienta = res[0].descripcion;
         this.urlSafe = this.sanitized.bypassSecurityTrustResourceUrl(this.urlHerramienta);

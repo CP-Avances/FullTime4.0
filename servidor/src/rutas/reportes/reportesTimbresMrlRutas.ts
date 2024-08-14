@@ -9,9 +9,8 @@ class ReportesTimbresMrlRutas {
     }
 
     configuracion(): void {
-        // REPORTES DE TIMBRES MRL
-        this.router.put('/timbres/:desde/:hasta', TokenValidation, REPORTES_TIMBRES_MRL_CONTROLADOR.ReporteTimbresMrl);
-        this.router.put('/timbres-regimen-cargo/:desde/:hasta', TokenValidation, REPORTES_TIMBRES_MRL_CONTROLADOR.ReporteTimbresMrlRegimenCargo);
+        // REPORTES DE TIMBRES MRL    **USADO
+        this.router.post('/timbres/:desde/:hasta', TokenValidation, REPORTES_TIMBRES_MRL_CONTROLADOR.ReporteTimbresMrl);
 
     }
 }
