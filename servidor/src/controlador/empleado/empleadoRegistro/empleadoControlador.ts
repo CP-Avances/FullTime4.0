@@ -492,12 +492,15 @@ class EmpleadoControlador {
 
   // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
   public async Listar(req: Request, res: Response) {
+
     const empleado = await pool.query(
       `
       SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `
     );
-    res.jsonp(empleado.rows);
+
+    console.log('empleado',empleado.rowCount);
+    return res.jsonp(empleado.rows);
   }
 
   // METODO QUE LISTA EMPLEADOS INHABILITADOS   **USADO
@@ -507,6 +510,7 @@ class EmpleadoControlador {
       SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `
     );
+    console.log('empleado desactivado',empleado.rowCount);
     res.jsonp(empleado.rows);
   }
 
@@ -516,25 +520,18 @@ class EmpleadoControlador {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
-      arrayIdsEmpleados.forEach(async (obj: number) => {
-
+      for (const obj of arrayIdsEmpleados) {
         try {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
           // CONSULTAR DATOSORIGINALES
           const empleado = await pool.query(
-            `
-            SELECT * FROM eu_empleados WHERE id = $1
-            `
-            , [obj]);
+            `SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
           const [datosOriginales] = empleado.rows;
 
           const usuario = await pool.query(
-            `
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `
-            , [obj]);
+            `SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [obj]);
           const [datosOriginalesUsuario] = usuario.rows;
 
           if (!datosOriginales || !datosOriginalesUsuario) {
@@ -565,14 +562,9 @@ class EmpleadoControlador {
 
           // 2 => DESACTIVADO O INACTIVO
           await pool.query(
-            `
-            UPDATE eu_empleados SET estado = 2 WHERE id = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `UPDATE eu_empleados SET estado = 2 WHERE id = $1`, [obj]);
 
-          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
-
+          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -587,11 +579,7 @@ class EmpleadoControlador {
 
           // FALSE => YA NO TIENE ACCESO
           await pool.query(
-            `
-            UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1`, [obj]);
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -610,8 +598,9 @@ class EmpleadoControlador {
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
+          console.log('error deshabilitar', error);
         }
-      });
+      }
 
       return res.jsonp({ message: 'Usuarios inhabilitados exitosamente.' });
     }
@@ -624,25 +613,26 @@ class EmpleadoControlador {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
-      arrayIdsEmpleados.forEach(async (obj: number) => {
+      for (const obj of arrayIdsEmpleados) {
         try {
-
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // CONSULTAR DATOSORIGINALES
+          // CONSULTAR DATOS ORIGINALES
           const empleado = await pool.query(
             `
             SELECT * FROM eu_empleados WHERE id = $1
-            `
-            , [obj]);
+            `,
+            [obj]
+          );
           const [datosOriginales] = empleado.rows;
 
           const usuario = await pool.query(
             `
             SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `
-            , [obj]);
+            `,
+            [obj]
+          );
           const [datosOriginalesUsuario] = usuario.rows;
 
           if (!datosOriginales || !datosOriginalesUsuario) {
@@ -675,11 +665,11 @@ class EmpleadoControlador {
           await pool.query(
             `
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `,
+            [obj]
+          );
 
-          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -696,9 +686,9 @@ class EmpleadoControlador {
           await pool.query(
             `
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `,
+            [obj]
+          );
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -717,8 +707,9 @@ class EmpleadoControlador {
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
+          console.log('error activar', error);
         }
-      });
+      }
 
       return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
     }
@@ -729,24 +720,26 @@ class EmpleadoControlador {
   public async ReactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
     const { arrayIdsEmpleados, user_name, ip } = req.body;
     if (arrayIdsEmpleados.length > 0) {
-      arrayIdsEmpleados.forEach(async (obj: number) => {
+      for (const obj of arrayIdsEmpleados) {
         try {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // CONSULTAR DATOSORIGINALES
+          // CONSULTAR DATOS ORIGINALES
           const empleado = await pool.query(
             `
             SELECT * FROM eu_empleados WHERE id = $1
-            `
-            , [obj]);
+            `,
+            [obj]
+          );
           const [datosOriginales] = empleado.rows;
 
           const usuario = await pool.query(
             `
             SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `
-            , [obj]);
+            `,
+            [obj]
+          );
           const [datosOriginalesUsuario] = usuario.rows;
 
           if (!datosOriginales || !datosOriginalesUsuario) {
@@ -779,9 +772,9 @@ class EmpleadoControlador {
           await pool.query(
             `
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `,
+            [obj]
+          );
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -798,9 +791,9 @@ class EmpleadoControlador {
           await pool.query(
             `
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `
-            , [obj])
-            .then((result: any) => { });
+            `,
+            [obj]
+          );
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -823,7 +816,7 @@ class EmpleadoControlador {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
         }
-      });
+      }
 
       return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
     }

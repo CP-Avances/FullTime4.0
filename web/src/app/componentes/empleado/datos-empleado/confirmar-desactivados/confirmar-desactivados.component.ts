@@ -56,38 +56,7 @@ export class ConfirmarDesactivadosComponent implements OnInit {
 
   // METODO PARA GUARDAR CAMBIOS EN BASE DE DATOS
   ConfirmarListaEmpleados() {
-    const datos = {
-      arrayIdsEmpleados: this.ids,
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    // INACTIVAR EMPLEADOS
-    if (this.Empleados.opcion === 1) {
-      this.restE.DesactivarVariosUsuarios(datos).subscribe(res => {
-        this.toastr.success(res.message, '', {
-          timeOut: 6000,
-        })
-      });
-      this.ventana.close(true);
-
-      // ACTIVAR EMPLEADOS
-    } else if (this.Empleados.opcion === 2) {
-      this.restE.ActivarVariosUsuarios(datos).subscribe(res => {
-        this.toastr.success(res.message, '', {
-          timeOut: 6000,
-        })
-      });
-      this.ventana.close(true);
-
-      // REACTIVAR EMPLEADOS
-    } else if (this.Empleados.opcion === 3) {
-      this.restE.ReActivarVariosUsuarios(datos).subscribe(res => {
-        this.toastr.success(res.message, '', {
-          timeOut: 6000,
-        })
-      });
-      this.ventana.close(true);
-    }
+    this.ventana.close(true);
   }
-  
+
 }

@@ -443,7 +443,8 @@ class EmpleadoControlador {
             const empleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `);
-            res.jsonp(empleado.rows);
+            console.log('empleado', empleado.rowCount);
+            return res.jsonp(empleado.rows);
         });
     }
     // METODO QUE LISTA EMPLEADOS INHABILITADOS   **USADO
@@ -452,6 +453,7 @@ class EmpleadoControlador {
             const empleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `);
+            console.log('empleado desactivado', empleado.rowCount);
             res.jsonp(empleado.rows);
         });
     }
@@ -460,18 +462,14 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOSORIGINALES
-                        const empleado = yield database_1.default.query(`
-            SELECT * FROM eu_empleados WHERE id = $1
-            `, [obj]);
+                        const empleado = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
                         const [datosOriginales] = empleado.rows;
-                        const usuario = yield database_1.default.query(`
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `, [obj]);
+                        const usuario = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [obj]);
                         const [datosOriginalesUsuario] = usuario.rows;
                         if (!datosOriginales || !datosOriginalesUsuario) {
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -497,10 +495,7 @@ class EmpleadoControlador {
                             throw new Error('Error al inhabilitar empleado con id: ' + obj);
                         }
                         // 2 => DESACTIVADO O INACTIVO
-                        yield database_1.default.query(`
-            UPDATE eu_empleados SET estado = 2 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+                        yield database_1.default.query(`UPDATE eu_empleados SET estado = 2 WHERE id = $1`, [obj]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -513,10 +508,7 @@ class EmpleadoControlador {
                             observacion: null
                         });
                         // FALSE => YA NO TIENE ACCESO
-                        yield database_1.default.query(`
-            UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+                        yield database_1.default.query(`UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1`, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -533,8 +525,9 @@ class EmpleadoControlador {
                     catch (error) {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
+                        console.log('error deshabilitar', error);
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios inhabilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
@@ -545,11 +538,11 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`
             SELECT * FROM eu_empleados WHERE id = $1
             `, [obj]);
@@ -584,8 +577,7 @@ class EmpleadoControlador {
                         // 1 => ACTIVADO
                         yield database_1.default.query(`
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -600,8 +592,7 @@ class EmpleadoControlador {
                         // TRUE => TIENE ACCESO
                         yield database_1.default.query(`
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -618,8 +609,9 @@ class EmpleadoControlador {
                     catch (error) {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
+                        console.log('error activar', error);
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
@@ -630,11 +622,11 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`
             SELECT * FROM eu_empleados WHERE id = $1
             `, [obj]);
@@ -669,8 +661,7 @@ class EmpleadoControlador {
                         // 1 => ACTIVADO
                         yield database_1.default.query(`
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_empleados',
@@ -684,8 +675,7 @@ class EmpleadoControlador {
                         // TRUE => TIENE ACCESO
                         yield database_1.default.query(`
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -705,7 +695,7 @@ class EmpleadoControlador {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upps!!! ocurrio un error.' });

@@ -277,14 +277,42 @@ export class ListaEmpleadosComponent implements OnInit {
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
     if (EmpleadosSeleccionados.length != 0) {
-      this.ventana.open(ConfirmarDesactivadosComponent, {
+      const dialogRef = this.ventana.open(ConfirmarDesactivadosComponent, {
         width: '500px',
         data: { opcion: opcion, lista: EmpleadosSeleccionados }
-      })
-        .afterClosed().subscribe(item => {
-          if (item === true) {
-            this.empleado = [];
-            this.GetEmpleados();
+      });
+      dialogRef.afterClosed().subscribe(async item => {
+          if (item) {
+            try {
+              const datos = {
+                arrayIdsEmpleados: EmpleadosSeleccionados.map((obj: any) => obj.id),
+                user_name: this.user_name,
+                ip: this.ip
+              }
+
+              let res: { message: string | undefined; } = { message: undefined };
+
+              // INACTIVAR EMPLEADOS
+              if (opcion === 1) {
+                res = await this.rest.DesactivarVariosUsuarios(datos);
+              }
+              // ACTIVAR EMPLEADOS
+              else if (opcion === 2) {
+                res = await this.rest.ActivarVariosUsuarios(datos);
+              }
+              // REACTIVAR EMPLEADOS
+              else if (opcion === 3) {
+                res = await this.rest.ReActivarVariosUsuarios(datos);
+              }
+              this.toastr.success(res.message, '', {
+                timeOut: 6000,
+              });
+              this.GetEmpleados();
+            } catch (error) {
+              this.toastr.error('Error al actualizar usuarios.', '', {
+                timeOut: 6000,
+              });
+            }
           };
           this.btnCheckHabilitar = false;
           this.btnCheckDeshabilitado = false;
@@ -368,6 +396,8 @@ export class ListaEmpleadosComponent implements OnInit {
     }
 
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
+      console.log('empleados', empleados);
+      console.log('desactivados', desactivados);
       this.ProcesarEmpleados(empleados, desactivados);
     });
   }
@@ -399,6 +429,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // ORDENAR LOS DATOS SEGUN EL CODIGO
   OrdenarDatos(array: any) {
+    console.log('ordenar datos')
     function compare(a: any, b: any) {
       if (parseInt(a.codigo) < parseInt(b.codigo)) {
         return -1;

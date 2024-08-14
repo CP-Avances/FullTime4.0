@@ -27,3 +27,63 @@ mat-form-field {
     width: 12px;
     background-color: #F5F5F5;
 }
+
+[type="file"] {
+  height: 0;
+  overflow: hidden;
+  width: 0;
+}
+
+[type="file"]+label {
+  background: #f15d22;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  padding: 0.5rem 45px;
+  position: relative;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  vertical-align: middle;
+  margin-bottom: 0;
+}
+
+[type="file"]+label.btn-2 {
+  background-color: rgb(150, 243, 141);
+  overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+  color: #fff;
+  content: "\f382";
+  font-family: "Font Awesome 5 Pro";
+  font-size: 100%;
+  right: 130%;
+  position: absolute;
+  margin-left: 5px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+[type="file"]+label.btn-2:hover {
+  background-color: rgb(21, 130, 1);
+}
+
+[type="file"]+label.btn-2:hover::before {
+  right: 80%
+}
+
+#respaldo {
+  font-size: 13px;
+  display: inline-block;
+}
+
+#contenedorBotones {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
