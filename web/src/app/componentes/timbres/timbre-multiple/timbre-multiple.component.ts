@@ -651,11 +651,14 @@ export class TimbreMultipleComponent implements OnInit {
       .afterClosed().subscribe(dataT => {
         if (dataT) {
           if (!dataT.close) {
-            this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
-              this.toastr.success(res.message)
-            }, err => {
-              this.toastr.error(err)
-            })
+            this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe({
+              next: (res) => {
+                this.toastr.success(res.message)
+              },
+              error: (err) => {
+                this.toastr.error(err)
+              }
+            });
           }
         }
         this.auto_individual = true;

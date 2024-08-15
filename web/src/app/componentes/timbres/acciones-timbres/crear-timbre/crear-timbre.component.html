@@ -55,9 +55,9 @@
         <div class="bd-highlight d-flex align-items-center">
             <form method="post">
                 <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
-                    id="file">
+                    id="file" accept="image/png, image/jpeg">
                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
-                    Subir Certificado
+                    Subir justificación
                 </label>
             </form>
         </div>
