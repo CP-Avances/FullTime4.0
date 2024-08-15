@@ -316,7 +316,7 @@ class TimbresControlador {
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
-                id_empleado, id_reloj, tipo, ip, user_name } = req.body
+                id_empleado, id_reloj, tipo, documento, ip, user_name } = req.body
 
             var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
@@ -349,10 +349,10 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
                 `
                 , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB']
+                    observacion, documento, 'APP_WEB']
 
                 , async (error, results) => {
 

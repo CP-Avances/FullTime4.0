@@ -106,7 +106,9 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ObtenerInformacionGeneral(1).subscribe(data => {
+      console.log('data',data);
       this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
+      console.log(this.datosEmpleado);
     });
   }
 

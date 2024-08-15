@@ -301,7 +301,7 @@ class TimbresControlador {
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, documento, ip, user_name } = req.body;
                 var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
@@ -324,9 +324,9 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, documento, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
