@@ -9,7 +9,7 @@ class UbicacionControlador {
      ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cat_ubicaciones)               ** **
      ** ************************************************************************************************ **/
 
-    // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACION    **USADO
     public async RegistrarCoordenadas(req: Request, res: Response) {
         try {
             const { latitud, longitud, descripcion, user_name, ip } = req.body;
@@ -47,6 +47,7 @@ class UbicacionControlador {
             else {
                 return res.status(404).jsonp({ message: 'error' })
             }
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -54,7 +55,7 @@ class UbicacionControlador {
         }
     }
 
-    // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACION   **USADO
     public async ActualizarCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { latitud, longitud, descripcion, id, user_name, ip } = req.body;
@@ -63,7 +64,7 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const coordenada = await pool.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
+            const coordenada = await pool.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
             const [datosOriginales] = coordenada.rows;
 
             if (!datosOriginales) {
@@ -87,8 +88,7 @@ class UbicacionControlador {
                 UPDATE mg_cat_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3
                 WHERE id = $4
                 `
-                ,
-                [latitud, longitud, descripcion, id]);
+                , [latitud, longitud, descripcion, id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -104,6 +104,7 @@ class UbicacionControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro guardado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -111,7 +112,7 @@ class UbicacionControlador {
         }
     }
 
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
+    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACION    **USADO
     public async ListarCoordenadas(req: Request, res: Response) {
         const UBICACIONES = await pool.query(
             `
@@ -126,7 +127,7 @@ class UbicacionControlador {
         }
     }
 
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN CON EXCEPCIONES
+    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACION CON EXCEPCIONES     **USADO
     public async ListarCoordenadasDefinidas(req: Request, res: Response) {
         const id = req.params.id;
         const UBICACIONES = await pool.query(
@@ -142,7 +143,7 @@ class UbicacionControlador {
         }
     }
 
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
+    // METODO PARA LISTAR DATOS DE UNA UBICACION ESPECIFICA  **USADO
     public async ListarUnaCoordenada(req: Request, res: Response) {
         const id = req.params.id;
         const UBICACIONES = await pool.query(
@@ -158,8 +159,7 @@ class UbicacionControlador {
         }
     }
 
-
-    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACION      **USADO
     public async EliminarCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -169,7 +169,7 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const coordenada = await pool.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
+            const coordenada = await pool.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
             const [datosOriginales] = coordenada.rows;
 
             if (!datosOriginales) {
@@ -190,8 +190,8 @@ class UbicacionControlador {
 
             await pool.query(
                 `
-            DELETE FROM mg_cat_ubicaciones WHERE id = $1
-            `
+                DELETE FROM mg_cat_ubicaciones WHERE id = $1
+                `
                 , [id]);
 
             // AUDITORIA
@@ -220,7 +220,7 @@ class UbicacionControlador {
      ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empleado_ubicacion)            ** **
      ** **************************************************************************************** **/
 
-    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO
+    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO    **USADO
     public async ListarRegistroUsuario(req: Request, res: Response) {
         const { id_empl } = req.params;
         const UBICACIONES = await pool.query(
@@ -239,7 +239,7 @@ class UbicacionControlador {
         }
     }
 
-    // ASIGNAR COORDENADAS GENERALES DE UBICACIÓN A LOS USUARIOS
+    // ASIGNAR COORDENADAS GENERALES DE UBICACION A LOS USUARIOS    **USADO
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
             const { id_empl, id_ubicacion, user_name, ip } = req.body;
@@ -269,15 +269,15 @@ class UbicacionControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             res.jsonp({ message: 'Registro guardado.' });
+
         } catch (error) {
-            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
-    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACIÓN 
+    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACION   **USADO
     public async ListarRegistroUsuarioU(req: Request, res: Response) {
         const id_ubicacion = req.params.id_ubicacion;
         const UBICACIONES = await pool.query(
@@ -296,7 +296,7 @@ class UbicacionControlador {
         }
     }
 
-    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACION    **USADO
     public async EliminarCoordenadasUsuario(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -345,6 +345,7 @@ class UbicacionControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');

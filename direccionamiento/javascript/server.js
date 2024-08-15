@@ -42,11 +42,11 @@ class Servidor {
         });
     }
     rutas() {
-        this.app.use('/fulltime', empresasRutas_1.default); //RUTA PARA EMPRESA
-        this.app.use('/parametrizacion', parametrizacionRutas_1.default); //RUTA DATOS INICIALES
-        this.app.use('/empleado', empleadoRutas_1.default); //RUTA DATOS INICIALES
-        this.app.use('/licencia', licenciaRutas_1.default); //RUTA PARA OBTENER LICENCIA
-        this.app.use('/', funcionesRutas_1.default);
+        this.app.use('/direccionamiento/fulltime', empresasRutas_1.default); //RUTA PARA EMPRESA
+        this.app.use('/direccionamiento/parametrizacion', parametrizacionRutas_1.default); //RUTA DATOS INICIALES
+        this.app.use('/direccionamiento/empleado', empleadoRutas_1.default); //RUTA DATOS INICIALES
+        this.app.use('/direccionamiento/licencia', licenciaRutas_1.default); //RUTA PARA OBTENER LICENCIA
+        this.app.use('/direccionamiento', funcionesRutas_1.default);
     }
     start() {
         this.server.listen(this.app.get('puerto'), () => {

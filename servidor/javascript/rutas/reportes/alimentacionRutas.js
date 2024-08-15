@@ -24,9 +24,8 @@ class AlimentacionRutas {
         this.router.post('/extras/detalle/solicita', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.DetallarExtrasSolConsumidos);
         // DETALLES SERVICIOS DE ALIMENTACIÓN DE INVITADOS
         this.router.post('/servicios/invitados', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.DetallarServiciosInvitados);
-        // TIMBRES DE ALIMENTACION
-        this.router.put('/timbres-alimentacion/:desde/:hasta', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.ReporteTimbresAlimentacion);
-        this.router.put('/timbres-alimentacion-regimen-cargo/:desde/:hasta', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.ReporteTimbresAlimentacionRegimenCargo);
+        // TIMBRES DE ALIMENTACION   **USADO
+        this.router.post('/timbres-alimentacion/:desde/:hasta', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.ReporteTimbresAlimentacion);
     }
 }
 const ALIMENTACION_RUTAS = new AlimentacionRutas();

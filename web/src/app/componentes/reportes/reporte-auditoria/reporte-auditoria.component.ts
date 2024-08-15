@@ -603,7 +603,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     GenerarPDF(data: any, action: any) {
         let documentDefinition: any;
-        documentDefinition = this.GetDocumentDefinicion(data);
+        documentDefinition = this.DefinirInformacionPDF(data);
         let doc_name = `Auditoría.pdf`;
         switch (action) {
             case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -618,7 +618,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-    GetDocumentDefinicion(data: any) {
+    DefinirInformacionPDF(data: any) {
         return {
             pageSize: 'A4',
             pageOrientation: 'landscape',

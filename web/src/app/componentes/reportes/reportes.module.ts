@@ -36,8 +36,8 @@ import { TimbreIncompletoComponent } from './timbres/timbre-incompleto/timbre-in
 import { SalidasAntesComponent } from './asistencia/salidas-antes/salidas-antes.component';
 import { SolicitudVacacionComponent } from './modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { HorasPlanificadasComponent } from './modulos/horasExtras/horas-planificadas/horas-planificadas.component';
-import { TimbreSistemaComponent } from './timbres/timbre-sistema/timbre-sistema.component';
-import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.component';
+import { TimbreSistemaComponent } from './modulos/timbre-sistema/timbre-sistema.component';
+import { TimbreVirtualComponent } from './modulos/timbre-virtual/timbre-virtual.component';
 import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';

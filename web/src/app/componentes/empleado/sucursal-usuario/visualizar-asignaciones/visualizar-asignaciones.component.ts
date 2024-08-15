@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { config } from 'rxjs';
+
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
@@ -10,7 +11,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   templateUrl: './visualizar-asignaciones.component.html',
   styleUrls: ['./visualizar-asignaciones.component.css']
 })
-export class VisualizarAsignacionesComponent implements OnInit{
+
+export class VisualizarAsignacionesComponent implements OnInit {
 
   asignaciones: any = [];
   nombre: string;
@@ -30,9 +32,7 @@ export class VisualizarAsignacionesComponent implements OnInit{
     public dialogo: MatDialog,
     public ventana: MatDialogRef<VisualizarAsignacionesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
-
-  }
+  ) { }
 
   ngOnInit(): void {
     this.user_name = this.data.user_name;
@@ -58,7 +58,7 @@ export class VisualizarAsignacionesComponent implements OnInit{
 
   // METODO PARA CONFIRMAR SI SE ELIMINA UN REGISTRO
   ConfirmarDeleteProceso(id: number) {
-    this.dialogo.open(MetodosComponent,  { width: '450px', data: 'eliminar' }).afterClosed()
+    this.dialogo.open(MetodosComponent, { width: '450px', data: 'eliminar' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarAsignacion(id);
@@ -109,15 +109,15 @@ export class VisualizarAsignacionesComponent implements OnInit{
         return asignacion;
       });
     });
-
   }
 
   // METODO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
-    this.numero_pagina= e.pageIndex + 1;
+    this.numero_pagina = e.pageIndex + 1;
   }
 
+  // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     const datos = {
       asignaciones: this.asignaciones,

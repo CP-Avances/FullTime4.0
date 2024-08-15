@@ -11,7 +11,7 @@ class DepartamentoRutas {
 
     configuracion(): void {
 
-        // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA
+        // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA   **USADO
         this.router.get('/autoriza/:id_empleado', AUTORIZA_DEPARTAMENTO_CONTROLADOR.EncontrarAutorizacionEmple);
         // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA
         this.router.get('/autorizaUsuarioDepa/:id_empleado', AUTORIZA_DEPARTAMENTO_CONTROLADOR.EncontrarAutorizacionUsuario);
@@ -19,11 +19,11 @@ class DepartamentoRutas {
         this.router.post('/', AUTORIZA_DEPARTAMENTO_CONTROLADOR.CrearAutorizaDepartamento);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/actualizar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ActualizarAutorizaDepartamento);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS    **USADO
         this.router.delete('/eliminar/:id', AUTORIZA_DEPARTAMENTO_CONTROLADOR.EliminarAutorizacionDepartamento);
         this.router.get('/empleadosAutorizan/:id_depar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerQuienesAutorizan);
-        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   --** VERIFICADO
-        this.router.get('/listaempleadosAutorizan/:id_depa', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerlistaEmpleadosAutorizan);
+        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   **USADO
+        this.router.get('/listaempleadosAutorizan/:id_depa', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerListaEmpleadosAutorizan);
         this.router.get('/listaDepaAutoriza/:id_depar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerListaAutorizaDepa);
         
 

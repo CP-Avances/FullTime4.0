@@ -4,7 +4,7 @@ import pool from '../../database';
 
 class AutorizaDepartamentoControlador {
 
-    // METODO PARA BUSCAR USUARIO AUTORIZA
+    // METODO PARA BUSCAR USUARIO AUTORIZA    **USADO
     public async EncontrarAutorizacionEmple(req: Request, res: Response) {
         const { id_empleado } = req.params;
         const AUTORIZA = await pool.query(
@@ -153,7 +153,7 @@ class AutorizaDepartamentoControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     public async EliminarAutorizacionDepartamento(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
@@ -163,7 +163,7 @@ class AutorizaDepartamentoControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOS ANTES DE ELIMINAR
-            const response = await pool.query('SELECT * FROM ed_autoriza_departamento WHERE id = $1', [id]);
+            const response = await pool.query(`SELECT * FROM ed_autoriza_departamento WHERE id = $1`, [id]);
             const [datos] = response.rows;
 
             if (!datos) {
@@ -202,6 +202,7 @@ class AutorizaDepartamentoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
+            
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
@@ -210,16 +211,12 @@ class AutorizaDepartamentoControlador {
     }
 
 
-    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
-    public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
+    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     **USADO
+    public async ObtenerListaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
         const { id_depa } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja, v.cargo 
-            FROM ed_autoriza_departamento AS d 
-            INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar 
-                AND d.id_empleado_cargo = v.id_cargo 
-            WHERE d.id_departamento = $1
+            SELECT * FROM informacionpersonalautoriza ia WHERE ia.id_depar = 9
             `
             , [id_depa]);
         if (EMPLEADOS.rowCount != 0) {
@@ -234,7 +231,7 @@ class AutorizaDepartamentoControlador {
         const { id_depar } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT * FROM VistaAutorizanCargo WHERE id_depar = $1
+            SELECT * FROM informacionpersonalautoriza WHERE id_depar = $1
             `
             , [id_depar]);
         if (EMPLEADOS.rowCount != 0) {

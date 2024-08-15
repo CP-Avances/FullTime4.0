@@ -11,6 +11,7 @@ export class PlanComidasService {
   ) { }
 
 
+  // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
   ObtenerSolComidaPorIdEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/infoComida/${id_empleado}`)
   }
@@ -27,6 +28,7 @@ export class PlanComidasService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/infoComida/estado/expirada`)
   }
 
+  // METODO PARA CONSULTAR PLANIFICACION DE COMIDAS POR ID DE EMPLEADO   **USADO
   ObtenerPlanComidaPorIdEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/infoComida/plan/${id_empleado}`)
   }
@@ -35,6 +37,7 @@ export class PlanComidasService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/comida-empleado/plan/${id}`)
   }
 
+  // METODO PARA CONSULTAR SERVICIOS DE ALIMENTACION CONSUMIDOS     **USADO
   EncontrarPlanComidaEmpleadoConsumido(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planComidas/empleado/plan/consumido`, datos);
   }
@@ -129,7 +132,7 @@ export class PlanComidasService {
     };
     return this.http.request('delete', url, httpOtions);
   }
-  // ELIMINAR PLANIFICACIÓN DE ALIMENTACIÓN DE UN USUARIO
+  // ELIMINAR PLANIFICACION DE ALIMENTACION DE UN USUARIO   **USADO
   EliminarPlanComida(id: number, id_empleado: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/plan-comida/${id}/${id_empleado}`;
     const httpOtions = {
@@ -152,7 +155,7 @@ export class PlanComidasService {
    ** **              METODO DE ENVIO DE NOTIFICACIONES DE SERVICIOS DE ALIMENTACION               ** **
    ** *********************************************************************************************** **/
 
-  // ALERTAS DE NOTIFICACIÓN DE SOLICITUD Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
+  // ALERTAS DE NOTIFICACION DE SOLICITUD Y PLANIFICACION DE SERVICIO DE ALIMENTACION   **USADO
   EnviarMensajePlanComida(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/send/planifica/`, data);
   }
@@ -160,7 +163,7 @@ export class PlanComidasService {
   EnviarCorreo(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/mail-noti`, datos);
   }
-  // ENVIAR CORREO DE PLANIFICACION DE ALIMENTACION
+  // ENVIAR CORREO DE PLANIFICACION DE ALIMENTACION   **USADO
   EnviarCorreoPlan(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/mail-plan-comida`, datos);
   }

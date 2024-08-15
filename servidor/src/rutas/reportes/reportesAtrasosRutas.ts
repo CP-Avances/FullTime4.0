@@ -11,11 +11,9 @@ class ReportesAtrasosRutas {
 
     configuracion(): void {
 
-        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
-        this.router.put('/atrasos-empleados/:desde/:hasta', TokenValidation, REPORTES_ATRASOS_CONTROLADOR.ReporteAtrasos);
+        // METODO DE BUSQUEDA DE DATOS DE ATRASOS   **USADO
+        this.router.post('/atrasos-empleados/:desde/:hasta', TokenValidation, REPORTES_ATRASOS_CONTROLADOR.ReporteAtrasos);
 
-        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[empleados]]
-        this.router.put('/atrasos-empleados-regimen-cargo/:desde/:hasta', TokenValidation, REPORTES_ATRASOS_CONTROLADOR.ReporteAtrasosRegimenCargo);
     }
 }
 

@@ -334,17 +334,8 @@ export class MainNavComponent implements OnInit {
   }
 
   // METODO DE SELECCION DE MENU
-  superadmin: boolean = false;
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
-
-    if (this.inicio.getRol() === 1) {
-      this.superadmin = true;
-    }
-    else {
-      this.superadmin = false;
-    }
-
     if (name_emp !== null) {
       this.MetodoSubSelectMenu(name_emp);
     } else {

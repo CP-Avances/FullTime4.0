@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 
 class FuncionesControlador {
 
-    // METODO PARA LISTAR FUNCIONES DEL SISTEMA
+    // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
     public async ConsultarFunciones(req: Request, res: Response) {
         const FUNCIONES = await pool.query(
             `

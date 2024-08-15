@@ -103,7 +103,7 @@ export class PedHoraExtraService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/${id}/solicitud`, datos);
   }
 
-  // LISTA DE HORAS EXTRAS SOLICITADOS POR EL USUARIO
+  // LISTA DE HORAS EXTRAS SOLICITADOS POR EL USUARIO   **USADO
   ObtenerListaEmpleado(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/lista/${id}`);
   }

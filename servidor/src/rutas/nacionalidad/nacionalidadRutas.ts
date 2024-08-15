@@ -11,7 +11,7 @@ class NacionalidadRutas {
     }
 
     configuracion(): void {
-        // METODO PARA LISTAR NACIONALIDADES
+        // METODO PARA LISTAR NACIONALIDADES   **USADO
         this.router.get('/', TokenValidation, nacionalidadControlador.ListarNacionalidades);
     }
 }

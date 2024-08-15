@@ -77,27 +77,27 @@ class DepartamentoRutas {
         /** ******************************************************************************************** **
          ** **                      MANEJO DE DATOS DE CONTRATO DEL USUARIO                           ** ** 
          ** ******************************************************************************************** **/
-        // REGISTRAR DATOS DE CONTRATO
+        // REGISTRAR DATOS DE CONTRATO    **USADO
         this.router.post('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CrearContrato);
-        // GUARDAR DOCUMENTO 
+        // GUARDAR DOCUMENTO    **USADO
         this.router.put('/:id/documento-contrato', [TokenValidation, upload.single('uploads')], CONTRATO_EMPLEADO_CONTROLADOR.GuardarDocumentoContrato);
-        // MOSTRAR DOCUMENTO CARGADO EN EL SISTEMA
+        // MOSTRAR DOCUMENTO CARGADO EN EL SISTEMA   
         this.router.get('/documentos/:docs/contrato/:id', CONTRATO_EMPLEADO_CONTROLADOR.ObtenerDocumento);
-        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO
+        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO   **USADO
         this.router.get('/contrato-empleado/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleado);
-        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR
+        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR   **USADO
         this.router.post('/contrato-empleado-editar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleadoEditar);
-        // EDITAR DATOS DE CONTRATO
+        // EDITAR DATOS DE CONTRATO   **USADO
         this.router.put('/:id/actualizar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EditarContrato);
-        // ELIMINAR DOCUMENTO DE CONTRATO BASE DE DATOS - SERVIDOR
+        // ELIMINAR DOCUMENTO DE CONTRATO BASE DE DATOS - SERVIDOR   **USADO
         this.router.put('/eliminar_contrato/base_servidor', [TokenValidation], CONTRATO_EMPLEADO_CONTROLADOR.EliminarDocumento);
-        // ELIMINAR DOCUMENTO DE CONTRATOS DEL SERVIDOR
+        // ELIMINAR DOCUMENTO DE CONTRATOS DEL SERVIDOR   **USADO
         this.router.put('/eliminar_contrato/servidor', [TokenValidation], CONTRATO_EMPLEADO_CONTROLADOR.EliminarDocumentoServidor);
-        // METODO PARA BUSCAR ID ACTUAL DE CONTRATO
+        // METODO PARA BUSCAR ID ACTUAL DE CONTRATO   **USADO
         this.router.get('/contratoActual/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContratoActual);
-        // METODO PARA BUSCAR DATOS DE CONTRATO POR ID
+        // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
         this.router.get('/contrato/:id', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarDatosUltimoContrato);
-        // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
+        // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);
 
 
@@ -105,20 +105,22 @@ class DepartamentoRutas {
          ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
 
-        // REGISTRAR MODALIDAD DE TRABAJO
+        // REGISTRAR MODALIDAD DE TRABAJO   **USADO
         this.router.post('/modalidad/trabajo', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CrearTipoContrato);
-        // BUSCAR LISTA DE MODALIDAD DE TRABAJO
+        // BUSCAR LISTA DE MODALIDAD DE TRABAJO O TIPO DE CARGOS    **USADO
         this.router.get('/modalidad/trabajo', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarTiposContratos);
-        // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
+        // BUSCAR MODALIDAD LABORAL POR SU NOMBRE   **USADO
         this.router.post('/modalidad/trabajo/nombre', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarModalidadLaboralNombre);
-
+        // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 
 
         /** ********************************************************************************************* **
          ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
          ** ********************************************************************************************* **/
+        // METODO DE REVISION DE DATOS DE PLANTILLA DE CONTRATOS   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], CONTRATO_EMPLEADO_CONTROLADOR.RevisarDatos);
+        // METODO PARA REGISTRAR DATOS DE PLANTILLA DE CONTRATOS   **USADO
         this.router.post('/cargar_plantilla/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CargarPlantilla_contrato);
     }
 }

@@ -12,6 +12,7 @@ class ParametrosRutas {
         this.configuracion();
     }
     configuracion() {
+        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
         // METODO PARA ACTUALIZAR PARAMETRO  **USADO
@@ -26,8 +27,9 @@ class ParametrosRutas {
         this.router.post('/detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.IngresarDetalleParametro);
         // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO **USADO
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
-        // METODO PARA COMPARAR COORDENADAS
+        // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
+        this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
     }
 }
 const PARAMETROS_RUTAS = new ParametrosRutas();

@@ -137,8 +137,8 @@ export class CrearVacunaComponent implements OnInit {
     // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
     let vacuna = {
       id_empleado: dataCarnet.id_empleado,
+      id_vacuna: dataCarnet.id_tipo_vacuna,
       fecha: dataCarnet.fecha,
-      id_vacuna: dataCarnet.id_tipo_vacuna
     }
     this.restVacuna.BuscarVacunaFechaTipo(vacuna).subscribe(response => {
       this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
@@ -160,6 +160,7 @@ export class CrearVacunaComponent implements OnInit {
     }
   }
 
+  // METODO PARA REGISTRAR SIN DOCUMENTO
   Registrar_sinCarnet(datos: any) {
     this.restVacuna.RegistrarVacunacion(datos).subscribe(response => {
       this.toastr.success('', 'Registro guardado.', {
@@ -192,7 +193,6 @@ export class CrearVacunaComponent implements OnInit {
       formData.append('user_name', this.user_name as string);
       formData.append('ip', this.ip as string);
       this.restVacuna.SubirDocumento(formData, vacuna.id, this.idEmploy).subscribe(res => {
-        //console.log('res documento ', res)
         this.archivoF.reset();
         this.nameFile = '';
         if (res.message === 'error') {

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { BuscarFecha , BuscarHora } from '../../libs/settingsMail';
 
 class ParametrosControlador {
 
@@ -252,6 +253,7 @@ class ParametrosControlador {
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro exitoso.' });
+            
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -260,32 +262,57 @@ class ParametrosControlador {
     }
 
 
-    // METODO PARA COMPARAR COORDENADAS
+    // METODO PARA COMPARAR COORDENADAS    **USADO
     public async CompararCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { lat1, lng1, lat2, lng2, valor } = req.body;
-            const RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
 
-        const VALIDACION = await pool.query(
-            `
-            SELECT CASE 
-                WHEN (
-                    ${RADIO_TIERRA} * ACOS(
-                        COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
-                        SIN(RADIANS($1)) * SIN(RADIANS($3))
-                    ) * 1000 -- Convertir a metros
-                ) <= $5 THEN 'ok'
-                ELSE 'vacio'
-            END AS verificar
-            `,
-            [lat1, lng1, lat2, lng2, valor]);
+            if (isNaN(lat1) || isNaN(lng1) || isNaN(lat2) || isNaN(lng2) || isNaN(valor)) {
+                return res.status(400).jsonp({ message: 'error' });
+            }
+
+            const RADIO_TIERRA = 6371; // RADIO DE LA TIERRA EN KILOMETROS
+
+            const VALIDACION = await pool.query(
+                `
+                SELECT CASE 
+                    WHEN (
+                        ${RADIO_TIERRA} * ACOS(
+                            COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
+                            SIN(RADIANS($1)) * SIN(RADIANS($3))
+                        ) * 1000 -- Convertir a metros
+                        ) <= $5 THEN 'ok'
+                    ELSE 'vacio'
+                    END AS verificar
+                `
+                , [lat1, lng1, lat2, lng2, valor]);
 
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
+            console.log('error --> ', error)
             return res.status(500)
                 .jsonp({ message: 'error_500' });
         }
     }
+
+
+    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+
+    public async BuscarFechasHoras(req: Request,res: Response): Promise<Response> {
+        try {
+            let formato_fecha = await BuscarFecha();
+            let formato_hora = await BuscarHora();
+            let formatos = {
+                fecha: formato_fecha.fecha,
+                hora: formato_hora.hora
+            }
+            return res.jsonp(formatos);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
+  
 
 }
 

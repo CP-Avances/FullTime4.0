@@ -20,7 +20,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class DiscapacidadControlador {
-    // METODO PARA LISTAR TIPO DE DISCAPACIDAD
+    // METODO PARA LISTAR TIPO DE DISCAPACIDAD    **USADO
     ListarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -39,7 +39,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD    **USADO
     CrearDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,7 +85,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD    **USADO
     EditarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -93,7 +93,7 @@ class DiscapacidadControlador {
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM e_cat_discapacidad WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -148,7 +148,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
+    // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD   **USADO
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -199,7 +199,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **usado
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -271,7 +271,7 @@ class DiscapacidadControlador {
                             else {
                                 item.observacion = 'Ya existe en el sistema';
                             }
-                            // Discriminación de elementos iguales
+                            // DISCRIMINACION DE ELEMENTOS IGUALES
                             if (duplicados.find((p) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
                                 duplicados.push(item);
                             }
@@ -320,13 +320,13 @@ class DiscapacidadControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_CARGO    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             let error = false;
             for (const data of plantilla) {
-                const { item, discapacidad, observacion } = data;
+                const { discapacidad } = data;
                 const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
                 try {
                     // INICIAR TRANSACCION

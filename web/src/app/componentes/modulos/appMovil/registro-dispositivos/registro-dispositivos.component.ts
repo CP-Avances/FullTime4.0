@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 // LIBRERIAS DE ARCHIVOS
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -26,6 +27,7 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-registro-dispositivos',
@@ -42,6 +44,9 @@ export class RegistroDispositivosComponent implements OnInit {
   // DATOS DE EMPLEADO
   empleado: any = [];
   idEmpleado: number;
+
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+  idUsuariosAcceso: Set<any> = new Set();
 
   // VALIDAR ELIMINAR PROCESO CON FILTROS
   ocultar: boolean = false;
@@ -76,7 +81,6 @@ export class RegistroDispositivosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-
   constructor(
     private usuariosService: UsuarioService,
     private funciones: MainNavService,
@@ -86,6 +90,7 @@ export class RegistroDispositivosComponent implements OnInit {
     private rest: RelojesService,
     public restEmpre: EmpresaService,
     public restE: EmpleadoService,
+    private asignaciones: AsignacionesService,
   ) { this.idEmpleado = parseInt(localStorage.getItem('empleado') as string); }
 
   ngOnInit(): void {
@@ -99,8 +104,12 @@ export class RegistroDispositivosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.ObtenerLogo();
       this.ObtenerColores();
       this.ObtenerEmpleados(this.idEmpleado);
@@ -166,9 +175,10 @@ export class RegistroDispositivosComponent implements OnInit {
   ObtenerDispositivosRegistrados() {
     this.usuariosService.BuscarDispositivoMovill().subscribe(res => {
       this.dispositivosRegistrados = res;
-      console.log('ver res ', res)
+      if (this.rolEmpleado !==1) {
+        this.dispositivosRegistrados = this.dispositivosRegistrados.filter((item: any) => this.idUsuariosAcceso.has(item.id_empleado));
+      }
     }, err => {
-      console.log('ver res ', err)
       this.toastr.info(err.error.message)
     })
   }
@@ -287,7 +297,7 @@ export class RegistroDispositivosComponent implements OnInit {
    ** ********************************************************************************* **/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -298,10 +308,8 @@ export class RegistroDispositivosComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('dispositivos_moviles', this.dispositivosRegistrados);
+  DefinirInformacionPDF() {
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -440,8 +448,8 @@ export class RegistroDispositivosComponent implements OnInit {
   data: any = [];
   exportToXML() {
     var objeto: any;
-    var count: number = 1;
     var arregloDispositivos: any = [];
+    let count: number = 0;
     this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
         "dispositivo_moviles": {
@@ -455,12 +463,32 @@ export class RegistroDispositivosComponent implements OnInit {
       }
       arregloDispositivos.push(objeto)
     });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
+    const xml = xmlBuilder.buildObject(arregloDispositivos);
 
-    this.rest.CrearXMLIdDispositivos(arregloDispositivos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/relojes/downloadIdDispositivos/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Dipositivos.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+    this.ObtenerDispositivosRegistrados();
   }
 
   //CONTROL BOTONES

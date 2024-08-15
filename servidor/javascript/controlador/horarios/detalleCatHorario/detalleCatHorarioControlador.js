@@ -17,7 +17,7 @@ const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditori
 const database_1 = __importDefault(require("../../../database"));
 const settingsMail_1 = require("../../../libs/settingsMail");
 class DetalleCatalogoHorarioControlador {
-    // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
+    // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
     ListarUnDetalleHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_horario } = req.params;
@@ -64,7 +64,7 @@ class DetalleCatalogoHorarioControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -73,7 +73,7 @@ class DetalleCatalogoHorarioControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eh_detalle_horarios WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -115,7 +115,7 @@ class DetalleCatalogoHorarioControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR DETALLES
+    // METODO PARA REGISTRAR DETALLES    **USADO
     CrearDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -151,7 +151,7 @@ class DetalleCatalogoHorarioControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DETALLE DE HORARIO
+    // METODO PARA ACTUALIZAR DETALLE DE HORARIO    **USADO
     ActualizarDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -206,6 +206,7 @@ class DetalleCatalogoHorarioControlador {
             }
         });
     }
+    // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS    **USADO
     ListarDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORARIO = yield database_1.default.query(`

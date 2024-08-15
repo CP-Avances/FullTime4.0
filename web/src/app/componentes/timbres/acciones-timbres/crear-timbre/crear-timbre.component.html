@@ -15,7 +15,7 @@
             </span>
         </div>
         <div class="d-flex flex-wrap justify-content-between">
-            <mat-form-field style="width: 200px;">
+            <mat-form-field style="width: 225px;">
                 <mat-label>Fecha timbre</mat-label>
                 <input id="i-cursor" matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa" [formControl]="FechaF"
                     required>
@@ -24,7 +24,7 @@
                 </mat-datepicker-toggle>
                 <mat-datepicker touchUi #picker></mat-datepicker>
             </mat-form-field>
-            <mat-form-field style="width: 175px;">
+            <mat-form-field style="width: 200px;">
                 <mat-label>Hora timbre</mat-label>
                 <input id="i-cursor" matInput type="time" [formControl]="HoraF">
             </mat-form-field>
@@ -49,6 +49,27 @@
                 </mat-hint>
                 <mat-hint align="end" id="letras">{{message.value.length}} / 100</mat-hint>
             </mat-form-field>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-evenly" id="contenedorBotones">
+        <div class="bd-highlight d-flex align-items-center">
+            <form method="post">
+                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                    id="file">
+                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
+                    Subir Certificado
+                </label>
+            </form>
+        </div>
+        <div class="bd-highlight d-flex align-items-center">
+            <input [required]='documento' type="text" id="respaldo"
+                placeholder="Ningún archivo seleccionado" class="form-control"
+                style="width: 200px;" [formControl]="nombreDocumento" readonly>
+            <i *ngIf="HabilitarBtn" class="far fa-trash-alt"
+                style="color:red; margin-left: 5px;" id="i-cursor"
+                (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
+                matTooltip="Eliminar archivo seleccionado.">
+            </i>
         </div>
     </div>
     <div style="text-align: center; padding-bottom: 5px;">

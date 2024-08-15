@@ -248,7 +248,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
-  // METODO PARA TOMAR DATOS DE MARCACION
+  // METODO PARA TOMAR DATOS DE MARCACION 
   RegistrarDatosTimbre(form: any, ubicacion: any) {
     // OBTENER LA FECHA Y HORA ACTUAL
     var now = moment();
@@ -266,7 +266,6 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
-    //console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 
@@ -275,10 +274,8 @@ export class RegistrarTimbreComponent implements OnInit {
   ubicacion: string = '';
   sin_ubicacion: number = 0;
   CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
-    console.log('verificar informacion ', informacion)
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
-        console.log('verificar res ', res)
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
@@ -301,7 +298,6 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
-    console.log('ver coordenadas ', longitud, latitud)
     var longitud_ = '';
     var latitud_ = '';
 
@@ -321,7 +317,6 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     this.restU.ListarCoordenadasUsuario(this.id_empl).subscribe(
       res => {
-        console.log(' res ', res)
         datosUbicacion = res;
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;
@@ -348,7 +343,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
-    console.log('ver ubicacion ', this.funciones[0].geolocalizacion)
+    //console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango, form);
     }
@@ -362,11 +357,10 @@ export class RegistrarTimbreComponent implements OnInit {
     console.log('ingresa a domicilio')
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
       if (res[0].longitud != null && res[0].latitud != null) {
-
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
-
-        if (informacion.lat1 && informacion.lng1) {
+        console.log('lat ', informacion.lat1, ' long ', informacion.lng1, 'res ', res, 'informacion ', informacion)
+        if (informacion.lat2 && informacion.lng2) {
           this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
             if (resu[0].verificar === 'ok') {
               this.ubicacion = 'DOMICILIO';

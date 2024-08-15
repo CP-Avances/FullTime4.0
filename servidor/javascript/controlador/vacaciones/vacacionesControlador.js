@@ -19,6 +19,7 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 class VacacionesControlador {
+    // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO    **USADO
     VacacionesIdPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -42,13 +43,13 @@ class VacacionesControlador {
             const { estado } = req.body;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_depa, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
       FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da, 
         ed_departamentos AS depa   
       WHERE dc.id_empleado = e.id  
 	      AND da.id_contrato = dc.contrato_id
-        AND depa.id = da.id_departamento
+        AND depa.id = da.id_depa
 	      AND (v.estado = 1 OR v.estado = 2) 
         AND da.estado = $1
       ORDER BY id DESC
@@ -133,7 +134,7 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empleado, user_name, ip } = req.body;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
@@ -152,7 +153,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
@@ -161,7 +162,7 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).
                     jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -174,7 +175,7 @@ class VacacionesControlador {
             try {
                 const id = req.params.id;
                 const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
@@ -189,7 +190,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -208,7 +209,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
@@ -217,7 +218,7 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -230,7 +231,7 @@ class VacacionesControlador {
             try {
                 const { user_name, ip } = req.body;
                 let { id_vacacion } = req.params;
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
@@ -245,7 +246,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -317,7 +318,7 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (objetoVacacion) {
                     return res.status(200).jsonp(objetoVacacion);
@@ -327,7 +328,7 @@ class VacacionesControlador {
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -359,7 +360,7 @@ class VacacionesControlador {
                 const id = req.params.id;
                 const { estado, user_name, ip } = req.body;
                 console.log('estado', id);
-                // INICIAR TRANSACCIÓN
+                // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
@@ -374,7 +375,7 @@ class VacacionesControlador {
                         ip,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
@@ -391,14 +392,14 @@ class VacacionesControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (3 === estado) {
                     (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id), user_name, ip);
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCIÓN
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -618,6 +619,29 @@ class VacacionesControlador {
             }
         });
     }
+    //------------------------------------------------- METODO APP MOBIL ----------------------------------------------------------------------
+    getlistaVacacionesByFechasyCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fec_inicio, fec_final, codigo } = req.query;
+                const query = `SELECT v.* FROM mv_solicitud_vacacion v WHERE v.id_empleado = '${codigo}' AND (
+            ((\'${fec_inicio}\' BETWEEN v.fecha_inicio AND v.fecha_final ) OR 
+             (\'${fec_final}\' BETWEEN v.fecha_inicio AND v.fecha_final)) 
+            OR
+            ((v.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
+             (v.fecha_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
+            )`;
+                const response = yield database_1.default.query(query);
+                const vacaciones = response.rows;
+                return res.status(200).jsonp(vacaciones);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.VACACIONES_CONTROLADOR = new VacacionesControlador();
 exports.default = exports.VACACIONES_CONTROLADOR;

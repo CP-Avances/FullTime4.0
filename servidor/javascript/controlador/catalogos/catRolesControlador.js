@@ -216,23 +216,35 @@ class RolesControlador {
             }
         });
     }
-    //CONSULTA PARA actualizar roles a varios usuarios
+    //CONSULTA PARA actualizar roles a varios usuarios **USADO
     UpdateRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { rol, listUsuarios } = req.body;
-                for (const user of listUsuarios) {
-                    yield database_1.default.query(`
+                const { idRol, listaUsuarios } = req.body;
+                var cont = 0;
+                listaUsuarios.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    let res = yield database_1.default.query(`
           UPDATE eu_usuarios
-          SET id_rol = $1, 
+          SET id_rol = $1 
           WHERE id = $2
-        `, [rol, user.id]);
-                }
+        `, [idRol, item.id]);
+                    if (res.rowCount != 0) {
+                        cont = cont + 1;
+                    }
+                }));
+                setTimeout(() => {
+                    if (cont == listaUsuarios.length) {
+                        return res.status(200).jsonp({ message: 'Se a actualizado todos los usuarios', status: 200 });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron', status: 404 });
+                    }
+                }, 1500);
             }
             catch (error) {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.', status: 500 });
             }
         });
     }

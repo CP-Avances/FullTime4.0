@@ -228,24 +228,38 @@ class RolesControlador {
     }
   }
 
-  //CONSULTA PARA actualizar roles a varios usuarios
+  //CONSULTA PARA actualizar roles a varios usuarios **USADO
   public async UpdateRoles(req: Request, res: Response){
     try{
 
-      const { rol, listUsuarios} = req.body;
-
-      for (const user of listUsuarios) {
-        await pool.query(`
+      const { idRol, listaUsuarios} = req.body;
+      var cont = 0;
+      listaUsuarios.forEach(async (item: any) => {
+        let res = await pool.query(`
           UPDATE eu_usuarios
-          SET id_rol = $1, 
+          SET id_rol = $1 
           WHERE id = $2
-        `, [rol, user.id]);
-      }
+        `, [idRol, item.id]);
+
+        if(res.rowCount != 0){
+          cont = cont + 1;
+        }
+      })
+
+      
+      setTimeout(() => {
+        if (cont == listaUsuarios.length) {
+          return res.status(200).jsonp({message: 'Se a actualizado todos los usuarios', status: 200})
+        } else {
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron', status: 404 });
+        }
+      }, 1500)
+      
 
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.', status:500 });
     }
   }
 

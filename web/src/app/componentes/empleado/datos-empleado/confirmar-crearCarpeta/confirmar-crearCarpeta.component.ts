@@ -44,7 +44,6 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
 
   // METODO PARA GUARDAR CAMBIOS EN BASE DE DATOS
   ConfirmarCrearCarpetaEmpleados() {
-
     const datos = {
       empleados: this.empleados,
       permisos: this.permisos,
@@ -65,11 +64,7 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
     });
 
     this.ventana.close(true);
-
   }
-
-
-
 
 }
 

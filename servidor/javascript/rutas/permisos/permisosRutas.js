@@ -89,9 +89,9 @@ class PermisosRutas {
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR HORAS ACTUALIZAR
         this.router.post('/permisos-solicitados-horas-editar', verificarToken_1.TokenValidation, permisosControlador_1.default.BuscarPermisosHorasEditar);
         // CREAR PERMISO
-        this.router.post('/', verificarToken_1.TokenValidation, permisosControlador_1.default.CrearPermisos);
+        this.router.post('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.CrearPermisos);
         // ACTUALIZAR PERMISO
-        this.router.put('/:id/permiso-solicitado', verificarToken_1.TokenValidation, permisosControlador_1.default.EditarPermiso);
+        this.router.put('/:id/permiso-solicitado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.EditarPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
         this.router.put('/:id/archivo/:archivo/validar/:codigo', [verificarToken_1.TokenValidation, upload.single('uploads')], permisosControlador_1.default.GuardarDocumentoPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
@@ -100,10 +100,10 @@ class PermisosRutas {
         this.router.put('/permisos-multiples', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.CrearPermisosMultiples);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', verificarToken_1.TokenValidation, permisosControlador_1.default.EliminarDocumentoPermiso);
-        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
-        this.router.get('/permiso-usuario/:id_empleado', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerPermisoEmpleado);
-        // BUSCAR INFORMACION DE UN PERMISO
-        this.router.get('/informe-un-permiso/:id_permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.InformarUnPermiso);
+        // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO    **USADO
+        this.router.get('/permiso-usuario/:id_empleado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ObtenerPermisoEmpleado);
+        // BUSCAR INFORMACION DE UN PERMISO   **USADO
+        this.router.get('/informe-un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.InformarUnPermiso);
         // ELIMINAR PERMISO
         this.router.delete('/eliminar/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
         // BUSQUEDA DE RESPALDOS DE PERMISOS
@@ -133,6 +133,11 @@ class PermisosRutas {
         this.router.post('/mail-noti-permiso-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoMovil);
         // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoEditarMovil);
+        //-------------------------------------RUTAS APP MOVIL ----------------------------------------------------------
+        this.router.get('/lista-permisos', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByCodigo);
+        this.router.get('/lista-permisosfechas', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByFechasyCodigo);
+        this.router.get('/lista-permisoshoras', verificarToken_1.TokenValidation, permisosControlador_1.default.getlistaPermisosByHorasyCodigo);
+        this.router.get('/obtener-permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.getPermisoByIdyCodigo);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

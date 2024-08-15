@@ -73,11 +73,11 @@
                                 <tr style="text-align: center; font-size: 13px;">
                                     <th scope="col">Item</th>
                                     <th scope="col">Observación</th>
-                                    <th scope="col">SUCURSAL</th>
+                                    <th scope="col">Sucursal</th>
                                     <th scope="col">Departamento</th>
                                     <th scope="col">Nivel</th>
-                                    <th scope="col">DEPARTAMENTO SUPERIOR</th>
-                                    <th scope="col">SUCURSAL DEPARTAMENTO SUPERIOR</th>
+                                    <th scope="col">Sucursal Departamento Superior</th>
+                                    <th scope="col">Departamento Superior</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,33 +87,32 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCeldaNivel(nt.observacion)"></div>
+                                                [style.background-color]="EstiloCeldaNivel(nt.observacion)"></div>
                                             {{nt.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(nt.sucursal)" style="font-size: 12px;" style="font-size: 12px;">{{nt.sucursal}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.departamento)" style="font-size: 12px;">{{nt.departamento}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">{{nt.depa_superior}}</td>
-                                    <td [style.color]="stiloTextoCelda(nt.sucursal_depa_superior)" style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.sucursal)" style="font-size: 12px;" style="font-size: 12px;">{{nt.sucursal}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.departamento)" style="font-size: 12px;">{{nt.departamento}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.sucursal_depa_superior)" style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
+                                    <td [style.color]="EstiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">{{nt.depa_superior}}</td>
                                 </tr>
                             </tbody>
                     </table>
                 </div>
-                <div>
-                    <div *ngIf="listaNivelesCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                        <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                        <div class="text">items 'OK' - {{listaNivelesCorrectas.length}}</div>
-                    </div>
-                    <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
+                <div style="display: flex; align-items: center;">
+                  <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{nivelesDepartamentoCorrectos}}</div>
+                  </div>
+                  <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
                         showFirstLastButtons>
-                    </mat-paginator>
+                  </mat-paginator>
                 </div>
-                
             </div>
         </div>
-        
+
      </mat-tab>
 
     <!-- PANTALLA CARGAR CONTRATOS -->
@@ -171,13 +170,13 @@
                     </div>
                 </div>
             </div>
-            
+
             <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
             <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
                 <app-definicion-plantilla>
                 </app-definicion-plantilla>
             </div>
-            
+
             <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CONTRATOS ------------------------------------------------->
             <div *ngIf="DatosContrato.length > 0 " class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
                 <div class="mat-elevation-z8" style="background: white;">
@@ -189,9 +188,9 @@
                                     <th scope="col">Item</th>
                                     <th scope="col">Observación</th>
                                     <th scope="col">Cédula</th>
-                                    <th scope="col">Pais</th>
-                                    <th scope="col">Regimen laboral</th>
-                                    <th scope="col">Modalidad laboral</th>
+                                    <th scope="col">País</th>
+                                    <th scope="col">Régimen Laboral</th>
+                                    <th scope="col">Modalidad Laboral</th>
                                     <th scope="col">Fecha desde</th>
                                     <th scope="col">Fecha hasta</th>
                                     <th scope="col">Control asistencias</th>
@@ -205,32 +204,32 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(contrato.observacion)"></div>
+                                                [style.background-color]="EstiloCelda(contrato.observacion)"></div>
                                             {{contrato.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">{{contrato.fecha_desde}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">{{contrato.fecha_hasta}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
-                                    
+                                    <td [style.color]="EstiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">{{contrato.fecha_desde}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">{{contrato.fecha_hasta}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
+                                    <td [style.color]="EstiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
+
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div>
-                        <div *ngIf="listaContratosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                            <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                            <div class="text">items 'OK' - {{listaContratosCorrectas.length}}</div>
-                        </div>
-                        <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
+                    <div style="display: flex; align-items: center;">
+                      <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                        <div id="t-editar" class="circulo circuloTotal"></div>
+                        <div>{{contratosCorrectos}}</div>
+                      </div>
+                      <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
                             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
                             showFirstLastButtons>
-                        </mat-paginator>
+                      </mat-paginator>
                     </div>
                 </div>
             </div>
@@ -268,7 +267,7 @@
                                         </form>
                                 </div>
                                 <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                                    <div *ngIf="DatosCargos.length == 0" class="d-flex flex-wrap justify-content-around">
+                                    <div *ngIf="DatosCargos?.length == 0" class="d-flex flex-wrap justify-content-around">
                                         <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                             style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                             href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -276,28 +275,28 @@
                                             Descargar plantilla usuarios
                                         </a>
                                     </div>
-                                    <div *ngIf="DatosCargos.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                    <div *ngIf="DatosCargos?.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm"
                                              matSuffix matTooltipPosition="right" (click)="ConfirmarRegistroMultipleCargos()"
                                              matTooltip="Guardar registro multiple.">
                                             Registrar
                                         </button>
                                     </div>
-                                </div>                                 
+                                </div>
                             </div>
                         </mat-card>
                     </div>
                 </div>
             </div>
-            
+
             <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
             <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
                 <app-definicion-plantilla>
                 </app-definicion-plantilla>
             </div>
-            
+
             <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CARGOS ------------------------------------------------->
-            <div *ngIf="DatosCargos.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div *ngIf="DatosCargos?.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo">REGISTRO MULTIPLE</div>
                     <div class="table-responsive">
@@ -324,32 +323,32 @@
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(cargo.observacion)"></div>
+                                                [style.background-color]="EstiloCelda(cargo.observacion)"></div>
                                             {{cargo.observacion}}
                                         </div>
                                     </td>
-                                    <td [style.color]="stiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">{{cargo.fecha_desde}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">{{cargo.fecha_hasta}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.admini_depa)" id="letras" style="font-size: 12px;">{{cargo.admini_depa}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">{{cargo.fecha_desde}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">{{cargo.fecha_hasta}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
+                                    <td [style.color]="EstiloTextoCelda(cargo.admini_depa)" id="letras" style="font-size: 12px;">{{cargo.admini_depa}}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div>
-                        <div *ngIf="listaCargosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                            <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                            <div class="text">items 'OK' - {{listaCargosCorrectas.length}}</div>
-                        </div>
-                        <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
+                    <div style="display: flex; align-items: center;">
+                      <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                        <div id="t-editar" class="circulo circuloTotal"></div>
+                        <div>{{cargosCorrectos}}</div>
+                      </div>
+                      <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
                             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
                             showFirstLastButtons>
-                        </mat-paginator>
+                      </mat-paginator>
                     </div>
                 </div>
             </div>

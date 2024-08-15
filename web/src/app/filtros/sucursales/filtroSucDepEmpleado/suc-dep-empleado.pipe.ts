@@ -12,6 +12,9 @@ export class SucDepEmpleadoPipe implements PipeTransform {
       if (resultados.departamento && resultados.departamento.toLowerCase().indexOf(args.toLowerCase()) > -1) {
         RESULTADO_BUSQUEDAS.push(resultados);
       }
+      else if (resultados.name_dep && resultados.name_dep.toLowerCase().indexOf(args.toLowerCase()) > -1) {
+        RESULTADO_BUSQUEDAS.push(resultados);
+      }
     };
     return RESULTADO_BUSQUEDAS;
 

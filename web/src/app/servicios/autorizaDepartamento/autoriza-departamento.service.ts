@@ -12,7 +12,7 @@ export class AutorizaDepartamentoService {
   ) { }
 
 
-  // METODO PARA BUSCAR USUARIO AUTORIZA
+  // METODO PARA BUSCAR USUARIO AUTORIZA    **USADO
   BuscarAutoridadEmpleado(id: any) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/autoriza/${id}`);
   }
@@ -32,7 +32,7 @@ export class AutorizaDepartamentoService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/actualizar`, datos);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarRegistro(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/eliminar/${id}`;
     const httpOtions = {
@@ -46,7 +46,7 @@ export class AutorizaDepartamentoService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/empleadosAutorizan/${id}`);
   }
 
-  // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    --**VERIFICADO
+  // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    **USADO
   BuscarListaEmpleadosAutorizan(id: any) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/listaempleadosAutorizan/${id}`);
   }

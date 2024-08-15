@@ -9,7 +9,7 @@ import excel from 'xlsx';
 
 class VacunaControlador {
 
-    // METODO PARA LISTAR TIPO VACUNAS
+    // METODO PARA LISTAR TIPO VACUNAS    **USADO
     public async ListaVacuna(req: Request, res: Response) {
         try {
             const VACUNA = await pool.query(
@@ -27,14 +27,15 @@ class VacunaControlador {
         }
     }
 
-    // METODO PARA REGISTRAR TIPO VACUNA
+    // METODO PARA REGISTRAR TIPO VACUNA   **USADO
     public async CrearVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { vacuna, user_name, ip } = req.body;
             var VERIFICAR_VACUNA = await pool.query(
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
-                `, [vacuna.toUpperCase()])
+                `
+                , [vacuna.toUpperCase()])
 
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
 
@@ -81,7 +82,7 @@ class VacunaControlador {
         }
     }
 
-    // METODO PARA EDITAR VACUNA
+    // METODO PARA EDITAR VACUNA    **USADO
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { id, nombre, user_name, ip } = req.body;
@@ -99,9 +100,9 @@ class VacunaControlador {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
-                const consulta = await pool.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+                const consulta = await pool.query(`SELECT * FROM e_cat_vacuna WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
-                
+
                 if (!datosOriginales) {
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'e_cat_vacuna',
@@ -112,7 +113,7 @@ class VacunaControlador {
                         ip: ip,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
-    
+
                     // FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
@@ -120,9 +121,9 @@ class VacunaControlador {
 
                 const response: QueryResult = await pool.query(
                     `
-                UPDATE e_cat_vacuna SET nombre = $2
-                WHERE id = $1 RETURNING *
-                `
+                    UPDATE e_cat_vacuna SET nombre = $2
+                    WHERE id = $1 RETURNING *
+                    `
                     , [id, vacunaEditar]);
 
                 const [vacunaActualizada] = response.rows;
@@ -158,7 +159,7 @@ class VacunaControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
@@ -220,7 +221,7 @@ class VacunaControlador {
         }
     }
 
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
         try {
             const documento = req.file?.originalname;
@@ -303,7 +304,7 @@ class VacunaControlador {
                             item.observacion = 'Ya existe en el sistema'
                         }
 
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
                         if (duplicados.find((p: any) => p.vacuna.toLowerCase() === item.vacuna.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         } else {
@@ -357,7 +358,7 @@ class VacunaControlador {
         }
     }
 
-    // REGISTRAR PLANTILLA TIPO VACUNA
+    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
         const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
@@ -374,8 +375,8 @@ class VacunaControlador {
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                 const response: QueryResult = await pool.query(
                     `
-                        INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                        `
+                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+                    `
                     , [vacu]);
 
                 const [vacuna_emp] = response.rows;
@@ -393,19 +394,17 @@ class VacunaControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
                 error = true;
-                
             }
 
         }
         if (error) {
             return res.status(500).jsonp({ message: 'error' });
         }
-    
         return res.status(200).jsonp({ message: 'ok' });
     }
 

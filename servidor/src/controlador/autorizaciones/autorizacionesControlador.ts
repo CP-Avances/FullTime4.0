@@ -4,7 +4,7 @@ import pool from '../../database';
 
 class AutorizacionesControlador {
 
-    // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS
+    // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS   **USADO
     public async ObtenerAutorizacionPermiso(req: Request, res: Response) {
         const id = req.params.id_permiso
         const AUTORIZACIONES = await pool.query(

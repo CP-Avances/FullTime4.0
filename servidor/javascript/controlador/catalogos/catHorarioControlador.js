@@ -21,7 +21,7 @@ const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const moment_1 = __importDefault(require("moment"));
 class HorarioControlador {
-    // REGISTRAR HORARIO
+    // REGISTRAR HORARIO    **USADO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
@@ -59,7 +59,7 @@ class HorarioControlador {
             }
         });
     }
-    // BUSCAR HORARIOS POR EL NOMBRE
+    // BUSCAR HORARIOS POR EL NOMBRE   **USADO
     BuscarHorarioNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo } = req.body;
@@ -76,7 +76,7 @@ class HorarioControlador {
             }
         });
     }
-    // GUARDAR DOCUMENTO DE HORARIO
+    // GUARDAR DOCUMENTO DE HORARIO    **USADO
     GuardarDocumentoHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -153,7 +153,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE HORARIO
+    // METODO PARA ACTUALIZAR DATOS DE HORARIO   **USADO
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -210,7 +210,7 @@ class HorarioControlador {
             }
         });
     }
-    // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR
+    // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR   **USADO
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento, id, user_name, ip } = req.body;
@@ -251,8 +251,8 @@ class HorarioControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 const actualizacion = yield database_1.default.query(`
-              UPDATE eh_cat_horarios SET documento = null WHERE id = $1
-              `, [id]);
+        UPDATE eh_cat_horarios SET documento = null WHERE id = $1
+        `, [id]);
                 const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -275,7 +275,7 @@ class HorarioControlador {
             }
         });
     }
-    // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR
+    // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR    **USADO
     EliminarDocumentoServidor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento } = req.body;
@@ -295,7 +295,7 @@ class HorarioControlador {
             res.jsonp({ message: 'Documento actualizado.' });
         });
     }
-    // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
+    // BUSCAR LISTA DE CATALOGO HORARIOS     **USADO
     ListarHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORARIOS = yield database_1.default.query(`
@@ -309,7 +309,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)
+    // METODO PARA BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)   **USADO
     BuscarHorarioNombre_(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, codigo } = req.body;
@@ -328,7 +328,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -380,7 +380,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE UN HORARIO
+    // METODO PARA BUSCAR DATOS DE UN HORARIO    **USADO
     ObtenerUnHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -395,7 +395,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA EDITAR HORAS TRABAJADAS
+    // METODO PARA EDITAR HORAS TRABAJADAS    **USADO
     EditarHorasTrabaja(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -450,7 +450,7 @@ class HorarioControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DOCUMENTO
+    // METODO PARA BUSCAR DOCUMENTO   **USADO
     ObtenerDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const docs = req.params.docs;
@@ -465,7 +465,7 @@ class HorarioControlador {
             });
         });
     }
-    // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS
+    // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS   **USADO
     CargarHorarioPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -636,173 +636,174 @@ class HorarioControlador {
                 }
             }
             catch (error) {
-                console.log('error ', error);
                 return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES   **USADO
     VerificarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-            const workbook = xlsx_1.default.readFile(ruta);
-            let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
-            let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
-            if (verificador_horario === false) {
-                const mensaje = 'no_existe_horario';
-                res.json({ mensaje });
+            let rutaPlantilla = '';
+            try {
+                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                rutaPlantilla = ruta;
+                const workbook = xlsx_1.default.readFile(ruta);
+                let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
+                let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
+                if (verificador_horario === false) {
+                    const mensaje = 'Estructura de plantilla incorrecta';
+                    EliminarPlantilla(ruta);
+                    res.status(404).jsonp({ mensaje });
+                }
+                else if (verificador_detalle === false) {
+                    const mensaje = 'Estructura de plantilla incorrecta';
+                    EliminarPlantilla(ruta);
+                    res.status(404).jsonp({ mensaje });
+                }
+                else if (verificador_horario != false && verificador_detalle != false) {
+                    const sheet_name_list = workbook.SheetNames;
+                    const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
+                    let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
+                    let codigos = [];
+                    for (const [index, data] of plantillaHorarios.entries()) {
+                        let { CODIGO_HORARIO, MINUTOS_ALIMENTACION, HORARIO_NOCTURNO } = data;
+                        if (MINUTOS_ALIMENTACION === undefined) {
+                            data.MINUTOS_ALIMENTACION = 0;
+                        }
+                        if (HORARIO_NOCTURNO === undefined) {
+                            data.HORARIO_NOCTURNO = 'No';
+                        }
+                        // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+                        const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
+                        let faltanDatos = false;
+                        let datosFaltantes = [];
+                        // MAPEO DE CLAVES A DESCRIPCIONES
+                        let descripciones = {
+                            DESCRIPCION: 'descripción',
+                            CODIGO_HORARIO: 'código',
+                            TIPO_HORARIO: 'tipo',
+                            HORAS_TOTALES: 'horas totales',
+                            HORARIO_NOTURNO: 'horario noturno'
+                        };
+                        for (const key of requiredValues) {
+                            if (data[key] === undefined) {
+                                data[key] = 'No registrado';
+                                datosFaltantes.push(descripciones[key]);
+                                faltanDatos = true;
+                            }
+                        }
+                        if (faltanDatos) {
+                            data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
+                            continue;
+                        }
+                        codigos.push(CODIGO_HORARIO.toString());
+                        if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
+                            data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
+                            continue;
+                        }
+                        const verificacion = VerificarFormatoDatos(data);
+                        if (verificacion[0]) {
+                            data.OBSERVACION = verificacion[1];
+                            continue;
+                        }
+                        if (yield VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
+                            data.OBSERVACION = 'Ya existe en el sistema';
+                            continue;
+                        }
+                        data.OBSERVACION = 'Ok';
+                        if (data.OBSERVACION === 'Ok') {
+                            plantillaHorarios[index] = ValidarHorasTotales(data);
+                        }
+                    }
+                    ;
+                    for (const data of plantillaDetalles) {
+                        let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
+                        let orden = 0;
+                        // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+                        const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
+                        let faltanDatosDetalles = false;
+                        let datosFaltantesDetalles = [];
+                        // MAPEO DE CLAVES A DESCRIPCIONES
+                        let descripciones = {
+                            CODIGO_HORARIO: 'código',
+                            TIPO_ACCION: 'tipo de acción',
+                            HORA: 'hora'
+                        };
+                        for (const key of requeridos) {
+                            if (data[key] === undefined) {
+                                data[key] = 'No registrado';
+                                datosFaltantesDetalles.push(descripciones[key]);
+                                faltanDatosDetalles = true;
+                            }
+                        }
+                        if (faltanDatosDetalles) {
+                            data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
+                            continue;
+                        }
+                        switch (TIPO_ACCION.toLowerCase()) {
+                            case 'entrada':
+                                orden = 1;
+                                break;
+                            case 'inicio alimentación':
+                            case 'inicio alimentacion':
+                                orden = 2;
+                                break;
+                            case 'fin alimentación':
+                            case 'fin alimentacion':
+                                orden = 3;
+                                break;
+                            case 'salida':
+                                orden = 4;
+                                break;
+                        }
+                        data.ORDEN = orden;
+                        data.MINUTOS_ANTES = MINUTOS_ANTES !== null && MINUTOS_ANTES !== void 0 ? MINUTOS_ANTES : 0;
+                        data.MINUTOS_DESPUES = MINUTOS_DESPUES !== null && MINUTOS_DESPUES !== void 0 ? MINUTOS_DESPUES : 0;
+                        data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
+                        data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA !== null && TOLERANCIA !== void 0 ? TOLERANCIA : 0) : '';
+                        if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
+                            data.OBSERVACION = 'Requerido codigo de horario existente';
+                            continue;
+                        }
+                        const verificacion = VerificarFormatoDetalleHorario(data);
+                        if (verificacion[0]) {
+                            data.OBSERVACION = verificacion[1];
+                            continue;
+                        }
+                        data.OBSERVACION = 'Ok';
+                    }
+                    ;
+                    const detallesAgrupados = AgruparDetalles(plantillaDetalles);
+                    const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
+                    // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
+                    for (const codigo of detallesAgrupadosVerificados) {
+                        const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
+                        for (const detalle of detalles) {
+                            if (detalle.OBSERVACION === 'Ok') {
+                                detalle.OBSERVACION = codigo.observacion;
+                            }
+                        }
+                    }
+                    // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
+                    plantillaHorarios.forEach((horario) => {
+                        if (horario.OBSERVACION === 'Ok') {
+                            const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
+                            horario.DETALLE = detallesCorrespondientes.length > 0;
+                        }
+                    });
+                    const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
+                    const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
+                    res.json({ plantillaHorarios, plantillaDetalles, mensaje });
+                    EliminarPlantilla(rutaPlantilla);
+                }
             }
-            else if (verificador_detalle === false) {
-                const mensaje = 'no_existe_detalle';
-                res.json({ mensaje });
-            }
-            else if (verificador_horario != false && verificador_detalle != false) {
-                const sheet_name_list = workbook.SheetNames;
-                const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
-                let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
-                let codigos = [];
-                for (const [index, data] of plantillaHorarios.entries()) {
-                    let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
-                    if (MINUTOS_ALIMENTACION === undefined) {
-                        data.MINUTOS_ALIMENTACION = 0;
-                    }
-                    if (HORARIO_NOCTURNO === undefined) {
-                        data.HORARIO_NOCTURNO = 'No';
-                    }
-                    // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                    const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
-                    let faltanDatos = false;
-                    let datosFaltantes = [];
-                    // MAPEO DE CLAVES A DESCRIPCIONES
-                    let descripciones = {
-                        DESCRIPCION: 'descripción',
-                        CODIGO_HORARIO: 'código',
-                        TIPO_HORARIO: 'tipo',
-                        HORAS_TOTALES: 'horas totales',
-                        HORARIO_NOTURNO: 'horario noturno'
-                    };
-                    for (const key of requiredValues) {
-                        if (data[key] === undefined) {
-                            data[key] = 'No registrado';
-                            datosFaltantes.push(descripciones[key]);
-                            faltanDatos = true;
-                        }
-                    }
-                    if (faltanDatos) {
-                        data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
-                        continue;
-                    }
-                    codigos.push(CODIGO_HORARIO.toString());
-                    if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
-                        data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
-                        continue;
-                    }
-                    const verificacion = VerificarFormatoDatos(data);
-                    if (verificacion[0]) {
-                        data.OBSERVACION = verificacion[1];
-                        continue;
-                    }
-                    if (yield VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
-                        data.OBSERVACION = 'Ya existe en el sistema';
-                        continue;
-                    }
-                    data.OBSERVACION = 'Ok';
-                    if (data.OBSERVACION === 'Ok') {
-                        plantillaHorarios[index] = ValidarHorasTotales(data);
-                    }
-                }
-                ;
-                for (const data of plantillaDetalles) {
-                    let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
-                    let orden = 0;
-                    // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                    // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
-                    const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
-                    let faltanDatosDetalles = false;
-                    let datosFaltantesDetalles = [];
-                    // MAPEO DE CLAVES A DESCRIPCIONES
-                    let descripciones = {
-                        CODIGO_HORARIO: 'código',
-                        TIPO_ACCION: 'tipo de acción',
-                        HORA: 'hora'
-                    };
-                    for (const key of requeridos) {
-                        if (data[key] === undefined) {
-                            data[key] = 'No registrado';
-                            datosFaltantesDetalles.push(descripciones[key]);
-                            faltanDatosDetalles = true;
-                        }
-                    }
-                    if (faltanDatosDetalles) {
-                        data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
-                        continue;
-                    }
-                    switch (TIPO_ACCION.toLowerCase()) {
-                        case 'entrada':
-                            orden = 1;
-                            break;
-                        case 'inicio alimentación':
-                        case 'inicio alimentacion':
-                            orden = 2;
-                            break;
-                        case 'fin alimentación':
-                        case 'fin alimentacion':
-                            orden = 3;
-                            break;
-                        case 'salida':
-                            orden = 4;
-                            break;
-                    }
-                    data.ORDEN = orden;
-                    data.MINUTOS_ANTES = MINUTOS_ANTES !== null && MINUTOS_ANTES !== void 0 ? MINUTOS_ANTES : 0;
-                    data.MINUTOS_DESPUES = MINUTOS_DESPUES !== null && MINUTOS_DESPUES !== void 0 ? MINUTOS_DESPUES : 0;
-                    data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
-                    data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA !== null && TOLERANCIA !== void 0 ? TOLERANCIA : 0) : '';
-                    if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
-                        data.OBSERVACION = 'Requerido codigo de horario existente';
-                        continue;
-                    }
-                    const verificacion = VerificarFormatoDetalleHorario(data);
-                    if (verificacion[0]) {
-                        data.OBSERVACION = verificacion[1];
-                        continue;
-                    }
-                    data.OBSERVACION = 'Ok';
-                }
-                ;
-                const detallesAgrupados = AgruparDetalles(plantillaDetalles);
-                const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
-                // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
-                for (const codigo of detallesAgrupadosVerificados) {
-                    const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
-                    for (const detalle of detalles) {
-                        if (detalle.OBSERVACION === 'Ok') {
-                            detalle.OBSERVACION = codigo.observacion;
-                        }
-                    }
-                }
-                // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
-                plantillaHorarios.forEach((horario) => {
-                    if (horario.OBSERVACION === 'Ok') {
-                        const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
-                        horario.DETALLE = detallesCorrespondientes.length > 0;
-                    }
-                });
-                const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(ruta);
-                    }
-                });
-                const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
-                res.json({ plantillaHorarios, plantillaDetalles, mensaje });
+            catch (error) {
+                EliminarPlantilla(rutaPlantilla);
+                console.log('error ', error);
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -972,6 +973,17 @@ function ValidarHorasTotales(horario) {
         horario.MINUTOS_ALIMENTACION = 0;
     }
     return horario;
+}
+function EliminarPlantilla(ruta) {
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+        if (err) {
+        }
+        else {
+            // ELIMINAR DEL SERVIDOR
+            fs_1.default.unlinkSync(ruta);
+        }
+    });
 }
 exports.HORARIO_CONTROLADOR = new HorarioControlador();
 exports.default = exports.HORARIO_CONTROLADOR;

@@ -115,6 +115,7 @@ class EmpleadoProcesoControlador {
     }
   }
 
+  // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
   public async BuscarProcesoUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const HORARIO_CARGO = await pool.query(

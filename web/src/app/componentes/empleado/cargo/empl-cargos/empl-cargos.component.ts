@@ -44,14 +44,14 @@ export class EmplCargosComponent implements OnInit {
   idDepartamento = new FormControl('', [Validators.required]);
   horaTrabaja = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
   fechaInicio = new FormControl('', Validators.required);
+  administraF = new FormControl(false);
   fechaFinal = new FormControl('', Validators.required);
   idSucursal = new FormControl('', [Validators.required]);
+  personalF = new FormControl(false);
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
   jefeF = new FormControl(false);
-  administraF = new FormControl(false);
-  personalF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO
   public formulario = new FormGroup({

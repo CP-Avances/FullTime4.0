@@ -206,9 +206,14 @@
                         NOTA: Permitir realizar timbres desde la aplicación móvil sin conectividad a internet.
                     </span>
 
-                    <!-- CONTENIDO USAR CONECTIVIDAD INTERNET (14) -->
+                    <!-- CONTENIDO CAPTURAR FOTO EN APP MOVIL (14) -->
                     <span *ngIf="foto_movil">
                         NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación móvil.
+                    </span>
+
+                    <!-- CONTENIDO CAPTURAR FOTO EN APP WEB (15) -->
+                    <span *ngIf="ubicacion_desconocida">
+                        NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación web.
                     </span>
                 </div>
                 <form [formGroup]="formulario">
@@ -361,6 +366,15 @@
                         </div>
                     </div>
                     <div class="col-md"></div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO URL DE HERRAMIENTA DE ANALISIS DE DATOS (16) -->
+            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="analisis">
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        NOTA: Registrar la URL de la herramienta de análisis de datos.
+                    </span>
                 </div>
             </div>
 

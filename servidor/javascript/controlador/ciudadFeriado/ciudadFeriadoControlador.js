@@ -16,7 +16,7 @@ exports.CIUDAD_FERIADO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class CiudadFeriadoControlador {
-    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
+    // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE  **USADO
     FiltrarCiudadesProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
@@ -33,7 +33,7 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR NOMBRES DE CIUDADES
+    // METODO PARA BUSCAR NOMBRES DE CIUDADES    **USADO
     EncontrarCiudadesFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { idferiado } = req.params;
@@ -51,7 +51,7 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     EliminarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -60,7 +60,7 @@ class CiudadFeriadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
-                const ciudad = yield database_1.default.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+                const ciudad = yield database_1.default.query(`SELECT * FROM ef_ciudad_feriado WHERE id = $1`, [id]);
                 const [datosOriginales] = ciudad.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -101,7 +101,7 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE CIUDADES
+    // METODO PARA BUSCAR ID DE CIUDADES   **USADO
     ObtenerIdCiudades(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_feriado, id_ciudad } = req.body;
@@ -116,7 +116,7 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    // METODO PARA ASIGNAR CIUDADES A FERIADO
+    // METODO PARA ASIGNAR CIUDADES A FERIADO   **USADO
     AsignarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -153,7 +153,7 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO    **USADO
     ActualizarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -161,7 +161,7 @@ class CiudadFeriadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
-                const ciudad = yield database_1.default.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+                const ciudad = yield database_1.default.query(`SELECT * FROM ef_ciudad_feriado WHERE id = $1`, [id]);
                 const [datosOriginales] = ciudad.rows;
                 if (!datosOriginales) {
                     // AUDITORIA

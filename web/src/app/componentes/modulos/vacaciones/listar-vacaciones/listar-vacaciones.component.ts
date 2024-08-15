@@ -471,7 +471,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open", opcion: string) {
-    const documentDefinition = this.getDocumentDefinicion(opcion);
+    const documentDefinition = this.DefinirInformacionPDF(opcion);
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -488,7 +488,7 @@ export class ListarVacacionesComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion(opcion: string) {
+  DefinirInformacionPDF(opcion: string) {
     if (opcion == "Vacaciones solicitadas") {
       sessionStorage.setItem(
         "VacacionesSolicitadas",

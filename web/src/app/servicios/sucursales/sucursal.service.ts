@@ -11,22 +11,22 @@ export class SucursalService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR SUCURSALES POR EL NOMBRE
+  // BUSCAR SUCURSALES POR EL NOMBRE   **USADO
   BuscarNombreSucursal(nombre: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/sucursales/nombre-sucursal`, nombre);
   }
 
-  // GUARDAR DATOS DE REGISTRO
+  // GUARDAR DATOS DE REGISTRO  **USADO
   RegistrarSucursal(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/sucursales`, data);
   }
 
-  // ACTUALIZAR REGISTRO
+  // ACTUALIZAR REGISTRO   **USADO
   ActualizarSucursal(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/sucursales`, datos);
   }
 
-  // BUSCAR SUCURSAL POR ID DE EMPRESA
+  // BUSCAR SUCURSAL POR ID DE EMPRESA   **USADO
   BuscarSucursalEmpresa(id_empresa: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales/empresa-sucursal/${id_empresa}`);
   }
@@ -45,16 +45,18 @@ export class SucursalService {
     return this.http.request('delete', url, httpOptions).pipe(catchError(id));
   }
 
-  // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
+  // METODO PARA BUSCAR DATOS DE UNA SUCURSAL  **USADO
   BuscarUnaSucursal(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales/unaSucursal/${id}`);
   }
 
-
-  RevisarFormato(formData) {
+  // METODO PARA VERIFICAR LA INFORMACION DE LA PLANTILLA  **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/sucursales/upload/revision', formData);
   }
 
+
+  // METODO PARA REGISTRAR SUCURSALES DE PLANTILLA  **USADO
   RegistrarSucursales(data: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/sucursales/registraSucursales', data);
   }

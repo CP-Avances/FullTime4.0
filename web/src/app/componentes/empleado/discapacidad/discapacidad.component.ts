@@ -58,7 +58,7 @@ export class DiscapacidadComponent implements OnInit {
   }
 
   // METODO PARA EDITAR FORMULARIO
-  texto: string = 'REGISTRAR'
+  texto: string = 'REGISTRAR';
   EditarFormulario() {
     if (this.editar == 'editar') {
       this.rest.BuscarDiscapacidadUsuario(parseInt(this.idEmploy)).subscribe(data => {
@@ -66,7 +66,7 @@ export class DiscapacidadComponent implements OnInit {
         this.carnet.setValue(this.userDiscapacidad[0].carnet_conadis);
         this.porcentaje.setValue(this.userDiscapacidad[0].porcentaje);
         this.tipo.setValue(this.userDiscapacidad[0].id_discapacidad);
-        this.texto = 'MODIFICAR'
+        this.texto = 'MODIFICAR';
       });
     }
   }

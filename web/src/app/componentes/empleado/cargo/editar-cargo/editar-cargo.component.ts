@@ -188,7 +188,6 @@ export class EditarCargoComponent implements OnInit {
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
       this.cargo.forEach((obj: any) => {
-        console.log('ver obj ', obj.id_departamento)
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
         // FORMATEAR HORAS
         if (obj.hora_trabaja.split(':').length === 3) {
@@ -237,14 +236,14 @@ export class EditarCargoComponent implements OnInit {
     let registro_fin = moment(form.fecFinalForm).format('YYYY-MM-DD');
     let contrato_inicio = moment(this.contrato_actual.fecha_ingreso).format('YYYY-MM-DD');
     let contrato_fin = moment(this.contrato_actual.fecha_salida).format('YYYY-MM-DD');
-    console.log('inicio ', registro_inicio)
+    /*console.log('inicio ', registro_inicio)
     console.log('inicio format ', Date.parse(registro_inicio))
     console.log('fin ', registro_fin)
     console.log('fin format ', Date.parse(registro_fin))
     console.log('inicio ', contrato_inicio)
     console.log('inicio format ', Date.parse(contrato_inicio))
     console.log('fin ', contrato_fin)
-    console.log('fin format ', Date.parse(contrato_fin))
+    console.log('fin format ', Date.parse(contrato_fin))*/
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
     if ((Date.parse(contrato_inicio) <= Date.parse(registro_inicio)) &&
       (Date.parse(contrato_fin) >= Date.parse(registro_fin))) {
@@ -280,7 +279,6 @@ export class EditarCargoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    console.log('ver cargo ', cargo)
 
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -384,7 +382,6 @@ export class EditarCargoComponent implements OnInit {
     let verificar = {
       nombre: (form.cargoForm).toUpperCase()
     }
-    //if (verificar.nombre === )
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
       this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -399,6 +396,7 @@ export class EditarCargoComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
+  // METODO PARA FINALIZAR PROCESO
   Cancelar() {
     this.verEmpleado.VerCargoEdicion(true);
   }

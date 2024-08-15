@@ -63,23 +63,19 @@
                                     <label id="datosF">Dirección IP:</label>
                                     <label>{{r.ip}}</label>
                                 </div>
+                            </div>
+                            <div class="col-md" id="verticalLine">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Contraseña:</label>
                                     <label>{{r.contrasenia}}</label>
                                 </div>
-                            </div>
-                            <div class="col-md" id="verticalLine">
-                                <div class="espacio d-flex justify-content-start" *ngIf="r.tiene_funciones == true">
-                                    <label id="datosF">Tiene acciones:</label>
-                                    <label>Sí</label>
+                                <div class="espacio d-flex justify-content-start" *ngIf="r.tipo_conexion == true">
+                                    <label id="datosF">Tipo de conexión:</label>
+                                    <label>Interna</label>
                                 </div>
-                                <div class="espacio d-flex justify-content-start">
-                                    <label id="datosF">N° de acciones:</label>
-                                    <label>{{r.numero_accion}}</label>
-                                </div>
-                                <div class="espacio d-flex justify-content-start" *ngIf="r.tiene_funciones == false">
-                                    <label id="datosF">Tiene acciones:</label>
-                                    <label>No</label>
+                                <div class="espacio d-flex justify-content-start" *ngIf="r.tipo_conexion == false">
+                                    <label id="datosF">Tipo de conexión:</label>
+                                    <label>Externa</label>
                                 </div>
                             </div>
                         </div>

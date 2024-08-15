@@ -48,9 +48,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     { valor: 5, nombre: '5' }
   ];
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -95,7 +93,6 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     var id_establecimiento = this.datos.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.listaDepaNiveles = datos;
-      console.log('VER DATOS ', this.listaDepaNiveles)
     })
   }
 

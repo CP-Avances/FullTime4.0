@@ -11,7 +11,7 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA
+        // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA   **USADO
         this.router.get('/autoriza/:id_empleado', autorizaDepartamentoControlador_1.default.EncontrarAutorizacionEmple);
         // METODO DE BUSQUEDA DE USUARIO QUE AUTORIZA
         this.router.get('/autorizaUsuarioDepa/:id_empleado', autorizaDepartamentoControlador_1.default.EncontrarAutorizacionUsuario);
@@ -19,11 +19,11 @@ class DepartamentoRutas {
         this.router.post('/', autorizaDepartamentoControlador_1.default.CrearAutorizaDepartamento);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/actualizar', autorizaDepartamentoControlador_1.default.ActualizarAutorizaDepartamento);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS    **USADO
         this.router.delete('/eliminar/:id', autorizaDepartamentoControlador_1.default.EliminarAutorizacionDepartamento);
         this.router.get('/empleadosAutorizan/:id_depar', autorizaDepartamentoControlador_1.default.ObtenerQuienesAutorizan);
-        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   --** VERIFICADO
-        this.router.get('/listaempleadosAutorizan/:id_depa', autorizaDepartamentoControlador_1.default.ObtenerlistaEmpleadosAutorizan);
+        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   **USADO
+        this.router.get('/listaempleadosAutorizan/:id_depa', autorizaDepartamentoControlador_1.default.ObtenerListaEmpleadosAutorizan);
         this.router.get('/listaDepaAutoriza/:id_depar', autorizaDepartamentoControlador_1.default.ObtenerListaAutorizaDepa);
     }
 }

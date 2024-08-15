@@ -11,11 +11,11 @@ export class EmpleadoHorariosService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  --**VERIFICADO
+  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  **USADO
   VerificarDuplicidadHorarios(id_empleado: string, datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/validarFechas/${id_empleado}`, datos);
   }
-  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  --**VERIFICADO
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
   VerificarHorariosExistentes(id_empleado: string, datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes/${id_empleado}`, datos);
   }

@@ -201,24 +201,24 @@
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
-                                    [style.background-color]="stiloCelda(dis.observacion)"></div>
+                                    [style.background-color]="EstiloCelda(dis.observacion)"></div>
                                 {{dis.observacion}}
                             </div>
                         </td>
-                        <td [style.color]="stiloTextoCelda(dis.discapacidad)" style="font-size: 12px;">
+                        <td [style.color]="EstiloTextoCelda(dis.discapacidad)" style="font-size: 12px;">
                             {{dis.discapacidad}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div>
-            <div *ngIf="listaDiscapacidadCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                <div class="text">items 'OK' - {{listaDiscapacidadCorrectas.length}}</div>
-            </div>
-            <mat-paginator [length]="Datos_discapacidad.length" [pageSize]="tamanio_paginaMul"
+        <div style="display: flex; align-items: center;">
+          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+            <div id="t-editar" class="circulo circuloTotal"></div>
+            <div>{{tiposDiscapacidadCorrectos}}</div>
+          </div>
+          <mat-paginator [length]="Datos_discapacidad.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-            </mat-paginator>
+          </mat-paginator>
         </div>
     </div>
 </div>

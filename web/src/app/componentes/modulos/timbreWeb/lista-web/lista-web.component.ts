@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-lista-web',
@@ -52,6 +53,13 @@ export class ListaWebComponent implements OnInit {
   empleados: any = [];
   regimen: any = [];
   cargos: any = [];
+
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -132,6 +140,11 @@ export class ListaWebComponent implements OnInit {
   regimen_dh: any = [];
   cargos_dh: any = [];
 
+  idCargosAcceso_dh: Set<any> = new Set();
+  idUsuariosAcceso_dh: Set<any> = new Set();
+  idSucursalesAcceso_dh: Set<any> = new Set();
+  idDepartamentosAcceso_dh: Set<any> = new Set();
+
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg_dh = new SelectionModel<ITableEmpleados>(true, []);
@@ -201,6 +214,7 @@ export class ListaWebComponent implements OnInit {
     public informacion: UsuarioService,
     public general: DatosGeneralesService,
     public restR: ReportesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -216,11 +230,13 @@ export class ListaWebComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
-      this.PresentarInformacion();
+
+      this.AdministrarInformacion();
     }
   }
 
@@ -230,23 +246,18 @@ export class ListaWebComponent implements OnInit {
     this.restR.DefaultValoresFiltros();
   }
 
-  // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  PresentarInformacion() {
-    let informacion = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    this.general.ObtenerInformacionUserRol(informacion).subscribe(res => {
-      respuesta = res[0];
-      this.AdministrarInformacion(respuesta, informacion);
-    }, vacio => {
-      this.toastr.info('No se han encontrado registros.', '', {
-        timeOut: 4000,
-      });
-    });
+  ObtenerAsignaciones() {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+
+    this.idUsuariosAcceso_dh = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso_dh = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso_dh = this.asignaciones.idSucursalesAcceso;
   }
 
   // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarInformacion(usuario: any, empleado: any) {
+  AdministrarInformacion() {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
@@ -260,34 +271,14 @@ export class ListaWebComponent implements OnInit {
     this.regimen_dh = [];
     this.cargos_dh = [];
 
-    this.usua_sucursales = [];
+    this.BuscarInformacionGeneral(false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
+    this.BuscarInformacionGeneral(true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
 
-    //console.log('empleado ', empleado)
-    this.informacion.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      //console.log('ver sucursales ', codigos);
-
-      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
-      /*if (usuario.id_rol === 1 && usuario.jefe === false) {
-        this.usua_sucursales = { id_sucursal: codigos };
-        this.BuscarInformacionAdministrador(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
-        this.BuscarInformacionAdministrador(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
-      }
-      else if (usuario.id_rol === 1 && usuario.jefe === true) {
-        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefe(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
-        this.BuscarInformacionJefe(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
-      }
-      else if (usuario.id_rol === 1) {*/
-        this.BuscarInformacionSuperAdministrador(false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
-        this.BuscarInformacionSuperAdministrador(true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
-      //}
-    });
   }
 
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
-  BuscarInformacionSuperAdministrador(estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
-    this.informacion.UsuariosTimbreWeb_SUPERADMIN(1, estado).subscribe((res: any[]) => {
+  // METODO DE BUSQUEDA DE DATOS GENERALES TIMBRE WEB
+  BuscarInformacionGeneral(estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
+    this.informacion.UsuariosTimbreWebGeneral(1, estado).subscribe((res: any[]) => {
       if (estado === false) {
         this.inactivar = true;
         this.ver_imagen = true;
@@ -296,50 +287,7 @@ export class ListaWebComponent implements OnInit {
         this.activar = true;
         this.ver_imagen = true;
       }
-      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
-    }, err => {
-      if (estado === false) {
-        this.inactivar = false;
-      }
-      else {
-        this.activar = false;
-      }
-    })
-  }
 
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
-  BuscarInformacionAdministrador(buscar: string, estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
-    this.informacion.UsuariosTimbreWeb_ADMIN(1, estado, buscar).subscribe((res: any[]) => {
-      if (estado === false) {
-        this.inactivar = true;
-        this.ver_imagen = true;
-      }
-      else {
-        this.activar = true;
-        this.ver_imagen = true;
-      }
-      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
-    }, err => {
-      if (estado === false) {
-        this.inactivar = false;
-      }
-      else {
-        this.activar = false;
-      }
-    })
-  }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefe(buscar: string, estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
-    this.informacion.UsuariosTimbreWeb_JEFE(1, estado, buscar).subscribe((res: any[]) => {
-      if (estado === false) {
-        this.inactivar = true;
-        this.ver_imagen = true;
-      }
-      else {
-        this.activar = true;
-        this.ver_imagen = true;
-      }
       this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
     }, err => {
       if (estado === false) {
@@ -354,118 +302,156 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any, estado: boolean) {
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
       sucursales_.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((obj: any) => {
-        regimenes_.push({
-          id: obj.id_regimen,
-          nombre: obj.name_regimen,
-          sucursal: obj.name_suc,
-          id_suc: reg.id_suc
-        })
+      regimenes_.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      departamentos_.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+      })
+
+      cargos_.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      empleados_.push({
+        id: obj.id,
+        nombre: obj.nombre + ' ' + obj.apellido,
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+        web_habilita: obj.web_habilita,
+        userid: obj.userid,
       })
     })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((obj: any) => {
-          departamentos_.push({
-            id: obj.id_depa,
-            departamento: obj.name_dep,
-            sucursal: obj.name_suc,
-            id_suc: reg.id_suc,
-            id_regimen: obj.id_regimen,
-          })
-        })
-      })
-    })
+    this.ObtenerAsignaciones();
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((obj: any) => {
-            cargos_.push({
-              id: obj.id_cargo_,
-              nombre: obj.name_cargo,
-              sucursal: obj.name_suc,
-              id_suc: reg.id_suc
-            })
-          })
-        })
-      })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((empl: any) => {
-            empl.empleado.forEach((obj: any) => {
-              let elemento = {
-                id: obj.id,
-                nombre: obj.nombre + ' ' + obj.apellido,
-                codigo: obj.codigo,
-                cedula: obj.cedula,
-                sucursal: obj.name_suc,
-                id_suc: obj.id_suc,
-                id_regimen: obj.id_regimen,
-                id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                web_habilita: obj.web_habilita,
-                userid: obj.userid,
-              }
-              empleados_.push(elemento)
-            })
-          })
-        })
-      })
-    })
+    // RETIRAR DUPLICADOS DE LA LISTA
+    if (estado === true) {
+      this.cargos = this.validar.OmitirDuplicadosCargos(cargos_);
+      this.regimen = this.validar.OmitirDuplicadosRegimen(regimenes_);
+      this.sucursales = this.validar.OmitirDuplicadosSucursales(sucursales_);
+      this.departamentos = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
 
-    this.OmitirDuplicados(departamentos_, cargos_, estado);
+      // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+      // SI ES SUPERADMINISTRADOR NO FILTRAR
+      if (this.rolEmpleado !== 1) {
+        this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
 
-    /*console.log('ver sucursales ', sucursales_)
-    console.log('ver regimenes ', regimenes_)
-    console.log('ver departamentos ', departamentos_)
-    console.log('ver cargos ', cargos_)
-    console.log('ver empleados ', empleados_)*/
-  }
+        // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+        const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+        if (empleadoSesion) {
+          this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+          this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+        } else {
+           // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso.forEach((id_suc: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso.delete(id_suc);
+            }
+          });
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados(departamentos_: any, cargos_: any, estado) {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = departamentos_.filter((objeto, indice, valor) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso.forEach((id_depa: any) => {
+            if (!this.empleados.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso.delete(id_depa);
+            }
+          });
         }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
 
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = cargos_.filter((objeto, indice, valor) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+
+        this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+        this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+        this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+        this.empleados.forEach((empleado: any) => {
+          this.idCargosAcceso.add(empleado.id_cargo_);
+        });
+
+        this.cargos = this.cargos.filter((cargo: any) =>
+          this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+        );
+      }
+      if (this.empleados.length > 0) {
+        this.activar = true;
+      } else {
+        this.activar = false;
+      }
+    }
+    else {
+      this.cargos_dh = this.validar.OmitirDuplicadosCargos(cargos_);
+      this.regimen_dh = this.validar.OmitirDuplicadosRegimen(regimenes_);
+      this.sucursales_dh = this.validar.OmitirDuplicadosSucursales(sucursales_);
+      this.departamentos_dh = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
+      this.ObtenerAsignaciones();
+
+      // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+      // SI ES SUPERADMINISTRADOR NO FILTRAR
+      if (this.rolEmpleado !== 1) {
+        this.empleados_dh = this.empleados_dh.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+        // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+        const empleadoSesion = this.empleados_dh.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+        if (empleadoSesion) {
+          this.idSucursalesAcceso_dh.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso_dh.add(empleadoSesion.id_depa);
+          this.idCargosAcceso_dh.add(empleadoSesion.id_cargo_);
+        } else {
+          // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          this.idSucursalesAcceso_dh.forEach((id_suc: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_suc === id_suc)) {
+              this.idSucursalesAcceso_dh.delete(id_suc);
+            }
+          });
+
+          // SI LOS IDDEPARTAMENTOSACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_DEPA, ELIMINARLO DEL SET
+          this.idDepartamentosAcceso_dh.forEach((id_depa: any) => {
+            if (!this.empleados_dh.some((empleado: any) => empleado.id_depa === id_depa)) {
+              this.idDepartamentosAcceso_dh.delete(id_depa);
+            }
+          });
+
         }
+
+        this.departamentos_dh = this.departamentos_dh.filter((departamento: any) => this.idDepartamentosAcceso_dh.has(departamento.id));
+        this.sucursales_dh = this.sucursales_dh.filter((sucursal: any) => this.idSucursalesAcceso_dh.has(sucursal.id));
+        this.regimen_dh = this.regimen_dh.filter((regimen: any) => this.idSucursalesAcceso_dh.has(regimen.id_suc));
+
+        this.empleados_dh.forEach((empleado: any) => {
+          this.idCargosAcceso_dh.add(empleado.id_cargo_);
+        });
+
+        this.cargos_dh = this.cargos_dh.filter((cargo: any) =>
+          this.idSucursalesAcceso_dh.has(cargo.id_suc) && this.idCargosAcceso_dh.has(cargo.id)
+        );
       }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-
-    if (estado === false) {
-      this.departamentos_dh = verificados_dep;
-      this.cargos_dh = verificados_car;
-
-    } else {
-      this.departamentos = verificados_dep;
-      this.cargos = verificados_car;
+      if (this.empleados_dh.length > 0) {
+        this.inactivar = true;
+      } else {
+        this.inactivar = false;
+      }
     }
 
   }
@@ -634,7 +620,6 @@ export class ListaWebComponent implements OnInit {
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar_DH(e: any, orden: number) {
-    //console.log('ver ingreso dh', e, ' orden ', orden)
     this.ControlarFiltrado_DH(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreSuc(e); break;
@@ -880,7 +865,6 @@ export class ListaWebComponent implements OnInit {
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
-    //console.log('ver ingreso ', e, ' orden ', orden)
     this.ControlarFiltrado(e);
     switch (orden) {
       case 6: this.restR.setFiltroNombreSuc(e); break;
@@ -1058,7 +1042,7 @@ export class ListaWebComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -1080,7 +1064,7 @@ export class ListaWebComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1102,7 +1086,7 @@ export class ListaWebComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1124,7 +1108,7 @@ export class ListaWebComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
-        selector.selected.find(selec => {
+        selector.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1145,7 +1129,7 @@ export class ListaWebComponent implements OnInit {
   ModelarEmpleados(tipo: any, lista: any, selector: any) {
     let respuesta: any = [];
     lista.forEach((obj: any) => {
-      selector.selected.find(obj1 => {
+      selector.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }
@@ -1180,7 +1164,6 @@ export class ListaWebComponent implements OnInit {
     if (seleccionados.length === undefined) {
       seleccionados = [seleccionados];
     }
-
     const datos = {
       array: seleccionados,
       user_name: this.user_name,
@@ -1191,12 +1174,11 @@ export class ListaWebComponent implements OnInit {
       this.individual = true;
       this.individual_dh = true;
       this.LimpiarFormulario(tipo);
-      this.PresentarInformacion();
+      this.AdministrarInformacion();
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
-
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(valor: any) {
@@ -1225,10 +1207,10 @@ export class ListaWebComponent implements OnInit {
     this.activar_habilitados = false;
     this.ver_imagen = true;
 
-    if (this.sucursales.length > 0) {
+    if (this.empleados.length > 0) {
       this.activar = true;
     }
-    if (this.sucursales_dh.length > 0) {
+    if (this.empleados_dh.length > 0) {
       this.inactivar = true;
     }
     if (tipo === 2) {
@@ -1254,7 +1236,6 @@ export class ListaWebComponent implements OnInit {
         this.selectionSuc.deselect();
         this.selectionSuc.clear();
       }
-
 
       if (this._booleanOptions.bool_reg) {
         this.nombre_reg.reset();

@@ -5,16 +5,15 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
+import * as xlsx from 'xlsx';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
-import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
 import { TiempoLaboradoService } from 'src/app/servicios/reportes/tiempoLaborado/tiempo-laborado.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { IReporteHorasTrabaja } from 'src/app/model/reportes.model';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
@@ -46,16 +45,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
-  origen: any = [];
-
-  // VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
-  tiempoDepartamentos: any = [];
-  tiempoSucursales: any = [];
-  tiempoRegimen: any = [];
-  tiempoCargos: any = [];
 
   // VARIABLES PARA MOSTRAR DETALLES
-  tipo: string;
   verDetalle: boolean = false;
 
   // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
@@ -116,11 +107,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
   constructor(
     private reportesTiempoLaborado: TiempoLaboradoService,
-    private validacionService: ValidacionesService,
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
+    private informacion: DatosGeneralesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
   ) {
@@ -185,120 +176,14 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
-
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
-
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: obj.nombre,
-        apellido: obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        ciudad: obj.ciudad,
-        regimen: obj.name_regimen,
-        departamento: obj.name_dep,
-        cargo: obj.name_cargo,
-        hora_trabaja: obj.hora_trabaja
-      })
-    })
-
-    // RETIRAR DATOS DUPLICADOS
-    this.OmitirDuplicados();
-
-    console.log('ver sucursales ', this.sucursales)
-    console.log('ver regimenes ', this.regimen)
-    console.log('ver departamentos ', this.departamentos)
-    console.log('ver cargos ', this.cargos)
-    console.log('ver empleados ', this.empleados)
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
   }
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
-  }
-
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -311,61 +196,86 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
 
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
         if (this.selectionReg.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
         if (this.selectionCar.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0)
-          return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen);
-    let suc = respuesta.filter((empl: any) => {
-      var bool = this.selectionSuc.selected.find(selec => {
-        return empl.id_suc === selec.id
-      })
-      return bool != undefined;
-    });
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
-    this.reportesTiempoLaborado.ReporteTiempoLaborado(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
-      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
+        case 'excel': this.ExportarExcel(); break;
         case 'ver': this.verDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -374,181 +284,6 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     })
   }
 
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
-      this.selectionReg.selected.find((selec: any) => {
-        objeto = {
-          regimen: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_regimen && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
-      });
-    });
-    this.data_pdf = [];
-    this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let dep: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
-      this.selectionDep.selected.find((selec: any) => {
-        objeto = {
-          depa: {
-            id: selec.id,
-            nombre: selec.departamento,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_depa && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        dep.push(objeto);
-      });
-    });
-    this.data_pdf = []
-    this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let car: any = [];
-    let objeto: any;
-    respuesta.forEach((res: any) => {
-      this.selectionCar.selected.find((selec: any) => {
-        objeto = {
-          cargo: {
-            id: selec.id,
-            nombre: selec.nombre,
-          },
-        };
-        empleados = [];
-        res.regimenes.forEach((regimen: any) => {
-          regimen.departamentos.forEach((departamento: any) => {
-            departamento.cargos.forEach((cargo: any) => {
-              cargo.empleado.forEach((empl: any) => {
-                if (selec.id === empl.id_cargo_ && selec.id_suc === empl.id_suc) {
-                  empleados.push(empl);
-                }
-              });
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        car.push(objeto);
-      });
-    });
-    this.data_pdf = [];
-    this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      console.log('data pdf cargo', this.data_pdf);
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos.forEach((cargo: any) => {
-            cargo.empleado = cargo.empleado.filter((o: any) => {
-              var bool = this.selectionEmp.selected.find(selec => {
-                return (selec.id === o.id && selec.id_suc === o.id_suc)
-              })
-              return bool != undefined
-            })
-          })
-        });
-      })
-    })
-    respuesta.forEach((obj: any) => {
-      obj.regimenes.forEach((regimen: any) => {
-        regimen.departamentos.forEach((departamento: any) => {
-          departamento.cargos = departamento.cargos.filter((e: any) => {
-            return e.empleado.length > 0
-          })
-        });
-      });
-    });
-    let emp = respuesta.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-    this.data_pdf = []
-    this.reportesTiempoLaborado.ReporteTiempoLaborado(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -574,16 +309,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
 
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
-    };
-
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -591,10 +321,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -631,6 +360,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
         tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
@@ -659,23 +389,15 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
-    let n: any = []
-    let c = 0;
     let totalTiempoLaboradoEmpleado: number = 0;
     let totalTiempoPlanificadoEmpleado: number = 0;
-    let totalTiempoLaboradoSucursal: number = 0;
-    let totalTiempoPlanificadoSucursal: number = 0;
-    let totalTiempoLaboradoCargo = 0;
-    let totalTiempoPlanificadoCargo = 0;
-    let totalTiempoLaboradoRegimen = 0;
-    let totalTiempoPlanificadoRegimen = 0;
-    let totalTiempoLaboradoDepartamento = 0;
-    let totalTiempoPlanificadoDepartamento = 0;
-    this.tiempoDepartamentos = [];
-    this.tiempoSucursales = [];
-    this.tiempoRegimen = [];
-    this.tiempoCargos = [];
-
+    let totalPlanificado: number = 0;
+    let totalLaborado: number = 0;
+    let resumen: string = '';
+    let general: any = [];
+    let n: any = [];
+    let c = 0;
+    // CODIGO DE COLORES
     n.push({
       style: 'tableMarginColores',
       table: {
@@ -708,735 +430,329 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       }
     });
 
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true || this.bool.bool_dep === true) {
-      data.forEach((selec: any) => {
-        if (this.bool.bool_cargo === true) {
-          totalTiempoLaboradoCargo = 0;
-          totalTiempoPlanificadoCargo = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'CARGO: ' + selec.cargo.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else if (this.bool.bool_reg === true) {
-          totalTiempoLaboradoRegimen = 0;
-          totalTiempoPlanificadoRegimen = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + selec.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-        else {
-          totalTiempoPlanificadoDepartamento = 0;
-          totalTiempoLaboradoDepartamento = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    text: 'DEPARTAMENTO: ' + selec.depa.nombre,
-                    style: 'itemsTableInfo'
-                  },
-                ]
-              ]
-            }
-          })
-        }
-
-        selec.empleados.forEach((empl: any) => {
-          n.push({
-            style: 'tableMarginCabeceraEmpleado',
-            table: {
-              widths: ['*', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  {
-                    border: [false, true, false, false],
-                    text: 'C.C.: ' + empl.cedula,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [true, true, false, false],
-                    text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'COD: ' + empl.codigo,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                ],
-                [
-                  {
-                    border: [true, false, false, false],
-                    text: 'DEPARTAMENTO: ' + empl.name_dep,
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: this.bool.bool_reg || this.bool.bool_dep ? 'CARGO: ' + empl.name_cargo : '',
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, true, false],
-                    text: '',
-                    style: 'itemsTableInfoEmpleado'
-                  }
-                ]
-              ],
-            },
-          });
-          c = 0;
-          totalTiempoLaboradoEmpleado = 0;
-          totalTiempoPlanificadoEmpleado = 0;
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*', '*', '*'],
-              headerRows: 2,
-              body: [
-                [
-                  { rowSpan: 2, text: 'N°', style: 'centrado' },
-                  { rowSpan: 2, text: 'FECHA', style: 'centrado' },
-                  { colSpan: 2, rowSpan: 1, text: 'ENTRADA', style: 'tableHeader' },
-                  {},
-                  { colSpan: 2, rowSpan: 1, text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                  {},
-                  { colSpan: 2, rowSpan: 1, text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                  {},
-                  { colSpan: 2, rowSpan: 1, text: 'SALIDA', style: 'tableHeader' },
-                  {},
-                  { rowSpan: 2, colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'centrado' },
-                  {},
-                  { rowSpan: 2, colSpan: 2, text: 'TIEMPO LABORADO', style: 'centrado' },
-                  {}
-                ],
-                [
-                  {}, {},
-                  { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                  { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                  { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                  { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                  {}, {}, {}, {}
-                ],
-                ...empl.timbres.map((usu: any) => {
-                  c = c + 1;
-
-                  //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
-                  const fecha = this.validacionService.FormatearFecha(
-                    usu.entrada.fec_horario,
-                    this.formato_fecha,
-                    this.validacionService.dia_abreviado);
-
-                  const entradaHorario = this.validacionService.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                  const salidaHorario = this.validacionService.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                  const inicioAlimentacionHorario = usu.tipo == 'EAS'
-                    ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                    : '';
-                  const finAlimentacionHorario = usu.tipo == 'EAS'
-                    ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                    : '';
-                  const entrada = usu.entrada.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                  const salida = usu.salida.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                  const inicioAlimentacion = usu.tipo == 'EAS'
-                    ? (usu.inicioAlimentacion.fecha_hora_timbre != null
-                      ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                    : '';
-                  const finAlimentacion = usu.tipo == 'EAS'
-                    ? (usu.finAlimentacion.fecha_hora_timbre != null
-                      ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                    : '';
-
-                  const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
-                  const minutosPlanificados = diferenciaEnMinutos[0];
-                  const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
-                  const minutosLaborados = diferenciaEnMinutos[1];
-                  const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
-
-                  totalTiempoPlanificadoDepartamento += minutosPlanificados;
-                  totalTiempoPlanificadoEmpleado += minutosPlanificados;
-                  totalTiempoPlanificadoRegimen += minutosPlanificados;
-                  totalTiempoPlanificadoCargo += minutosPlanificados;
-
-                  totalTiempoLaboradoDepartamento += minutosLaborados;
-                  totalTiempoLaboradoEmpleado += minutosLaborados;
-                  totalTiempoLaboradoRegimen += minutosLaborados;
-                  totalTiempoLaboradoCargo += minutosLaborados;
-                  return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: fecha },
-                    { style: 'itemsTableCentrado', text: entradaHorario },
-                    { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
-                    { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
-                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                    { style: 'itemsTableCentrado', text: finAlimentacionHorario },
-                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                    { style: 'itemsTableCentrado', text: salidaHorario },
-                    { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
-                    { style: 'itemsTableDerecha', text: tiempoPlanificado },
-                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: tiempoLaborado },
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: minutosLaborados.toFixed(2) },
-                  ];
-                }),
-                [
-                  {
-                    border: [true, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                  { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2))) },
-                  { style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2) },
-                  { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2))) },
-                  { style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2) },
-                ],
-              ],
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        });
-        if (this.bool.bool_cargo) {
-          totalTiempoPlanificadoCargo = Number(totalTiempoPlanificadoCargo.toFixed(2));
-          totalTiempoLaboradoCargo = Number(totalTiempoLaboradoCargo.toFixed(2));
-          let cargo = {
-            cargo: selec.cargo.nombre,
-            minutosPlanificados: totalTiempoPlanificadoCargo.toFixed(2),
-            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoCargo),
-            minutosLaborados: totalTiempoLaboradoCargo.toFixed(2),
-            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoCargo)
-          }
-          this.tiempoCargos.push(cargo);
-        };
-
-        if (this.bool.bool_reg) {
-          totalTiempoPlanificadoRegimen = Number(totalTiempoPlanificadoRegimen.toFixed(2));
-          totalTiempoLaboradoRegimen = Number(totalTiempoLaboradoRegimen.toFixed(2));
-          let regimen = {
-            regimen: selec.regimen.nombre,
-            minutosPlanificados: totalTiempoPlanificadoRegimen.toFixed(2),
-            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoRegimen),
-            minutosLaborados: totalTiempoLaboradoRegimen.toFixed(2),
-            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen)
-          }
-          this.tiempoRegimen.push(regimen);
-        };
-
-        if (this.bool.bool_dep) {
-          totalTiempoPlanificadoDepartamento = Number(totalTiempoPlanificadoDepartamento.toFixed(2));
-          totalTiempoLaboradoDepartamento = Number(totalTiempoLaboradoDepartamento.toFixed(2));
-          let departamento = {
-            departamento: selec.depa.nombre,
-            minutosPlanificados: totalTiempoPlanificadoDepartamento.toFixed(2),
-            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoDepartamento),
-            minutosLaborados: totalTiempoLaboradoDepartamento.toFixed(2),
-            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento)
-          }
-          this.tiempoDepartamentos.push(departamento);
-        };
-      });
-
-      if (this.bool.bool_cargo) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL CARGOS',
-                  style: 'itemsTableInfoTotal'
-                },
-                { colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'TIEMPO LABORADO', style: 'itemsTableInfoTotal' },
-                {},
-              ],
-              ...this.tiempoCargos.map((cargo: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: cargo.cargo,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: cargo.tiempoPlanificado, style: 'itemsTableDerecha' },
-                  { text: cargo.minutosPlanificados, style: 'itemsTableDerecha' },
-                  { text: cargo.tiempoLaborado, style: 'itemsTableDerecha' },
-                  { text: cargo.minutosLaborados, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_reg) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL REGIMENES',
-                  style: 'itemsTableInfoTotal'
-                },
-                { colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'TIEMPO LABORADO', style: 'itemsTableInfoTotal' },
-                {},
-              ],
-              ...this.tiempoRegimen.map((regimen: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: regimen.regimen,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: regimen.tiempoPlanificado, style: 'itemsTableDerecha' },
-                  { text: regimen.minutosPlanificados, style: 'itemsTableDerecha' },
-                  { text: regimen.tiempoLaborado, style: 'itemsTableDerecha' },
-                  { text: regimen.minutosLaborados, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_dep) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL DEPARTAMENTOS',
-                  style: 'itemsTableInfoTotal'
-                },
-                { colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'itemsTableInfoTotal' },
-                {},
-                { colSpan: 2, text: 'TIEMPO LABORADO', style: 'itemsTableInfoTotal' },
-                {},
-              ],
-              ...this.tiempoDepartamentos.map((departamento: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: departamento.departamento,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: departamento.tiempoPlanificado, style: 'itemsTableDerecha' },
-                  { text: departamento.minutosPlanificados, style: 'itemsTableDerecha' },
-                  { text: departamento.tiempoLaborado, style: 'itemsTableDerecha' },
-                  { text: departamento.minutosLaborados, style: 'itemsTableDerecha' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-    } else {
-      data.forEach((suc: any) => {
-
-        totalTiempoPlanificadoSucursal = 0;
-        totalTiempoLaboradoSucursal = 0;
-        n.push({
-          style: 'tableMarginCabecera',
-          table: {
-            widths: ['*', '*'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + suc.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'SUCURSAL: ' + suc.name_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
+    data.forEach((selec: any) => {
+      // CONTAR REGISTROS
+      let arr_reg = selec.empleados.map((o: any) => { return o.tLaborado.length });
+      let reg = this.validar.SumarRegistros(arr_reg);
+      // CONTAR MINUTOS LABORADOS Y PLANIFICADOS
+      totalLaborado = 0;
+      totalPlanificado = 0;
+      selec.empleados.forEach((o: any) => {
+        o.tLaborado.map((usu: any) => {
+          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
+          const minutosPlanificados = diferenciaEnMinutos[0];
+          const minutosLaborados = diferenciaEnMinutos[1];
+          totalPlanificado += minutosPlanificados;
+          totalLaborado += minutosLaborados;
         })
-
-        suc.regimenes.forEach((reg: any) => {
-          reg.departamentos.forEach((dep: any) => {
-            dep.cargos.forEach((car: any) => {
-              car.empleado.forEach((empl: any) => {
-                n.push({
-                  style: 'tableMarginCabeceraEmpleado',
-                  table: {
-                    widths: ['*', 'auto', 'auto',],
-                    headerRows: 2,
-                    body: [
-                      [
-                        {
-                          border: [false, true, false, false],
-                          text: 'C.C.: ' + empl.cedula,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [true, true, false, false],
-                          text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, true, true, false],
-                          text: 'COD: ' + empl.codigo,
-                          style: 'itemsTableInfoEmpleado'
-                        }
-                      ],
-                      [
-                        {
-                          border: [true, false, false, false],
-                          text: 'DEPARTAMENTO: ' + empl.name_dep,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, false, false, false],
-                          text: 'CARGO: ' + empl.name_cargo,
-                          style: 'itemsTableInfoEmpleado'
-                        },
-                        {
-                          border: [false, false, true, false],
-                          text: '',
-                          style: 'itemsTableInfoEmpleado'
-                        }
-                      ]
-                    ]
-                  }
-                });
-                c = 0;
-                totalTiempoPlanificadoEmpleado = 0;
-                totalTiempoLaboradoEmpleado = 0;
-                n.push({
-                  style: 'tableMargin',
-                  table: {
-                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*', '*', '*'],
-                    headerRows: 2,
-                    body: [
-                      [
-                        { rowSpan: 2, text: 'N°', style: 'centrado' },
-                        { rowSpan: 2, text: 'FECHA', style: 'centrado' },
-                        { colSpan: 2, rowSpan: 1, text: 'ENTRADA', style: 'tableHeader' },
-                        {},
-                        { colSpan: 2, rowSpan: 1, text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                        {},
-                        { colSpan: 2, rowSpan: 1, text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                        {},
-                        { colSpan: 2, rowSpan: 1, text: 'SALIDA', style: 'tableHeader' },
-                        {},
-                        { rowSpan: 2, colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'centrado' },
-                        {},
-                        { rowSpan: 2, colSpan: 2, text: 'TIEMPO LABORADO', style: 'centrado' },
-                        {}
-                      ],
-                      [
-                        {}, {},
-                        { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                        { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                        { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                        { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                        { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                        { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                        { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                        { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                        {}, {}, {}, {}
-                      ],
-                      ...empl.timbres.map((usu: any) => {
-                        c = c + 1;
-
-                        //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
-                        const fecha = this.validacionService.FormatearFecha(
-                          usu.entrada.fec_horario,
-                          this.formato_fecha,
-                          this.validacionService.dia_abreviado);
-
-                        const entradaHorario = this.validacionService.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                        const salidaHorario = this.validacionService.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                        const inicioAlimentacionHorario = usu.tipo == 'EAS'
-                          ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                          : '';
-                        const finAlimentacionHorario = usu.tipo == 'EAS'
-                          ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                          : '';
-                        const entrada = usu.entrada.fecha_hora_timbre != null
-                          ? this.validacionService.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                          : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                        const salida = usu.salida.fecha_hora_timbre != null
-                          ? this.validacionService.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                          : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                        const inicioAlimentacion = usu.tipo == 'EAS'
-                          ? (usu.inicioAlimentacion.fecha_hora_timbre != null
-                            ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                          : '';
-                        const finAlimentacion = usu.tipo == 'EAS'
-                          ? (usu.finAlimentacion.fecha_hora_timbre != null
-                            ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                          : '';
-
-                        const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
-                        const minutosPlanificados = diferenciaEnMinutos[0];
-                        const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
-                        const minutosLaborados = diferenciaEnMinutos[1];
-                        const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
-
-                        totalTiempoPlanificadoEmpleado += minutosPlanificados;
-                        totalTiempoPlanificadoDepartamento += minutosPlanificados;
-                        totalTiempoPlanificadoSucursal += minutosPlanificados;
-                        totalTiempoLaboradoEmpleado += minutosLaborados;
-                        totalTiempoLaboradoDepartamento += minutosLaborados;
-                        totalTiempoLaboradoSucursal += minutosLaborados;
-
-                        return [
-                          { style: 'itemsTableCentrado', text: c },
-                          { style: 'itemsTableCentrado', text: fecha },
-                          { style: 'itemsTableCentrado', text: entradaHorario },
-                          { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
-                          { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
-                          { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                          { style: 'itemsTableCentrado', text: finAlimentacionHorario },
-                          { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                          { style: 'itemsTableCentrado', text: salidaHorario },
-                          { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
-                          { style: 'itemsTableDerecha', text: tiempoPlanificado },
-                          { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
-                          { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: tiempoLaborado },
-                          { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: minutosLaborados.toFixed(2) },
-                        ];
-                      }),
-                      [
-                        {
-                          border: [true, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        {
-                          border: [false, true, false, true],
-                          text: '',
-                          style: 'itemsTableCentradoTotal'
-                        },
-                        { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                        { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2))) },
-                        { style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2) },
-                        { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2))) },
-                        { style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2) },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    fillColor: function (rowIndex: any) {
-                      return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                    }
-                  }
-                });
-              });
-            });
-          })
-        })
-
-        if (this.bool.bool_suc) {
-          totalTiempoPlanificadoSucursal = Number(totalTiempoPlanificadoSucursal.toFixed(2));
-          totalTiempoLaboradoSucursal = Number(totalTiempoLaboradoSucursal.toFixed(2));
-          let sucursal = {
-            sucursal: suc.name_suc,
-            minutosPlanificados: totalTiempoPlanificadoSucursal.toFixed(2),
-            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoSucursal),
-            minutosLaborados: totalTiempoLaboradoSucursal.toFixed(2),
-            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal)
-          }
-          this.tiempoSucursales.push(sucursal);
-        };
-      });
-    }
-
-    if (this.bool.bool_suc) {
+      })
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      let opcion = selec.nombre;
+      if (this.bool.bool_reg === true) {
+        descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
+        resumen = 'TOTAL RÉGIMEN LABORAL';
+      }
+      else if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
+      }
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
+        resumen = 'TOTAL CARGOS';
+      }
+      else if (this.bool.bool_suc === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+      // DATOS DE RESUMEN GENERAL
+      let informacion = {
+        sucursal: selec.sucursal,
+        nombre: opcion,
+        formato_general_planificado: this.MinutosAHorasMinutosSegundos(Number(totalPlanificado.toFixed(2))),
+        formato_decimal_planifiado: totalPlanificado.toFixed(2),
+        formato_general_laborado: this.MinutosAHorasMinutosSegundos(Number(totalLaborado.toFixed(2))),
+        formato_decimal_laborado: totalLaborado.toFixed(2),
+      }
+      general.push(informacion);
+      // CABECERA PRINCIPAL
       n.push({
-        style: 'tableMarginCabeceraTotal',
+        style: 'tableMarginCabecera',
         table: {
-          widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+          widths: ['*', '*', '*'],
           headerRows: 1,
           body: [
             [
               {
                 border: [true, true, false, true],
                 bold: true,
-                text: 'TOTAL SUCURSALES',
-                style: 'itemsTableInfoTotal'
+                text: descripcion,
+                style: 'itemsTableInfo',
               },
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
+      });
+      // PRESENTACION DE LA INFORMACION
+      selec.empleados.forEach((empl: any) => {
+        n.push({
+          style: 'tableMarginCabeceraEmpleado',
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                {
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
+              ],
+              [
+                {
+                  border: [true, false, true, false],
+                  text: 'RÉGIMEN LABORAL ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
+                }
+              ]
+            ],
+          },
+        });
+        // ENCERAR VARIABLES
+        c = 0;
+        totalTiempoLaboradoEmpleado = 0;
+        totalTiempoPlanificadoEmpleado = 0;
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*', '*', '*'],
+            headerRows: 2,
+            body: [
+              [
+                { rowSpan: 2, text: 'N°', style: 'centrado' },
+                { rowSpan: 2, text: 'FECHA', style: 'centrado' },
+                { colSpan: 2, rowSpan: 1, text: 'ENTRADA', style: 'tableHeader' },
+                {},
+                { colSpan: 2, rowSpan: 1, text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
+                {},
+                { colSpan: 2, rowSpan: 1, text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
+                {},
+                { colSpan: 2, rowSpan: 1, text: 'SALIDA', style: 'tableHeader' },
+                {},
+                { rowSpan: 2, colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'centrado' },
+                {},
+                { rowSpan: 2, colSpan: 2, text: 'TIEMPO LABORADO', style: 'centrado' },
+                {}
+              ],
+              [
+                {}, {},
+                { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
+                { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
+                { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
+                { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
+                { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                {}, {}, {}, {}
+              ],
+              ...empl.tLaborado.map((usu: any) => {
+                c = c + 1;
+                //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
+                const fecha = this.validar.FormatearFecha(usu.entrada.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const entradaHorario = this.validar.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
+                const salidaHorario = this.validar.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
+                const inicioAlimentacionHorario = usu.tipo == 'EAS'
+                  ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+                  : '';
+                const finAlimentacionHorario = usu.tipo == 'EAS'
+                  ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+                  : '';
+                const entrada = usu.entrada.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+                const salida = usu.salida.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+                const inicioAlimentacion = usu.tipo == 'EAS'
+                  ? (usu.inicioAlimentacion.fecha_hora_timbre != null
+                    ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+                  : '';
+                const finAlimentacion = usu.tipo == 'EAS'
+                  ? (usu.finAlimentacion.fecha_hora_timbre != null
+                    ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+                  : '';
+                // SUMA DE MINUTOS DE TIEMPO LABORADO Y PLANIFICADO
+                const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
+                const minutosPlanificados = diferenciaEnMinutos[0];
+                const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
+                const minutosLaborados = diferenciaEnMinutos[1];
+                const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                totalTiempoPlanificadoEmpleado += minutosPlanificados;
+                totalTiempoLaboradoEmpleado += minutosLaborados;
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTableCentrado', text: fecha },
+                  { style: 'itemsTableCentrado', text: entradaHorario },
+                  { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
+                  { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
+                  { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                  { style: 'itemsTableCentrado', text: finAlimentacionHorario },
+                  { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                  { style: 'itemsTableCentrado', text: salidaHorario },
+                  { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
+                  { style: 'itemsTableDerecha', text: tiempoPlanificado },
+                  { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
+                  { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: tiempoLaborado },
+                  { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: minutosLaborados.toFixed(2) },
+                ];
+              }),
+              [
+                {
+                  border: [true, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                {
+                  border: [false, true, false, true],
+                  text: '',
+                  style: 'itemsTableCentradoTotal'
+                },
+                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2))) },
+                { style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2) },
+                { style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2))) },
+                { style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2) },
+              ],
+            ],
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
+          }
+        });
+      })
+    })
+    // RESUMEN TOTALES DE REGISTROS
+    if (this.bool.bool_emp === false) {
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', '*', 'auto', 'auto', 'auto', 'auto'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
+              },
+              {},
               { colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'itemsTableInfoTotal' },
               {},
               { colSpan: 2, text: 'TIEMPO LABORADO', style: 'itemsTableInfoTotal' },
               {},
             ],
-            ...this.tiempoSucursales.map((sucursal: any) => {
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (this.bool.bool_suc === true) {
+                valor = 2;
+              }
               return [
                 {
                   border: [true, true, false, true],
                   bold: true,
-                  text: sucursal.sucursal,
-                  style: 'itemsTableCentrado'
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
                 },
-                { text: sucursal.tiempoPlanificado, style: 'itemsTableDerecha' },
-                { text: sucursal.minutosPlanificados, style: 'itemsTableDerecha' },
-                { text: sucursal.tiempoLaborado, style: 'itemsTableDerecha' },
-                { text: sucursal.minutosLaborados, style: 'itemsTableDerecha' },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
+                },
+                { text: info.formato_general_planificado, style: 'itemsTableDerecha' },
+                { text: info.formato_decimal_planifiado, style: 'itemsTableCentrado' },
+                { text: info.formato_general_laborado, style: 'itemsTableCentrado' },
+                { text: info.formato_decimal_laborado, style: 'itemsTableDerecha' },
               ]
             })
           ]
@@ -1447,8 +763,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           }
         }
       });
-    };
-
+    }
     return n;
   }
 
@@ -1456,128 +771,43 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(tipo: string): void {
-    switch (tipo) {
-      case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
-        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Tiempo_laborado');
-        xlsx.writeFile(wb_regimen_cargo, `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-      default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-        const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Tiempo_laborado');
-        xlsx.writeFile(wb, `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-    }
+  ExportarExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Tiempo_laborado');
+    xlsx.writeFile(wb, `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let n = 0;
     array.forEach((suc: any) => {
-      suc.regimenes.forEach((reg: any) => {
-        reg.departamentos.forEach((dep: any) => {
-          dep.cargos.forEach((car: any) => {
-            car.empleado.forEach((empl: any) => {
-              empl.timbres.forEach((usu: any) => {
-                n++;
-                //CAMBIO DE FORMATO EN HORAS (HORARIO Y TIMBRE)
-                const entradaHorario = this.validacionService.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                const salidaHorario = this.validacionService.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                const inicioAlimentacionHorario = usu.tipo == 'EAS'
-                  ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                  : '';
-                const finAlimentacionHorario = usu.tipo == 'EAS'
-                  ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                  : '';
-                const entrada = usu.entrada.fecha_hora_timbre != null
-                  ? this.validacionService.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                const salida = usu.salida.fecha_hora_timbre != null
-                  ? this.validacionService.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                const inicioAlimentacion = usu.tipo == 'EAS'
-                  ? (usu.inicioAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                  : '';
-                const finAlimentacion = usu.tipo == 'EAS'
-                  ? (usu.finAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                  : '';
-
-                const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
-                const minutosPlanificados = diferenciaEnMinutos[0];
-                const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
-                const minutosLaborados = diferenciaEnMinutos[1];
-                const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
-                let ele = {
-                  'N°': n,
-                  'Cédula': empl.cedula,
-                  'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-                  'Código': empl.codigo,
-                  'Ciudad': empl.ciudad,
-                  'Sucursal': empl.name_suc,
-                  'Régimen': empl.name_regimen,
-                  'Departamento': empl.name_dep,
-                  'Cargo': empl.name_cargo,
-                  'Fecha': new Date(usu.entrada.fecha_hora_horario),
-                  'Horario Entrada': entradaHorario,
-                  'Timbre Entrada': entrada,
-                  'Horario Inicio Alimentación': inicioAlimentacionHorario,
-                  'Timbre Inicio Alimentación': inicioAlimentacion,
-                  'Horario Fin Alimentación': finAlimentacionHorario,
-                  'Timbre Fin Alimentación': finAlimentacion,
-                  'Horario Salida': salidaHorario,
-                  'Timbre Salida': salida,
-                  'Tiempo Planificado HH:MM:SS': tiempoPlanificado,
-                  'Tiempo Planificado Minutos': minutosPlanificados.toFixed(2),
-                  'Tiempo Laborado HH:MM:SS': tiempoLaborado,
-                  'Tiempo Laborado Minutos': minutosLaborados.toFixed(2),
-                }
-                nuevo.push(ele);
-              })
-            })
-          })
-        })
-      })
-    })
-    return nuevo;
-  }
-
-  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
-        empl.timbres.forEach((obj3: any) => {
+        empl.tLaborado.forEach((obj3: any) => {
           n++;
           //CAMBIO DE FORMATO EN HORAS (HORARIO Y TIMBRE)
-          const entradaHorario = this.validacionService.FormatearHora(obj3.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-          const salidaHorario = this.validacionService.FormatearHora(obj3.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const entradaHorario = this.validar.FormatearHora(obj3.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const salidaHorario = this.validar.FormatearHora(obj3.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
           const inicioAlimentacionHorario = obj3.tipo == 'EAS'
-            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(obj3.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
             : '';
           const finAlimentacionHorario = obj3.tipo == 'EAS'
-            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(obj3.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
             : '';
           const entrada = obj3.entrada.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(obj3.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT');
           const salida = obj3.salida.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(obj3.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT');
           const inicioAlimentacion = obj3.tipo == 'EAS'
             ? (obj3.inicioAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              ? this.validar.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT'))
             : '';
           const finAlimentacion = obj3.tipo == 'EAS'
             ? (obj3.finAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              ? this.validar.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT'))
             : '';
 
@@ -1590,13 +820,13 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           let ele = {
             'N°': n,
             'Cédula': empl.cedula,
-            'Nombre Empleado': empl.name_empleado,
             'Código': empl.codigo,
+            'Nombre Empleado': empl.name_empleado,
             'Ciudad': empl.ciudad,
             'Sucursal': empl.sucursal,
-            'Régimen': empl.name_regimen,
+            'Régimen': empl.regimen,
             'Departamento': empl.departamento,
-            'Cargo': empl.name_cargo,
+            'Cargo': empl.cargo,
             'Fecha': new Date(obj3.entrada.fecha_hora_horario),
             'Horario Entrada': entradaHorario,
             'Timbre Entrada': entrada,
@@ -1623,116 +853,36 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
 
-  ExtraerTimbres() {
-    this.timbres = [];
-    let n = 0;
-    this.data_pdf.forEach((suc: any) => {
-      suc.regimenes.forEach((reg: any) => {
-        reg.departamentos.forEach((dep: any) => {
-          dep.cargos.forEach((car: any) => {
-            car.empleado.forEach((empl: any) => {
-              empl.timbres.forEach((usu: any) => {
-                //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
-                const fecha = this.validacionService.FormatearFecha(
-                  usu.entrada.fec_horario,
-                  this.formato_fecha,
-                  this.validacionService.dia_abreviado);
-
-                const entradaHorario = this.validacionService.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                const salidaHorario = this.validacionService.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
-                const inicioAlimentacionHorario = usu.tipo == 'EAS'
-                  ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                  : '';
-                const finAlimentacionHorario = usu.tipo == 'EAS'
-                  ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
-                  : '';
-                const entrada = usu.entrada.fecha_hora_timbre != null
-                  ? this.validacionService.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                const salida = usu.salida.fecha_hora_timbre != null
-                  ? this.validacionService.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
-                const inicioAlimentacion = usu.tipo == 'EAS'
-                  ? (usu.inicioAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                  : '';
-                const finAlimentacion = usu.tipo == 'EAS'
-                  ? (usu.finAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
-                  : '';
-
-                const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
-                const minutosPlanificados = diferenciaEnMinutos[0];
-                const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
-                const minutosLaborados = diferenciaEnMinutos[1];
-                const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
-                n = n + 1;
-                const ele = {
-                  n,
-                  cedula: empl.cedula,
-                  empleado: empl.apellido + ' ' + empl.nombre,
-                  codigo: empl.codigo,
-                  ciudad: empl.ciudad,
-                  sucursal: empl.name_suc,
-                  departamento: empl.name_dep,
-                  regimen: empl.name_regimen,
-                  fecha, entradaHorario,
-                  entrada, salidaHorario,
-                  salida,
-                  inicioAlimentacionHorario,
-                  inicioAlimentacion,
-                  finAlimentacionHorario,
-                  finAlimentacion,
-                  tiempoPlanificado,
-                  minutosPlanificados: minutosPlanificados.toFixed(2),
-                  tiempoLaborado,
-                  minutosLaborados: minutosLaborados.toFixed(2),
-                }
-                this.timbres.push(ele);
-              })
-            })
-          })
-        })
-      })
-    })
-  }
-
-  ExtraerTimbresRegimenCargo() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
-        empl.timbres.forEach((usu: any) => {
+        empl.tLaborado.forEach((usu: any) => {
           //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
-          const fecha = this.validacionService.FormatearFecha(
-            usu.entrada.fec_horario,
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-
-          const entradaHorario = this.validacionService.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
-          const salidaHorario = this.validacionService.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const fecha = this.validar.FormatearFecha(usu.entrada.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          const entradaHorario = this.validar.FormatearHora(usu.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const salidaHorario = this.validar.FormatearHora(usu.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
           const inicioAlimentacionHorario = usu.tipo == 'EAS'
-            ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
             : '';
           const finAlimentacionHorario = usu.tipo == 'EAS'
-            ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_horario.split(' ')[1], this.formato_hora)
             : '';
           const entrada = usu.entrada.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
           const salida = usu.salida.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+            ? this.validar.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
           const inicioAlimentacion = usu.tipo == 'EAS'
             ? (usu.inicioAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
             : '';
           const finAlimentacion = usu.tipo == 'EAS'
             ? (usu.finAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
             : '';
 
@@ -1745,12 +895,12 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           const ele = {
             n,
             cedula: empl.cedula,
-            empleado: empl.apellido + ' ' + empl.nombre,
             codigo: empl.codigo,
+            empleado: empl.apellido + ' ' + empl.nombre,
             ciudad: empl.ciudad,
-            sucursal: empl.name_suc,
-            departamento: empl.name_dep,
-            regimen: empl.name_regimen,
+            sucursal: empl.sucursal,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
             fecha, entradaHorario,
             entrada, salidaHorario, salida,
             inicioAlimentacionHorario,
@@ -1772,26 +922,26 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
    ** **                                   CALCULOS Y CONVERSIONES                            ** **
    ** ****************************************************************************************** **/
 
-  CalcularDiferenciaFechas(timbre: any) {
-    if (timbre.origen === 'L' || timbre.origen === 'FD') {
+  CalcularDiferenciaFechas(informacion: any) {
+    if (informacion.origen === 'L' || informacion.origen === 'FD') {
       return [0, 0];
     }
 
-    if (timbre.tipo === 'ES') {
-      const { entrada, salida } = timbre;
-      let minutosPlanificados = this.CalcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario);
+    if (informacion.tipo === 'ES') {
+      const { entrada, salida } = informacion;
+      let minutosPlanificados = this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario);
 
       if (entrada.fecha_hora_timbre !== null && salida.fecha_hora_timbre !== null) {
         const minutosLaborados = this.CalcularMinutosDiferencia(entrada.fecha_hora_timbre, salida.fecha_hora_timbre);
         return [minutosPlanificados, Number(minutosLaborados.toFixed(2))];
       }
-
       return [minutosPlanificados, 0];
-    } else {
-      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
-      const min_alimentacion: number = timbre.inicioAlimentacion.minutos_alimentacion;
+    }
+    else {
+      const { entrada, inicioAlimentacion, finAlimentacion, salida } = informacion;
+      const min_alimentacion: number = informacion.inicioAlimentacion.minutos_alimentacion;
 
-      const minutosPlanificados = Number((this.CalcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario) - min_alimentacion).toFixed(2));
+      const minutosPlanificados = Number((this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario) - min_alimentacion).toFixed(2));
       const minutosLaborados = entrada.fecha_hora_timbre !== null && salida.fecha_hora_timbre !== null ? this.CalcularMinutosDiferencia(entrada.fecha_hora_timbre, salida.fecha_hora_timbre) : 0;
       const minutosAlimentacion = inicioAlimentacion.fecha_hora_timbre !== null && finAlimentacion.fecha_hora_timbre !== null ? this.CalcularMinutosDiferencia(inicioAlimentacion.fecha_hora_timbre, finAlimentacion.fecha_hora_timbre) : min_alimentacion;
       return minutosLaborados == 0 ? [minutosPlanificados, minutosLaborados] : [minutosPlanificados, Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
@@ -1959,23 +1109,20 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
-
+  // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e)
   }
 
+  // METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg || this.bool.bool_dep) {
-      this.ExtraerTimbresRegimenCargo();
-    } else {
-      this.ExtraerTimbres();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
@@ -1985,14 +1132,14 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
   // METODODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
-  obtenerClaseTiempo(planificado: any, laborado: any) {
+  ObtenerClaseTiempo(planificado: any, laborado: any) {
     const tPlanificado = Number(planificado);
     const tLaborado = Number(laborado);
     if (tLaborado < tPlanificado) {
       return 'verde';
     }
   }
-
+  // METODODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
   ObtenerClaseTimbre(valor: any) {
     if (valor == 'FT') {
       return 'rojo';

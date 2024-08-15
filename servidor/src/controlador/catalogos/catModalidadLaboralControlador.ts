@@ -27,8 +27,8 @@ class ModalidaLaboralControlador {
         }
     }
 
-    // METODO PARA REGISTRAR MODALIDAD LABORAL
-    public async CrearMadalidadLaboral(req: Request, res: Response): Promise<Response> {
+    // METODO PARA REGISTRAR MODALIDAD LABORAL   **USADO
+    public async CrearModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
             const { modalidad, user_name, ip } = req.body;
             var VERIFICAR_MODALIDAD = await pool.query(
@@ -83,7 +83,7 @@ class ModalidaLaboralControlador {
         }
     }
 
-    // METODO PARA EDITAR MODALIDAD LABORAL
+    // METODO PARA EDITAR MODALIDAD LABORAL    **USADO
     public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
             const { id, modalidad, user_name, ip } = req.body;
@@ -117,7 +117,6 @@ class ModalidaLaboralControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-
 
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
@@ -164,7 +163,7 @@ class ModalidaLaboralControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
@@ -226,7 +225,7 @@ class ModalidaLaboralControlador {
         }
     }
 
-    // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO 
+    // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO    **USADO
     public async VerfificarPlantillaModalidadLaboral(req: Request, res: Response) {
         try {
             const documento = req.file?.originalname;
@@ -353,12 +352,12 @@ class ModalidaLaboralControlador {
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
         const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
 
-        for ( const data of plantilla ) {
+        for (const data of plantilla) {
             try {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { modalida_laboral } = data;
@@ -389,18 +388,18 @@ class ModalidaLaboralControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
                 error = true;
             }
         }
-        
+
         if (error) {
             return res.status(500).jsonp({ message: 'error' });
         }
-    
+
         return res.status(200).jsonp({ message: 'ok' });
     }
 

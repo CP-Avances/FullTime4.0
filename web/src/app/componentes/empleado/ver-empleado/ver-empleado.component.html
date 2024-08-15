@@ -43,6 +43,14 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Rol:</label>
+                                            <label>{{e.rol}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Código:</label>
                                             <label>{{e.codigo}}</label>
                                         </div>
@@ -476,11 +484,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="text-align: right; padding-top: 3%;" *ngIf="!editar_contrato">
-                                    <i type="submit" id="edit" style="margin-right: 20px;"
+                                <div style="text-align: right; padding-top: 5%;" *ngIf="!editar_contrato">
+                                    <i type="submit" id="edit" style="margin-right: 6px;"
                                         (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
+                                    </i>
+                                    <i type="submit" id="t-eliminar" style="margin-right: 3px;"
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Elimina los datos generales de este registro" class="far fa-trash-alt">
+                                        <p>Eliminar</p>
                                     </i>
                                 </div>
                             </div>
@@ -705,12 +718,17 @@
                                         </mat-radio-group>
                                     </div>
                                 </div>
-                                <div style="text-align: right;">
-                                    <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo && getEditarDatos()"
+                                <div style="text-align: right; margin-top: 5px;">
+                                    <i type="submit" id="edit" style="margin-right: 6px;" *ngIf="btnActualizarCargo && getEditarDatos()"
                                         (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                         <p>Editar</p>
+                                    </i>
+                                    <i type="submit" id="t-eliminar" style="margin-right: 3px;"
+                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Elimina los datos generales de este registro" class="far fa-trash-alt">
+                                        <p>Eliminar</p>
                                     </i>
                                 </div>
                             </div>
@@ -1513,48 +1531,6 @@
         <!-- ************** PANTALLA ELIMINAR REGISTROS ************************* -->
         <div class="container" style="padding-bottom: 15px;" *ngIf="eliminar_plan">
             <app-eliminar-individual [datosEliminar]="eliminar_horarios"></app-eliminar-individual>
-        </div>
-
-    </mat-tab>
-
-    <!-- PLANTILLAS DE CARGA DE HORARIOS -->
-    <mat-tab *ngIf="plantillas" label="cargar_plantilla">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">today</mat-icon>
-            <h6 id="items">Plantillas</h6>
-        </ng-template>
-
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_rotativo">
-            <div class="row">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div style="text-align: center; padding-top: 20px;" *ngIf="plantillas">
-                            <button type="submit" class="redondo">
-                                <a style="text-decoration: none;" matSuffix matTooltipPosition="right"
-                                    matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">>
-                                    <mat-icon style="color: white; font-size: 20px;">cloud_download</mat-icon>
-                                    <span style="color: white; font-size: xx-small;">
-                                        Descargar plantilla
-                                    </span>
-                                </a>
-                            </button>
-                        </div>
-                        <div style="text-align: center; padding-top: 20px;" *ngIf="plantillas">
-                            <form method="post" enctype="multipart/form-data">
-                                <input (change)="FileChangeHorario($event)" type="file"
-                                    [formControl]="archivoHorarioForm" id="redondo"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">
-                                    Cargar plantilla
-                                </label>
-                            </form>
-                        </div>
-                        <br>
-                    </mat-card>
-                </div>
-            </div>
         </div>
 
     </mat-tab>

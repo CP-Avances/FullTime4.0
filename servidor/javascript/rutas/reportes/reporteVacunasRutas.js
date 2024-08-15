@@ -12,10 +12,8 @@ class ReportesAsistenciasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
-        this.router.put('/vacunas-multiples/', verificarToken_1.TokenValidation, reporteVacunasControlador_1.default.ReporteVacunasMultiple);
-        // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[empleados]]
-        this.router.put('/vacunas-multiples-cargos-regimen/', verificarToken_1.TokenValidation, reporteVacunasControlador_1.default.ReporteVacunasMultipleCargosRegimen);
+        // METODO DE BUSQUEDA DE DATOS DE VACUNAS    **USADO
+        this.router.post('/vacunas-multiples/', verificarToken_1.TokenValidation, reporteVacunasControlador_1.default.ReporteVacunasMultiple);
     }
 }
 const VACUNAS_REPORTE_RUTAS = new ReportesAsistenciasRutas();

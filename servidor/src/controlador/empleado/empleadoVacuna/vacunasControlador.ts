@@ -1,15 +1,15 @@
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
+
 class VacunasControlador {
 
-    // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
+    // LISTAR REGISTROS DE VACUNACION DEL EMPLEADO POR SU ID   **USADO
     public async ListarUnRegistro(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
         const VACUNA = await pool.query(
@@ -28,7 +28,7 @@ class VacunasControlador {
         }
     }
 
-    // LISTAR REGISTRO TIPO DE VACUNA
+    // LISTAR REGISTRO TIPO DE VACUNA    **USADO
     public async ListarTipoVacuna(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
@@ -43,7 +43,7 @@ class VacunasControlador {
         }
     }
 
-    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO   **USADO
     public async BuscarVacunaFechaTipo(req: Request, res: Response) {
         const { id_empleado, id_vacuna, fecha } = req.body;
         const VACUNA = await pool.query(
@@ -60,7 +60,7 @@ class VacunasControlador {
         }
     }
 
-    // CREAR REGISTRO DE VACUNACION
+    // CREAR REGISTRO DE VACUNACION    **USADO
     public async CrearRegistro(req: Request, res: Response): Promise<Response> {
         const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
 
@@ -70,7 +70,7 @@ class VacunasControlador {
         if (subir_documento === true) {
             // RUTA DE LA CARPETA VACUNAS DEL USUARIO
             const carpetaVacunas = await ObtenerRutaVacuna(id_empleado);
-            //console.log('ruta vacuna ', carpetaVacunas)
+
             fs.access(carpetaVacunas, fs.constants.F_OK, (err) => {
                 if (err) {
                     // METODO MKDIR PARA CREAR LA CARPETA
@@ -97,9 +97,9 @@ class VacunasControlador {
                     SELECT id FROM eu_usuarios WHERE id_empleado = $1
                     `
                     , [id_empleado]);
-            
-                  const id_usuario = usuario.rows[0].id;
-                  
+
+                const id_usuario = usuario.rows[0].id;
+
 
                 const response: QueryResult = await pool.query(
                     `
@@ -109,8 +109,6 @@ class VacunasControlador {
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
 
                 const [vacuna] = response.rows;
-                console.log('vacuna ', vacuna)
-
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -145,9 +143,8 @@ class VacunasControlador {
 
     }
 
-    // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
+    // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION    **USADO
     public async GuardarDocumento(req: Request, res: Response): Promise<Response> {
-        //console.log('ingresa aqui')
         try {
             // FECHA DEL SISTEMA
             var fecha = moment();
@@ -164,8 +161,8 @@ class VacunasControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                    SELECT codigo FROM eu_empleados WHERE id = $1
-                    `
+                SELECT codigo FROM eu_empleados WHERE id = $1
+                `
                 , [id_empleado]);
 
             const [vacuna] = response.rows;
@@ -175,8 +172,8 @@ class VacunasControlador {
             // CONSULTAR DATOSORIGINALES
             const vacuna1 = await pool.query(
                 `
-                    SELECT * FROM eu_empleado_vacunas WHERE id = $1
-                    `
+                SELECT * FROM eu_empleado_vacunas WHERE id = $1
+                `
                 , [id]);
             const [datosOriginales] = vacuna1.rows;
 
@@ -198,10 +195,9 @@ class VacunasControlador {
 
             const datosNuevos = await pool.query(
                 `
-                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
-                    `
+                UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
+                `
                 , [id, documento]);
-
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -216,19 +212,16 @@ class VacunasControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
             return res.jsonp({ message: 'Registro guardado.' });
 
-
         } catch (error) {
-            console.log('vacuna error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
-    // ACTUALIZAR REGISTRO DE VACUNACION
+    // ACTUALIZAR REGISTRO DE VACUNACION   **USADO
     public async ActualizarRegistro(req: Request, res: Response): Promise<Response> {
 
         const { id } = req.params;
@@ -240,7 +233,7 @@ class VacunasControlador {
         if (subir_documento === true) {
             // RUTA DE LA CARPETA VACUNAS DEL USUARIO
             const carpetaVacunas = await ObtenerRutaVacuna(id_empleado);
-            //console.log('ruta vacuna ', carpetaVacunas)
+
             fs.access(carpetaVacunas, fs.constants.F_OK, (err) => {
                 if (err) {
                     // METODO MKDIR PARA CREAR LA CARPETA
@@ -321,7 +314,7 @@ class VacunasControlador {
 
     }
 
-    // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR
+    // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR    **USADO
     public async EliminarDocumentoServidor(req: Request, res: Response): Promise<void> {
         let { documento, id } = req.body;
         let separador = path.sep;
@@ -340,7 +333,7 @@ class VacunasControlador {
         res.jsonp({ message: 'Documento actualizado.' });
     }
 
-    // ELIMINAR DOCUMENTO CARNET DE VACUNACION
+    // ELIMINAR DOCUMENTO CARNET DE VACUNACION    **USADO
     public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
@@ -350,7 +343,7 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacunaconsulta = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
+            const vacunaconsulta = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
             if (!datosOriginales) {
@@ -404,6 +397,7 @@ class VacunasControlador {
             }
 
             return res.jsonp({ message: 'Documento eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -411,7 +405,7 @@ class VacunasControlador {
         }
     }
 
-    // ELIMINAR REGISTRO DE VACUNACION
+    // ELIMINAR REGISTRO DE VACUNACION   **USADO
     public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
@@ -423,7 +417,7 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacunaconsulta = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
+            const vacunaconsulta = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
             if (!datosOriginales) {
@@ -476,6 +470,7 @@ class VacunasControlador {
                 });
             }
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');

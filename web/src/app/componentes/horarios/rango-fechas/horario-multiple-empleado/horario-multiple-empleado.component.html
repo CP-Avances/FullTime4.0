@@ -74,7 +74,7 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Régimen laboral</mat-label>
+                                <mat-label>Régimen Laboral</mat-label>
                                 <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 7)"
                                     [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
@@ -295,7 +295,7 @@
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
-                        RESULTADO REGIMEN LABORAL
+                        RESULTADO RÉGIMEN LABORAL
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                         (click)="MostrarLista()">Mostrar lista</button>
@@ -317,8 +317,8 @@
                                         [aria-label]="checkboxLabelReg()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Establecimiento</th>
-                                <th scope="col">Descripción</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Régimen Laboral</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
@@ -393,8 +393,8 @@
                                         [aria-label]="checkboxLabelCarg()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Establecimiento</th>
-                                <th scope="col">Descripción</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Cargo</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
@@ -468,8 +468,8 @@
                                         [aria-label]="checkboxLabelDep()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Establecimiento</th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Departamento</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
@@ -543,10 +543,10 @@
                                         [aria-label]="checkboxLabelEmp()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Establecimiento</th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Sucursal</th>
                                 <th scope="col">Cédula</th>
-                                <th scope="col">Codigo</th>
+                                <th scope="col">Código</th>
+                                <th scope="col">Nombre</th>
                                 <th scope="col">Planificaciones</th>
                             </tr>
                         </thead>
@@ -560,9 +560,9 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{e.sucursal}}</td>
-                                <td>{{e.nombre}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
+                                <td>{{e.nombre}}</td>
                                 <td>
                                     <i (click)="PlanificarIndividual(e, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"

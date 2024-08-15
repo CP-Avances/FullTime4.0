@@ -9,13 +9,14 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
 import { default as _rollupMoment, Moment } from 'moment';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
@@ -87,6 +88,7 @@ import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.co
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { MatRadioChange } from '@angular/material/radio';
+import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -165,6 +167,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     private activatedRoute: ActivatedRoute,
     private restPlanGeneral: PlanGeneralService, // SERVICIO DATOS DE PLANIFICACION
     private aprobar: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIONES
+    private perfil: PerfilEmpleadoService, // SERVICIO DE DATOS DE PERFIL DE EMPLEADO
 
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -490,8 +493,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.perfil.SetImagen(this.urlImagen);
         this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          //console.log('ver imagen data ', data)
           if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
@@ -500,9 +503,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           else {
             this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
           }
-          //console.log('imagen codificado ', this.imagenEmpleado)
         });
-        //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
         this.textoBoton = 'Editar foto';
       } else {
@@ -579,7 +580,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   AbrirUbicacion(nombre: string, apellido: string) {
     this.ventana.open(EmplLeafletComponent, { width: '500px', height: '500px' })
       .afterClosed().subscribe((res: any) => {
-        //console.log('res ', res)
         if (res.message === true) {
           if (res.latlng != undefined) {
             const datos = {
@@ -679,8 +679,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     localStorage.removeItem('iniciales');
     localStorage.removeItem('view_imagen');
   }
-
-
 
 
   /** ********************************************************************************************* **
@@ -884,7 +882,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA OBTENER ULTIMO CONTRATO
   BuscarContratoActual(formato_fecha: string) {
     this.restEmpleado.BuscarIDContratoActual(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.datoActual.id_contrato = datos[0].max;
+      this.datoActual.id_contrato = datos[0].id_contrato;
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
     });
   }
@@ -960,6 +958,30 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.contrato_editar = dataContrato;
     this.pagina_contrato = 'ver-empleado';
     this.btnActualizarCargo = true;
+  }
+
+  EliminarDatos(dataContrato: any){
+    console.log('va a eliminar datos contrato: ',dataContrato)
+  }
+
+  EliminarDatosCargos(dataCargo: any){
+    console.log('va a eliminar datos cargo: ',dataCargo)
+  }
+
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+  ConfirmarEliminacionDatos(data: any, tipo: string) {
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if(tipo === 'contrato'){
+            this.EliminarDatos(data);
+          }else{
+            this.EliminarDatosCargos(data);
+          }
+          
+        }
+      });
   }
 
   // METODO PARA MOSTRAR VENTANA DE EDICION DE CONTRATO
@@ -1337,7 +1359,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -1404,7 +1426,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     if (this.datoActual.id_cargo != undefined) {
       this.ventana_horario = true;
       this.ver_rotativo = false;
-
       this.data_horario = {
         pagina: 'ver_empleado',
         codigo: this.datoActual.codigo,
@@ -1419,119 +1440,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       })
     }
   }
-
-
-
-
-
-
-  /** ********************************************************************************************* **
-   ** **                     CARGAR HORARIOS DEL EMPLEADO CON PLANTILLA                          ** **
-   ** ********************************************************************************************* **/
-  plantillas: boolean = false;
-
-  nameFileHorario: string;
-  archivoSubidoHorario: Array<File>;
-  archivoHorarioForm = new FormControl('');
-
-  FileChangeHorario(element) {
-    if (this.datoActual.id_cargo != undefined) {
-      this.archivoSubidoHorario = element.target.files;
-      this.nameFileHorario = this.archivoSubidoHorario[0].name;
-      let arrayItems = this.nameFileHorario.split(".");
-      let itemExtencion = arrayItems[arrayItems.length - 1];
-      let itemName = arrayItems[0].slice(0, 16);
-      console.log(itemName.toLowerCase());
-      if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-        if (itemName.toLowerCase() == 'horario empleado') {
-          this.SubirPlantillaHorario();
-        } else {
-          this.toastr.error('Plantilla seleccionada incorrecta', '', {
-            timeOut: 6000,
-          });
-          this.archivoHorarioForm.reset();
-          this.nameFileHorario = '';
-        }
-      } else {
-        this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
-          timeOut: 6000,
-        });
-        this.archivoHorarioForm.reset();
-        this.nameFileHorario = '';
-      }
-    }
-    else {
-      this.toastr.info('El empleado no tiene registrado un Cargo.', '', {
-        timeOut: 6000,
-      })
-      this.archivoHorarioForm.reset();
-      this.nameFileHorario = '';
-    }
-  }
-
-  SubirPlantillaHorario() {
-    let formData = new FormData();
-    for (var i = 0; i < this.archivoSubidoHorario.length; i++) {
-      formData.append("uploads[]", this.archivoSubidoHorario[i], this.archivoSubidoHorario[i].name);
-      console.log("toda la data", this.archivoSubidoHorario[i])
-    }
-
-    formData.append('user_name', this.user_name as string);
-    formData.append('ip', this.ip as string);
-
-    this.restEmpleHorario.VerificarDatos_EmpleadoHorario(formData, parseInt(this.idEmpleado)).subscribe(res => {
-      console.log('entra')
-      if (res.message === 'error') {
-        this.toastr.error('Para el buen funcionamiento del sistema verificar los datos de la plantilla. ' +
-          'Recuerde que el horario indicado debe estar registrado en el sistema y debe tener su respectivo detalle de horario, ' +
-          'el empleado debe tener registrado un contrato de trabajo y las fechas indicadas no deben estar duplicadas dentro del sistema. ' +
-          'Las fechas deben estar ingresadas correctamente, la fecha de inicio no debe ser posterior a la fecha final.', 'Verificar Plantilla', {
-          timeOut: 6000,
-        });
-        this.archivoHorarioForm.reset();
-        this.nameFileHorario = '';
-      }
-      else {
-        this.restEmpleHorario.VerificarPlantilla_EmpleadoHorario(formData).subscribe(resD => {
-          if (resD.message === 'error') {
-            this.toastr.error('Para el buen funcionamiento del sistema verificar los datos de la plantilla. ' +
-              'Recuerde que el horario indicado debe estar registrado en el sistema y debe tener su respectivo detalle de horario, ' +
-              'el empleado debe tener registrado un contrato de trabajo y las fechas indicadas no deben estar duplicadas dentro del sistema.', 'Verificar Plantilla', {
-              timeOut: 6000,
-            });
-            this.archivoHorarioForm.reset();
-            this.nameFileHorario = '';
-          }
-          else {
-            this.restEmpleHorario.SubirArchivoExcel(formData, parseInt(this.idEmpleado), this.empleadoUno[0].codigo).subscribe(resC => {
-
-              this.restEmpleHorario.CreaPlanificacion(formData, parseInt(this.idEmpleado), this.empleadoUno[0].codigo).subscribe(resP => {
-                this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
-                  timeOut: 6000,
-                });
-                // this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);-------------------------------
-                //this.actualizar = false;
-                //window.location.reload(this.actualizar);
-                this.archivoHorarioForm.reset();
-                this.nameFileHorario = '';
-              });
-              /*this.ObtenerHorariosEmpleado(parseInt(this.idEmpleado));
-              //this.actualizar = false;
-              //window.location.reload(this.actualizar);
-              this.archivoHorarioForm.reset();
-              this.nameFileHorario = '';*/
-            });
-          }
-        });
-      }
-    });
-  }
-
-
-
-
-
-
 
 
   /** **************************************************************************************** **
@@ -1565,49 +1473,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         timeOut: 6000,
       })
     }
-  }
-
-  // BUSCAR FECHAS DE HORARIO y ELIMINAR PLANIFICACION GENERAL
-  id_planificacion_general: any = [];
-  EliminarPlanGeneral(fec_inicio: string, fec_final: string, horario: number, id_empleado: string) {
-    this.id_planificacion_general = [];
-    let plan_fecha = {
-      fec_inicio: fec_inicio.split('T')[0],
-      fec_final: fec_final.split('T')[0],
-      id_horario: horario,
-      id_empleado: id_empleado
-    };
-    this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
-      this.id_planificacion_general = res;
-      let datos = {
-        user_name: this.user_name,
-        ip: this.ip,
-        id_plan: '',
-      }
-      this.id_planificacion_general.map((obj: any) => {
-        datos.id_plan = obj.id;
-        this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
-        })
-      })
-    })
-  }
-
-
-  // ELIMINAR REGISTROS DE PLANIFICACION GENERAL
-  EliminarPlanificacionGeneral(fecha: string, horario: number, id_empleado: string) {
-    this.id_planificacion_general = [];
-    let plan_fecha = {
-      fec_inicio: fecha.split('T')[0],
-      id_horario: horario,
-      id_empleado: id_empleado
-    };
-    this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
-      this.id_planificacion_general = res;
-      this.id_planificacion_general.map((obj: any) => {
-        this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
-        })
-      })
-    })
   }
 
 
@@ -1651,7 +1516,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let fecha = anio + '-' + mes + '-' + dia;
     let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
     let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
-    console.log('resultado ', verificar)
     // VERIFICAR QUE EL DIA SEA VALIDO (30-31)
     if (verificar === true) {
       this.horariosEmpleado[index].color = 'ok';
@@ -1709,9 +1573,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
         p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
         p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
-
       })
-      console.log('permisos', this.permisosTotales)
     })
   }
 
@@ -1856,7 +1718,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   cont: number = 0;
   VerInformacionAutoriza(array: any) {
     this.cont = 0;
-    array.map(empl => {
+    array.map((empl: any) => {
       this.informacion.InformarEmpleadoAutoriza(parseInt(empl.id_empleado)).subscribe(data => {
         this.cont = this.cont + 1;
         empl.nombre = data[0].fullname;
@@ -2189,16 +2051,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     })
   }
 
-  // VENTANA PARA INGRESAR PERÍODO DE VACACIONES
+  // VENTANA PARA INGRESAR PERIODO DE VACACIONES
   registrar_periodo: boolean = false;
   data_registrar_periodo: any = [];
   pagina_registrar_periodo: string = '';
   ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
-    if (this.datoActual.id_contrato != undefined) {
+    if (this.datoActual.id_cargo != undefined) {
       this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
         this.idPerVacacion = datos;
-        console.log("idPerVaca ", this.idPerVacacion[0].id);
         this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
           timeOut: 6000,
         })
@@ -2213,7 +2074,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
     }
     else {
-      this.toastr.info('El usuario no tiene registrado un Contrato.', '', {
+      this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
         timeOut: 6000,
       })
     }
@@ -2275,14 +2136,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
     }
     else {
-      this.toastr.info('El usuario no tiene registrado Contrato o Cargo.', '', {
+      this.toastr.info('El usuario no tiene registrado Cargo.', '', {
         timeOut: 6000,
       })
     }
   }
 
   // METODO PARA EDITAR REGISTRO DE VACACION
-  EditarVacaciones(v) {
+  EditarVacaciones(v: any) {
     this.ventana.open(EditarVacacionesEmpleadoComponent,
       {
         width: '900px',
@@ -2297,7 +2158,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // METODO PARA ELIMINAR REGISTRO DE VACACIONES
-  CancelarVacaciones(v) {
+  CancelarVacaciones(v: any) {
     this.ventana.open(CancelarVacacionesComponent,
       {
         width: '450px',
@@ -2442,7 +2303,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
-    console.log('ver data seleccionada... ', datos)
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2453,12 +2313,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
-
     const data = {
       user_name: this.user_name,
       ip: this.ip,
     }
-
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -2485,7 +2343,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let mensaje = {
       id_empl_envia: this.idEmpleadoLogueado,
       id_empl_recive: recibe,
-      tipo: 10, // PLANIFICACIÓN DE HORAS EXTRAS
+      tipo: 10, // PLANIFICACION DE HORAS EXTRAS
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
@@ -2497,7 +2355,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // METODO DE ENVIO DE CORREO DE PLANIFICACIÓN DE HORAS EXTRAS
+  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE HORAS EXTRAS
   EnviarCorreoPlanH(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
 
     // DATOS DE ESTRUCTURA DEL CORREO
@@ -2516,7 +2374,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       fin: h_fin,
     }
 
-    // METODO ENVIO DE CORREO DE PLANIFICACIÓN DE HE
+    // METODO ENVIO DE CORREO DE PLANIFICACION DE HE
     this.plan_hora.EnviarCorreoPlanificacion(DataCorreo).subscribe(res => {
       if (res.message === 'ok') {
         this.toastr.success('Correo de planificación enviado exitosamente.', '', {
@@ -2569,7 +2427,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA FORMATEAR FECHAS Y HORAS
   FormatearFechas(datos: any, formato_fecha: string, formato_hora: string) {
-    datos.forEach(c => {
+    datos.forEach((c: any) => {
       // TRATAMIENTO DE FECHAS Y HORAS
       c.fecha_ = this.validar.FormatearFecha(c.fecha, formato_fecha, this.validar.dia_completo);
 
@@ -2589,7 +2447,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // VENTANA PARA INGRESAR PLANIFICACION DE COMIDAS
   AbrirVentanaPlanificacion(): void {
-    console.log(this.idEmpleado);
     var info = {
       id_contrato: this.datoActual.id_contrato,
       id_cargo: this.datoActual.id_cargo,
@@ -2608,8 +2465,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
   }
 
-  // VENTANA PARA EDITAR PLANIFICACIÓN DE COMIDAS
-  AbrirEditarPlanComidas(datoSeleccionado): void {
+  // VENTANA PARA EDITAR PLANIFICACION DE COMIDAS
+  AbrirEditarPlanComidas(datoSeleccionado: any) {
     if (datoSeleccionado.fec_inicio != undefined) {
       // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
       let datosConsumido = {
@@ -2683,8 +2540,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-
-
     this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
@@ -2733,7 +2588,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       id_comida: datos.id_detalle,
       id_empl_envia: this.idEmpleadoLogueado,
       id_empl_recive: id_empleado_recibe,
-      tipo: 20, // PLANIFICACIÓN DE ALIMENTACION
+      tipo: 20, // PLANIFICACION DE ALIMENTACION
       mensaje: 'Planificación de alimentación eliminada desde ' +
         desde + ' hasta ' +
         hasta +
@@ -2745,7 +2600,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     })
   }
 
-  // METODO DE ENVIO DE CORREO DE PLANIFICACIÓN DE SERVICIO DE ALIMENTACION
+  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE SERVICIO DE ALIMENTACION
   EnviarCorreo(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
     // DATOS DE ESTRUCTURA DEL CORREO
     let DataCorreo = {
@@ -2764,7 +2619,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       final: h_fin,
     }
 
-    // METODO ENVIO DE CORREO DE PLANIFICACIÓN DE ALIMENTACION
+    // METODO ENVIO DE CORREO DE PLANIFICACION DE ALIMENTACION
     this.restPlanComidas.EnviarCorreoPlan(DataCorreo).subscribe(res => {
       if (res.message === 'ok') {
         this.toastr.success('Correo de planificación enviado exitosamente.', '', {
@@ -2772,11 +2627,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         });
       }
       else {
-        this.toastr.warning('Ups algo salio mal !!!', 'No fue posible enviar correo de planificación.', {
+        this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de planificación.', {
           timeOut: 6000,
         });
       }
-      console.log(res.message);
     })
   }
 
@@ -2888,7 +2742,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarAutorizacion(id_auto: number) {
     const datos = {
       user_name: this.user_name,
@@ -3000,7 +2854,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** ****************************************************************************************** **/
 
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -3009,7 +2863,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].estado_civil - 1];
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
@@ -3019,7 +2873,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         nacionalidad = element.nombre;
       }
     });
-    sessionStorage.setItem('profile', this.empleadoUno);
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
@@ -3206,7 +3059,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
-  obtenerDatos() {
+  ObtenerDatos() {
     let objeto: any;
     let objetoTitulo: any;
     let objetoDiscapacidad: any;
@@ -3305,7 +3158,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
 
   ExportToExcel() {
-    const datos: any = this.obtenerDatos();
+    const datos: any = this.ObtenerDatos();
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
@@ -3333,7 +3186,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** ******************************************************************************************* **/
 
   ExportToCVS() {
-    const datos: any = this.obtenerDatos();
+    const datos: any = this.ObtenerDatos();
     const datosEmpleado: any = [];
     const objeto = {
       ...datos[0][0],
@@ -3402,7 +3255,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         objeto.empleado.latitud = obj.latitud;
       }
       if (this.discapacidadUser !== null) {
-        this.discapacidadUser.map(discapacidad => {
+        this.discapacidadUser.map((discapacidad: any) => {
           objeto.empleado.discapacidad = {
             'carnet_conadis': discapacidad.carnet_conadis,
             'tipo': discapacidad.tipo,
@@ -3411,7 +3264,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         });
       };
       if (this.tituloEmpleado !== null) {
-        this.tituloEmpleado.map(titulo => {
+        this.tituloEmpleado.map((titulo: any) => {
           objeto.empleado.titulos = {
             'nombre': titulo.nombre,
             'Nivel': titulo.nivel,
@@ -3465,7 +3318,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
 
     const a = document.createElement('a');
     a.href = xmlUrl;

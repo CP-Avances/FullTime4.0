@@ -16,7 +16,7 @@ exports.CIUDAD_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class CiudadControlador {
-    // BUSCAR DATOS RELACIONADOS A LA CIUDAD
+    // BUSCAR DATOS RELACIONADOS A LA CIUDAD   **USADO
     ListarInformacionCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_ciudad } = req.params;
@@ -160,7 +160,7 @@ class CiudadControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD
+    // METODO PARA CONSULTAR DATOS DE UNA CIUDAD   **USADO
     ConsultarUnaCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

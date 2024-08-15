@@ -96,7 +96,7 @@
                             </th>
                             <th scope="col">Código</th>
                             <th scope="col">Descripción</th>
-                            <th scope="col">Min. alimentación</th>
+                            <th scope="col">Minutos alimentación</th>
                             <th scope="col">Horas totales</th>
                             <th scope="col">Tipo</th>
                             <th scope="col">Horario nocturno</th>
@@ -226,11 +226,11 @@
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
                         <th scope="col">Descripción</th>
-                        <th scope="col">Código Horario</th>
-                        <th scope="col">Horas Totales</th>
-                        <th scope="col">Minutos Alimentación</th>
-                        <th scope="col">Tipo Horario</th>
-                        <th scope="col">Horario Nocturno</th>
+                        <th scope="col">Código horario</th>
+                        <th scope="col">Horas totales</th>
+                        <th scope="col">Minutos alimentación</th>
+                        <th scope="col">Tipo horario</th>
+                        <th scope="col">Horario nocturno</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -255,7 +255,7 @@
             </table>
         </div>
         <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal">
+          <div class="contenedorTotal"  matTooltip="Número de datos que se van a cargar en el sistema.">
             <div id="t-editar" class="circulo circuloTotal"></div>
             <div>{{horariosCorrectos}}</div>
           </div>
@@ -276,14 +276,14 @@
                     <tr style="text-align: center;">
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
-                        <th scope="col">Código Horario</th>
-                        <th scope="col">Tipo Acción</th>
+                        <th scope="col">Código horario</th>
+                        <th scope="col">Tipo acción</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Tolerancia</th>
                         <th scope="col">Orden</th>
-                        <th scope="col">Salida Siguiente Día</th>
-                        <th scope="col">Minutos Antes</th>
-                        <th scope="col">Minutos Después</th>
+                        <th scope="col">Salida siguiente día</th>
+                        <th scope="col">Minutos antes</th>
+                        <th scope="col">Minutos después</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -309,7 +309,7 @@
             </table>
         </div>
         <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal">
+          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
             <div id="t-editar" class="circulo circuloTotal"></div>
             <div>{{detallesCorrectos}}</div>
           </div>

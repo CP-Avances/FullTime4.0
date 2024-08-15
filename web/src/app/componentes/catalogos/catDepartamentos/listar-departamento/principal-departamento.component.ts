@@ -49,6 +49,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
+  departamentosCorrectos: number = 0;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -323,6 +324,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.listDepartamentosCorrectos.push(item);
           }
         });
+
+        this.departamentosCorrectos = this.listDepartamentosCorrectos.length;
       }
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
@@ -335,7 +338,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
@@ -413,7 +416,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -425,8 +428,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Departamentos', this.departamentos);
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',

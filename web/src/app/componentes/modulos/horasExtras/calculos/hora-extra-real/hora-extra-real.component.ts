@@ -322,7 +322,7 @@ export class HoraExtraRealComponent implements OnInit {
    * ****************************************************************************************************/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -334,8 +334,8 @@ export class HoraExtraRealComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Empleados', this.empleado);
+  DefinirInformacionPDF() {
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -528,13 +528,6 @@ export class HoraExtraRealComponent implements OnInit {
       arregloEmpleado.push(objeto)
     });
 
-    this.rest.CrearXML(arregloEmpleado).subscribe(res => {
-      console.log(arregloEmpleado)
-      this.data = res;
-      console.log("prueba-empleado", res)
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/empleado/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
   }
 
   /****************************************************************************************************** 
@@ -583,7 +576,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   DefinirPDFTimbre() {
-    sessionStorage.setItem('Timbres Empleado', this.empleado);
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

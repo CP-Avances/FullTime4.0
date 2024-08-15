@@ -9,13 +9,13 @@ import excel from 'xlsx';
 
 class RelojesControlador {
 
-    // METODO PARA BUSCAR DISPOSITIVOS
+    // METODO PARA BUSCAR DISPOSITIVOS    **USADO
     public async ListarRelojes(req: Request, res: Response) {
         const RELOJES = await pool.query(
             `
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
-                cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
+                cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
@@ -30,7 +30,7 @@ class RelojesControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -40,7 +40,7 @@ class RelojesControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const reloj = await pool.query('SELECT * FROM ed_relojes WHERE id = $1', [id]);
+            const reloj = await pool.query(`SELECT * FROM ed_relojes WHERE id = $1`, [id]);
             const [datosOriginales] = reloj.rows;
 
             if (!datosOriginales) {
@@ -79,8 +79,8 @@ class RelojesControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -88,13 +88,12 @@ class RelojesControlador {
         }
     }
 
-    // METODO PARA REGISTRAR DISPOSITIVO
+    // METODO PARA REGISTRAR DISPOSITIVO   **USADO
     public async CrearRelojes(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
+                tipo_conexion, id_sucursal, id_departamento, codigo, user_name, user_ip } = req.body;
 
-            console.log('ver req.body ', req.body)
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -115,17 +114,15 @@ class RelojesControlador {
                     , [codigo.toUpperCase(), serie.toUpperCase()])
             }
 
-            console.log('ver rows ', VERIFICAR_CODIGO.rows)
             if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
-                        numero_accion )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
                     `
                     , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo]);
 
                 const [reloj] = response.rows;
 
@@ -154,15 +151,15 @@ class RelojesControlador {
                 return res.jsonp({ message: 'existe' })
             }
         }
+
         catch (error) {
-            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error' });
         }
     }
 
-    // METODO PARA VER DATOS DE UN DISPOSITIVO
+    // METODO PARA VER DATOS DE UN DISPOSITIVO    **USADO
     public async ListarUnReloj(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const RELOJES = await pool.query(
@@ -178,11 +175,11 @@ class RelojesControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO   **USADO
     public async ActualizarReloj(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real, user_name, user_ip } = req.body;
+                tipo_conexion, id_sucursal, id_departamento, codigo, id_real, user_name, user_ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -235,12 +232,11 @@ class RelojesControlador {
                     `
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
-                        numero_accion = $15 
-                    WHERE id = $16
+                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14
+                    WHERE id = $15
                     `
                     , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, id_real]);
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -248,7 +244,7 @@ class RelojesControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tiene_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}"}`,
                     ip: user_ip,
                     observacion: null
                 });
@@ -261,6 +257,7 @@ class RelojesControlador {
             else {
                 return res.jsonp({ message: 'existe' });
             }
+
         }
         catch (error) {
             // REVERTIR TRANSACCION
@@ -269,14 +266,14 @@ class RelojesControlador {
         }
     }
 
-    // METODO PARA CONSULTAR DATOS GENERALES DE DISPOSITIVO
+    // METODO PARA CONSULTAR DATOS GENERALES DE DISPOSITIVO    **USADO
     public async ListarDatosUnReloj(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const RELOJES = await pool.query(
             `
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
-                cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
+                cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
@@ -292,123 +289,7 @@ class RelojesControlador {
     }
 
 
-
-    public async VerificarDatos(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var contarNombre = 0;
-        var contarAccion = 0;
-        var contarCodigo = 0;
-        var contarIP = 0;
-        var contarSucursal = 0;
-        var contarDepartamento = 0;
-        var contarLlenos = 0;
-        var contador = 1;
-        plantilla.forEach(async (data: any) => {
-            // Datos que se leen de la plantilla ingresada
-            const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
-
-            //Verificar que los datos obligatorios no esten vacios
-            if (nombre != undefined && ip != undefined && puerto != undefined && sucursal != undefined &&
-                departamento != undefined && tiene_funciones != undefined && codigo_reloj != undefined) {
-                contarLlenos = contarLlenos + 1;
-            }
-
-            //Verificar que el codigo no se encuentre registrado
-            const VERIFICAR_CODIGO = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE id = $1
-                `
-                , [codigo_reloj]);
-            if (VERIFICAR_CODIGO.rowCount === 0) {
-                contarCodigo = contarCodigo + 1;
-            }
-
-            //Verificar que el nombre del equipo no se encuentre registrado
-            const VERIFICAR_NOMBRE = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE UPPER(nombre) = $1
-                `
-                , [nombre.toUpperCase()]);
-            if (VERIFICAR_NOMBRE.rowCount === 0) {
-                contarNombre = contarNombre + 1;
-            }
-
-            //Verificar que la IP del dispositivo no se encuentre registrado
-            const VERIFICAR_IP = await pool.query(
-                `
-                SELECT * FROM ed_relojes WHERE ip = $1
-                `
-                , [ip]);
-            if (VERIFICAR_IP.rowCount === 0) {
-                contarIP = contarIP + 1;
-            }
-
-            //Verificar que la sucursal exista dentro del sistema
-            const VERIFICAR_SUCURSAL = await pool.query(
-                `
-                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-                `
-                , [sucursal.toUpperCase()]);
-            if (VERIFICAR_SUCURSAL.rowCount != 0) {
-                contarSucursal = contarSucursal + 1;
-                // Verificar que el departamento exista dentro del sistema
-                const VERIFICAR_DEPARTAMENTO = await pool.query(
-                    `
-                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
-                    `
-                    , [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
-                if (VERIFICAR_DEPARTAMENTO.rowCount != 0) {
-                    contarDepartamento = contarDepartamento + 1;
-                }
-            }
-
-            // Verificar que se haya ingresado némero de acciones si el dispositivo las tiene
-            if (tiene_funciones === true) {
-                if (numero_accion != undefined || numero_accion != '') {
-                    contarAccion = contarAccion + 1;
-                }
-            }
-            else {
-                contarAccion = contarAccion + 1;
-            }
-
-            // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-            console.log('nombre', contarNombre, plantilla.length, contador);
-            console.log('ip', contarIP, plantilla.length, contador);
-            console.log('sucursal', contarSucursal, plantilla.length, contador);
-            console.log('departamento', contarDepartamento, plantilla.length, contador);
-            console.log('llenos', contarLlenos, plantilla.length, contador);
-            console.log('codigo', contarCodigo, plantilla.length, contador);
-            console.log('accion', contarAccion, plantilla.length, contador);
-            if (contador === plantilla.length) {
-                if (contarNombre === plantilla.length && contarIP === plantilla.length &&
-                    contarSucursal === plantilla.length && contarLlenos === plantilla.length &&
-                    contarDepartamento === plantilla.length && contarCodigo === plantilla.length &&
-                    contarAccion === plantilla.length) {
-                    return res.jsonp({ message: 'correcto' });
-                } else {
-                    return res.jsonp({ message: 'error' });
-                }
-            }
-            contador = contador + 1;
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-    }
-
+    // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
     public async VerificarPlantilla(req: Request, res: Response) {
         try {
             const documento = req.file?.originalname;
@@ -418,7 +299,8 @@ class RelojesControlador {
             let verificador = ObtenerIndicePlantilla(workbook, 'BIOMETRICOS');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
-            } else {
+            }
+            else {
                 const sheet_name_list = workbook.SheetNames;
                 const plantilla_dispositivos = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
 
@@ -441,8 +323,6 @@ class RelojesControlador {
                     contrasena: '',
                     observacion: ''
                 }
-
-
                 var listDispositivos: any = [];
                 var duplicados: any = [];
                 var duplicados1: any = [];
@@ -450,15 +330,15 @@ class RelojesControlador {
                 var duplicados3: any = [];
                 var mensaje: string = 'correcto';
 
-                //Exprecion regular para validar el formato de una IPv4.
+                // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE UNA IPV4.
                 const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
-                //Exprecion regular para validar el formato de una direccion mac
+                // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE UNA DIRECCION MAC
                 const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
-                //Exprecion regular para validar el formato de solo números.
+                // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE SOLO NUMEROS.
                 const regex = /^[0-9]+$/;
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_dispositivos.forEach(async (dato: any, indice: any, array: any) => {
+                plantilla_dispositivos.forEach(async (dato: any) => {
                     var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO,
                         CODIGO, DIRECCION_IP, PUERTO, ACCIONES, NUMERO_ACCIONES, MARCA,
                         MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA
@@ -494,18 +374,18 @@ class RelojesControlador {
 
                         // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
                         if (duplicados.find((p: any) => p.codigo === data.codigo) == undefined) {
-                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                            // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
                             if (duplicados1.find((a: any) => a.direccion_ip === data.direccion_ip) == undefined) {
-                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
-                                if(duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined){
-                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
-                                    if(duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined){
+                                // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                if (duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined) {
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
+                                    if (duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined) {
                                         duplicados3.push(data);
-                                    }else{
+                                    } else {
                                         data.observacion = '4';
                                     }
                                     duplicados2.push(data);
-                                }else{
+                                } else {
                                     data.observacion = '3';
                                 }
                                 duplicados1.push(data);
@@ -513,13 +393,14 @@ class RelojesControlador {
                                 data.observacion = '2';
                             }
                             duplicados.push(data);
-                        }else {
+                        } else {
                             data.observacion = '1';
-                        }                                                                
+                        }
 
                         listDispositivos.push(data);
 
-                    } else {
+                    }
+                    else {
                         data.fila = ITEM;
                         data.establecimiento = ESTABLECIMIENTO;
                         data.departamento = DEPARTAMENTO;
@@ -595,49 +476,43 @@ class RelojesControlador {
                             data.contrasena = ' - ';
                         }
 
-                        if(data.observacion == 'no registrado'){
-                            if(data.codigo != 'No registrado' && data.direccion_ip != 'No registrado'){
+                        if (data.observacion == 'no registrado') {
+                            if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
                                 // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
                                 if (duplicados.find((p: any) => p.codigo === data.codigo) == undefined) {
-                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
-                                if (duplicados1.find((a: any) => a.direccion_ip === data.direccion_ip) == undefined) {
-    
-                                    if(data.numero_serie != ' - '){
-                                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
-                                        if(duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined){
-                                            duplicados2.push(data);
-                                        }else{
-                                            data.observacion = '3';
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
+                                    if (duplicados1.find((a: any) => a.direccion_ip === data.direccion_ip) == undefined) {
+
+                                        if (data.numero_serie != ' - ') {
+                                            // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                            if (duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined) {
+                                                duplicados2.push(data);
+                                            } else {
+                                                data.observacion = '3';
+                                            }
                                         }
-                                    }
-    
-                                    if(data.direccion_mac != ' - '){
-                                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
-                                        if(duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined){
-                                            duplicados3.push(data);
-                                        }else{
-                                            data.observacion = '4';
+                                        if (data.direccion_mac != ' - ') {
+                                            // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
+                                            if (duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined) {
+                                                duplicados3.push(data);
+                                            } else {
+                                                data.observacion = '4';
+                                            }
                                         }
+                                        duplicados1.push(data);
+                                    } else {
+                                        data.observacion = '2';
                                     }
-                                    
-                                    duplicados1.push(data);
+                                    duplicados.push(data);
                                 } else {
-                                    data.observacion = '2';
-                                }
-                                duplicados.push(data);
-                                }else {
                                     data.observacion = '1';
-                                }   
+                                }
                             }
                         }
-                        
-
                         listDispositivos.push(data);
 
                     }
-
                     data = {};
-
                 });
 
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -651,103 +526,122 @@ class RelojesControlador {
 
                 listDispositivos.forEach(async (item: any) => {
                     if (item.observacion == 'no registrado' || item.observacion == '1' ||
-                        item.observacion == '2' || item.observacion == '3' || item.observacion == '4') 
-                        {
+                        item.observacion == '2' || item.observacion == '3' || item.observacion == '4') {
                         var validEstablecimiento = await pool.query(
-                            `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+                            `
+                            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                            `
                             , [item.establecimiento.toUpperCase()])
                         if (validEstablecimiento.rows[0] != undefined && validEstablecimiento.rows[0] != '') {
                             var validDeparta = await pool.query(
-                                `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                                `
+                                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                                `
                                 , [item.departamento.toUpperCase()])
                             if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                                 var VERIFICAR_DEP_SUC: any = await pool.query(
-                                    `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
-                                    ,[validEstablecimiento.rows[0].id, item.departamento.toUpperCase()]
+                                    `
+                                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                                    `
+                                    , [validEstablecimiento.rows[0].id, item.departamento.toUpperCase()]
                                 )
                                 if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
                                     var validCodigo = await pool.query(
-                                        `SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`
+                                        `
+                                        SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
+                                        `
                                         , [item.codigo.toString().toUpperCase()])
                                     if (validCodigo.rows[0] == undefined || validCodigo.rows[0] == '') {
                                         if (ipv4Regex.test(item.direccion_ip.toString())) {
                                             var validDireccIP = await pool.query(
-                                                `SELECT * FROM ed_relojes WHERE ip = $1`
+                                                `
+                                                SELECT * FROM ed_relojes WHERE ip = $1
+                                                `
                                                 , [item.direccion_ip])
-                                            if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == ''){
+                                            if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == '') {
                                                 if (regex.test(item.puerto)) {
                                                     if (item.puerto.toString().length > 6) {
                                                         item.observacion = 'El puerto debe ser de 6 dígitos';
-                                                    } else {
+                                                    }
+                                                    else {
                                                         if (item.acciones.toString().toLowerCase() == 'si' || item.acciones.toString().toLowerCase() == 'no') {
                                                             if (item.acciones.toString().toLowerCase() == 'si') {
-                                                                if(item.numero_acciones != ' - '){
+                                                                if (item.numero_acciones != ' - ') {
                                                                     if (!regex.test(item.numero_acciones)) {
                                                                         item.observacion = 'Número de acciones incorrecta (solo números)';
-                                                                    } else{
-                                                                        if (item.numero_acciones < 1 || item.numero_acciones > 8 ) {
+                                                                    }
+                                                                    else {
+                                                                        if (item.numero_acciones < 1 || item.numero_acciones > 8) {
                                                                             item.observacion = 'El número de acciones debe ser mayor a 0 y menor a 8';
                                                                         }
                                                                     }
-                                                                }else{
+                                                                }
+                                                                else {
                                                                     item.observacion = 'Debe ingresar acciones';
-                                                                } 
+                                                                }
                                                             }
 
-                                                            if(item.numero_serie != ' - '){
+                                                            if (item.numero_serie != ' - ') {
                                                                 var VERIFICAR_SERIE = await pool.query(
                                                                     `SELECT id FROM ed_relojes WHERE serie = $1`
                                                                     , [item.numero_serie])
-                                                                if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != ''){
+                                                                if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != '') {
                                                                     item.observacion = 'Número de serie ya existe en el sistema';
                                                                 }
                                                             }
 
-                                                            if(item.direccion_mac != ' - '){
+                                                            if (item.direccion_mac != ' - ') {
                                                                 var VERIFICAR_MAC = await pool.query(
                                                                     `SELECT id FROM ed_relojes WHERE mac = $1`
                                                                     , [item.direccion_mac])
-                                                                if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != ''){
+                                                                if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != '') {
                                                                     item.observacion = 'Dirección MAC ya existe en el sistema';
                                                                 }
                                                             }
 
-                                                        } else {
+                                                        }
+                                                        else {
                                                             item.observacion = 'Acción incorrecta ingrese (SI / NO)';
                                                         }
                                                     }
-                                                } else {
+                                                }
+                                                else {
                                                     item.observacion = 'Puerto incorrecto (solo números)';
                                                 }
-                                            }else {
+                                            }
+                                            else {
                                                 item.observacion = 'Ya existe en el sistema';
                                             }
-                                        } else {
+                                        }
+                                        else {
                                             item.observacion = 'Dirección IP incorrecta';
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         item.observacion = 'Ya existe en el sistema';
                                     }
-                                } else {
+                                }
+                                else {
                                     item.observacion = 'Departamento no pertenece al establecimiento';
                                 }
-                                
-                            } else {
+
+                            }
+                            else {
                                 item.observacion = 'Departamento no existe en el sistema';
                             }
-                        } else {
+                        }
+                        else {
                             item.observacion = 'Establecimiento no existe en el sistema';
                         }
                     }
-
-
                 });
 
                 var tiempo = 2000;
                 if (listDispositivos.length > 500 && listDispositivos.length <= 1000) {
-                  tiempo = 4000;
-                } else if (listDispositivos.length > 1000) {
-                  tiempo = 7000;
+                    tiempo = 4000;
+                }
+                else if (listDispositivos.length > 1000) {
+                    tiempo = 7000;
                 }
 
                 setTimeout(() => {
@@ -769,27 +663,30 @@ class RelojesControlador {
 
                         if (item.direccion_mac != ' - ') {
                             if (direccMac.test(item.direccion_mac.toString())) {
-                            } else {
+                            }
+                            else {
                                 item.observacion = 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
                             }
                         }
 
-
                         if (item.observacion != undefined) {
                             let arrayObservacion = item.observacion.split(" ");
                             if (arrayObservacion[0] == 'no' || item.observacion == " ") {
-                              item.observacion = 'ok'
+                                item.observacion = 'ok';
                             }
 
                             if (item.observacion == '1') {
-                                item.observacion = 'Registro duplicado (código)'
-                            }else if (item.observacion == '2') {
-                                item.observacion = 'Registro duplicado (dirección IP)'
-                            }else if (item.observacion == '3') {
-                                item.observacion = 'Registro duplicado (número de serie)'
-                            }else if (item.observacion == '4') {
-                                item.observacion = 'Registro duplicado (dirección MAC)'
-                            } 
+                                item.observacion = 'Registro duplicado (código)';
+                            }
+                            else if (item.observacion == '2') {
+                                item.observacion = 'Registro duplicado (dirección IP)';
+                            }
+                            else if (item.observacion == '3') {
+                                item.observacion = 'Registro duplicado (número de serie)';
+                            }
+                            else if (item.observacion == '4') {
+                                item.observacion = 'Registro duplicado (dirección MAC)';
+                            }
                         }
 
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
@@ -798,25 +695,19 @@ class RelojesControlador {
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }
-                        } else {
+                        }
+                        else {
                             return mensaje = 'error';
                         }
 
                         filaDuplicada = item.fila;
-
                     });
-
                     if (mensaje == 'error') {
                         listDispositivos = undefined;
                     }
-
-
                     return res.jsonp({ message: mensaje, data: listDispositivos });
-
                 }, tiempo)
-
             }
-
 
         } catch (error) {
             return res.status(500).jsonp({ message: error });
@@ -824,17 +715,14 @@ class RelojesControlador {
 
     }
 
+    // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
     public async CargaPlantillaRelojes(req: Request, res: Response): Promise<any> {
         try {
             const { plantilla, user_name, ip } = req.body;
-
-            console.log('plantilla: ', plantilla.length);
-
             var contador = 1;
-            var respuesta: any
+            var respuesta: any;
 
             plantilla.forEach(async (data: any) => {
-
                 // DATOS DE LA PLANTILLA INGRESADA
                 const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, acciones,
                     numero_acciones, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena } = data;
@@ -843,10 +731,14 @@ class RelojesControlador {
                 await pool.query('BEGIN');
 
                 // BUSCAR ID DE LA SUCURSAL INGRESADA
-                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [establecimiento.toUpperCase()]);
+                const id_sucursal = await pool.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`,
+                    [establecimiento.toUpperCase()]);
 
-                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+                const id_departamento = await pool.query(
+                    `
+                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                    `
+                    , [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
 
 
                 if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
@@ -862,14 +754,14 @@ class RelojesControlador {
                     });
                 }
 
-
-                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
+                // VERIFICAR QUE SE HAYA INGRESADO NUMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
                 var num_accion;
                 var acciones_boolean;
                 if (acciones.toLowerCase() === 'si') {
                     num_accion = numero_acciones;
                     acciones_boolean = true;
-                } else {
+                }
+                else {
                     num_accion = 0;
                     acciones_boolean = false;
                 }
@@ -877,16 +769,14 @@ class RelojesControlador {
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                 const response: QueryResult = await pool.query(
                     `
-                        INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                            id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                        `
+                    INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `
                     , [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca,
                         modelo, numero_serie, id_fabricante, fabricante, direccion_mac, acciones_boolean, num_accion, codigo]);
 
                 const [reloj_ingre] = response.rows;
-
-                console.log('response.rows: ', response.rows);
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -899,21 +789,18 @@ class RelojesControlador {
                     observacion: null
                 });
 
-
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                console.log('contador: ', contador, ' plantilla: ', plantilla.length)
+
                 if (contador === plantilla.length) {
-                    console.log('reloj: ', reloj_ingre);
                     if (reloj_ingre) {
                         return respuesta = res.status(200).jsonp({ message: 'ok' })
-                    } else {
+                    }
+                    else {
                         return respuesta = res.status(404).jsonp({ message: 'error' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
 
         } catch (error) {
@@ -921,8 +808,8 @@ class RelojesControlador {
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error });
         }
-
     }
+
 }
 
 const RELOJES_CONTROLADOR = new RelojesControlador();

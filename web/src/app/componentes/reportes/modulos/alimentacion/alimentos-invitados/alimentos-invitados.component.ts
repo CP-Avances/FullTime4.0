@@ -171,7 +171,7 @@ export class AlimentosInvitadosComponent implements OnInit {
       }
     }
     else {
-      const documentDefinition = this.getDocumentDefinicion();
+      const documentDefinition = this.DefinirInformacionPDF();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;
         case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -182,8 +182,8 @@ export class AlimentosInvitadosComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+  DefinirInformacionPDF() {
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
@@ -387,7 +387,7 @@ export class AlimentosInvitadosComponent implements OnInit {
 
   /** GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS */
   GenerarSinRegistros() {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

@@ -12,14 +12,12 @@ import excel from 'xlsx';
 
 class EmpleadoCargosControlador {
 
-  // METODO PARA BUSCAR ULTIMO CONTRATO
+  // METODO PARA BUSCAR CARGO ACTIVO   **USADO
   public async BuscarCargosActivos(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.body;
     const CARGO = await pool.query(
       `
-      SELECT e.id AS id_empleado,econ.id AS id_contrato, ecar.id AS id_cargo
-      FROM eu_empleado_cargos AS ecar, eu_empleado_contratos AS econ, eu_empleados AS e
-      WHERE e.id = econ.id_empleado AND econ.id = ecar.id_contrato AND ecar.estado = true AND e.id = $1;
+      SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1;
       `
       , [id_empleado]);
 
@@ -32,7 +30,7 @@ class EmpleadoCargosControlador {
 
   }
 
-  // METODO PARA ACTUALIZAR ESTADO DEL CARGO
+  // METODO PARA ACTUALIZAR ESTADO DEL CARGO    **USADO
   public async EditarEstadoCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_cargo, estado, user_name, ip } = req.body;
@@ -95,6 +93,7 @@ class EmpleadoCargosControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -102,7 +101,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
+  // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO   **USADO
   public async ObtenerCargoID(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const unEmplCargp = await pool.query(
@@ -126,12 +125,11 @@ class EmpleadoCargosControlador {
 
   }
 
-  // METODO DE REGISTRO DE CARGO
+  // METODO DE REGISTRO DE CARGO    **USADO
   public async Crear(req: Request, res: Response): Promise<void> {
     try {
       const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo,
         user_name, ip, jefe } = req.body;
-
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -152,7 +150,6 @@ class EmpleadoCargosControlador {
       empleadoCargo.fecha_inicio = fechaIngresoN;
       empleadoCargo.fecha_final = fechaSalidaN;
 
-
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
@@ -166,17 +163,16 @@ class EmpleadoCargosControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       res.jsonp({ message: 'Registro guardado.' });
+
     } catch (error) {
-      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar el registro.' });
     }
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO    **USADO
   public async EditarCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empl_contrato, id } = req.params;
@@ -247,6 +243,7 @@ class EmpleadoCargosControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -254,7 +251,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
+  // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO    **USADO
   public async EncontrarCargoIDContrato(req: Request, res: Response): Promise<any> {
     const { id_empl_contrato } = req.params;
     const unEmplCargp = await pool.query(
@@ -274,7 +271,7 @@ class EmpleadoCargosControlador {
   }
 
 
-  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
   public async BuscarCargosFecha(req: Request, res: Response): Promise<any> {
     const { id_empleado, fecha_verificar } = req.body;
     const CARGOS = await pool.query(
@@ -293,7 +290,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+  // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
   public async BuscarCargosFechaEditar(req: Request, res: Response): Promise<any> {
     const { id_empleado, fecha_verificar, id_cargo } = req.body;
     const CARGOS = await pool.query(
@@ -417,7 +414,7 @@ class EmpleadoCargosControlador {
    ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** ** 
    ** **************************************************************************************** **/
 
-  // METODO DE BUSQUEDA DE TIPO DE CARGOS
+  // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
   public async ListarTiposCargo(req: Request, res: Response) {
     const Cargos = await pool.query(
       `
@@ -432,7 +429,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-  // METODO DE REGISTRO DE TIPO DE CARGO
+  // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { cargo, user_name, ip } = req.body;
@@ -468,6 +465,7 @@ class EmpleadoCargosControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -477,7 +475,7 @@ class EmpleadoCargosControlador {
 
 
 
-  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
@@ -515,7 +513,7 @@ class EmpleadoCargosControlador {
         var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO,
           CARGO, HORA_TRABAJA, JEFE } = dato;
 
-        //Verificar que el registo no tenga datos vacios
+        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
         if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
           (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
           (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
@@ -528,48 +526,48 @@ class EmpleadoCargosControlador {
           data.admini_depa = JEFE;
           data.observacion = 'no registrado';
 
-          //Valida si los datos de la columna cedula son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
           const rege = /^[0-9]+$/;
           if (rege.test(data.cedula)) {
             if (data.cedula.toString().length != 10) {
               data.observacion = 'La cédula ingresada no es válida';
             } else {
-              // Verificar si la variable tiene el formato de fecha correcto con moment
+              // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
               if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
 
-                // Verificar si la variable tiene el formato de fecha correcto con moment
+                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                 if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
 
-                  //Verifica el valor del suelo que sea solo numeros
+                  // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                   if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                     data.observacion = 'El sueldo es incorrecto';
-                  } else {
+                  }
+                  else {
                     if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
                       if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                         data.observacion = 'Columna jefe formato incorrecto';
                       }
-                    } else {
+                    }
+                    else {
                       data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                     }
                   }
-
-                } else {
+                }
+                else {
                   data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                 }
-
-              } else {
+              }
+              else {
                 data.observacion = 'Formato de fecha desde incorrecto (YYYY-MM-DD)';
               }
-
             }
-
-          } else {
+          }
+          else {
             data.observacion = 'La cédula ingresada no es válida';
           }
-
           listCargos.push(data);
-
-        } else {
+        }
+        else {
           data.fila = ITEM;
           data.cedula = CEDULA; data.departamento = DEPARTAMENTO;
           data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
@@ -618,72 +616,63 @@ class EmpleadoCargosControlador {
           if (CEDULA == undefined) {
             data.cedula = 'No registrado'
             data.observacion = 'Cédula ' + data.observacion;
-          } else {
-            //Valida si los datos de la columna cedula son numeros.
+          }
+          else {
+            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
             const rege = /^[0-9]+$/;
             if (rege.test(data.cedula)) {
               if (data.cedula.toString().length != 10) {
                 data.observacion = 'La cédula ingresada no es válida';
-              } else {
-                // Verificar si la variable tiene el formato de fecha correcto con moment
+              }
+              else {
+                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                 if (data.fecha_desde != 'No registrado') {
                   if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
 
-                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                     if (data.fecha_hasta != 'No registrado') {
                       if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
 
                         if (data.sueldo != 'No registrado') {
-                          //Verifica el valor del suelo que sea solo numeros
+                          // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                           if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                             data.observacion = 'El sueldo es incorrecto';
                           } else {
-                            //Verficar formato de horas
+                            // VERFICAR FORMATO DE HORAS
                             if (data.hora_trabaja != 'No registrado') {
                               if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
-
                                 if (data.admini_depa != 'No registrado') {
                                   if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                                     data.observacion = 'Columna jefe formato incorrecto';
                                   }
                                 }
-
-                              } else {
+                              }
+                              else {
                                 data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                               }
                             }
                           }
                         }
-
-
-                      } else {
+                      }
+                      else {
                         data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                       }
                     }
-
-                  } else {
+                  }
+                  else {
                     data.observacion = 'Formato de fecha desde incorrecto (YYYY-MM-DD)';
                   }
                 }
-
               }
-            } else {
+            }
+            else {
               data.observacion = 'La cédula ingresada no es válida';
             }
-
           }
-
-
-
           listCargos.push(data);
-
-
         }
-
         data = {}
-
       });
-
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -694,12 +683,11 @@ class EmpleadoCargosControlador {
       });
 
       listCargos.forEach(async (valor: any) => {
-
         if (valor.observacion == 'no registrado') {
           var VERIFICAR_CEDULA = await pool.query(
             `
-              SELECT * FROM eu_empleados WHERE cedula = $1
-              `
+            SELECT * FROM eu_empleados WHERE cedula = $1
+            `
             , [valor.cedula]);
 
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
@@ -714,87 +702,92 @@ class EmpleadoCargosControlador {
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
             ) {
               var VERIFICAR_SUCURSALES = await pool.query(
-                `SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1`
+                `
+                SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+                `
                 , [valor.sucursal.toUpperCase()])
               if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
 
-
                 var VERIFICAR_DEPARTAMENTO: any = await pool.query(
-                  `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                  `
+                  SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                  `
                   , [valor.departamento.toUpperCase()])
                 if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
 
                   var VERIFICAR_DEP_SUC: any = await pool.query(
-                    `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
+                    `
+                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                    `
                     , [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]
                   )
                   if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
                     var VERFICAR_CARGO = await pool.query(
-                      `SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`
+                      `
+                      SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                      `
                       , [valor.cargo.toUpperCase()])
                     if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
                       if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
                         valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
-                      } else {
+                      }
+                      else {
                         const fechaRango: any = await pool.query(
                           `
-                                    SELECT id FROM eu_empleado_cargos 
-                                    WHERE id_contrato = $1 AND 
-                                    ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
-                                    fecha_inicio BETWEEN $2 AND $3)
-                                    `
+                          SELECT id FROM eu_empleado_cargos 
+                          WHERE id_contrato = $1 AND 
+                            ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
+                            fecha_inicio BETWEEN $2 AND $3)
+                          `
                           , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
 
                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                           valor.observacion = 'Existe un cargo en esas fechas'
-                        } else {
-
-                          // Discriminación de elementos iguales
+                        }
+                        else {
+                          // DISCRIMINACION DE ELEMENTOS IGUALES
                           if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
                             duplicados.push(valor);
-                          } else {
+                          }
+                          else {
                             valor.observacion = '1';
                           }
-
                         }
-
                       }
-
-                    } else {
+                    }
+                    else {
                       valor.observacion = 'Cargo no existe en el sistema'
                     }
-                  } else {
+                  }
+                  else {
                     valor.observacion = 'Departamento no pertenece a la sucursal'
                   }
-
-                } else {
+                }
+                else {
                   valor.observacion = 'Departamento no existe en el sistema'
                 }
-
-              } else {
+              }
+              else {
                 valor.observacion = 'Sucursal no existe en el sistema'
               }
-
-            } else {
+            }
+            else {
               valor.observacion = 'Cédula no tiene registrado un contrato'
             }
-
-          } else {
+          }
+          else {
             valor.observacion = 'Cédula no existe en el sistema'
           }
-
         }
-
       });
-
       var tiempo = 2000;
       if (listCargos.length > 500 && listCargos.length <= 1000) {
         tiempo = 4000;
-      } else if (listCargos.length > 1000) {
+      }
+      else if (listCargos.length > 1000) {
         tiempo = 7000;
       }
-
       setTimeout(() => {
 
         listCargos.sort((a: any, b: any) => {
@@ -844,18 +837,16 @@ class EmpleadoCargosControlador {
 
       }, tiempo)
     }
-
   }
 
-
+  // METODO PARA CARGAR DATOS DE PLANTILLA CARGOS   **USADO
   public async CargarPlantilla_cargos(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body;
     let error: boolean = false;
-
+  
     for (const data of plantilla) {
       try {
-
-        const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
+        const { cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
           cargo, hora_trabaja, admini_depa } = data;
 
         // INICIAR TRANSACCION
@@ -873,10 +864,10 @@ class EmpleadoCargosControlador {
           `
           , [cedula]);
         const ID_SUCURSAL: any = await pool.query(
-            `
-            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-            `
-            , [sucursal.toUpperCase()]);
+          `
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
+          , [sucursal.toUpperCase()]);
         const ID_DEPARTAMENTO: any = await pool.query(
           `
           SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
@@ -888,20 +879,14 @@ class EmpleadoCargosControlador {
           `
           , [cargo.toUpperCase()]);
 
-
         let id_empleado = ID_EMPLEADO.rows[0].id;
         let id_contrato = ID_CONTRATO.rows[0].id_contrato;
-        let id_sucursal = ID_SUCURSAL.rows[0].id;
         let id_departamento = ID_DEPARTAMENTO.rows[0].id;
         let id_cargo = ID_TIPO_CARGO.rows[0].id;
         let admin_dep = false;
-
         if (admini_depa.toLowerCase() == 'si') {
           admin_dep = true;
         }
-
-        console.log('id_empleado: ', id_empleado);
-        console.log('departamento: ', id_departamento);
 
         const response: QueryResult = await pool.query(
           `
@@ -911,7 +896,6 @@ class EmpleadoCargosControlador {
           `
           , [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
             hora_trabaja, admin_dep]);
-
         const [cargos] = response.rows;
 
         const response2 = await pool.query(
@@ -920,24 +904,29 @@ class EmpleadoCargosControlador {
           VALUES ($1, $2, $3, $4, $5) RETURNING *
           `
           , [id_empleado, id_departamento, true, true, admin_dep]);
-
         const [usuarioDep] = response2.rows;
-
 
         const id_last_cargo = await pool.query(
           `
-           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `
           , [id_contrato]);
 
-        const response3 = await pool.query(
+         console.log('response: ',response.rows[0]);
+
+        await pool.query(
           `
           UPDATE eu_empleado_cargos set estado = $2 
           WHERE id = $1 AND estado = 'true' RETURNING *
           `
           , [id_last_cargo.rows[0].id, false]);
 
-        const [usuarioCargo] = response3.rows;
+        await pool.query(
+            `
+            UPDATE eu_empleado_cargos set estado = $2 
+            WHERE id = $1 AND estado = 'false' RETURNING *
+            `
+          , [response.rows[0].id, true]);
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -969,12 +958,13 @@ class EmpleadoCargosControlador {
         error = true;
       }
     }
-
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
+    }else{
+      return res.status(200).jsonp({ message: 'ok' });
     }
 
-    return res.status(200).jsonp({ message: 'ok' });
+    
 
   }
 

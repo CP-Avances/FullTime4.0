@@ -8,6 +8,8 @@ import path from 'path';
 import pool from '../../database';
 import jwt from 'jsonwebtoken';
 import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
+//IMPORTACIONES PARA AOO MOVIL
+import { QueryResult } from 'pg';
 
 interface IPayload {
   _id: number,
@@ -15,7 +17,7 @@ interface IPayload {
 
 class UsuarioControlador {
 
-  // CREAR REGISTRO DE USUARIOS
+  // CREAR REGISTRO DE USUARIOS    **USADO
   public async CrearUsuario(req: Request, res: Response) {
     try {
       const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
@@ -45,8 +47,8 @@ class UsuarioControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       res.jsonp({ message: 'Usuario Guardado' });
+
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -55,7 +57,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
   public async ObtenerDatosUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const UN_USUARIO = await pool.query(
@@ -108,7 +110,7 @@ class UsuarioControlador {
   }
 
 
-  // METODO PARA ACTUALIZAR DATOS DE USUARIO
+  // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
     try {
       const { usuario, contrasena, id_rol, id_empleado, user_name, ip } = req.body;
@@ -156,16 +158,16 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     }
     catch (error) {
-      console.log('error *** ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
   }
 
-  // METODO PARA ACTUALIZAR CONTRASEÑA
+  // METODO PARA ACTUALIZAR CONTRASEÑA    **USADO
   public async CambiarPasswordUsuario(req: Request, res: Response): Promise<Response> {
     try {
       const { contrasena, id_empleado, user_name, ip } = req.body;
@@ -214,6 +216,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -346,454 +349,25 @@ class UsuarioControlador {
    ** **               METODO PARA MANEJAR DATOS DE USUARIOS TIMBRE WEB                         ** **
    ** ******************************************************************************************** **/
 
-  /**
-   * @returns Retorna Array de [Sucursales[Regimen[Departamentos[Cargos[empleados[]]]]]]
-   **/
-
-  // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
-  public async UsuariosTimbreWeb_SUPERADMIN(req: Request, res: Response) {
+  // METODO PARA LEER DATOS GENERALES TIMBRE WEB    **USADO
+  public async BuscarUsuariosTimbreWeb(req: Request, res: Response) {
     let estado = req.params.estado;
     let habilitado = req.params.habilitado;
-
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
+    let respuesta = await pool.query(
       `
-      SELECT ig.id_suc, ig.name_suc 
-      FROM informacion_general AS ig
-      GROUP BY ig.id_suc, ig.name_suc
-      ORDER BY ig.name_suc ASC
+      SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
+      FROM informacion_general AS ig, eu_usuarios AS u 
+      WHERE ig.estado = $1 AND u.id_empleado = ig.id AND u.web_habilita = $2
       `
+      , [estado, habilitado]
     ).then((result: any) => { return result.rows });
 
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+    if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
 
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          `
-          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
-          `
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-              ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-              ig.name_regimen
-            ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.web_habilita = $6
-              `
-              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
+    return res.status(200).jsonp(respuesta);
   }
 
-  // METODO PARA LEER DATOS PERFIL ADMINISTRADOR
-  public async UsuariosTimbreWeb_ADMIN(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-    let { id_sucursal } = req.body;
-
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
-      "SELECT ig.id_suc, ig.name_suc " +
-      "FROM informacion_general AS ig " +
-      "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-      "GROUP BY ig.id_suc, ig.name_suc " +
-      "ORDER BY ig.name_suc ASC"
-    ).then((result: any) => { return result.rows });
-
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          `
-          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
-          `
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.web_habilita = $6
-              `
-              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
-  }
-
-  // METODO PARA LEER DATOS PERFIL ADMINISTRADOR JEFE
-  public async UsuariosTimbreWeb_JEFE(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-    let { id_sucursal, id_departamento } = req.body;
-
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
-      "SELECT ig.id_suc, ig.name_suc " +
-      "FROM informacion_general AS ig " +
-      "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-      "GROUP BY ig.id_suc, ig.name_suc " +
-      "ORDER BY ig.name_suc ASC"
-    ).then((result: any) => { return result.rows });
-
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          "SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-          "FROM informacion_general AS ig " +
-          "WHERE ig.id_regimen = $1 AND ig.id_suc = $2 AND ig.id_depa IN (" + id_departamento + ")" +
-          "GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-          "ORDER BY ig.name_suc ASC "
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-              ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-              ig.name_regimen
-            ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.web_habilita = $6
-              `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
-  }
-
-
-  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
+  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB    **USADO
   public async ActualizarEstadoTimbreWeb(req: Request, res: Response) {
     try {
       const { array, user_name, ip } = req.body;
@@ -846,7 +420,8 @@ class UsuarioControlador {
 
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
-          return result
+          return result;
+
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -867,452 +442,27 @@ class UsuarioControlador {
    ** **               METODO PARA MANEJAR DATOS DE USUARIOS TIMBRE MOVIL                       ** **
    ** ******************************************************************************************** **/
 
-  /**
-   * @returns Retorna Array de [Sucursales[Regimen[Departamentos[Cargos[empleados[]]]]]]
-   **/
-
-  // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
-  public async UsuariosTimbreMovil_SUPERADMIN(req: Request, res: Response) {
+  // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
+  public async UsuariosTimbreMovilGeneral(req: Request, res: Response) {
     let estado = req.params.estado;
     let habilitado = req.params.habilitado;
 
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
+    let respuesta = await pool.query(
       `
-      SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
-      GROUP BY ig.id_suc, ig.name_suc
-      ORDER BY ig.name_suc ASC
+      SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
+      FROM informacion_general AS ig, eu_usuarios AS u 
+      WHERE ig.estado = $1 AND u.id_empleado = ig.id AND u.app_habilita = $2
       `
+      , [estado, habilitado]
     ).then((result: any) => { return result.rows });
 
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+    if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
 
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          `
-          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
-          `
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-              ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-              ig.name_regimen
-            ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.app_habilita = $6
-              `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
+    return res.status(200).jsonp(respuesta);
   }
 
-  // METODO PARA LEER DATOS PERFIL ADMINISTRADOR
-  public async UsuariosTimbreMovil_ADMIN(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-    let { id_sucursal } = req.body;
 
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
-      "SELECT ig.id_suc, ig.name_suc " +
-      "FROM informacion_general AS ig " +
-      "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-      "GROUP BY ig.id_suc, ig.name_suc " +
-      "ORDER BY ig.name_suc ASC"
-    ).then((result: any) => { return result.rows });
-
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          `
-          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
-          `
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-              ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-              ig.name_regimen
-            ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.app_habilita = $6
-              `
-              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
-  }
-
-  // METODO PARA LEER DATOS PERFIL ADMINISTRADOR JEFE
-  public async UsuariosTimbreMovil_JEFE(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-    let { id_sucursal, id_departamento } = req.body;
-
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let sucursal_ = await pool.query(
-      "SELECT ig.id_suc, ig.name_suc " +
-      "FROM informacion_general AS ig " +
-      "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-      "GROUP BY ig.id_suc, ig.name_suc " +
-      "ORDER BY ig.name_suc ASC"
-    ).then((result: any) => { return result.rows });
-
-    if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE REGIMEN
-    let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
-      reg.regimenes = await pool.query(
-        `
-        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        FROM informacion_general AS ig
-        WHERE ig.id_suc = $1
-        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-        ORDER BY ig.name_suc ASC
-        `
-        , [reg.id_suc]
-      ).then((result: any) => { return result.rows });
-      return reg;
-    }));
-
-    let lista_regimen = regimen_.filter((obj: any) => {
-      return obj.regimenes.length > 0
-    });
-
-    if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await pool.query(
-          "SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-          "FROM informacion_general AS ig " +
-          "WHERE ig.id_regimen = $1 AND ig.id_suc = $2 AND ig.id_depa IN (" + id_departamento + ")" +
-          "GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-          "ORDER BY ig.name_suc ASC"
-          , [dep.id_regimen, dep.id_suc]
-        ).then((result: any) => { return result.rows });
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_departamentos = departamentos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      })
-      return reg;
-    });
-
-    if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await pool.query(
-            `
-            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-              ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-              ig.name_regimen
-            ORDER BY ig.name_suc ASC
-            `
-            , [car.id_depa, car.id_suc, car.id_regimen]
-          ).then((result: any) => { return result.rows });
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }));
-
-    let lista_cargos = cargos_.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          return car.cargos.length > 0;
-        })
-        return dep;
-      })
-      return reg;
-    });
-
-    if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-    let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
-      reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
-        dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
-            empl.empleado = await pool.query(
-              `
-              SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-              FROM informacion_general AS ig, eu_usuarios AS u 
-              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                AND u.app_habilita = $6
-              `
-              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
-              .then((result: any) => { return result.rows });
-            return empl;
-          }));
-          return car;
-        }))
-        return dep;
-      }))
-      return reg;
-    }))
-
-    let empleados = lista.map((reg: any) => {
-      reg.regimenes = reg.regimenes.filter((dep: any) => {
-        dep.departamentos = dep.departamentos.filter((car: any) => {
-          car.cargos = car.cargos.filter((empl: any) => {
-            return empl.empleado.length > 0;
-          })
-          return car;
-        }).filter((car: any) => {
-          return car.cargos.length > 0;
-        });
-        return dep;
-      }).filter((dep: any) => {
-        return dep.departamentos.length > 0;
-      });
-      return reg;
-    }).filter((reg: any) => {
-      return reg.regimenes.length > 0;
-    });
-
-    if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(empleados);
-  }
-
-  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
+  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
     try {
       const { array, user_name, ip } = req.body;
@@ -1365,8 +515,8 @@ class UsuarioControlador {
 
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
+          return result;
 
-          return result
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -1390,7 +540,7 @@ class UsuarioControlador {
     try {
       const DISPOSITIVOS = await pool.query(
         `
-        SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
+        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
         INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
@@ -1406,7 +556,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTROS DE DISPOSITIVOS MOVILES
+  // METODO PARA ELIMINAR REGISTROS DE DISPOSITIVOS MOVILES    **USADO
   public async EliminarDispositivoMovil(req: Request, res: Response) {
     try {
       const { user_name, ip } = req.body;
@@ -1462,8 +612,8 @@ class UsuarioControlador {
 
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
+          return result;
 
-          return result
         } catch (error) {
           // REVERTIR TRANSACCION
           await pool.query('ROLLBACK');
@@ -1471,10 +621,10 @@ class UsuarioControlador {
         }
       }))
 
-      return res.status(200).jsonp({ message: 'Datos eliminados exitosamente.', nuevo })
+      return res.status(200).jsonp({ message: 'Datos eliminados exitosamente.', nuevo });
 
     } catch (error) {
-      return res.status(500).jsonp({ message: error })
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -1666,7 +816,7 @@ class UsuarioControlador {
   }
 
 
-  // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+  // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
       const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body
@@ -1695,6 +845,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
+
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -1727,7 +878,7 @@ class UsuarioControlador {
     }
   }
 
-  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
   public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
@@ -1745,7 +896,7 @@ class UsuarioControlador {
     }
   }
 
-  // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+  // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO   **USADO
   public async ActualizarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
@@ -1794,6 +945,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
+
     }
     catch (error) {
       // REVERTIR TRANSACCION
@@ -1802,7 +954,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO   **USADO
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, id } = req.body;
@@ -1850,6 +1002,7 @@ class UsuarioControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1857,6 +1010,7 @@ class UsuarioControlador {
     }
   }
 
+  //METODO PARA OBTENER DATO ENCRIPTADO
   public async ObtenerDatoEncriptado(req: Request, res: Response) {
     try {
       const { contrasena } = req.body;
@@ -1867,7 +1021,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO
   public async RegistrarUsuarioDepartamentoMultiple(req: Request, res: Response) {
     const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
     let error: boolean = false;
@@ -1920,6 +1074,113 @@ class UsuarioControlador {
 
   }
 
+  //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
+
+  public async getidDispositivo(req: Request, res: Response): Promise<Response> {
+    try {
+      const id_empleado = req.params.id_empleado;
+      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `);
+      const IdDispositivos = response.rows;
+      return res.jsonp(IdDispositivos);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).jsonp({
+        message: 'Ups! Problemas para conectar con el servidor' +
+          '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+      });
+    }
+  };
+
+  public async getDispositivoPorIdDispositivo(req: Request, res: Response): Promise<Response> {
+    try {
+      const {id_dispositivo} = req.body;
+      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`);
+      const idDispositivo = response.rows[0];
+      if (response.rows.length === 0) {
+        return res.status(404).jsonp({
+          message: 'Dispositivo no encontrado'
+        });
+      }
+      return res.jsonp(idDispositivo);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).jsonp({
+        message: 'Ups! Problemas para conectar con el servidor' +
+          '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+      });
+    }
+  };
+
+  public async ingresarIDdispositivo(req: Request, res: Response) {
+    try {
+      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
+      await pool.query('BEGIN');
+
+      const response: QueryResult = await pool.query(
+        'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo, terminos_condiciones)' +
+        'VALUES ($1, $2, $3, $4) RETURNING *',
+        [id_empleado, id_celular, modelo_dispositivo, terminos_condiciones]
+      )
+      const [objetoDispositivos] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: "mrv_dispositivos",
+        usuario: user_name,
+        accion: "I",
+        datosOriginales: "",
+        datosNuevos: JSON.stringify(objetoDispositivos),
+        ip: ip,
+        observacion: null,
+      });
+
+      await pool.query('COMMIT');
+      if (!Response) return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
+
+      return res.status(200).jsonp({
+        body: {
+          mensaje: "Celular Registrado ",
+          response: response.rowCount
+        }
+      })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Error para registrar el celular, Revise su conexion a la red.' });
+    }
+  };
+
+  async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
+    try {
+      const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo, ' +
+        '( e.apellido || \' \' || e.nombre) as fullname, e.id, u.id_rol, u.usuario ' +
+        'FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+      const usuarios = response.rows;
+      console.log(usuarios);
+      return res.jsonp(usuarios);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).
+        jsonp({
+          message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+            'o https://casapazmino.com.ec'
+        });
+    }
+  };
+  public async getUserById(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = parseInt(req.params.id);
+      const response: QueryResult = await pool.query("SELECT * FROM eu_usuarios WHERE id = $1", [id]);
+      const usuarios: any[] = response.rows;
+      return res.jsonp(usuarios[0]);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({
+        message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+          'o https://casapazmino.com.ec'
+      });
+    }
+  };
+
 }
 
 /* @return
@@ -1927,8 +1188,37 @@ class UsuarioControlador {
     0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
     1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL) 
-    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */  async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> { const { id_empleado, id_departamento } = datos; const consulta = await pool.query(`      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `, [id_empleado, id_departamento]); if (consulta.rowCount === 0) return 1; const asignacion = consulta.rows[0]; if (asignacion.principal) { datos.principal = true; datos.id = asignacion.id; datos.personal = asignacion.personal; if (isPersonal) { datos.personal = true; } if (personal) { datos.administra = asignacion.administra; } return 2; } return 3; }
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  
+*/
 
+// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION
+async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> {
+  const { id_empleado, id_departamento } = datos;
+  const consulta = await pool.query(
+    `
+    SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
+    `
+    , [id_empleado, id_departamento]);
+
+  if (consulta.rowCount === 0) return 1;
+  const asignacion = consulta.rows[0];
+
+  if (asignacion.principal) {
+    datos.principal = true;
+    datos.id = asignacion.id;
+    datos.personal = asignacion.personal;
+    if (isPersonal) {
+      datos.personal = true;
+    }
+    if (personal) {
+      datos.administra = asignacion.administra;
+    }
+    return 2;
+  }
+  return 3;
+}
+
+// METODO PARA REGISTRAR UNA ASIGNACION
 async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
@@ -1964,6 +1254,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   }
 }
 
+// METODO PARA EDITAR UNA ASIGNACION
 async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
@@ -2033,6 +1324,8 @@ interface Datos {
   user_name: string;
   ip: string;
 }
+
+
 
 export const USUARIO_CONTROLADOR = new UsuarioControlador();
 

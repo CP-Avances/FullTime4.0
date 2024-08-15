@@ -515,7 +515,7 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   generarPdf(action = "open") {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDFIndividual();
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -532,7 +532,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDFIndividual() {
     return {
       // ENCABEZADO DE LA PAGINA
       pageMargins: [10, 40, 10, 40],
@@ -3996,7 +3996,7 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   GenerarPdf(action = "open") {
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -4013,8 +4013,8 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  GetDocumentDefinicion() {
-    sessionStorage.setItem("Pedidos", this.listaPedidos);
+  DefinirInformacionPDF() {
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",

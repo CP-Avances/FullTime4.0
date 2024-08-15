@@ -62,13 +62,47 @@ export const ObtenerRutaPermisosIdEmpleado = async function (id_empleado: any) {
     const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].cedula}`;
     return { carpetaPermisos, codigo };
 }
-
 // METODO PARA OBTENER RUTA CARPETA DE PERMISOS GENERAL
 export const ObtenerRutaPermisosGeneral = async function () {
     let ruta = '';
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
     return ruta + separador + 'permisos';
+}
+
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE HORAS EXTRA
+export const ObtenerRutaHorasExtraIdEmpleado = async function (id_empleado: any) {
+    let ruta = '';
+    let separador = path.sep;
+    const usuario = await pool.query(
+        `
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        `
+        , [id_empleado]);
+    ruta = path.join(__dirname, `..${separador}..`);
+    const codigo = usuario.rows[0].codigo;
+    const carpetaHorasExtra = `${ruta}${separador}horasExtra${separador}${codigo}_${usuario.rows[0].cedula}`;
+    return { carpetaHorasExtra, codigo };
+}
+
+// METODO PARA OBTENER RUTA CARPETA DE HORAS EXTRA GENERAL
+let ruta = '';
+export const ObtenerRutaHorasExtraGeneral = async function () {
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'horasExtra';
+}
+
+export const ObtenerRutaHorasExtra = async function (codigo: any) {
+    let ruta = '';
+    let separador = path.sep;
+    const usuario = await pool.query(
+        `
+        SELECT cedula FROM eu_empleados WHERE codigo = $1
+        `
+        , [codigo]);
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'horasExtra' + separador + codigo + '_' + usuario.rows[0].cedula;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
@@ -130,6 +164,14 @@ export const ObtenerRutaLeerPlantillas = function () {
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
     return ruta + separador + 'leerPlantillas';
+}
+
+// METODO DE BUSQUEDA DE ARCHIVO LICENCIA
+export const ObtenerRutaLicencia = function () {
+    let ruta = '';
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'licencia.conf.json';
 }
 
 // METODO PARA OBTENER POSICION DE PLANTILLA

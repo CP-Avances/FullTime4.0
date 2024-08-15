@@ -10,7 +10,7 @@ class DepartamentoRutas {
     }
 
     configuracion(): void {
-
+        // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS   **USADO
         this.router.get('/by-permiso/:id_permiso', TokenValidation, AUTORIZACIONES_CONTROLADOR.ObtenerAutorizacionPermiso);
         this.router.get('/by-vacacion/:id_vacacion', TokenValidation, AUTORIZACIONES_CONTROLADOR.ObtenerAutorizacionByVacacion);
         this.router.get('/by-hora-extra/:id_hora_extra', AUTORIZACIONES_CONTROLADOR.ObtenerAutorizacionByHoraExtra);

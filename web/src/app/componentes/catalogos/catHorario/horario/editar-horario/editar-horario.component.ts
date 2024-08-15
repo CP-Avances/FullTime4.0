@@ -173,7 +173,6 @@ export class EditarHorarioComponent implements OnInit {
     }
 
     // SI EL CODIGO DE HORARIO ES IGUAL NO VERIFICA DUPLICADOS
-    console.log('verificar nombres ', form.codigoForm, ' data ', this.data.horario.codigo)
     if (form.codigoForm === this.data.horario.codigo) {
       this.VerificarInformacion(dataHorario, form);
     }

@@ -1,15 +1,15 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -25,8 +25,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   templateUrl: './reporte-tiempo-alimentacion.component.html',
   styleUrls: ['./reporte-tiempo-alimentacion.component.css']
 })
-export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
+export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
@@ -42,21 +42,12 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   data_pdf: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
-  origen: any = [];
-
-  //VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
-  excesoDepartamentos: any = [];
-  excesoSucursales: any = [];
-  excesoRegimen: any = [];
-  excesoCargos: any = [];
 
   //VARIABLES PARA MOSTRAR DETALLES
-  tipo: string;
   verDetalle: boolean = false;
 
   // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
@@ -116,12 +107,12 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
 
   constructor(
-    private validacionService: ValidacionesService,
     private restAlimentacion: AlimentacionService,
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
+    private informacion: DatosGeneralesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
   ) {
@@ -132,7 +123,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
     this.BuscarHora();
   }
@@ -140,7 +131,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.timbres = [];
@@ -177,130 +167,31 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarSucursalesUsuario(opcion: number) {
-    let empleado = { id_empleado: this.idEmpleadoLogueado };
-
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      console.log('ver sucursales ', codigos);
-      this.usua_sucursales = { id_sucursal: codigos };
-      this.BuscarInformacion(opcion, this.usua_sucursales);
-      this.BuscarCargos(opcion, this.usua_sucursales);
-    });
-  }
-
-  // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number, buscar: any) {
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral(opcion: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
-    this.origen = [];
-    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen = JSON.stringify(res);
-        res.forEach((obj: any) => {
-          this.sucursales.push({
-            id: obj.id_suc,
-            nombre: obj.name_suc,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            this.departamentos.push({
-              id: departamento.id_depa,
-              departamento: departamento.name_dep,
-              nombre: departamento.sucursal,
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((r: any) => {
-              let elemento = {
-                id: r.id,
-                nombre: r.name_empleado,
-                codigo: r.codigo,
-                cedula: r.cedula,
-                correo: r.correo,
-                cargo: r.cargo,
-                id_contrato: r.id_contrato,
-                hora_trabaja: r.hora_trabaja,
-                sucursal: r.sucursal,
-                departamento: r.departamento,
-                ciudad: r.ciudad,
-                regimen: r.regimen,
-              };
-              this.empleados.push(elemento);
-            });
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((reg: any) => {
-              reg.regimen.forEach((r: any) => {
-                this.regimen.push({
-                  id: r.id_regimen,
-                  nombre: r.name_regimen,
-                });
-              });
-            });
-          });
-        });
-
-        this.regimen = this.regimen.filter(
-          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
-        );
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  BuscarCargos(opcion: number, buscar: any) {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
-      (res: any[]) => {
-        this.origen_cargo = JSON.stringify(res);
-
-        res.forEach((obj: any) => {
-          this.cargos.push({
-            id: obj.id_cargo,
-            nombre: obj.name_cargo,
-          });
-        });
-
-        res.forEach((obj: any) => {
-          obj.empleados.forEach((r: any) => {
-            this.empleados_cargos.push({
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              ciudad: r.ciudad,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-              hora_trabaja: r.hora_trabaja,
-            });
-          });
-        });
-      });
+    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any) {
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
+  }
+
+  // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO
   ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
@@ -310,59 +201,89 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
-  // VALIDACIONES DE OPCIONES DE REPORTE
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    // METODO PARA MODELAR DATOS
+    this.ModelarDatos(action);
+  }
+
+  // MODELAR DATOS DE ACUERDO AL CRITERIO DE BUSQUEDA
+  ModelarDatos(accion: any) {
+    let seleccionados: any = [];
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
+        if (this.selectionSuc.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
+        seleccionados = this.validar.ModelarSucursal(this.empleados, this.sucursales, this.selectionSuc);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
+        if (this.selectionReg.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        seleccionados = this.validar.ModelarRegimen(this.empleados, this.regimen, this.selectionReg);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
+        if (this.selectionCar.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
+        seleccionados = this.validar.ModelarCargo(this.empleados, this.cargos, this.selectionCar);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
+        seleccionados = this.validar.ModelarDepartamento(this.empleados, this.departamentos, this.selectionDep);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
+        if (this.selectionEmp.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
+        seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
         break;
       default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
+        this.toastr.error(
+          'Ups!!! algo salio mal.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
+    }
+    // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+    if (seleccionados.length != 0) {
+      this.MostrarInformacion(seleccionados, accion);
     }
   }
 
-  // TRATAMIENTO DE DATOS POR SUCURSAL
-  ModelarSucursal(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-
-    let suc = respuesta.filter((o: any) => {
-      let bool = this.selectionSuc.selected.find(obj1 => {
-        return obj1.id === o.id_suc
-      });
-      return bool != undefined
-    });
-
+  // METODO PARA MOSTRAR INFORMACION
+  MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
-    this.restAlimentacion.BuscarTimbresAlimentacion(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restAlimentacion.BuscarTimbresAlimentacion(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
+        case 'excel': this.ExportarExcel(); break;
         case 'ver': this.verDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -370,141 +291,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       this.toastr.error(err.error.message)
     })
   }
-
-  // TRATAMIENTO DE DATOS POR REGIMEN
-  ModelarRegimen(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen);
-    let empleados: any = [];
-    let reg: any = [];
-    let objeto: any;
-    respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen: any) => {
-        objeto = {
-          regimen: {
-            id: regimen.id,
-            nombre: regimen.nombre,
-          },
-        };
-        empleados = [];
-        obj.departamentos.forEach((departamento: any) => {
-          departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r: any) => {
-              if (regimen.id === r.id_regimen) {
-                empleados.push(empleado);
-              }
-            });
-          });
-        });
-        objeto.empleados = empleados;
-        reg.push(objeto);
-      });
-    });
-
-    this.data_pdf = [];
-    this.restAlimentacion.BuscarTimbresAlimentacionRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
-  ModelarDepartamento(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((o: any) => {
-        let bool = this.selectionDep.selected.find(obj1 => {
-          return obj1.id === o.id_depa
-        })
-        return bool != undefined
-      })
-    })
-    let dep = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-    this.data_pdf = []
-    this.restAlimentacion.BuscarTimbresAlimentacion(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR CARGO
-  ModelarCargo(accion: any) {
-    this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o: any) => {
-      var bool = this.selectionCar.selected.find((obj1) => {
-        return obj1.id === o.id_cargo;
-      });
-      return bool != undefined;
-    });
-
-    this.data_pdf = [];
-    this.restAlimentacion.BuscarTimbresAlimentacionRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // TRATAMIENTO DE DATOS POR EMPLEADO
-  ModelarEmpleados(accion: any) {
-    this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((departamento: any) => {
-        departamento.empleado = departamento.empleado.filter((o: any) => {
-          var bool = this.selectionEmp.selected.find(obj1 => {
-            return obj1.id === o.id
-          })
-          return bool != undefined
-        })
-      });
-    })
-    respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((e: any) => {
-        return e.empleado.length > 0
-      })
-    });
-
-    let emp = respuesta.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-
-    this.data_pdf = []
-    this.restAlimentacion.BuscarTimbresAlimentacion(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      switch (accion) {
-        case 'excel': this.ExportarExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -529,16 +315,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                                              PDF                                           **
+   ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
-
   GenerarPDF(action: any) {
-    let documentDefinition: any;
-
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.GetDocumentDefinicion();
-    };
-
+    const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -546,10 +326,9 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
-  GetDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -586,6 +365,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 1, 0, 1], },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
@@ -612,18 +392,13 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
+    let totalExcesoEmpleado: number = 0;
+    let totalExceso: number = 0;
+    let resumen: string = '';
+    let general: any = [];
     let n: any = []
     let c = 0;
-    let totalExcesoEmpleado: number = 0;
-    let totalExcesoSucursal: number = 0;
-    let totalExcesoCargo = 0;
-    let totalExcesoRegimen = 0;
-    let totalExcesoDepartamento = 0;
-    this.excesoDepartamentos = [];
-    this.excesoSucursales = [];
-    this.excesoRegimen = [];
-    this.excesoCargos = [];
-
+    // CODIGO DE COLORES
     n.push({
       style: 'tableMarginColores',
       table: {
@@ -656,492 +431,232 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       }
     });
 
-    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1: any) => {
-        if (this.bool.bool_cargo === true) {
-          totalExcesoCargo = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        } else {
-          totalExcesoRegimen = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, true, true],
-                    bold: true,
-                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
-        }
-
-        obj1.empleados.forEach((obj2: any) => {
-          n.push({
-            style: 'tableMarginCabeceraEmpleado',
-            table: {
-              widths: ['*', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  {
-                    border: [true, true, false, false],
-                    text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, false, false],
-                    text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                  {
-                    border: [false, true, true, false],
-                    text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoEmpleado',
-                  },
-                ],
-                [
-                  {
-                    border: [true, false, false, false],
-                    text: 'DEPARTAMENTO: ' + obj2.departamento,
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
-                    style: 'itemsTableInfoEmpleado'
-                  },
-                  {
-                    border: [false, false, true, false],
-                    text: '',
-                    style: 'itemsTableInfoEmpleado'
-                  }
-                ]
-              ],
-            },
-          });
-          c = 0;
-          totalExcesoEmpleado = 0;
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'FECHA', style: 'tableHeader' },
-                  { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
-                  { text: 'M. TOMADOS', style: 'tableHeader' },
-                  { text: 'M. EXCESO', style: 'tableHeader' },
-                ],
-                ...obj2.timbres.map((obj3: any) => {
-
-                  const fecha = this.validacionService.FormatearFecha(
-                    obj3.inicioAlimentacion.fec_horario,
-                    this.formato_fecha,
-                    this.validacionService.dia_abreviado);
-
-                  const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : 'FT';
-                  const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-                    ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : 'FT';
-
-                  const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-                  const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
-                  const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-                  totalExcesoEmpleado += exceso;
-                  totalExcesoRegimen += exceso;
-                  totalExcesoCargo += exceso;
-                  c = c + 1
-                  return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: fecha },
-                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                    { style: 'itemsTableCentrado', text: minAlimentacion },
-                    { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
-                    { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
-                  ];
-                }),
-                [
-                  {}, {}, {}, {}, {},
-                  { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                  { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
-                ],
-              ],
-            },
-            layout: {
-              fillColor: function (rowIndex: any) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-              }
-            }
-          });
-        });
-        if (this.bool.bool_cargo) {
-          let cargo = {
-            cargo: obj1.name_cargo,
-            exceso: totalExcesoCargo,
-          }
-          this.excesoCargos.push(cargo);
-        };
-
-        if (this.bool.bool_reg) {
-          let regimen = {
-            regimen: obj1.regimen.nombre,
-            exceso: totalExcesoRegimen,
-          }
-          this.excesoRegimen.push(regimen);
-        };
-      });
-
-      if (this.bool.bool_cargo) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL CARGOS',
-                  style: 'itemsTableInfoTotal'
-                },
-                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-              ],
-              ...this.excesoCargos.map((cargo: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: cargo.cargo,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: cargo.exceso, style: 'itemsTableCentrado' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-
-      if (this.bool.bool_reg) {
-        n.push({
-          style: 'tableMarginCabeceraTotal',
-          table: {
-            widths: ['*', 'auto'],
-            headerRows: 1,
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'TOTAL REGIMENES',
-                  style: 'itemsTableInfoTotal'
-                },
-                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-              ],
-              ...this.excesoRegimen.map((regimen: any) => {
-                return [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: regimen.regimen,
-                    style: 'itemsTableCentrado'
-                  },
-                  { text: regimen.exceso, style: 'itemsTableCentrado' },
-                ]
-              })
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      };
-    } else {
-      data.forEach((obj: IReporteFaltas) => {
-        if (this.bool.bool_suc === true) {
-          totalExcesoSucursal = 0;
-          n.push({
-            style: 'tableMarginCabecera',
-            table: {
-              widths: ['*', '*'],
-              headerRows: 1,
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo'
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo'
-                  }
-                ]
-              ]
-            }
-          })
-        }
-
-        obj.departamentos.forEach((obj1: any) => {
-          totalExcesoDepartamento = 0;
-          // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
-          if (this.bool.bool_dep === true) {
-            n.push({
-              style: 'tableMarginCabecera',
-              table: {
-                widths: ['*'],
-                headerRows: 1,
-                body: [
-                  [
-                    {
-                      border: [true, true, true, true],
-                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfo'
-                    },
-                  ]
-                ]
-              }
-            })
-          }
-
-          obj1.empleado.forEach((obj2: any) => {
-            n.push({
-              style: 'tableMarginCabeceraEmpleado',
-              table: {
-                widths: ['*', 'auto', 'auto',],
-                headerRows: 2,
-                body: [
-                  [
-                    {
-                      border: [true, true, false, false],
-                      text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, false, false],
-                      text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, true, true, false],
-                      text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ],
-                  [
-                    {
-                      border: [true, false, false, false],
-                      text: this.bool.bool_suc || this.bool.bool_emp ? 'DEPARTAMENTO: ' + obj2.departamento : '',
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: 'CARGO: ' + obj2.cargo,
-                      style: 'itemsTableInfoEmpleado'
-                    },
-                    {
-                      border: [false, false, true, false],
-                      text: '',
-                      style: 'itemsTableInfoEmpleado'
-                    }
-                  ]
-                ]
-              }
-            });
-            c = 0;
-            totalExcesoEmpleado = 0;
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-                headerRows: 1,
-                body: [
-                  [
-                    { text: 'N°', style: 'tableHeader' },
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
-                    { text: 'M. TOMADOS', style: 'tableHeader' },
-                    { text: 'M. EXCESO', style: 'tableHeader' },
-                  ],
-                  ...obj2.timbres.map((obj3: any) => {
-                    const fecha = this.validacionService.FormatearFecha(
-                      obj3.inicioAlimentacion.fec_horario,
-                      this.formato_fecha,
-                      this.validacionService.dia_abreviado);
-
-                    const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-                      ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : 'FT';
-                    const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-                      ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                      : 'FT';
-
-                    const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-                    const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
-                    const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-                    totalExcesoEmpleado += exceso;
-                    totalExcesoSucursal += exceso;
-                    totalExcesoDepartamento += exceso;
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: fecha },
-                      { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                      { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                      { style: 'itemsTableCentrado', text: minAlimentacion },
-                      { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
-                      { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
-                    ];
-                  }),
-                  [
-                    {}, {}, {}, {}, {},
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                    { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
-                  ],
-                ],
+    data.forEach((selec: any) => {
+      // CONTAR REGISTROS
+      let arr_reg = selec.empleados.map((o: any) => { return o.alimentacion.length });
+      let reg = this.validar.SumarRegistros(arr_reg);
+      // CONTAR MINUTOS DE EXCESO DE ALIMENTACION 
+      totalExceso = 0;
+      selec.empleados.forEach((o: any) => {
+        o.alimentacion.map((usu: any) => {
+          const minAlimentacion = usu.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(usu.inicioAlimentacion.fecha_hora_timbre, usu.finAlimentacion.fecha_hora_timbre);
+          const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
+          totalExceso += exceso;
+        })
+      })
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      let opcion = selec.nombre;
+      if (this.bool.bool_reg === true) {
+        descripcion = 'RÉGIMEN LABORAL: ' + selec.nombre;
+        resumen = 'TOTAL RÉGIMEN LABORAL';
+      }
+      else if (this.bool.bool_dep === true) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
+      }
+      else if (this.bool.bool_cargo === true) {
+        descripcion = 'CARGO: ' + selec.nombre;
+        resumen = 'TOTAL CARGOS';
+      }
+      else if (this.bool.bool_suc === true) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (this.bool.bool_emp === true) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+      // DATOS DE RESUMEN GENERAL
+      let informacion = {
+        sucursal: selec.sucursal,
+        nombre: opcion,
+        totalMinExceso: totalExceso,
+      }
+      general.push(informacion);
+      // CABECERA PRINCIPAL
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
               },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
+      });
+      // PRESENTACION DE LA INFORMACION
+      selec.empleados.forEach((empl: any) => {
+        n.push({
+          style: 'tableMarginCabeceraEmpleado',
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                {
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
+              ],
+              [
+                {
+                  border: [true, false, true, false],
+                  text: 'RÉGIMEN LABORAL ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
                 }
-              }
-            });
-          });
-          if (this.bool.bool_dep) {
-            let departamento = {
-              departamento: obj1.name_dep,
-              exceso: totalExcesoDepartamento,
-            }
-            this.excesoDepartamentos.push(departamento);
-          };
+              ]
+            ],
+          },
         });
-
-        if (this.bool.bool_suc) {
-          let sucursal = {
-            sucursal: obj.name_suc,
-            exceso: totalExcesoSucursal,
+        // ENCERAR VARIABLES
+        c = 0;
+        totalExcesoEmpleado = 0;
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            headerRows: 1,
+            body: [
+              [
+                { text: 'N°', style: 'tableHeader' },
+                { text: 'FECHA', style: 'tableHeader' },
+                { text: 'INICIO ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'FIN ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'M. ALIMENTACIÓN', style: 'tableHeader' },
+                { text: 'M. TOMADOS', style: 'tableHeader' },
+                { text: 'M. EXCESO', style: 'tableHeader' },
+              ],
+              ...empl.alimentacion.map((usu: any) => {
+                const fecha = this.validar.FormatearFecha(usu.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const inicioAlimentacion = usu.inicioAlimentacion.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : 'FT';
+                const finAlimentacion = usu.finAlimentacion.fecha_hora_timbre != null
+                  ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+                  : 'FT';
+                const minAlimentacion = usu.inicioAlimentacion.minutos_alimentacion;
+                const minutosTomados = this.CalcularDiferenciaFechas(usu.inicioAlimentacion.fecha_hora_timbre, usu.finAlimentacion.fecha_hora_timbre);
+                const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
+                totalExcesoEmpleado += exceso;
+                c = c + 1
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTableCentrado', text: fecha },
+                  { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                  { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                  { style: 'itemsTableCentrado', text: minAlimentacion },
+                  { style: 'itemsTableCentrado', text: minutosTomados !== null ? minutosTomados : minAlimentacion },
+                  { style: exceso > 0 ? 'itemsTableCentradoExceso' : 'itemsTableCentrado', text: exceso },
+                ];
+              }),
+              [
+                {}, {}, {}, {}, {},
+                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                { style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado },
+              ],
+            ],
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
-          this.excesoSucursales.push(sucursal);
-        };
+        });
+      })
+    })
+    // RESUMEN TOTALES DE REGISTROS
+    if (this.bool.bool_emp === false) {
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
+              },
+              {},
+              { text: 'MINUTOS EXCESO', style: 'itemsTableInfoTotal' },
+            ],
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (this.bool.bool_suc === true) {
+                valor = 2;
+              }
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
+                },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
+                },
+                { text: info.totalMinExceso, style: 'itemsTableDerecha' },
+              ]
+            })
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex: any) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
+        }
       });
     }
-
-    if (this.bool.bool_dep) {
-      n.push({
-        style: 'tableMarginCabeceraTotal',
-        table: {
-          widths: ['*', 'auto'],
-          headerRows: 1,
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                bold: true,
-                text: 'TOTAL DEPARTAMENTOS',
-                style: 'itemsTableInfoTotal'
-              },
-              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-            ],
-            ...this.excesoDepartamentos.map((departamento: any) => {
-              return [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: departamento.departamento,
-                  style: 'itemsTableCentrado'
-                },
-                { text: departamento.exceso, style: 'itemsTableCentrado' },
-              ]
-            })
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
-    };
-
-    if (this.bool.bool_suc) {
-      n.push({
-        style: 'tableMarginCabeceraTotal',
-        table: {
-          widths: ['*', 'auto'],
-          headerRows: 1,
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                bold: true,
-                text: 'TOTAL SUCURSALES',
-                style: 'itemsTableInfoTotal'
-              },
-              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
-            ],
-            ...this.excesoSucursales.map((sucursal: any) => {
-              return [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: sucursal.sucursal,
-                  style: 'itemsTableCentrado'
-                },
-                { text: sucursal.exceso, style: 'itemsTableCentrado' },
-              ]
-            })
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
-    };
-
     return n;
   }
 
@@ -1150,80 +665,45 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(tipo: string): void {
-    switch (tipo) {
-      case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
-        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Alimentacion');
-        xlsx.writeFile(wb_regimen_cargo, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-      default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-        const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Alimentacion');
-        xlsx.writeFile(wb, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-        break;
-    }
+  ExportarExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Alimentacion');
+    xlsx.writeFile(wb, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let n = 0;
-    array.forEach((obj1: IReporteFaltas) => {
-      obj1.departamentos.forEach((obj2: any) => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: any) => {
-            n++;
-            const inicioAlimentacion = obj4.inicioAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : 'FT';
-            const finAlimentacion = obj4.finAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : 'FT';
-            const minAlimentacion = obj4.inicioAlimentacion.minutos_alimentacion;
-            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fecha_hora_timbre, obj4.finAlimentacion.fecha_hora_timbre);
-            const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-            let ele = {
-              'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
-              'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
-              'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
-              'Fecha': new Date(obj4.inicioAlimentacion.fecha_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
-              'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !== null ? minutosTomados : minAlimentacion,
-              'M. Exceso': exceso
-            }
-            nuevo.push(ele);
-          })
-        })
-      })
-    })
-    return nuevo;
-  }
-
-  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((obj1: any) => {
-      obj1.empleados.forEach((obj2: any) => {
-        obj2.timbres.forEach((obj3: any) => {
+    array.forEach((info: any) => {
+      info.empleados.forEach((usu: any) => {
+        usu.alimentacion.forEach((a: any) => {
           n++;
-          const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+          const inicioAlimentacion = a.inicioAlimentacion.fecha_hora_timbre != null
+            ? this.validar.FormatearHora(a.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+          const finAlimentacion = a.finAlimentacion.fecha_hora_timbre != null
+            ? this.validar.FormatearHora(a.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
+          const minAlimentacion = a.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(a.inicioAlimentacion.fecha_hora_timbre, a.finAlimentacion.fecha_hora_timbre);
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
-            'N°': n, 'Código': obj2.codigo, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula,
-            'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
-            'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
-            'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
-            'Fecha': new Date(obj3.inicioAlimentacion.fecha_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
-            'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !== null ? minutosTomados : minAlimentacion,
-            'M. Exceso': exceso
+            'N°': n,
+            'Cédula': usu.cedula,
+            'Código': usu.codigo,
+            'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
+            'Ciudad': usu.ciudad,
+            'Sucursal': usu.sucursal,
+            'Régimen': usu.regimen,
+            'Departamento': usu.departamento,
+            'Cargo': usu.cargo,
+            'Fecha': new Date(a.inicioAlimentacion.fecha_hora_horario),
+            'Inicio Alimentación': inicioAlimentacion,
+            'Fin Alimentación': finAlimentacion,
+            'Minutos Alimentación': minAlimentacion,
+            'Minutos Tomados': minutosTomados !== null ? minutosTomados : minAlimentacion,
+            'Minutos Exceso': exceso
           }
           nuevo.push(ele);
         })
@@ -1236,73 +716,39 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
 
-  ExtraerTimbres() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
-    this.data_pdf.forEach((obj1: IReporteFaltas) => {
-      obj1.departamentos.forEach((obj2: any) => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: any) => {
-            const fecha = this.validacionService.FormatearFecha(
-              obj4.inicioAlimentacion.fec_horario,
-              this.formato_fecha,
-              this.validacionService.dia_abreviado);
-
-            const inicioAlimentacion = obj4.inicioAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : 'FT';
-            const finAlimentacion = obj4.finAlimentacion.fecha_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : 'FT';
-
-            const minAlimentacion = obj4.inicioAlimentacion.minutos_alimentacion;
-            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fecha_hora_timbre, obj4.finAlimentacion.fecha_hora_timbre);
-            const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-            n = n + 1;
-            const ele = {
-              n: n,
-              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-              departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
-              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-              fecha, inicio: inicioAlimentacion, fin: finAlimentacion,
-              alimentacion: minAlimentacion, tomados: minutosTomados !== null ? minutosTomados : minAlimentacion, exceso: exceso
-            }
-            this.timbres.push(ele);
-          })
-        })
-      })
-    })
-  }
-
-  ExtraerTimbresRegimenCargo() {
-    this.timbres = [];
-    let n = 0;
-    this.data_pdf.forEach((obj1: any) => {
-      obj1.empleados.forEach((obj2: any) => {
-        obj2.timbres.forEach((obj3: any) => {
-          const fecha = this.validacionService.FormatearFecha(
-            obj3.inicioAlimentacion.fec_horario,
-            this.formato_fecha,
-            this.validacionService.dia_abreviado);
-
-          const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+    this.data_pdf.forEach((info: any) => {
+      info.empleados.forEach((usu: any) => {
+        usu.alimentacion.forEach((a: any) => {
+          const fecha = this.validar.FormatearFecha(a.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          const inicioAlimentacion = a.inicioAlimentacion.fecha_hora_timbre != null
+            ? this.validar.FormatearHora(a.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+          const finAlimentacion = a.finAlimentacion.fecha_hora_timbre != null
+            ? this.validar.FormatearHora(a.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-
-          const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
-          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
+          const minAlimentacion = a.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(a.inicioAlimentacion.fecha_hora_timbre, a.finAlimentacion.fecha_hora_timbre);
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           n = n + 1;
           const ele = {
             n: n,
-            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-            departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
-            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-            fecha, inicio: inicioAlimentacion, fin: finAlimentacion,
-            alimentacion: minAlimentacion, tomados: minutosTomados !== null ? minutosTomados : minAlimentacion, exceso: exceso
+            cedula: usu.cedula,
+            codigo: usu.codigo,
+            empleado: usu.apellido + ' ' + usu.nombre,
+            ciudad: usu.ciudad,
+            sucursal: usu.sucursal,
+            regimen: usu.regimen,
+            departamento: usu.departamento,
+            cargo: usu.cargo,
+            fecha,
+            inicio: inicioAlimentacion,
+            fin: finAlimentacion,
+            alimentacion: minAlimentacion,
+            tomados: minutosTomados !== null ? minutosTomados : minAlimentacion,
+            exceso: exceso
           }
           this.timbres.push(ele);
         })
@@ -1474,22 +920,20 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // METODO DE VALIDACION DE LETRAS
   IngresarSoloLetras(e: any) {
-    return this.validacionService.IngresarSoloLetras(e)
+    return this.validar.IngresarSoloLetras(e)
   }
 
+  // METODO DE VALIDACION DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.ExtraerTimbresRegimenCargo();
-    } else {
-      this.ExtraerTimbres();
-    }
+    this.ExtraerDatos();
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
@@ -1502,7 +946,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   ObtenerClaseCeldas(valor: any) {
     if (valor > 0) {
       return 'verde';
-    } else if (valor == 'FT') {
+    }
+    else if (valor == 'FT') {
       return 'rojo';
     }
   }

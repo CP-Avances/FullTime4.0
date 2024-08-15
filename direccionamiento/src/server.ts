@@ -52,11 +52,11 @@ class Servidor{
     }
 
     rutas(): void {
-        this.app.use('/fulltime', EMPRESAS_RUTAS);//RUTA PARA EMPRESA
-        this.app.use('/parametrizacion', PARAMETRIZACION_RUTAS);//RUTA DATOS INICIALES
-        this.app.use('/empleado', EMPLEADO_RUTAS);//RUTA DATOS INICIALES
-        this.app.use('/licencia', LICENCIA_RUTAS);//RUTA PARA OBTENER LICENCIA
-        this.app.use('/', FUNCIONES_RUTAS);
+        this.app.use('/direccionamiento/fulltime', EMPRESAS_RUTAS);//RUTA PARA EMPRESA
+        this.app.use('/direccionamiento/parametrizacion', PARAMETRIZACION_RUTAS);//RUTA DATOS INICIALES
+        this.app.use('/direccionamiento/empleado', EMPLEADO_RUTAS);//RUTA DATOS INICIALES
+        this.app.use('/direccionamiento/licencia', LICENCIA_RUTAS);//RUTA PARA OBTENER LICENCIA
+        this.app.use('/direccionamiento', FUNCIONES_RUTAS);
     }
 
     start(): void {

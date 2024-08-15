@@ -238,6 +238,15 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     // SI ES SUPERADMINISTRADOR NO FILTRAR
     if (this.rolEmpleado !== 1) {
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
+
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
@@ -550,7 +559,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionSuc.selected.find(selec => {
+        this.selectionSuc.selected.find((selec: any) => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -572,7 +581,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find(selec => {
+        this.selectionReg.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -594,7 +603,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find(selec => {
+        this.selectionCarg.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -616,7 +625,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find(selec => {
+        this.selectionDep.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -637,7 +646,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+      this.selectionEmp.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }

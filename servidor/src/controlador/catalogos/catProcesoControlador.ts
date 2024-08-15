@@ -148,7 +148,7 @@ class ProcesoControlador {
     }
   }
 
-  // METODO PARA ELIMINA PROCESOS
+  // METODO PARA ELIMINA PROCESOS   **USADO
   public async EliminarProceso(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
@@ -205,7 +205,6 @@ class ProcesoControlador {
       return res.jsonp({ message: 'Registro eliminado.' })
 
     } catch (error) {
-      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });

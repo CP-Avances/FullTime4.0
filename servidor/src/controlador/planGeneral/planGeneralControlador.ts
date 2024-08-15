@@ -1,11 +1,11 @@
-import e, { Request, Response } from 'express';
+import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 
 class PlanGeneralControlador {
 
-    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
+    // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
         let errores: number = 0;
         let ocurrioError = false;
@@ -22,11 +22,12 @@ class PlanGeneralControlador {
 
                 const result = await pool.query(
                     `
-                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
-                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `,
+                    INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                        minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `
+                    ,
                     [
                         plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
                         plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
@@ -81,7 +82,7 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     public async BuscarFechas(req: Request, res: Response) {
         const { fec_inicio, fec_final, id_horario, id_empleado } = req.body;
         const FECHAS = await pool.query(
@@ -98,9 +99,8 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
-
         var errores: number = 0;
         let ocurrioError = false;
         let mensajeError = '';
@@ -167,7 +167,6 @@ class PlanGeneralControlador {
 
             } catch (error) {
                 // REVERTIR TRANSACCION
-                console.log(error)
                 await pool.query('ROLLBACK');
                 errores++;
                 ocurrioError = true;
@@ -217,11 +216,10 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   **USADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
-            console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', id_empleado)
             const HORARIO = await pool.query(
                 "SELECT id_e, codigo_e, nombre_e, anio, mes, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
@@ -283,7 +281,7 @@ class PlanGeneralControlador {
     }
 
 
-    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
+    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              **USADO
     public async ListarDetalleHorarios(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
@@ -313,7 +311,7 @@ class PlanGeneralControlador {
     }
 
 
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO  **USADO
     public async ListarHorariosUsuario(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
@@ -338,18 +336,12 @@ class PlanGeneralControlador {
         }
     }
 
-    // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
-
-
-    // METODO PARA BUSCAR ASISTENCIAS
+    // METODO PARA BUSCAR ASISTENCIAS   **USADO
     public async BuscarAsistencia(req: Request, res: Response) {
         try {
             const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
-            console.log('ver datos ', cedula, ' ', codigo, ' ', inicio, ' ', fin, ' ', nombre, ' ', apellido)
             let ids = [];
-    
             if (codigo !== '' && codigo !== null) {
-                console.log('ver codigo ', codigo)
                 const empleado = await BuscarEmpleadoPorParametro('codigo', codigo);
                 if (empleado.rowCount! > 0) {
                     ids = empleado.rows.map(row => row.id);
@@ -358,30 +350,33 @@ class PlanGeneralControlador {
                 let empleado;
                 if (cedula !== '' && cedula !== null) {
                     empleado = await BuscarEmpleadoPorParametro('cedula', cedula);
-                } else if (nombre !== '' && apellido !== '' && nombre !== null && apellido !== null) {
+                }
+                else if (nombre !== '' && apellido !== '' && nombre !== null && apellido !== null) {
                     empleado = await BuscarEmpleadoPorParametro('nombre_apellido', { nombre, apellido });
-                } else if (apellido !== '' && apellido !== null) {
+                }
+                else if (apellido !== '' && apellido !== null) {
                     empleado = await BuscarEmpleadoPorParametro('apellido', apellido);
-                } else if (nombre !== '' && nombre !== null) {
+                }
+                else if (nombre !== '' && nombre !== null) {
                     empleado = await BuscarEmpleadoPorParametro('nombre', nombre);
                 }
-                console.log('ver empleado ', empleado)
-    
                 if (empleado && empleado.rowCount! > 0) {
                     ids = empleado.rows.map(row => row.id);
                 }
             }
-    
             if (ids.length > 0) {
-                const ASISTENCIA = await pool.query(`
+                const ASISTENCIA = await pool.query(
+                    `
                     SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
-                    p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                    empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
+                        p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                        empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
                     FROM eu_asistencia_general p_g
                     INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
                     WHERE p_g.fecha_horario BETWEEN $1 AND $2
-                    ORDER BY p_g.fecha_hora_horario ASC`, [inicio, fin, ids]);
-    
+                    ORDER BY p_g.fecha_hora_horario ASC
+                    `
+                    , [inicio, fin, ids]);
+
                 if (ASISTENCIA.rowCount === 0) {
                     return res.status(404).jsonp({ message: 'vacio' });
                 } else {
@@ -390,22 +385,21 @@ class PlanGeneralControlador {
             } else {
                 return res.status(404).jsonp({ message: 'vacio' });
             }
+
         } catch (error) {
             return res.status(500).jsonp({ message: 'Error interno del servidor' });
         }
     }
 
-    // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
+    // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
     public async ActualizarManual(req: Request, res: Response) {
         try {
-            const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
-            console.log('ver datos ', id_empleado, ' ', fecha, ' ', id)
+            const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
             const ASIGNADO = await pool.query(
                 `
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `
-                , [fecha, id_empleado]);
-            //console.log('ver asignado ', ASIGNADO)
+                , [fecha, codigo]);
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -439,6 +433,7 @@ class PlanGeneralControlador {
             var fecha_hora_horario1 = await FormatearHora(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1])
             var fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd')
             var fecha_horario = await FormatearFecha2(datosOriginales.fecha_horario, 'ddd')
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_asistencia_general',
@@ -452,7 +447,6 @@ class PlanGeneralControlador {
             });
 
             if (PLAN.rowCount != 0) {
-
                 const TIMBRE = await pool.query(
                     `
                     UPDATE eu_timbres SET accion = $1 WHERE id = $2
@@ -472,8 +466,8 @@ class PlanGeneralControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
+                return res.jsonp({ message: 'OK', respuesta: PLAN.rows });
 
-                return res.jsonp({ message: 'OK', respuesta: PLAN.rows })
             }
             else {
                 // REVERTIR TRANSACCION

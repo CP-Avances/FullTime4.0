@@ -44,8 +44,8 @@ export class LoginComponent implements OnInit {
   constructor(
     public rest: LoginService,
     public restU: UsuarioService,
-    private router: Router,
     private route: ActivatedRoute,
+    private router: Router,
     private toastr: ToastrService,
     private asignacionesService: AsignacionesService,
   ) {
@@ -56,48 +56,8 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  latitud: number = -0.1918213;
-  longitud: number = -78.4875258;
-
-  private options = {
-    enableHighAccuracy: false,
-    maximumAge: 30000,
-    timeout: 15000
-  };
-
   ngOnInit(): void {
     this.url = this.router.url;
-    this.Geolocalizar();
-  }
-
-  // METODO QUE PERMITE ACCEDER A UBICACION DEL USUARIO
-  Geolocalizar() {
-    if (navigator.geolocation) {
-
-      navigator.geolocation.getCurrentPosition(
-        (objPosition) => {
-          this.latitud = objPosition.coords.latitude;
-          this.longitud = objPosition.coords.longitude;
-        }, (objPositionError) => {
-
-          switch (objPositionError.code) {
-            case objPositionError.PERMISSION_DENIED:
-              // NO ES POSIBLE ACCEDER A LA POSICION DEL USUARIO
-              break;
-            case objPositionError.POSITION_UNAVAILABLE:
-              // NO SE HA PODIDO ACCEDER A LA INFORMACION DE SU POSICION
-              break;
-            case objPositionError.TIMEOUT:
-              // EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER
-              break;
-            default:
-            // ERROR DESCONOCIDO
-          }
-        }, this.options);
-    }
-    else {
-      // EL NAVEGADOR NO SOPORTA LA API DE GEOLOCALIZACION
-    }
   }
 
   // MENSAJE DE ERROR AL INGRESAR INFORMACION
@@ -107,6 +67,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  // MENSAJE DE ERROR AL INGRESAR INFORMACION
   ObtenerMensajeCampoContraseniaError() {
     if (this.pass.hasError('required')) {
       return 'Ingresar contraseña.';
@@ -199,15 +160,12 @@ export class LoginComponent implements OnInit {
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
       pass: clave,
+      movil: false
     };
-    console.log('ingresa ', dataUsuario)
-    if (this.latitud === undefined) {
-      this.Geolocalizar();
-      return this.toastr.error('Es necesario permitir el acceso a la ubicación del usuario.');
-    }
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
+      console.log('res login ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -275,7 +233,6 @@ export class LoginComponent implements OnInit {
         })
 
         if (!!localStorage.getItem("redireccionar")) {
-          console.log('redireccionar')
           let redi = localStorage.getItem("redireccionar");
           this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
           localStorage.removeItem("redireccionar");

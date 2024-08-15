@@ -14,10 +14,10 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
@@ -161,9 +161,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    //console.log('ver original ', this.origen)
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
@@ -214,6 +212,15 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     // SI ES SUPERADMINISTRADOR NO FILTRAR
     if (this.rolEmpleado !== 1) {
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
+
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
@@ -255,6 +262,18 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.departamentos = verificados_dep;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.sucursales = verificados_suc;
 
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
     let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
@@ -487,7 +506,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find(selec => {
+        this.selectionReg.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -509,7 +528,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find(selec => {
+        this.selectionCarg.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -532,7 +551,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find(selec => {
+        this.selectionDep.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -546,9 +565,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         }
       })
     }
-
-    console.log('ver usuarios ', usuarios);
-
     this.SeleccionarProceso(tipo, usuarios);
   }
 
@@ -556,7 +572,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   ModelarEmpleados(tipo: string) {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+      this.selectionEmp.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }
@@ -641,7 +657,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   plan_rotativo: boolean = false;
   data_rotativo: any = []
   PlanificarRotativos(data: any) {
-    console.log('data rotativos ', data)
     this.data_horario = [];
     if (data.length > 0) {
       this.data_horario = {
@@ -661,21 +676,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   cargar_plantilla: boolean = false;
   data_cargar: any = [];
   CargarPlantilla(data: any) {
-    console.log('data cargar ', data)
     this.data_cargar = [];
-    // if (data.length > 0) {
     this.data_cargar = {
       usuariosSeleccionados: data,
       pagina: 'cargar-plantilla',
     }
     this.seleccionar = false;
     this.cargar_plantilla = true;
-    // }
-    // else {
-    //   this.toastr.warning('No ha seleccionado usuarios.', '', {
-    //     timeOut: 6000,
-    //   });
-    // }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -783,7 +790,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA VER PLANIFICACION
   resultados: any = [];
   VerPlanificacion(data: any) {
-    console.log('VerPlanificacion', data);
     if (data.length > 0) {
       this.resultados = data;
       this.seleccionar = false;
@@ -835,7 +841,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   rotativo: any = []
   registrar_rotativo: boolean = false;
   AbrirMultipleIndividual(usuario: any): void {
-    //console.log('ver usuario ', usuario)
     this.rotativo = {
       idCargo: usuario.id_cargo,
       codigo: usuario.codigo,
@@ -878,7 +883,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
   CargarTimbres(data: any) {
-    //console.log('ver data timbres ', data)
     if (data.length > 0) {
 
       var inicio = moment(this.fechaInicioF.value).format('YYYY-MM-DD');
@@ -905,7 +909,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         };
 
         this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-          //console.log('datos ', datos)
           if (datos.message === 'vacio') {
             this.toastr.info(
               'No se han encontrado registros de marcaciones.', '', {

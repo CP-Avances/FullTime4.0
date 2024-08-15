@@ -56,5 +56,9 @@ export class RolesService {
     );
   }
 
+  actualizarRoles(data: any){
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol/updateUsers`, data);
+  }
+
 
 }

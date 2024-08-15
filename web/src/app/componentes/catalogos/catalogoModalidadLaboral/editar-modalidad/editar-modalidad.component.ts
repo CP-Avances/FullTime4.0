@@ -1,7 +1,8 @@
-import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+
 import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
@@ -10,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
   templateUrl: './editar-modalidad.component.html',
   styleUrls: ['./editar-modalidad.component.css']
 })
+
 export class EditarModalidadComponent implements OnInit {
 
   // VARIABLES PARA AUDITORIA
@@ -58,7 +60,6 @@ export class EditarModalidadComponent implements OnInit {
       ip: this.ip,
     };
     this._ModalidaLaboral.ActualizarModalidadLab(modalidad).subscribe(response => {
-      console.log('response: ', response);
       if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,
@@ -73,7 +74,6 @@ export class EditarModalidadComponent implements OnInit {
           timeOut: 4000,
         });
       }
-
     }, error => {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,

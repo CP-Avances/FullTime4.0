@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_HORARIOS_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../../database"));
 class EmpleadoHorariosControlador {
-    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  --**VERIFICADO
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
     VerificarHorariosExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal } = req.body;
@@ -175,7 +175,7 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    // VERIFICAR EXISTENCIA DE PLANIFICACION   --**VERIFICADO
+    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
     VerificarFechasHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal, id_horario } = req.body;

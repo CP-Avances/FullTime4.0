@@ -24,18 +24,19 @@ class NivelTituloRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR LISTA DE NIVELES DE TITULO
+        // METODO PARA BUSCAR LISTA DE NIVELES DE TITULO   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ListarNivel);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS   **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.EliminarNivelTitulo);
-        // METODO PARA REGISTRAR NIVEL DE TITULO
+        // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.CrearNivel);
-        // METODO PARA ACTUALIZAR REGISTRO DE NIVEL
+        // METODO PARA ACTUALIZAR REGISTRO DE NIVEL   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ActualizarNivelTitulo);
-        // METODO PARA BUSCAR NIVEL POR SU NOMBRE
+        // METODO PARA BUSCAR NIVEL POR SU NOMBRE   **USADO
         this.router.get('/buscar/:nombre', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ObtenerNivelNombre);
+        // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], nivelTituloControlador_1.default.RevisarDatos);
-        // METODO PARA REGISTRAR NIVELES DE TITULO DE LA PLANTILLA
+        // METODO PARA REGISTRAR NIVELES DE TITULO DE LA PLANTILLA   **USADO
         this.router.post('/registrarNiveles', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.RegistrarNivelesPlantilla);
     }
 }

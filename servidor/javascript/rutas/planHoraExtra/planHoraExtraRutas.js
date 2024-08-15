@@ -33,19 +33,19 @@ class DepartamentoRutas {
         this.router.get('/plan_empleado/:id_plan_hora', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], planHoraExtraControlador_1.default.ListarPlanEmpleados);
         // ELIMINAR PLANIFICACION DE ALIMENTACION
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, planHoraExtraControlador_1.default.EliminarRegistros);
-        // ELIMINAR PLANIFICACION DE UN USUARIO
+        // ELIMINAR PLANIFICACION DE UN USUARIO    **USADO
         this.router.delete('/eliminar/plan-hora/:id/:id_empleado', verificarToken_1.TokenValidation, planHoraExtraControlador_1.default.EliminarPlanEmpleado);
-        // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
+        // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO   **USADO
         this.router.get('/listar-plan/:id', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], planHoraExtraControlador_1.default.BuscarPlanUsuario);
         /** ******************************************************************************************** **
          ** *             ENVIO DE CORREO ELECTRONICO DE PLANIFICACIONES DE HORAS EXTRAS               * **
          ** ******************************************************************************************** **/
-        // CREACIÓN DE PLANIFICACION DE HORAS EXTRAS
+        // CREACION DE PLANIFICACION DE HORAS EXTRAS   **USADO
         this.router.post('/send/correo-planifica/', [verificarToken_1.TokenValidation], planHoraExtraControlador_1.default.EnviarCorreoPlanificacion);
         /** ******************************************************************************************** **
-         ** *                   NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                       ** **
+         ** *                   NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS                       ** **
          ** ******************************************************************************************** **/
-        // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+        // CREACION DE PLANIFICACION DE HORAS EXTRAS    **USADO
         this.router.post('/send/noti-planifica', verificarToken_1.TokenValidation, planHoraExtraControlador_1.default.EnviarNotiPlanHE);
     }
 }

@@ -49,6 +49,7 @@ export class CambiarContrasenaComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
   }
 
+  // METODO PARA CONPARAR CONTRASEÑAS
   CompararContrasenia(form: any) {
     //TODO CAMBIO PARA NO ENCRIPTAR EN FRONTEND
     // CIFRADO DE CONTRASEÑA?

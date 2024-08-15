@@ -6,11 +6,11 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-empleado',
@@ -256,7 +256,7 @@ export class EditarEmpleadoComponent implements OnInit {
     }
   }
 
-  // METODO PARA ACTUALIZAR INFORMACION D EUSUARIO
+  // METODO PARA ACTUALIZAR INFORMACION DE USUARIO
   contador: number = 0;
   ActualizarUser(form3: any, form1: any) {
     this.contador = 0;

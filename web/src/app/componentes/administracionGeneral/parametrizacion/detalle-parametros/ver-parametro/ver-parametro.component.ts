@@ -1,6 +1,6 @@
 // SECCION DE LIBRERIAS
-import { FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,7 +39,6 @@ export class VerParametroComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-
   // ACTIVADORES
   ver_editar: boolean = true;
   ver_detalles: boolean = true;
@@ -73,8 +72,12 @@ export class VerParametroComponent implements OnInit {
   conectividad_internet: boolean = false;
   // PARAMETRO TOMAR FOTO MOVIL
   foto_movil: boolean = false;
+  // PARAMETRO TOMAR FOTO WEB
+  foto_web: boolean = false;
   // PARAMETRO LIMITE CORREO
   limite_correo: boolean = false;
+  // PARAMETRO HERRAMIENTA DE ANALISIS DE DATOS
+  analisis: boolean = false;
 
   ingreso: number = 0;
 
@@ -95,6 +98,8 @@ export class VerParametroComponent implements OnInit {
     this.BuscarParametros(this.idParametro);
     this.ListarDetalles(this.idParametro);
     this.ActivarBoton();
+
+    console.log('ver registrar ', this.boton_registrar)
   }
 
   // METODO PARA ACTIVAR BOTONES SEGUN PARAMETRO
@@ -102,7 +107,6 @@ export class VerParametroComponent implements OnInit {
 
     this.ver_editar = false;
     this.ver_detalles = false;
-    this.boton_registrar = false;
 
     // FORMATO FECHA
     if (this.idParametro === '1') {
@@ -118,35 +122,27 @@ export class VerParametroComponent implements OnInit {
     }
     // TOLERANCIA UBICACION
     if (this.idParametro === '4') {
-      this.ver_detalles = true;
-      this.ver_editar = true;
       this.ubicacion = true;
     }
     // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
     if (this.idParametro === '5') {
-      this.ver_formulario = true;
       this.ubicacion_desconocida = true;
     }
     // DISPOSITIVOS MOVILES
     if (this.idParametro === '6') {
-      this.ver_editar = true;
-      this.ver_detalles = true;
       this.dispositivos = true;
     }
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '7') {
       this.certificados = true;
-      this.ver_formulario = true;
     }
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '8') {
       this.cumpleanios = true;
-      this.ver_formulario = true;
     }
     // CONSIDERAR SEGUNDOS MARCACIONES
     if (this.idParametro === '9') {
       this.segundos_timbres = true;
-      this.ver_formulario = true;
     }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '10') {
@@ -163,17 +159,31 @@ export class VerParametroComponent implements OnInit {
     // FORMATO CONECTIVIDAD INTERNET
     if (this.idParametro === '13') {
       this.conectividad_internet = true;
-      this.ver_formulario = true;
     }
-    // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
+    // FORMATO FOTO MOVIL
     if (this.idParametro === '14') {
-      this.ver_formulario = true;
       this.foto_movil = true;
+    }
+    // FORMATO FOTO WEB
+    if (this.idParametro === '15') {
+      this.foto_web = true;
+    }
+    // PARAMETRO DE HERRAMIENTA DE ANALISIS DE DATOS
+    if (this.idParametro === '16') {
+      this.analisis = true;
+    }
+    // PARAMETROS PARA INGRESAR DETALLE
+    if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16' || this.idParametro === '33') {
+      this.ver_editar = true;
+      this.ver_detalles = true;
+    }
+    // PARAMETROS CON FORMULARIO
+    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9'
+      || this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
+      this.ver_formulario = true;
     }
     // LIMITE CORREO
     if (this.idParametro === '33') {
-      this.ver_editar = true;
-      this.ver_detalles = true;
       this.limite_correo = true;
     }
 
@@ -235,15 +245,16 @@ export class VerParametroComponent implements OnInit {
       }
 
       // PARAMETROS QUE EXISTEN Y NO NECESITAN REGISTRO ADICIONAL
-      if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '13') {
+      if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16' || this.idParametro === '33') {
         this.boton_registrar = false;
       }
 
       // PARAMETROS CON DETALLES
       if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9' ||
-        this.idParametro === '13' || this.idParametro === '14') {
+        this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
         this.VerConfiguracionRegistro();
       }
+
     }, vacio => {
       if (this.idParametro === '3') {
         this.ver_actualizar_atraso = false;

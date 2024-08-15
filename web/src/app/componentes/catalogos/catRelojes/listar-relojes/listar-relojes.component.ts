@@ -1,9 +1,13 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ITableDispositivos } from 'src/app/model/reportes.model';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
@@ -17,17 +21,10 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { RelojesComponent } from 'src/app/componentes/catalogos/catRelojes/relojes/relojes.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-
-import { SelectionModel } from '@angular/cdk/collections';
-import { ITableDispositivos } from 'src/app/model/reportes.model';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-
 
 @Component({
   selector: 'app-listar-relojes',
@@ -81,6 +78,8 @@ export class ListarRelojesComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  dispositivosCorrectos: number = 0;
+
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
   color: ThemePalette = 'primary';
@@ -94,7 +93,6 @@ export class ListarRelojesComponent implements OnInit {
     public restE: EmpleadoService,
     private rest: RelojesService,
     private toastr: ToastrService,
-    private restUsuario: UsuarioService,
     private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -280,6 +278,7 @@ export class ListarRelojesComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA VALIDAR DATOS DE PLANTILLA
   DataDispositivos: any;
   listaDispositivosCorrectos: any = [];
   messajeExcel: string = '';
@@ -290,12 +289,12 @@ export class ListarRelojesComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.progreso = true;
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.VerificarArchivoExcel(formData).subscribe(res => {
       this.DataDispositivos = res.data;
       this.messajeExcel = res.message;
 
-      this.DataDispositivos.sort((a, b) => {
+      this.DataDispositivos.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -323,10 +322,10 @@ export class ListarRelojesComponent implements OnInit {
             this.listaDispositivosCorrectos.push(item);
           }
         });
-      }
 
+        this.dispositivosCorrectos = this.listaDispositivosCorrectos.length;
+      }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -338,8 +337,7 @@ export class ListarRelojesComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
+  EstiloCelda(observacion: string): string {
     if (observacion == 'Registro duplicado (código)' ||
       observacion == 'Registro duplicado (dirección IP)' ||
       observacion == 'Registro duplicado (número de serie)' ||
@@ -373,8 +371,9 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(242, 21, 21)';
     }
   }
+
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto;
     if (arrayObservacion == 'No registrado') {
       return 'rgb(255, 80, 80)';
@@ -383,30 +382,30 @@ export class ListarRelojesComponent implements OnInit {
     }
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listDepartamentosCorrectos: ', this.listaDispositivosCorrectos.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarDispositivos();
+          this.RegistrarDispositivos();
         }
       });
   }
 
-  registrarDispositivos() {
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
+  RegistrarDispositivos() {
     if (this.listaDispositivosCorrectos?.length > 0) {
       const data = {
         plantilla: this.listaDispositivosCorrectos,
         user_name: this.user_name,
         ip: this.ip,
       }
-      this.rest.subirArchivoExcel(data).subscribe(response => {
+      this.rest.SubirArchivoExcel(data).subscribe(response => {
         this.toastr.success('Operación exitosa.', 'Plantilla de Dispositivos importada.', {
           timeOut: 3000,
         });
-        //window.location.reload();
         this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
@@ -420,59 +419,13 @@ export class ListarRelojesComponent implements OnInit {
     }
   }
 
-  plantilla() {
-    let formData = new FormData();
-    for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
-    }
-    this.rest.Verificar_Datos_ArchivoExcel(formData).subscribe(res => {
-      if (res.message === 'error') {
-        this.toastr.error(
-          `Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos
-          de la plantilla ingresada, recuerde que los datos no pueden estar duplicados dentro del sistema,
-          nombre del equipo, código y dirección IP son datos únicos de cada registro, asegurese
-          que el nombre de la sucursal y el departamento exitan dentro del sistema.`,
-          'Verificar los datos ingresados en la plantilla.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      } else {
-        this.rest.VerificarArchivoExcel(formData).subscribe(response => {
-          if (response.message === 'error') {
-            this.toastr.error(
-              `Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos
-              de la plantilla ingresada, recuerde que los datos no pueden estar duplicados dentro del sistema,
-              nombre del equipo, código y dirección IP son datos únicos de cada registro, asegurese
-              que el nombre de la sucursal y el departamento exitan dentro del sistema.`,
-              'Verificar los datos ingresados en la plantilla.', {
-              timeOut: 10000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          } else {
-            formData.append('user_name', this.user_name as string);
-            formData.append('user_ip', this.ip as string);
-            this.rest.subirArchivoExcel(formData).subscribe(datos_reloj => {
-              this.toastr.success('Operación exitosa.', 'Plantilla de Relojes importada.', {
-                timeOut: 10000,
-              });
-              this.archivoForm.reset();
-              this.nameFile = '';
-              window.location.reload();
-            });
-          }
-        });
-      }
-    });
-  }
 
   /** ********************************************************************************* **
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -482,10 +435,8 @@ export class ListarRelojesComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Dispositivos', this.relojes);
+  DefinirInformacionPDF() {
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -654,7 +605,6 @@ export class ListarRelojesComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloRelojes);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -739,6 +689,10 @@ export class ListarRelojesComponent implements OnInit {
   }
 
 
+  /** ********************************************************************************************** **
+   ** **                          METODO DE SELECCION MULTIPLE DE DATOS                           ** **
+   ** ********************************************************************************************** **/
+
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -779,7 +733,6 @@ export class ListarRelojesComponent implements OnInit {
     return `${this.selectionDispositivos.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
 
   }
-
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarRelojes(id_reloj: number) {

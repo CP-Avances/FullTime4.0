@@ -26,15 +26,15 @@ class ModalidaLaboralRutas {
     configuracion() {
         // METODO PARA LISTAR MODALIDAD LABORAL
         this.router.get('/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.ListaModalidadLaboral);
-        // METODO PARA REGISTRAR MODALIDAD LABORAL
-        this.router.post('/crearModalidad', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CrearMadalidadLaboral);
-        // METODO PARA EDITAR MODALIDAD LABORAL
+        // METODO PARA REGISTRAR MODALIDAD LABORAL     **USADO
+        this.router.post('/crearModalidad', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CrearModalidadLaboral);
+        // METODO PARA EDITAR MODALIDAD LABORAL   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.EditarModalidadLaboral);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catModalidadLaboralControlador_1.default.VerfificarPlantillaModalidadLaboral);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CargarPlantilla);
     }
 }

@@ -14,10 +14,12 @@ class VacacionesRutas {
     configuracion() {
         this.router.get('/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ListarVacaciones);
         this.router.get('/estado-solicitud', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ListarVacacionesAutorizadas);
+        // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO   **USADO
         this.router.get('/:id', verificarToken_1.TokenValidation, vacacionesControlador_1.default.VacacionesIdPeriodo);
         this.router.post('/fechasFeriado', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerFechasFeriado);
         this.router.get('/datosSolicitud/:id_emple_vacacion', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerSolicitudVacaciones);
         this.router.get('/datosAutorizacion/:id_vacaciones', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerAutorizacionVacaciones);
+        this.router.get('/lista-vacacionesfechas/fechas/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.getlistaVacacionesByFechasyCodigo);
         /** ************************************************************************************************* **
          ** **                          METODOS PARA MANEJO DE VACACIONES                                  ** **
          ** ************************************************************************************************* **/

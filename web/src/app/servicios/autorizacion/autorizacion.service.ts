@@ -13,7 +13,7 @@ export class AutorizacionService {
   ) { }
 
 
-  // METODO PARA BUSCAR APROBACIONES DE PERMISO
+  // METODO PARA BUSCAR APROBACIONES DE PERMISO    **USADO
   BuscarAutorizacionPermiso(id_permiso: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/by-permiso/${id_permiso}`);
   }

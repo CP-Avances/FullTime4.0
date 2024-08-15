@@ -96,11 +96,9 @@ export class EditarTimbreComponent implements OnInit {
   LeerDatosTimbre() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    console.log('ver timbre ', this.datosTimbre)
     this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
     this.datosTimbre.hora_ = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
     this.ValidarObservacion();
-
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: [this.datosTimbre.accion, Validators.required],
       teclaFunTimbre: [this.datosTimbre.tecla_funcion, Validators.required],
@@ -115,18 +113,15 @@ export class EditarTimbreComponent implements OnInit {
     const simbolo = "/";
     this.simbolo_ = '';
     if (patron.test(cadena) && cadena.includes(simbolo)) {
-      //--console.log('ingresa 1')
       this.observacion = cadena.slice(cadena.indexOf(simbolo) + 1);
       const indice = cadena.indexOf(simbolo);
       this.simbolo_ = cadena.substring(0, indice) + ' / ';
     }
     else if (patron.test(cadena)) {
-      //--console.log('ingresa 2')
       this.observacion = '';
       this.simbolo_ = cadena + ' / ';
     }
     else {
-      //--console.log('ingresa 3')
       this.observacion = this.datosTimbre.observacion
     }
 
@@ -160,13 +155,11 @@ export class EditarTimbreComponent implements OnInit {
   EnviarDatosTimbre(formTimbre: any) {
     let data = {
       id: this.datosTimbre.id,
-      id_empleado: this.datosTimbre.id_empleado,
-      accion: formTimbre.accionTimbre,
+      codigo: this.datosTimbre.codigo,
       tecla: formTimbre.teclaFunTimbre,
       observacion: this.simbolo_ + formTimbre.ObservacionForm,
       fecha: this.datosTimbre.fecha_hora_timbre_servidor,
     }
-    //--console.log('data: ', data);
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any = res
       this.ventana.close(2);

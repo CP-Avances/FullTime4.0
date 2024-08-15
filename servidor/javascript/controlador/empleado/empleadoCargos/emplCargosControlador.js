@@ -22,14 +22,12 @@ const fs_1 = __importDefault(require("fs"));
 const settingsMail_1 = require("../../../libs/settingsMail");
 const xlsx_1 = __importDefault(require("xlsx"));
 class EmpleadoCargosControlador {
-    // METODO PARA BUSCAR ULTIMO CONTRATO
+    // METODO PARA BUSCAR CARGO ACTIVO   **USADO
     BuscarCargosActivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const CARGO = yield database_1.default.query(`
-      SELECT e.id AS id_empleado,econ.id AS id_contrato, ecar.id AS id_cargo
-      FROM eu_empleado_cargos AS ecar, eu_empleado_contratos AS econ, eu_empleados AS e
-      WHERE e.id = econ.id_empleado AND econ.id = ecar.id_contrato AND ecar.estado = true AND e.id = $1;
+      SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1;
       `, [id_empleado]);
             if (CARGO.rowCount != 0) {
                 return res.jsonp({ message: 'contrato_cargo', datos: CARGO.rows[0] });
@@ -39,7 +37,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR ESTADO DEL CARGO
+    // METODO PARA ACTUALIZAR ESTADO DEL CARGO    **USADO
     EditarEstadoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -96,7 +94,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
+    // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO   **USADO
     ObtenerCargoID(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -118,7 +116,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO DE REGISTRO DE CARGO
+    // METODO DE REGISTRO DE CARGO    **USADO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -150,14 +148,13 @@ class EmpleadoCargosControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar el registro.' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR REGISTRO
+    // METODO PARA ACTUALIZAR REGISTRO    **USADO
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -221,7 +218,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
+    // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO    **USADO
     EncontrarCargoIDContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl_contrato } = req.params;
@@ -239,7 +236,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar } = req.body;
@@ -257,7 +254,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFechaEditar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar, id_cargo } = req.body;
@@ -363,7 +360,7 @@ class EmpleadoCargosControlador {
     /** **************************************************************************************** **
      ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **
      ** **************************************************************************************** **/
-    // METODO DE BUSQUEDA DE TIPO DE CARGOS
+    // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
     ListarTiposCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Cargos = yield database_1.default.query(`
@@ -377,7 +374,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO DE REGISTRO DE TIPO DE CARGO
+    // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
     CrearTipoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -414,7 +411,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -448,7 +445,7 @@ class EmpleadoCargosControlador {
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO, CARGO, HORA_TRABAJA, JEFE } = dato;
-                    //Verificar que el registo no tenga datos vacios
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
                         (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
                         (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
@@ -464,18 +461,18 @@ class EmpleadoCargosControlador {
                         data.hora_trabaja = HORA_TRABAJA;
                         data.admini_depa = JEFE;
                         data.observacion = 'no registrado';
-                        //Valida si los datos de la columna cedula son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
                             if (data.cedula.toString().length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
                             }
                             else {
-                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                 if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                     if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
-                                        //Verifica el valor del suelo que sea solo numeros
+                                        // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                                         if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                                             data.observacion = 'El sueldo es incorrecto';
                                         }
@@ -557,26 +554,26 @@ class EmpleadoCargosControlador {
                             data.observacion = 'Cédula ' + data.observacion;
                         }
                         else {
-                            //Valida si los datos de la columna cedula son numeros.
+                            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {
                                 if (data.cedula.toString().length != 10) {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                     if (data.fecha_desde != 'No registrado') {
                                         if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                             if (data.fecha_hasta != 'No registrado') {
                                                 if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
                                                     if (data.sueldo != 'No registrado') {
-                                                        //Verifica el valor del suelo que sea solo numeros
+                                                        // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                                                         if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                                                             data.observacion = 'El sueldo es incorrecto';
                                                         }
                                                         else {
-                                                            //Verficar formato de horas
+                                                            // VERFICAR FORMATO DE HORAS
                                                             if (data.hora_trabaja != 'No registrado') {
                                                                 if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
                                                                     if (data.admini_depa != 'No registrado') {
@@ -623,8 +620,8 @@ class EmpleadoCargosControlador {
                 listCargos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query(`
-              SELECT * FROM eu_empleados WHERE cedula = $1
-              `, [valor.cedula]);
+            SELECT * FROM eu_empleados WHERE cedula = $1
+            `, [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                             const ID_CONTRATO = yield database_1.default.query(`
               SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
@@ -632,29 +629,37 @@ class EmpleadoCargosControlador {
               `, [valor.cedula]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
-                                var VERIFICAR_SUCURSALES = yield database_1.default.query(`SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1`, [valor.sucursal.toUpperCase()]);
+                                var VERIFICAR_SUCURSALES = yield database_1.default.query(`
+                SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+                `, [valor.sucursal.toUpperCase()]);
                                 if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
-                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [valor.departamento.toUpperCase()]);
+                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                  SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                  `, [valor.departamento.toUpperCase()]);
                                     if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                        var VERIFICAR_DEP_SUC = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
+                                        var VERIFICAR_DEP_SUC = yield database_1.default.query(`
+                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                    `, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
                                         if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
-                                            var VERFICAR_CARGO = yield database_1.default.query(`SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`, [valor.cargo.toUpperCase()]);
+                                            var VERFICAR_CARGO = yield database_1.default.query(`
+                      SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                      `, [valor.cargo.toUpperCase()]);
                                             if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                                                 if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
                                                     valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                                 }
                                                 else {
                                                     const fechaRango = yield database_1.default.query(`
-                                    SELECT id FROM eu_empleado_cargos 
-                                    WHERE id_contrato = $1 AND 
-                                    ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
-                                    fecha_inicio BETWEEN $2 AND $3)
-                                    `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
+                          SELECT id FROM eu_empleado_cargos 
+                          WHERE id_contrato = $1 AND 
+                            ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
+                            fecha_inicio BETWEEN $2 AND $3)
+                          `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
                                                     if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                                         valor.observacion = 'Existe un cargo en esas fechas';
                                                     }
                                                     else {
-                                                        // Discriminación de elementos iguales
+                                                        // DISCRIMINACION DE ELEMENTOS IGUALES
                                                         if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
                                                             duplicados.push(valor);
                                                         }
@@ -738,13 +743,14 @@ class EmpleadoCargosControlador {
             }
         });
     }
+    // METODO PARA CARGAR DATOS DE PLANTILLA CARGOS   **USADO
     CargarPlantilla_cargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
-                    const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo, cargo, hora_trabaja, admini_depa } = data;
+                    const { cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo, cargo, hora_trabaja, admini_depa } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const ID_EMPLEADO = yield database_1.default.query(`
@@ -755,8 +761,8 @@ class EmpleadoCargosControlador {
           WHERE e.id = uc.id_empleado AND e.cedula = $1
           `, [cedula]);
                     const ID_SUCURSAL = yield database_1.default.query(`
-            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-            `, [sucursal.toUpperCase()]);
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `, [sucursal.toUpperCase()]);
                     const ID_DEPARTAMENTO = yield database_1.default.query(`
           SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
           `, [ID_SUCURSAL.rows[0].id, departamento.toUpperCase()]);
@@ -765,15 +771,12 @@ class EmpleadoCargosControlador {
           `, [cargo.toUpperCase()]);
                     let id_empleado = ID_EMPLEADO.rows[0].id;
                     let id_contrato = ID_CONTRATO.rows[0].id_contrato;
-                    let id_sucursal = ID_SUCURSAL.rows[0].id;
                     let id_departamento = ID_DEPARTAMENTO.rows[0].id;
                     let id_cargo = ID_TIPO_CARGO.rows[0].id;
                     let admin_dep = false;
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
-                    console.log('id_empleado: ', id_empleado);
-                    console.log('departamento: ', id_departamento);
                     const response = yield database_1.default.query(`
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
             sueldo, id_tipo_cargo, hora_trabaja, jefe) 
@@ -787,13 +790,17 @@ class EmpleadoCargosControlador {
           `, [id_empleado, id_departamento, true, true, admin_dep]);
                     const [usuarioDep] = response2.rows;
                     const id_last_cargo = yield database_1.default.query(`
-           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `, [id_contrato]);
-                    const response3 = yield database_1.default.query(`
+                    console.log('response: ', response.rows[0]);
+                    yield database_1.default.query(`
           UPDATE eu_empleado_cargos set estado = $2 
           WHERE id = $1 AND estado = 'true' RETURNING *
           `, [id_last_cargo.rows[0].id, false]);
-                    const [usuarioCargo] = response3.rows;
+                    yield database_1.default.query(`
+            UPDATE eu_empleado_cargos set estado = $2 
+            WHERE id = $1 AND estado = 'false' RETURNING *
+            `, [response.rows[0].id, true]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_cargos',
@@ -825,7 +832,9 @@ class EmpleadoCargosControlador {
             if (error) {
                 return res.status(500).jsonp({ message: 'error' });
             }
-            return res.status(200).jsonp({ message: 'ok' });
+            else {
+                return res.status(200).jsonp({ message: 'ok' });
+            }
         });
     }
 }

@@ -11,7 +11,7 @@ class DoumentosRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR FUNCIONES DEL SISTEMA
+        // METODO PARA LISTAR FUNCIONES DEL SISTEMA   **USO TEMPORAL
         this.router.get('/funcionalidad', funcionControlador_1.default.ConsultarFunciones);
     }
 }

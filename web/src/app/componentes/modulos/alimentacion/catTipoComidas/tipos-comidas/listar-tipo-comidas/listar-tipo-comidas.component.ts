@@ -246,7 +246,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** **                              METODO PARA EXPORTAR A PDF                                  ** **
    ** ********************************************************************************************** **/
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -255,8 +255,8 @@ export class ListarTipoComidasComponent implements OnInit {
     }
   }
 
-  GetDocumentDefinicion() {
-    sessionStorage.setItem('Comidas', this.tipoComidas);
+  DefinirInformacionPDF() {
+
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

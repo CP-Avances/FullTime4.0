@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
     ListarParametros(req, res) {
@@ -240,31 +241,54 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA COMPARAR COORDENADAS
+    // METODO PARA COMPARAR COORDENADAS    **USADO
     CompararCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { lat1, lng1, lat2, lng2, valor } = req.body;
-                const RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+                if (isNaN(lat1) || isNaN(lng1) || isNaN(lat2) || isNaN(lng2) || isNaN(valor)) {
+                    return res.status(400).jsonp({ message: 'error' });
+                }
+                const RADIO_TIERRA = 6371; // RADIO DE LA TIERRA EN KILOMETROS
                 const VALIDACION = yield database_1.default.query(`
-            SELECT CASE 
-                WHEN (
-                    ${RADIO_TIERRA} * ACOS(
-                        COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
-                        SIN(RADIANS($1)) * SIN(RADIANS($3))
-                    ) * 1000 -- Convertir a metros
-                ) <= $5 THEN 'ok'
-                ELSE 'vacio'
-            END AS verificar
-            `, [lat1, lng1, lat2, lng2, valor]);
+                SELECT CASE 
+                    WHEN (
+                        ${RADIO_TIERRA} * ACOS(
+                            COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
+                            SIN(RADIANS($1)) * SIN(RADIANS($3))
+                        ) * 1000 -- Convertir a metros
+                        ) <= $5 THEN 'ok'
+                    ELSE 'vacio'
+                    END AS verificar
+                `, [lat1, lng1, lat2, lng2, valor]);
                 return res.jsonp(VALIDACION.rows);
             }
             catch (error) {
+                console.log('error --> ', error);
                 return res.status(500)
                     .jsonp({ message: 'error_500' });
             }
         });
     }
+    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+    BuscarFechasHoras(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let formato_fecha = yield (0, settingsMail_1.BuscarFecha)();
+                let formato_hora = yield (0, settingsMail_1.BuscarHora)();
+                let formatos = {
+                    fecha: formato_fecha.fecha,
+                    hora: formato_hora.hora
+                };
+                return res.jsonp(formatos);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.PARAMETROS_CONTROLADOR = new ParametrosControlador();
 exports.default = exports.PARAMETROS_CONTROLADOR;

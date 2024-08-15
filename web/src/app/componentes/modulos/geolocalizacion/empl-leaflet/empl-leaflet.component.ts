@@ -63,7 +63,6 @@ export class EmplLeafletComponent implements OnInit {
 
   // METODO PARA TOMAR COORDENAS DE UBICACION
   Geolocalizar() {
-    console.log('ingresa aqui')
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (objPosition) => {

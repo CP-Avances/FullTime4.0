@@ -223,50 +223,14 @@ class AlimentacionControlador {
         }
     }
 
+    // METODO PARA BUSCAR DATOS DE ALIMENTACION   **USADO
     public async ReporteTimbresAlimentacion(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
-        let { desde, hasta } = req.params
-        let datos: any[] = req.body;
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteAlimentacion) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    const listaTimbres = await BuscarAlimentacion(desde, hasta, o.id);
-                    o.timbres = await agruparTimbres(listaTimbres);
-                    console.log('timbres:-------------------- ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-        let nuevo = n.map((obj: ReporteAlimentacion) => {
-            obj.departamentos = obj.departamentos.map((e) => {
-                e.empleado = e.empleado.filter((v: any) => { return v.timbres.length > 0 })
-                return e
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
-
-        return res.status(200).jsonp(nuevo)
-
-    }
-
-    public async ReporteTimbresAlimentacionRegimenCargo(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 const listaTimbres = await BuscarAlimentacion(desde, hasta, o.id);
-                o.timbres = await agruparTimbres(listaTimbres);
+                o.alimentacion = await AgruparTimbres(listaTimbres);
                 console.log('Timbres: ', o);
                 return o;
             }));
@@ -274,14 +238,13 @@ class AlimentacionControlador {
         }));
 
         let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            e.empleados = e.empleados.filter((t: any) => { return t.alimentacion.length > 0 })
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
         if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
 
         return res.status(200).jsonp(nuevo)
-
     }
 
 
@@ -291,26 +254,26 @@ export const ALIMENTACION_CONTROLADOR = new AlimentacionControlador();
 
 export default ALIMENTACION_CONTROLADOR;
 
-
-const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
+// FUNCION PARA BUSCAR DATOS DE ALIMENTACION
+const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
             id_empleado, estado_timbre, tipo_accion AS accion, minutos_alimentacion 
         FROM eu_asistencia_general 
-        WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
-            AND tipo_accion IN (\'I/A\', \'F/A\') 
+        WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND id_empleado = $3 
+            AND tipo_accion IN ('I/A', 'F/A') 
         ORDER BY id_empleado, fecha_hora_horario ASC
         `
-        , [fec_inicio, fec_final, codigo])
+        , [fec_inicio, fec_final, id_empleado])
         .then(res => {
             return res.rows;
         })
 }
 
-
-const agruparTimbres = async function (listaTimbres: any) {
+// METODO PARA AGRUPAR TIMBRES
+const AgruparTimbres = async function (listaTimbres: any) {
     const timbresAgrupados: any[] = [];
     for (let i = 0; i < listaTimbres.length; i += 2) {
         timbresAgrupados.push({

@@ -14,19 +14,19 @@ class TimbresRutas {
     configuracion() {
         // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS  --**VERIFICADO
         this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
-        // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+        // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
         this.router.post('/buscar/timbres-asistencia', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresAsistencia);
-        // METODO PARA BUSCAR MARCACIONES
+        // METODO PARA BUSCAR MARCACIONES   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbres);
-        // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA
+        // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA   **USADO
         this.router.get('/timbresfechaemple', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenertimbreFechaEmple);
-        // METODO PARA REGISTRAR TIMBRES PERSONALES
+        // METODO PARA REGISTRAR TIMBRES PERSONALES    **USADO
         this.router.post('/', verificarToken_1.TokenValidation, timbresControlador_1.default.CrearTimbreWeb);
-        // METODO PARA REGISTRAR TIMBRE ADMINISTRADOR
+        // METODO PARA REGISTRAR TIMBRE ADMINISTRADOR    **USADO
         this.router.post('/admin/', verificarToken_1.TokenValidation, timbresControlador_1.default.CrearTimbreWebAdmin);
-        // METODO PARA ACTUALIZAR EL TIMBRE DEL EMPLEADO
+        // METODO PARA ACTUALIZAR EL TIMBRE DEL EMPLEADO    **USADO
         this.router.put('/timbre/editar', verificarToken_1.TokenValidation, timbresControlador_1.default.EditarTimbreEmpleadoFecha);
-        // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA
+        // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA   **USADO
         this.router.post('/buscar/timbres-planificacion', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresPlanificacion);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
@@ -34,7 +34,15 @@ class TimbresRutas {
         this.router.get('/aviso-individual/:id', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerUnAviso);
         this.router.get('/noti-timbres/avisos/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosTimbresEmpleado);
         this.router.put('/noti-timbres/vista/:id_noti_timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarVista);
+        // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USADO
         this.router.get('/ver/timbres/:id', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbresEmpleado);
+        //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+        this.router.post('/timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbre);
+        this.router.post('/timbreSinConexion', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreDesconectado);
+        this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
+        this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
+        this.router.post('/atraso', verificarToken_1.TokenValidation, timbresControlador_1.default.justificarAtraso);
+        this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
     }
 }
 const TIMBRES_RUTAS = new TimbresRutas();

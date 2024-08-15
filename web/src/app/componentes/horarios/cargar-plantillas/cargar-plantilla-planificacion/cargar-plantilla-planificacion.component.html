@@ -104,8 +104,9 @@
 
               <tbody>
                   <tr *ngFor="let empleado of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
-                      <td class="sticky colum_1 td_horarios">{{empleado.cedula_empleado}}</td>
-                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="empleado.cedula_empleado">{{empleado.cedula_empleado}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="!empleado.cedula_empleado" [style.color]="ObtenerColorEmpleado('Empleado no válido')">{{empleado.cedula}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorEmpleado(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
                       <td *ngFor="let dia of empleado.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}
@@ -116,7 +117,9 @@
                         <div [style.color]="ObtenerColorObservacion(dia.observacion)">
                           {{dia.observacion}}
                         </div>
-                        <br>
+                        <div *ngIf="dia.observacion5" [style.color]="ObtenerColorObservacion(dia.observacion5)">
+                          {{dia.observacion5}}
+                        </div>
                         <div class="icon-container">
                           <i id="ver" *ngIf="MostrarVisualizarObservacion(dia)"
                             class="fa fa-eye" matSuffix matTooltipPosition="right"
@@ -130,11 +133,16 @@
 
               </table>
             </div>
-            <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
-              [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
-              showFirstLastButtons>
-            </mat-paginator>
-
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{numeroPlanificacionesCorrectas}}</div>
+              </div>
+              <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
+                [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
+                showFirstLastButtons>
+              </mat-paginator>
+            </div>
           </div>
 
       </mat-card-content>

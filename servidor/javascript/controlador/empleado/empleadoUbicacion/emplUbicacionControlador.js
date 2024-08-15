@@ -19,7 +19,7 @@ class UbicacionControlador {
     /** ************************************************************************************************ **
      ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cat_ubicaciones)               ** **
      ** ************************************************************************************************ **/
-    // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACION    **USADO
     RegistrarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -57,7 +57,7 @@ class UbicacionControlador {
             }
         });
     }
-    // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACION   **USADO
     ActualizarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -65,7 +65,7 @@ class UbicacionControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const coordenada = yield database_1.default.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
+                const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
                 const [datosOriginales] = coordenada.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -106,7 +106,7 @@ class UbicacionControlador {
             }
         });
     }
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
+    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACION    **USADO
     ListarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const UBICACIONES = yield database_1.default.query(`
@@ -120,7 +120,7 @@ class UbicacionControlador {
             }
         });
     }
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN CON EXCEPCIONES
+    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACION CON EXCEPCIONES     **USADO
     ListarCoordenadasDefinidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -135,7 +135,7 @@ class UbicacionControlador {
             }
         });
     }
-    // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
+    // METODO PARA LISTAR DATOS DE UNA UBICACION ESPECIFICA  **USADO
     ListarUnaCoordenada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -150,7 +150,7 @@ class UbicacionControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACION      **USADO
     EliminarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -159,7 +159,7 @@ class UbicacionControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const coordenada = yield database_1.default.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
+                const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
                 const [datosOriginales] = coordenada.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -176,8 +176,8 @@ class UbicacionControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-            DELETE FROM mg_cat_ubicaciones WHERE id = $1
-            `, [id]);
+                DELETE FROM mg_cat_ubicaciones WHERE id = $1
+                `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mg_cat_ubicaciones',
@@ -202,7 +202,7 @@ class UbicacionControlador {
     /** **************************************************************************************** **
      ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empleado_ubicacion)            ** **
      ** **************************************************************************************** **/
-    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO
+    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO    **USADO
     ListarRegistroUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl } = req.params;
@@ -220,7 +220,7 @@ class UbicacionControlador {
             }
         });
     }
-    // ASIGNAR COORDENADAS GENERALES DE UBICACIÓN A LOS USUARIOS
+    // ASIGNAR COORDENADAS GENERALES DE UBICACION A LOS USUARIOS    **USADO
     RegistrarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -246,14 +246,13 @@ class UbicacionControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar registro.' });
             }
         });
     }
-    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACIÓN 
+    // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACION   **USADO
     ListarRegistroUsuarioU(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_ubicacion = req.params.id_ubicacion;
@@ -271,7 +270,7 @@ class UbicacionControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
+    // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACION    **USADO
     EliminarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

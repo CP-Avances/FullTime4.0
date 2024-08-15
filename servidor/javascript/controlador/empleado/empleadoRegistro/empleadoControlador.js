@@ -14,23 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
+const settingsMail_1 = require("../../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service")); //Importacion de llaves
-const settingsMail_1 = require("../../../libs/settingsMail");
 const sharp = require('sharp');
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
      ** ** ********************************************************************************************* **/
-    // BUSQUEDA DE CODIGO DEL EMPLEADO
+    // BUSQUEDA DE CODIGO DEL EMPLEADO   **USADO
     ObtenerCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VALOR = yield database_1.default.query(`
@@ -44,7 +44,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // CREAR CODIGO DE EMPLEADO
+    // CREAR CODIGO DE EMPLEADO    **USADO
     CrearCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -75,7 +75,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
+    // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA   **USADO
     ObtenerMAXCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -90,12 +90,11 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                console.log('error ---- ', error);
                 return res.status(404).jsonp({ text: 'Error al obtener código máximo.' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
+    // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS   **USADO
     ActualizarCodigoTotal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -145,7 +144,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO
+    // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO   **USADO
     ActualizarCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -198,7 +197,7 @@ class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** **
      ** ** ********************************************************************************************* **/
-    // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS
+    // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
     InsertarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -240,7 +239,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // ACTUALIZAR INFORMACION EL EMPLEADO
+    // ACTUALIZAR INFORMACION EL EMPLEADO    **USADO
     EditarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -303,10 +302,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                     fs_1.default.access(carpetaPermisosAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaPermisosAnterior, carpetaPermisos, (err) => {
                                 if (err) {
                                     verificar_permisos = 1;
@@ -323,10 +322,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
                     fs_1.default.access(carpetaImagenesAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaImagenesAnterior, carpetaImagenes, (err) => {
                                 if (err) {
                                     verificar_imagen = 1;
@@ -343,10 +342,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                     fs_1.default.access(carpetaVacunasAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaVacunasAnterior, carpetaVacunas, (err) => {
                                 if (err) {
                                     verificar_vacunas = 1;
@@ -363,10 +362,10 @@ class EmpleadoControlador {
                     // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
                     fs_1.default.access(carpetaContratosAnterior, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
-                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                            // SI NO EXISTE LA CARPETA CON EL CODIGO ANTERIOR, NO HACER NADA
                         }
                         else {
-                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            // SI EXISTE LA CARPETA CON EL CODIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CODIGO NUEVO
                             fs_1.default.rename(carpetaContratosAnterior, carpetaContratos, (err) => {
                                 if (err) {
                                     verificar_contrato = 1;
@@ -388,7 +387,6 @@ class EmpleadoControlador {
                 const verificaciones = [verificar_permisos, verificar_imagen, verificar_vacunas, verificar_contrato];
                 const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
                 if (mensajesError.length > 0) {
-                    console.log('error empleado ', mensajesError);
                     yield database_1.default.query('ROLLBACK');
                     return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
                 }
@@ -399,7 +397,6 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                console.log('error empleado 500', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
@@ -411,7 +408,10 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const EMPLEADO = yield database_1.default.query(`
-      SELECT * FROM eu_empleados WHERE id = $1
+      SELECT e.*, r.nombre AS rol FROM eu_empleados e
+      INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
+      INNER JOIN ero_cat_roles r ON u.id_rol = r.id
+      WHERE e.id = $1
       `, [id]);
             if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
@@ -437,41 +437,39 @@ class EmpleadoControlador {
             res.jsonp(empleado);
         });
     }
-    // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA
+    // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
     Listar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `);
-            res.jsonp(empleado.rows);
+            console.log('empleado', empleado.rowCount);
+            return res.jsonp(empleado.rows);
         });
     }
-    // METODO QUE LISTA EMPLEADOS INHABILITADOS
+    // METODO QUE LISTA EMPLEADOS INHABILITADOS   **USADO
     ListarEmpleadosDesactivados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `);
+            console.log('empleado desactivado', empleado.rowCount);
             res.jsonp(empleado.rows);
         });
     }
-    // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
+    // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
     DesactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOSORIGINALES
-                        const empleado = yield database_1.default.query(`
-            SELECT * FROM eu_empleados WHERE id = $1
-            `, [obj]);
+                        const empleado = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
                         const [datosOriginales] = empleado.rows;
-                        const usuario = yield database_1.default.query(`
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `, [obj]);
+                        const usuario = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [obj]);
                         const [datosOriginalesUsuario] = usuario.rows;
                         if (!datosOriginales || !datosOriginalesUsuario) {
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -497,10 +495,7 @@ class EmpleadoControlador {
                             throw new Error('Error al inhabilitar empleado con id: ' + obj);
                         }
                         // 2 => DESACTIVADO O INACTIVO
-                        yield database_1.default.query(`
-            UPDATE eu_empleados SET estado = 2 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+                        yield database_1.default.query(`UPDATE eu_empleados SET estado = 2 WHERE id = $1`, [obj]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -513,10 +508,7 @@ class EmpleadoControlador {
                             observacion: null
                         });
                         // FALSE => YA NO TIENE ACCESO
-                        yield database_1.default.query(`
-            UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+                        yield database_1.default.query(`UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1`, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -533,23 +525,24 @@ class EmpleadoControlador {
                     catch (error) {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
+                        console.log('error deshabilitar', error);
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios inhabilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
         });
     }
-    // METODO PARA HABILITAR EMPLEADOS
+    // METODO PARA HABILITAR EMPLEADOS    *USADO
     ActivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`
             SELECT * FROM eu_empleados WHERE id = $1
             `, [obj]);
@@ -584,8 +577,7 @@ class EmpleadoControlador {
                         // 1 => ACTIVADO
                         yield database_1.default.query(`
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -600,8 +592,7 @@ class EmpleadoControlador {
                         // TRUE => TIENE ACCESO
                         yield database_1.default.query(`
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -618,23 +609,24 @@ class EmpleadoControlador {
                     catch (error) {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
+                        console.log('error activar', error);
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
         });
     }
-    // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO
+    // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
     ReactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
-                arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                for (const obj of arrayIdsEmpleados) {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`
             SELECT * FROM eu_empleados WHERE id = $1
             `, [obj]);
@@ -669,8 +661,7 @@ class EmpleadoControlador {
                         // 1 => ACTIVADO
                         yield database_1.default.query(`
             UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_empleados',
@@ -684,8 +675,7 @@ class EmpleadoControlador {
                         // TRUE => TIENE ACCESO
                         yield database_1.default.query(`
             UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `, [obj])
-                            .then((result) => { });
+            `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
@@ -705,13 +695,13 @@ class EmpleadoControlador {
                         // REVERTIR TRANSACCION
                         yield database_1.default.query('ROLLBACK');
                     }
-                }));
+                }
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
             return res.jsonp({ message: 'Upps!!! ocurrio un error.' });
         });
     }
-    // CARGAR IMAGEN DE EMPLEADO
+    // CARGAR IMAGEN DE EMPLEADO   **USADO
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -754,7 +744,6 @@ class EmpleadoControlador {
                     // VERIFICAR SI LA CARPETA DE IMAGENES SE CREO
                     if (verificar_imagen === 0) {
                         let ruta_guardar = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(unEmpleado.rows[0].id)) + separador + imagen;
-                        //console.log('ruta 1 ', ruta1)
                         fs_1.default.access(ruta_temporal, fs_1.default.constants.F_OK, (err) => {
                             if (!err) {
                                 sharp(ruta_temporal)
@@ -827,12 +816,11 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO
+    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
     GeolocalizacionCrokis(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             let { lat, lng, user_name, ip } = req.body;
-            console.log(lat, lng, id);
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -882,17 +870,17 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
      ** **************************************************************************************** **/
-    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO
+    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
     ObtenerTitulosEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const unEmpleadoTitulo = yield database_1.default.query(`
-        SELECT et.id, et.observacion As observaciones, et.id_titulo, 
-          et.id_empleado, ct.nombre, nt.nombre as nivel
-        FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-        WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
-        ORDER BY id
-        `, [id_empleado]);
+      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
+        et.id_empleado, ct.nombre, nt.nombre as nivel
+      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
+      ORDER BY id
+      `, [id_empleado]);
             if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
@@ -901,7 +889,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
     ObtenerTituloEspecifico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, id_titulo } = req.body;
@@ -918,7 +906,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO
+    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     CrearEmpleadoTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -953,7 +941,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO
+    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     EditarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -962,7 +950,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1002,7 +990,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO
+    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
     EliminarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1011,7 +999,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1054,7 +1042,7 @@ class EmpleadoControlador {
     /** ******************************************************************************************* **
      ** **               CONSULTAS DE COORDENADAS DE UBICACION DEL USUARIO                       ** **
      ** ******************************************************************************************* **/
-    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO
+    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
     BuscarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -1148,7 +1136,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleados, user_name, ip } = req.body;
@@ -1159,9 +1147,9 @@ class EmpleadoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // CONSULTAR DATOS ORIGINALES
-                    const usuario = yield database_1.default.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    const usuario = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
                     const [datosOriginalesUsuarios] = usuario.rows;
-                    const empleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [e.id]);
+                    const empleado = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE id = $1`, [e.id]);
                     const [datosOriginalesEmpleado] = empleado.rows;
                     if (!datosOriginalesUsuarios || !datosOriginalesEmpleado) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1186,22 +1174,22 @@ class EmpleadoControlador {
                         yield database_1.default.query('COMMIT');
                         continue;
                     }
-                    const datosActuales = yield database_1.default.query('SELECT * FROM informacion_general WHERE id = $1', [e.id]);
+                    const datosActuales = yield database_1.default.query(`SELECT * FROM informacion_general WHERE id = $1`, [e.id]);
                     const [datosActualesEmpleado] = datosActuales.rows;
-                    const contratos = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
+                    const contratos = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1`, [e.id]);
                     const [datosContratos] = contratos.rows;
-                    const titulos = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+                    const titulos = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1`, [e.id]);
                     const [datosTitulos] = titulos.rows;
-                    const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+                    const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [e.id]);
                     const [datosDiscapacidad] = discapacidad.rows;
-                    const vacunas = yield database_1.default.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+                    const vacunas = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1`, [e.id]);
                     const [datosVacunas] = vacunas.rows;
                     if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
                         empleadosRegistrados = true;
                         continue;
                     }
                     // ELIMINAR USUARIO
-                    yield database_1.default.query('DELETE FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    yield database_1.default.query(`DELETE FROM eu_usuarios WHERE id_empleado = $1`, [e.id]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_usuarios',
@@ -1213,7 +1201,7 @@ class EmpleadoControlador {
                         observacion: null
                     });
                     // ELIMINAR EMPLEADO
-                    yield database_1.default.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
+                    yield database_1.default.query(`DELETE FROM eu_empleados WHERE id = $1`, [e.id]);
                     const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesEmpleado.fecha_nacimiento, 'ddd');
                     datosOriginalesEmpleado.fecha_nacimiento = fechaNacimientoO;
                     // AUDITORIA
@@ -1252,6 +1240,7 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/
+    // METODO PARA VERIFICAR PLANTILLA CODIGO AUTOMATICO    **USADO
     VerificarPlantilla_Automatica(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -1295,7 +1284,6 @@ class EmpleadoControlador {
                     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
                     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleados = [];
-                    var duplicados = [];
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var mensaje = 'correcto';
@@ -1335,7 +1323,6 @@ class EmpleadoControlador {
                                 }
                                 else {
                                     if (!valiContra.test(data.contrasena.toString())) {
-                                        //console.log('entro ', data.contrasena.toString().length);
                                         if (data.contrasena.toString().length <= 10) {
                                             if (estadoCivilArray.includes(data.estado_civil)) {
                                                 if (tipogenero.includes(data.genero.toLowerCase())) {
@@ -1347,9 +1334,11 @@ class EmpleadoControlador {
                                                                 data.observacion = 'Verificar ubicación';
                                                             }
                                                         }
+                                                        else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                            data.observacion = 'Verificar ubicación';
+                                                        }
                                                         // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                                                         if (TELEFONO != undefined) {
-                                                            //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                                             if (regex.test(data.telefono.toString())) {
                                                                 if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                                                     data.observacion = 'El teléfono ingresado no es válido';
@@ -1491,12 +1480,13 @@ class EmpleadoControlador {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
                                                                                 }
+                                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                                    data.observacion = 'Verificar ubicación';
+                                                                                }
                                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                                 if (TELEFONO != undefined) {
-                                                                                    //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                                                                     if (regex.test(data.telefono.toString())) {
                                                                                         if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                            //console.log('ent: ', data.telefono);
                                                                                             data.observacion = 'El teléfono ingresado no es válido';
                                                                                         }
                                                                                     }
@@ -1577,7 +1567,6 @@ class EmpleadoControlador {
                                                 if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
                                                     // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                                     if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                                        //valor.observacion = 'ok'
                                                         duplicados2.push(valor);
                                                     }
                                                     else {
@@ -1654,7 +1643,6 @@ class EmpleadoControlador {
                         if (mensaje == 'error') {
                             listEmpleados = undefined;
                         }
-                        //console.log('empleados: ', listEmpleados);
                         return res.jsonp({ message: mensaje, data: listEmpleados });
                     }, tiempo);
                 }
@@ -1664,12 +1652,10 @@ class EmpleadoControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
-            // Expresión regular para validar la latitud y longitud
-            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
@@ -1746,6 +1732,14 @@ class EmpleadoControlador {
                     if (latitud != 'No registrado') {
                         _latitud = latitud;
                     }
+                    var _telefono = null;
+                    if (telefono != 'No registrado') {
+                        _telefono = telefono;
+                    }
+                    var _domicilio = null;
+                    if (domicilio != 'No registrado') {
+                        _domicilio = domicilio;
+                    }
                     //OBTENER ID DEL ESTADO
                     var id_estado = 1;
                     var estado_user = true;
@@ -1766,11 +1760,6 @@ class EmpleadoControlador {
                         codigo = cedula;
                     }
                     console.log('Estado civil: ', id_estado_civil);
-                    /*console.log('codigo: ', codigo)
-                    console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
-                    console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
-                    console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
-                    console.log('longitud: ', _longitud, ' latitud: ', _latitud)*/
                     // REGISTRO DE NUEVO EMPLEADO
                     const response = yield database_1.default.query(`
           INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
@@ -1778,7 +1767,7 @@ class EmpleadoControlador {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `, [cedula, apellidoE, nombreE,
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                        _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1792,7 +1781,6 @@ class EmpleadoControlador {
                     });
                     // OBTENER EL ID DEL EMPLEADO INGRESADO
                     const id_empleado = empleado.id;
-                    //console.log('id ', id_empleado)
                     // REGISTRO DE LOS DATOS DE USUARIO
                     yield database_1.default.query(`
           INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
@@ -1849,7 +1837,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
+    // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL    **USADO
     VerificarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -1894,7 +1882,6 @@ class EmpleadoControlador {
                     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
                     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleadosManual = [];
-                    var duplicados = [];
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var duplicados3 = [];
@@ -1940,9 +1927,7 @@ class EmpleadoControlador {
                                             data.observacion = 'El código debe tener máximo 10 caracteres';
                                         }
                                         else {
-                                            //console.log(!valiContra.test(data.contrasena));
                                             if (!valiContra.test(data.contrasena.toString())) {
-                                                //console.log('entro ', data.contrasena.toString().length);
                                                 if (data.contrasena.toString().length > 10) {
                                                     data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                 }
@@ -1956,6 +1941,9 @@ class EmpleadoControlador {
                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                                                         data.observacion = 'Verificar ubicación';
                                                                     }
+                                                                }
+                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                    data.observacion = 'Verificar ubicación';
                                                                 }
                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                 if (TELEFONO != undefined) {
@@ -2109,6 +2097,9 @@ class EmpleadoControlador {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
                                                                                 }
+                                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                                    data.observacion = 'Verificar ubicación';
+                                                                                }
                                                                                 // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                                 if (TELEFONO != undefined) {
                                                                                     const regex = /^[0-9]+$/;
@@ -2176,37 +2167,37 @@ class EmpleadoControlador {
                         }
                     });
                     listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                        if (valor.observacion == 'no registrado') {
+                        if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
                             var VERIFICAR_CEDULA = yield database_1.default.query(`
               SELECT * FROM eu_empleados WHERE cedula = $1
-            `, [valor.cedula]);
+              `, [valor.cedula]);
                             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                                 valor.observacion = 'Cédula ya existe en el sistema';
                             }
                             else {
                                 var VERIFICAR_CODIGO = yield database_1.default.query(`
-              SELECT * FROM eu_empleados WHERE codigo = $1
-              `, [valor.codigo]);
+                SELECT * FROM eu_empleados WHERE codigo = $1
+                `, [valor.codigo]);
                                 if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
                                     valor.observacion = 'Código ya existe en el sistema';
                                 }
                                 else {
                                     var VERIFICAR_USUARIO = yield database_1.default.query(`
-                SELECT * FROM eu_usuarios WHERE usuario = $1
-                `, [valor.usuario]);
+                  SELECT * FROM eu_usuarios WHERE usuario = $1
+                  `, [valor.usuario]);
                                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                                         valor.observacion = 'Usuario ya existe en el sistema';
                                     }
                                     else {
                                         if (valor.rol != 'No registrado') {
                                             var VERIFICAR_ROL = yield database_1.default.query(`
-                    SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                    `, [valor.rol.toUpperCase()]);
+                      SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+                      `, [valor.rol.toUpperCase()]);
                                             if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                                                 if (valor.nacionalidad != 'No registrado') {
                                                     var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`
-                        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                        `, [valor.nacionalidad.toUpperCase()]);
+                          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+                          `, [valor.nacionalidad.toUpperCase()]);
                                                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                                                         // DISCRIMINACION DE ELEMENTOS IGUALES
                                                         if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
@@ -2307,12 +2298,10 @@ class EmpleadoControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
-            // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
-            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
-            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             var contador = 1;
             let ocurrioError = false;
             let mensajeError = '';
@@ -2381,6 +2370,14 @@ class EmpleadoControlador {
                     if (latitud != 'No registrado') {
                         _latitud = latitud;
                     }
+                    var _telefono = null;
+                    if (telefono != 'No registrado') {
+                        _telefono = telefono;
+                    }
+                    var _domicilio = null;
+                    if (domicilio != 'No registrado') {
+                        _domicilio = domicilio;
+                    }
                     // OBTENER ID DEL ESTADO
                     var id_estado = 1;
                     var estado_user = true;
@@ -2406,7 +2403,7 @@ class EmpleadoControlador {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `, [cedula, apellidoE, nombreE,
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                        _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -2477,6 +2474,7 @@ class EmpleadoControlador {
     /** **************************************************************************************** **
      ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           **
      ** **************************************************************************************** **/
+    // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
     CrearCarpetasEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleados, permisos, vacaciones, horasExtras } = req.body;
@@ -2534,6 +2532,107 @@ class EmpleadoControlador {
             }
         });
     }
+    //------------------------------ Metodos de APP MOVIL -----------------------------------------------------------------------------
+    getHorariosEmpleadoByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo, fecha_inicio } = req.query;
+                const response = yield database_1.default.query(`
+            SELECT id, id_empleado AS empl_codigo, id_empleado_cargo, id_horario,
+                fecha_horario AS fecha, fecha_hora_horario::time AS horario,
+                tipo_dia, tipo_accion AS tipo_hora, id_detalle_horario
+            FROM eu_asistencia_general
+            WHERE id_empleado = $1
+                AND fecha_horario BETWEEN $2 AND $2 
+            ORDER BY horario ASC`, [codigo, fecha_inicio]);
+                const horarios = response.rows;
+                if (horarios.length === 0)
+                    return res.status(200).jsonp([]);
+                return res.status(200).jsonp(horarios);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getListaEmpleados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield database_1.default.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
+                const empleados = response.rows;
+                console.log(empleados);
+                return res.status(200).jsonp(empleados);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getPlanificacionMesesCodigoEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo } = req.query;
+                const HORARIO = yield database_1.default.query("SELECT codigo_e, nombre_e, anio, mes, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') ELSE '-' END AS dia3, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 4 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 4 THEN codigo_dia end,', ') ELSE '-' END AS dia4, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 5 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 5 THEN codigo_dia end,', ') ELSE '-' END AS dia5, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 6 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 6 THEN codigo_dia end,', ') ELSE '-' END AS dia6, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 7 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 7 THEN codigo_dia end,', ') ELSE '-' END AS dia7, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 8 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 8 THEN codigo_dia end,', ') ELSE '-' END AS dia8, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 9 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 9 THEN codigo_dia end,', ') ELSE '-' END AS dia9, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 10 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 10 THEN codigo_dia end,', ') ELSE '-' END AS dia10, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 11 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 11 THEN codigo_dia end,', ') ELSE '-' END AS dia11, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 12 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 12 THEN codigo_dia end,', ') ELSE '-' END AS dia12, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 13 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 13 THEN codigo_dia end,', ') ELSE '-' END AS dia13, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 14 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 14 THEN codigo_dia end,', ') ELSE '-' END AS dia14, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 15 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 15 THEN codigo_dia end,', ') ELSE '-' END AS dia15, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 16 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 16 THEN codigo_dia end,', ') ELSE '-' END AS dia16, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 17 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 17 THEN codigo_dia end,', ') ELSE '-' END AS dia17, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 18 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 18 THEN codigo_dia end,', ') ELSE '-' END AS dia18, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 19 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 19 THEN codigo_dia end,', ') ELSE '-' END AS dia19, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 20 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 20 THEN codigo_dia end,', ') ELSE '-' END AS dia20, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 21 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 21 THEN codigo_dia end,', ') ELSE '-' END AS dia21, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 22 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 22 THEN codigo_dia end,', ') ELSE '-' END AS dia22, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 23 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 23 THEN codigo_dia end,', ') ELSE '-' END AS dia23, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 24 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 24 THEN codigo_dia end,', ') ELSE '-' END AS dia24, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 25 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 25 THEN codigo_dia end,', ') ELSE '-' END AS dia25, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 26 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 26 THEN codigo_dia end,', ') ELSE '-' END AS dia26, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 27 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 27 THEN codigo_dia end,', ') ELSE '-' END AS dia27, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 28 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 28 THEN codigo_dia end,', ') ELSE '-' END AS dia28, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 29 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 29 THEN codigo_dia end,', ') ELSE '-' END AS dia29, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
+                    "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
+                    "FROM ( " +
+                    "SELECT p_g.id_empleado AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                    "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN ($1) " +
+                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                    "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
+                    "ORDER BY p_g.id_empleado,anio, mes , dia, p_g.id_horario " +
+                    ") AS datos " +
+                    "GROUP BY codigo_e, nombre_e, anio, mes " +
+                    "ORDER BY 1,3,4", [codigo]);
+                if (HORARIO.rowCount != 0) {
+                    return res.jsonp(HORARIO.rows);
+                }
+                else {
+                    return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                }
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;

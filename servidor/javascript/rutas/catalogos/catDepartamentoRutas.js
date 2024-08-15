@@ -29,39 +29,41 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        // REGISTRAR DEPARTAMENTO
+        // REGISTRAR DEPARTAMENTO   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CrearDepartamento);
-        // BUSCAR DEPARTAMENTOS POR ID SUCURSAL
+        // BUSCAR DEPARTAMENTOS POR ID SUCURSAL  **USADO
         this.router.get('/sucursal-departamento/:id_sucursal', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamentosSucursal);
-        // BUSCAR DEPARTAMENTO POR ID
+        // BUSCAR DEPARTAMENTO POR ID   **USADO
         this.router.get('/infodepartamento/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamento);
-        // BUSCAR DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO
+        // BUSCAR DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamentosSucursal_);
-        // ACTUALIZAR DEPARTAMENTO  --**VERIFICADO
+        //ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MASIVA   **USADO
+        this.router.put('/actualizarUserDepa', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.UpdateDepartamentosMul);
+        // ACTUALIZAR DEPARTAMENTO    **USADO
         this.router.put('/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarDepartamento);
-        // LISTAR DEPARTAMENTOS    --**VERIFICADO
-        this.router.get('/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentos);
-        // LISTAR DEPARTAMENTOS
+        // LISTAR DEPARTAMENTOS  **USADO
         this.router.get('/listarDepartamentos', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentos);
-        // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
+        // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL  **USADO
         this.router.get('/buscar/datosDepartamento/:id_sucursal', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentosSucursal);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO  **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.EliminarRegistros);
-        // REGISTRAR NIVELDEPARTAMENTO   --**VERIFICADO
+        // REGISTRAR NIVELDEPARTAMENTO  **USADO
         this.router.post('/crearnivel', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CrearNivelDepa);
-        // BUSCAR NIVEL DEPARTAMENTO POR ID_DEPARTAMENTO Y ID_SUCURSAL   --**VERIFICADO
+        // BUSCAR NIVEL DEPARTAMENTO POR ID_DEPARTAMENTO Y ID_SUCURSAL   **USADO
         this.router.get('/infoniveldepa/:id_departamento/:id_establecimiento', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerNivelesDepa);
-        // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO    --**VERIFICADO
+        // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO    **USADO
         this.router.delete('/eliminarniveldepa/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.EliminarRegistroNivelDepa);
-        // ACTUALIZAR NIVEL DEPARTAMENTO TABLA NIVEL_JERARQUICO  --**VERIFICADO
+        // ACTUALIZAR NIVEL DEPARTAMENTO TABLA NIVEL_JERARQUICO  **USADO
         this.router.put('/nivelactualizar/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarNivelDepa);
-        // ACTUALIZAR NOMBRE DE DEPARTAMENTOS EN NIVELES DE APROBACION   --**VERIFICADO
+        // ACTUALIZAR NOMBRE DE DEPARTAMENTOS EN NIVELES DE APROBACION  **USADO
         this.router.post('/actualizarNombrenivel', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarNombreNivel);
         this.router.get('/busqueda-cargo/:id_cargo', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.BuscarDepartamentoPorCargo);
         this.router.get('/buscar/regimen-departamento/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentosRegimen);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catDepartamentoControlador_1.default.RevisarDatos);
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CargarPlantilla);
+        // METODO PARA VALIDAR DATOS DE PLANTILLA DE NIVELES DE DEPARTAMENTO   **USADO
         this.router.post('/upload/revisionNivel', [verificarToken_1.TokenValidation, upload.single('uploads')], catDepartamentoControlador_1.default.RevisarDatosNivel);
+        // METODO PARA REGISTRAR DATOS DE PLANTILLA DE NIVELES DE DEPARATMENTO  **USADO
         this.router.post('/cargar_plantillaNivel/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CargarPlantillaNivelesDep);
     }
 }

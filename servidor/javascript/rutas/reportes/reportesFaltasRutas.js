@@ -12,10 +12,8 @@ class FaltasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
-        this.router.put('/faltas/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltas);
-        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[empleados]]
-        this.router.put('/faltas-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltasRegimenCargo);
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
+        this.router.post('/faltas/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltas);
     }
 }
 const FALTAS_RUTAS = new FaltasRutas();

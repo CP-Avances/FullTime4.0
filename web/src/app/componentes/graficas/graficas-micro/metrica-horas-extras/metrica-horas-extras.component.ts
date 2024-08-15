@@ -158,7 +158,7 @@ export class MetricaHorasExtrasComponent implements OnInit {
   }
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_horas_extras" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -170,7 +170,7 @@ export class MetricaHorasExtrasComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

@@ -95,6 +95,10 @@ a.mat-menu-item {
   color: rgb(99, 105, 107);
 }
 
+.icono-opciones {
+  color: rgb(5, 162, 253) !important;
+}
+
 .uno {
   margin-bottom: 15px;
   background: white;

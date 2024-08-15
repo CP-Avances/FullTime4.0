@@ -1,11 +1,11 @@
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 
 class DiscapacidadControlador {
 
-  // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO
+  // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO   **USADO
   public async BuscarDiscapacidadUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const unaDiscapacidad = await pool.query(
@@ -23,7 +23,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA REGISTRAR DISCAPACIDAD
+  // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
   public async RegistrarDiscapacidad(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
@@ -59,6 +59,7 @@ class DiscapacidadControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Discapacidad guardada' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -66,7 +67,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR DATOS DE REGISTRO
+  // METODO PARA ACTUALIZAR DATOS DE REGISTRO   **USADO
   public async ActualizarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
       const id_empleado = req.params.id_empleado;
@@ -76,7 +77,7 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+      const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
       if (!datosOriginales) {
@@ -85,12 +86,12 @@ class DiscapacidadControlador {
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
-          datosNuevos:'',
-          ip, 
+          datosNuevos: '',
+          ip,
           observacion: `Error al actualizar discapacidad con id_empleado: ${id_empleado}`
         });
       }
-      
+
       const datosNuevos = await pool.query(
         `
         UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
@@ -105,14 +106,14 @@ class DiscapacidadControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip, 
+        ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       return res.jsonp({ message: 'Registro actualizado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -120,6 +121,7 @@ class DiscapacidadControlador {
     }
   }
 
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   public async EliminarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -129,7 +131,7 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+      const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
       if (!datosOriginales) {
@@ -138,8 +140,8 @@ class DiscapacidadControlador {
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
-          datosNuevos:'',
-          ip, 
+          datosNuevos: '',
+          ip,
           observacion: `Error al eliminar discapacidad con id_empleado: ${id_empleado}`
         });
 
@@ -160,15 +162,15 @@ class DiscapacidadControlador {
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos:'',
-        ip, 
+        datosNuevos: '',
+        ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -194,7 +196,7 @@ class DiscapacidadControlador {
         INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
         `
         , [nombre]);
-  
+
       const [tipo] = response.rows;
 
       // AUDITORIA
@@ -204,13 +206,13 @@ class DiscapacidadControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `{nombre: ${nombre}}`,
-        ip, 
+        ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (tipo) {
         return res.status(200).jsonp(tipo)
       }
@@ -220,11 +222,11 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al guardar registro.' });      
+      return res.status(500).jsonp({ message: 'Error al guardar registro.' });
     }
   }
 
-  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
+  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD   **USADO
   public async ListarTipo(req: Request, res: Response) {
     const TIPO_DISCAPACIDAD = await pool.query(
       `
@@ -239,7 +241,7 @@ class DiscapacidadControlador {
     }
   }
 
-  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE   **USADO
   public async BuscarDiscapacidadNombre(req: Request, res: Response) {
     const { nombre } = req.body;
     const TIPO_DISCAPACIDAD = await pool.query(
@@ -269,7 +271,7 @@ class DiscapacidadControlador {
     }
   }
 
-  
+
 }
 
 export const DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();

@@ -82,6 +82,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  expansion: boolean = false;
+
   constructor(
     private varificarFunciones: MainNavService,
     private validar: ValidacionesService,

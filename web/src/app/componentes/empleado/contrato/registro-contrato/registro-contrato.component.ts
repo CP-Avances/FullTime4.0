@@ -6,10 +6,10 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import * as moment from 'moment';
 
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 
 @Component({
   selector: 'app-registro-contrato',
@@ -235,7 +235,6 @@ export class RegistroContratoComponent implements OnInit {
       datos.subir_documento = true;
     }
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
-      //console.log('res ', response)
       if (response.message === 'error' || response.message === 'error_carpeta') {
         this.toastr.success('Intente nuevamente.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,

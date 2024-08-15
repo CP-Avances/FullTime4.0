@@ -164,7 +164,7 @@ class ProvinciaControlador {
     }
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UN PAIS
+  // METODO PARA BUSCAR INFORMACION DE UN PAIS    **USADO
   public async ObtenerPais(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const PAIS = await pool.query(

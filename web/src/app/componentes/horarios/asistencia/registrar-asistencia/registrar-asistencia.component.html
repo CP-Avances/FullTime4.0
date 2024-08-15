@@ -117,12 +117,12 @@
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr>
-                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
-                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
-                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
-                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
-                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
-                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                                <th scope="col" id="centrar" rowspan="2">Código</th>
+                                <th scope="col" id="centrar" rowspan="2">Apellido</th>
+                                <th scope="col" id="centrar" rowspan="2">Nombre</th>
+                                <th scope="col" id="centrar" colspan="2">Timbre</th>
+                                <th scope="col" id="centrar" rowspan="2">Tipo</th>
+                                <th scope="col" id="centrar" rowspan="2">Acciones</th>
                             </tr>
                             <tr>
                                 <th id="centrar" scope="col">Fecha</th>
@@ -132,8 +132,8 @@
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate:tamanio_pagina:numero_pagina">
                                 <td>{{t.codigo}}</td>
-                                <td>{{informacion.detalle.nombre}}</td>
                                 <td>{{informacion.detalle.apellido}}</td>
+                                <td>{{informacion.detalle.nombre}}</td>
                                 <td>{{t.fecha}}</td>
                                 <td>{{t.hora}}</td>
                                 <td>{{informacion.detalle.tipo_}}</td>

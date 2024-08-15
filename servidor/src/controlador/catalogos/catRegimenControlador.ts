@@ -275,7 +275,7 @@ class RegimenControlador {
     }
   }
 
-  // BUSCAR REGISTRO DE REGIMEN LABORAL POR ID DE PAIS
+  // BUSCAR REGISTRO DE REGIMEN LABORAL POR ID DE PAIS   **USADO
   public async ListarRegimenPais(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
     const REGIMEN = await pool.query(

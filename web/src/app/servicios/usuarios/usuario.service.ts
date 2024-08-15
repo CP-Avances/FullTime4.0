@@ -11,7 +11,7 @@ export class UsuarioService {
     private http: HttpClient,
   ) { }
 
-  // REGISTRAR USUARIO
+  // REGISTRAR USUARIO    **USADO
   RegistrarUsuario(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios`, data)
       .pipe(
@@ -19,7 +19,7 @@ export class UsuarioService {
       );
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO   **USADO
   BuscarDatosUser(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos/${id}`);
   }
@@ -33,13 +33,13 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-ids-usuarios-departamento`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO    **USADO
   ActualizarDatos(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizarDatos`, data).pipe(
       catchError(data));
   }
 
-  // METODO PARA CAMBIAR PASSWORD
+  // METODO PARA CAMBIAR PASSWORD      **USADO
   ActualizarPassword(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios`, data);
   }
@@ -54,23 +54,23 @@ export class UsuarioService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase`, data);
   }
 
-  // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB
+  // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB    **USADO
   ActualizarEstadoTimbreWeb(data: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web/`, data);
   }
 
 
-  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
+  // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   ActualizarEstadoTimbreMovil(data: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil/`, data);
   }
 
-  // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS
+  // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS     **USADO
   BuscarDispositivoMovill() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/registro-dispositivos`);
   }
 
-  // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS
+  // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS    **USADO
   EliminarDispositivoMovil(data: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/usuarios/delete-registro-dispositivos/${data}`;
     const httpOptions = {
@@ -94,37 +94,15 @@ export class UsuarioService {
    ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **
    ** *********************************************************************************************** */
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
-  UsuariosTimbreWeb_SUPERADMIN(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web-superior/${estado}/activo/${habilitado}`);
+  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE WEB       **USADO
+  UsuariosTimbreWebGeneral(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web-general/${estado}/activo/${habilitado}`);
   }
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMNISTRADOR
-  UsuariosTimbreWeb_ADMIN(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web-general/${estado}/activo/${habilitado}`, datos);
+  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE MOVIL    **USADO
+  UsuariosTimbreMovilGeneral(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`);
   }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-  UsuariosTimbreWeb_JEFE(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web-jefe/${estado}/activo/${habilitado}`, datos);
-  }
-
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
-  UsuariosTimbreMovil_SUPERADMIN(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-superior/${estado}/activo/${habilitado}`);
-  }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
-  UsuariosTimbreMovil_ADMIN(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`, datos);
-  }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR JEFE
-  UsuariosTimbreMovil_JEFE(estado: any, habilitado: boolean, datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-jefe/${estado}/activo/${habilitado}`, datos);
-  }
-
 
 
   /** *********************************************************************************************** **
@@ -136,7 +114,7 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-sucursal`, id_empleado);
   }
 
-  //REGISTRAR USUARIO - DEPARTAMENTO
+  //REGISTRAR USUARIO - DEPARTAMENTO    **USADO
   RegistrarUsuarioDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento`, data)
       .pipe(
@@ -149,18 +127,18 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
   BuscarAsignacionUsuarioDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS   **USADO
   ActualizarUsuarioDepartamento(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizar-usuario-departamento`, data).pipe(
       catchError(data));
   }
 
-  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
+  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO    **USADO
   EliminarUsuarioDepartamento(datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/usuarios/eliminar-usuario-departamento`;
     const httpOptions = {
@@ -169,7 +147,7 @@ export class UsuarioService {
     return this.http.request('delete', url, httpOptions);
   }
 
-  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS   **USADO
   RegistrarUsuarioDepartamentoMultiple(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento/multiple`, data);
   }

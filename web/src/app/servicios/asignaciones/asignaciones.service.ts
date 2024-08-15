@@ -16,6 +16,7 @@ export class AsignacionesService {
     this.ObtenerEstado();
   }
 
+  // METODO PARA OBTENER ASIGNAICONES
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
 
     this.asignacionesAcceso = [];
@@ -38,9 +39,11 @@ export class AsignacionesService {
           if (!asignacion.administra && !asignacion.personal) {
             noPersonal = true;
             return Promise.resolve(null);
-          } else if (asignacion.administra && !asignacion.personal) {
+          }
+          else if (asignacion.administra && !asignacion.personal) {
             noPersonal = true;
-          } else if (asignacion.personal && !asignacion.administra) {
+          }
+          else if (asignacion.personal && !asignacion.administra) {
             this.idUsuariosAcceso.add(idEmpleado);
             return Promise.resolve(null);
           }
@@ -67,12 +70,14 @@ export class AsignacionesService {
     }
   }
 
+  // METODO PARA GUARDAR ID DE ACCESO A LA INFORMACION
   GuardarEstado() {
     localStorage.setItem('idDepartamentosAcceso', JSON.stringify(Array.from(this.idDepartamentosAcceso)));
     localStorage.setItem('idSucursalesAcceso', JSON.stringify(Array.from(this.idSucursalesAcceso)));
     localStorage.setItem('idUsuariosAcceso', JSON.stringify(Array.from(this.idUsuariosAcceso)));
   }
 
+  // METODO PARA LEER ID DE ACCESO A LA INFORMACION
   ObtenerEstado() {
     this.idDepartamentosAcceso = new Set(JSON.parse(localStorage.getItem('idDepartamentosAcceso') || '[]'));
     this.idSucursalesAcceso = new Set(JSON.parse(localStorage.getItem('idSucursalesAcceso') || '[]'));

@@ -20,7 +20,7 @@ const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class SucursalControlador {
-    // BUSCAR SUCURSALES POR EL NOMBRE
+    // BUSCAR SUCURSALES POR EL NOMBRE   **USADO
     BuscarNombreSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
@@ -35,7 +35,7 @@ class SucursalControlador {
             }
         });
     }
-    // GUARDAR REGISTRO DE SUCURSAL
+    // GUARDAR REGISTRO DE SUCURSAL   **USADO
     CrearSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -72,7 +72,7 @@ class SucursalControlador {
             }
         });
     }
-    // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO
+    // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO  **USADO
     ActualizarSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -80,7 +80,7 @@ class SucursalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM e_sucursales WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -120,7 +120,7 @@ class SucursalControlador {
             }
         });
     }
-    // BUSCAR SUCURSAL POR ID DE EMPRESA
+    // BUSCAR SUCURSAL POR ID DE EMPRESA  **USADO
     ObtenerSucursalEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empresa } = req.params;
@@ -201,7 +201,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
+    // METODO PARA BUSCAR DATOS DE UNA SUCURSAL  **USADO
     ObtenerUnaSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -218,7 +218,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR  **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -361,7 +361,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO PARA CARGAR PLANTILLA DE SUCURSALES
+    // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
     RegistrarSucursales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sucursales, user_name, ip } = req.body;

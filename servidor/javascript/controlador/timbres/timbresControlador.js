@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
-const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));
+const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
@@ -81,7 +81,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA LISTAR MARCACIONES
+    // METODO PARA LISTAR MARCACIONES    **USADO
     ObtenerTimbres(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -179,7 +179,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
+    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA     **USADO
     ObtenertimbreFechaEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -221,8 +221,6 @@ class TimbresControlador {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 });
-                //console.log('respuesta: ', timbresRows)
-                //generarTimbres('1', '2024-01-01', '2024-01-06');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron registros." });
                 }
@@ -233,41 +231,34 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
+    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO   **USADO
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
-                console.log('id: ', id);
-                console.log('codigo: ', id_empleado);
-                console.log('accion: ', accion);
-                console.log('tecla: ', tecla);
-                console.log('observacion: ', observacion);
-                console.log('fecha: ', fecha);
+                let { id, codigo, tecla, observacion, fecha } = req.body;
                 yield database_1.default.query(`
-                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
-                        $3::character varying, $4::integer, $5::character varying) 
-                `, [fecha, id_empleado, tecla, id, observacion])
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
+                    $3::character varying, $4::integer, $5::character varying) 
+                `, [fecha, codigo, tecla, id, observacion])
                     .then((result) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
             }
             catch (err) {
+                console.log('timbre error ', err);
                 const message = 'Ups!!! algo salio mal con la peticion al servidor.';
-                console.log('error ----- ', err);
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
     }
-    // METODO DE REGISTRO DE TIMBRES PERSONALES
+    // METODO DE REGISTRO DE TIMBRES PERSONALES    **USADO
     CrearTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('ingresa aqui timbre personal');
             try {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip } = req.body;
-                // Obtener la fecha y hora actual
+                // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
-                // Formatear la fecha y hora actual en el formato deseado
+                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
@@ -276,15 +267,13 @@ class TimbresControlador {
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
                 var codigo = parseInt(code[0].codigo);
-                console.log('codigo ', codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                database_1.default.query(`
-                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
-                    codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
-                VALUES(to_timestamp($1, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $2, $3, $4, $5, $6, $7, to_timestamp($8, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $9, $10, $11) RETURNING id
-                `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    fecha_hora, id_reloj, ubicacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                yield database_1.default.query(`
+                SELECT * FROM public.timbres_web ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                `, [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
+                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -302,14 +291,13 @@ class TimbresControlador {
                 }));
             }
             catch (error) {
-                console.log('error ------- ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: error });
             }
         });
     }
-    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
+    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -321,7 +309,7 @@ class TimbresControlador {
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
                 let servidor;
                 if (tipo === 'administrar') {
-                    servidor = fec_hora_timbre;
+                    servidor = hora_fecha_timbre;
                 }
                 else {
                     servidor = fecha_hora;
@@ -336,8 +324,8 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
-                `, [codigo, id_empleado, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
                     observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
@@ -346,7 +334,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, id_empleado: ${id_empleado}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
                         ip,
                         observacion: null
                     });
@@ -361,11 +349,10 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TIMBRES
+    // METODO PARA BUSCAR TIMBRES   **USADO
     BuscarTimbresPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo, fec_inicio, fec_final } = req.body;
-            console.log('ver datos timbres ', codigo, fec_inicio, fec_final);
             const TIMBRES = yield database_1.default.query("SELECT * FROM eu_timbres " +
                 "WHERE fecha_hora_timbre_servidor BETWEEN $1 AND $2 " +
                 "AND codigo IN (" + codigo + ") " +
@@ -376,17 +363,11 @@ class TimbresControlador {
             else {
                 var contador = 0;
                 TIMBRES.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    console.log('fecha ', obj.fecha_hora_timbre_servidor);
-                    console.log('codigo ', obj.codigo);
-                    console.log('funcion ', obj.tecla_funcion);
-                    console.log('id ', obj.id);
-                    console.log('observacion ', obj.observacion);
                     contador = contador + 1;
-                    // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
                     yield database_1.default.query(`
-                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                             $3::character varying, $4::integer, $5::character varying)  
-                    `, [obj.fecha_hora_timbre_servidor, obj.id_empleado, obj.tecla_funcion, obj.id, obj.observacion]);
+                    `, [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
                 }));
                 if (contador === TIMBRES.rowCount) {
                     return res.jsonp({ message: 'OK', respuesta: TIMBRES.rows });
@@ -539,6 +520,7 @@ class TimbresControlador {
             }
         });
     }
+    // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USAD
     ObtenerTimbresEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -601,7 +583,7 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)    **USADO
     BuscarTimbresAsistencia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fecha, funcion, codigo } = req.body;
@@ -620,6 +602,231 @@ class TimbresControlador {
             }
         });
     }
+    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+    crearTimbre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const hoy = new Date();
+                const timbre = req.body;
+                yield database_1.default.query('BEGIN');
+                // Verificar el contenido de req.body
+                console.log('Contenido de req.body:', timbre);
+                timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+                const timbreRV = new Date(timbre.fecha_hora_timbre || '');
+                const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
+                const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
+                const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
+                if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
+                    if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
+                        timbre.hora_timbre_diferente = false;
+                    }
+                    else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
+                        timbre.hora_timbre_diferente = false;
+                    }
+                    else {
+                        timbre.hora_timbre_diferente = true;
+                    }
+                }
+                else {
+                    timbre.hora_timbre_diferente = false;
+                }
+                // Verificar el valor de timbre.accion antes de la consulta
+                console.log('Valor de timbre.accion:', timbre.accion);
+                const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
+                    'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
+                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);', [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
+                    timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
+                    timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
+                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+                const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
+                const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_timbres',
+                    usuario: timbre.user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${timbre.imagen} }`,
+                    ip: timbre.ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({
+                    message: 'Timbre creado con éxito',
+                    respuestaBDD: response
+                });
+            }
+            catch (error) {
+                console.log("ver el error", error);
+                return res.status(500).jsonp({ message: 'Error al crear Timbre' });
+            }
+        });
+    }
+    ;
+    crearTimbreDesconectado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const hoy = new Date();
+                const timbre = req.body;
+                yield database_1.default.query('BEGIN');
+                timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+                const timbreRV = new Date(timbre.fecha_hora_timbre || '');
+                const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
+                const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
+                const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
+                if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
+                    if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
+                        timbre.hora_timbre_diferente = false;
+                    }
+                    else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
+                        timbre.hora_timbre_diferente = false;
+                    }
+                    else {
+                        timbre.hora_timbre_diferente = true;
+                    }
+                }
+                else {
+                    timbre.hora_timbre_diferente = false;
+                }
+                const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
+                    'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
+                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);', [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
+                    timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
+                    timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
+                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+                // const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
+                // const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_timbres',
+                    usuario: timbre.user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: '', id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, id_empleado: ${timbre.id_empleado}, imagen: ${timbre.imagen} }`,
+                    ip: timbre.ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({
+                    message: 'Timbre creado con éxito',
+                    respuestaBDD: response
+                });
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Error al crear Timbre' });
+            }
+        });
+    }
+    ;
+    crearTimbreJustificadoAdmin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip } = req.body;
+                console.log(req.body);
+                yield database_1.default.query('BEGIN');
+                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj])
+                    .then(result => {
+                    return result.rows;
+                });
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split('T')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_timbres',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor:'null', id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: 'null }`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!timbre)
+                    return res.status(400).jsonp({ message: "No se inserto timbre" });
+                return res.status(200).jsonp({ message: "Timbre Creado exitosamente" });
+            }
+            catch (error) {
+                return res.status(400).jsonp({ message: error });
+            }
+        });
+    }
+    FiltrarTimbre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecInicio, fecFinal, codigo } = req.body;
+                console.log(req.body);
+                const response = yield database_1.default.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC ', [fecInicio, fecFinal, codigo]);
+                const timbres = response.rows;
+                return res.jsonp(timbres);
+            }
+            catch (error) {
+                return res.status(400).jsonp({ message: error });
+            }
+        });
+    }
+    getTimbreByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = parseInt(req.params.idUsuario);
+                const response = yield database_1.default.query('SELECT * FROM eu_timbres WHERE codigo = $1 ORDER BY fecha_hora_timbre DESC LIMIT 100', [id]);
+                const timbres = response.rows;
+                return res.jsonp(timbres);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    justificarAtraso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { descripcion, fec_justifica, codigo, create_time, codigo_create_user, user_name, ip } = req.body;
+                yield database_1.default.query('BEGIN');
+                const [atraso] = yield database_1.default.query('INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, id_empleado, fecha_hora, id_empleado_justifica) ' +
+                    'VALUES($1, $2, $3, $4, $5) RETURNING id', [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
+                    .then(res => {
+                    return res.rows;
+                });
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(create_time.toLocaleString().split('T')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(create_time.toLocaleString(), 'ddd');
+                const fechaHoraJustificacion = yield (0, settingsMail_1.FormatearHora)(fec_justifica.toLocaleString().split('T')[1]);
+                const fechaTimbreJustificacion = yield (0, settingsMail_1.FormatearFecha2)(fec_justifica.toLocaleString(), 'ddd');
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_justificacion_atraso',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{fecha_hora: ${fechaTimbre + ' ' + fechaHora}, fecha_justifica: ${fechaTimbreJustificacion + ' ' + fechaHoraJustificacion}, descripcion: ${descripcion}, id_empleado: ${codigo}, id_empleado_justifica: ${codigo_create_user} }`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!atraso)
+                    return res.status(400).jsonp({ message: "Atraso no insertado" });
+                return res.status(200).jsonp({
+                    body: {
+                        mensaje: "Atraso justificado",
+                        response: atraso.rows
+                    }
+                });
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Error al crear justificación' });
+            }
+        });
+    }
+    ;
 }
 exports.timbresControlador = new TimbresControlador;
 exports.default = exports.timbresControlador;

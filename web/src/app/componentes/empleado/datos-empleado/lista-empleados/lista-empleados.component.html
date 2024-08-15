@@ -129,28 +129,57 @@
                                 [aria-label]="checkboxLabelDos()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Código</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Nombre</th>
                         <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let e of desactivados  | paginate:tamanio_paginaDes:numero_paginaDes">
-                        <td>
-                            <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
-                                [aria-label]="checkboxLabelDos(e)">
-                            </mat-checkbox>
-                        </td>
-                        <td scope="row">{{e.codigo}}</td>
-                        <td>{{e.nombre}}</td>
-                        <td>{{e.apellido}}</td>
-                        <td>{{e.cedula}}</td>
-                        <td *ngIf="e.estado === 1">Activo</td>
-                        <td *ngIf="e.estado === 2">Inactivo</td>
-                    </tr>
+                  <tr>
+                      <td></td>
+                      <td>
+                          <mat-form-field class="input-tables codigo">
+                              <input matInput placeholder="Buscar" [formControl]="codigo"
+                                  (keypress)="IngresarSoloNumeros($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                  (keypress)="IngresarSoloLetras($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                  (keypress)="IngresarSoloLetras($event)">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                          <mat-form-field class="input-tables cedula">
+                              <input matInput placeholder="Buscar" maxlength="10"
+                                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                  [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                          </mat-form-field>
+                      </td>
+                      <td></td>
+                  </tr>
+                  <tr *ngFor="let e of desactivados | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value |  paginate:tamanio_paginaDes:numero_paginaDes">
+                      <td>
+                          <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
+                              (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
+                              [aria-label]="checkboxLabelDos(e)">
+                          </mat-checkbox>
+                      </td>
+                      <td>{{e.cedula}}</td>
+                      <td scope="row">{{e.codigo}}</td>
+                      <td>{{e.apellido}}</td>
+                      <td>{{e.nombre}}</td>
+                      <td *ngIf="e.estado === 1">Activo</td>
+                      <td *ngIf="e.estado === 2">Inactivo</td>
+                  </tr>
                 </tbody>
             </table>
         </div>
@@ -187,31 +216,31 @@
 </div>
 
 <!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
-<div *ngIf="tabla_activos && !DataEmpleados && mostarTabla && (messajeExcel == 'error' || messajeExcel == '')" class="container"
-    style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="tabla_activos && !DataEmpleados && mostarTabla && (messajeExcel == 'error' || messajeExcel == '')"
+    class="container" style="padding-bottom: 50px; text-align: center;">
 
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
-      <div class="row">
-        <div class="col-md">
-          <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
-              (click)="Deshabilitar(1)">
-              Confirmar
-          </button>
-        </div>
+        <div class="row">
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+                    (click)="Deshabilitar(1)">
+                    Confirmar
+                </button>
+            </div>
 
-        <div class="col-md" *ngIf="mostrarCrearCarpeta">
-          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
-              style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
-              Crear Carpeta
-          </button>
+            <div class="col-md" *ngIf="mostrarCrearCarpeta">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+                    style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+                    Crear Carpeta
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+                    (click)="ConfirmarDeleteMultiple(1)">
+                    Eliminar
+                </button>
+            </div>
         </div>
-        <div class="col-md">
-          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
-              (click)="ConfirmarDeleteMultiple(1)">
-              Eliminar
-          </button>
-        </div>
-      </div>
     </div>
 
     <div class="mat-elevation-z8" style="background: white;">
@@ -235,10 +264,10 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Código</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Nombre</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Correo</th>
                         <th scope="col">Acciones</th>
@@ -289,10 +318,10 @@
                                 [aria-label]="checkboxLabel(e)">
                             </mat-checkbox>
                         </td>
-                        <td scope="row">{{e.codigo}}</td>
-                        <td>{{e.nombre}}</td>
-                        <td>{{e.apellido}}</td>
                         <td>{{e.cedula}}</td>
+                        <td scope="row">{{e.codigo}}</td>
+                        <td>{{e.apellido}}</td>
+                        <td>{{e.nombre}}</td>
                         <td *ngIf="e.estado === 1; else showInactivo">Activo</td>
                         <ng-template #showInactivo>
                             <td *ngIf="e.estado === 2">Inactivo</td>
@@ -357,10 +386,10 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th id="td_usuario" scope="col">Observación</th>
                         <th id="td_usuario" scope="col">Item</th>
+                        <th id="td_usuario" scope="col">Observación</th>
                         <th id="td_usuario" scope="col">Cédula</th>
-                        <th id="td_usuario" scope="col" *ngIf="datosManuales">Codigo</th>
+                        <th id="td_usuario" scope="col" *ngIf="datosManuales">Código</th>
                         <th id="td_usuario" scope="col">Apellido</th>
                         <th id="td_usuario" scope="col">Nombre</th>
                         <th id="td_usuario" scope="col">Estado civil</th>
@@ -379,12 +408,12 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
+                        <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
                         <td style="width: 400px;">
                             <div id="t-editar" class="circulo" [style.background-color]="EstiloCelda(e.observacion)">
                             </div>
                             {{e.observacion}}
                         </td>
-                        <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
                         <td [style.color]="EstiloTextoCelda(e.cedula)">{{e.cedula}}</td>
                         <td [style.color]="EstiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
                         <td [style.color]="EstiloTextoCelda(e.apellido)">{{e.apellido}}</td>
@@ -405,13 +434,14 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <div *ngIf="listUsuariosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
-                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                <div class="text">items 'OK' - {{listUsuariosCorrectas.length}}</div>
+        <div style="display: flex; align-items: center;">
+            <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{usuariosCorrectos}}</div>
             </div>
             <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                showFirstLastButtons>
             </mat-paginator>
         </div>
     </div>

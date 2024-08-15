@@ -1,9 +1,9 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 import { ThemePalette } from '@angular/material/core';
 
 import * as xlsx from 'xlsx';
@@ -67,6 +67,8 @@ export class CatModalidaLaboralComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  modalidadesCorrectas: number = 0;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarModalidad = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
@@ -127,10 +129,8 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ObtenerModalidaLaboral() {
     this._ModalidaLaboral.listaModalidad_laboral().subscribe(res => {
-      //console.log('lista> ', res);
       this.listaModalida_Laboral = res
     }, error => {
-      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       if (error.status == 400 || error.status == 404) {
         this.toastr.info('No se ha encontrado registros.', '', {
           timeOut: 1500,
@@ -143,6 +143,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     });
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.Datos_modalidad_laboral = null;
     this.archivoSubido = [];
@@ -156,6 +157,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.ObtenerModalidaLaboral();
   }
 
+  // METODO PARA ABRIR VENTANA REGISTRO DE MODALIDAD LABORAL
   AbrirVentanaRegistrarModalidad(): void {
     this.ventana.open(RegistroModalidadComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
@@ -204,7 +206,6 @@ export class CatModalidaLaboralComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
@@ -228,6 +229,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA VALIDAR DATOS DE PLANTILLAS
   Datos_modalidad_laboral: any
   listaModalidadCorrectas: any = [];
   messajeExcel: string = '';
@@ -237,15 +239,12 @@ export class CatModalidaLaboralComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
       this.messajeExcel = res.message;
-
-      this.Datos_modalidad_laboral.sort((a, b) => {
+      this.Datos_modalidad_laboral.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -254,8 +253,6 @@ export class CatModalidaLaboralComponent implements OnInit {
         }
         return 0;
       });
-
-      //console.log('probando plantilla modalidad laboral', this.Datos_modalidad_laboral);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -274,9 +271,9 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.listaModalidadCorrectas.push(item);
           }
         });
+        this.modalidadesCorrectas = this.listaModalidadCorrectas.length;
       }
     }, error => {
-      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -288,7 +285,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
@@ -302,8 +299,9 @@ export class CatModalidaLaboralComponent implements OnInit {
       return 'rgb(242, 21, 21)';
     }
   }
+
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -312,20 +310,19 @@ export class CatModalidaLaboralComponent implements OnInit {
     }
   }
 
-
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    //console.log('listaContratosCorrectas: ', this.listaModalidadCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.subirDatosPlantillaModal()
+          this.SubirDatosPlantilla()
         }
       });
   }
 
-  subirDatosPlantillaModal() {
+  // METODO PARA CARGAR DATOS DE PLANTIILA AL SISTEMA
+  SubirDatosPlantilla() {
     if (this.listaModalidadCorrectas.length > 0) {
       const data = {
         plantilla: this.listaModalidadCorrectas,
@@ -342,7 +339,7 @@ export class CatModalidaLaboralComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error: any) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
             timeOut: 4000,
           });
           this.archivoForm.reset();
@@ -350,7 +347,6 @@ export class CatModalidaLaboralComponent implements OnInit {
         }
       });
     } else {
-      //console.log('entro en salir')
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -380,9 +376,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const documentDefinition = this.GetDocumentDefinicion();
-    //console.log('this.listaModalida_Laboral: ', this.listaModalida_Laboral)
-    //console.log('documentDefinition: ', documentDefinition)
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -392,10 +386,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  GetDocumentDefinicion() {
-    //console.log('this.empleado: ', this.empleado)
-    //console.log('this.frase: ', this.frase)
-    sessionStorage.setItem('ModalidadLabo', this.listaModalida_Laboral);
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -423,7 +414,7 @@ export class CatModalidaLaboralComponent implements OnInit {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: 'Lista de Modalidad Laboral', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
-        this.PresentarDataPDFFeriados(),
+        this.PresentarDataPDF(),
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -433,7 +424,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     };
   }
 
-  PresentarDataPDFFeriados() {
+  PresentarDataPDF() {
     return {
       columns: [
         { width: '*', text: '' },
@@ -515,7 +506,6 @@ export class CatModalidaLaboralComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -558,16 +548,9 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  //CONTROL BOTONES
-  getCrearModalidadLaboral(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Modalidad Laboral');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
+  /** ************************************************************************************************** **
+   ** **                            METODO DE SELECCION MULTIPLE DE DATOS                             ** **
+   ** ************************************************************************************************** **/
 
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
@@ -607,7 +590,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     return `${this.selectionModalidad.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
   }
 
-
+  // METODO PARA CONFIMAR ELIMINACION DE REGISTROS
   ConfirmarDelete(modalidad: any) {
     const mensaje = 'eliminar';
     const data = {
@@ -639,6 +622,7 @@ export class CatModalidaLaboralComponent implements OnInit {
       });
   }
 
+  // METODO DE ELIMINACION MULTIPLE DE DATOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -672,6 +656,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     );
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -733,6 +718,17 @@ export class CatModalidaLaboralComponent implements OnInit {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Descargar Reportes Modalidad Laboral');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  //CONTROL BOTONES
+  getCrearModalidadLaboral(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Crear Modalidad Laboral');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }

@@ -11,6 +11,8 @@ class ParametrosRutas {
     }
 
     configuracion(): void {
+        this.router.get('/buscar-formato/fecha_horas', TokenValidation, PARAMETROS_CONTROLADOR.BuscarFechasHoras);
+
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', TokenValidation, PARAMETROS_CONTROLADOR.ListarParametros);
         // METODO PARA ACTUALIZAR PARAMETRO  **USADO
@@ -25,8 +27,10 @@ class ParametrosRutas {
         this.router.post('/detalle', TokenValidation, PARAMETROS_CONTROLADOR.IngresarDetalleParametro);
         // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO **USADO
         this.router.put('/actual-detalle', TokenValidation, PARAMETROS_CONTROLADOR.ActualizarDetalleParametro);
-        // METODO PARA COMPARAR COORDENADAS
+        // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', TokenValidation, PARAMETROS_CONTROLADOR.CompararCoordenadas);
+        this.router.get('/:id', TokenValidation, PARAMETROS_CONTROLADOR.VerDetalleParametro);
+
 
     }
 }

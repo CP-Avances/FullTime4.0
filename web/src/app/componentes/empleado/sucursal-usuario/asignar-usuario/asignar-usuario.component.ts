@@ -2,7 +2,6 @@ import { Observable, map, startWith } from 'rxjs';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
-import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -63,7 +62,6 @@ export class AsignarUsuarioComponent implements OnInit {
   ver_personal: boolean = false;
   isPersonal: boolean = false;
 
-
   constructor(
     public departamentoService: DepartamentosService,
     public ventanasu: PrincipalSucursalUsuarioComponent,
@@ -73,7 +71,6 @@ export class AsignarUsuarioComponent implements OnInit {
     public toastr: ToastrService,
     private usuario: UsuarioService,
     private asignacionesService: AsignacionesService,
-
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -113,18 +110,15 @@ export class AsignarUsuarioComponent implements OnInit {
   ver_principal: boolean = false;
   ver_asignados: boolean = false;
   BuscarUsuariosSucursal() {
-    let data = {
-      sucursal: this.data.id,
-      estado: 1
-    }
     this.usuarios = [];
     this.asignados = [];
-    this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
-      this.usuarios = res;
-      this.ver_principal = true;
+    this.general.ObtenerInformacionGeneral(1).subscribe(res => {
+      this.usuarios = res.filter((item: any) => item.id_suc === this.data.id);
+      if(this.usuarios.length != 0){
+        this.ver_principal = true;
+      }
     });
   }
-
 
   /** ********************************************************************************************************* **
    ** **                        METODO PARA VER ADMINISTRADORES Y JEFES DE OTRAS SUCURSALES                   ** **
@@ -138,7 +132,7 @@ export class AsignarUsuarioComponent implements OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.sucursales.filter(sucursal => sucursal.nombre.toLowerCase().includes(filterValue));
+      return this.sucursales.filter((sucursal: any) => sucursal.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -423,6 +417,7 @@ export class AsignarUsuarioComponent implements OnInit {
     }
   }
 
+  // METODO PARA VISUALIZAR INFORMACION
   VisualizarAsignaciones(usuario: any) {
     const datos = {
       nombre: `${usuario.nombre} ${usuario.apellido}`,
@@ -435,12 +430,6 @@ export class AsignarUsuarioComponent implements OnInit {
       width: '700px',
       height: 'auto',
     }).afterClosed().subscribe(async () => {
-      // if (datos) {
-      //   const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
-      //   if (usuarioIndex !== -1) {
-      //     this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
-      //   }
-      // }
       await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
     });
   }

@@ -202,7 +202,7 @@ export class PrincipalProcesoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -214,8 +214,8 @@ export class PrincipalProcesoComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Procesos', this.procesos);
+  DefinirInformacionPDF() {
+
     return {
 
       // ENCABEZADO DE LA PAGINA

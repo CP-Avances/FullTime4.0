@@ -26,15 +26,15 @@ class ModalidaLaboralRutas {
     configuracion(): void {
         // METODO PARA LISTAR MODALIDAD LABORAL
         this.router.get('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.ListaModalidadLaboral);
-        // METODO PARA REGISTRAR MODALIDAD LABORAL
-        this.router.post('/crearModalidad', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CrearMadalidadLaboral);
-        // METODO PARA EDITAR MODALIDAD LABORAL
+        // METODO PARA REGISTRAR MODALIDAD LABORAL     **USADO
+        this.router.post('/crearModalidad', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CrearModalidadLaboral);
+        // METODO PARA EDITAR MODALIDAD LABORAL   **USADO
         this.router.put('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.EditarModalidadLaboral);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, MODALIDADLABORAL_CONTROLADOR.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], MODALIDADLABORAL_CONTROLADOR.VerfificarPlantillaModalidadLaboral);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CargarPlantilla);
 
     }

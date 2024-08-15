@@ -16,10 +16,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
   hide1 = true;
   hide2 = true;
   token: string;
+  mensaje: any = [];
   NuevaContrasenia = new FormControl('', Validators.maxLength(12));
   ConfirmarContrasenia = new FormControl('', Validators.maxLength(12));
   CodigoEmpresa = new FormControl('');
-  mensaje: any = [];
   mensajeURL: any = [];
 
   // VARIABLES PARA AUDITORIA

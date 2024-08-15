@@ -10,17 +10,17 @@ export class PlanGeneralService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA CREAR PLAN GENERAL   --**VERIFICADO
+  // METODO PARA CREAR PLAN GENERAL   **USADO
   CrearPlanGeneral(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/`, datos);
   }
 
-  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
+  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
   BuscarFechas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar_fechas`, datos);
   }
 
-  // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+  // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/eliminar`, data);
   }
@@ -30,27 +30,28 @@ export class PlanGeneralService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-general-fechas`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO  **USADO
   BuscarPlanificacionHoraria(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-general-planificacion`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO   **USADO
   BuscarDetallePlanificacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-general-detalle`, datos);
   }
 
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO   **USADO
   BuscarHorariosUsuario(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-solo-planificacion/lista`, datos);
   }
 
-  // METODO PARA CONSULTAR ASISTENCIA
+
+  // METODO PARA CONSULTAR ASISTENCIA    **USADO
   ConsultarAsistencia(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar-asistencia`, data);
   }
 
-  // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
+  // METODO PARA ACTUALIZAR ASISTENCIA MANUAL    **USADO
   ActualizarAsistenciaManual(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/actualizar-asistencia/manual`, data);
   }

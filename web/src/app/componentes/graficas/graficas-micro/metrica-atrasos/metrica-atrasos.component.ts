@@ -166,7 +166,7 @@ export class MetricaAtrasosComponent implements OnInit {
   }
 
   generarPdf(action: any) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_atrasos" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -178,7 +178,7 @@ export class MetricaAtrasosComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

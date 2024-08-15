@@ -75,7 +75,6 @@ export class EditarPlanificacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    //console.log('datos horario ', this.datos_horarios)
     this.BuscarHora();
     this.BuscarFeriados();
   }
@@ -145,12 +144,10 @@ export class EditarPlanificacionComponent implements OnInit {
     this.restH.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
       this.horarios.map((hor: any) => {
-        //console.log('ver is horario ', hor.id)
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
           contar = contar + 1;
           this.detalles_horarios = res;
-          //console.log('detalles ', this.detalles_horarios)
           this.detalles_horarios.map((det: any) => {
             if (det.tipo_accion === 'E') {
               this.hora_entrada = det.hora.slice(0, 5);
@@ -177,8 +174,6 @@ export class EditarPlanificacionComponent implements OnInit {
           else {
             this.vista_horarios = this.vista_horarios.concat(datos_horario);
           }
-          // FINALIZAR CICLO
-          //console.log('ver contador cont ', contar, ' horarios ', this.horarios.length)
           this.FinalizarCiclo(contar);
         }, vacio => {
           contar = contar + 1;
@@ -205,7 +200,6 @@ export class EditarPlanificacionComponent implements OnInit {
   seleccionar_horario: boolean = true;
   seleccionar_libre: boolean = true;
   ListarHorariosSeleccionados() {
-    //--console.log('ingresa aqui')
     this.tipo_dia_verificar = '';
     this.horas = [];
     this.lista_libres = [];
@@ -223,7 +217,6 @@ export class EditarPlanificacionComponent implements OnInit {
       else {
         this.horarios.forEach((o: any) => {
           // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
-          //console.log(' o.codigo ', o.codigo, ' horario ', (this.datos_horarios.datosPlan.split(',')[i]).trim())
           if (o.codigo === (this.datos_horarios.datosPlan.split(',')[i]).trim()) {
             let data = {
               horarios: o,
@@ -238,14 +231,12 @@ export class EditarPlanificacionComponent implements OnInit {
       }
     }
     if (this.feriados.length) {
-      //console.log('existen feriados', this.feriados);
       this.seleccionar_libre = false;
       this.ver_feriado = true;
       this.ver_nota = true;
       this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
       this.nota_ = 'feriado';
     }
-    //console.log('ver horarios asignados ', this.horas)
     this.BuscarPlanificacionAntes();
     this.BuscarPlanificacionDespues();
   }
@@ -254,7 +245,6 @@ export class EditarPlanificacionComponent implements OnInit {
   lista_libres: any = [];
   lista_feriados: any = [];
   BuscarPlanificacion(tipo: string) {
-    //console.log('ver tipo ', tipo)
     if (tipo === 'L') {
       this.tipo_dia_verificar = 'L';
     }
@@ -271,7 +261,6 @@ export class EditarPlanificacionComponent implements OnInit {
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios ', datos.data)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
@@ -295,33 +284,27 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      //console.log('ver horario libre ', this.lista_libres);
     })
   }
 
   // METODO PARA BUSCAR PLANIFICACION DIA ANTES
   antes: any = [];
   BuscarPlanificacionAntes() {
-    //console.log('ver horraios ', this.horarios)
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     var restar = moment(formato, 'YYYY-MM-DD').subtract(1, 'days');
     var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
-    //console.log('ver dia anterior ', fecha);
-
     let busqueda = {
       fecha_inicio: fecha,
       fecha_final: fecha,
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios antes', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
             // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
             if (this.horarios[j].id === datos.data[k].id_horario) {
               if (this.horarios[j].detalles.segundo_dia) {
-                //console.log('detalles ', this.horarios[j].detalles.segundo_dia)
                 if (this.horarios[j].detalles.segundo_dia === true) {
                   let data = {
                     horarios: this.horarios[j].detalles,
@@ -334,7 +317,6 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      //console.log('antes ', this.antes);
     })
   }
 
@@ -344,7 +326,6 @@ export class EditarPlanificacionComponent implements OnInit {
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     var restar = moment(formato, 'YYYY-MM-DD').add(1, 'days');
     var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
-    //console.log('ver dia anterior ', fecha);
 
     let busqueda = {
       fecha_inicio: fecha,
@@ -352,7 +333,6 @@ export class EditarPlanificacionComponent implements OnInit {
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios despues', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -367,7 +347,6 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      //console.log('depues ', this.despues);
     })
   }
 
@@ -473,12 +452,9 @@ export class EditarPlanificacionComponent implements OnInit {
     const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
-
     if (!obj_res) return this.toastr.warning('Horario no válido.');
-    //console.log('ver horas ', this.horas)
     this.asignado_libre = [];
     var tipo = '';
-    //console.log('ver obj horario ', obj_res.default_)
     if (obj_res.default_ === 'HA') {
       tipo = 'HA';
     }
@@ -486,23 +462,19 @@ export class EditarPlanificacionComponent implements OnInit {
       tipo = 'HL';
     }
     else if (obj_res.default_ === 'FD') {
-      //console.log('ingresa a DFD')
       tipo = 'HFD';
     }
     else {
-      //console.log('ingresa a N')
       tipo = 'N';
     }
 
     var proceso: number = 0;
     if (this.feriados.length) {
-      //console.log('ver tipo ', tipo)
       if (tipo === 'HL' || tipo === 'HFD') {
         proceso = 0;
         this.ver_feriado = false;
       }
       else {
-        //console.log('existen feriados', this.feriados);
         this.seleccionar_libre = false;
         this.ver_feriado = true;
         this.ver_nota = true;
@@ -572,7 +544,6 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      //console.log('verificador .. ', verificador)
       if (verificador === 1) {
         this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
           timeOut: 6000,
@@ -599,13 +570,10 @@ export class EditarPlanificacionComponent implements OnInit {
           });
         }
         else {
-          //console.log('ver horario dia despues ', this.despues)
           // SI EL HORARIO TIENE SALIDA AL SIGUIENTE DIA
           if (data.horarios.detalles.segundo_dia === true) {
             // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
             for (var t = 0; t < this.despues.length; t++) {
-              //console.log('entrada ', moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss'))
-              //console.log('salida ', moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss'))
               if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
                 verificador = 4;
                 break;
@@ -630,10 +598,6 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-
-      //console.log('horarios agregados ', this.horas)
-      //console.log('verificador ', verificador)
-
     }
     else {
       this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups!!! VERIFICAR.', {
@@ -668,8 +632,6 @@ export class EditarPlanificacionComponent implements OnInit {
         this.ver_guardar = false;
       }
     }
-    //console.log('ver datos horas', this.horas);
-    //console.log('ver eliminados ', this.lista_eliminar);
   }
 
   // METODO PARA AGREGAR DIAS LIBRES
@@ -690,7 +652,6 @@ export class EditarPlanificacionComponent implements OnInit {
         this.notas2 = '';
       }
       else {
-        //console.log('ver horarios ', this.horarios)
         const [obj_res] = this.horarios.filter((o: any) => {
           return o.default_ === 'DL';
         })
@@ -715,7 +676,6 @@ export class EditarPlanificacionComponent implements OnInit {
         this.notas1 = 'DÍA CONFIGURADO COMO LIBRE O NO LABORABLE.';
         this.notas2 = '';
       }
-      //console.log('ver libre ', this.asignado_libre)
     }
   }
 
@@ -729,13 +689,12 @@ export class EditarPlanificacionComponent implements OnInit {
     this.notas1 = '';
     const trabajo = this.datos_horarios.horas_trabaja;
     let suma = '00:00:00';
-    this.horas.forEach(valor => {
+    this.horas.forEach((valor: any) => {
       // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS SELECCIONADOS
       suma = this.SumarHoras(suma, valor.horarios.hora_trabajo);
     })
 
     this.ver_nota = true;
-    //console.log('ver datos de horas ', this.StringTimeToSegundosTime(suma), ' trabajo ', this.StringTimeToSegundosTime(trabajo))
     if (this.StringTimeToSegundosTime(suma) <= this.StringTimeToSegundosTime(trabajo)) {
       this.notas1 = 'Horarios verificados exitosamente.';
       this.notas2 = '';
@@ -753,12 +712,10 @@ export class EditarPlanificacionComponent implements OnInit {
       this.ver_horario_ = false;
       this.ver_feriado = false;
     }
-    //console.log('ver suma total ', suma);
   }
 
   // METODO PARA ELIMINAR Y REGISTRAR HORARIOS
   RegistrarHorario() {
-
     // VERIFICAR ELIMINACION DE DIAS LIBRES
     if (this.tipo_dia_verificar === 'L') {
       this.EliminarPlanificacion(this.lista_libres, this.horas);
@@ -811,16 +768,14 @@ export class EditarPlanificacionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    lista.forEach(horario => {
+    lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
-      //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
         fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id_horario: horario.horarios.id,
       };
-      //console.log('plan ', plan_fecha)
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
         datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
@@ -890,15 +845,13 @@ export class EditarPlanificacionComponent implements OnInit {
       var laborar = 0;
       // SELECCIONADOS CON HORARIOS
       lista.forEach((h: any) => {
-        //console.log('ver asignado ', h)
         if (h.asignado === true) {
           this.restD.ConsultarUnDetalleHorario(h.horarios.id).subscribe(res => {
             cont2 = cont2 + 1;
             if (res.length != 0) {
               // COLOCAR DETALLE DE DIA SEGUN HORARIO
-              res.map(deta => {
+              res.map((deta: any) => {
                 cont3 = cont3 + 1;
-                //console.log('ver detalle ', deta)
                 var accion = 0;
                 var nocturno: number = 0;
                 if (deta.tipo_accion === 'E') {
@@ -973,7 +926,6 @@ export class EditarPlanificacionComponent implements OnInit {
                 if (cont3 === res.length) {
                   cont3 = 0;
                   if (cont2 === cont1) {
-                    //console.log('ver data plan generala ', this.plan_general);
                     if (laborar === 1) {
                       this.EliminarFeriados(this.lista_feriados);
                     }
@@ -999,11 +951,8 @@ export class EditarPlanificacionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    //console.log('plan genral ', this.plan_general)
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
-      //console.log('ver respuesta ', res)
       if (res.message === 'OK') {
-        //this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {
           timeOut: 6000,
         });
@@ -1012,20 +961,17 @@ export class EditarPlanificacionComponent implements OnInit {
         this.ver_guardar = false;
       }
       else {
-        //this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana(2);
       }
     }, error => {
-      //this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.CerrarVentana(2);
     })
-    //this.AuditarPlanificar(form);
   }
 
   // METODO PARA REGISTRAR DIAS COMO FERIADOS
@@ -1035,9 +981,7 @@ export class EditarPlanificacionComponent implements OnInit {
     const [obj_res] = this.horarios.filter((o: any) => {
       return o.default_ === 'FD'
     })
-
     this.asignado_feriados = [];
-
     let data = {
       horarios: obj_res,
       asignado: true,
@@ -1047,7 +991,6 @@ export class EditarPlanificacionComponent implements OnInit {
       tipo_dia: 'FD',
     }
     this.asignado_feriados = this.asignado_feriados.concat(data);
-
     if (this.horas.length != 0) {
       this.EliminarPlanificacion(this.horas, this.asignado_feriados);
     }
@@ -1071,9 +1014,7 @@ export class EditarPlanificacionComponent implements OnInit {
       fec_final: moment(moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD')).add(2, 'days'),
       fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
     };
-
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-      //console.log('datos ', datos)
       if (datos.message === 'vacio') {
         this.toastr.info(
           'No se han encontrado registros de marcaciones.', '', {
@@ -1112,14 +1053,12 @@ export class EditarPlanificacionComponent implements OnInit {
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
-      //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
         fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id_horario: horario.horarios.id,
       };
-      //console.log('plan ', plan_fecha)
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
         datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
@@ -1131,7 +1070,6 @@ export class EditarPlanificacionComponent implements OnInit {
 
   // METODO PARA SUMAR HORAS
   SumarHoras(suma: string, tiempo: string) {
-    //console.log('dato 1 ', suma, ' dato 2 ', tiempo)
     let sumah = parseInt(suma.split(':')[0]) + parseInt(tiempo.split(':')[0]);
     let sumam = parseInt(suma.split(':')[1]) + parseInt(tiempo.split(':')[1]);
     let sumas = parseInt(suma.split(':')[2]) + parseInt(tiempo.split(':')[2]);

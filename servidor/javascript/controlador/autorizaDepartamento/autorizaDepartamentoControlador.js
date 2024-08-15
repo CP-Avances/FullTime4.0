@@ -16,7 +16,7 @@ exports.AUTORIZA_DEPARTAMENTO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class AutorizaDepartamentoControlador {
-    // METODO PARA BUSCAR USUARIO AUTORIZA
+    // METODO PARA BUSCAR USUARIO AUTORIZA    **USADO
     EncontrarAutorizacionEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -146,7 +146,7 @@ class AutorizaDepartamentoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS   **USADO
     EliminarAutorizacionDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -155,7 +155,7 @@ class AutorizaDepartamentoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ELIMINAR
-                const response = yield database_1.default.query('SELECT * FROM ed_autoriza_departamento WHERE id = $1', [id]);
+                const response = yield database_1.default.query(`SELECT * FROM ed_autoriza_departamento WHERE id = $1`, [id]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -195,16 +195,12 @@ class AutorizaDepartamentoControlador {
             }
         });
     }
-    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
-    ObtenerlistaEmpleadosAutorizan(req, res) {
+    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     **USADO
+    ObtenerListaEmpleadosAutorizan(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_depa } = req.params;
             const EMPLEADOS = yield database_1.default.query(`
-            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja, v.cargo 
-            FROM ed_autoriza_departamento AS d 
-            INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar 
-                AND d.id_empleado_cargo = v.id_cargo 
-            WHERE d.id_departamento = $1
+            SELECT * FROM informacionpersonalautoriza ia WHERE ia.id_depar = 9
             `, [id_depa]);
             if (EMPLEADOS.rowCount != 0) {
                 return res.jsonp(EMPLEADOS.rows);
@@ -218,7 +214,7 @@ class AutorizaDepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_depar } = req.params;
             const EMPLEADOS = yield database_1.default.query(`
-            SELECT * FROM VistaAutorizanCargo WHERE id_depar = $1
+            SELECT * FROM informacionpersonalautoriza WHERE id_depar = $1
             `, [id_depar]);
             if (EMPLEADOS.rowCount != 0) {
                 return res.jsonp(EMPLEADOS.rows);

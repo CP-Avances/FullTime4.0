@@ -7,9 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 
+import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -19,8 +20,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
-import { CrearCoordenadasComponent } from '../crear-coordenadas/crear-coordenadas.component';
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
+import { CrearCoordenadasComponent } from '../crear-coordenadas/crear-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -128,7 +129,7 @@ export class ListarCoordenadasComponent implements OnInit {
     this.coordenadas = [];
     this.restU.ListarCoordenadas().subscribe(datos => {
       this.coordenadas = datos;
-    }, error => { });
+    });
   }
 
   // METODO PARA LIMPIAR CAMPO DE BUSQUEDA
@@ -206,8 +207,7 @@ export class ListarCoordenadasComponent implements OnInit {
    ** **                              METODO PARA EXPORTAR A PDF                                      ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
-
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -218,10 +218,8 @@ export class ListarCoordenadasComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Parametros', this.coordenadas);
+  DefinirInformacionPDF() {
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -328,7 +326,7 @@ export class ListarCoordenadasComponent implements OnInit {
     var arregloCoordenadas: any = [];
     this.coordenadas.forEach((obj: any) => {
       objeto = {
-        "tipo_permiso": {
+        "zonas": {
           '@id': obj.id,
           "descripcion": obj.descripcion,
           "latitud": obj.latitud,
@@ -337,12 +335,33 @@ export class ListarCoordenadasComponent implements OnInit {
       }
       arregloCoordenadas.push(objeto)
     });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
+    const xml = xmlBuilder.buildObject(arregloCoordenadas);
 
-    this.restU.CrearXML(arregloCoordenadas).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    }
+    else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'CoordenadasUbicacion.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+    this.ObtenerCoordenadas();
   }
 
   //CONTROL BOTONES

@@ -11,7 +11,7 @@ export class CiudadService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR INFORMACION DE LA CIUDAD
+  // BUSCAR INFORMACION DE LA CIUDAD  **USADO
   BuscarInformacionCiudad(id_ciudad: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/informacion-ciudad/${id_ciudad}`);
   }
@@ -45,7 +45,7 @@ export class CiudadService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD
+  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD   **USADO
   BuscarUnaCiudad(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/${id}`);
   }

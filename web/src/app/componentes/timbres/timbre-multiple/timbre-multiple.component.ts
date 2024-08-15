@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -9,15 +9,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-
-// SERVICIOS FILTROS DE BUSQUEDA
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
@@ -131,6 +129,7 @@ export class TimbreMultipleComponent implements OnInit {
   constructor(
     public loginService: LoginService,
     public informacion: DatosGeneralesService,
+    private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
     private restEmpresa: EmpresaService,
     private restUsuario: UsuarioService,
@@ -139,7 +138,6 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
-    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -179,7 +177,6 @@ export class TimbreMultipleComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
@@ -223,12 +220,25 @@ export class TimbreMultipleComponent implements OnInit {
       })
     })
 
-    this.OmitirDuplicados();
+    // RETIRAR DUPLICADOS DE LA LISTA
+    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
+    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
+    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
+    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
     if (this.rolEmpleado !== 1) {
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
+
       this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
@@ -245,56 +255,6 @@ export class TimbreMultipleComponent implements OnInit {
     this.mostrarTablas = true;
   }
 
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
-  }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
@@ -541,7 +501,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionSuc.selected.find(selec => {
+        this.selectionSuc.selected.find((selec: any) => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -563,7 +523,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find(selec => {
+        this.selectionReg.selected.find((selec: any) => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -586,7 +546,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find(selec => {
+        this.selectionDep.selected.find((selec: any) => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -608,7 +568,7 @@ export class TimbreMultipleComponent implements OnInit {
     let usuarios: any = [];
     if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find(selec => {
+        this.selectionCarg.selected.find((selec: any) => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -629,7 +589,7 @@ export class TimbreMultipleComponent implements OnInit {
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+      this.selectionEmp.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }
@@ -687,9 +647,8 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA INGRESAR TIMBRE DE UN USUARIO
   RegistrarTimbre(empleado: any) {
-    this.ventana.open(CrearTimbreComponent, { width: '400px', data: empleado })
+    this.ventana.open(CrearTimbreComponent, { width: '500px', data: empleado })
       .afterClosed().subscribe(dataT => {
-        console.log('timbres ', dataT)
         if (dataT) {
           if (!dataT.close) {
             this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
@@ -706,7 +665,6 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   RegistrarMultiple(data: any) {
-    console.log('ver data ', data)
     if (data.length > 0) {
       this.VerificarSeguridad(data);
     }
@@ -747,7 +705,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA REGISTRAR VARIOS TIMBRES
   TimbrarVarios(seleccionados: any) {
-    this.ventana.open(CrearTimbreComponent, { width: '400px', data: seleccionados })
+    this.ventana.open(CrearTimbreComponent, { width: '500px', data: seleccionados })
       .afterClosed().subscribe(dataT => {
         this.auto_individual = true;
         this.LimpiarFormulario();
@@ -776,7 +734,6 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(valor: any) {
-    console.log('ver valor ', valor)
     if (this.opcion === 's') {
       this.ModelarSucursal(valor.id);
     }

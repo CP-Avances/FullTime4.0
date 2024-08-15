@@ -74,7 +74,7 @@ export class HoraExtraMacroComponent implements OnInit {
       echarts.use(
         [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
       );
-      this.llamarGraficaOriginal();
+      //this.llamarGraficaOriginal();
     }
   }
 
@@ -87,6 +87,7 @@ export class HoraExtraMacroComponent implements OnInit {
     this.thisChart = echarts.init(this.chartDom, 'light', { width: 1050, renderer: 'svg', devicePixelRatio: 5 });
 
     if (local === null) {
+      // NO FUNCIONA
       this.restGraficas.MetricaHoraExtraMicro().subscribe(res => {
         // console.log('************* Hora Extra Micro **************');
         // console.log(res);
@@ -182,7 +183,7 @@ export class HoraExtraMacroComponent implements OnInit {
   }
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_hora_extra_" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -194,7 +195,7 @@ export class HoraExtraMacroComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

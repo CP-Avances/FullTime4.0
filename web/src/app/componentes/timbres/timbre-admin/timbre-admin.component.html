@@ -75,8 +75,8 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Código</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Departamento</th>
                         <th scope="col">Cargo</th>
@@ -120,11 +120,11 @@
                     </tr>
                     <tr
                         *ngFor="let d of datosEmpleado | emplCodigo: codigo.value | emplCedula: cedula.value | nombreApellido: nombre.value | paginate:tamanio_pagina_e:numero_pagina_e">
-                        <td>{{d.codigo}}</td>
                         <td>{{d.cedula}}</td>
+                        <td>{{d.codigo}}</td>
                         <td>{{d.apellido}} {{d.nombre}}</td>
-                        <td>{{d.departamento | titlecase}}</td>
-                        <td>{{d.cargo}}</td>
+                        <td>{{d.name_dep | titlecase}}</td>
+                        <td>{{d.name_cargo}}</td>
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de timbres del empleado."
                                 class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)" *ngIf="getVerTimbres()">

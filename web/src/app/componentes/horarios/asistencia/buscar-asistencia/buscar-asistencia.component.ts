@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-
 import { Validators, FormGroup, FormControl } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
-
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator';
 import moment from 'moment';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-buscar-asistencia',
@@ -110,25 +108,17 @@ export class BuscarAsistenciaComponent implements OnInit {
       inicio: form.fechaInicioForm,
       fin: form.fechaFinForm,
     }
-
-
     if (!datos.codigo && !datos.cedula && !datos.nombre && !datos.apellido) {
       return this.toastr.warning('Debe ingresar al menos un criterio de búsqueda.', 'Notificación', {
         timeOut: 6000,
       });
     }
-
     this.asistir.ConsultarAsistencia(datos).subscribe(async data => {
-      console.log('ver asistencia ', data)
-
       if (data.message === 'OK') {
-
         if (data.respuesta.length > 0) {
           this.existenAsistencias = true;
         }
-
         this.asistencia = this. rolEmpleado === 1 ? data.respuesta : await this.FiltrarEmpleadosAsignados(data.respuesta);
-
         if (this.asistencia.length === 0 && this.existenAsistencias) {
           return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {
             timeOut: 6000,

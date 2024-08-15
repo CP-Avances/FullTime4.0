@@ -7,7 +7,7 @@ import { FormatearHora } from '../../../libs/settingsMail';
 
 class DetalleCatalogoHorarioControlador {
 
-    // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
+    // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
     public async ListarUnDetalleHorario(req: Request, res: Response): Promise<any> {
         const { id_horario } = req.params;
         const HORARIO = await pool.query(
@@ -56,7 +56,7 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
@@ -67,7 +67,7 @@ class DetalleCatalogoHorarioControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
+            const consulta = await pool.query(`SELECT * FROM eh_detalle_horarios WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
@@ -109,6 +109,7 @@ class DetalleCatalogoHorarioControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -116,10 +117,11 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
-    // METODO PARA REGISTRAR DETALLES
+    // METODO PARA REGISTRAR DETALLES    **USADO
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
         try {
-            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
+            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
+                min_despues, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -133,12 +135,12 @@ class DetalleCatalogoHorarioControlador {
                 , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
 
             const [datosNuevos] = registro.rows;
-            
+
             const horadetalle = await FormatearHora(hora);
             datosNuevos.hora = horadetalle;
-            
+
             // AUDITORIA
-            
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eh_detalle_horarios',
                 usuario: user_name,
@@ -152,6 +154,7 @@ class DetalleCatalogoHorarioControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             res.jsonp({ message: 'Registro guardado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -159,7 +162,7 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR DETALLE DE HORARIO
+    // METODO PARA ACTUALIZAR DETALLE DE HORARIO    **USADO
     public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<Response> {
         try {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
@@ -218,8 +221,8 @@ class DetalleCatalogoHorarioControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
             return res.jsonp({ message: 'Registro actualizado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -227,6 +230,7 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
+    // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS    **USADO
     public async ListarDetalleHorarios(req: Request, res: Response) {
         const HORARIO = await pool.query(
             `
@@ -234,7 +238,7 @@ class DetalleCatalogoHorarioControlador {
             ORDER BY id_horario ASC, orden ASC
             `
         );
-    
+
         if (HORARIO.rowCount != 0) {
             const detallesHorarios = HORARIO.rows.map((detalle: any) => {
                 switch (detalle.tipo_accion) {
@@ -256,15 +260,12 @@ class DetalleCatalogoHorarioControlador {
                 }
                 return detalle;
             });
-    
+
             return res.jsonp(detallesHorarios);
         } else {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
-
-
-
 }
 
 export const DETALLE_CATALOGO_HORARIO_CONTROLADOR = new DetalleCatalogoHorarioControlador();

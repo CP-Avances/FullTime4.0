@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.nacionalidadControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
 class NacionalidadControlador {
+    // METODO PARA BUSCAR NACIONALIDADES   **USADO
     ListarNacionalidades(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const nacinalidad = yield database_1.default.query(`

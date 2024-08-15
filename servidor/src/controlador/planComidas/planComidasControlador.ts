@@ -95,6 +95,7 @@ class PlanComidasControlador {
     }
   }
 
+   // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
   public async EncontrarSolicitaComidaIdEmpleado(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const PLAN_COMIDAS = await pool.query(
@@ -196,6 +197,7 @@ class PlanComidasControlador {
     }
   }
 
+  // METODO PARA CONSULTAR DATOS DE ALIMENTACION CONSUMIDOS    **USADO
   public async EncontrarPlanComidaEmpleadoConsumido(req: Request, res: Response): Promise<any> {
     const { id_plan_comida, id_empleado } = req.body;
     const PLAN_COMIDAS = await pool.query(
@@ -773,7 +775,7 @@ class PlanComidasControlador {
     }
   }
 
-  // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
+  // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO    **USADO
   public async EliminarPlanComidaEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -813,7 +815,7 @@ class PlanComidasControlador {
         DELETE FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
         `
         , [id, id_empleado]);
-        
+
       var fechaN = await FormatearFecha2(datosOriginales.fecha, 'ddd');
       var horaInicio = await FormatearHora(datosOriginales.hora_inicio)
       var horaFin = await FormatearHora(datosOriginales.hora_fin)
@@ -833,6 +835,7 @@ class PlanComidasControlador {
       await pool.query('COMMIT');
 
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -905,7 +908,7 @@ class PlanComidasControlador {
     }
   }
 
-  // METODO PARA BUSCAR DATOS DE PLANIFICACIÓN DE ALIMENTACIÓN POR ID DE USUARIO
+  // METODO PARA BUSCAR DATOS DE PLANIFICACION DE ALIMENTACION POR ID DE USUARIO     **USADO
   public async EncontrarPlanComidaIdEmpleado(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const PLAN_COMIDAS = await pool.query(
@@ -928,10 +931,10 @@ class PlanComidasControlador {
   }
 
   /** ********************************************************************************************** **
-   ** *              ENVIO DE NOTIFICACIONES DE SERVICIOS DE ALIMENTACIÓN                          * **
+   ** *              ENVIO DE NOTIFICACIONES DE SERVICIOS DE ALIMENTACION                          * **
    ** ********************************************************************************************** **/
 
-  // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
+  // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACION DE SERVICIO DE ALIMENTACION   **USADO
   public async EnviarNotificacionComidas(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip } = req.body;
@@ -990,6 +993,7 @@ class PlanComidasControlador {
 
       return res.status(200)
         .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1254,7 +1258,7 @@ class PlanComidasControlador {
    ** **    METODOS DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIOS DE ALIMENTACION    ** ** 
    ** ************************************************************************************************ **/
 
-  // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB  -- verificar si se requiere estado
+  // ENVIAR CORREO ELECTRONICO DE PLANIFICACION DE COMIDA APLICACION WEB  **USADO
   public async EnviarCorreoPlanComidas(req: Request, res: Response): Promise<void> {
 
     var tiempo = fechaHora();
@@ -1270,8 +1274,6 @@ class PlanComidasControlador {
       const { id_envia, desde, hasta, inicio, final, correo, id_comida, observacion,
         extra, nombres, asunto, tipo_solicitud, proceso } = req.body;
 
-      console.log('data', req.body)
-
       var tipo_servicio = 'Extra';
       if (extra === false) {
         tipo_servicio = 'Normal';
@@ -1285,7 +1287,7 @@ class PlanComidasControlador {
         WHERE da.id = $1
         `
         , [id_envia]).then((resultado: any) => { return resultado.rows[0] });
-      console.log('envia...', Envia)
+
       const SERVICIO_SOLICITADO = await pool.query(
         `
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, dm.nombre AS comida, dm.valor, 

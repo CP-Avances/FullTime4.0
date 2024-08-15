@@ -10,12 +10,12 @@ export class DetalleCatHorariosService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA BUSCAR DETALLES DE UN HORARIO    --**VERIFICADO
+  // METODO PARA BUSCAR DETALLES DE UN HORARIO   **USADO
   ConsultarUnDetalleHorario(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/${id}`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO    **USADO
   EliminarRegistro(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/detalleHorario/eliminar/${id}`;
     const httpOtions = {
@@ -24,17 +24,17 @@ export class DetalleCatHorariosService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA REGISTRAR DETALLE DE HORARIO
+  // METODO PARA REGISTRAR DETALLE DE HORARIO    **USADO
   IngresarDetalleHorarios(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario`, datos);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
+  // METODO PARA ACTUALIZAR REGISTRO   **USADO
   ActualizarRegistro(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario`, data);
   }
 
-  // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS
+  // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS     **USADO
   ConsultarDetalleHorarios(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/lista`, datos);
   }

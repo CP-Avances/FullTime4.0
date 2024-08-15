@@ -23,6 +23,14 @@ export class CrearTimbreComponent implements OnInit {
   FechaF = new FormControl('', Validators.required);
   HoraF = new FormControl('', Validators.required);
 
+  // VARIABLES DE ALMACENAMIENTO DE ARCHIVO
+  nombreDocumento = new FormControl('');
+  archivoForm = new FormControl('');
+  nameFile: string;
+  archivoSubido: Array<File>;
+  documento: boolean = false;
+  HabilitarBtn: boolean = false;
+
   // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
   idEmpleadoLogueado: any;
   nombre: string;
@@ -52,14 +60,8 @@ export class CrearTimbreComponent implements OnInit {
     accionForm: this.accionF,
     teclaFuncionForm: this.teclaFuncionF,
     observacionForm: this.observacionF,
+    nombreDocumentoForm: this.nombreDocumento,
   });
-
-  // METODO DE CONTROL DE MEMORIA
-  private options = {
-    enableHighAccuracy: false,
-    maximumAge: 30000,
-    timeout: 15000
-  };
 
   constructor(
     public ventana: MatDialogRef<CrearTimbreComponent>, // VARIABLE MANEJO DE VENTANAS
@@ -79,7 +81,6 @@ export class CrearTimbreComponent implements OnInit {
       this.nombre = this.data.name_empleado;
     }
     this.VerDatosEmpleado(this.idEmpleadoLogueado);
-    this.Geolocalizar();
   }
 
   // METODO DE BUSQUEDA DE DATOS DE EMPLEADO
@@ -89,34 +90,6 @@ export class CrearTimbreComponent implements OnInit {
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleadoUno = data;
     })
-  }
-
-  // METODO PARA TOMAR CORDENAS DE UBICACIÓN
-  Geolocalizar() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (objPosition) => {
-          this.latitud = objPosition.coords.latitude;
-          this.longitud = objPosition.coords.longitude;
-        }, (objPositionError) => {
-          switch (objPositionError.code) {
-            case objPositionError.PERMISSION_DENIED:
-              console.log('NO SE HA PERMITIDO ACCEDER A POSICIÓN DEL USUARIO.');
-              break;
-            case objPositionError.POSITION_UNAVAILABLE:
-              console.log('NO SE HA PODIDO ACCEDER A INFORMACIÓN DE SU POSICIÓN.');
-              break;
-            case objPositionError.TIMEOUT:
-              console.log('EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER.');
-              break;
-            default:
-              console.log('ERROR DESCONOCIDO.');
-          }
-        }, this.options);
-    }
-    else {
-      console.log('SU NAVEGADOR NO SOPORTA API DE GEOLOCALIZACIÓN.');
-    }
   }
 
   // METODO DE INGRESO DE ACCIONES DEL TIMBRE
@@ -158,9 +131,7 @@ export class CrearTimbreComponent implements OnInit {
       ip: this.ip,
     }
     if (this.data.length === undefined) {
-      //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
-      //console.log('timbre ', timbre)
       this.ventana.close(timbre);
     }
     else {
@@ -179,6 +150,40 @@ export class CrearTimbreComponent implements OnInit {
         })
       })
     }
+  }
+
+  // SUBIR ARCHIVO DE JUSTIFICACION DE TIMBRES
+  fileChange(element: any) {
+    this.archivoSubido = element.target.files;
+    if (this.archivoSubido.length != 0) {
+      // VALIDAR QUE EL DOCUEMNTO SUBIDO CUMPLA CON EL TAMAÑO ESPECIFICADO
+      if (this.archivoSubido[0].size <= 2e+6) {
+        const name = this.archivoSubido[0].name;
+        this.formulario.patchValue({ nombreDocumentoForm: name });
+
+        this.HabilitarBtn = true;
+      }
+      else {
+        this.toastr.info('El archivo ha excedido el tamaño permitido.', 'Tamaño de archivos permitido máximo 2MB.', {
+          timeOut: 6000,
+        });
+      }
+    }
+  }
+
+  // LIMPIAR EL NOMBRE DEL ARCHIVO
+  LimpiarNombreArchivo() {
+    this.formulario.patchValue({
+      nombreDocumentoForm: '',
+    });
+  }
+
+  // METODO PARA QUITAR ARCHIVO SELECCIONADO
+  RetirarArchivo() {
+    this.archivoSubido = [];
+    this.HabilitarBtn = false;
+    this.LimpiarNombreArchivo();
+    this.archivoForm.patchValue('');
   }
 
 }

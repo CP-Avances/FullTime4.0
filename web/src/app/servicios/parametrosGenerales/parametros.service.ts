@@ -32,7 +32,7 @@ export class ParametrosService {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion/ver-parametro/${id}`);
   }
 
-  // METODO PARA LISTAR DETALLES DE PARAMETRO **USADO
+  // METODO PARA LISTAR DETALLES DE PARAMETRO   **USADO
   ListarDetalleParametros(id: number) {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion/${id}`);
   }
@@ -56,7 +56,7 @@ export class ParametrosService {
     return this.http.put(`${(this.url as string)}/parametrizacion/actual-detalle`, datos);
   }
 
-  // METODO PARA COMPARAR CORDENADAS
+  // METODO PARA COMPARAR CORDENADAS    **USADO
   ObtenerCoordenadas(data: any) {
     return this.http.post<any>(`${(this.url as string)}/parametrizacion/coordenadas`, data);;
   }

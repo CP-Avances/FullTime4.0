@@ -1,11 +1,9 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -24,12 +22,12 @@ import { TitulosComponent } from '../titulos/titulos.component'
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 
 import { ITableProvincias } from 'src/app/model/reportes.model';
-import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -79,6 +77,8 @@ export class ListarTitulosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+  titulosCorrectos: number = 0;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -228,10 +228,11 @@ export class ListarTitulosComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
+
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   DataTitulosProfesionales: any;
   listTitulosCorrectos: any = [];
   messajeExcel: string = '';
-  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
     this.listTitulosCorrectos = [];
     let formData = new FormData();
@@ -239,13 +240,12 @@ export class ListarTitulosComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
       this.messajeExcel = res.message;
 
-      this.DataTitulosProfesionales.sort((a, b) => {
+      this.DataTitulosProfesionales.sort((a: any, b: any) => {
         if (a.observacion !== 'ok' && b.observacion === 'ok') {
           return -1;
         }
@@ -281,15 +281,13 @@ export class ListarTitulosComponent implements OnInit {
             this.listTitulosCorrectos.push(titulo);
           }
         });
-      }
 
+        this.titulosCorrectos = this.listTitulosCorrectos.length;
+      }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-
-    }, () => {
 
     });
 
@@ -297,7 +295,7 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = '';
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
@@ -312,7 +310,7 @@ export class ListarTitulosComponent implements OnInit {
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): any {
+  EstiloTextoCelda(texto: string): any {
     let arrayObservacion = texto.split(" ");
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
@@ -322,25 +320,25 @@ export class ListarTitulosComponent implements OnInit {
 
   }
 
-  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarTitulos();
+          this.RegistrarTitulos();
         }
       });
   }
 
-  registrarTitulos() {
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
+  RegistrarTitulos() {
     if (this.listTitulosCorrectos.length > 0) {
       const data = {
         titulos: this.listTitulosCorrectos,
         user_name: this.user_name,
         ip: this.ip
       };
-
       this.rest.RegistrarTitulosPlantilla(data).subscribe({
         next: (res: any) => {
           this.toastr.success('Plantilla de Titulos profesionales importada.', 'Operación exitosa.', {
@@ -372,7 +370,7 @@ export class ListarTitulosComponent implements OnInit {
 
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.verTitulos);
-    const documentDefinition = this.GetDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -382,8 +380,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
   }
 
-  GetDocumentDefinicion() {
-    sessionStorage.setItem('Títulos', this.verTitulos);
+  DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -507,7 +504,6 @@ export class ListarTitulosComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloTitulos);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -522,7 +518,6 @@ export class ListarTitulosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -596,8 +591,11 @@ export class ListarTitulosComponent implements OnInit {
     }
   }
 
-  // METODOS PARA LA SELECCION MULTIPLE
+  /** ************************************************************************************************** **
+   ** **                           METODO DE SELECCION MULTIPLE DE DATOS                              ** **
+   ** ************************************************************************************************** **/
 
+  // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -676,7 +674,7 @@ export class ListarTitulosComponent implements OnInit {
       });
   }
 
-
+  // METODO DE ELIMINACIN MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -710,6 +708,7 @@ export class ListarTitulosComponent implements OnInit {
     )
   }
 
+  // METODO DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

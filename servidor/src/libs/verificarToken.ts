@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Licencias, Modulos } from '../class/Licencia';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import { ObtenerRutaLicencia } from './accesoCarpetas';
 import pool from '../database';
 
 interface IPayload {

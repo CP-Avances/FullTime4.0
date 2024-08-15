@@ -12,6 +12,7 @@ import path from 'path';
 
 class VacacionesControlador {
 
+  // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO    **USADO
   public async VacacionesIdPeriodo(req: Request, res: Response) {
     const { id } = req.params;
     const VACACIONES = await pool.query(
@@ -36,13 +37,13 @@ class VacacionesControlador {
     const VACACIONES = await pool.query(
       `
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_depa, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
       FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da, 
         ed_departamentos AS depa   
       WHERE dc.id_empleado = e.id  
 	      AND da.id_contrato = dc.contrato_id
-        AND depa.id = da.id_departamento
+        AND depa.id = da.id_depa
 	      AND (v.estado = 1 OR v.estado = 2) 
         AND da.estado = $1
       ORDER BY id DESC
@@ -137,7 +138,7 @@ class VacacionesControlador {
       const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado,
         id_peri_vacacion, id_empleado, user_name, ip } = req.body;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
@@ -162,7 +163,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
@@ -174,7 +175,7 @@ class VacacionesControlador {
 
 
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).
         jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -188,7 +189,7 @@ class VacacionesControlador {
 
       const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -206,7 +207,7 @@ class VacacionesControlador {
           observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -231,7 +232,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
@@ -243,7 +244,7 @@ class VacacionesControlador {
 
 
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -257,7 +258,7 @@ class VacacionesControlador {
       const { user_name, ip } = req.body;
       let { id_vacacion } = req.params;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -275,7 +276,7 @@ class VacacionesControlador {
           observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -365,7 +366,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (objetoVacacion) {
@@ -375,7 +376,7 @@ class VacacionesControlador {
         return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
       }
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
 
@@ -410,7 +411,7 @@ class VacacionesControlador {
       const { estado, user_name, ip } = req.body;
       console.log('estado', id);
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
@@ -428,7 +429,7 @@ class VacacionesControlador {
           observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
         });
 
-        // FINALIZAR TRANSACCIÓN
+        // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
@@ -449,14 +450,14 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (3 === estado) {
         RestarPeriodoVacacionAutorizada(parseInt(id), user_name, ip);
       }
     } catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
@@ -701,6 +702,28 @@ class VacacionesControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
+
+  //------------------------------------------------- METODO APP MOBIL ----------------------------------------------------------------------
+  public async getlistaVacacionesByFechasyCodigo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { fec_inicio, fec_final, codigo } = req.query;
+
+      const query = `SELECT v.* FROM mv_solicitud_vacacion v WHERE v.id_empleado = '${codigo}' AND (
+            ((\'${fec_inicio}\' BETWEEN v.fecha_inicio AND v.fecha_final ) OR 
+             (\'${fec_final}\' BETWEEN v.fecha_inicio AND v.fecha_final)) 
+            OR
+            ((v.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
+             (v.fecha_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
+            )`
+
+      const response: QueryResult = await pool.query(query);
+      const vacaciones: any[] = response.rows;
+      return res.status(200).jsonp(vacaciones);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
 
 }
 

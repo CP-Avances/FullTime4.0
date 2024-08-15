@@ -12,6 +12,7 @@ import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import { ObtenerRutaLicencia } from '../../libs/accesoCarpetas';
 import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
@@ -22,7 +23,7 @@ interface IPayload {
 
 class LoginControlador {
 
-  // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA
+  // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
 
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
@@ -36,7 +37,7 @@ class LoginControlador {
     }
 
     try {
-      const { nombre_usuario, pass } = req.body;
+      const { nombre_usuario, pass, movil } = req.body;
       let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
       console.log('ingresa ', req.body)
       // BUSQUEDA DE USUARIO
@@ -45,13 +46,16 @@ class LoginControlador {
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `
         , [nombre_usuario, pass_encriptado]);
-      console.log('verificar ', USUARIO.rows)
+
       // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
+
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
         let ACTIVO = await pool.query(
+
+          //FIXME
           `
-          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
+          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
@@ -59,7 +63,7 @@ class LoginControlador {
             return result.rows
           });
 
-        const { empleado, usuario, codigo, web_access } = ACTIVO[0];
+        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
@@ -69,13 +73,14 @@ class LoginControlador {
         if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
 
         // BUSQUEDA DE CLAVE DE LICENCIA
+        //FIXME
         const EMPRESA = await pool.query(
           `
-          SELECT public_key, id AS id_empresa FROM e_empresa
+          SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `
         );
 
-        const { public_key, id_empresa } = EMPRESA.rows[0];
+        const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
         {
@@ -114,21 +119,43 @@ class LoginControlador {
 
         // VALIDACION DE ACCESO CON LICENCIA 
         if (INFORMACION.rowCount != 0) {
-          const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
-            public_key: licencia } = INFORMACION.rows[0];
-
+          const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa, public_key: licencia } = INFORMACION.rows[0];
+          const expiresIn = movil ? '365d' : 60 * 60 * 23;
           const token = jwt.sign({
-            _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-            _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-            _empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente/*, modulos: modulos*/,
+            _licencia: licencia,
+            codigo: codigo,
+            _id: id,
+            _id_empleado: id_empleado,
+            rol: id_rol,
+            _dep: id_departamento,
+            _web_access: web_access,
+            _acc_tim: acciones_timbres,
+            _suc: id_sucursal,
+            _empresa: id_empresa,
+            cargo: id_cargo,
+            ip_adress: ip_cliente,
             id_contrato: id_contrato
-          },
-            process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
+          }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
+
           return res.status(200).jsonp({
-            caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-            departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-            empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente/*, modulos: modulos*/,
-            id_contrato: id_contrato
+            caducidad_licencia,
+            token,
+            usuario: user,
+            rol: id_rol,
+            empleado: id_empleado,
+            departamento: id_departamento,
+            acciones_timbres: acciones_timbres,
+            sucursal: id_sucursal,
+            empresa: id_empresa,
+            cargo: id_cargo,
+            ip_adress: ip_cliente,
+            id_contrato: id_contrato,
+            nombre: nombre,
+            apellido: apellido,
+            cedula: cedula,
+            codigo: codigo,
+            ruc: ruc,
+            version: '4.0.0'
           });
         }
         else {
@@ -158,7 +185,7 @@ class LoginControlador {
     }
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO
+  // METODO PARA CAMBIAR CONTRASEÑA - ENVIO DE CORREO    **USADO
   public async EnviarCorreoContrasena(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;

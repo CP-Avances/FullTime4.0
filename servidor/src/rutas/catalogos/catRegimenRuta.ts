@@ -27,7 +27,7 @@ class RegimenRuta {
         this.router.get('/:id', TokenValidation, REGIMEN_CONTROLADOR.ListarUnRegimen);
         // ELIMINAR REGISTRO DE REGIMEN LABORAL  **USADO
         this.router.delete('/eliminar/:id', TokenValidation, REGIMEN_CONTROLADOR.EliminarRegistros);
-        // BUSCAR REGIMEN LABORAL POR ID DE PAIS
+        // BUSCAR REGIMEN LABORAL POR ID DE PAIS   **USADO
         this.router.get('/pais-regimen/:nombre', TokenValidation, REGIMEN_CONTROLADOR.ListarRegimenPais);
 
 

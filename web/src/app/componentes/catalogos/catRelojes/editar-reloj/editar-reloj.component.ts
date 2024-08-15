@@ -40,21 +40,18 @@ export class EditarRelojComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
-
   // PRIMER FORMULARIO
   ipF = new FormControl('', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/)]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   codigoF = new FormControl('', Validators.required);
-  numeroF = new FormControl('', [Validators.required]);
   funcionesF = new FormControl('', [Validators.required]);
   idSucursalF = new FormControl('', Validators.required);
   idDepartamentoF = new FormControl('', [Validators.required]);
 
   // SEGUNDO FORMULARIO
   macF = new FormControl('');
-  marcaF = new FormControl('', [Validators.minLength(2)]);
-  serieF = new FormControl('', Validators.minLength(4));
+  marcaF = new FormControl('', [Validators.required]);
+  serieF = new FormControl('', [Validators.minLength(4), Validators.required]);
   modeloF = new FormControl('', [Validators.minLength(3)]);
   puertoF = new FormControl('', [Validators.required]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
@@ -89,7 +86,6 @@ export class EditarRelojComponent implements OnInit {
       ipForm: this.ipF,
       nombreForm: this.nombreF,
       puertoForm: this.puertoF,
-      numeroForm: this.numeroF,
       codigoForm: this.codigoF,
       funcionesForm: this.funcionesF,
       idSucursalForm: this.idSucursalF,
@@ -112,24 +108,12 @@ export class EditarRelojComponent implements OnInit {
     this.rest.ConsultarUnReloj(this.idReloj).subscribe(datos => {
       this.datosReloj = datos[0];
       this.BuscarDatos(this.datosReloj.id_sucursal);
-      if (this.datosReloj.tiene_funciones === true) {
-        this.activarCampo = true;
-        this.primerFormulario.patchValue({
-          numeroForm: this.datosReloj.numero_accion
-        })
-      }
-      else {
-        this.activarCampo = false;
-        this.primerFormulario.patchValue({
-          numeroForm: 0
-        })
-      }
       this.primerFormulario.patchValue({
         ipForm: this.datosReloj.ip,
         nombreForm: this.datosReloj.nombre,
         puertoForm: this.datosReloj.puerto,
         codigoForm: this.datosReloj.codigo,
-        funcionesForm: this.datosReloj.tiene_funciones,
+        funcionesForm: this.datosReloj.tipo_conexion,
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
       })
@@ -192,8 +176,7 @@ export class EditarRelojComponent implements OnInit {
       nombre: form1.nombreForm,
       puerto: form1.puertoForm,
       id_sucursal: form1.idSucursalForm,
-      numero_accion: form1.numeroForm,
-      tien_funciones: form1.funcionesForm,
+      tipo_conexion: form1.funcionesForm,
       id_departamento: form1.idDepartamentoForm,
 
       // SEGUNDO FORMULARIO
@@ -227,7 +210,6 @@ export class EditarRelojComponent implements OnInit {
   // METODO PARA GUARDAR EN LA BASE DE DATOS
   GuardarSistema(datosReloj: any) {
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
-      //console.log('ver respuesta ', response)
       if (response.message === 'actualizado') {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
@@ -279,22 +261,6 @@ export class EditarRelojComponent implements OnInit {
   // METODO PARA INGRESAR SOLO NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
-  }
-
-  // METODO PARA ACTIVAR CAMPO NUMERO DE FUNCIONES
-  ActivarVista() {
-    this.activarCampo = true;
-    this.primerFormulario.patchValue({
-      numeroForm: ''
-    })
-  }
-
-  // METODO PARA OCULTAR CAMPO NUMERO DE FUNCIONES
-  DesactivarVista() {
-    this.activarCampo = false;
-    this.primerFormulario.patchValue({
-      numeroForm: 0
-    })
   }
 
   // METODO PARA LIMPIAR FORMULARIO

@@ -42,32 +42,33 @@ class HorarioRutas {
         this.configuracion();
     }
     configuracion() {
-        // REGISTRAR HORARIO
+        // REGISTRAR HORARIO    **USADO
         this.router.post('/', verificarToken_1.TokenValidation, catHorarioControlador_1.default.CrearHorario);
-        // BUSCAR HORARIO POR SU NOMBRE
+        // BUSCAR HORARIO POR SU NOMBRE   **USADO
         this.router.post('/buscar-horario/nombre', verificarToken_1.TokenValidation, catHorarioControlador_1.default.BuscarHorarioNombre);
-        // CARGAR ARCHIVO DE RESPALDO  **//VERIFICADO
+        // CARGAR ARCHIVO DE RESPALDO    **USADO
         this.router.put('/:id/documento/:archivo/verificar/:codigo', [verificarToken_1.TokenValidation, upload_horario.single('uploads')], catHorarioControlador_1.default.GuardarDocumentoHorario);
-        // ACTUALIZAR DATOS DE HORARIO
+        // ACTUALIZAR DATOS DE HORARIO    **USADO
         this.router.put('/editar/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorario);
-        // ELIMINAR DOCUMENTO DE HORARIO BASE DE DATOS - SERVIDOR
+        // ELIMINAR DOCUMENTO DE HORARIO BASE DE DATOS - SERVIDOR    **USADO
         this.router.put('/eliminar_horario/base_servidor', [verificarToken_1.TokenValidation], catHorarioControlador_1.default.EliminarDocumento);
-        // ELIMINAR DOCUMENTO DE HORARIOS DEL SERVIDOR
+        // ELIMINAR DOCUMENTO DE HORARIOS DEL SERVIDOR   **USADO
         this.router.put('/eliminar_horario/servidor', [verificarToken_1.TokenValidation], catHorarioControlador_1.default.EliminarDocumentoServidor);
-        // BUSCAR LISTA DE CATALOGO HORARIOS   --**VERIFICADO
+        // BUSCAR LISTA DE CATALOGO HORARIOS   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catHorarioControlador_1.default.ListarHorarios);
-        // OBTENER VISTA DE DOCUMENTOS
+        // OBTENER VISTA DE DOCUMENTOS   **USADO
         this.router.get('/documentos/:docs', catHorarioControlador_1.default.ObtenerDocumento);
-        // BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)
+        // BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)   **USADO
         this.router.post('/buscar_horario/edicion', verificarToken_1.TokenValidation, catHorarioControlador_1.default.BuscarHorarioNombre_);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO    **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EliminarRegistros);
-        // METODO PARA BUSCAR DATOS DE UN HORARIO
+        // METODO PARA BUSCAR DATOS DE UN HORARIO   **USADO
         this.router.get('/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.ObtenerUnHorario);
-        // METODO PARA ACTUALIZAR HORAS TRABAJADAS
+        // METODO PARA ACTUALIZAR HORAS TRABAJADAS   **USADO
         this.router.put('/update-horas-trabaja/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorasTrabaja);
-        // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA
+        // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA   **USADO
         this.router.post('/cargarHorario/verificarDatos/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.VerificarDatos);
+        // REGISTRAR DATOS DE PLANTILLA EN EL SISTEMA   **USADO
         this.router.post('/cargarHorario/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.CargarHorarioPlantilla);
     }
 }

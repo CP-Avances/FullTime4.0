@@ -12,6 +12,9 @@ export class SucRolEmpleadoPipe implements PipeTransform {
       if (resultados.rol && resultados.rol.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
         RESULTADO_BUSQUEDAS.push(resultados);
       }
+      else if (resultados.name_rol && resultados.name_rol.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+        RESULTADO_BUSQUEDAS.push(resultados);
+      }
     };
     return RESULTADO_BUSQUEDAS;
   }

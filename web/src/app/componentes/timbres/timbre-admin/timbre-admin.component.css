@@ -32,6 +32,18 @@ mat-form-field.input-tables {
     height: 65px;
 }
 
-.codigo { width: 70px; }
-.cedula { width: 100px; }
-.fecha { width: 100px;}
+.codigo {
+    width: 70px;
+}
+
+.cedula {
+    width: 100px;
+}
+
+.fecha {
+    width: 100px;
+}
+
+p {
+    font-size: x-small;
+}

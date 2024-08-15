@@ -15,7 +15,6 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
 
@@ -119,11 +118,10 @@ export class ListaNotificacionComponent implements OnInit {
     constructor(
         public informacion: DatosGeneralesService,
         public restR: ReportesService,
+        private asignaciones: AsignacionesService,
         private ventana: MatDialog,
-        private restUsuario: UsuarioService,
         private validar: ValidacionesService,
         private toastr: ToastrService,
-        private asignaciones: AsignacionesService,
     ) {
         this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -163,9 +161,7 @@ export class ListaNotificacionComponent implements OnInit {
 
     // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
     ProcesarDatos(informacion: any) {
-        //console.log('ver original ', this.origen)
         informacion.forEach((obj: any) => {
-            //console.log('ver obj ', obj)
             this.sucursales.push({
                 id: obj.id_suc,
                 sucursal: obj.name_suc
@@ -215,18 +211,25 @@ export class ListaNotificacionComponent implements OnInit {
         // FILTROS POR ASIGNACION USUARIO - DEPARTAMENTO
         // SI ES SUPERADMINISTRADOR NO FILTRAR
         if (this.rolEmpleado !== 1) {
-            this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
-            this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
-            this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
-            this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+          this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
 
-            this.empleados.forEach((empleado: any) => {
-                this.idCargosAcceso.add(empleado.id_cargo_);
-            });
+          // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+          const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+          this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+          this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+          this.idCargosAcceso.add(empleadoSesion.id_cargo_);
 
-            this.cargos = this.cargos.filter((cargo: any) =>
-                this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
-            );
+          this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+          this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+          this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+          this.empleados.forEach((empleado: any) => {
+            this.idCargosAcceso.add(empleado.id_cargo_);
+          });
+
+          this.cargos = this.cargos.filter((cargo: any) =>
+            this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+          );
         }
 
         this.mostrarTablas = true;
@@ -528,7 +531,7 @@ export class ListaNotificacionComponent implements OnInit {
         let usuarios: any = [];
         if (id === 0 || id === undefined) {
             this.empleados.forEach((empl: any) => {
-                this.selectionSuc.selected.find(selec => {
+                this.selectionSuc.selected.find((selec: any) => {
                     if (empl.id_suc === selec.id) {
                         usuarios.push(empl)
                     }
@@ -551,7 +554,7 @@ export class ListaNotificacionComponent implements OnInit {
         let usuarios: any = [];
         if (id === 0 || id === undefined) {
             this.empleados.forEach((empl: any) => {
-                this.selectionReg.selected.find(selec => {
+                this.selectionReg.selected.find((selec: any) => {
                     if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
                         usuarios.push(empl)
                     }
@@ -574,7 +577,7 @@ export class ListaNotificacionComponent implements OnInit {
         let usuarios: any = [];
         if (id === 0 || id === undefined) {
             this.empleados.forEach((empl: any) => {
-                this.selectionCarg.selected.find(selec => {
+                this.selectionCarg.selected.find((selec: any) => {
                     if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
                         usuarios.push(empl)
                     }
@@ -596,7 +599,7 @@ export class ListaNotificacionComponent implements OnInit {
         let usuarios: any = [];
         if (id === 0 || id === undefined) {
             this.empleados.forEach((empl: any) => {
-                this.selectionDep.selected.find(selec => {
+                this.selectionDep.selected.find((selec: any) => {
                     if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
                         usuarios.push(empl)
                     }
@@ -617,7 +620,7 @@ export class ListaNotificacionComponent implements OnInit {
     ModelarEmpleados() {
         let respuesta: any = [];
         this.empleados.forEach((obj: any) => {
-            this.selectionEmp.selected.find(obj1 => {
+            this.selectionEmp.selected.find((obj1: any) => {
                 if (obj1.id === obj.id) {
                     respuesta.push(obj)
                 }

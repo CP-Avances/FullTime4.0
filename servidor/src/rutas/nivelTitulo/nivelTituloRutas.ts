@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import NIVEL_TITULO_CONTROLADOR from '../../controlador/nivelTitulo/nivelTituloControlador';
-import { TokenValidation } from '../../libs/verificarToken'
+import { TokenValidation } from '../../libs/verificarToken';
 
 import multer from 'multer';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
@@ -29,18 +29,19 @@ class NivelTituloRutas {
 
     configuracion(): void {
 
-        // METODO PARA BUSCAR LISTA DE NIVELES DE TITULO
+        // METODO PARA BUSCAR LISTA DE NIVELES DE TITULO   **USADO
         this.router.get('/', TokenValidation, NIVEL_TITULO_CONTROLADOR.ListarNivel);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, NIVEL_TITULO_CONTROLADOR.EliminarNivelTitulo);
-        // METODO PARA REGISTRAR NIVEL DE TITULO
+        // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
         this.router.post('/', TokenValidation, NIVEL_TITULO_CONTROLADOR.CrearNivel);
-        // METODO PARA ACTUALIZAR REGISTRO DE NIVEL
+        // METODO PARA ACTUALIZAR REGISTRO DE NIVEL   **USADO
         this.router.put('/', TokenValidation, NIVEL_TITULO_CONTROLADOR.ActualizarNivelTitulo);
-        // METODO PARA BUSCAR NIVEL POR SU NOMBRE
+        // METODO PARA BUSCAR NIVEL POR SU NOMBRE   **USADO
         this.router.get('/buscar/:nombre', TokenValidation, NIVEL_TITULO_CONTROLADOR.ObtenerNivelNombre);
+        // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], NIVEL_TITULO_CONTROLADOR.RevisarDatos);
-        // METODO PARA REGISTRAR NIVELES DE TITULO DE LA PLANTILLA
+        // METODO PARA REGISTRAR NIVELES DE TITULO DE LA PLANTILLA   **USADO
         this.router.post('/registrarNiveles', TokenValidation, NIVEL_TITULO_CONTROLADOR.RegistrarNivelesPlantilla);
 
     }

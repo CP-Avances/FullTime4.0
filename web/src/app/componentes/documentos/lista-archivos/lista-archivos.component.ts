@@ -60,7 +60,6 @@ export class ListaArchivosComponent implements OnInit {
   MostrarArchivos() {
     this.route.params.subscribe((obj: any) => {
       this.Dirname = obj.filename
-      //console.log('ver carpetas ', obj.filename)
       this.ObtenerArchivos(obj.filename)
     })
     if (this.Dirname === 'documentacion') {
@@ -77,37 +76,30 @@ export class ListaArchivosComponent implements OnInit {
       this.rest.ListarDocumentacion(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
     else if (this.Dirname === 'contratos') {
       this.rest.ListarContratos(nombre_carpeta).subscribe(res => {
         this.archivos = res;
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ', this.archivosFiltro);
-        console.log('contratos ', res)
       })
     }
     else if (this.Dirname === 'permisos') {
       this.rest.ListarPermisos(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ', this.archivosFiltro);
-        //console.log('permisos ', res)
       })
     }
     else if (this.Dirname === 'horarios') {
       this.rest.ListarHorarios(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
     else {
       this.rest.ListarArchivosDeCarpeta(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
   }
@@ -132,7 +124,6 @@ export class ListaArchivosComponent implements OnInit {
         this.rest.ListarDocumentacion('documentacion').subscribe(res => {
           this.archivos = res
           this.archivosFiltro = [...this.archivos];
-          //console.log('archivosFiltro: ', this.archivosFiltro);
         })
       });
     this.MostrarArchivos();
@@ -152,7 +143,6 @@ export class ListaArchivosComponent implements OnInit {
     this.rest.ListarArchivosIndividuales(nombre_carpeta, tipo).subscribe(res => {
       this.archivos = res
       this.archivosFiltro = [...this.archivos];
-      //console.log('archivosFiltro: ', this.archivosFiltro);
     })
   }
 
@@ -165,10 +155,8 @@ export class ListaArchivosComponent implements OnInit {
 
   // METODO PARA FILTRAR CARPETAS
   Filtrar(e: any, tipo: string) {
-    //console.log('e: ', e.target.value);
     const query: string = e.target.value;
     const filtro = this.archivos.filter((o: any) => {
-      //console.log('o: ', o);
       if (tipo == 'carpeta') {
         return (o.indexOf(query) > -1);
       } else {
@@ -177,6 +165,11 @@ export class ListaArchivosComponent implements OnInit {
     })
     this.archivosFiltro = filtro;
   }
+
+
+  /** *********************************************************************************************** **
+   ** **                      METODO DE SELECCION MULTIPLE DE DATOS                                ** **
+   ** *********************************************************************************************** **/          
 
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;

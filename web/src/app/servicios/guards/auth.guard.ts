@@ -14,10 +14,12 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
+    // CON INICIO DE SESION
     if (this.loginService.loggedIn()) {
       return true;
     }
 
+    // SIN INICIO DE SESION
     if (!this.loginService.loggedIn()) {
       if (this.loginService.loggedRol() === route.data['log']) {
         return true;

@@ -79,7 +79,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+    // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
     ObtenerConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_empleado = req.params.id;
@@ -139,6 +139,7 @@ class NotificacionTiempoRealControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("Ver Error notificacion", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -233,7 +234,7 @@ class NotificacionTiempoRealControlador {
     /** *********************************************************************************************** **
      **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
      ** *********************************************************************************************** **/
-    // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+    // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -270,7 +271,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+    // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -279,7 +280,7 @@ class NotificacionTiempoRealControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1', [id_empleado]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -455,7 +456,7 @@ class NotificacionTiempoRealControlador {
     /** ***************************************************************************************** **
      ** **                          MANEJO DE COMUNICADOS                                      ** **
      ** ***************************************************************************************** **/
-    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
+    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB      **USADO
     EnviarCorreoComunicado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -533,7 +534,7 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // NOTIFICACIONES GENERALES
+    // NOTIFICACIONES GENERALES    **USADO
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -678,6 +679,68 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
+    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+    getInfoEmpleadoByCodigo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo } = req.query;
+                const query = `
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal
+            FROM informacion_general AS da, eu_configurar_alertas AS cn            
+            WHERE da.id = ${codigo} AND cn.id_empleado = da.id
+            `;
+                const response = yield database_1.default.query(query);
+                const [infoEmpleado] = response.rows;
+                console.log("ver", response.rows);
+                console.log(infoEmpleado);
+                return res.status(200).jsonp(infoEmpleado);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getNotificacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado } = req.query;
+                const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`;
+                const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`;
+                const query = `SELECT r.*, ${subquery1}, ${subquery2} FROM ecm_realtime_notificacion r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 40`;
+                const response = yield database_1.default.query(query);
+                const notificacion = response.rows;
+                return res.status(200).jsonp(notificacion);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
+    getNotificacionTimbres(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado } = req.query;
+                const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`;
+                const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`;
+                const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`;
+                const response = yield database_1.default.query(query);
+                const notificacion = response.rows;
+                return res.status(200).jsonp(notificacion);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 const generarTablaHTMLWeb = function (datos) {
     return __awaiter(this, void 0, void 0, function* () {

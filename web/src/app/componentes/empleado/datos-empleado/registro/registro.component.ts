@@ -76,7 +76,7 @@ export class RegistroComponent implements OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.nacionalidades.filter(nacionalidades => nacionalidades.nombre.toLowerCase().includes(filterValue));
+      return this.nacionalidades.filter((nacionalidades: any) => nacionalidades.nombre.toLowerCase().includes(filterValue));
     }
   }
 

@@ -22,6 +22,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -72,10 +73,17 @@ export class VerCoordenadasComponent implements OnInit {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any[];
+  respuesta: any = [];
   regimen: any = [];
-  origen: any = [];
-  data_pdf: any = [];
+  cargos: any = [];
+
+  idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc = [5, 10, 20, 50];
@@ -141,13 +149,20 @@ export class VerCoordenadasComponent implements OnInit {
     private validar: ValidacionesService,
     public informacion: DatosGeneralesService,
     public componentec: ListarCoordenadasComponent,
+    private asignaciones: AsignacionesService,
   ) { }
 
   ngOnInit(): void {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
     this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.ConsultarDatos();
   }
 
@@ -156,15 +171,12 @@ export class VerCoordenadasComponent implements OnInit {
     this.BuscarUbicacion(this.idUbicacion);
     this.ListarUsuarios(this.idUbicacion);
     this.BuscarInformacion();
-    this.BuscarCargos();
   }
 
   ngOnDestroy() {
     this.filtros.GuardarCheckOpcion('');
     this.filtros.DefaultFormCriterios();
     this.filtros.DefaultValoresFiltros();
-    this.origen = [];
-    this.origen_cargo = [];
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE PARA ELIMINAR
@@ -187,7 +199,7 @@ export class VerCoordenadasComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
   }
 
-  // METODO PARA BUSCAR DATOS DE UBICACIÓN GEOGRÁFICA
+  // METODO PARA BUSCAR DATOS DE UBICACION GEOGRAFICA
   BuscarUbicacion(id: any) {
     this.coordenadas = [];
     this.restU.ListarUnaCoordenada(id).subscribe(data => {
@@ -195,11 +207,13 @@ export class VerCoordenadasComponent implements OnInit {
     })
   }
 
-  // METODO PARA BUSCAR DETALLES DE PARAMETRO GENERAL
+  // METODO PARA BUSCAR COORDENADAS DE UBICACION DE USUARIO
   ListarUsuarios(id: number) {
     this.datosUsuarios = [];
-    this.restU.ListarCoordenadasUsuarioU(id).subscribe(datos => {
-      this.datosUsuarios = datos;
+    this.restU.ListarCoordenadasUsuarioU(id).subscribe((datos: any) => {
+      // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
+      this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
+
     })
   }
 
@@ -248,110 +262,97 @@ export class VerCoordenadasComponent implements OnInit {
       });
   }
 
-
   // BUSCAR DATOS DE USUARIOS
   BuscarInformacion() {
     this.departamentos = [];
     this.sucursales = [];
     this.empleados = [];
-    this.origen = [];
     this.regimen = [];
-    let ubicacion = {
-      ubicacion: this.idUbicacion
-    }
-    this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
-      this.origen = JSON.stringify(res);
-
-      res.forEach((obj: any) => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        })
-      })
-
-      res.forEach((obj: any) => {
-        obj.departamentos.forEach((ele: any) => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal
-          })
-        })
-      })
-
-      res.forEach((obj: any) => {
-        obj.departamentos.forEach((ele: any) => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-            }
-            this.empleados.push(elemento)
-          })
-        })
-      })
-
-      res.forEach((obj: any) => {
-        obj.departamentos.forEach((ele: any) => {
-          ele.empleado.forEach((reg: any) => {
-            reg.regimen.forEach(r => {
-              this.regimen.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen
-              })
-            })
-          })
-        })
-      })
-
-      this.regimen = this.regimen.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.id === obj.id)
-      );
-
-    })
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  cargos: any = [];
-  BuscarCargos() {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
     this.cargos = [];
     let ubicacion = {
       ubicacion: this.idUbicacion
     }
-    this.informacion.ObtenerInformacionCargosUbicacion(1, ubicacion).subscribe((res: any[]) => {
-      this.origen_cargo = JSON.stringify(res);
+    this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    })
+  }
 
-      res.forEach((obj: any) => {
-        this.cargos.push({
-          id: obj.id_cargo,
-          nombre: obj.name_cargo,
-        })
+  //METODO PARA PROCESAR DATOS
+  ProcesarDatos(informacion: any) {
+    informacion.forEach((obj: any) => {
+      this.sucursales.push({
+        id: obj.id_suc,
+        sucursal: obj.name_suc
       })
 
-      res.forEach((obj: any) => {
-        obj.empleados.forEach(r => {
-          this.empleados_cargos.push({
-            id: r.id,
-            nombre: r.name_empleado,
-            codigo: r.codigo,
-            cedula: r.cedula,
-            correo: r.correo,
-            id_cargo: r.id_cargo,
-            id_contrato: r.id_contrato,
-            hora_trabaja: r.hora_trabaja
-          })
-        })
+      this.regimen.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      this.departamentos.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+      })
+
+      this.cargos.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
+      })
+
+      this.empleados.push({
+        id: obj.id,
+        nombre: obj.nombre + ' ' + obj.apellido,
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        correo: obj.correo,
+        id_cargo: obj.id_cargo,
+        id_contrato: obj.id_contrato,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_ // TIPO DE CARGO
       })
     })
+
+    // RETIRAR DUPLICADOS DE LA LISTA
+    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
+    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
+    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
+    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
+
+    if (this.rolEmpleado !== 1) {
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+
+      // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
+      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      if (empleadoSesion) {
+        this.idSucursalesAcceso.add(empleadoSesion.id_suc);
+        this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
+        this.idCargosAcceso.add(empleadoSesion.id_cargo_);
+      }
+
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso.add(empleado.id_cargo_);
+      });
+
+      this.cargos = this.cargos.filter((cargo: any) =>
+        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      );
+    }
+
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
@@ -691,15 +692,10 @@ export class VerCoordenadasComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
   ModelarSucursal() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      this.selectionSuc.selected.find(obj1 => {
-        if (obj.id_suc === obj1.id) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          })
+    this.empleados.forEach((empl: any) => {
+      this.selectionSuc.selected.find((selec: any) => {
+        if (empl.id_suc === selec.id) {
+          usuarios.push(empl)
         }
       })
     })
@@ -710,33 +706,24 @@ export class VerCoordenadasComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((obj1: any) => {
-        obj1.empleado.forEach((obj2: any) => {
-          this.selectionReg.selected.find(obj3 => {
-            obj2.regimen.forEach((obj4: any) => {
-              if (obj3.id === obj4.id_regimen) {
-                usuarios.push(obj2);
-              }
-            })
-          })
-        })
+    this.empleados.forEach((empl: any) => {
+      this.selectionReg.selected.find((selec: any) => {
+        if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
+          usuarios.push(empl)
+        }
       })
     })
+
     this.RegistrarUbicacionUsuario(usuarios);
   }
 
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen_cargo)
-    respuesta.forEach((obj: any) => {
-      this.selectionCarg.selected.find(obj1 => {
-        if (obj.id_cargo === obj1.id) {
-          obj.empleados.forEach((obj3: any) => {
-            usuarios.push(obj3)
-          })
+    this.empleados.forEach((empl: any) => {
+      this.selectionCarg.selected.find((selec: any) => {
+        if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
+          usuarios.push(empl)
         }
       })
     })
@@ -747,7 +734,7 @@ export class VerCoordenadasComponent implements OnInit {
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+      this.selectionEmp.selected.find((obj1: any) => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }
@@ -759,16 +746,11 @@ export class VerCoordenadasComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((obj1: any) => {
-        this.selectionDep.selected.find(obj2 => {
-          if (obj1.id_depa === obj2.id) {
-            obj1.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          }
-        })
+    this.empleados.forEach((empl: any) => {
+      this.selectionDep.selected.find((selec: any) => {
+        if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
+          usuarios.push(empl)
+        }
       })
     })
     this.RegistrarUbicacionUsuario(usuarios);

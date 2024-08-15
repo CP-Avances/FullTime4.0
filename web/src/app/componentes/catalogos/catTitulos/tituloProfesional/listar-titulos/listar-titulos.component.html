@@ -100,8 +100,8 @@
                                 [aria-label]="checkboxLabelPag()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Nombre</th>
                         <th scope="col">Nivel</th>
+                        <th scope="col">Título</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -135,8 +135,8 @@
                                 [checked]="selectionTitulos.isSelected(t)" [aria-label]="checkboxLabelPag(t)">
                             </mat-checkbox>
                         </td>
-                        <td>{{t.nombre}}</td>
                         <td>{{t.nivel}}</td>
+                        <td>{{t.nombre}}</td>
                         <td class="d-flex justify-content-center">
                             <i class="fas fa-edit" (click)=AbrirVentanaEditarTitulo(t) matSuffix
                                 matTooltipPosition="right" matTooltip="Editar los datos generales de este registro."
@@ -203,8 +203,8 @@
                     <tr style="text-align: center;">
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
-                        <th scope="col">Titulo</th>
                         <th scope="col">Nivel</th>
+                        <th scope="col">Título</th>
 
                     </tr>
                 </thead>
@@ -214,26 +214,24 @@
                         <td style="font-size: 12px;">
                             <div style="width: 250px; margin: auto;">
                                 <div id="t-editar" class="circulo"
-                                    [style.background-color]="stiloCelda(data.observacion)"></div>
+                                    [style.background-color]="EstiloCelda(data.observacion)"></div>
                                 {{ data.observacion}}
                             </div>
                         </td>
-                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.titulo)">{{ data.titulo}}</td>
-                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nivel)">{{ data.nivel}}</td>
-
+                        <td style="font-size: 12px;" [style.color]="EstiloTextoCelda(data.nivel)">{{ data.nivel}}</td>
+                        <td style="font-size: 12px;" [style.color]="EstiloTextoCelda(data.titulo)">{{ data.titulo}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div>
-            <div *ngIf="listTitulosCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
-                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
-                <div class="text">items 'OK' - {{listTitulosCorrectos.length}}</div>
-            </div>
-            <mat-paginator [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
+        <div style="display: flex; align-items: center;">
+          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+            <div id="t-editar" class="circulo circuloTotal"></div>
+            <div>{{titulosCorrectos}}</div>
+          </div>
+          <mat-paginator [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
             </mat-paginator>
         </div>
-        
     </div>
 </div>

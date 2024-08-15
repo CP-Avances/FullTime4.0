@@ -84,7 +84,7 @@ class NotificacionTiempoRealControlador {
 
   }
 
-  // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+  // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
     if (id_empleado != 'NaN') {
@@ -160,6 +160,7 @@ class NotificacionTiempoRealControlador {
 
     } catch (error) {
       // REVERTIR TRANSACCION
+      console.log("Ver Error notificacion", error)
       await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -267,7 +268,7 @@ class NotificacionTiempoRealControlador {
    **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
    ** *********************************************************************************************** **/
 
-  // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+  // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
@@ -303,6 +304,7 @@ class NotificacionTiempoRealControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Configuracion guardada' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -310,7 +312,7 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
+  // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
@@ -321,7 +323,7 @@ class NotificacionTiempoRealControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1', [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -367,6 +369,7 @@ class NotificacionTiempoRealControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Configuración actualizada.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -526,7 +529,7 @@ class NotificacionTiempoRealControlador {
    ** **                          MANEJO DE COMUNICADOS                                      ** ** 
    ** ***************************************************************************************** **/
 
-  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB      **USADO
   public async EnviarCorreoComunicado(req: Request, res: Response): Promise<void> {
 
     var tiempo = fechaHora();
@@ -613,7 +616,7 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-  // NOTIFICACIONES GENERALES
+  // NOTIFICACIONES GENERALES    **USADO
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
@@ -658,13 +661,14 @@ class NotificacionTiempoRealControlador {
         `
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
-        `,
-        [id_empl_envia]);
+        `
+        , [id_empl_envia]);
 
       notificiacion.usuario = USUARIO.rows[0].usuario;
 
       return res.status(200)
         .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -781,6 +785,69 @@ class NotificacionTiempoRealControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
+
+  //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+
+  public async getInfoEmpleadoByCodigo(req: Request, res: Response): Promise<Response> {
+    try {
+
+      const { codigo } = req.query;
+
+      const query =
+        `
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal
+            FROM informacion_general AS da, eu_configurar_alertas AS cn            
+            WHERE da.id = ${codigo} AND cn.id_empleado = da.id
+            `
+      const response: QueryResult = await pool.query(query);
+      const [infoEmpleado]: any[] = response.rows;
+      console.log("ver", response.rows);
+
+      console.log(infoEmpleado);
+
+      return res.status(200).jsonp(infoEmpleado);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
+
+
+  public async getNotificacion(req: Request, res: Response): Promise<Response> {
+    try {
+
+      const { id_empleado } = req.query;
+      const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
+      const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
+      const query = `SELECT r.*, ${subquery1}, ${subquery2} FROM ecm_realtime_notificacion r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 40`
+
+      const response: QueryResult = await pool.query(query);
+      const notificacion: any[] = response.rows;
+
+      return res.status(200).jsonp(notificacion);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
+
+  public async getNotificacionTimbres(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id_empleado } = req.query;
+      const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
+      const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
+      const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`
+      const response: QueryResult = await pool.query(query);
+      const notificacion: any[] = response.rows;
+      return res.status(200).jsonp(notificacion);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  };
 
 }
 

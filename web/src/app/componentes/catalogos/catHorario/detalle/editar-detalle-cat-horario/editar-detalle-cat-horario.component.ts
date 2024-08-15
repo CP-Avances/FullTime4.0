@@ -9,7 +9,6 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { hora } from '../../../../../model/reportes.model';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -51,9 +50,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     horaForm: this.horaF,
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
+
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

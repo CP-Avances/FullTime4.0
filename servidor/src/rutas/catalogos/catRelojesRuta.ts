@@ -25,23 +25,21 @@ class RelojesRuta {
 
     configuracion(): void {
 
-        // METODO PARA BUSCAR DISPOSITIVOS
+        // METODO PARA BUSCAR DISPOSITIVOS   **USADO
         this.router.get('/', TokenValidation, RELOJES_CONTROLADOR.ListarRelojes);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS      **USADO
         this.router.delete('/eliminar/:id', TokenValidation, RELOJES_CONTROLADOR.EliminarRegistros);
-        // METODO PARA REGISTRAR DISPOSITIVO
+        // METODO PARA REGISTRAR DISPOSITIVO   **USADO
         this.router.post('/', TokenValidation, RELOJES_CONTROLADOR.CrearRelojes);
-        // METODO PARA VER DATOS DE UN DISPOSITIVO
+        // METODO PARA VER DATOS DE UN DISPOSITIVO    **USADO
         this.router.get('/:id', TokenValidation, RELOJES_CONTROLADOR.ListarUnReloj);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO   **USADO
         this.router.put('/', TokenValidation, RELOJES_CONTROLADOR.ActualizarReloj);
-        // METODO PARA BUSCAR DATOS GENERALES DE DISPOSITIVOS
+        // METODO PARA BUSCAR DATOS GENERALES DE DISPOSITIVOS   **USADO
         this.router.get('/datosReloj/:id', TokenValidation, RELOJES_CONTROLADOR.ListarDatosUnReloj);
-
-
-        //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
-        // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA
+        // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], RELOJES_CONTROLADOR.VerificarPlantilla);
+        // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
         this.router.post('/plantillaExcel/', TokenValidation, RELOJES_CONTROLADOR.CargaPlantillaRelojes);
 
 

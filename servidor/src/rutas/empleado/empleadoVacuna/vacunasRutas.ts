@@ -48,23 +48,23 @@ class VacunaRutas {
 
     configuracion(): void {
 
-        // METODO PARA LISTAR REGISTROS DE UN USUARIO
+        // METODO PARA LISTAR REGISTROS DE UN USUARIO   **USADO
         this.router.get('/:id_empleado', TokenValidation, VACUNA_CONTROLADOR.ListarUnRegistro);
-        // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS
+        // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS   **USADO
         this.router.get('/lista/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.ListarTipoVacuna);
-        // METODO REGISTRO DE VACUNACION
+        // METODO REGISTRO DE VACUNACION   **USADO
         this.router.post('/', TokenValidation, VACUNA_CONTROLADOR.CrearRegistro);
-        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO   **USADO
         this.router.post('/fecha_nombre/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.BuscarVacunaFechaTipo);
-        // METODO PARA GUARDAR DOCUMENTO 
+        // METODO PARA GUARDAR DOCUMENTO      **USADO
         this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACUNA_CONTROLADOR.GuardarDocumento);
-        // METODO ACTUALIZACION DE REGISTROS DE VACUNACION
+        // METODO ACTUALIZACION DE REGISTROS DE VACUNACION   **USADO
         this.router.put('/:id', TokenValidation, VACUNA_CONTROLADOR.ActualizarRegistro);
-        // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR
+        // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR   **USADO
         this.router.put('/eliminar_carnet/servidor', [TokenValidation], VACUNA_CONTROLADOR.EliminarDocumentoServidor);
-        // ELIMINAR DOCUMENTO DE VACUNAS
+        // ELIMINAR DOCUMENTO DE VACUNAS   **USADO
         this.router.put('/eliminar_carnet/base_servidor', [TokenValidation], VACUNA_CONTROLADOR.EliminarDocumento);
-        // METODO DE ELIMINACION DE REGISTRO DE VACUNA
+        // METODO DE ELIMINACION DE REGISTRO DE VACUNA   **USADO
         this.router.delete('/eliminar/:id/:documento', TokenValidation, VACUNA_CONTROLADOR.EliminarRegistro);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', VACUNA_CONTROLADOR.ObtenerDocumento);

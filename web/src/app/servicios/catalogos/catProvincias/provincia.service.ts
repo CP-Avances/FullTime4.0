@@ -51,7 +51,7 @@ export class ProvinciaService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/${id}`);
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UN PAIS
+  // METODO PARA BUSCAR INFORMACION DE UN PAIS    **USADO
   BuscarPaisId(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/pais/${id}`);
   }

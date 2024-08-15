@@ -28,10 +28,10 @@
                                 [aria-label]="checkboxLabelEmp()">
                             </mat-checkbox>
                         </th>
+                        <th scope="col">Cédula</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
-                        <th scope="col">Cédula</th>
-                        <th scope="col">Id Dispositivo</th>
+                        <th scope="col">Id dispositivo</th>
                         <th scope="col">Modelo</th>
                         <th scope="col">Acción</th>
                     </tr>
@@ -75,9 +75,9 @@
                                 [aria-label]="checkboxLabelEmp(d)">
                             </mat-checkbox>
                         </td>
+                        <td>{{d.cedula}}</td>
                         <td scope="row">{{d.codigo}}</td>
                         <td>{{d.nombre}}</td>
-                        <td>{{d.cedula}}</td>
                         <td>{{d.id_dispositivo}}</td>
                         <td>{{d.modelo_dispositivo}}</td>
                         <td class="justify-content-center">

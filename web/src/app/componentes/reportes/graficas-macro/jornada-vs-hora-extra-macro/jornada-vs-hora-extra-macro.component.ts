@@ -173,7 +173,7 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
   }
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_jornadaVShoraExtra" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -185,7 +185,7 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',

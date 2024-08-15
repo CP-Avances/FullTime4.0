@@ -158,7 +158,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     let suc = respuesta.filter((o: any) => {
-      var bool =  this.selectionSuc.selected.find(obj1 => {
+      var bool =  this.selectionSuc.selected.find((obj1: any) => {
         return obj1.id === o.id_suc
       })
       return bool != undefined
@@ -184,7 +184,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     respuesta.forEach((obj: any) => {
       obj.departamentos =  obj.departamentos.filter((o: any) => {
-        var bool =  this.selectionDep.selected.find(obj1 => {
+        var bool =  this.selectionDep.selected.find((obj1: any) => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -215,7 +215,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
-          var bool =  this.selectionEmp.selected.find(obj1 => {
+          var bool =  this.selectionEmp.selected.find((obj1: any) => {
             return obj1.id === o.id
           })
           return bool != undefined
@@ -279,7 +279,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
    *******************************************/
 
   generarPdf(action) {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "Reporte puntualidad" + f.toLocaleString() + ".pdf";
     switch (action) {
@@ -291,7 +291,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   }
 
-  getDocumentDefinicion() {
+  DefinirInformacionPDF() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',

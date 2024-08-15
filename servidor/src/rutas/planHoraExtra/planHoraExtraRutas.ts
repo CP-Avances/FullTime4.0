@@ -40,9 +40,9 @@ class DepartamentoRutas {
         this.router.get('/plan_empleado/:id_plan_hora', [TokenValidation, ModuloHoraExtraValidation], PLAN_HORA_EXTRA_CONTROLADOR.ListarPlanEmpleados);
         // ELIMINAR PLANIFICACION DE ALIMENTACION
         this.router.delete('/eliminar/:id', TokenValidation, PLAN_HORA_EXTRA_CONTROLADOR.EliminarRegistros);
-        // ELIMINAR PLANIFICACION DE UN USUARIO
+        // ELIMINAR PLANIFICACION DE UN USUARIO    **USADO
         this.router.delete('/eliminar/plan-hora/:id/:id_empleado', TokenValidation, PLAN_HORA_EXTRA_CONTROLADOR.EliminarPlanEmpleado);
-        // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
+        // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO   **USADO
         this.router.get('/listar-plan/:id', [TokenValidation, ModuloHoraExtraValidation], PLAN_HORA_EXTRA_CONTROLADOR.BuscarPlanUsuario);
         
 
@@ -50,15 +50,15 @@ class DepartamentoRutas {
          ** *             ENVIO DE CORREO ELECTRONICO DE PLANIFICACIONES DE HORAS EXTRAS               * **
          ** ******************************************************************************************** **/
 
-        // CREACIÓN DE PLANIFICACION DE HORAS EXTRAS
+        // CREACION DE PLANIFICACION DE HORAS EXTRAS   **USADO
         this.router.post('/send/correo-planifica/', [TokenValidation], PLAN_HORA_EXTRA_CONTROLADOR.EnviarCorreoPlanificacion);
 
 
         /** ******************************************************************************************** **
-         ** *                   NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                       ** **
+         ** *                   NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS                       ** **
          ** ******************************************************************************************** **/
 
-        // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+        // CREACION DE PLANIFICACION DE HORAS EXTRAS    **USADO
         this.router.post('/send/noti-planifica', TokenValidation, PLAN_HORA_EXTRA_CONTROLADOR.EnviarNotiPlanHE);
 
 

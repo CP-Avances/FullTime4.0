@@ -63,164 +63,73 @@
     <br>
 </div>
 <br>
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1">
-    <div id="titulo">
-        <span>FUNCIONES DEL SISTEMA</span>
-    </div>
-    <mat-card class="example-card mat-elevation-z8">
-        <!-- FORMULARIO COMPLETO -->
-        <mat-card-content>
-            <div class="nota">
-                <span>
-                    Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
-                </span>
-            </div>
-            <form>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm">
-                            <!--  ************  TABLA DE MENU  ****************  -->
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
-                                    <div class="container-fluid">
-                                        <input class="form-check-input" type="checkbox" id="seleccionar"
-                                            [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
-                                            [ngModelOptions]="{standalone: true}">
-                                        <label class="form-check-label" for="inlineCheckbox1"
-                                            style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
-                                            Todos los links
-                                        </label>
-                                        <div class="row" style="text-align: center; padding-top: 10px;">
-                                            <div class="col-md-6 col-lg-6 col-6"
-                                                style="text-align:left; padding-bottom: 10px;"
-                                                *ngFor="let n of nombresMenu; index as i" id="verticalLine">
-                                                <input class="form-check-input" type="checkbox"
-                                                    name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
-                                                    style="text-align: center; margin-left: 10px;">
-                                                <label style="margin-left: 30px; font-size: 11px;"
-                                                    class="form-check-label" for="inlineCheckbox1">
-                                                    {{n.nombre}}
-                                                    <!--  ***************  ACCIONES DE LAS PAGINAS  **************  -->
-                                                </label>
-                                                <div class="d-flex flex-wrap justify-content-start">
-                                                    <div class="modal-body"
-                                                        style="margin-left: 60px; padding-top: 15px;">
-                                                        <div class="container-fluid">
-                                                            <div class="row"
-                                                                style="text-align: left; padding-top: 10px;"
-                                                                *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="seleccionarAccion{{n.id}}"
-                                                                    (change)="SeleccionarTodasAcciones($event, n.id)">
+<mat-accordion  >
+  <mat-expansion-panel *ngIf="id_rol != 1" (opened)="expansion = true" (closed)="expansion = false" style="margin-top: 15px; margin-bottom: 25px;">
+    <mat-expansion-panel-header style="background: rgb(52, 65, 84); font-size: 14px; color: white;">
+      <mat-panel-title class="panel-title" style="color: white;">
 
-                                                                <label class="form-check-label" for="inlineCheckbox1"
-                                                                    style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
-                                                                    Todos las acciones
-                                                                </label>
-                                                                <div class="col-md-6 col-lg-6 col-6"
-                                                                    style="text-align:left; padding-bottom: 10px; "
-                                                                    *ngFor="let accion of pagina; index as i">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        name="accionesSeleccionadasPorPagina"
-                                                                        id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
-                                                                        (change)="SeleccionarIndividualAccion($event, n.id, accion)">
-                                                                    <label style="margin-left: 10px; font-size: 11px;"
-                                                                        class="form-check-label" for="inlineCheckbox1">
-                                                                        {{accion.accion}}
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </mat-card-content>
-        <mat-card-actions>
-            <div class="container" style="text-align: center;">
-                <button *ngIf="getVerFuncionesGuardar()" id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()" value="Guardar">
-                    Guardar
-                </button>
-            </div>
-        </mat-card-actions>
-    </mat-card>
-</div>
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1 && ver_modulo === true">
-    <div id="titulo">
-        <span>MÓDULOS DEL SISTEMA</span>
+          <span id="titulo">FUNCIONES DEL SISTEMA</span>
+
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="nota">
+        <span>
+            Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
+        </span>
     </div>
-    <mat-card class="example-card mat-elevation-z8">
-        <!-- FORMULARIO COMPLETO -->
-        <mat-card-content>
-            <div class="nota">
-                <span>
-                    Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
-                </span>
-            </div>
-            <form>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm">
-                            <!-- TABLA DE MENU MODULOS -->
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
-                                    <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
-                                        <div class="row" *ngIf="diccionarioFuncionesActivas[modulo]">
-                                            <input class="form-check-input" type="checkbox"
-                                                id="seleccionarmodulo{{modulo}}"
-                                                (change)="SeleccionarTodasModulos($event, modulo)">
-                                            <label class="form-check-label" for="inlineCheckbox1"
-                                                style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
-                                                Todos los links de {{modulo}}
-                                            </label>
-                                            <div class="col-md-6 col-lg-6 col-6"
-                                                style="text-align:left; padding-bottom: 10px;"
-                                                *ngFor="let n of paginasModulos[modulo]; index as i" id="verticalLine">
-                                                <input class="form-check-input" type="checkbox"
-                                                    name="paginasSeleccionadasModulos"
-                                                    id="paginasSeleccionadasModulos{{i}}{{modulo}}"
-                                                    (change)="SeleccionarIndividualModulos($event, n,modulo )"
-                                                    style="text-align: center; margin-left: 10px;">
-                                                <label style="margin-left: 30px; font-size: 11px;"
-                                                    class="form-check-label" for="inlineCheckbox1">
-                                                    {{n.nombre}}
-                                                    <!--  **************  ACCIONES DE LAS PAGINAS  ***************  -->
-                                                </label>
-                                                <div class="d-flex flex-wrap justify-content-start">
-                                                    <div class="modal-body"
-                                                        style="margin-left: 60px; padding-top: 15px;">
-                                                        <div class="container-fluid">
-                                                            <div class="row"
-                                                                style="text-align: left; padding-top: 10px;"
-                                                                *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="seleccionarAccion{{n.id}}"
-                                                                    (change)="SeleccionarTodasAcciones($event, n.id)">
-                                                                <label class="form-check-label" for="inlineCheckbox1"
-                                                                    style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
-                                                                    Todos las acciones
-                                                                </label>
-                                                                <div class="col-md-6 col-lg-6 col-6"
-                                                                    style="text-align:left; padding-bottom: 10px; "
-                                                                    *ngFor="let accion of pagina; index as i">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        name="accionesSeleccionadasPorPagina"
-                                                                        id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
-                                                                        (change)="SeleccionarIndividualAccion($event, n.id, accion)">
-                                                                    <label style="margin-left: 10px; font-size: 11px;"
-                                                                        class="form-check-label" for="inlineCheckbox1">
-                                                                        {{accion.accion}}
-                                                                    </label>
-                                                                </div>
-                                                            </div>
+    <form>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <!--  ************  TABLA DE MENU  ****************  -->
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
+                            <div class="container-fluid">
+                                <input class="form-check-input" type="checkbox" id="seleccionar"
+                                    [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
+                                    [ngModelOptions]="{standalone: true}">
+                                <label class="form-check-label" for="inlineCheckbox1"
+                                    style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
+                                    Todos los links
+                                </label>
+                                <div class="row" style="text-align: center; padding-top: 10px;">
+                                    <div class="col-md-6 col-lg-6 col-6"
+                                        style="text-align:left; padding-bottom: 10px;"
+                                        *ngFor="let n of nombresMenu; index as i" id="verticalLine">
+                                        <input class="form-check-input" type="checkbox"
+                                            name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
+                                            (change)="SeleccionarIndividual($event, n)"
+                                            style="text-align: center; margin-left: 10px;">
+                                        <label style="margin-left: 30px; font-size: 11px;"
+                                            class="form-check-label" for="inlineCheckbox1">
+                                            {{n.nombre}}
+                                            <!--  ***************  ACCIONES DE LAS PAGINAS  **************  -->
+                                        </label>
+                                        <div class="d-flex flex-wrap justify-content-start">
+                                            <div class="modal-body"
+                                                style="margin-left: 60px; padding-top: 15px;">
+                                                <div class="container-fluid">
+                                                    <div class="row"
+                                                        style="text-align: left; padding-top: 10px;"
+                                                        *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="seleccionarAccion{{n.id}}"
+                                                            (change)="SeleccionarTodasAcciones($event, n.id)">
+                                                        <label class="form-check-label" for="inlineCheckbox1"
+                                                            style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                            Todos las acciones
+                                                        </label>
+                                                        <div class="col-md-6 col-lg-6 col-6"
+                                                            style="text-align:left; padding-bottom: 10px; "
+                                                            *ngFor="let accion of pagina; index as i">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="accionesSeleccionadasPorPagina"
+                                                                id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
+                                                                (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                            <label style="margin-left: 10px; font-size: 11px;"
+                                                                class="form-check-label" for="inlineCheckbox1">
+                                                                {{accion.accion}}
+                                                            </label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -232,14 +141,109 @@
                         </div>
                     </div>
                 </div>
-            </form>
-        </mat-card-content>
-        <mat-card-actions>
-            <div class="container" style="text-align: center;">
-                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()" value="Guardar" *ngIf="getVerFuncionesGuardar()">
-                    Guardar
-                </button>
             </div>
-        </mat-card-actions>
-    </mat-card>
-</div>
+        </div>
+    </form>
+    <mat-action-row>
+        <div class="container" style="text-align: center;">
+            <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()" value="Guardar" *ngIf="getVerFuncionesGuardar()">
+                Guardar
+            </button>
+        </div>
+    </mat-action-row>
+
+
+  </mat-expansion-panel>
+
+  <mat-expansion-panel *ngIf="id_rol != 1 && ver_modulo === true"  (opened)="expansion = true" (closed)="expansion = false" style="margin-top: 15px; margin-bottom: 25px;">
+    <mat-expansion-panel-header style="background: rgb(52, 65, 84); font-size: 14px; color: white;">
+      <mat-panel-title class="panel-title" style="color: white;">
+          <span id="titulo">MÓDULOS DEL SISTEMA</span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="nota">
+      <span>
+          Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
+      </span>
+    </div>
+    <form>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <!-- TABLA DE MENU MODULOS -->
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
+                            <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
+                                <div class="row" *ngIf="diccionarioFuncionesActivas[modulo]">
+                                    <input class="form-check-input" type="checkbox"
+                                        id="seleccionarmodulo{{modulo}}"
+                                        (change)="SeleccionarTodasModulos($event, modulo)">
+                                    <label class="form-check-label" for="inlineCheckbox1"
+                                        style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
+                                        Todos los links de {{modulo}}
+                                    </label>
+                                    <div class="col-md-6 col-lg-6 col-6"
+                                        style="text-align:left; padding-bottom: 10px;"
+                                        *ngFor="let n of paginasModulos[modulo]; index as i" id="verticalLine">
+                                        <input class="form-check-input" type="checkbox"
+                                            name="paginasSeleccionadasModulos"
+                                            id="paginasSeleccionadasModulos{{i}}{{modulo}}"
+                                            (change)="SeleccionarIndividualModulos($event, n,modulo )"
+                                            style="text-align: center; margin-left: 10px;">
+                                        <label style="margin-left: 30px; font-size: 11px;"
+                                            class="form-check-label" for="inlineCheckbox1">
+                                            {{n.nombre}}
+                                            <!--  **************  ACCIONES DE LAS PAGINAS  ***************  -->
+                                        </label>
+                                        <div class="d-flex flex-wrap justify-content-start">
+                                            <div class="modal-body"
+                                                style="margin-left: 60px; padding-top: 15px;">
+                                                <div class="container-fluid">
+                                                    <div class="row"
+                                                        style="text-align: left; padding-top: 10px;"
+                                                        *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="seleccionarAccion{{n.id}}"
+                                                            (change)="SeleccionarTodasAcciones($event, n.id)">
+                                                        <label class="form-check-label" for="inlineCheckbox1"
+                                                            style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                            Todos las acciones
+                                                        </label>
+                                                        <div class="col-md-6 col-lg-6 col-6"
+                                                            style="text-align:left; padding-bottom: 10px; "
+                                                            *ngFor="let accion of pagina; index as i">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="accionesSeleccionadasPorPagina"
+                                                                id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
+                                                                (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                            <label style="margin-left: 10px; font-size: 11px;"
+                                                                class="form-check-label" for="inlineCheckbox1">
+                                                                {{accion.accion}}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <mat-action-row>
+        <div class="container" style="text-align: center;">
+            <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()" value="Guardar">
+                Guardar
+            </button>
+        </div>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>
+
+<mat-accordion *ngIf="id_rol != 1 && ver_modulo === true" >
+
+</mat-accordion>

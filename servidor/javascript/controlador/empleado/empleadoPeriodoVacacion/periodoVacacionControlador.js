@@ -13,20 +13,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
-const database_1 = __importDefault(require("../../../database"));
 const settingsMail_1 = require("../../../libs/settingsMail");
+const database_1 = __importDefault(require("../../../database"));
 class PeriodoVacacionControlador {
-    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES
+    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
     EncontrarIdPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const VACACIONES = yield database_1.default.query(`
-        SELECT pv.id, pv.id_empleado_cargo
-        FROM mv_periodo_vacacion AS pv
-        WHERE pv.id = (SELECT MAX(pv.id) AS id 
-                       FROM mv_periodo_vacacion AS pv 
-                       WHERE pv.id_empleado = $1 )
-        `, [id_empleado]);
+      SELECT pv.id, pv.id_empleado_cargo
+      FROM mv_periodo_vacacion AS pv
+      WHERE pv.id = (SELECT MAX(pv.id) AS id 
+        FROM mv_periodo_vacacion AS pv 
+        WHERE pv.id_empleado = $1 )
+      `, [id_empleado]);
             if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
@@ -72,12 +72,13 @@ class PeriodoVacacionControlador {
             }
         });
     }
+    // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION    **USADO
     EncontrarPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const PERIODO_VACACIONES = yield database_1.default.query(`
-        SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
-        `, [id_empleado]);
+      SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
+      `, [id_empleado]);
             if (PERIODO_VACACIONES.rowCount != 0) {
                 return res.jsonp(PERIODO_VACACIONES.rows);
             }

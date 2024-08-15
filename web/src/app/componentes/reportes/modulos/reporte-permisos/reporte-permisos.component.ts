@@ -306,7 +306,7 @@ export class ReportePermisosComponent implements OnInit {
    * ****************************************************************************************************/
 
   generarPdf(action = 'open', codigo) {
-    const documentDefinition = this.getDocumentDefinicion(codigo);
+    const documentDefinition = this.DefinirInformacionPDF(codigo);
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -318,8 +318,8 @@ export class ReportePermisosComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion(codigo: string | number) {
-    sessionStorage.setItem('Administrador', this.empleadoLogueado);
+  DefinirInformacionPDF(codigo: string | number) {
+
     return {
 
       // ENCABEZADO DE LA PAGINA

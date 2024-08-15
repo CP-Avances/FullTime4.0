@@ -42,7 +42,8 @@
     <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
             <span class="w-100 bd-highlight">
-                RESULTADO SUCURSALES</span>
+                RESULTADO SUCURSALES
+            </span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="MostrarLista()">Mostrar lista</button>
         </div>
@@ -57,7 +58,7 @@
                                 [aria-label]="checkboxLabelSuc()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Nombre</th>
+                        <th scope="col">Sucursal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,7 +84,8 @@
     <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
             <span class="w-100 bd-highlight">
-                RESULTADO DEPARTAMENTOS</span>
+                RESULTADO DEPARTAMENTOS
+            </span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="MostrarLista()">Mostrar lista</button>
         </div>
@@ -98,7 +100,7 @@
                                 [aria-label]="checkboxLabelDep()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Nombre</th>
+                        <th scope="col">Departamento</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,7 +126,8 @@
     <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
             <span class="w-100 bd-highlight">
-                RESULTADO USUARIOS</span>
+                RESULTADO USUARIOS
+            </span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="MostrarLista()">Mostrar lista</button>
         </div>
@@ -139,9 +142,9 @@
                                 [aria-label]="checkboxLabelEmp()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Nombre</th>
                         <th scope="col">Cédula</th>
-                        <th scope="col">Codigo</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Nombre</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,9 +156,9 @@
                                 [aria-label]="checkboxLabelEmp(e)">
                             </mat-checkbox>
                         </td>
-                        <td>{{e.nombre}}</td>
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
+                        <td>{{e.nombre}}</td>
                     </tr>
                 </tbody>
             </table>

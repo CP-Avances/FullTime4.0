@@ -15,15 +15,15 @@ class PermisosRutas {
     }
 
     configuracion(): void {
-        // METODO PARA BUSCAR DETALLES DE UN HORARIO  --**VERIFICADO
+        // METODO PARA BUSCAR DETALLES DE UN HORARIO  **USADO
         this.router.get('/:id_horario', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.ListarUnDetalleHorario);
-        // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS
+        // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS    **USADO
         this.router.post('/lista', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.ListarDetalleHorarios);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.EliminarRegistros);
-        // METODO PARA REGISTRAR DETALLES
+        // METODO PARA REGISTRAR DETALLES   **USADO
         this.router.post('/', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.CrearDetalleHorarios);
-        // METODO PARA ACTUALIZAR REGISTRO
+        // METODO PARA ACTUALIZAR REGISTRO    **USADO
         this.router.put('/', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.ActualizarDetalleHorarios);
 
     }

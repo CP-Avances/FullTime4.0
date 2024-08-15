@@ -124,7 +124,6 @@ export class VerHorarioDetalleComponent implements OnInit {
       this.datosDetalle.forEach((data: any) => {
         data.hora_ = this.validar.FormatearHora(data.hora, formato_hora);
       });
-      //--console.log('ver detales ', this.datosDetalle)
     })
   }
 

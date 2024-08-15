@@ -47,12 +47,10 @@ export class AlimentacionService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/servicios/invitados`, data)
   }
 
+  // METODO PARA BUSCAR DATOS TIEMPO DE ALIMENTACION   **USADO
   BuscarTimbresAlimentacion(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/timbres-alimentacion/${inicio}/${fin}`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/timbres-alimentacion/${inicio}/${fin}`, data);
   }
 
-  BuscarTimbresAlimentacionRegimenCargo(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/timbres-alimentacion-regimen-cargo/${inicio}/${fin}`, data);
-  }
 
 }

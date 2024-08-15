@@ -16,7 +16,7 @@ exports.DISCAPACIDAD_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
 class DiscapacidadControlador {
-    // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO
+    // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO   **USADO
     BuscarDiscapacidadUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -33,7 +33,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR DISCAPACIDAD
+    // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
     RegistrarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -68,7 +68,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE REGISTRO
+    // METODO PARA ACTUALIZAR DATOS DE REGISTRO   **USADO
     ActualizarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -77,7 +77,7 @@ class DiscapacidadControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+                const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = discapacidad.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -115,6 +115,7 @@ class DiscapacidadControlador {
             }
         });
     }
+    // METODO PARA ELIMINAR REGISTRO   **USADO
     EliminarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -123,7 +124,7 @@ class DiscapacidadControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+                const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = discapacidad.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -203,7 +204,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
+    // METODO PARA LISTAR TIPOS DE DISCAPACIDAD   **USADO
     ListarTipo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const TIPO_DISCAPACIDAD = yield database_1.default.query(`
@@ -217,7 +218,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+    // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE   **USADO
     BuscarDiscapacidadNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;

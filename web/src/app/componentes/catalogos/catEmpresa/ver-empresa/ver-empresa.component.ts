@@ -302,13 +302,13 @@ export class VerEmpresaComponent implements OnInit {
 
   // GENERACION DE REPORTE DE PDF
   GenerarPdf(action = 'open') {
-    const documentDefinition = this.getDocumentDefinicion();
+    const documentDefinition = this.DefinirInformacionPDF();
     pdfMake.createPdf(documentDefinition).open();
   }
 
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
-  getDocumentDefinicion() {
-    sessionStorage.setItem('Empresas', this.empresas);
+  DefinirInformacionPDF() {
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',

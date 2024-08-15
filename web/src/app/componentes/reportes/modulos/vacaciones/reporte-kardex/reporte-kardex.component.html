@@ -51,10 +51,10 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Código</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Nombre</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -97,10 +97,10 @@
                     </tr>
                     <tr
                         *ngFor="let e of empleados | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value | paginate:tamanio_pagina:numero_pagina">
-                        <th scope="row">{{e.codigo}}</th>
-                        <td>{{e.nombre}}</td>
-                        <td>{{e.apellido}}</td>
                         <td>{{e.cedula}}</td>
+                        <th scope="row">{{e.codigo}}</th>
+                        <td>{{e.apellido}}</td>
+                        <td>{{e.nombre}}</td>
                         <td class="d-flex justify-content-center">
                             <i matSuffix [ngStyle]="estiloK" matTooltipPosition="right" id="upload"
                                 matTooltip="Ver datos generales de este empleado" class="material-icons"

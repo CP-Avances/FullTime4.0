@@ -24,19 +24,19 @@ class TiposCargosRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE
+        // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE   **USADO
         this.router.post('/buscar/tipo_cargo/nombre', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.BuscarTipoCargoNombre);
-        // METODO PARA LISTAR TIPO CARGOS
+        // METODO PARA LISTAR TIPO CARGOS   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.ListaTipoCargos);
-        // METODO PARA REGISTRAR TIPO CARGO
+        // METODO PARA REGISTRAR TIPO CARGO    **USADO
         this.router.post('/crearCargo', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.CrearCargo);
-        // METODO PARA EDITAR TIPO CARGO
+        // METODO PARA EDITAR TIPO CARGO   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.EditarCargo);
-        // METODO PARA ELIMINAR TIPO CARGO
+        // METODO PARA ELIMINAR TIPO CARGO    **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.EliminarRegistro);
-        // METODO PARA LEER DATOS DE PLANTILLA
-        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catTipoCargos_Controlador_1.default.VerfificarPlantillaTipoCargos);
-        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        // METODO PARA LEER DATOS DE PLANTILLA   **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catTipoCargos_Controlador_1.default.VerificarPlantillaTipoCargos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catTipoCargos_Controlador_1.default.CargarPlantilla);
     }
 }

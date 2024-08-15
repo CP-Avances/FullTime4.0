@@ -16,7 +16,6 @@ import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
   templateUrl: './editar-empresa.component.html',
   styleUrls: ['./editar-empresa.component.css']
 })
-
 export class EditarEmpresaComponent implements OnInit {
 
   // VARIABLES USADAS PARA VER U OCULTAR OPCIONES

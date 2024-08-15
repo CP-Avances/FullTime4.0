@@ -134,49 +134,8 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(respuesta)
     }
 
+    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO     **USADO
     public async ReporteTimbresMultiple(req: Request, res: Response) {
-
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        //El reporte funciona para relojs de 6, 3 y sin acciones.        
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-
-        let nuevo = n.map((obj: IReporteTimbres) => {
-
-            obj.departamentos = obj.departamentos.map((e) => {
-
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                // console.log('Empleados: ',e);
-                return e
-
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-
-    }
-
-    public async ReporteTimbresMultipleRegimenCargo(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -199,40 +158,8 @@ class ReportesAsistenciaControlador {
 
     }
 
+    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS     **USADO
     public async ReporteTimbresIncompletos(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-        let nuevo = n.map((obj: IReporteTimbres) => {
-            obj.departamentos = obj.departamentos.map((e) => {
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                return e
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-
-    }
-
-    public async ReporteTimbresIncompletosRegimenCargo(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -249,54 +176,13 @@ class ReportesAsistenciaControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
 
-        return res.status(200).jsonp(nuevo)
-
+        return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA
+    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA       **USADO
     public async ReporteTimbreSistema(req: Request, res: Response) {
-
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        //El reporte funciona para relojs de 6, 3 y sin acciones.        
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-        let nuevo = n.map((obj: IReporteTimbres) => {
-
-            obj.departamentos = obj.departamentos.map((e) => {
-
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                // console.log('Empleados: ',e);
-                return e
-
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-    }
-
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA PARA REGIMEN Y CARGO
-    public async ReporteTimbreSistemaRegimenCargo(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -310,56 +196,16 @@ class ReportesAsistenciaControlador {
 
         let nuevo = n.map((e: any) => {
             e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
+            return e;
+        }).filter(e => { return e.empleados.length > 0 });
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
 
-        return res.status(200).jsonp(nuevo)
+        return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL
+    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL       **USADO
     public async ReporteTimbreRelojVirtual(req: Request, res: Response) {
-
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        //El reporte funciona para relojs de 6, 3 y sin acciones.        
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-        let nuevo = n.map((obj: IReporteTimbres) => {
-
-            obj.departamentos = obj.departamentos.map((e) => {
-
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                // console.log('Empleados: ',e);
-                return e
-
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-    }
-
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL PARA REGIMEN Y CARGO
-    public async ReporteTimbreRelojVirtualRegimenCargo(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -372,58 +218,17 @@ class ReportesAsistenciaControlador {
         }));
 
         let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
+            return e;
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
 
-        return res.status(200).jsonp(nuevo)
+        return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES HORARIO ABIERTO
+    // REPORTE DE TIMBRES HORARIO ABIERTO     **USADO
     public async ReporteTimbreHorarioAbierto(req: Request, res: Response) {
-
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        //El reporte funciona para relojs de 6, 3 y sin acciones.        
-
-        let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
-            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
-                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
-                    return o
-                })
-                )
-                return ele
-            })
-            )
-            return obj
-        })
-        )
-
-        let nuevo = n.map((obj: IReporteTimbres) => {
-
-            obj.departamentos = obj.departamentos.map((e) => {
-
-                e.empleado = e.empleado.filter((t: any) => { return t.timbres.length > 0 })
-                // console.log('Empleados: ',e);
-                return e
-
-            }).filter((e: any) => { return e.empleado.length > 0 })
-            return obj
-
-        }).filter(obj => { return obj.departamentos.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-    }
-
-    // REPORTE DE TIMBRES HORARIO ABIERTO
-    public async ReporteTimbreHorarioAbiertoRegimenCargo(req: Request, res: Response) {
-        console.log('datos recibidos', req.body)
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -436,29 +241,29 @@ class ReportesAsistenciaControlador {
         }));
 
         let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
+            return e;
+        }).filter(e => { return e.empleados.length > 0 });
 
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
+        return res.status(200).jsonp(nuevo);
     }
 
 }
 
 const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
-export default REPORTE_A_CONTROLADOR
 
+export default REPORTE_A_CONTROLADOR;
 
+// FUNCION DE BUSQUEDA DE TIMBRES     **USADO
 const BuscarTimbres = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
             latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
         ORDER BY fecha_hora_timbre ASC
         `
         , [fec_inicio, fec_final, codigo])
@@ -467,30 +272,31 @@ const BuscarTimbres = async function (fec_inicio: string, fec_final: string, cod
         })
 }
 
-const BuscarTimbresIncompletos = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
+// FUNCION PARA BUSQUEDA DE TIMBRES INCOMPLETOS    **USADO
+const BuscarTimbresIncompletos = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_horario AS VARCHAR), id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia, estado_origen
-        FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
-            AND fecha_hora_timbre IS null AND estado_origen IN (\'N\',\'HL\', \'HFD\') 
+        FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND id_empleado = $3 
+            AND fecha_hora_timbre IS null AND estado_origen IN ('N','HL', 'HFD') 
         ORDER BY fecha_hora_horario ASC
         `
-        , [fec_inicio, fec_final, codigo])
+        , [fec_inicio, fec_final, id_empleado])
         .then(res => {
             return res.rows;
         })
 }
 
-// CONSULTA TIMBRES REALIZADOS EN EL SISTEMA CODIGO 98
+// CONSULTA TIMBRES REALIZADOS EN EL SISTEMA CODIGO 98     **USADO
 const BuscarTimbreSistemas = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
             latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = \'98\' 
-            AND NOT accion = \'HA\'
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND id_reloj = '98' 
+            AND NOT accion = 'HA'
         ORDER BY fecha_hora_timbre ASC
         `
         , [fec_inicio, fec_final, codigo])
@@ -516,14 +322,14 @@ const BuscarTimbreRelojVirtual = async function (fec_inicio: string, fec_final: 
         })
 }
 
-// CONSULTA TIMBRES REALIZADOS EN EL RELOJ VIRTUAL CODIGO 97
+// CONSULTA TIMBRES REALIZADOS EN HORARIO ABIERTO      **USADO
 const BuscarTimbreHorarioAbierto = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
             latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion = \'HA\' 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND accion = 'HA' 
         ORDER BY fecha_hora_timbre ASC
         `
         , [fec_inicio, fec_final, codigo])

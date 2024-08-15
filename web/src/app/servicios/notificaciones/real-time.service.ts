@@ -13,13 +13,12 @@ export class RealTimeService {
   ) {
   }
 
-  // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL
+  // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL    **USADO
   RecibirNuevosAvisos(data: any) {
-    //console.log('ingresa ', data)
     this.socket.emit('nuevo_aviso', data);
   }
 
-  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
   ObtenerConfiguracionEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/${id_empleado}`);
   }
@@ -51,11 +50,12 @@ export class RealTimeService {
    ** **                        METODOS PARA CONFIGURAR_ALERTAS                         ** **
    ** ************************************************************************************ **/
 
-
+  // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
   IngresarConfigNotiEmpleado(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config`, datos);
   }
 
+  // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
   ActualizarConfigNotiEmpl(id_empleado: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/noti-put/${id_empleado}`, datos);
   }
@@ -74,12 +74,12 @@ export class RealTimeService {
    ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
-  // METODO PARA ENVIO DE CORREO DE COMUNICADOS
+  // METODO PARA ENVIO DE CORREO DE COMUNICADOS    **USADO
   EnviarCorreoComunicado(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/mail-comunicado`, datos);
   }
 
-  // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS
+  // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS   **USADO
   EnviarMensajeGeneral(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/noti-comunicado/`, data);
   }

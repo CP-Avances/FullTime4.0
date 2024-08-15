@@ -91,7 +91,7 @@ export class EditarContratoComponent implements OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -144,7 +144,6 @@ export class EditarContratoComponent implements OnInit {
     this.regimenLaboral = [];
     this.restRegimen.ConsultarRegimenPais(pais).subscribe(datos => {
       this.regimenLaboral = datos;
-      console.log('ver id de regimen', this.regimenLaboral)
     }, error => {
       this.toastr.info('Pais seleccionado no tiene registros de Régimen Laboral.', '', {
         timeOut: 6000,

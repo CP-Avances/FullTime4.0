@@ -12,6 +12,7 @@ export class EmpleadoProcesosService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos`, datos);
   }
 
+  // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
   ObtenerProcesoUsuario(id_empl_cargo: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos/infoProceso/${id_empl_cargo}`);
   }
@@ -20,6 +21,7 @@ export class EmpleadoProcesosService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos`, datos);
   }
 
+  // METODO PARA ELIMINAR REGISTRO   **USADO
   EliminarRegistro(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos/eliminar/${id}`;
     const httpOtions = {

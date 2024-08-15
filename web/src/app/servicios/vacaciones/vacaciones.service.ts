@@ -29,6 +29,7 @@ export class VacacionesService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/estado-solicitud`);
   }
 
+  // METODO PARA BUSCAR VACACIONES POR ID DEL PERIODO   **USADO
   ObtenerVacacionesPorIdPeriodo(id_peri_perido: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id_peri_perido}`)
   }

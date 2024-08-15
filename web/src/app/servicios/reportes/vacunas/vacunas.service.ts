@@ -10,16 +10,9 @@ export class VacunasService {
     private http: HttpClient
   ) { }
 
-  // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
+  // METODO DE BUSQUEDA DE DATOS DE VACUNAS    **USADO
   ReporteVacunasMultiples(data: any) {
-    console.log('recibiendo data', data)
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado-vacunas-multiples/vacunas-multiples/`, data);
-  }
-
-  // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[empleados]]
-  ReporteVacunasMultiplesCargoRegimen(data: any) {
-    console.log('recibiendo data', data)
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado-vacunas-multiples/vacunas-multiples-cargos-regimen/`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado-vacunas-multiples/vacunas-multiples/`, data);
   }
 
 }
