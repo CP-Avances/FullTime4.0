@@ -73,7 +73,6 @@
                         </tr>
                         <tr
                             *ngFor="let rol of roles | roles:buscarDescripcion.value | paginate:tamanio_pagina:numero_pagina">
-
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionRoles.toggle(rol) : null"

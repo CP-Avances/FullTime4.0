@@ -247,6 +247,7 @@ export class AsignarCiudadComponent implements OnInit {
     this.ingresar = 0;
     this.contador = 0;
     this.nota = '';
+    this.OmitirDuplicados();
     // VALIDAR SI SE HA SELECCIONADO CIUDADES
     if (this.ciudadesSeleccionadas.length != 0) {
       this.habilitarprogress = true;
@@ -303,6 +304,23 @@ export class AsignarCiudadComponent implements OnInit {
       }
       this.CerrarVentana(2);
     }
+  }
+
+  // METODO PARA DEPURAR LISTA DE CIUDADES
+  OmitirDuplicados() {
+    console.log('data.... ', this.ciudadesSeleccionadas)
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados = this.ciudadesSeleccionadas.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_feriado === objeto.id_feriado) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    console.log('feriados ', verificados, ' data ', this.ciudadesSeleccionadas)
+    this.ciudadesSeleccionadas = verificados;
   }
 
   // METODO PARA LIMPIAR FORMULARIO
