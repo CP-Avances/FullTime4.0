@@ -594,7 +594,7 @@ export class ListarTitulosComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                           METODO DE SELECCION MULTIPLE DE DATOS                              ** **
    ** ************************************************************************************************** **/
-
+  
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;

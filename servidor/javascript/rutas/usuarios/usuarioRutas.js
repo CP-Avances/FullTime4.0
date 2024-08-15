@@ -64,6 +64,13 @@ class UsuarioRutas {
         this.router.post('/ingresarIDdispositivo', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ingresarIDdispositivo);
         this.router.get('/usuarioEmpresa', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getEmpleadosActivos);
         this.router.get('/usuario/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getUserById);
+        //--------------------------------------------------------------------------------------------------------------------------------------
+        // METODOS PARA APP MOVIL
+        this.router.get('/IDdispositivos/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getidDispositivo);
+        this.router.post('/dispositivo/idDispositivo', usuarioControlador_1.USUARIO_CONTROLADOR.getDispositivoPorIdDispositivo);
+        this.router.post('/ingresarIDdispositivo', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ingresarIDdispositivo);
+        this.router.get('/usuarioEmpresa', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getEmpleadosActivos);
+        this.router.get('/usuario/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getUserById);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

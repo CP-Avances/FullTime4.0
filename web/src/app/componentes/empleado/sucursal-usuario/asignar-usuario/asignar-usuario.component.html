@@ -151,14 +151,15 @@
                             </td>
                             <td>
                                 <mat-form-field class="input-tables">
-                                    <input matInput placeholder="Buscar" type="text" [formControl]="nombre">
+                                    <input matInput placeholder="Buscar" type="text" [formControl]="departamento">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables">
-                                    <input matInput placeholder="Buscar" type="text" [formControl]="departamento">
+                                    <input matInput placeholder="Buscar" type="text" [formControl]="nombre">
                                 </mat-form-field>
                             </td>
+                            <td></td>
                         </tr>
                         <tr
                             *ngFor="let u of usuarios | sucRolEmpleado: rol.value | sucNomEmpleado: nombre.value | sucDepEmpleado: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">

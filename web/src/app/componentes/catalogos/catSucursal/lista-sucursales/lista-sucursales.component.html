@@ -109,13 +109,13 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
+                                    <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
+                                        [formControl]="buscarCiudad">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                        [formControl]="buscarCiudad">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
                                 </mat-form-field>
                             </td>
                             <td>

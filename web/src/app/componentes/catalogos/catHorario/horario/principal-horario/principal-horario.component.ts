@@ -1026,5 +1026,4 @@ export class PrincipalHorarioComponent implements OnInit {
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
-
 }

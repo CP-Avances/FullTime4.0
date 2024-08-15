@@ -34,7 +34,6 @@ class LoginControlador {
             try {
                 const { nombre_usuario, pass, movil } = req.body;
                 let pass_encriptado = rsa_keys_service_1.default.encriptarLogin(pass);
-                console.log('ingresa ', req.body);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)

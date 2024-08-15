@@ -315,6 +315,21 @@ const routes: Routes = [
   { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard] },
   { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard] },
   { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard] },
+
+  // VERIFICAR SU USO
+  { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
+  { path: 'macro/user/horas-extras', component: MetricaHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 2 } },
+  { path: 'macro/user/permisos', component: MetricaPermisosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
+  { path: 'macro/user/vacaciones', component: MetricaVacacionesComponent, canActivate: [AuthGuard], data: { roles: 2 } },
+  { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard] },
+  { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard] },
+  { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard] },
+  { path: 'macro/tiempo-jornada-vs-hora-ext', component: TiempoJornadaVsHoraExtMacroComponent, canActivate: [AuthGuard] },
+  { path: 'macro/salidas-antes', component: SalidasAntesMacroComponent, canActivate: [AuthGuard] },
+  { path: 'macro/inasistencia', component: InasistenciaMacroComponent, canActivate: [AuthGuard] },
+  { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard] },
+  { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard] },
+  { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

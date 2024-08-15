@@ -39,7 +39,6 @@ class LoginControlador {
     try {
       const { nombre_usuario, pass, movil } = req.body;
       let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
-      console.log('ingresa ', req.body)
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `

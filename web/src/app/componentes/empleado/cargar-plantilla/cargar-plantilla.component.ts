@@ -603,7 +603,7 @@ export class CargarPlantillaComponent implements OnInit {
     }
   }
 
-  //MENU LATERAL
+  //CONTROL BOTONES
   getCargarContratos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

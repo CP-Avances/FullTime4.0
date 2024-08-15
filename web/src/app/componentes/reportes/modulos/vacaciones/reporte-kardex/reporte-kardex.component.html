@@ -62,14 +62,15 @@
                     <tr>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="codigo"
-                                    (keypress)="IngresarSoloNumeros($event)">
+                                <input matInput placeholder="Buscar" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
+                                    (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -80,9 +81,8 @@
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" maxlength="10"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -104,11 +104,13 @@
                         <td class="d-flex justify-content-center">
                             <i matSuffix [ngStyle]="estiloK" matTooltipPosition="right" id="upload"
                                 matTooltip="Ver datos generales de este empleado" class="material-icons"
-                                (click)="KardexEmpleado(e.id, 'download')">cloud_download
+                                (click)="KardexEmpleado(e.id, 'download')">
+                                cloud_download
                             </i>
                             <i matSuffix [ngStyle]="estiloK" matTooltipPosition="right" id="pdf"
                                 matTooltip="Ver datos generales de este empleado" class="material-icons"
-                                (click)="KardexEmpleado(e.id, 'open')">picture_as_pdf
+                                (click)="KardexEmpleado(e.id, 'open')">
+                                picture_as_pdf
                             </i>
                         </td>
                     </tr>

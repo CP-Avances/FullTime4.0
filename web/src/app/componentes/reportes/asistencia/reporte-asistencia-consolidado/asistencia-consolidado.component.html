@@ -67,27 +67,22 @@
                     <tr>
                         <td>
                             <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
+                        <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
                                     (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" maxlength="10"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -97,7 +92,8 @@
                             </mat-icon>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de datos de empleado de acuerdo a las columnas de la tabla. Se visualizaran opciones de descarga al validar fechas ingresadas y seleccionar campos que se visualizaran en el reporte.">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr

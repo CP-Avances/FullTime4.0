@@ -40,6 +40,16 @@
                     <tr>
                         <td></td>
                         <td>
+                            <mat-form-field class="input-tables cedula">
+                                <input matInput placeholder="Buscar" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-error *ngIf="cedula.invalid">
+                                    Indispensable ingresar dos valores
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td>
                             <mat-form-field class="input-tables codigo">
                                 <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
@@ -54,16 +64,7 @@
                                 </mat-error>
                             </mat-form-field>
                         </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" maxlength="10"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-error *ngIf="cedula.invalid">
-                                    Indispensable ingresar dos valores
-                                </mat-error>
-                            </mat-form-field>
-                        </td>
+                        <td></td>
                         <td></td>
                         <td></td>
                     </tr>
