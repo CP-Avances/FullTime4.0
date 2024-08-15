@@ -5,6 +5,7 @@ import pool from '../../database';
 class DatosGeneralesControlador {
 
     // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    **USADO
+    //LOOKME C
     public async BuscarDataGeneral(req: Request, res: Response) {
         let estado = req.params.estado;
         let informacion = await pool.query(

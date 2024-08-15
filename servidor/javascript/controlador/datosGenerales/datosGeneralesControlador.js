@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class DatosGeneralesControlador {
     // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    **USADO
+    //LOOKME C
     BuscarDataGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
