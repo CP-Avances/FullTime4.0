@@ -1245,40 +1245,42 @@ class DepartamentoControlador {
   }
 
 
-  //CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
-  public async UpdateDepartamentosMul(req: Request, res: Response){
-    try{
-      const { idDepartamento, listaUsuarios} = req.body;
+  // CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
+  public async ActualizarDepartamentosUsuario(req: Request, res: Response) {
+    try {
+      const { idDepartamento, listaUsuarios } = req.body;
       var cont = 0;
       listaUsuarios.forEach(async (item: any) => {
-        let res = await pool.query(`
+        let res = await pool.query(
+          `
           UPDATE eu_usuario_departamento
           SET id_departamento = $1 
           WHERE id_empleado = $2
-        `, [idDepartamento, item.id]);
+          `
+          , [idDepartamento, item.id]);
 
         await pool.query(
           `
           UPDATE eu_empleado_cargos
           SET id_departamento = $1 
           WHERE id_contrato = $2
-        `, [idDepartamento, item.id_contrato]);
+          `
+          , [idDepartamento, item.id_contrato]);
 
-        if(res.rowCount != 0){
+        if (res.rowCount != 0) {
           cont = cont + 1;
         }
 
       })
 
-      
       setTimeout(() => {
         if (cont == listaUsuarios.length) {
-          return res.jsonp({message: 'Se a actualizado todos los usuarios'})
+          return res.jsonp({ message: 'Se ha actualizado todos los registros.' })
         } else {
-          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos registros no se actualizaron.' });
         }
       }, 1500)
-      
+
 
     } catch (error) {
       // FINALIZAR TRANSACCION

@@ -31,7 +31,7 @@ class RolesControlador {
       // CONSULTAR DATOSORIGINALES
       const rol = await pool.query('SELECT * FROM ero_cat_roles WHERE id = $1', [id]);
       const [datosOriginales] = rol.rows;
-      
+
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -48,13 +48,13 @@ class RolesControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
       }
-      
+
       await pool.query(
         `
         DELETE FROM ero_cat_roles WHERE id = $1
         `
         , [id]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ero_cat_roles',
@@ -69,7 +69,7 @@ class RolesControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
-      
+
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
@@ -81,7 +81,7 @@ class RolesControlador {
   public async CrearRol(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, user_name, ip } = req.body;
-      
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -90,7 +90,7 @@ class RolesControlador {
         INSERT INTO ero_cat_roles (nombre) VALUES ($1)  RETURNING *
          `
         , [nombre]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ero_cat_roles',
@@ -143,7 +143,7 @@ class RolesControlador {
     }
   }
 
-// METODO PARA ACTUALIZAR ROLES  **USADO
+  // METODO PARA ACTUALIZAR ROLES  **USADO
   public async ActualizarRol(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id, user_name, ip } = req.body;
@@ -174,7 +174,7 @@ class RolesControlador {
 
       const datosNuevos = await pool.query('UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2 RETURNING *'
         , [nombre, id]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ero_cat_roles',
@@ -198,10 +198,10 @@ class RolesControlador {
 
 
   //CONSULTA PARA OPTENER LOS USUARIOS CON NO SON JEFES Y ADMINISTRAR UN DEPARTAMENTO
-  public async ListarRolesUsuario(req: Request, res: Response){
+  public async ListarRolesUsuario(req: Request, res: Response) {
     console.log('entro en el controlador :)')
-    try{
-      
+    try {
+
       const ROL = await pool.query(
         `
         SELECT data_empl.codigo, data_empl.cedula, CONCAT(TRIM(data_empl.nombre), ' ',TRIM(data_empl.apellido)) AS nombre, 
@@ -216,7 +216,7 @@ class RolesControlador {
         `
       );
       if (ROL.rowCount != 0) {
-        return res.jsonp({message: 'Registros encontrados', lista: ROL.rows})
+        return res.jsonp({ message: 'Registros encontrados', lista: ROL.rows })
       } else {
         return res.status(404).jsonp({ message: 'Registros no encontrados.' });
       }
@@ -228,38 +228,37 @@ class RolesControlador {
     }
   }
 
-  //CONSULTA PARA actualizar roles a varios usuarios **USADO
-  public async UpdateRoles(req: Request, res: Response){
-    try{
-
-      const { idRol, listaUsuarios} = req.body;
+  // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS **USADO
+  public async ActualizarRolUusuario (req: Request, res: Response) {
+    try {
+      const { idRol, listaUsuarios } = req.body;
       var cont = 0;
       listaUsuarios.forEach(async (item: any) => {
-        let res = await pool.query(`
+        let res = await pool.query(
+          `
           UPDATE eu_usuarios
           SET id_rol = $1 
           WHERE id = $2
-        `, [idRol, item.id]);
+          `
+          , [idRol, item.id]);
 
-        if(res.rowCount != 0){
+        if (res.rowCount != 0) {
           cont = cont + 1;
         }
       })
 
-      
       setTimeout(() => {
         if (cont == listaUsuarios.length) {
-          return res.status(200).jsonp({message: 'Se a actualizado todos los usuarios', status: 200})
+          return res.status(200).jsonp({ message: 'Se ha actualizado todos los registros.', status: 200 })
         } else {
-          return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron', status: 404 });
+          return res.status(404).jsonp({ message: 'Revisar los datos, algunos registros no se actualizaron.', status: 404 });
         }
       }, 1500)
-      
 
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al actualizar el registro.', status:500 });
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.', status: 500 });
     }
   }
 

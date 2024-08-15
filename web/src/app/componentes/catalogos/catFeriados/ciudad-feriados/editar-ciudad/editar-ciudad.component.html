@@ -22,7 +22,8 @@
                                 <mat-label>Seleccionar continente</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Lista de continentes.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                                 <mat-select [formControl]="nombreContinenteF" required>
                                     <mat-option *ngFor="let c of continentes" [value]="c.continente"
                                         (click)="FiltrarPaises(asignarCiudadForm.value)">
@@ -34,7 +35,8 @@
                                 <mat-label>Seleccionar país</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Lista de países del continente seleccionado.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                                 <mat-select [formControl]="nombrePaisF" required>
                                     <mat-option *ngFor="let pais of paises" [value]="pais.id"
                                         (click)="FiltrarProvincias(asignarCiudadForm.value)">

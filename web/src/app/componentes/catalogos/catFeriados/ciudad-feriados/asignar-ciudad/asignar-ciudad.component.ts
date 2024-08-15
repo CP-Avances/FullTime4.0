@@ -308,7 +308,6 @@ export class AsignarCiudadComponent implements OnInit {
 
   // METODO PARA DEPURAR LISTA DE CIUDADES
   OmitirDuplicados() {
-    console.log('data.... ', this.ciudadesSeleccionadas)
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
     let verificados = this.ciudadesSeleccionadas.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
@@ -319,7 +318,6 @@ export class AsignarCiudadComponent implements OnInit {
       }
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
-    console.log('feriados ', verificados, ' data ', this.ciudadesSeleccionadas)
     this.ciudadesSeleccionadas = verificados;
   }
 

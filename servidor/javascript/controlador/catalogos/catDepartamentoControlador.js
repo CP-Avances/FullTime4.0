@@ -1079,8 +1079,8 @@ class DepartamentoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    //CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
-    UpdateDepartamentosMul(req, res) {
+    // CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
+    ActualizarDepartamentosUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { idDepartamento, listaUsuarios } = req.body;
@@ -1090,22 +1090,22 @@ class DepartamentoControlador {
           UPDATE eu_usuario_departamento
           SET id_departamento = $1 
           WHERE id_empleado = $2
-        `, [idDepartamento, item.id]);
+          `, [idDepartamento, item.id]);
                     yield database_1.default.query(`
           UPDATE eu_empleado_cargos
           SET id_departamento = $1 
           WHERE id_contrato = $2
-        `, [idDepartamento, item.id_contrato]);
+          `, [idDepartamento, item.id_contrato]);
                     if (res.rowCount != 0) {
                         cont = cont + 1;
                     }
                 }));
                 setTimeout(() => {
                     if (cont == listaUsuarios.length) {
-                        return res.jsonp({ message: 'Se a actualizado todos los usuarios' });
+                        return res.jsonp({ message: 'Se ha actualizado todos los registros.' });
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron' });
+                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos registros no se actualizaron.' });
                     }
                 }, 1500);
             }

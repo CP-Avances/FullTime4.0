@@ -29,9 +29,9 @@ class CiudadFeriadoControlador {
         const CIUDAD_FERIADO = await pool.query(
             `
             SELECT fe.id AS idferiado, fe.descripcion AS nombreferiado, cfe.id AS idciudad_asignada,
-                c.id AS idciudad, c.descripcion AS nombreciudad
-            FROM ef_cat_feriados fe, ef_ciudad_feriado cfe, e_ciudades c
-            WHERE fe.id = cfe.id_feriado AND c.id = cfe.id_ciudad AND fe.id = $1
+                c.id AS idciudad, c.descripcion AS nombreciudad, p.nombre AS provincia
+            FROM ef_cat_feriados fe, ef_ciudad_feriado cfe, e_ciudades c, e_provincias AS p
+            WHERE fe.id = cfe.id_feriado AND c.id = cfe.id_ciudad AND fe.id = $1 AND p.id = c.id_provincia
             `
             , [idferiado]);
         if (CIUDAD_FERIADO.rowCount != 0) {

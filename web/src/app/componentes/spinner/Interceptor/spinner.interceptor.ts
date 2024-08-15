@@ -6,12 +6,15 @@ import { finalize } from 'rxjs/operators';
 
 @Injectable()
 export class SpinnerInterceptor implements HttpInterceptor {
-    constructor(private SpinnerServices: SpinnerService){}
+    constructor(private SpinnerServices: SpinnerService) { }
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         this.SpinnerServices.showSpinner();
         return next.handle(req).pipe(
             finalize(() => this.SpinnerServices.hideSpinner())
         );
+
+
+        
     }
 
 }

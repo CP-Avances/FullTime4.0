@@ -12,7 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   imports: [
     CommonModule,
     MatProgressSpinnerModule
-  ],exports: [
+  ],
+  exports: [
     SpinnerComponent
   ]
 })

@@ -16,7 +16,6 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
 import { FraseSeguridadComponent } from '../../administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
@@ -127,7 +126,6 @@ export class TimbreMultipleComponent implements OnInit {
   auto_individual: boolean = true;
 
   constructor(
-    public loginService: LoginService,
     public informacion: DatosGeneralesService,
     private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
