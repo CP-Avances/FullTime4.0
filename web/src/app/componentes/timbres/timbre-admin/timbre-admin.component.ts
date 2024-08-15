@@ -106,7 +106,9 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ObtenerInformacionGeneral(1).subscribe(data => {
+      console.log('data',data);
       this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
+      console.log(this.datosEmpleado);
     });
   }
 
@@ -160,6 +162,20 @@ export class TimbreAdminComponent implements OnInit {
     }, err => {
       this.toastr.info(err.error.message)
     })
+  }
+
+  VerJustificacion(justificacion: any) {
+    // CREAR UNA URL DE DATOS PARA LA IMAGEN EN BASE64
+    const imageUrl = `${justificacion}`;
+
+    // ABRIR LA IMAGEN EN UNA NUEVA PESTAÑA DEL NAVEGADOR
+    const newWindow = window.open(imageUrl, '_blank');
+    if (newWindow) {
+      newWindow.document.write(`<img src="${imageUrl}" alt="Justificación" />`);
+      newWindow.document.title = "Justificación";
+    } else {
+      this.toastr.error('No se pudo abrir la nueva pestaña.');
+    }
   }
 
   // METODO DE BUSQUEDA DE DATOS DE ACUERDO A LA FECHA INGRESADA

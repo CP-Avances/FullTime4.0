@@ -253,6 +253,7 @@ class TimbresControlador {
     // METODO DE REGISTRO DE TIMBRES PERSONALES    **USADO
     public async CrearTimbreWeb(req: Request, res: Response): Promise<any> {
         try {
+            // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip } = req.body;
 
@@ -279,10 +280,10 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion],
+                    observacion, 'APP_WEB', ubicacion, null],
 
                 async (error, results) => {
                     const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
@@ -317,7 +318,7 @@ class TimbresControlador {
         try {
             // LA UBICACION ES NULL YA QUE ESTE USUARIO NO TIMBRA CON UBICACION
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
-                id_empleado, id_reloj, tipo, ip, user_name, ubicacion } = req.body
+                id_empleado, id_reloj, tipo, ip, user_name, ubicacion, documento } = req.body
 
             var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
@@ -350,10 +351,10 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
                 `
                 , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion]
+                    observacion, 'APP_WEB', ubicacion, documento]
 
                 , async (error, results) => {
 
@@ -593,7 +594,8 @@ class TimbresControlador {
             let timbres = await pool.query(
                 `
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
-                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, CAST(t.fecha_hora_timbre_servidor AS VARCHAR)
+                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, 
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 50
