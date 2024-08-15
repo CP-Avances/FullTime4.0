@@ -164,6 +164,20 @@ export class TimbreAdminComponent implements OnInit {
     })
   }
 
+  VerJustificacion(justificacion: any) {
+    // CREAR UNA URL DE DATOS PARA LA IMAGEN EN BASE64
+    const imageUrl = `${justificacion}`;
+
+    // ABRIR LA IMAGEN EN UNA NUEVA PESTAÑA DEL NAVEGADOR
+    const newWindow = window.open(imageUrl, '_blank');
+    if (newWindow) {
+      newWindow.document.write(`<img src="${imageUrl}" alt="Justificación" />`);
+      newWindow.document.title = "Justificación";
+    } else {
+      this.toastr.error('No se pudo abrir la nueva pestaña.');
+    }
+  }
+
   // METODO DE BUSQUEDA DE DATOS DE ACUERDO A LA FECHA INGRESADA
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

@@ -527,7 +527,7 @@ class TimbresControlador {
                 const { id } = req.params;
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
-                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj 
+                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, t.documento
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fecha_hora_timbre DESC LIMIT 50
