@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
   //url: 'https://app2.casa'
-  url: 'http://192.168.0.144:3005/direccionamiento'
+  url: 'https://186.4.226.49/direccionamiento'
 };
