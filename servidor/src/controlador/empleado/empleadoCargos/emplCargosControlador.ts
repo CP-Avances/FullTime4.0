@@ -969,6 +969,41 @@ class EmpleadoCargosControlador {
 
   }
 
+  //ELIMINAR REGISTRO DEL CARGO SELECCIONADO **USADO
+  public async EliminarCargo(req: Request, res: Response): Promise<any>{
+    const { id } = req.body;
+    console.log('idCargo: ',id);
+    try {
+
+        const cargo_vigente = await pool.query(
+            `
+            SELECT * FROM contrato_cargo_vigente WHERE id_cargo = $1
+            `
+            , [id]);
+
+        console.log('contrato_vigente: ',cargo_vigente.rows[0]);
+
+        if(cargo_vigente.rows[0] == undefined || cargo_vigente.rows[0] == ""){
+            await pool.query(
+                `
+                DELETE FROM eu_empleado_cargos WHERE id = $1
+                `
+                , [id]);
+
+                return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
+
+        }else{
+            return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro', status: '300' });
+        }
+
+    }catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+        return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+    }
+}
+
 }
 
 export const EMPLEADO_CARGO_CONTROLADOR = new EmpleadoCargosControlador();

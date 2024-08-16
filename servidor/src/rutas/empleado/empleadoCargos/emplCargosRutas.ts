@@ -50,6 +50,9 @@ class EmpleadosCargpsRutas {
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
 
+        //METODO PARA ELIMINAR EL CARGO REGISTRADO DE LA TABLA EU_EMPLEADOS_CARGOS **USADO
+        this.router.post('/eliminarCargo', [TokenValidation], EMPLEADO_CARGO_CONTROLADOR.EliminarCargo);
+
 
         /** ****************************************************************************************** **
          ** **                    METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **     

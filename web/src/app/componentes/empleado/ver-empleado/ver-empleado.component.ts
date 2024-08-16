@@ -946,10 +946,46 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   EliminarDatos(dataContrato: any){
     console.log('va a eliminar datos contrato: ',dataContrato)
+    const idContrato = dataContrato.id;
+    this.restEmpleado.EliminarContrato(idContrato, dataContrato).subscribe({
+      next: (res: any) => {
+        if(res.status != '200'){
+          this.toastr.warning(res.message, 'VERIFICAR', {
+            timeOut: 4500,
+          });
+        }else{
+          this.toastr.success(res.message, 'Correcto', {
+            timeOut: 4500,
+          });
+        }
+      }, error: (err: any) => {
+        this.toastr.warning(err.message, 'Error', {
+          timeOut: 4500,
+        });
+      }
+    })
   }
 
   EliminarDatosCargos(dataCargo: any){
     console.log('va a eliminar datos cargo: ',dataCargo)
+    const data = { id: dataCargo};
+    this.restCargo.EliminarCargo(data).subscribe({
+      next: (res: any) => {
+        if(res.status != '200'){
+          this.toastr.warning(res.message, 'VERIFICAR', {
+            timeOut: 4500,
+          });
+        }else{
+          this.toastr.success(res.message, 'Correcto', {
+            timeOut: 4500,
+          });
+        }
+      }, error: (err: any) => {
+        this.toastr.warning(err.message, 'Error', {
+          timeOut: 4500,
+        });
+      }
+    })
   }
 
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL

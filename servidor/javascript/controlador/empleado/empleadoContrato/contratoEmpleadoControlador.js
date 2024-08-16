@@ -885,19 +885,21 @@ class ContratoEmpleadoControlador {
     //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
     EliminarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { idContrato } = req.body;
+            const { id } = req.params;
+            console.log('idContrato: ', id);
             try {
                 const contrato_vigente = yield database_1.default.query(`
-                SELECT id FROM contrato_cargo_vigente WHERE id_contrato = $1
-                `, [idContrato]);
+                SELECT * FROM contrato_cargo_vigente WHERE id_contrato = $1
+                `, [id]);
+                console.log('contrato_vigente: ', contrato_vigente.rows[0]);
                 if (contrato_vigente.rows[0] == undefined || contrato_vigente.rows[0] == "") {
                     yield database_1.default.query(`
                     DELETE FROM eu_empleado_contratos WHERE id_contrato = $1
-                    `, [idContrato]);
-                    return res.status(200).jsonp({ message: 'Registro eliminado correctamente' });
+                    `, [id]);
+                    return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
                 }
                 else {
-                    return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro' });
+                    return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro', status: '300' });
                 }
             }
             catch (error) {
