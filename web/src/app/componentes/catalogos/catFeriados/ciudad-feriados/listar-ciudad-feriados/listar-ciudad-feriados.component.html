@@ -62,8 +62,9 @@
                                             [aria-label]="checkboxLabel()">
                                         </mat-checkbox>
                                     </th>
-                                    <th scope="col">Feriado</th>
+                                    <th scope="col">Provincia</th>
                                     <th scope="col">Ciudades</th>
+                                    <th scope="col">Feriado</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
@@ -75,8 +76,9 @@
                                             [checked]="selection.isSelected(dc)" [aria-label]="checkboxLabel(dc)">
                                         </mat-checkbox>
                                     </td>
-                                    <td>{{dc.nombreferiado}}</td>
+                                    <td>{{dc.provincia}}</td>
                                     <td>{{dc.nombreciudad}}</td>
+                                    <td>{{dc.nombreferiado}}</td>
                                     <td>
                                         <i *ngIf="auto_individual && getVerFeriadoEditarCiudadFeriado()" id="editarI" (click)="AbrirVentanaEditarCiudad(dc)"
                                             matSuffix matTooltipPosition="right"

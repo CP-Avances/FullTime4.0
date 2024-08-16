@@ -20,6 +20,7 @@
                         <th scope="col">Latitud</th>
                         <th scope="col">Longitud</th>
                         <th scope="col">Reloj</th>
+                        <th scope="col">Justificación</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,7 @@
                                 <input matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
                             </mat-form-field>
                         </td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -54,6 +56,13 @@
                         <td>{{t.latitud}}</td>
                         <td>{{t.longitud}}</td>
                         <td>{{t.id_reloj}}</td>
+                        <td class="justify-content-center">
+                          <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
+                              matTooltip="Ver justificación"
+                              *ngIf="t.documento" (click)="VerJustificacion(t.documento)">
+                              image
+                          </mat-icon>
+                      </td>
                     </tr>
                 </tbody>
             </table>

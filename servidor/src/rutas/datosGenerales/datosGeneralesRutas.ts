@@ -26,17 +26,6 @@ class CiudadRutas {
         // LISTA DE DATOS ACTIVOS O INACTIVOS QUE RECIBEN COMUNICADOS  **USADO
         this.router.get('/datos_generales_comunicados/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesComunicados);
 
-
-
-
-
-
-
-
-
-
-
-
         // METODO DE BUSQUEDA DE INFORMACION ACTUAL DEL EMPLEADO    **USADO
         this.router.get('/datos-actuales/:empleado_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosActuales);
         // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ACTIVOS E INACTIVOS
@@ -60,6 +49,12 @@ class CiudadRutas {
 
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);
+
+        //-------------------------------- METODOS APP MOVIL -------------------------------------------------------------
+
+        this.router.get('/datos_generales/ver/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesParaMovil);
+
+
 
 
 

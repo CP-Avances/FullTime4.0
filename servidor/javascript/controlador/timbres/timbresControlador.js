@@ -87,12 +87,12 @@ class TimbresControlador {
             try {
                 const id = req.userIdEmpleado;
                 let timbres = yield database_1.default.query(`
-                SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
+                SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre 
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre DESC LIMIT 100
+                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 100
                 `, [id]).then((result) => {
                     return result.rows
                         .map((obj) => {
@@ -255,6 +255,7 @@ class TimbresControlador {
     CrearTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip } = req.body;
                 // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
@@ -271,9 +272,9 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
                 `, [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', ubicacion, null], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -301,7 +302,8 @@ class TimbresControlador {
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name } = req.body;
+                // LA UBICACION ES NULL YA QUE ESTE USUARIO NO TIMBRA CON UBICACION
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name, ubicacion, documento } = req.body;
                 var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
@@ -324,9 +326,9 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', ubicacion, documento], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -520,17 +522,18 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USAD
+    // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USADO
     ObtenerTimbresEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id } = req.params;
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
-                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj 
+                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, 
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre DESC LIMIT 50
+                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 50
                 `, [id]).then((result) => {
                     return result.rows
                         .map((obj) => {

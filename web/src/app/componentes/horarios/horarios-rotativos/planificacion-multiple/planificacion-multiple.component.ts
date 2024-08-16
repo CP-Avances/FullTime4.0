@@ -1,8 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { FormControl } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -41,12 +39,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   pageSizeOptions_emp = [5, 10, 20, 50];
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -882,7 +874,6 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA VERIFICAR HORARIOS ASIGNADOS
   VerificarAsignados() {
-    this.progreso = true;
     let usuarios: any = [];
     this.datosSeleccionados.usuarios.forEach((usu: any) => {
       if (usu.asignado.length != 0) {
@@ -890,7 +881,6 @@ export class PlanificacionMultipleComponent implements OnInit {
       }
     })
     if (usuarios.length === 0) {
-      this.progreso = false;
       this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
       });
@@ -1083,11 +1073,9 @@ export class PlanificacionMultipleComponent implements OnInit {
       }
     })
     if (contador === 0) {
-      this.progreso = false;
       this.ControlarBotones(false, true);
     }
     else {
-      this.progreso = false;
       this.ControlarBotones(true, false);
     }
   }
@@ -1100,7 +1088,6 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GURADAR DATOS EN BASE DE DATOS
   GuardarPlanificacion() {
-    this.progreso = true;
     let contador = 0;
 
     let datos = {
@@ -1155,7 +1142,6 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
-        this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
@@ -1163,14 +1149,12 @@ export class PlanificacionMultipleComponent implements OnInit {
         this.cargar = true;
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
         timeOut: 6000,
       });

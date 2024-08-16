@@ -266,6 +266,7 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
+    console.log('data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 

@@ -29,6 +29,7 @@ export class CrearTimbreComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   documento: boolean = false;
+  documentoBase64: string;
   HabilitarBtn: boolean = false;
 
   // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
@@ -127,6 +128,7 @@ export class CrearTimbreComponent implements OnInit {
       latitud: this.latitud,
       accion: form.accionForm,
       tipo: 'administrar',
+      documento: this.documentoBase64,
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -161,6 +163,17 @@ export class CrearTimbreComponent implements OnInit {
         const name = this.archivoSubido[0].name;
         this.formulario.patchValue({ nombreDocumentoForm: name });
 
+        // CONVERTIR EL ARCHIVO A BASE64
+        try {
+          this.ReducirCalidadYConvertirABase64(this.archivoSubido[0]).then((base64: string) => {
+            this.documentoBase64 = base64;
+          });
+        } catch (error) {
+          this.toastr.error('No se pudo cargar la imagen', 'Imagen', {
+            timeOut: 6000,
+          });
+        }
+
         this.HabilitarBtn = true;
       }
       else {
@@ -169,6 +182,36 @@ export class CrearTimbreComponent implements OnInit {
         });
       }
     }
+  }
+
+  // METODO PARA REDUCIR CALIDAD Y CONVERTIR ARCHIVO A BASE64
+  ReducirCalidadYConvertirABase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          let width = img.width;
+          let height = img.height;
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Convertir a base64 con calidad reducida
+          const quality = 0.9; // Ajusta la calidad según sea necesario (0.0 - 1.0)
+          const base64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(base64);
+        };
+        img.onerror = error => reject(error);
+      };
+      reader.onerror = error => reject(error);
+    });
   }
 
   // LIMPIAR EL NOMBRE DEL ARCHIVO

@@ -593,12 +593,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="text-align: right;">
-                                    <i type="submit" id="cerrar" style="margin-right: 20px;" (click)="LimpiarContrato()"
+                                <div style="text-align: right; margin-top: 5px;">
+                                    <i type="submit" id="cerrar" style="margin-right: 6px;" (click)="LimpiarContrato()"
                                         matSuffix matTooltipPosition="right" matTooltip="Cerrar Registro"
                                         class="fa fa-times-circle">
                                         <p>Cerrar</p>
                                     </i>
+                                    <i type="submit" id="edit" style="margin-right: 6px;"
+                                        (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                    <p>Editar</p>
+                                </i>
                                 </div>
                             </div>
                         </mat-card-content>

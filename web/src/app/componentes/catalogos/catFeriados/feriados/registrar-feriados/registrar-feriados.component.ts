@@ -376,8 +376,9 @@ export class RegistrarFeriadosComponent implements OnInit {
     this.ingresar = 0;
     this.contadorc = 0;
     this.nota = '';
-
     this.habilitarprogress = true;
+    // METODO PARA OMITIR DUPLICADOS
+    this.OmitirDuplicados();
     // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
     this.ciudadesSeleccionadas.map((obj: any) => {
       var buscarCiudad = {
@@ -425,6 +426,22 @@ export class RegistrarFeriadosComponent implements OnInit {
       }
       this.CerrarVentana(id);
     }
+  }
+
+  // METODO PARA OMITIR DUPLICADOS
+  // METODO PARA DEPURAR LISTA DE CIUDADES
+  OmitirDuplicados() {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados = this.ciudadesSeleccionadas.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_feriado === objeto.id_feriado) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.ciudadesSeleccionadas = verificados;
   }
 
   // METODO PARA LIMPIAR FORMULARIO

@@ -1,9 +1,7 @@
 // IMPORTAR LIBRERIAS
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ThemePalette } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
@@ -27,12 +25,6 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 export class EliminarIndividualComponent implements OnInit {
 
   @Input() datosEliminar: any;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // CONTROL DE BOTONES
   cerrar_ventana: boolean = true;
@@ -196,7 +188,6 @@ export class EliminarIndividualComponent implements OnInit {
 
     let total = this.horariosSeleccionados.length * this.datosEliminar.usuario.length;
     let contador = 0;
-    this.progreso = true;
 
     let datos = {
       id_plan: [],
@@ -235,21 +226,18 @@ export class EliminarIndividualComponent implements OnInit {
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
     this.restP.EliminarRegistro(eliminar).subscribe(datos => {
       if (datos.message === 'OK') {
-        this.progreso = false;
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
           'Intentar eliminar los registros nuevamente.', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
       });

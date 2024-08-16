@@ -216,8 +216,8 @@ class RolesControlador {
             }
         });
     }
-    //CONSULTA PARA actualizar roles a varios usuarios **USADO
-    UpdateRoles(req, res) {
+    // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS **USADO
+    ActualizarRolUusuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { idRol, listaUsuarios } = req.body;
@@ -227,17 +227,17 @@ class RolesControlador {
           UPDATE eu_usuarios
           SET id_rol = $1 
           WHERE id = $2
-        `, [idRol, item.id]);
+          `, [idRol, item.id]);
                     if (res.rowCount != 0) {
                         cont = cont + 1;
                     }
                 }));
                 setTimeout(() => {
                     if (cont == listaUsuarios.length) {
-                        return res.status(200).jsonp({ message: 'Se a actualizado todos los usuarios', status: 200 });
+                        return res.status(200).jsonp({ message: 'Se ha actualizado todos los registros.', status: 200 });
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos usuarios no se actualizaron', status: 404 });
+                        return res.status(404).jsonp({ message: 'Revisar los datos, algunos registros no se actualizaron.', status: 404 });
                     }
                 }, 1500);
             }

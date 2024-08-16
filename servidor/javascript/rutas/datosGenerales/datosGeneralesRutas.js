@@ -40,6 +40,8 @@ class CiudadRutas {
         this.router.post('/informacion-general-ubicacion/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesUbicacion);
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarUsuariosSucursal);
+        //-------------------------------- METODOS APP MOVIL -------------------------------------------------------------
+        this.router.get('/datos_generales/ver/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesParaMovil);
     }
 }
 const DATOS_GENERALES_RUTAS = new CiudadRutas();
