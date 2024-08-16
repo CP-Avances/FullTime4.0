@@ -986,12 +986,12 @@ class ContratoEmpleadoControlador {
                 `
                 , [id]);
 
-            console.log('contrato_vigente: ',contrato_vigente.rows[0]);
-
             if(contrato_vigente.rows[0] == undefined || contrato_vigente.rows[0] == ""){
+                console.log('contrato_vigente: ',contrato_vigente.rows[0]);
+
                 await pool.query(
                     `
-                    DELETE FROM eu_empleado_contratos WHERE id_contrato = $1
+                    DELETE FROM eu_empleado_contratos WHERE id = $1
                     `
                     , [id]);
 

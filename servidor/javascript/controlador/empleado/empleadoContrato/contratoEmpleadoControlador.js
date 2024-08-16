@@ -891,10 +891,10 @@ class ContratoEmpleadoControlador {
                 const contrato_vigente = yield database_1.default.query(`
                 SELECT * FROM contrato_cargo_vigente WHERE id_contrato = $1
                 `, [id]);
-                console.log('contrato_vigente: ', contrato_vigente.rows[0]);
                 if (contrato_vigente.rows[0] == undefined || contrato_vigente.rows[0] == "") {
+                    console.log('contrato_vigente: ', contrato_vigente.rows[0]);
                     yield database_1.default.query(`
-                    DELETE FROM eu_empleado_contratos WHERE id_contrato = $1
+                    DELETE FROM eu_empleado_contratos WHERE id = $1
                     `, [id]);
                     return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
                 }
