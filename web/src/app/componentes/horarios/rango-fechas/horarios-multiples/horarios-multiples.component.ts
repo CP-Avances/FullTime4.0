@@ -33,8 +33,7 @@ export class HorariosMultiplesComponent implements OnInit {
   @Input() pagina: any;
 
   // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  progreso_: boolean = false;
+  //progreso: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
@@ -328,7 +327,6 @@ export class HorariosMultiplesComponent implements OnInit {
   usuarios: any = [];
   // METODO PARA VERIFICAR QUE LOS USUARIOS NO DUPLIQUEN SU ASIGNACION DE HORARIO
   VerificarDuplicidad(form: any) {
-    this.progreso = true;
     this.guardar = false;
     this.cargar = false;
     this.observaciones = false;
@@ -358,7 +356,6 @@ export class HorariosMultiplesComponent implements OnInit {
           if (duplicados.length === this.datos.length) {
             this.ControlarBotones(false, true, true, false, true);
             this.observaciones = true;
-            this.progreso = false;
           }
           else {
             this.VerificarContrato(form, correctos);
@@ -417,7 +414,6 @@ export class HorariosMultiplesComponent implements OnInit {
             if (sin_contrato.length === correctos.length) {
               this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
-              this.progreso = false;
             }
             else {
               this.ValidarHorarioByHorasTrabaja(form, contrato);
@@ -485,7 +481,6 @@ export class HorariosMultiplesComponent implements OnInit {
             if (horas_incorrectas.length === correctos.length) {
               this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
-              this.progreso = false;
             }
             else {
               // FINALIZACION DEL CICLO
@@ -528,7 +523,6 @@ export class HorariosMultiplesComponent implements OnInit {
             if (horas_incorrectas.length === correctos.length) {
               this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
-              this.progreso = false;
             }
             else {
               // FINALIZACION DEL CICLO
@@ -892,7 +886,6 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
     if (this.plan_general.length > 99200) {
-      this.progreso = false;
       this.guardar = false;
       this.cargar = false;
       this.toastr.error(
@@ -902,7 +895,6 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     }
     else {
-      this.progreso = false;
       this.guardar = true;
       this.btn_eliminar = false;
       this.cargar = false;
@@ -962,7 +954,6 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA INGRESAR DATOS DE HORARIO
   contador: number = 0;
   InsertarEmpleadoHorario(form: any) {
-    this.progreso = true;
     this.eliminar_horarios = [];
     this.eliminar = [];
     this.contar_eliminar = 0;
@@ -1024,13 +1015,11 @@ export class HorariosMultiplesComponent implements OnInit {
         this.GuardarInformacion();
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error. Verificar registro de planificación.', '', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error. Verificar registro de planificación.', '', {
         timeOut: 6000,
       });
@@ -1046,7 +1035,6 @@ export class HorariosMultiplesComponent implements OnInit {
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
-        this.progreso = false;
         this.cargar = true;
         this.guardar = false;
         this.toastr.success(
@@ -1055,7 +1043,6 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       }
       else {
-        this.progreso = false;
         this.toastr.error(
           'Ups!!! algo salio mal.', '', {
           timeOut: 6000,
@@ -1257,7 +1244,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
-    this.progreso = true;
     let datos = {
       id_plan: this.eliminar,
       user_name: this.user_name,
@@ -1266,7 +1252,6 @@ export class HorariosMultiplesComponent implements OnInit {
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
     this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
-        this.progreso = false;
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
           timeOut: 6000,
         });
@@ -1276,13 +1261,11 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
       });

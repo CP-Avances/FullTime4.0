@@ -1,5 +1,5 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, ThemePalette } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
@@ -38,12 +38,6 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 export class RegistroPlanHorarioComponent implements OnInit {
 
   @Input() datoEmpleado: any;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl();
@@ -864,9 +858,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.ControlarBotones(true, false);
     }
     else {
-      if (opcion === 2) {
-        this.progreso = true;
-      }
       this.CrearPlanGeneral(datos, opcion);
     }
   }
@@ -1049,7 +1040,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.ControlarBotones(true, false);
     }
     else {
-      this.progreso = true;
       this.CrearPlanGeneral(datos, opcion);
     }
   }
@@ -1196,7 +1186,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
-        this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {
           timeOut: 6000,
         });
@@ -1204,14 +1193,12 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.ver_guardar = false;
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });

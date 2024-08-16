@@ -1,9 +1,7 @@
 // IMPORTAR LIBRERIAS
 import * as moment from 'moment';
 import { Router } from '@angular/router';
-import { ThemePalette } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 
@@ -31,12 +29,6 @@ import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/h
 export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   @Input() data_horario: any;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLE DE ALMACENAMIENTO
   horarios: any = [];
@@ -500,7 +492,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
-        this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
@@ -511,7 +502,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         this.cargar = true;
       }
       else {
-        this.progreso = false;
         this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
@@ -519,7 +509,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         this.cargar = false;
       }
     }, error => {
-      this.progreso = false;
       this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
@@ -710,7 +699,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         })
       }
     })
-    this.progreso = true;
     // METODO PARA REGISTTRAR LA PLANIFICACION
     this.InsertarPlanificacion(form);
   }
@@ -796,9 +784,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let sumaN = 0;
     let sumaL = 0;
 
-    // VARIABLE DE SPINNER
-    this.progreso = true;
-
     // ALMACENAMIENTO DE LOS DATOS A ELIMINAR
     let datos = {
       id_plan: [],
@@ -857,7 +842,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
             // SI LAS PASADAS SON IGUALES AL TOTAL DE HORARIOS A ELIMINAR
             if (verificador === this.eliminar_horarios.length) {
               // FINALIZA EL PROCESO
-              this.progreso = false;
               this.ControlarBotones(true, true, true, false, false);
               if (eliminar === fechas) {
                 this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
@@ -887,7 +871,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         verificador = verificador + 1;
         vacio = vacio + 1;
         if (verificador === this.eliminar_horarios.length) {
-          this.progreso = false;
           this.ControlarBotones(true, true, true, false, false);
           // SI NO EXISTEN DATOS SE NOTIFICA AL USUARIO
           if (vacio === this.eliminar_horarios.length) {
@@ -908,7 +891,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   // METODO PARA ENVIAR MENSAJE - ERROR
   EmitirMensajeNovedad(verificador: any, guardar: boolean, eliminar: boolean, cerrar: boolean, resetear: boolean, nuevo: boolean) {
     if (verificador === this.eliminar_horarios.length) {
-      this.progreso = false;
       this.ControlarBotones(guardar, eliminar, cerrar, resetear, nuevo);
       this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
