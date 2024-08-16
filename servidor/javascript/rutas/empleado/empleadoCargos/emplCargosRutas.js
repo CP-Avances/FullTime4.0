@@ -42,6 +42,8 @@ class EmpleadosCargpsRutas {
         this.router.post('/fecha_cargo/editar', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarCargosFechaEditar);
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargoActual);
+        //METODO PARA ELIMINAR EL CARGO REGISTRADO DE LA TABLA EU_EMPLEADOS_CARGOS **USADO
+        this.router.post('/eliminarCargo', [verificarToken_1.TokenValidation], emplCargosControlador_1.default.EliminarCargo);
         /** ****************************************************************************************** **
          ** **                    METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **
          ** ****************************************************************************************** **/

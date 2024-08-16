@@ -39,6 +39,11 @@ export class EmplCargosService {
     return this.http.post<any>(`${environment.url}/empleadoCargos/cargo-activo`, data);
   }
 
+  // METODO PARA ELIMINAR EL CARGO POR EL ID **USADO
+  EliminarCargo(data: any) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/eliminarCargo`, data);
+  }
+
 
 
   // METODO PARA REGISTRAR CARGO   **USADO
