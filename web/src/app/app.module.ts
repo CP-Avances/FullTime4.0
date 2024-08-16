@@ -310,7 +310,7 @@ import { ProgressService } from './componentes/administracionGeneral/progress/pr
 import { TokenInterceptorService } from './servicios/login/token-interceptor.service';
 // PARAMETRIZACION
 import { MainNavService } from './componentes/administracionGeneral/main-nav/main-nav.service';
-// REPORTES  
+// REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
 

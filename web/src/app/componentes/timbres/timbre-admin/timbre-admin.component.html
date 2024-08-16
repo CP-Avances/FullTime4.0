@@ -1,5 +1,5 @@
 <!--  ************************** LISTA DE TIMBRES DEL USUARIO SELECCIONADO ************************************ -->
-<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="lista">
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="lista && !verJustificacion">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">LISTA DE TIMBRES DE {{selec_nombre.toUpperCase()}}
             <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarTabla()" matSuffix
@@ -59,7 +59,8 @@
                         <td class="justify-content-center">
                           <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
                               matTooltip="Ver justificación"
-                              *ngIf="t.documento" (click)="VerJustificacion(t.documento)">
+                              *ngIf="t.documento" (click)="VerJustificacion(t.documento)"
+                              fontSet="material-icons-outlined">
                               image
                           </mat-icon>
                       </td>
@@ -75,7 +76,7 @@
 </div>
 
 <!--  ************************** LISTA DE USUARIOS REGISTRADOS EN EL SISTEMA ************************************ -->
-<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;">
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;" *ngIf="!verJustificacion">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">
             ADMINISTRACIÓN DE TIMBRES
@@ -150,3 +151,21 @@
         <br>
     </div>
 </div>
+
+
+<!--Ver justifcicaion-->
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="verJustificacion">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            JUSTIFICACIÓN
+            <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarJustificacion()" matSuffix
+                matTooltipPosition="right" matTooltip="Cerrar justificación seleccionada." id="cerrar">
+                highlight_off
+            </mat-icon>
+        </div>
+        <mat-card appearance="outlined">
+          <mat-card-content>
+            <img mat-card-image [src]="justificacion" alt="Justificación" id="justificacion">
+          </mat-card-content>
+        </mat-card>
+    </div>
