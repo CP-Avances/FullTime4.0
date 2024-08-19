@@ -245,6 +245,7 @@ export class MainNavComponent implements OnInit {
   showMessageLicencia: Boolean = false;
   FuncionLicencia() {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
+    console.log(licencia);
     if (licencia !== null) {
       const fec_caducidad = new Date(licencia.split('.')[0])
       const fecha_hoy = new Date();

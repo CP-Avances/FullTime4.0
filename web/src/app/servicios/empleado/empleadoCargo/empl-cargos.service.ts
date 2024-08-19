@@ -40,7 +40,7 @@ export class EmplCargosService {
 
   // METODO PARA ELIMINAR EL CARGO POR EL ID **USADO
   EliminarCargo(data: any) {
-    return this.http.post<any>(`${environment.url}/empleadoCargos/eliminarCargo`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/eliminarCargo`, data);
   }
 
 

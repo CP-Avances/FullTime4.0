@@ -265,7 +265,7 @@ export class EmpleadoService {
 
   // METODO PARA ELIMINAR EL CARGO POR EL ID **USADO
   EliminarContrato(id: any, data: any) {
-    return this.http.post<any>(`${environment.url}/contratoEmpleado/eliminarContrato/${id}`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/eliminarContrato/${id}`, data);
   }
 
   // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO

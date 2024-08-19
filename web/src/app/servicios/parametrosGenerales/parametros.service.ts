@@ -18,7 +18,8 @@ export class ParametrosService {
 
   // BUSCAR LISTA DE PARAMETROS  **USADO
   ListarParametros() {
-    return this.http.get<any>(`${(this.url as string)}/parametrizacion`);
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion`);
   }
 
 

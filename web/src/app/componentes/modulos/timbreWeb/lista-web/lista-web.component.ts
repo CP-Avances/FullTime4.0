@@ -447,6 +447,7 @@ export class ListaWebComponent implements OnInit {
           this.idSucursalesAcceso_dh.has(cargo.id_suc) && this.idCargosAcceso_dh.has(cargo.id)
         );
       }
+      
       if (this.empleados_dh.length > 0) {
         this.inactivar = true;
       } else {
@@ -1366,7 +1367,7 @@ export class ListaWebComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 39);
+      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 42);
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -1376,7 +1377,7 @@ export class ListaWebComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 39);
+      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 42);
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
