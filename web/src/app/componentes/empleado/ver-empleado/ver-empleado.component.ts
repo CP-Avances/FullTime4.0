@@ -1049,7 +1049,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA LIMPIAR REGISTRO
   LimpiarCargo() {
     this.cargoSeleccionado = [];
-    this.listaCargos = [];
+    //this.listaCargos = [];
     this.cargoForm.reset();
   }
 
