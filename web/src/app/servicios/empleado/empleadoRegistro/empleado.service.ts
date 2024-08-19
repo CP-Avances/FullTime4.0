@@ -259,7 +259,7 @@ export class EmpleadoService {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato/${id}`);
   }
 
-  // METODO PARA ELIMINAR EL CARGO POR EL ID **USADO
+  // METODO PARA ELIMINAR EL CONTRATO POR EL ID         **USADO
   EliminarContrato(id: any, data: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/eliminarContrato/${id}`, data);
   }

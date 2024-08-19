@@ -247,7 +247,13 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EL REGISTRO ENTRA O NO A VERIFICACION DE DUPLICIDAD
   VerificarDatos(datos: any, form: any) {
-    if (datos.fec_ingreso === this.contrato.fecha_ingreso) {
+    /*console.log('datos contrato ', datos, ' contrato ', this.contrato)
+    console.log('datos inicio ', moment(datos.fec_ingreso).format('YYYY-MM-DD'))
+    console.log('datos fin ', moment(datos.fec_salida).format('YYYY-MM-DD'))
+    console.log('contrato inicio ', moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD'))
+    console.log('contrato fin ', moment(this.contrato.fecha_salida).format('YYYY-MM-DD'))*/
+    if (moment(datos.fec_ingreso).format('YYYY-MM-DD') === moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD') &&
+      moment(datos.fec_salida).format('YYYY-MM-DD') === moment(this.contrato.fecha_salida).format('YYYY-MM-DD')) {
       this.VerificarInformacion(datos, form);
     }
     else {
@@ -300,7 +306,7 @@ export class EditarContratoComponent implements OnInit {
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;

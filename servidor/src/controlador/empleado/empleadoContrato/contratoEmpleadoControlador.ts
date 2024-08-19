@@ -975,36 +975,20 @@ class ContratoEmpleadoControlador {
     }
 
     //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
-    public async EliminarContrato(req: Request, res: Response): Promise<any>{
+    public async EliminarContrato(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
-        console.log('idContrato: ',id);
         try {
-
-            const contrato_vigente = await pool.query(
+            await pool.query(
                 `
-                SELECT * FROM contrato_cargo_vigente WHERE id_contrato = $1
+                DELETE FROM eu_empleado_contratos WHERE id = $1
                 `
                 , [id]);
 
-            if(contrato_vigente.rows[0] == undefined || contrato_vigente.rows[0] == ""){
-                console.log('contrato_vigente: ',contrato_vigente.rows[0]);
+            return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 
-                await pool.query(
-                    `
-                    DELETE FROM eu_empleado_contratos WHERE id = $1
-                    `
-                    , [id]);
-
-                    return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
-
-            }else{
-                return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro', status: '300' });
-            }
-
-        }catch (error) {
+        } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            error = true;
             return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
         }
     }

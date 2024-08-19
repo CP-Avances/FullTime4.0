@@ -93,7 +93,7 @@ class EmpleadoCargosControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado exitosamente.' });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -243,7 +243,7 @@ class EmpleadoCargosControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado exitosamente.' });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -466,7 +466,7 @@ class EmpleadoCargosControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -844,7 +844,7 @@ class EmpleadoCargosControlador {
   public async CargarPlantilla_cargos(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body;
     let error: boolean = false;
-  
+
     for (const data of plantilla) {
       try {
         const { cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
@@ -913,7 +913,7 @@ class EmpleadoCargosControlador {
           `
           , [id_contrato]);
 
-         console.log('response: ',response.rows[0]);
+        console.log('response: ', response.rows[0]);
 
         await pool.query(
           `
@@ -923,7 +923,7 @@ class EmpleadoCargosControlador {
           , [id_last_cargo.rows[0].id, false]);
 
         await pool.query(
-            `
+          `
             UPDATE eu_empleado_cargos set estado = $2 
             WHERE id = $1 AND estado = 'false' RETURNING *
             `
@@ -961,48 +961,31 @@ class EmpleadoCargosControlador {
     }
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
-    }else{
+    }
+    else {
       return res.status(200).jsonp({ message: 'ok' });
     }
-
-    
-
   }
 
-  //ELIMINAR REGISTRO DEL CARGO SELECCIONADO **USADO
-  public async EliminarCargo(req: Request, res: Response): Promise<any>{
+  // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
+  public async EliminarCargo(req: Request, res: Response): Promise<any> {
     const { id } = req.body;
-    console.log('idCargo: ',id);
     try {
+      await pool.query(
+        `
+        DELETE FROM eu_empleado_cargos WHERE id = $1
+        `
+        , [id]);
 
-        const cargo_vigente = await pool.query(
-            `
-            SELECT * FROM contrato_cargo_vigente WHERE id_cargo = $1
-            `
-            , [id]);
+      return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 
-        console.log('contrato_vigente: ',cargo_vigente.rows[0]);
-
-        if(cargo_vigente.rows[0] == undefined || cargo_vigente.rows[0] == ""){
-            await pool.query(
-                `
-                DELETE FROM eu_empleado_cargos WHERE id = $1
-                `
-                , [id]);
-
-                return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
-
-        }else{
-            return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro', status: '300' });
-        }
-
-    }catch (error) {
-        // REVERTIR TRANSACCION
-        await pool.query('ROLLBACK');
-        error = true;
-        return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+    } catch (error) {
+      //console.log('error ', error)
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'No fue posible eliminar.' });
     }
-}
+  }
 
 }
 

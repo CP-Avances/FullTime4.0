@@ -111,7 +111,7 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ObtenerInformacionGeneral(1).subscribe(data => {
-      console.log('data',data);
+      console.log('data', data);
       this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       console.log(this.datosEmpleado);
     });
@@ -137,8 +137,13 @@ export class TimbreAdminComponent implements OnInit {
       this.lista = true;
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach((data: any) => {
-        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+        //console.log('ver timbre ', data.fecha_hora_timbre_servidor)
+        let fecha: any = data.fecha_hora_timbre;
+        if (data.fecha_hora_timbre_servidor) {
+          fecha = data.fecha_hora_timbre_servidor;
+        }
+        data.fecha = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(fecha.split(' ')[1], this.formato_hora);
         if (data.tecla_funcion === '0') {
           data.tecla_funcion_ = 'Entrada';
         }

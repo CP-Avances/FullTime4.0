@@ -434,6 +434,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
     }, vacio => {
       this.BuscarContratoActual(formato_fecha);
+      this.cargoEmpleado = [];
     });
   }
 
@@ -868,6 +869,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarIDContratoActual(parseInt(this.idEmpleado)).subscribe(datos => {
       this.datoActual.id_contrato = datos[0].id_contrato;
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
+    }, vacio => {
+      this.contratoEmpleado = [];
     });
   }
 
@@ -944,62 +947,41 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.btnActualizarCargo = true;
   }
 
-  EliminarDatos(dataContrato: any){
-    console.log('va a eliminar datos contrato: ',dataContrato)
+  // METODO PARA ELIMINAR CONTRATOS
+  EliminarDatos(dataContrato: any) {
     const idContrato = dataContrato.id;
     this.restEmpleado.EliminarContrato(idContrato, dataContrato).subscribe({
       next: (res: any) => {
-        if(res.status != '200'){
-          this.toastr.warning(res.message, 'VERIFICAR', {
+        if (res.status != '200') {
+          this.toastr.warning(res.message, 'VERIFICAR.', {
             timeOut: 4500,
           });
-        }else{
-          this.toastr.success(res.message, 'Correcto', {
+        } else {
+          this.toastr.success(res.message, 'Correcto.', {
             timeOut: 4500,
           });
+          this.VerDatosActuales(this.formato_fecha);
         }
       }, error: (err: any) => {
-        this.toastr.warning(err.message, 'Error', {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 4500,
         });
       }
     })
   }
 
-  EliminarDatosCargos(dataCargo: any){
-    console.log('va a eliminar datos cargo: ',dataCargo)
-    const data = { id: dataCargo};
-    this.restCargo.EliminarCargo(data).subscribe({
-      next: (res: any) => {
-        if(res.status != '200'){
-          this.toastr.warning(res.message, 'VERIFICAR', {
-            timeOut: 4500,
-          });
-        }else{
-          this.toastr.success(res.message, 'Correcto', {
-            timeOut: 4500,
-          });
-        }
-      }, error: (err: any) => {
-        this.toastr.warning(err.message, 'Error', {
-          timeOut: 4500,
-        });
-      }
-    })
-  }
-
-  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+  // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS
   ConfirmarEliminacionDatos(data: any, tipo: string) {
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          if(tipo === 'contrato'){
+          if (tipo === 'contrato') {
             this.EliminarDatos(data);
-          }else{
+          }
+          else {
             this.EliminarDatosCargos(data);
           }
-          
         }
       });
   }
@@ -1031,7 +1013,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   /** ** ***************************************************************************************** **
    ** ** **                  METODOS PARA MANEJO DE DATOS DE CARGO                              ** **
    ** ******************************************************************************************** **/
-
 
   // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
@@ -1160,6 +1141,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
+  }
+
+  // METODO PARA ELIMINAR DATOS DE CARGO
+  EliminarDatosCargos(dataCargo: any) {
+    const data = { id: dataCargo };
+    this.restCargo.EliminarCargo(data).subscribe({
+      next: (res: any) => {
+        if (res.status != '200') {
+          this.toastr.warning(res.message, 'VERIFICAR', {
+            timeOut: 4500,
+          });
+        } else {
+          this.toastr.success(res.message, 'Correcto.', {
+            timeOut: 4500,
+          });
+          this.VerDatosActuales(this.formato_fecha);
+        }
+      }, error: (err: any) => {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 4500,
+        });
+      }
+    })
   }
 
 

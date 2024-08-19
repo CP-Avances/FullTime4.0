@@ -413,7 +413,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Regimen:</label>
+                                            <label id="datosF">Régimen Laboral:</label>
                                             <label>{{ce.descripcion}}</label>
                                         </div>
                                     </div>
@@ -491,8 +491,10 @@
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro" class="far fa-trash-alt">
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Elimina los datos generales de este registro"
+                                        class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
                                 </div>
@@ -517,7 +519,8 @@
                                         <mat-label>Período del contrato</mat-label>
                                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                             matTooltip="Lista de contratos del empleado">
-                                            help_outline</mat-icon>
+                                            help_outline
+                                        </mat-icon>
                                         <mat-select [formControl]="fechaContrato">
                                             <mat-option *ngFor="let c of contratoBuscado" [value]="c.id"
                                                 (click)="ObtenerContratoSeleccionado(contratoForm.value)">
@@ -531,7 +534,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Regimen:</label>
+                                            <label id="datosF">Régimen Laboral:</label>
                                             <label>{{ce.descripcion}}</label>
                                         </div>
                                     </div>
@@ -731,8 +734,10 @@
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro" class="far fa-trash-alt">
+                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Elimina los datos generales de este registro"
+                                        class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
                                 </div>
@@ -871,14 +876,16 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div style="text-align: right; margin-top: 5px;">
-                                            <i type="submit" id="cerrar" style="margin-right: 6px;" (click)="LimpiarCargo()"
-                                                matSuffix matTooltipPosition="right" matTooltip="Cerrar Registro"
-                                                class="fa fa-times-circle">
+                                            <i type="submit" id="cerrar" style="margin-right: 6px;"
+                                                (click)="LimpiarCargo()" matSuffix matTooltipPosition="right"
+                                                matTooltip="Cerrar Registro" class="fa fa-times-circle">
                                                 <p>Cerrar</p>
                                             </i>
                                             <i type="submit" id="edit" style="margin-right: 6px;"
-                                                (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                                (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)"
+                                                matSuffix matTooltipPosition="right"
+                                                matTooltip="Modificar los datos generales de este registro"
+                                                class="fas fa-edit">
                                                 <p>Editar</p>
                                             </i>
                                         </div>
