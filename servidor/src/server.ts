@@ -130,92 +130,94 @@ class Servidor {
     }
 
     rutas(): void {
-        this.app.use('/server', indexRutas);
-        this.app.use('/server/login', LOGIN_RUTA);
+        const ruta: any = 'server';
+
+        this.app.use(`/${ruta}`, indexRutas);
+        this.app.use(`/${ruta}/login`, LOGIN_RUTA);
 
         // EMPRESA
-        this.app.use('/server/parametrizacion', PARAMETROS_RUTAS);
-        this.app.use('/server/empresas', EMPRESA_RUTAS);
-        this.app.use('/server/provincia', PROVINCIA_RUTA);
-        this.app.use('/server/ciudades', CIUDAD_RUTAS);
-        this.app.use('/server/nacionalidades', NACIONALIDADES_RUTAS);
-        this.app.use('/server/sucursales', SUCURSAL_RUTAS);
-        this.app.use('/server/feriados', FERIADOS_RUTA);
-        this.app.use('/server/ciudadFeriados', CIUDAD_FERIADOS_RUTAS);
-        this.app.use('/server/regimenLaboral', REGIMEN_RUTA);
-        this.app.use('/server/departamento', DEPARTAMENTO_RUTA);
-        this.app.use('/server/autorizaDepartamento', AUTORIZA_DEPARTAMENTO_RUTAS);
-        this.app.use('/server/nivel-titulo', NIVEL_TITULO_RUTAS);
-        this.app.use('/server/titulo', TITULO_RUTAS);
-        this.app.use('/server/horario', HORARIO_RUTA);
-        this.app.use('/server/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
-        this.app.use('/server/planificacionHoraria', PLANIFICACION_HORARIA_RUTAS);
-        this.app.use('/server/rol', ROLES_RUTAS);
-        this.app.use('/server/rolPermisos', ROL_PERMISOS_RUTAS);
-        this.app.use('/server/relojes', RELOJES_RUTA);
-        this.app.use('/server/modalidadLaboral', MODALIDAD_LABORAL_RUTAS);
-        this.app.use('/server/tipoCargos', TIPO_CARGOS_RUTAS);
-        this.app.use('/server/discapacidades', DISCAPACIDADES_RUTAS);
-        this.app.use('/server/vacunasTipos', TIPO_VACUNAS_RUTAS);
-        this.app.use('/server/archivosCargados', DOCUMENTOS_RUTAS);
-        this.app.use('/server/birthday', BIRTHDAY_RUTAS);
+        this.app.use(`/${ruta}/parametrizacion`, PARAMETROS_RUTAS);
+        this.app.use(`/${ruta}/empresas`, EMPRESA_RUTAS);
+        this.app.use(`/${ruta}/provincia`, PROVINCIA_RUTA);
+        this.app.use(`/${ruta}/ciudades`, CIUDAD_RUTAS);
+        this.app.use(`/${ruta}/nacionalidades`, NACIONALIDADES_RUTAS);
+        this.app.use(`/${ruta}/sucursales`, SUCURSAL_RUTAS);
+        this.app.use(`/${ruta}/feriados`, FERIADOS_RUTA);
+        this.app.use(`/${ruta}/ciudadFeriados`, CIUDAD_FERIADOS_RUTAS);
+        this.app.use(`/${ruta}/regimenLaboral`, REGIMEN_RUTA);
+        this.app.use(`/${ruta}/departamento`, DEPARTAMENTO_RUTA);
+        this.app.use(`/${ruta}/autorizaDepartamento`, AUTORIZA_DEPARTAMENTO_RUTAS);
+        this.app.use(`/${ruta}/nivel-titulo`, NIVEL_TITULO_RUTAS);
+        this.app.use(`/${ruta}/titulo`, TITULO_RUTAS);
+        this.app.use(`/${ruta}/horario`, HORARIO_RUTA);
+        this.app.use(`/${ruta}/detalleHorario`, DETALLE_CATALOGO_HORARIO_RUTAS);
+        this.app.use(`/${ruta}/planificacionHoraria`, PLANIFICACION_HORARIA_RUTAS);
+        this.app.use(`/${ruta}/rol`, ROLES_RUTAS);
+        this.app.use(`/${ruta}/rolPermisos`, ROL_PERMISOS_RUTAS);
+        this.app.use(`/${ruta}/relojes`, RELOJES_RUTA);
+        this.app.use(`/${ruta}/modalidadLaboral`, MODALIDAD_LABORAL_RUTAS);
+        this.app.use(`/${ruta}/tipoCargos`, TIPO_CARGOS_RUTAS);
+        this.app.use(`/${ruta}/discapacidades`, DISCAPACIDADES_RUTAS);
+        this.app.use(`/${ruta}/vacunasTipos`, TIPO_VACUNAS_RUTAS);
+        this.app.use(`/${ruta}/archivosCargados`, DOCUMENTOS_RUTAS);
+        this.app.use(`/${ruta}/birthday`, BIRTHDAY_RUTAS);
         // EMPLEADOS
-        this.app.use('/server/empleado', EMPLEADO_RUTAS);
-        this.app.use('/server/usuarios', USUARIO_RUTA);
-        this.app.use('/server/discapacidad', DISCAPACIDAD_RUTAS);
-        this.app.use('/server/contratoEmpleado', CONTRATO_EMPLEADO_RUTAS);
-        this.app.use('/server/empleadoCargos', EMPLEADO_CARGO_RUTAS);
-        this.app.use('/server/empleadoHorario', EMPLEADO_HORARIOS_RUTAS);
-        this.app.use('/server/vacunas', VACUNA_RUTAS);
-        this.app.use('/server/timbres', TIMBRES_RUTAS);
-        this.app.use('/server/planificacion_general', PLAN_GENERAL_RUTAS);
-        this.app.use('/server/plantillaD', PLANTILLA_RUTAS);
-        this.app.use('/server/generalidades', DATOS_GENERALES_RUTAS);
-        this.app.use('/server/notificacionSistema', NOTIFICACION_RUTAS);
-        this.app.use('/server/metricas', GRAFICAS_RUTAS);
+        this.app.use(`/${ruta}/empleado`, EMPLEADO_RUTAS);
+        this.app.use(`/${ruta}/usuarios`, USUARIO_RUTA);
+        this.app.use(`/${ruta}/discapacidad`, DISCAPACIDAD_RUTAS);
+        this.app.use(`/${ruta}/contratoEmpleado`, CONTRATO_EMPLEADO_RUTAS);
+        this.app.use(`/${ruta}/empleadoCargos`, EMPLEADO_CARGO_RUTAS);
+        this.app.use(`/${ruta}/empleadoHorario`, EMPLEADO_HORARIOS_RUTAS);
+        this.app.use(`/${ruta}/vacunas`, VACUNA_RUTAS);
+        this.app.use(`/${ruta}/timbres`, TIMBRES_RUTAS);
+        this.app.use(`/${ruta}/planificacion_general`, PLAN_GENERAL_RUTAS);
+        this.app.use(`/${ruta}/plantillaD`, PLANTILLA_RUTAS);
+        this.app.use(`/${ruta}/generalidades`, DATOS_GENERALES_RUTAS);
+        this.app.use(`/${ruta}/notificacionSistema`, NOTIFICACION_RUTAS);
+        this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
         // CON MODULOS
-        this.app.use('/server/autorizaciones', AUTORIZACIONES_RUTAS);
-        this.app.use('/server/noti-real-time', NOTIFICACION_TIEMPO_REAL_RUTAS);
+        this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
+        this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);
         // MODULO PERMISOS
-        this.app.use('/server/empleadoPermiso', PERMISOS_RUTAS);
-        this.app.use('/server/tipoPermisos', TIPO_PERMISOS_RUTAS);
+        this.app.use(`/${ruta}/empleadoPermiso`, PERMISOS_RUTAS);
+        this.app.use(`/${ruta}/tipoPermisos`, TIPO_PERMISOS_RUTAS);
         // MODULO VACACIONES
-        this.app.use('/server/perVacacion', PERIODO_VACACION__RUTAS);
-        this.app.use('/server/vacaciones', VACACIONES__RUTAS);
+        this.app.use(`/${ruta}/perVacacion`, PERIODO_VACACION__RUTAS);
+        this.app.use(`/${ruta}/vacaciones`, VACACIONES__RUTAS);
         // MODULO HORAS EXTRAS
-        this.app.use('/server/horas-extras-pedidas', HORA_EXTRA_PEDIDA_RUTAS);
-        this.app.use('/server/horasExtras', HORAS_EXTRAS_RUTAS);
-        this.app.use('/server/planificacionHoraExtra', PLAN_HORAS_EXTRAS_RUTAS);
+        this.app.use(`/${ruta}/horas-extras-pedidas`, HORA_EXTRA_PEDIDA_RUTAS);
+        this.app.use(`/${ruta}/horasExtras`, HORAS_EXTRAS_RUTAS);
+        this.app.use(`/${ruta}/planificacionHoraExtra`, PLAN_HORAS_EXTRAS_RUTAS);
         // MODULO GEOLOCALIZACION
-        this.app.use('/server/ubicacion', UBICACION_RUTAS);
+        this.app.use(`/${ruta}/ubicacion`, UBICACION_RUTAS);
         // MODULO ACCIONES DE PERSONAL
-        this.app.use('/server/proceso', PROCESO_RUTA);
-        this.app.use('/server/empleadoProcesos', EMPLEADO_PROCESO_RUTAS);
-        this.app.use('/server/accionPersonal', ACCION_PERSONAL_RUTAS);
+        this.app.use(`/${ruta}/proceso`, PROCESO_RUTA);
+        this.app.use(`/${ruta}/empleadoProcesos`, EMPLEADO_PROCESO_RUTAS);
+        this.app.use(`/${ruta}/accionPersonal`, ACCION_PERSONAL_RUTAS);
         // MODULO ALIMENTACION
-        this.app.use('/server/tipoComidas', TIPO_COMIDAS_RUTA);
-        this.app.use('/server/planComidas', PLAN_COMIDAS_RUTAS);
-        this.app.use('/server/alimentacion', ALIMENTACION_RUTAS);
+        this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
+        this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
+        this.app.use(`/${ruta}/alimentacion`, ALIMENTACION_RUTAS);
         // MODULO RELOJ VIRTUAL
-        this.app.use('/server/reloj-virtual', RELOJ_VIRTUAL_RUTAS);
+        this.app.use(`/${ruta}/reloj-virtual`, RELOJ_VIRTUAL_RUTAS);
         // REPORTES
-        this.app.use('/server/asistencia', ASISTENCIA_RUTAS);
-        this.app.use('/server/reportes/vacacion', KARDEX_VACACION_RUTAS);
-        this.app.use('/server/reportes/hora-extra', REPORTE_HORA_EXTRA_RUTAS);
-        this.app.use('/server/reporte', REPORTES_RUTAS);
-        this.app.use('/server/reporte-faltas/', FALTAS_RUTAS);
-        this.app.use('/server/reportes-asistencias/', REPORTES_A_RUTAS);
-        this.app.use('/server/reporte-salidas-antes/', SALIDAS_ANTICIPADAS_RUTAS);
-        this.app.use('/server/reporte-atrasos/', REPORTES_ATRASOS_RUTAS);
-        this.app.use('/server/reporte-tiempo-laborado/', REPORTES_TIEMPO_LABORADO_RUTAS);
-        this.app.use('/server/reporte-timbres-mrl/', REPORTES_TIMBRES_MRL_RUTAS);
-        this.app.use('/server/reportes-auditoria', AUDITORIA_RUTAS);
-        this.app.use('/server/empleado-vacunas-multiples', VACUNAS_REPORTE_RUTAS);
-        this.app.use('/server/empleado-vacaciones-solicitudes', VACACIONES_REPORTES_RUTAS);
+        this.app.use(`/${ruta}/asistencia`, ASISTENCIA_RUTAS);
+        this.app.use(`/${ruta}/reportes/vacacion`, KARDEX_VACACION_RUTAS);
+        this.app.use(`/${ruta}/reportes/hora-extra`, REPORTE_HORA_EXTRA_RUTAS);
+        this.app.use(`/${ruta}/reporte`, REPORTES_RUTAS);
+        this.app.use(`/${ruta}/reporte-faltas/`, FALTAS_RUTAS);
+        this.app.use(`/${ruta}/reportes-asistencias/`, REPORTES_A_RUTAS);
+        this.app.use(`/${ruta}/reporte-salidas-antes/`, SALIDAS_ANTICIPADAS_RUTAS);
+        this.app.use(`/${ruta}/reporte-atrasos/`, REPORTES_ATRASOS_RUTAS);
+        this.app.use(`/${ruta}/reporte-tiempo-laborado/`, REPORTES_TIEMPO_LABORADO_RUTAS);
+        this.app.use(`/${ruta}/reporte-timbres-mrl/`, REPORTES_TIMBRES_MRL_RUTAS);
+        this.app.use(`/${ruta}/reportes-auditoria`, AUDITORIA_RUTAS);
+        this.app.use(`/${ruta}/empleado-vacunas-multiples`, VACUNAS_REPORTE_RUTAS);
+        this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, VACACIONES_REPORTES_RUTAS);
         // FUNCIONES
-        this.app.use('/server/administracion', FUNCIONES_RUTAS);
+        this.app.use(`/${ruta}/administracion`, FUNCIONES_RUTAS);
         // LICENCIAS
-        this.app.use('/server/licencias', LICENCIAS_RUTAS);
+        this.app.use(`/${ruta}/licencias`, LICENCIAS_RUTAS);
     }
 
 

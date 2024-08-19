@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-timbre-admin',
@@ -51,6 +52,9 @@ export class TimbreAdminComponent implements OnInit {
   dataSource: any;
   filtroFechaTimbre = '';
 
+  justificacion: any;
+  verJustificacion: boolean = false;
+
   constructor(
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
@@ -58,6 +62,7 @@ export class TimbreAdminComponent implements OnInit {
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
     private asignaciones: AsignacionesService,
+    private ventana: MatDialog  // VARIABLE MANEJO DE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -165,17 +170,12 @@ export class TimbreAdminComponent implements OnInit {
   }
 
   VerJustificacion(justificacion: any) {
-    // CREAR UNA URL DE DATOS PARA LA IMAGEN EN BASE64
-    const imageUrl = `${justificacion}`;
+    this.justificacion = justificacion;
+    this.verJustificacion = true;
+  }
 
-    // ABRIR LA IMAGEN EN UNA NUEVA PESTAÑA DEL NAVEGADOR
-    const newWindow = window.open(imageUrl, '_blank');
-    if (newWindow) {
-      newWindow.document.write(`<img src="${imageUrl}" alt="Justificación" />`);
-      newWindow.document.title = "Justificación";
-    } else {
-      this.toastr.error('No se pudo abrir la nueva pestaña.');
-    }
+  CerrarJustificacion() {
+    this.verJustificacion = false;
   }
 
   // METODO DE BUSQUEDA DE DATOS DE ACUERDO A LA FECHA INGRESADA
