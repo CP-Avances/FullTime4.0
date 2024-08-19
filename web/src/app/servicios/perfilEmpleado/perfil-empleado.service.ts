@@ -13,7 +13,6 @@ export class PerfilEmpleadoService {
 
   SetImagen(url: string) {
     this.urlImagenSubject.next(url);
-    console.log(url);
   }
 
   GetImagen() {
