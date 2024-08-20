@@ -899,12 +899,14 @@ class EmpleadoCargosControlador {
           `
           , [id_contrato]);
 
-        await pool.query(
-          `
-          UPDATE eu_empleado_cargos set estado = $2 
-          WHERE id = $1 AND estado = 'true' RETURNING *
-          `
-          , [id_last_cargo.rows[0].id, false]);
+         if(id_last_cargo.rows[0] != undefined){
+          await pool.query(
+            `
+            UPDATE eu_empleado_cargos set estado = $2 
+            WHERE id = $1 AND estado = 'true' RETURNING *
+            `
+            , [id_last_cargo.rows[0].id, false]);
+         } 
 
         const response: QueryResult = await pool.query(
           `
