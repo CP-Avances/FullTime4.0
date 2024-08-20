@@ -30,12 +30,14 @@ export class ParametrosService {
 
   // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
-    return this.http.get<any>(`${(this.url as string)}/parametrizacion/ver-parametro/${id}`);
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion/ver-parametro/${id}`);
   }
 
   // METODO PARA LISTAR DETALLES DE PARAMETRO   **USADO
   ListarDetalleParametros(id: number) {
-    return this.http.get<any>(`${(this.url as string)}/parametrizacion/${id}`);
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion/${id}`);
   }
 
   // METODO PARA ELIMINAR DETALLE DE PARAMETRO **USADO
