@@ -777,6 +777,13 @@ class EmpleadoCargosControlador {
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
+                    const id_last_cargo = yield database_1.default.query(`
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
+          `, [id_contrato]);
+                    yield database_1.default.query(`
+          UPDATE eu_empleado_cargos set estado = $2 
+          WHERE id = $1 AND estado = 'true' RETURNING *
+          `, [id_last_cargo.rows[0].id, false]);
                     const response = yield database_1.default.query(`
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
             sueldo, id_tipo_cargo, hora_trabaja, jefe) 
@@ -789,14 +796,7 @@ class EmpleadoCargosControlador {
           VALUES ($1, $2, $3, $4, $5) RETURNING *
           `, [id_empleado, id_departamento, true, true, admin_dep]);
                     const [usuarioDep] = response2.rows;
-                    const id_last_cargo = yield database_1.default.query(`
-           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
-          `, [id_contrato]);
                     console.log('response: ', response.rows[0]);
-                    yield database_1.default.query(`
-          UPDATE eu_empleado_cargos set estado = $2 
-          WHERE id = $1 AND estado = 'true' RETURNING *
-          `, [id_last_cargo.rows[0].id, false]);
                     yield database_1.default.query(`
             UPDATE eu_empleado_cargos set estado = $2 
             WHERE id = $1 AND estado = 'false' RETURNING *

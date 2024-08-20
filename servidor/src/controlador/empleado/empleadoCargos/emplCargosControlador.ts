@@ -702,6 +702,8 @@ class EmpleadoCargosControlador {
             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
             ) {
+              
+
               var VERIFICAR_SUCURSALES = await pool.query(
                 `
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
@@ -772,6 +774,8 @@ class EmpleadoCargosControlador {
               else {
                 valor.observacion = 'Sucursal no existe en el sistema'
               }
+
+
             }
             else {
               valor.observacion = 'Cédula no tiene registrado un contrato'
@@ -889,6 +893,19 @@ class EmpleadoCargosControlador {
           admin_dep = true;
         }
 
+        const id_last_cargo = await pool.query(
+          `
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
+          `
+          , [id_contrato]);
+
+        await pool.query(
+          `
+          UPDATE eu_empleado_cargos set estado = $2 
+          WHERE id = $1 AND estado = 'true' RETURNING *
+          `
+          , [id_last_cargo.rows[0].id, false]);
+
         const response: QueryResult = await pool.query(
           `
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
@@ -907,20 +924,9 @@ class EmpleadoCargosControlador {
           , [id_empleado, id_departamento, true, true, admin_dep]);
         const [usuarioDep] = response2.rows;
 
-        const id_last_cargo = await pool.query(
-          `
-           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
-          `
-          , [id_contrato]);
-
         console.log('response: ', response.rows[0]);
 
-        await pool.query(
-          `
-          UPDATE eu_empleado_cargos set estado = $2 
-          WHERE id = $1 AND estado = 'true' RETURNING *
-          `
-          , [id_last_cargo.rows[0].id, false]);
+        
 
         await pool.query(
           `
