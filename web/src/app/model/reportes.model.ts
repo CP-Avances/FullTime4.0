@@ -512,9 +512,7 @@ export interface ITableTitulos {
 }
 
 export interface ITableFeriados {
-
     descripcion: string,
-
 }
 
 export interface ITableHorarios {

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,7 +25,6 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 })
 
 export class VerHorarioDetalleComponent implements OnInit {
-
   @Input() idHorario: number;
   @Input() pagina: string;
 
@@ -92,6 +92,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     this.datosHorario = [];
     this.rest.BuscarUnHorario(id_horario).subscribe(data => {
       this.datosHorario = data;
+      console.log('horarios ', data)
       this.ColocarTipo();
     })
   }
@@ -143,7 +144,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     this.ventana.open(EditarHorarioComponent, { width: '900px', data: { horario: datosSeleccionados, actualizar: true } })
       .afterClosed().subscribe(result => {
         if (result !== undefined) {
-          this.datosHorario = result
+          this.datosHorario = result;
         }
         this.BuscarDatosHorario(this.idHorario);
         this.ListarDetalles(this.idHorario, this.formato_hora);
@@ -156,33 +157,6 @@ export class VerHorarioDetalleComponent implements OnInit {
       { width: '600px', data: { detalle: datosSeleccionados, horario: this.datosHorario[0] } }).afterClosed().subscribe(item => {
         this.BuscarDatosHorario(this.idHorario);
         this.ListarDetalles(this.idHorario, this.formato_hora);
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
-  EliminarDetalle(id_detalle: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.BuscarDatosHorario(this.idHorario);
-      this.ListarDetalles(this.idHorario, this.formato_hora);
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarDetalle(datos.id);
-          let horasT = this.datosHorario[0].hora_trabajo.split(':')[0] + ':' + this.datosHorario[0].hora_trabajo.split(':')[1];
-          this.ActualizarHorario(this.datosHorario[0].id, horasT, false);
-        }
       });
   }
 
@@ -474,7 +448,6 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR HORAS DE HORARIO
   ActualizarHorario(id: any, horasT: any, mensaje: boolean) {
-
     const datos = {
       hora_trabajo: horasT,
       user_name: this.user_name,
@@ -507,6 +480,146 @@ export class VerHorarioDetalleComponent implements OnInit {
       this.componente.ObtenerHorarios();
     }
 
+  }
+
+
+  /** ************************************************************************************************* **
+   ** **                          METODO DE SELECCION MULTIPLE DE DATOS                              ** **
+   ** ************************************************************************************************* **/
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  auto_individual: boolean = true;
+
+  btnCheckHabilitar: boolean = false;
+  selectionDetalles = new SelectionModel<any>(true, []);
+  detallesEliminar: any = [];
+
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+      this.auto_individual = false;
+    }
+    else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.auto_individual = true;
+      this.selectionDetalles.clear();
+      this.detallesEliminar = [];
+    }
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionDetalles.selected.length;
+    return numSelected === this.detalles.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionDetalles.clear() :
+      this.detalles.forEach((row: any) => this.selectionDetalles.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.detallesEliminar = this.selectionDetalles.selected;
+
+    return `${this.selectionDetalles.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  EliminarDetalle(id_detalle: number) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.restD.EliminarRegistro(id_detalle, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        let horasT = this.datosHorario[0].hora_trabajo.split(':')[0] + ':' + this.datosHorario[0].hora_trabajo.split(':')[1];
+        this.ActualizarHorario(this.datosHorario[0].id, horasT, false);
+        this.BuscarDatosHorario(this.idHorario);
+        this.ListarDetalles(this.idHorario, this.formato_hora);
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any, opcion: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (opcion === 1) {
+            this.EliminarDetalle(datos.id);
+          }
+          else if (opcion === 2) {
+            if (this.detallesEliminar.length != 0) {
+              this.EliminarMultiple();
+            } else {
+              this.toastr.warning('No ha seleccionado DETALLES.', 'Ups!!! algo salio mal.', {
+                timeOut: 6000,
+              })
+            }
+          }
+        }
+      });
+  }
+
+  // METODO PARA ELIMINAR REGISTROS
+  contador: number = 0;
+  ingresar: number = 0;
+  errores: number = 0;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.contador = 0;
+    this.ingresar = 0;
+    this.errores = 0;
+    this.detallesEliminar.forEach((datos: any) => {
+      this.contador = this.contador + 1;
+      this.restD.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.errores = this.errores + 1;
+        }
+        else {
+          this.detalles = this.detalles.filter((item: any) => item.id !== datos.id);
+          this.ingresar = this.ingresar + 1;
+        }
+
+        if (this.contador === this.detallesEliminar.length) {
+          if (this.errores != 0) {
+            this.toastr.error('Existen datos relacionados con los registros.', 'No fue posible eliminar.', {
+              timeOut: 6000,
+            });
+          }
+          if (this.ingresar != 0) {
+            this.toastr.error('Se ha eliminado ' + this.ingresar + ' registros.', '', {
+              timeOut: 6000,
+            });
+            let horasT = this.datosHorario[0].hora_trabajo.split(':')[0] + ':' + this.datosHorario[0].hora_trabajo.split(':')[1];
+            this.ActualizarHorario(this.datosHorario[0].id, horasT, false);
+          }
+
+          this.HabilitarSeleccion();
+          this.BuscarDatosHorario(this.idHorario);
+          this.ListarDetalles(this.idHorario, this.formato_hora);
+        }
+
+      });
+    }
+    )
   }
 
 }
