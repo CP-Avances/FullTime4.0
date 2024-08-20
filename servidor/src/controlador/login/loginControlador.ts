@@ -52,7 +52,7 @@ class LoginControlador {
 
           //FIXME
           `
-          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula
+          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
@@ -60,7 +60,7 @@ class LoginControlador {
             return result.rows
           });
 
-        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula } = ACTIVO[0];
+        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
@@ -157,6 +157,7 @@ class LoginControlador {
             nombre: nombre,
             apellido: apellido,
             cedula: cedula,
+            imagen: imagen,
             codigo: codigo,
             ruc: ruc,
             version: '4.0.0'

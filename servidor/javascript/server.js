@@ -238,7 +238,7 @@ class Servidor {
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
-                //console.log('ver aviso .......', data);
+                console.log('ver aviso .......', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,

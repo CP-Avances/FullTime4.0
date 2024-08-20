@@ -253,7 +253,7 @@ class Servidor {
             });
 
             socket.on("nuevo_aviso", (data: any) => {
-                //console.log('ver aviso .......', data);
+                console.log('ver aviso .......', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
