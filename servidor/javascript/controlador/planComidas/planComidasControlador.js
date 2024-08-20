@@ -18,6 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const builder = require('xmlbuilder');
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class PlanComidasControlador {
     // CONSULTA DE SOLICITUDES DE SERVICIO DE ALIMENTACIÓN CON ESTADO PENDIENTE
     EncontrarSolicitaComidaNull(req, res) {
@@ -863,7 +864,9 @@ class PlanComidasControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_usua_solicita, correo, fec_solicitud, id_comida, inicio, final, observacion, extra, solicitado_por, asunto, tipo_solicitud, proceso, estadoc } = req.body;
@@ -936,12 +939,12 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -971,7 +974,9 @@ class PlanComidasControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
             if (datos === 'ok') {
                 const { id_usua_solicita, correo, fec_solicitud, id_comida, inicio, final, observacion, extra, solicitado_por, asunto, tipo_solicitud, proceso, estadoc } = req.body;
@@ -1042,12 +1047,12 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -1080,7 +1085,9 @@ class PlanComidasControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_envia, desde, hasta, inicio, final, correo, id_comida, observacion, extra, nombres, asunto, tipo_solicitud, proceso } = req.body;
@@ -1159,12 +1166,12 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]

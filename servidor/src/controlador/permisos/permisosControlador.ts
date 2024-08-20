@@ -2,7 +2,7 @@ import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
     FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
-import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
+import { ObtenerRutaLogos, ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -868,7 +868,9 @@ class PermisosControlador {
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
         var hora = await FormatearHora(tiempo.hora);
 
-        const path_folder = path.resolve('logos');
+        // OBTENER RUTA DE LOGOS
+        let separador = path.sep;
+        const path_folder = ObtenerRutaLogos();
 
         var datos = await Credenciales(req.id_empresa);
 
@@ -944,12 +946,12 @@ class PermisosControlador {
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
-                        path: `${path_folder}/${cabecera_firma}`,
+                        path: `${path_folder}${separador}${cabecera_firma}`,
                         cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     },
                     {
                         filename: 'pie_firma.jpg',
-                        path: `${path_folder}/${pie_firma}`,
+                        path: `${path_folder}${separador}${pie_firma}`,
                         cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     }]
             };
@@ -979,7 +981,9 @@ class PermisosControlador {
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
         var hora = await FormatearHora(tiempo.hora);
 
-        const path_folder = path.resolve('logos');
+        // OBTENER RUTA DE LOGOS
+        let separador = path.sep;
+        const path_folder = ObtenerRutaLogos();
 
         var datos = await Credenciales(req.id_empresa);
 
@@ -1126,12 +1130,12 @@ class PermisosControlador {
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
-                        path: `${path_folder}/${cabecera_firma}`,
+                        path: `${path_folder}${separador}${cabecera_firma}`,
                         cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     },
                     {
                         filename: 'pie_firma.jpg',
-                        path: `${path_folder}/${pie_firma}`,
+                        path: `${path_folder}${separador}${pie_firma}`,
                         cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     }]
             };
@@ -1169,7 +1173,9 @@ class PermisosControlador {
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
         var hora = await FormatearHora(tiempo.hora);
 
-        const path_folder = path.resolve('logos');
+        // OBTENER RUTA DE LOGOS
+        let separador = path.sep;
+        const path_folder = ObtenerRutaLogos();
 
         var datos = await Credenciales(req.id_empresa);
 
@@ -1247,12 +1253,12 @@ class PermisosControlador {
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
-                        path: `${path_folder}/${cabecera_firma}`,
+                        path: `${path_folder}${separador}${cabecera_firma}`,
                         cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     },
                     {
                         filename: 'pie_firma.jpg',
-                        path: `${path_folder}/${pie_firma}`,
+                        path: `${path_folder}${separador}${pie_firma}`,
                         cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     }]
             };
@@ -1493,7 +1499,9 @@ class PermisosControlador {
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
         var hora = await FormatearHora(tiempo.hora);
 
-        const path_folder = path.resolve('logos');
+        // OBTENER RUTA DE LOGOS
+        let separador = path.sep;
+        const path_folder = ObtenerRutaLogos();
 
         var datos = await Credenciales(parseInt(req.params.id_empresa));
 
@@ -1566,12 +1574,12 @@ class PermisosControlador {
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
-                        path: `${path_folder}/${cabecera_firma}`,
+                        path: `${path_folder}${separador}${cabecera_firma}`,
                         cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     },
                     {
                         filename: 'pie_firma.jpg',
-                        path: `${path_folder}/${pie_firma}`,
+                        path: `${path_folder}${separador}${pie_firma}`,
                         cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     }]
             };
@@ -1602,7 +1610,9 @@ class PermisosControlador {
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
         var hora = await FormatearHora(tiempo.hora);
 
-        const path_folder = path.resolve('logos');
+        // OBTENER RUTA DE LOGOS
+        let separador = path.sep;
+        const path_folder = ObtenerRutaLogos();
 
         var datos = await Credenciales(parseInt(req.params.id_empresa));
 
@@ -1747,12 +1757,12 @@ class PermisosControlador {
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
-                        path: `${path_folder}/${cabecera_firma}`,
+                        path: `${path_folder}${separador}${cabecera_firma}`,
                         cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     },
                     {
                         filename: 'pie_firma.jpg',
-                        path: `${path_folder}/${pie_firma}`,
+                        path: `${path_folder}${separador}${pie_firma}`,
                         cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                     }]
             };
@@ -1828,7 +1838,7 @@ class PermisosControlador {
         }
     };
 
-   
+
 
     public async getPermisoByIdyCodigo(req: Request, res: Response): Promise<Response> {
         try {
