@@ -262,17 +262,19 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const sendBirthday_1 = require("./libs/sendBirthday");
-const avisoVacaciones_1 = require("./libs/avisoVacaciones");
-const ContarHoras_1 = require("./libs/ContarHoras");
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
+/** **************************************************************************************************** **
+ ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
+ ** **************************************************************************************************** **/
+// METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
+(0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendBirthday_1.cumpleanios)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES
-(0, avisoVacaciones_1.beforeFiveDays)();
-(0, avisoVacaciones_1.beforeTwoDays)();
+//beforeFiveDays();
+//beforeTwoDays();
 // LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-(0, avisoVacaciones_1.Peri_Vacacion_Automatico)();
-(0, ContarHoras_1.RegistrarAsistenciaByTimbres)();
+//Peri_Vacacion_Automatico();
+//RegistrarAsistenciaByTimbres();
 // ----------// conteoPermisos();
-(0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 //generarTimbres('1', '2023-11-01', '2023-11-02');

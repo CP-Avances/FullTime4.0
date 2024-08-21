@@ -111,7 +111,7 @@ class DetalleCatalogoHorarioControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }

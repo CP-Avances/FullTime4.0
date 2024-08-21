@@ -233,9 +233,6 @@ export class PrincipalHorarioComponent implements OnInit {
           this.ObtenerHorarios();
         }
       });
-    this.activar_seleccion = true;
-    this.plan_multiple = false;
-    this.plan_multiple_ = false;
     this.selectionHorarios.clear();
     this.horariosEliminar = [];
   }
@@ -812,21 +809,22 @@ export class PrincipalHorarioComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   // METODOS PARA LA SELECCION MULTIPLE
-  plan_multiple: boolean = false;
-  plan_multiple_: boolean = false;
+  btnCheckHabilitar: boolean = false;
+  auto_individual: boolean = true;
+  selectionHorarios = new SelectionModel<ITableHorarios>(true, []);
 
   HabilitarSeleccion() {
-    this.plan_multiple = true;
-    this.plan_multiple_ = true;
-    this.auto_individual = false;
-    this.activar_seleccion = false;
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+      this.auto_individual = false;
+    }
+    else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.auto_individual = true;
+      this.selectionHorarios.clear();
+      this.horariosEliminar = [];
+    }
   }
-
-  auto_individual: boolean = true;
-  activar_seleccion: boolean = true;
-  seleccion_vacia: boolean = true;
-
-  selectionHorarios = new SelectionModel<ITableHorarios>(true, []);
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
@@ -851,7 +849,7 @@ export class PrincipalHorarioComponent implements OnInit {
     return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarDetalle(id_horario: any) {
     const datos = {
       user_name: this.user_name,
@@ -877,11 +875,6 @@ export class PrincipalHorarioComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarDetalle(datos.id);
-          this.activar_seleccion = true;
-          this.plan_multiple = false;
-          this.plan_multiple_ = false;
-          this.horariosEliminar = [];
-          this.selectionHorarios.clear();
           this.ObtenerHorarios();
         }
       });
@@ -928,11 +921,7 @@ export class PrincipalHorarioComponent implements OnInit {
         if (confirmado) {
           if (this.horariosEliminar.length != 0) {
             this.EliminarMultiple();
-            this.activar_seleccion = true;
-            this.plan_multiple = false;
-            this.plan_multiple_ = false;
-            this.horariosEliminar = [];
-            this.selectionHorarios.clear();
+            this.HabilitarSeleccion();
             this.ObtenerHorarios();
           } else {
             this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {

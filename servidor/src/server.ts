@@ -287,20 +287,28 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
+
+/** **************************************************************************************************** **
+ ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
+ ** **************************************************************************************************** **/
+
+ // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
+DesactivarFinContratoEmpleado();
+
+
 // LLAMA AL MEODO DE CUMPLEAÑOS
 cumpleanios();
 
 // LLAMA AL METODO DE AVISOS DE VACACIONES
-beforeFiveDays();
-beforeTwoDays();
+//beforeFiveDays();
+//beforeTwoDays();
 
 // LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-Peri_Vacacion_Automatico();
+//Peri_Vacacion_Automatico();
 
-RegistrarAsistenciaByTimbres();
+//RegistrarAsistenciaByTimbres();
 
 // ----------// conteoPermisos();
 
-DesactivarFinContratoEmpleado();
 
 //generarTimbres('1', '2023-11-01', '2023-11-02');

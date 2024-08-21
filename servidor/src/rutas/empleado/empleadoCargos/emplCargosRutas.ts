@@ -33,8 +33,6 @@ class EmpleadosCargpsRutas {
         this.router.post('/estado-cargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EditarEstadoCargo);
         // METODO PARA BUSCAR CARGOS ACTIVOS   **USADO
         this.router.post('/cargo-activo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosActivos);
-
-
         // METODO PARA CREAR CARGOS DEL USUARIO    **USADO
         this.router.post('/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.Crear);
         // METODO DE BUSQUEDA DE DATOS DE CARGO DEL USUARIO MEDIANTE ID DEL CARGO    **USADO
@@ -49,8 +47,7 @@ class EmpleadosCargpsRutas {
         this.router.post('/fecha_cargo/editar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFechaEditar);
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
-
-        //METODO PARA ELIMINAR EL CARGO REGISTRADO DE LA TABLA EU_EMPLEADOS_CARGOS **USADO
+        // METODO PARA ELIMINAR EL CARGO REGISTRADO DE LA TABLA EU_EMPLEADOS_CARGOS      **USADO
         this.router.post('/eliminarCargo', [TokenValidation], EMPLEADO_CARGO_CONTROLADOR.EliminarCargo);
 
 

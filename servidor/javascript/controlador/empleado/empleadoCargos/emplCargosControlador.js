@@ -837,31 +837,21 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    //ELIMINAR REGISTRO DEL CARGO SELECCIONADO **USADO
+    // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
     EliminarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.body;
-            console.log('idCargo: ', id);
             try {
-                const cargo_vigente = yield database_1.default.query(`
-            SELECT * FROM contrato_cargo_vigente WHERE id_cargo = $1
-            `, [id]);
-                console.log('contrato_vigente: ', cargo_vigente.rows[0]);
-                if (cargo_vigente.rows[0] == undefined || cargo_vigente.rows[0] == "") {
-                    yield database_1.default.query(`
-                DELETE FROM eu_empleado_cargos WHERE id = $1
-                `, [id]);
-                    return res.status(200).jsonp({ message: 'Registro eliminado correctamente', status: '200' });
-                }
-                else {
-                    return res.status(200).jsonp({ message: 'No fue posible eliminar, existen datos relacionados con este registro', status: '300' });
-                }
+                yield database_1.default.query(`
+        DELETE FROM eu_empleado_cargos WHERE id = $1
+        `, [id]);
+                return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {
+                //console.log('error ', error)
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                error = true;
-                return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+                return res.status(500).jsonp({ message: 'No fue posible eliminar.' });
             }
         });
     }

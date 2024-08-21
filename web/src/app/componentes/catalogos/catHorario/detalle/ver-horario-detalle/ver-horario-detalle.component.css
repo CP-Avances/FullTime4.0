@@ -44,3 +44,8 @@ table {
     width: 100%;
     font-size: 14px;
 }
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 8px;
+}
