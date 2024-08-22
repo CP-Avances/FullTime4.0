@@ -822,12 +822,19 @@ class TimbresControlador {
     public async FiltrarTimbre(req: Request, res: Response) {
         try {
             const { fecInicio, fecFinal, codigo } = req.body
+            // Convertir fechas de entrada a objetos Date
+            let fechaDesde = new Date(fecInicio);
+            let fechaHasta = new Date(fecFinal);
+            const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
+            const fechaHastaStr = fechaHasta.toISOString().split('T')[0] + " 23:59:59";
+
             console.log(req.body);
-            const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC ',
-                [fecInicio, fecFinal, codigo])
+            const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre_servidor DESC ',
+                [fechaDesdeStr, fechaHastaStr, codigo])
             const timbres = response.rows;
             return res.jsonp(timbres);
         } catch (error) {
+            console.log("Error de filtro de timbre", error)
             return res.status(400).jsonp({ message: error });
         }
     }
@@ -836,7 +843,24 @@ class TimbresControlador {
         try {
 
             const id = parseInt(req.params.idUsuario);
-            const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $1 ORDER BY fecha_hora_timbre DESC LIMIT 100', [id]);
+            // Obtener la fecha actual
+            const fechaHasta = new Date();
+            // Establecer la hora final del día (23:59:59)
+            const fechaHastaStr = fechaHasta.toISOString().split('T')[0] + " 23:59:59";
+
+            // Calcular la fecha de hace 2 meses
+            const fechaDesde = new Date();
+            fechaDesde.setMonth(fechaDesde.getMonth() - 2);
+            // Establecer la hora inicial del día (00:00:00) para dos meses atrás
+            const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
+            
+            const response: QueryResult = await pool.query(
+                `SELECT * FROM eu_timbres 
+                 WHERE codigo = $1 
+                 AND fecha_hora_timbre_servidor BETWEEN $2 AND $3
+                 ORDER BY fecha_hora_timbre_servidor DESC LIMIT 100`,
+                [id, fechaDesdeStr, fechaHastaStr]
+            );
             const timbres: any[] = response.rows;
             return res.jsonp(timbres);
         } catch (error) {

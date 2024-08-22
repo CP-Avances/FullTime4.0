@@ -212,6 +212,7 @@ class NotificacionTiempoRealControlador {
     try {
       const id = req.params.id;
       const { visto, user_name, ip } = req.body;
+      console.log("ver parametros", req.body )
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -825,7 +826,6 @@ class NotificacionTiempoRealControlador {
 
   public async getNotificacion(req: Request, res: Response): Promise<Response> {
     try {
-
       const { id_empleado } = req.query;
       const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
       const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`

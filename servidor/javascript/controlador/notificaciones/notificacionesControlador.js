@@ -189,6 +189,7 @@ class NotificacionTiempoRealControlador {
             try {
                 const id = req.params.id;
                 const { visto, user_name, ip } = req.body;
+                console.log("ver parametros", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
