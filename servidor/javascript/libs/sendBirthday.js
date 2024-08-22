@@ -29,8 +29,9 @@ const cumpleanios = function () {
         const hora = date.getHours();
         const minutos = date.getMinutes();
         const fecha = date.toJSON().slice(4).split("T")[0];
+        console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
         // VERIFICAR HORA DE ENVIO
-        if (hora === 6 && minutos === 0) {
+        if (hora === 11 && minutos === 0) {
             const PARAMETRO = yield database_1.default.query(`
                 SELECT * FROM ep_detalle_parametro WHERE id_parametro = 8
                 `);
@@ -47,6 +48,7 @@ const cumpleanios = function () {
                         `, [fecha]);
                     if (EMPLEADOS.rowCount != 0) {
                         var correos = (0, exports.BuscarCorreos)(EMPLEADOS);
+                        console.log('correos ', correos);
                         var usuarios = (0, exports.PresentarUsuarios)(EMPLEADOS);
                         // ENVIAR MAIL A TODOS LOS QUE NACIERON EN LA FECHA SELECCIONADA
                         let message_url = `
@@ -137,7 +139,7 @@ const cumpleanios = function () {
                 }
             }
         }
-    }), 3600000);
+    }), 2700000);
 };
 exports.cumpleanios = cumpleanios;
 // FUNCION PARA BUSCAR CORREOS
