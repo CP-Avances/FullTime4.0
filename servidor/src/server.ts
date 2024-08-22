@@ -247,13 +247,12 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                console.log('server', data_llega);
+                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
 
             socket.on("nuevo_aviso", (data: any) => {
-                console.log('ver aviso .......', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -266,7 +265,6 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });
