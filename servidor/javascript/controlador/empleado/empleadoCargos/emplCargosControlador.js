@@ -629,60 +629,71 @@ class EmpleadoCargosControlador {
               `, [valor.cedula]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
-                                var VERIFICAR_SUCURSALES = yield database_1.default.query(`
+                                const ID_CONTRATO_FECHAS = yield database_1.default.query(` 
+                SELECT euc.id FROM eu_empleado_contratos AS euc
+                WHERE euc.id = $1 AND (
+                  ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
+                  ($3 BETWEEN fecha_ingreso AND fecha_salida))
+                `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
+                                if (ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '') {
+                                    var VERIFICAR_SUCURSALES = yield database_1.default.query(`
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
                 `, [valor.sucursal.toUpperCase()]);
-                                if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
-                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                                    if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                                        var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
                   SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                   `, [valor.departamento.toUpperCase()]);
-                                    if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                        var VERIFICAR_DEP_SUC = yield database_1.default.query(`
+                                        if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
+                                            var VERIFICAR_DEP_SUC = yield database_1.default.query(`
                     SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                     `, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
-                                        if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
-                                            var VERFICAR_CARGO = yield database_1.default.query(`
+                                            if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
+                                                var VERFICAR_CARGO = yield database_1.default.query(`
                       SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                       `, [valor.cargo.toUpperCase()]);
-                                            if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                                if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
-                                                    valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
-                                                }
-                                                else {
-                                                    const fechaRango = yield database_1.default.query(`
+                                                if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                                                    if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                        valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
+                                                    }
+                                                    else {
+                                                        const fechaRango = yield database_1.default.query(`
                           SELECT id FROM eu_empleado_cargos 
                           WHERE id_contrato = $1 AND 
                             ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
                             fecha_inicio BETWEEN $2 AND $3)
                           `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
-                                                    if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                                                        valor.observacion = 'Existe un cargo en esas fechas';
-                                                    }
-                                                    else {
-                                                        // DISCRIMINACION DE ELEMENTOS IGUALES
-                                                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                            duplicados.push(valor);
+                                                        if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                                                            valor.observacion = 'Existe un cargo en esas fechas';
                                                         }
                                                         else {
-                                                            valor.observacion = '1';
+                                                            // DISCRIMINACION DE ELEMENTOS IGUALES
+                                                            if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                                                                duplicados.push(valor);
+                                                            }
+                                                            else {
+                                                                valor.observacion = '1';
+                                                            }
                                                         }
                                                     }
                                                 }
+                                                else {
+                                                    valor.observacion = 'Cargo no existe en el sistema';
+                                                }
                                             }
                                             else {
-                                                valor.observacion = 'Cargo no existe en el sistema';
+                                                valor.observacion = 'Departamento no pertenece a la sucursal';
                                             }
                                         }
                                         else {
-                                            valor.observacion = 'Departamento no pertenece a la sucursal';
+                                            valor.observacion = 'Departamento no existe en el sistema';
                                         }
                                     }
                                     else {
-                                        valor.observacion = 'Departamento no existe en el sistema';
+                                        valor.observacion = 'Sucursal no existe en el sistema';
                                     }
                                 }
                                 else {
-                                    valor.observacion = 'Sucursal no existe en el sistema';
+                                    valor.observacion = 'Las fechas debe coresponder con las del contrato vigente';
                                 }
                             }
                             else {

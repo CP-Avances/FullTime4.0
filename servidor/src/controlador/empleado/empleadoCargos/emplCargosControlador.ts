@@ -703,13 +703,24 @@ class EmpleadoCargosControlador {
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
             ) {
               
+              const ID_CONTRATO_FECHAS: any = await pool.query(
+                ` 
+                SELECT euc.id FROM eu_empleado_contratos AS euc
+                WHERE euc.id = $1 AND (
+                  ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
+                  ($3 BETWEEN fecha_ingreso AND fecha_salida))
+                `
+                , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
 
-              var VERIFICAR_SUCURSALES = await pool.query(
+
+                if(ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '' ){
+
+                  var VERIFICAR_SUCURSALES = await pool.query(
                 `
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
                 `
-                , [valor.sucursal.toUpperCase()])
-              if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                  , [valor.sucursal.toUpperCase()])
+                  if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
 
                 var VERIFICAR_DEPARTAMENTO: any = await pool.query(
                   `
@@ -770,13 +781,16 @@ class EmpleadoCargosControlador {
                 else {
                   valor.observacion = 'Departamento no existe en el sistema'
                 }
-              }
-              else {
+                  }
+                  else {
                 valor.observacion = 'Sucursal no existe en el sistema'
-              }
+                  }
 
+                }else{
+                  valor.observacion = 'Las fechas debe coresponder con las del contrato vigente'
+                }
 
-            }
+             }
             else {
               valor.observacion = 'Cédula no tiene registrado un contrato'
             }
