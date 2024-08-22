@@ -19,21 +19,23 @@ const HORA_EJECUTA = 23;
 // METODO PARA CAMBIAR EL ESTADO DE ACCESO DE USUARIOS SEGUN FECHA DE FINALIZACION DE CONTRATO
 const DesactivarFinContratoEmpleado = function () {
     setInterval(() => __awaiter(this, void 0, void 0, function* () {
+        // OBTENER HORA Y FECHA
         var f = (0, moment_1.default)();
         let hora = parseInt((0, moment_1.default)(f).format('HH'));
         let fecha = (0, moment_1.default)(f).format('YYYY-MM-DD');
         if (hora === HORA_EJECUTA) {
-            let idsEmpleados_FinContrato = yield database_1.default.query(`
-                SELECT DISTINCT id_empleado 
-                FROM eu_empleado_contratos 
-                WHERE CAST(fecha_salida AS VARCHAR) LIKE $1 || \'%\' 
+            let EMPLEADOS = yield database_1.default.query(`
+                SELECT DISTINCT cv.id_empleado 
+                FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec 
+                WHERE CAST(ec.fecha_salida AS VARCHAR) LIKE $1 || '%' 
+                    AND ec.id = cv.id_contrato
                 ORDER BY id_empleado DESC
                 `, [fecha])
                 .then(result => {
                 return result.rows;
             });
-            if (idsEmpleados_FinContrato.length > 0) {
-                idsEmpleados_FinContrato.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+            if (EMPLEADOS.length > 0) {
+                EMPLEADOS.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     yield database_1.default.query(`
                         UPDATE eu_empleados SET estado = 2 WHERE id = $1
                         `, [obj.id_empleado]) // 2 => DESACTIVADO O INACTIVO

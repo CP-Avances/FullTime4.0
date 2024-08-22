@@ -9,6 +9,7 @@ import {
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 class NotificacionTiempoRealControlador {
 
@@ -442,7 +443,9 @@ class NotificacionTiempoRealControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(parseInt(req.params.id_empresa));
 
@@ -496,12 +499,12 @@ class NotificacionTiempoRealControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           }]
       };
@@ -536,7 +539,9 @@ class NotificacionTiempoRealControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+     // OBTENER RUTA DE LOGOS
+     let separador = path.sep;
+     const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -589,12 +594,12 @@ class NotificacionTiempoRealControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           }]
       };
@@ -692,7 +697,9 @@ class NotificacionTiempoRealControlador {
     var hora = await FormatearHora(tiempo.hora);
     var dispositivo = ''
 
-    const path_folder = path.resolve('logos');
+     // OBTENER RUTA DE LOGOS
+     let separador = path.sep;
+     const path_folder = ObtenerRutaLogos();
 
     const { id_envia, correo, mensaje, asunto } = req.body.datosCorreo;
     const solicitudes = req.body.solicitudes;
@@ -760,12 +767,12 @@ class NotificacionTiempoRealControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
           }]
       };

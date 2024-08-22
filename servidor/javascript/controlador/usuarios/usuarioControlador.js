@@ -18,6 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class UsuarioControlador {
     // CREAR REGISTRO DE USUARIOS    **USADO
     CrearUsuario(req, res) {
@@ -544,7 +545,9 @@ class UsuarioControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             const correoValido = yield database_1.default.query(`
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
@@ -593,12 +596,12 @@ class UsuarioControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]

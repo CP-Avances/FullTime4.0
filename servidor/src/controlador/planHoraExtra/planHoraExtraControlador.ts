@@ -9,6 +9,7 @@ import {
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 
 class PlanHoraExtraControlador {
@@ -520,7 +521,9 @@ class PlanHoraExtraControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -594,12 +597,12 @@ class PlanHoraExtraControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };

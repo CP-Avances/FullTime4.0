@@ -286,8 +286,11 @@ class TimbresControlador {
                     observacion, 'APP_WEB', ubicacion, null],
 
                 async (error, results) => {
-                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
-                    const fechaTimbre = await FormatearFecha(fec_hora_timbre.toLocaleString(), 'ddd');
+                    // FORMATEAR FECHAS
+                    var hora = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
+                    var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY/MM/DD');
+                    const fechaHora = await FormatearHora(hora);
+                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
@@ -298,11 +301,9 @@ class TimbresControlador {
                         ip,
                         observacion: null
                     });
-
                     //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
-
                 }
             )
 

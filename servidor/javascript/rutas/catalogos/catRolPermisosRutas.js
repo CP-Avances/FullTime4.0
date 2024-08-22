@@ -13,9 +13,9 @@ class RolPermisosRutas {
     }
     configuracion() {
         // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
-        this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
+        this.router.get('/menu/paginas/:tipo', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
         // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
-        this.router.get('/menu/modulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuModulosRoles);
+        this.router.get('/menu/modulos/:tipo', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuModulosRoles);
         // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
         this.router.post('/menu/paginasmodulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarModuloPorNombre);
         // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO

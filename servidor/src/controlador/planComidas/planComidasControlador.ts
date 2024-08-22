@@ -11,6 +11,7 @@ import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 const builder = require('xmlbuilder');
 import pool from '../../database';
 import path from 'path';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 class PlanComidasControlador {
 
@@ -95,7 +96,7 @@ class PlanComidasControlador {
     }
   }
 
-   // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
+  // METODO PARA CONSULTAR SOLICITUD DE COMIDAS POR ID DE EMPLEADO     **USADO
   public async EncontrarSolicitaComidaIdEmpleado(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const PLAN_COMIDAS = await pool.query(
@@ -1013,7 +1014,9 @@ class PlanComidasControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -1102,12 +1105,12 @@ class PlanComidasControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };
@@ -1138,7 +1141,9 @@ class PlanComidasControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(parseInt(req.params.id_empresa));
 
@@ -1224,12 +1229,12 @@ class PlanComidasControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };
@@ -1265,7 +1270,9 @@ class PlanComidasControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -1358,12 +1365,12 @@ class PlanComidasControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };

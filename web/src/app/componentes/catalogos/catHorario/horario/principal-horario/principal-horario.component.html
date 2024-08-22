@@ -69,6 +69,11 @@
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!dataHorarios">
         <div class="mat-elevation-z8" style="background: white;">
             <div class="d-flex bd-highlight" id="titulo">
+                <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
+                    (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
+                    matTooltip="Elimar múltiples registros." id="SelectCheck">
+                    library_add_check
+                </mat-icon>
                 <div class="w-100 bd-highlight">
                     <h5>
                         LISTA DE PLANIFICACIÓN HORARIA
@@ -76,20 +81,17 @@
                 </div>
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-                            <th>
-                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
-                                    matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
-                                    id="SelectCheck" (click)="HabilitarSeleccion()">
-                                    library_add_check
-                                </mat-icon>
-                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                            <th *ngIf="btnCheckHabilitar">
+                                <mat-checkbox (change)="$event ? masterTogglePag() : null"
                                     [checked]="selectionHorarios.hasValue() && isAllSelectedPag()"
                                     [indeterminate]="selectionHorarios.hasValue() && !isAllSelectedPag()"
                                     [aria-label]="checkboxLabelPag()">
@@ -127,9 +129,8 @@
                         </tr>
                         <tr
                             *ngFor="let horario of horarios | filtroCodigo: nombreHorarioF.value | paginate:tamanio_pagina:numero_pagina">
-
-                            <td>
-                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                            <td *ngIf="btnCheckHabilitar">
+                                <mat-checkbox (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionHorarios.toggle(horario) : null"
                                     [checked]="selectionHorarios.isSelected(horario)"
                                     [aria-label]="checkboxLabelPag(horario)">
@@ -152,25 +153,25 @@
                                 </a>
                             </td>
                             <td class="justify-content-center">
-                                <i matSuffix matTooltipPosition="right"
+                                <i *ngIf="auto_individual" matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
                                     (click)="VerDetallesHorario(horario.id)">
                                     <p>Ver</p>
                                 </i>
                                 <i matSuffix matTooltipPosition="right" matTooltip="Agregar Detalles de Horario."
                                     class="fas fa-list-alt" id="t-detalles" (click)="AbrirRegistraDetalle(horario)"
-                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA'">
+                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual">
                                     <p>Detalle</p>
                                 </i>
                                 <i class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
                                     (click)="AbrirVentanaEditarHorario(horario)"
                                     matTooltip="Modificar los datos generales de este registro."
-                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA'">
+                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(horario)" class="far fa-trash-alt" id="t-eliminar" matSuffix
                                     matTooltipPosition="right" matTooltip="Eliminar este registro."
-                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA'">
+                                    *ngIf="horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -256,13 +257,13 @@
             </table>
         </div>
         <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal"  matTooltip="Número de datos que se van a cargar en el sistema.">
-            <div id="t-editar" class="circulo circuloTotal"></div>
-            <div>{{horariosCorrectos}}</div>
-          </div>
-          <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
-                        [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
-          </mat-paginator>
+            <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{horariosCorrectos}}</div>
+            </div>
+            <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
+                [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
+            </mat-paginator>
         </div>
     </div>
 </div>
@@ -310,13 +311,13 @@
             </table>
         </div>
         <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-            <div id="t-editar" class="circulo circuloTotal"></div>
-            <div>{{detallesCorrectos}}</div>
-          </div>
-          <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
-              [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
-          </mat-paginator>
+            <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{detallesCorrectos}}</div>
+            </div>
+            <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
+                [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
+            </mat-paginator>
         </div>
     </div>
 </div>

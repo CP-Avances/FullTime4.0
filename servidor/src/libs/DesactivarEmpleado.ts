@@ -7,19 +7,19 @@ const HORA_EJECUTA = 23
 export const DesactivarFinContratoEmpleado = function () {
 
     setInterval(async () => {
-
+        // OBTENER HORA Y FECHA
         var f = moment();
-
         let hora: number = parseInt(moment(f).format('HH'));
         let fecha: string = moment(f).format('YYYY-MM-DD');
 
         if (hora === HORA_EJECUTA) {
 
-            let idsEmpleados_FinContrato = await pool.query(
+            let EMPLEADOS = await pool.query(
                 `
-                SELECT DISTINCT id_empleado 
-                FROM eu_empleado_contratos 
-                WHERE CAST(fecha_salida AS VARCHAR) LIKE $1 || \'%\' 
+                SELECT DISTINCT cv.id_empleado 
+                FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec 
+                WHERE CAST(ec.fecha_salida AS VARCHAR) LIKE $1 || '%' 
+                    AND ec.id = cv.id_contrato
                 ORDER BY id_empleado DESC
                 `
                 , [fecha])
@@ -27,9 +27,9 @@ export const DesactivarFinContratoEmpleado = function () {
                     return result.rows
                 });
 
-            if (idsEmpleados_FinContrato.length > 0) {
+            if (EMPLEADOS.length > 0) {
 
-                idsEmpleados_FinContrato.forEach(async (obj) => {
+                EMPLEADOS.forEach(async (obj) => {
                     await pool.query(
                         `
                         UPDATE eu_empleados SET estado = 2 WHERE id = $1

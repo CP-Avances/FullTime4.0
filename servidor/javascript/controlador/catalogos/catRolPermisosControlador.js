@@ -19,9 +19,10 @@ class RolPermisosControlador {
     // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { tipo } = req.params;
             const Roles = yield database_1.default.query(`
-      SELECT * FROM es_paginas WHERE modulo = false
-      `);
+      SELECT * FROM es_paginas WHERE modulo = false AND movil = $1
+      `, [tipo]);
             if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
@@ -33,9 +34,10 @@ class RolPermisosControlador {
     // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
     ListarMenuModulosRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { tipo } = req.params;
             const Roles = yield database_1.default.query(`
-      SELECT * FROM es_paginas WHERE modulo = true
-      `);
+      SELECT * FROM es_paginas WHERE modulo = true AND movil = $1
+      `, [tipo]);
             if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
@@ -47,10 +49,10 @@ class RolPermisosControlador {
     // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
     ListarModuloPorNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre_modulo } = req.body;
+            const { nombre_modulo, tipo } = req.body;
             const Roles = yield database_1.default.query(`
-      SELECT * FROM es_paginas WHERE nombre_modulo = $1
-      `, [nombre_modulo]);
+      SELECT * FROM es_paginas WHERE nombre_modulo = $1 AND movil = $2
+      `, [nombre_modulo, tipo]);
             if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
@@ -93,10 +95,10 @@ class RolPermisosControlador {
     ObtenerPaginasRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_rol } = req.body;
+                const { id_rol, tipo } = req.body;
                 const PAGINA_ROL = yield database_1.default.query(`
-        SELECT * FROM ero_rol_permisos WHERE id_rol = $1 ORDER BY 3,5
-        `, [id_rol]);
+        SELECT * FROM ero_rol_permisos WHERE id_rol = $1 AND movil = $2 ORDER BY 3,5
+        `, [id_rol, tipo]);
                 return res.jsonp(PAGINA_ROL.rows);
             }
             catch (error) {

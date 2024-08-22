@@ -8,10 +8,11 @@ class RolPermisosControlador {
 
   // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
   public async ListarMenuRoles(req: Request, res: Response) {
+    const { tipo } = req.params;
     const Roles = await pool.query(
       `
-      SELECT * FROM es_paginas WHERE modulo = false
-      `
+      SELECT * FROM es_paginas WHERE modulo = false AND movil = $1
+      `, [tipo]
     );
     if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
@@ -23,10 +24,11 @@ class RolPermisosControlador {
 
   // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
   public async ListarMenuModulosRoles(req: Request, res: Response) {
+    const { tipo } = req.params;
     const Roles = await pool.query(
       `
-      SELECT * FROM es_paginas WHERE modulo = true
-      `
+      SELECT * FROM es_paginas WHERE modulo = true AND movil = $1
+      `, [tipo]
     );
     if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
@@ -38,12 +40,12 @@ class RolPermisosControlador {
 
   // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
   public async ListarModuloPorNombre(req: Request, res: Response) {
-    const { nombre_modulo } = req.body;
+    const { nombre_modulo, tipo } = req.body;
     const Roles = await pool.query(
       `
-      SELECT * FROM es_paginas WHERE nombre_modulo = $1
+      SELECT * FROM es_paginas WHERE nombre_modulo = $1 AND movil = $2
       `
-      , [nombre_modulo]
+      , [nombre_modulo, tipo]
     );
     if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
@@ -88,12 +90,12 @@ class RolPermisosControlador {
   // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL  **USADO
   public async ObtenerPaginasRol(req: Request, res: Response): Promise<any> {
     try {
-      const { id_rol } = req.body;
+      const { id_rol, tipo } = req.body;
       const PAGINA_ROL = await pool.query(
         `
-        SELECT * FROM ero_rol_permisos WHERE id_rol = $1 ORDER BY 3,5
+        SELECT * FROM ero_rol_permisos WHERE id_rol = $1 AND movil = $2 ORDER BY 3,5
         `
-        , [id_rol]);
+        , [id_rol, tipo]);
       return res.jsonp(PAGINA_ROL.rows)
     } catch (error) {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });

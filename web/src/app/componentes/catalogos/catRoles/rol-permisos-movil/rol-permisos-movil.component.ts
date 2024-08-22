@@ -15,12 +15,12 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 import { RolesService } from '../../../../servicios/catalogos/catRoles/roles.service';
 
 @Component({
-  selector: 'app-seleccionar-rol-permiso',
-  templateUrl: './seleccionar-rol-permiso.component.html',
-  styleUrls: ['./seleccionar-rol-permiso.component.css'],
+  selector: 'app-rol-permisos-movil',
+  templateUrl: './rol-permisos-movil.component.html',
+  styleUrl: './rol-permisos-movil.component.css'
 })
 
-export class SeleccionarRolPermisoComponent implements OnInit {
+export class RolPermisosMovilComponent implements OnInit {
 
   @Input() id_rol: number;
 
@@ -83,7 +83,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ip: string | null;
 
   expansion: boolean = false;
-  plataforma: boolean = false;  // FALSE --> APLICACION WEB
+  plataforma: boolean = true;  // TRUE --> APLICACION MOVIL
 
   constructor(
     private varificarFunciones: MainNavService,
@@ -175,7 +175,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ObtenerMenuModulos() {
     this.nombreModulos.map(nombre => {
       var nombre_modulo = {
-        nombre_modulo: nombre, 
+        nombre_modulo: nombre,
         tipo: this.plataforma,
       }
       this.rest.ObtenerMenuModulos(nombre_modulo).subscribe(res => {
@@ -832,5 +832,4 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
-
 }
