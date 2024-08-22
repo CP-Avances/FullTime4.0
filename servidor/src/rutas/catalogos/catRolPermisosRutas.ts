@@ -10,10 +10,10 @@ class RolPermisosRutas {
     configuracion(): void {
 
         // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
-        this.router.get('/menu/paginas', TokenValidation, rolPermisosControlador.ListarMenuRoles);
+        this.router.get('/menu/paginas/:tipo', TokenValidation, rolPermisosControlador.ListarMenuRoles);
 
         // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
-        this.router.get('/menu/modulos', TokenValidation, rolPermisosControlador.ListarMenuModulosRoles);
+        this.router.get('/menu/modulos/:tipo', TokenValidation, rolPermisosControlador.ListarMenuModulosRoles);
 
         // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
         this.router.post('/menu/paginasmodulos', TokenValidation, rolPermisosControlador.ListarModuloPorNombre);
