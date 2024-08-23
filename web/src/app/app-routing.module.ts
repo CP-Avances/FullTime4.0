@@ -32,7 +32,7 @@ import { ListaEmpleadosComponent } from './componentes/empleado/datos-empleado/l
 import { VerEmpleadoComponent } from './componentes/empleado/ver-empleado/ver-empleado.component';
 import { RegistroComponent } from './componentes/empleado/datos-empleado/registro/registro.component';
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
-import { ActualizacionInformacionComponent } from './componentes/catalogos/catActualizacion/actualizacion-informacion.component';
+import { ActualizacionInformacionComponent } from './componentes/empleado/actualizar-datos/principal-actualizacion/actualizacion-informacion.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
@@ -299,7 +299,6 @@ const routes: Routes = [
 
   // REPORTE  --AUDITORIA
   { path: 'reporte-auditoria', component: ReporteAuditoriaComponent, canActivate: [AuthGuard] },
-
 
   // VERIFICAR SU USO
   { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },

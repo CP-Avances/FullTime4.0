@@ -17,6 +17,7 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class NotificacionTiempoRealControlador {
     // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
     EliminarMultiplesNotificaciones(req, res) {
@@ -188,6 +189,7 @@ class NotificacionTiempoRealControlador {
             try {
                 const id = req.params.id;
                 const { visto, user_name, ip } = req.body;
+                console.log("ver parametros", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -380,7 +382,9 @@ class NotificacionTiempoRealControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
             const { id_envia, correo, mensaje, asunto } = req.body;
             if (datos === 'ok') {
@@ -424,12 +428,12 @@ class NotificacionTiempoRealControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         }
                     ]
@@ -462,7 +466,9 @@ class NotificacionTiempoRealControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             const { id_envia, correo, mensaje, asunto } = req.body;
             if (datos === 'ok') {
@@ -506,12 +512,12 @@ class NotificacionTiempoRealControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         }
                     ]
@@ -592,7 +598,9 @@ class NotificacionTiempoRealControlador {
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
             var dispositivo = '';
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             const { id_envia, correo, mensaje, asunto } = req.body.datosCorreo;
             const solicitudes = req.body.solicitudes;
             console.log('req.body.movil: ', req.body.movil);
@@ -652,12 +660,12 @@ class NotificacionTiempoRealControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
                         }
                     ]

@@ -12,7 +12,7 @@ import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import { ObtenerRutaLicencia } from '../../libs/accesoCarpetas';
+import { ObtenerRutaLicencia, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
@@ -54,7 +54,7 @@ class LoginControlador {
 
           //FIXME
           `
-          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula
+          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
@@ -62,7 +62,7 @@ class LoginControlador {
             return result.rows
           });
 
-        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula } = ACTIVO[0];
+        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
@@ -152,6 +152,7 @@ class LoginControlador {
             nombre: nombre,
             apellido: apellido,
             cedula: cedula,
+            imagen: imagen,
             codigo: codigo,
             ruc: ruc,
             version: '4.0.0'
@@ -194,7 +195,9 @@ class LoginControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     const correoValido = await pool.query(
       `
@@ -254,12 +257,12 @@ class LoginControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };

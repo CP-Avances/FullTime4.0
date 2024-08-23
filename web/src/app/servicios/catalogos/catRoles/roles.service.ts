@@ -32,8 +32,8 @@ export class RolesService {
   }
 
 
-  // Roles
-  getOneRol(id: number) {
+  // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+  BuscarUnRol(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/${id}`);
   }
 

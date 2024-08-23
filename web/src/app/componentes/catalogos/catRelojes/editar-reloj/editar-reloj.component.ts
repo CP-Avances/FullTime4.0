@@ -45,6 +45,7 @@ export class EditarRelojComponent implements OnInit {
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   codigoF = new FormControl('', Validators.required);
   funcionesF = new FormControl('', [Validators.required]);
+  temperaturaF = new FormControl('', [Validators.required]);
   idSucursalF = new FormControl('', Validators.required);
   idDepartamentoF = new FormControl('', [Validators.required]);
 
@@ -88,6 +89,7 @@ export class EditarRelojComponent implements OnInit {
       puertoForm: this.puertoF,
       codigoForm: this.codigoF,
       funcionesForm: this.funcionesF,
+      temperaturaForm: this.temperaturaF,
       idSucursalForm: this.idSucursalF,
       idDepartamentoForm: this.idDepartamentoF,
     });
@@ -114,6 +116,7 @@ export class EditarRelojComponent implements OnInit {
         puertoForm: this.datosReloj.puerto,
         codigoForm: this.datosReloj.codigo,
         funcionesForm: this.datosReloj.tipo_conexion,
+        temperaturaForm: this.datosReloj.temperatura,
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
       })
@@ -176,6 +179,7 @@ export class EditarRelojComponent implements OnInit {
       nombre: form1.nombreForm,
       puerto: form1.puertoForm,
       id_sucursal: form1.idSucursalForm,
+      temperatura: form1.temperaturaForm,
       tipo_conexion: form1.funcionesForm,
       id_departamento: form1.idDepartamentoForm,
 

@@ -26,7 +26,7 @@ class RelojesControlador {
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
                 cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
-                e.nombre AS nomempresa, c.descripcion AS nomciudad
+                e.nombre AS nomempresa, c.descripcion AS nomciudad, cr.temperatura
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
@@ -93,7 +93,7 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, user_name, user_ip } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 var VERIFICAR_CODIGO;
@@ -110,10 +110,10 @@ class RelojesControlador {
                 if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                     `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tipo_conexion, id_sucursal, id_departamento, codigo]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura]);
                     const [reloj] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -164,7 +164,7 @@ class RelojesControlador {
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, user_name, user_ip } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -202,10 +202,10 @@ class RelojesControlador {
                     yield database_1.default.query(`
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14
-                    WHERE id = $15
+                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, temperatura = $15
+                    WHERE id = $16
                     `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tipo_conexion, id_sucursal, id_departamento, codigo, id_real]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, id_real]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ed_relojes',
@@ -237,7 +237,7 @@ class RelojesControlador {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, cr.temperatura,
                 cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e

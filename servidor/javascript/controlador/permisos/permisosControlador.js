@@ -771,7 +771,9 @@ class PermisosControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, id, asunto, tipo_solicitud, proceso } = req.body;
@@ -835,12 +837,12 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -870,7 +872,9 @@ class PermisosControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, id, asunto, tipo_solicitud, proceso, adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso, ahoras_permiso } = req.body;
@@ -1004,12 +1008,12 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -1044,7 +1048,9 @@ class PermisosControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { correo, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, asunto, tipo_solicitud, proceso, usuario_solicita, tipo } = req.body;
@@ -1110,12 +1116,12 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -1337,7 +1343,9 @@ class PermisosControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
             if (datos === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
@@ -1399,12 +1407,12 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
@@ -1434,7 +1442,9 @@ class PermisosControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
             console.log('datos: ', datos);
             if (datos === 'ok') {
@@ -1566,12 +1576,12 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]

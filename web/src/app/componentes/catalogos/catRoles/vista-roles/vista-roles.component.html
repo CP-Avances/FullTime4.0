@@ -132,5 +132,26 @@
     </div>
 </div>
 
-<!-- COMPONENTE SELECCION DE FUNCIONES DEL SISTEMA -->
-<app-seleccionar-rol-permiso *ngIf="ver_funciones" [id_rol]="rol_id"></app-seleccionar-rol-permiso>
+
+<mat-tab-group *ngIf="ver_funciones">
+    <mat-tab label="sistema">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">computer</mat-icon>
+            <h6 id="items">Funciones Aplicación Web</h6>
+        </ng-template>
+        <!-- COMPONENTE SELECCION DE FUNCIONES DEL SISTEMA -->
+        <div class="container" tyle="margin-bottom: 25px; padding-bottom: 15px;">
+            <app-seleccionar-rol-permiso [id_rol]="rol_id"></app-seleccionar-rol-permiso>
+        </div>
+    </mat-tab>
+    <mat-tab label="movil">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">phonelink_setup</mat-icon>
+            <h6 id="items">Funciones Aplicación Móvil</h6>
+        </ng-template>
+        <!-- COMPONENTE SELECCION DE FUNCIONES DE LA APLICACION MOVIL -->
+        <div class="container" tyle="margin-bottom: 25px; padding-bottom: 15px;">
+            <app-rol-permisos-movil [id_rol]="rol_id"></app-rol-permisos-movil>
+        </div>
+    </mat-tab>
+</mat-tab-group>

@@ -5,7 +5,7 @@ import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
-import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado, ObtenerRutaHorasExtraIdEmpleado, ObtenerRutaHorasExtraGeneral, ObtenerRutaHorasExtra } from '../../libs/accesoCarpetas';
+import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado, ObtenerRutaHorasExtraIdEmpleado, ObtenerRutaHorasExtraGeneral, ObtenerRutaHorasExtra, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
@@ -292,7 +292,7 @@ class HorasExtrasPedidasControlador {
 
       const documentoTemporal = `${carpetaHorasExtra}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
 
-      
+
       if (nombreArchivo) {
         try {
           console.log("entrando a subir documento")
@@ -300,7 +300,7 @@ class HorasExtrasPedidasControlador {
 
           const documento = `${carpetaEmpleado}${separador}${codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
           fs.copyFileSync(documentoTemporal, documento);
-          
+
         }
         catch (error) {
           console.error('Error al copiar el archivo:', error);
@@ -977,8 +977,9 @@ class HorasExtrasPedidasControlador {
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
-
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -1055,12 +1056,12 @@ class HorasExtrasPedidasControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };
@@ -1091,7 +1092,9 @@ class HorasExtrasPedidasControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(parseInt(req.params.id_empresa));
 
@@ -1164,12 +1167,12 @@ class HorasExtrasPedidasControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };

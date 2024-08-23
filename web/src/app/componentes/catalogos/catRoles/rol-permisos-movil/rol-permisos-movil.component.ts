@@ -15,12 +15,12 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 import { RolesService } from '../../../../servicios/catalogos/catRoles/roles.service';
 
 @Component({
-  selector: 'app-seleccionar-rol-permiso',
-  templateUrl: './seleccionar-rol-permiso.component.html',
-  styleUrls: ['./seleccionar-rol-permiso.component.css'],
+  selector: 'app-rol-permisos-movil',
+  templateUrl: './rol-permisos-movil.component.html',
+  styleUrl: './rol-permisos-movil.component.css'
 })
 
-export class SeleccionarRolPermisoComponent implements OnInit {
+export class RolPermisosMovilComponent implements OnInit {
 
   @Input() id_rol: number;
 
@@ -39,13 +39,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   // DICCIONARIO DE MODULOS
   diccionarioFuncionesActivas: { [id_funcion: string]: boolean } = {
     "permisos": this.permisos,
-    "geolocalizacion": this.geolocalizacion,
-    "alimentacion": this.alimentacion,
-    "horas_extras": this.horas_extras,
-    "timbre_virtual": this.timbre_virtual,
     "vacaciones": this.vacaciones,
-    "acciones_personal": this.acciones_personal,
-    "reloj_virtual": this.reloj_virtual,
+    "horas_extras": this.horas_extras,
+    "alimentacion": this.alimentacion,
+    "aprobar": this.permisos || this.vacaciones || this.horas_extras || this.alimentacion,
   };
 
   nombreRol: string;
@@ -83,7 +80,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ip: string | null;
 
   expansion: boolean = false;
-  plataforma: boolean = false;  // FALSE --> APLICACION WEB
+  plataforma: boolean = true;  // TRUE --> APLICACION MOVIL
 
   constructor(
     private varificarFunciones: MainNavService,
@@ -93,7 +90,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -144,7 +142,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA 
+  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA
   ObtenerMenu() {
     this.nombresMenu = [];
     this.rest.ObtenerMenu(this.plataforma).subscribe(res => {
@@ -166,13 +164,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     'vacaciones',
     'horas_extras',
     'alimentacion',
-    'acciones_personal',
-    'geolocalizacion',
-    'timbre_virtual',
-    'reloj_virtual',
+    'aprobar',
   ]
 
-  // METODO PARA BUSCAR PAGINAS QUE PERTENECEN A MODULOS
+  // METODO PARA MOSTRAR LAS PAGINAS QUE PERTENECEN A MODULOS
   ObtenerMenuModulos() {
     this.nombreModulos.map(nombre => {
       var nombre_modulo = {
@@ -762,7 +757,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
   ObtenerTodasPaginasAcciones(): any {
     this.rest.ObtenerMenu(this.plataforma).subscribe(res => {
       this.nombrePaginas = res;
@@ -839,46 +834,4 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
-
-  //CONTROL BOTONES
-  getVerFuncionesGuardar() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol - Guardar');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (rolEmpl != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getVerFuncionesEliminar() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol - Eliminar');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (rolEmpl != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
 }

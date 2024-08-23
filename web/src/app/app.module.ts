@@ -59,6 +59,7 @@ import { RegistroRolComponent } from './componentes/catalogos/catRoles/registro-
 import { EditarRolComponent } from './componentes/catalogos/catRoles/editar-rol/editar-rol.component';
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
 import { SeleccionarRolPermisoComponent } from './componentes/catalogos/catRoles/seleccionar-rol-permiso/seleccionar-rol-permiso.component';
+import { RolPermisosMovilComponent } from './componentes/catalogos/catRoles/rol-permisos-movil/rol-permisos-movil.component';
 import { RegimenComponent } from './componentes/catalogos/catRegimen/regimen/regimen.component';
 import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';
 import { VerRegimenComponent } from './componentes/catalogos/catRegimen/ver-regimen/ver-regimen.component';
@@ -120,7 +121,7 @@ import { RegistroContratoComponent } from './componentes/empleado/contrato/regis
 import { EditarContratoComponent } from './componentes/empleado/contrato/editar-contrato/editar-contrato.component';
 import { EmplCargosComponent } from './componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { EditarCargoComponent } from './componentes/empleado/cargo/editar-cargo/editar-cargo.component';
-import { ActualizacionInformacionComponent } from './componentes/catalogos/catActualizacion/actualizacion-informacion.component';
+import { ActualizacionInformacionComponent } from './componentes/empleado/actualizar-datos/principal-actualizacion/actualizacion-informacion.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { CambiarContrasenaComponent } from './componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
@@ -131,8 +132,8 @@ import { ConfirmarCrearCarpetaComponent } from './componentes/empleado/datos-emp
 import { EmplLeafletComponent } from './componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { SeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/seguridad/seguridad.component';
 import { FraseSeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
-import { EditarRolUserComponent } from './componentes/catalogos/catActualizacion/editar-rol-user/editar-rol-user.component';
-import { EditarDepaUserComponent } from './componentes/catalogos/catActualizacion/editar-depa-user/editar-depa-user.component';
+import { EditarRolUserComponent } from './componentes/empleado/actualizar-datos/editar-rol-user/editar-rol-user.component';
+import { EditarDepaUserComponent } from './componentes/empleado/actualizar-datos/editar-depa-user/editar-depa-user.component';
 import { AsignarUsuarioComponent } from './componentes/empleado/sucursal-usuario/asignar-usuario/asignar-usuario.component';
 import { DefinicionPlantillaComponent } from './componentes/administracionGeneral/definicion-plantilla/definicion-plantilla.component';
 import { RegistrarCargoComponent } from './componentes/catalogos/catalogoTipoCargo/registrar-cargo/registrar-cargo.component';
@@ -343,6 +344,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     EditarRolComponent,
     VistaRolesComponent,
     SeleccionarRolPermisoComponent,
+    RolPermisosMovilComponent,
     RegimenComponent,
     ListarRegimenComponent,
     VerRegimenComponent,

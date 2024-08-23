@@ -1368,7 +1368,7 @@ export class ListaAppComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 41);
+      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 44);
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -1378,7 +1378,7 @@ export class ListaAppComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 41);
+      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 44);
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }

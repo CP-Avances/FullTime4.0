@@ -125,7 +125,8 @@ class RolesControlador {
             }
         });
     }
-    ObtnenerUnRol(req, res) {
+    // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+    ObtenerUnRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const ROL = yield database_1.default.query(`

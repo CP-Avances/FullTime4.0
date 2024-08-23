@@ -629,60 +629,71 @@ class EmpleadoCargosControlador {
               `, [valor.cedula]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
-                                var VERIFICAR_SUCURSALES = yield database_1.default.query(`
+                                const ID_CONTRATO_FECHAS = yield database_1.default.query(` 
+                SELECT euc.id FROM eu_empleado_contratos AS euc
+                WHERE euc.id = $1 AND (
+                  ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
+                  ($3 BETWEEN fecha_ingreso AND fecha_salida))
+                `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
+                                if (ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '') {
+                                    var VERIFICAR_SUCURSALES = yield database_1.default.query(`
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
                 `, [valor.sucursal.toUpperCase()]);
-                                if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
-                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                                    if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                                        var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
                   SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                   `, [valor.departamento.toUpperCase()]);
-                                    if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                        var VERIFICAR_DEP_SUC = yield database_1.default.query(`
+                                        if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
+                                            var VERIFICAR_DEP_SUC = yield database_1.default.query(`
                     SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                     `, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
-                                        if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
-                                            var VERFICAR_CARGO = yield database_1.default.query(`
+                                            if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
+                                                var VERFICAR_CARGO = yield database_1.default.query(`
                       SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                       `, [valor.cargo.toUpperCase()]);
-                                            if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                                if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
-                                                    valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
-                                                }
-                                                else {
-                                                    const fechaRango = yield database_1.default.query(`
+                                                if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                                                    if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                        valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
+                                                    }
+                                                    else {
+                                                        const fechaRango = yield database_1.default.query(`
                           SELECT id FROM eu_empleado_cargos 
                           WHERE id_contrato = $1 AND 
                             ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
                             fecha_inicio BETWEEN $2 AND $3)
                           `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
-                                                    if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                                                        valor.observacion = 'Existe un cargo en esas fechas';
-                                                    }
-                                                    else {
-                                                        // DISCRIMINACION DE ELEMENTOS IGUALES
-                                                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                            duplicados.push(valor);
+                                                        if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                                                            valor.observacion = 'Existe un cargo en esas fechas';
                                                         }
                                                         else {
-                                                            valor.observacion = '1';
+                                                            // DISCRIMINACION DE ELEMENTOS IGUALES
+                                                            if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                                                                duplicados.push(valor);
+                                                            }
+                                                            else {
+                                                                valor.observacion = '1';
+                                                            }
                                                         }
                                                     }
                                                 }
+                                                else {
+                                                    valor.observacion = 'Cargo no existe en el sistema';
+                                                }
                                             }
                                             else {
-                                                valor.observacion = 'Cargo no existe en el sistema';
+                                                valor.observacion = 'Departamento no pertenece a la sucursal';
                                             }
                                         }
                                         else {
-                                            valor.observacion = 'Departamento no pertenece a la sucursal';
+                                            valor.observacion = 'Departamento no existe en el sistema';
                                         }
                                     }
                                     else {
-                                        valor.observacion = 'Departamento no existe en el sistema';
+                                        valor.observacion = 'Sucursal no existe en el sistema';
                                     }
                                 }
                                 else {
-                                    valor.observacion = 'Sucursal no existe en el sistema';
+                                    valor.observacion = 'Las fechas debe coresponder con las del contrato vigente';
                                 }
                             }
                             else {
@@ -777,30 +788,49 @@ class EmpleadoCargosControlador {
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
-                    const response = yield database_1.default.query(`
-          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
-            sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
-          `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
-                        hora_trabaja, admin_dep]);
-                    const [cargos] = response.rows;
-                    const response2 = yield database_1.default.query(`
-          INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-          VALUES ($1, $2, $3, $4, $5) RETURNING *
-          `, [id_empleado, id_departamento, true, true, admin_dep]);
-                    const [usuarioDep] = response2.rows;
                     const id_last_cargo = yield database_1.default.query(`
            SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `, [id_contrato]);
-                    console.log('response: ', response.rows[0]);
-                    yield database_1.default.query(`
-          UPDATE eu_empleado_cargos set estado = $2 
-          WHERE id = $1 AND estado = 'true' RETURNING *
-          `, [id_last_cargo.rows[0].id, false]);
-                    yield database_1.default.query(`
+                    if (id_last_cargo.rows[0] != undefined) {
+                        yield database_1.default.query(`
             UPDATE eu_empleado_cargos set estado = $2 
-            WHERE id = $1 AND estado = 'false' RETURNING *
-            `, [response.rows[0].id, true]);
+            WHERE id = $1 AND estado = 'true' RETURNING *
+            `, [id_last_cargo.rows[0].id, false]);
+                    }
+                    const response = yield database_1.default.query(`
+          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
+            sueldo, id_tipo_cargo, hora_trabaja, jefe, estado) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+          `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
+                        hora_trabaja, admin_dep, true]);
+                    const [cargos] = response.rows;
+                    const id_usuario_depa = yield database_1.default.query(`
+           SELECT id FROM eu_usuario_departamento WHERE id_empleado = $1
+          `, [id_empleado]);
+                    if (id_usuario_depa.rows[0] != undefined) {
+                        yield database_1.default.query(`
+              UPDATE eu_usuario_departamento 
+              SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+              WHERE id_empleado = $1 RETURNING *
+              `, [id_empleado, id_departamento, true, true, admin_dep]);
+                    }
+                    else {
+                        const response2 = yield database_1.default.query(`
+            INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+            VALUES ($1, $2, $3, $4, $5) RETURNING *
+            `, [id_empleado, id_departamento, true, true, admin_dep]);
+                        const [usuarioDep] = response2.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuario_departamento',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(usuarioDep),
+                            ip,
+                            observacion: null
+                        });
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_cargos',
@@ -808,15 +838,6 @@ class EmpleadoCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(cargos),
-                        ip,
-                        observacion: null
-                    });
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuario_departamento',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(usuarioDep),
                         ip,
                         observacion: null
                     });

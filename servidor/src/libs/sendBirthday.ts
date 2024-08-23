@@ -6,6 +6,7 @@ import path from 'path'
 // METODO PARA ENVIAR MENSAJES DE CUMPLEANIOS A UNA HORA DETERMINADA 
 
 export const cumpleanios = function () {
+
     setInterval(async () => {
         // OBTENER RUTAS
         let separador = path.sep;
@@ -16,8 +17,9 @@ export const cumpleanios = function () {
         const hora = date.getHours();
         const minutos = date.getMinutes();
         const fecha = date.toJSON().slice(4).split("T")[0];
+        console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
         // VERIFICAR HORA DE ENVIO
-        if (hora === 6 && minutos === 0) {
+        if (hora === 14) {
 
             const PARAMETRO = await pool.query(
                 `
@@ -42,6 +44,7 @@ export const cumpleanios = function () {
                     if (EMPLEADOS.rowCount != 0) {
 
                         var correos = BuscarCorreos(EMPLEADOS);
+                        console.log('correos ', correos)
 
                         var usuarios = PresentarUsuarios(EMPLEADOS);
 
@@ -142,7 +145,7 @@ export const cumpleanios = function () {
                 }
             }
         }
-    }, 3600000);
+    }, 2700000);
 }
 
 

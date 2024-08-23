@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken';
 import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 //IMPORTACIONES PARA AOO MOVIL
 import { QueryResult } from 'pg';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 interface IPayload {
   _id: number,
@@ -642,7 +643,9 @@ class UsuarioControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-    const path_folder = path.resolve('logos');
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     const correoValido = await pool.query(
       `
@@ -702,12 +705,12 @@ class UsuarioControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}/${cabecera_firma}`,
+            path: `${path_folder}${separador}${cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}/${pie_firma}`,
+            path: `${path_folder}${separador}${pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };
@@ -1093,7 +1096,7 @@ class UsuarioControlador {
 
   public async getDispositivoPorIdDispositivo(req: Request, res: Response): Promise<Response> {
     try {
-      const {id_dispositivo} = req.body;
+      const { id_dispositivo } = req.body;
       const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`);
       const idDispositivo = response.rows[0];
       if (response.rows.length === 0) {
@@ -1152,7 +1155,7 @@ class UsuarioControlador {
   async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
     try {
       const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo, ' +
-        '( e.apellido || \' \' || e.nombre) as fullname, e.id, u.id_rol, u.usuario ' +
+        '( e.apellido || \' \' || e.nombre) as fullname, e.nombre, e.apellido, e.correo, e.id, u.id_rol, u.usuario ' +
         'FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
       const usuarios = response.rows;
       console.log(usuarios);

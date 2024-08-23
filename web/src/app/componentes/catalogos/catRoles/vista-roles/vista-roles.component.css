@@ -25,3 +25,18 @@ button {
 table {
     width: 100%;
 }
+
+#items {
+    font-size: 14px;
+    margin-top: 8%;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+    padding-left: 10px;
+}
+
+mat-tab-group {
+    background: rgb(232, 232, 232);
+    background: radial-gradient(circle, rgba(232, 232, 232, 0.8883928571428571) 0%, rgba(249, 249, 249, 1) 100%);
+}

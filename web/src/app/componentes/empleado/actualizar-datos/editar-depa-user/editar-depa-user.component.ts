@@ -55,7 +55,6 @@ export class EditarDepaUserComponent implements OnInit {
 
   filtro_sucursal: any;
 
-  //FILTRO DEPARTAMENTOS
   // FILTROS SUCURSALES
   get filtroNombreSucDep() {return this.restR.filtroNombreSuc}
   // FILTROS DEPARTAMENTOS

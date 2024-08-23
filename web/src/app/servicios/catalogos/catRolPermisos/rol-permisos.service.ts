@@ -12,20 +12,20 @@ export class RolPermisosService {
   ) { }
 
   // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  ** USADO
-  ObtenerMenu() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas`);
+  ObtenerMenu(tipo: any) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/${tipo}`);
   }
 
   // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
-  ObtenerModulos() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/modulos`);
+  ObtenerModulos(tipo: any) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/modulos/${tipo}`);
   }
 
   // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
   ObtenerMenuModulos(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginasmodulos`, datos);
   }
-  
+
   // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  ** USADO
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/ide`, datos);

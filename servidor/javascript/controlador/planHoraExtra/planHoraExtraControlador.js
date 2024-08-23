@@ -17,6 +17,7 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class PlanHoraExtraControlador {
     ListarPlanHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -456,7 +457,9 @@ class PlanHoraExtraControlador {
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            const path_folder = path_1.default.resolve('logos');
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
             if (datos === 'ok') {
                 const { id_empl_envia, correos, nombres, observacion, desde, hasta, inicio, fin, horas, asunto, tipo_solicitud, proceso } = req.body;
@@ -520,12 +523,12 @@ class PlanHoraExtraControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
