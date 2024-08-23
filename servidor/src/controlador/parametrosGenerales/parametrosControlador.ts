@@ -22,61 +22,6 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL  **USADO
-    public async ActualizarTipoParametro(req: Request, res: Response): Promise<Response> {
-        try {
-            const { descripcion, id, user_name, ip } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT descripcion FROM ep_parametro WHERE id = $1`, [id]);
-            const [datosOriginales] = consulta.rows;
-
-            if (!datosOriginales) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ep_parametro',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al actualizar tipo parametro con id ${id}`
-                });
-
-                //FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-            }
-
-            await pool.query(
-                `
-                UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
-                `
-                , [descripcion, id]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ep_parametro',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: JSON.stringify({ descripcion }),
-                ip,
-                observacion: null
-            });
-
-            //FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'Registro exitoso.' });
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-        }
-    }
-
     // METODO PARA LISTAR UN PARAMETRO GENERALES **USADO
     public async ListarUnParametro(req: Request, res: Response) {
         const { id } = req.params;

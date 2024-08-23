@@ -15,8 +15,6 @@ class ParametrosRutas {
 
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', TokenValidation, PARAMETROS_CONTROLADOR.ListarParametros);
-        // METODO PARA ACTUALIZAR PARAMETRO  **USADO
-        this.router.put('/actual-tipo', TokenValidation, PARAMETROS_CONTROLADOR.ActualizarTipoParametro);
         // METODO PARA VER DATOS DE UN PARAMETRO **USADO
         this.router.get('/ver-parametro/:id', TokenValidation, PARAMETROS_CONTROLADOR.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO

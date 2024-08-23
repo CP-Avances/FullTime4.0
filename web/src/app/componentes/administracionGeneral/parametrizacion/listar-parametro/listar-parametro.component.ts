@@ -12,8 +12,6 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { EditarParametroComponent } from '../editar-parametro/editar-parametro.component';
-
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
@@ -118,18 +116,6 @@ export class ListarParametroComponent implements OnInit {
       descripcionForm: '',
     });
     this.ObtenerParametros();
-  }
-
-  // METODO PARA ABRIR VENTANA EDICIÓN DE REGISTRO
-  AbrirEditar(datos: any): void {
-    this.ventana.open(EditarParametroComponent,
-      { width: '400px', data: { parametros: datos, actualizar: false } }).afterClosed().subscribe(item => {
-        if (item) {
-          if (item > 0) {
-            this.VerDetalleParametro(item);
-          }
-        }
-      });
   }
 
   // METODO PARA VER DETALLE DE PARAMETROS

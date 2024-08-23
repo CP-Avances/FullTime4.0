@@ -22,12 +22,6 @@ export class ParametrosService {
     return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion`);
   }
 
-
-  // ACTUALIZAR REGISTRO PARAMETRO  **USADO
-  ActualizarTipoParametro(datos: any) {
-    return this.http.put(`${(this.url as string)}/parametrizacion/actual-tipo`, datos);
-  }
-
   // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
     let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;

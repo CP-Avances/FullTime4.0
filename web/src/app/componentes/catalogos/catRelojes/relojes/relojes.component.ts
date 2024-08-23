@@ -159,7 +159,7 @@ export class RelojesComponent implements OnInit {
       id_sucursal: form1.idSucursalForm,
       tipo_conexion: form1.funcionesForm,
       id_departamento: form1.idDepartamentoForm,
-      temepratura: form1.temperaturaForm,
+      temperatura: form1.temperaturaForm,
 
       // SEGUNDO FORMULARIO
       mac: form2.macForm,

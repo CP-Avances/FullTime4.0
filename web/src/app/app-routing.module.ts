@@ -11,7 +11,7 @@ import { ConfirmarContraseniaComponent } from './componentes/iniciarSesion/contr
 import { HomeComponent } from './componentes/home/home.component';
 // CONFIGURACION --PARAMETRIZACION
 import { VerEmpresaComponent } from './componentes/catalogos/catEmpresa/ver-empresa/ver-empresa.component';
-import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
+import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/listar-parametro/listar-parametro.component';
 import { ConfiguracionComponent } from './componentes/administracionGeneral/correo/configuracion/configuracion.component';
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
 import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';

@@ -32,54 +32,6 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL  **USADO
-    ActualizarTipoParametro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, id, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT descripcion FROM ep_parametro WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'ep_parametro',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar tipo parametro con id ${id}`
-                    });
-                    //FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-                UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
-                `, [descripcion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ep_parametro',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify({ descripcion }),
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro exitoso.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
     // METODO PARA LISTAR UN PARAMETRO GENERALES **USADO
     ListarUnParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
