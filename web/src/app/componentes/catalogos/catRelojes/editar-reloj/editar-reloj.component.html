@@ -109,6 +109,22 @@
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
+
+                                <mat-radio-group aria-label="Select an option" formControlName="temperaturaForm" required>
+                                    <label class="d-flex justify-content-start">
+                                        <span style="margin-left: 10px; padding-top: 10px;">
+                                            Función de Temperatura *
+                                        </span>
+                                    </label>
+                                    <div class="d-flex justify-content-around">
+                                        <mat-radio-button [value]="true">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button [value]="false">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
                             </div>
                         </div>
                     </div>

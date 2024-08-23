@@ -98,7 +98,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    this.rol.getOneRol(this.id_rol).subscribe(data => {
+    this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
     this.ObtenerMenu();
@@ -144,7 +144,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA
+  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA 
   ObtenerMenu() {
     this.nombresMenu = [];
     this.rest.ObtenerMenu(this.plataforma).subscribe(res => {
@@ -172,10 +172,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     'reloj_virtual',
   ]
 
+  // METODO PARA BUSCAR PAGINAS QUE PERTENECEN A MODULOS
   ObtenerMenuModulos() {
     this.nombreModulos.map(nombre => {
       var nombre_modulo = {
-        nombre_modulo: nombre, 
+        nombre_modulo: nombre,
         tipo: this.plataforma,
       }
       this.rest.ObtenerMenuModulos(nombre_modulo).subscribe(res => {
@@ -441,6 +442,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     link: obj.link,
                     id_rol: this.id_rol,
                     id_accion: accion.id,
+                    movil: this.plataforma,
                     user_name: this.user_name,
                     ip: this.ip,
                   }
@@ -479,6 +481,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             link: obj.link,
             id_rol: this.id_rol,
             id_accion: null,
+            movil: this.plataforma,
             user_name: this.user_name,
             ip: this.ip,
           }
@@ -566,6 +569,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     link: obj.link,
                     id_rol: this.id_rol,
                     id_accion: accion.id,
+                    movil: this.plataforma,
                     user_name: this.user_name,
                     ip: this.ip,
                   }
@@ -605,6 +609,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             link: obj.link,
             id_rol: this.id_rol,
             id_accion: null,
+            movil: this.plataforma,
             user_name: this.user_name,
             ip: this.ip,
           }
@@ -757,13 +762,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       });
   }
 
-  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+  // FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
   ObtenerTodasPaginasAcciones(): any {
     this.rest.ObtenerMenu(this.plataforma).subscribe(res => {
       this.nombrePaginas = res;
       this.nombrePaginas.map((pagina: any) => {
         var buscarAcciones = {
-          id_funcion: pagina.id
+          id_funcion: pagina.id,
+          tipo: this.plataforma
         };
         this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
           this.todasPaginasAcciones[pagina.id] = res
@@ -774,13 +780,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     return this.todasPaginasAcciones;
   }
 
-  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS
+  // FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS
   ObtenerTodasModulosAcciones(): any {
     this.rest.ObtenerModulos(this.plataforma).subscribe(res => {
       this.nombreModulosAsignados = res;
       this.nombreModulosAsignados.map((pagina: any) => {
         var buscarAcciones = {
-          id_funcion: pagina.id
+          id_funcion: pagina.id,
+          tipo: this.plataforma
         };
         this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
           this.todosModulosAcciones[pagina.id] = res

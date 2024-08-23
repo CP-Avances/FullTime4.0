@@ -22,8 +22,8 @@ class PruebasRutas {
         // METODO PARA LISTAR ROLES  **USADO
         this.router.get('/listausuariosroles', TokenValidation, ROLES_CONTROLADOR.ListarRolesUsuario);
 
-
-        this.router.get('/:id', TokenValidation, ROLES_CONTROLADOR.ObtnenerUnRol);
+       // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+        this.router.get('/:id', TokenValidation, ROLES_CONTROLADOR.ObtenerUnRol);
         // METODO PARA LISTAR ROLES EXCEPTO EL QUE SE EDITA  **USADO
         this.router.get('/actualiza/:id', TokenValidation, ROLES_CONTROLADOR.ListarRolesActualiza);
         // METODO PARA ACTUALIZAR ROLES **USADO

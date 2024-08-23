@@ -129,7 +129,9 @@ class RolesControlador {
     }
   }
 
-  public async ObtnenerUnRol(req: Request, res: Response): Promise<any> {
+
+  // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+  public async ObtenerUnRol(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const ROL = await pool.query(
       `
@@ -229,7 +231,7 @@ class RolesControlador {
   }
 
   // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS **USADO
-  public async ActualizarRolUusuario (req: Request, res: Response) {
+  public async ActualizarRolUusuario(req: Request, res: Response) {
     try {
       const { idRol, listaUsuarios } = req.body;
       var cont = 0;

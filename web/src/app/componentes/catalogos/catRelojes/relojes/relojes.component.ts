@@ -46,6 +46,7 @@ export class RelojesComponent implements OnInit {
   puertoF = new FormControl('', [Validators.required]);
   codigoF = new FormControl('', Validators.required);
   funcionesF = new FormControl('', [Validators.required]);
+  temperaturaF = new FormControl('', [Validators.required]);
   idSucursalF = new FormControl('', Validators.required);
   idDepartamentoF = new FormControl('', [Validators.required]);
 
@@ -92,6 +93,7 @@ export class RelojesComponent implements OnInit {
       puertoForm: this.puertoF,
       codigoForm: this.codigoF,
       funcionesForm: this.funcionesF,
+      temperaturaForm: this.temperaturaF,
       idSucursalForm: this.idSucursalF,
       idDepartamentoForm: this.idDepartamentoF,
     });
@@ -157,6 +159,7 @@ export class RelojesComponent implements OnInit {
       id_sucursal: form1.idSucursalForm,
       tipo_conexion: form1.funcionesForm,
       id_departamento: form1.idDepartamentoForm,
+      temepratura: form1.temperaturaForm,
 
       // SEGUNDO FORMULARIO
       mac: form2.macForm,

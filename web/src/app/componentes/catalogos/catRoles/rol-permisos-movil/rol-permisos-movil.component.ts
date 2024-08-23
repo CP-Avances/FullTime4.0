@@ -39,13 +39,10 @@ export class RolPermisosMovilComponent implements OnInit {
   // DICCIONARIO DE MODULOS
   diccionarioFuncionesActivas: { [id_funcion: string]: boolean } = {
     "permisos": this.permisos,
-    "geolocalizacion": this.geolocalizacion,
-    "alimentacion": this.alimentacion,
-    "horas_extras": this.horas_extras,
-    "timbre_virtual": this.timbre_virtual,
     "vacaciones": this.vacaciones,
-    "acciones_personal": this.acciones_personal,
-    "reloj_virtual": this.reloj_virtual,
+    "horas_extras": this.horas_extras,
+    "alimentacion": this.alimentacion,
+    "aprobar": this.permisos || this.vacaciones || this.horas_extras || this.alimentacion,
   };
 
   nombreRol: string;
@@ -93,12 +90,13 @@ export class RolPermisosMovilComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    this.rol.getOneRol(this.id_rol).subscribe(data => {
+    this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
     this.ObtenerMenu();
@@ -166,12 +164,10 @@ export class RolPermisosMovilComponent implements OnInit {
     'vacaciones',
     'horas_extras',
     'alimentacion',
-    'acciones_personal',
-    'geolocalizacion',
-    'timbre_virtual',
-    'reloj_virtual',
+    'aprobar',
   ]
 
+  // METODO PARA MOSTRAR LAS PAGINAS QUE PERTENECEN A MODULOS
   ObtenerMenuModulos() {
     this.nombreModulos.map(nombre => {
       var nombre_modulo = {
@@ -441,6 +437,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     link: obj.link,
                     id_rol: this.id_rol,
                     id_accion: accion.id,
+                    movil: this.plataforma,
                     user_name: this.user_name,
                     ip: this.ip,
                   }
@@ -479,6 +476,7 @@ export class RolPermisosMovilComponent implements OnInit {
             link: obj.link,
             id_rol: this.id_rol,
             id_accion: null,
+            movil: this.plataforma,
             user_name: this.user_name,
             ip: this.ip,
           }
@@ -566,6 +564,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     link: obj.link,
                     id_rol: this.id_rol,
                     id_accion: accion.id,
+                    movil: this.plataforma,
                     user_name: this.user_name,
                     ip: this.ip,
                   }
@@ -605,6 +604,7 @@ export class RolPermisosMovilComponent implements OnInit {
             link: obj.link,
             id_rol: this.id_rol,
             id_accion: null,
+            movil: this.plataforma,
             user_name: this.user_name,
             ip: this.ip,
           }
@@ -763,7 +763,8 @@ export class RolPermisosMovilComponent implements OnInit {
       this.nombrePaginas = res;
       this.nombrePaginas.map((pagina: any) => {
         var buscarAcciones = {
-          id_funcion: pagina.id
+          id_funcion: pagina.id,
+          tipo: this.plataforma
         };
         this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
           this.todasPaginasAcciones[pagina.id] = res
@@ -774,13 +775,14 @@ export class RolPermisosMovilComponent implements OnInit {
     return this.todasPaginasAcciones;
   }
 
-  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS
+  // FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS
   ObtenerTodasModulosAcciones(): any {
     this.rest.ObtenerModulos(this.plataforma).subscribe(res => {
       this.nombreModulosAsignados = res;
       this.nombreModulosAsignados.map((pagina: any) => {
         var buscarAcciones = {
-          id_funcion: pagina.id
+          id_funcion: pagina.id,
+          tipo: this.plataforma
         };
         this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
           this.todosModulosAcciones[pagina.id] = res

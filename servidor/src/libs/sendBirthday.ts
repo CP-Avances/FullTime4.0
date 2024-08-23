@@ -19,7 +19,7 @@ export const cumpleanios = function () {
         const fecha = date.toJSON().slice(4).split("T")[0];
         console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
         // VERIFICAR HORA DE ENVIO
-        if (hora === 11 && minutos === 0) {
+        if (hora === 14) {
 
             const PARAMETRO = await pool.query(
                 `

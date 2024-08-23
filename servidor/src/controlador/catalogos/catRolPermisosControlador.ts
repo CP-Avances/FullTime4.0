@@ -12,7 +12,8 @@ class RolPermisosControlador {
     const Roles = await pool.query(
       `
       SELECT * FROM es_paginas WHERE modulo = false AND movil = $1
-      `, [tipo]
+      `
+      , [tipo]
     );
     if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
@@ -105,15 +106,15 @@ class RolPermisosControlador {
   // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
-      const { funcion, link, id_rol, id_accion, user_name, ip } = req.body;
+      const { funcion, link, id_rol, id_accion, movil, user_name, ip } = req.body;
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
+        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
         `
-        , [funcion, link, id_rol, id_accion]);
+        , [funcion, link, id_rol, id_accion, movil]);
       const [datosOriginales] = response.rows;
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ero_rol_permisos',
@@ -196,12 +197,13 @@ class RolPermisosControlador {
 
   // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA  **USADO
   public async ObtenerAccionesPaginas(req: Request, res: Response): Promise<any> {
-    const { id_funcion } = req.body;
+    const { id_funcion, tipo } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-      SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+      SELECT * FROM es_acciones_paginas AS ap, es_paginas AS p 
+      WHERE ap.id_pagina = $1 AND p.id = ap.id_pagina AND p.movil = $2
       `
-      , [id_funcion]);
+      , [id_funcion, tipo]);
     if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
     }
