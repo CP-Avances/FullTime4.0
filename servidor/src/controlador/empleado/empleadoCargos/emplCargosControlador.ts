@@ -925,20 +925,12 @@ class EmpleadoCargosControlador {
         const response: QueryResult = await pool.query(
           `
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
-            sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+            sueldo, id_tipo_cargo, hora_trabaja, jefe, estado) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
           `
           , [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
-            hora_trabaja, admin_dep]);
+            hora_trabaja, admin_dep, true]);
         const [cargos] = response.rows;
-
-        await pool.query(
-          `
-            UPDATE eu_empleado_cargos set estado = $2 
-            WHERE id = $1 AND estado = 'false' RETURNING *
-            `
-          , [response.rows[0].id, true]);
-
 
         const id_usuario_depa = await pool.query(
           `
