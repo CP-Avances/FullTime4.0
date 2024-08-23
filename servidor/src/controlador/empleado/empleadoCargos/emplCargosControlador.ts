@@ -953,7 +953,7 @@ class EmpleadoCargosControlador {
               SET id_departamento = $2, principal = $3, personal = $4, administra =$5
               WHERE id_empleado = $1 RETURNING *
               `
-            , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
+            , [id_empleado, id_departamento, true, true, admin_dep]
           )
          }else{
             
