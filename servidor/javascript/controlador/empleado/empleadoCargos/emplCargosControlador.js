@@ -804,16 +804,37 @@ class EmpleadoCargosControlador {
           `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
                         hora_trabaja, admin_dep]);
                     const [cargos] = response.rows;
-                    const response2 = yield database_1.default.query(`
-          INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-          VALUES ($1, $2, $3, $4, $5) RETURNING *
-          `, [id_empleado, id_departamento, true, true, admin_dep]);
-                    const [usuarioDep] = response2.rows;
-                    console.log('response: ', response.rows[0]);
                     yield database_1.default.query(`
             UPDATE eu_empleado_cargos set estado = $2 
             WHERE id = $1 AND estado = 'false' RETURNING *
             `, [response.rows[0].id, true]);
+                    const id_usuario_depa = yield database_1.default.query(`
+           SELECT id FROM eu_usuario_departamento WHERE id_empleado = $1
+          `, [id_empleado]);
+                    if (id_usuario_depa.rows[0] != undefined) {
+                        yield database_1.default.query(`
+              UPDATE eu_usuario_departamento 
+              SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+              WHERE id_empleado = $1 RETURNING *
+              `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
+                    }
+                    else {
+                        const response2 = yield database_1.default.query(`
+            INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+            VALUES ($1, $2, $3, $4, $5) RETURNING *
+            `, [id_empleado, id_departamento, true, true, admin_dep]);
+                        const [usuarioDep] = response2.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuario_departamento',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(usuarioDep),
+                            ip,
+                            observacion: null
+                        });
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_cargos',
@@ -821,15 +842,6 @@ class EmpleadoCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(cargos),
-                        ip,
-                        observacion: null
-                    });
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuario_departamento',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(usuarioDep),
                         ip,
                         observacion: null
                     });
