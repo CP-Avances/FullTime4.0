@@ -10,8 +10,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { EditarParametroComponent } from '../../parametros/editar-parametro/editar-parametro.component';
-import { ListarParametroComponent } from '../../parametros/listar-parametro/listar-parametro.component';
+import { ListarParametroComponent } from '../../listar-parametro/listar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
 
@@ -276,19 +275,6 @@ export class VerParametroComponent implements OnInit {
       .afterClosed().subscribe(item => {
         this.BuscarParametros(this.idParametro);
         this.ListarDetalles(this.idParametro);
-      });
-  }
-
-  // METODO PARA EDITAR PARAMETRO
-  AbrirVentanaEditar(datos: any): void {
-    this.ventana.open(EditarParametroComponent,
-      { width: '400px', data: { parametros: datos, actualizar: true } })
-      .afterClosed().subscribe(item => {
-        if (item) {
-          if (item > 0) {
-            this.BuscarParametros(this.idParametro);
-          }
-        }
       });
   }
 

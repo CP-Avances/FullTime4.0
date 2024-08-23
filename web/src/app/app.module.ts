@@ -49,11 +49,10 @@ import { MetodosComponent } from './componentes/administracionGeneral/metodoElim
 import { EditarEmpresaComponent } from './componentes/catalogos/catEmpresa/editar-empresa/editar-empresa.component';
 import { LogosComponent } from './componentes/catalogos/catEmpresa/logos/logos.component';
 import { VerEmpresaComponent } from './componentes/catalogos/catEmpresa/ver-empresa/ver-empresa.component';
-import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
 import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';
 import { CrearDetalleParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/editar-detalle-parametro/editar-detalle-parametro.component';
-import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
+import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/listar-parametro/listar-parametro.component';
 import { ConfiguracionComponent } from './componentes/administracionGeneral/correo/configuracion/configuracion.component';
 import { RegistroRolComponent } from './componentes/catalogos/catRoles/registro-rol/registro-rol.component';
 import { EditarRolComponent } from './componentes/catalogos/catRoles/editar-rol/editar-rol.component';
@@ -334,7 +333,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     EditarEmpresaComponent,
     LogosComponent,
     VerEmpresaComponent,
-    EditarParametroComponent,
     VerParametroComponent,
     CrearDetalleParametroComponent,
     EditarDetalleParametroComponent,
