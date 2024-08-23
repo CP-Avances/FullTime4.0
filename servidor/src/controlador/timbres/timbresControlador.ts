@@ -784,13 +784,13 @@ class TimbresControlador {
 
     public async crearTimbreJustificadoAdmin(req: Request, res: Response) {
         try {
-            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip } = req.body
+            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento } = req.body
             console.log(req.body);
             await pool.query('BEGIN');
 
 
-            const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
-                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre ])
+            const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
+                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre , documento])
                 .then(result => {
                     return result.rows;
                 });
