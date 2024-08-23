@@ -703,13 +703,24 @@ class EmpleadoCargosControlador {
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
             ) {
               
+              const ID_CONTRATO_FECHAS: any = await pool.query(
+                ` 
+                SELECT euc.id FROM eu_empleado_contratos AS euc
+                WHERE euc.id = $1 AND (
+                  ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
+                  ($3 BETWEEN fecha_ingreso AND fecha_salida))
+                `
+                , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
 
-              var VERIFICAR_SUCURSALES = await pool.query(
+
+                if(ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '' ){
+
+                  var VERIFICAR_SUCURSALES = await pool.query(
                 `
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
                 `
-                , [valor.sucursal.toUpperCase()])
-              if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                  , [valor.sucursal.toUpperCase()])
+                  if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
 
                 var VERIFICAR_DEPARTAMENTO: any = await pool.query(
                   `
@@ -770,13 +781,16 @@ class EmpleadoCargosControlador {
                 else {
                   valor.observacion = 'Departamento no existe en el sistema'
                 }
-              }
-              else {
+                  }
+                  else {
                 valor.observacion = 'Sucursal no existe en el sistema'
-              }
+                  }
 
+                }else{
+                  valor.observacion = 'Las fechas debe coresponder con las del contrato vigente'
+                }
 
-            }
+             }
             else {
               valor.observacion = 'Cédula no tiene registrado un contrato'
             }
@@ -911,31 +925,52 @@ class EmpleadoCargosControlador {
         const response: QueryResult = await pool.query(
           `
           INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
-            sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+            sueldo, id_tipo_cargo, hora_trabaja, jefe, estado) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
           `
           , [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
-            hora_trabaja, admin_dep]);
+            hora_trabaja, admin_dep, true]);
         const [cargos] = response.rows;
 
-        const response2 = await pool.query(
+        const id_usuario_depa = await pool.query(
           `
-          INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-          VALUES ($1, $2, $3, $4, $5) RETURNING *
+           SELECT id FROM eu_usuario_departamento WHERE id_empleado = $1
           `
-          , [id_empleado, id_departamento, true, true, admin_dep]);
-        const [usuarioDep] = response2.rows;
+          , [id_empleado]);
 
-        console.log('response: ', response.rows[0]);
-
-        
-
-        await pool.query(
-          `
-            UPDATE eu_empleado_cargos set estado = $2 
-            WHERE id = $1 AND estado = 'false' RETURNING *
+         if(id_usuario_depa.rows[0] != undefined){
+          await pool.query(
             `
-          , [response.rows[0].id, true]);
+              UPDATE eu_usuario_departamento 
+              SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+              WHERE id_empleado = $1 RETURNING *
+              `
+            , [id_empleado, id_departamento, true, true, admin_dep]
+          )
+         }else{
+            
+          const response2 = await pool.query(
+            `
+            INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+            VALUES ($1, $2, $3, $4, $5) RETURNING *
+            `
+            , [id_empleado, id_departamento, true, true, admin_dep]);
+          
+            const [usuarioDep] = response2.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuario_departamento',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(usuarioDep),
+              ip,
+              observacion: null
+            });
+            
+         }
+
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -948,15 +983,7 @@ class EmpleadoCargosControlador {
           observacion: null
         });
 
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_usuario_departamento',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: JSON.stringify(usuarioDep),
-          ip,
-          observacion: null
-        });
+        
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');

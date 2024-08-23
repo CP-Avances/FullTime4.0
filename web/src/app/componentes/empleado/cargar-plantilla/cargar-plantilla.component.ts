@@ -427,7 +427,8 @@ export class CargarPlantillaComponent implements OnInit {
     }
     else if (observacion == 'País no corresponde con el Régimen Laboral' ||
       observacion == 'La fecha desde no puede ser mayor o igual a la fecha hasta' ||
-      observacion == 'Departamento no pertenece a la sucursal') {
+      observacion == 'Departamento no pertenece a la sucursal' ||
+      observacion == 'Las fechas debe coresponder con las del contrato vigente') {
       return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
