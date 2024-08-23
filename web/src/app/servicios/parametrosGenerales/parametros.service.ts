@@ -16,12 +16,6 @@ export class ParametrosService {
     return this.http.get<any>(`${environment.url}/parametrizacion`);
   }
 
-
-  // ACTUALIZAR REGISTRO PARAMETRO  **USADO
-  ActualizarTipoParametro(datos: any) {
-    return this.http.put(`${environment.url}/parametrizacion/actual-tipo`, datos);
-  }
-
   // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
     return this.http.get<any>(`${environment.url}/parametrizacion/ver-parametro/${id}`);
