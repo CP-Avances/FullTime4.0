@@ -29,11 +29,12 @@ p {
 }
 
 #cerrar {
-    color: rgb(38, 0, 255);
+    color: rgb(233, 0, 0);
     margin-right: 5px;
     cursor: pointer;
     margin-left: 15px;
     text-align: center;
+    border-radius: 40px;
 }
 
 mat-tab-group {

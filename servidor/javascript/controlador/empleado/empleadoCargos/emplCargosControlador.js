@@ -805,14 +805,16 @@ class EmpleadoCargosControlador {
                         hora_trabaja, admin_dep, true]);
                     const [cargos] = response.rows;
                     const id_usuario_depa = yield database_1.default.query(`
-           SELECT id FROM eu_usuario_departamento WHERE id_empleado = $1
+           SELECT id FROM eu_usuario_departamento 
+           WHERE id_empleado = $1 AND 
+            principal = true AND administra = false 
           `, [id_empleado]);
                     if (id_usuario_depa.rows[0] != undefined) {
                         yield database_1.default.query(`
               UPDATE eu_usuario_departamento 
               SET id_departamento = $2, principal = $3, personal = $4, administra =$5
-              WHERE id_empleado = $1 RETURNING *
-              `, [id_empleado, id_departamento, true, true, admin_dep]);
+              WHERE id = $1 RETURNING *
+              `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
                     }
                     else {
                         const response2 = yield database_1.default.query(`
