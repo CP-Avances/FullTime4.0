@@ -865,9 +865,18 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.body;
             try {
+                const info_cargo = yield database_1.default.query(`
+        SELECT emCa.id, emCa.id_contrato, emCa.id_departamento, caEmp.id_empleado, euDe.id AS id_us_depa
+        FROM eu_empleado_cargos AS emCa, cargos_empleado AS caEmp, eu_usuario_departamento AS euDe
+        WHERE emCa.id = $1 AND caEmp.id_cargo = emCa.id AND euDe.id_empleado = caEmp.id_empleado AND 
+          euDe.id_departamento = emCa.id_departamento
+        `, [id]);
                 yield database_1.default.query(`
         DELETE FROM eu_empleado_cargos WHERE id = $1
         `, [id]);
+                yield database_1.default.query(`
+        DELETE FROM eu_usuario_departamento WHERE id = $1
+        `, [info_cargo.rows[0].id_us_depa]);
                 return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {
