@@ -126,9 +126,7 @@ export class RolPermisosMovilComponent implements OnInit {
   ver_modulo: boolean = false;
   VerModulos() {
     if (this.permisos === false && this.vacaciones === false && this.horas_extras === false &&
-      this.acciones_personal === false && this.timbre_virtual === false && this.reloj_virtual === false &&
-      this.geolocalizacion === false
-    ) {
+      this.alimentacion === false) {
       this.ver_modulo = false;
     }
     else {
