@@ -44,13 +44,13 @@ class LoginControlador {
                     let ACTIVO = yield database_1.default.query(
                     //FIXME
                     `
-          SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
+          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `, [USUARIO.rows[0].id])
                         .then((result) => {
                         return result.rows;
                     });
-                    const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen } = ACTIVO[0];
+                    const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });
@@ -58,6 +58,9 @@ class LoginControlador {
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
                     if (!web_access)
                         return res.status(404).jsonp({ message: "sin_permiso_acceso" });
+                    // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO AA  LAPP_MOVIL
+                    if (!app_habilita && movil == true)
+                        return res.jsonp({ message: "sin_permiso_acces_movil" });
                     // BUSQUEDA DE MODULOS DEL SISTEMA
                     const [modulos] = yield database_1.default.query(`
           SELECT * FROM e_funciones LIMIT 1
