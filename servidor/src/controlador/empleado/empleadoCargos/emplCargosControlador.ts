@@ -1025,9 +1025,9 @@ class EmpleadoCargosControlador {
 
       await pool.query(
         `
-        DELETE FROM eu_usuario_departamento WHERE id = $1
+        DELETE FROM eu_usuario_departamento WHERE id = $1 AND principal = $2
         `
-        , [info_cargo.rows[0].id_us_depa])
+        , [info_cargo.rows[0].id_us_depa, true])
       
 
       return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });

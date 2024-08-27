@@ -425,39 +425,39 @@ class RelojesControlador {
                         }
                         if (ESTABLECIMIENTO == undefined) {
                             data.establecimiento = 'No registrado';
-                            data.observacion = 'Sucursal ' + data.observacion;
+                            data.observacion = 'Sucursal, ' + data.observacion;
                         }
                         if (DEPARTAMENTO == undefined) {
                             data.departamento = 'No registrado';
-                            data.observacion = 'Departamento ' + data.observacion;
+                            data.observacion = 'Departamento, ' + data.observacion;
                         }
                         if (NOMBRE_DISPOSITIVO == undefined) {
                             data.nombre_dispo = 'No registrado';
-                            data.observacion = 'Nombre dispositivo ' + data.observacion;
+                            data.observacion = 'Nombre dispositivo, ' + data.observacion;
                         }
                         if (CODIGO == undefined) {
                             data.codigo = 'No registrado';
-                            data.observacion = 'Código ' + data.observacion;
+                            data.observacion = 'Código, ' + data.observacion;
                         }
                         if (DIRECCION_IP == undefined) {
                             data.direccion_ip = 'No registrado';
-                            data.observacion = 'Dirección IP ' + data.observacion;
+                            data.observacion = 'Dirección IP, ' + data.observacion;
                         }
                         if (PUERTO == undefined) {
                             data.puerto = 'No registrado';
-                            data.observacion = 'Puerto ' + data.observacion;
+                            data.observacion = 'Puerto, ' + data.observacion;
                         }
                         if (TIPO_CONEXION == undefined) {
                             data.tipo_conexion = 'No registrado';
-                            data.observacion = 'Tipo conexión ' + data.observacion;
+                            data.observacion = 'Tipo conexión, ' + data.observacion;
                         }
                         if (TEMPERATURA == undefined) {
                             data.temperatura = 'No registrado';
-                            data.observacion = 'Función temperatura ' + data.observacion;
+                            data.observacion = 'Función temperatura, ' + data.observacion;
                         }
                         if (MARCA == undefined) {
                             data.marca = 'No registrado';
-                            data.observacion = 'Marca ' + data.observacion;
+                            data.observacion = 'Marca, ' + data.observacion;
                         }
                         if (MODELO == undefined) {
                             data.modelo = ' - ';
@@ -470,7 +470,7 @@ class RelojesControlador {
                         }
                         if (NUMERO_SERIE == undefined) {
                             data.numero_serie = 'No registrado';
-                            data.observacion = 'Número de serie ' + data.observacion;
+                            data.observacion = 'Número de serie, ' + data.observacion;
                         }
                         if (DIRECCION_MAC == undefined) {
                             data.direccion_mac = ' - ';
@@ -750,6 +750,32 @@ class RelojesControlador {
                     });
                 }
 
+                var modelo_data = null
+                if(modelo != ' - '){
+                    modelo_data = modelo;
+                }
+
+                var contrasenia_data = null
+                if(contrasena != ' - '){
+                    contrasenia_data = contrasena;
+                }
+
+                var fabricanteID_data = null
+                if(id_fabricante != ' - '){
+                    fabricanteID_data = id_fabricante;
+                }
+
+                var fabricante_data = null
+                if(fabricante != ' - '){
+                    fabricante_data = fabricante;
+                }
+
+                
+                var mac_data = null
+                if(direccion_mac != ' - '){
+                    mac_data = direccion_mac;
+                }
+
                 // VERIFICAR QUE SE HAYA INGRESADO NUMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
                 var tipo_conexion_boolean = false;
                 if (tipo_conexion.toLowerCase() === 'interna') {
@@ -773,8 +799,8 @@ class RelojesControlador {
                         id_fabricacion, fabricante, mac, tipo_conexion, temperatura, codigo) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                     `
-                    , [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca,
-                        modelo, numero_serie, id_fabricante, fabricante, direccion_mac, tipo_conexion_boolean, temperatura_boolean, codigo]);
+                    , [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasenia_data, marca,
+                        modelo_data, numero_serie, fabricanteID_data, fabricante_data, mac_data, tipo_conexion_boolean, temperatura_boolean, codigo]);
 
                 const [reloj_ingre] = response.rows;
 

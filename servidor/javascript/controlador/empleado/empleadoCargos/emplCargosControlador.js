@@ -875,8 +875,8 @@ class EmpleadoCargosControlador {
         DELETE FROM eu_empleado_cargos WHERE id = $1
         `, [id]);
                 yield database_1.default.query(`
-        DELETE FROM eu_usuario_departamento WHERE id = $1
-        `, [info_cargo.rows[0].id_us_depa]);
+        DELETE FROM eu_usuario_departamento WHERE id = $1 AND principal = $2
+        `, [info_cargo.rows[0].id_us_depa, true]);
                 return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {
