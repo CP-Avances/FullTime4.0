@@ -425,7 +425,7 @@ class RelojesControlador {
                         }
                         if (ESTABLECIMIENTO == undefined) {
                             data.establecimiento = 'No registrado';
-                            data.observacion = 'Establecimiento ' + data.observacion;
+                            data.observacion = 'Sucursal ' + data.observacion;
                         }
                         if (DEPARTAMENTO == undefined) {
                             data.departamento = 'No registrado';
@@ -437,7 +437,7 @@ class RelojesControlador {
                         }
                         if (CODIGO == undefined) {
                             data.codigo = 'No registrado';
-                            data.observacion = 'Codigo ' + data.observacion;
+                            data.observacion = 'Código ' + data.observacion;
                         }
                         if (DIRECCION_IP == undefined) {
                             data.direccion_ip = 'No registrado';
@@ -452,7 +452,8 @@ class RelojesControlador {
                             data.observacion = 'Tipo conexión ' + data.observacion;
                         }
                         if (TEMPERATURA == undefined) {
-                            data.temperatura = ' - ';
+                            data.temperatura = 'No registrado';
+                            data.observacion = 'Función temperatura ' + data.observacion;
                         }
                         if (MARCA == undefined) {
                             data.marca = 'No registrado';
@@ -469,7 +470,7 @@ class RelojesControlador {
                         }
                         if (NUMERO_SERIE == undefined) {
                             data.numero_serie = 'No registrado';
-                            data.observacion = 'Numero de serie ' + data.observacion;
+                            data.observacion = 'Número de serie ' + data.observacion;
                         }
                         if (DIRECCION_MAC == undefined) {
                             data.direccion_mac = ' - ';
@@ -587,16 +588,16 @@ class RelojesControlador {
                                                                         }
                                                                     }
                                                                 }else{
-                                                                    item.observacion = 'Marca incorrecta ingrese (ZKTECO / HIKVISION)';
+                                                                    item.observacion = 'Marca no válida ingrese (ZKTECO / HIKVISION)';
                                                                 }
 
 
                                                             }else{
-                                                                item.observacion = 'Temperarura incorrecta ingrese (SI / NO)';
+                                                                item.observacion = 'Función temperatura no válida ingrese (SI / NO)';
                                                             }
                                                         }
                                                         else {
-                                                            item.observacion = 'Acción incorrecta ingrese (interna / externa)';
+                                                            item.observacion = 'Conexión no válida ingrese (interna / externa)';
                                                         }
                                                     }
                                                 }
@@ -617,7 +618,7 @@ class RelojesControlador {
                                     }
                                 }
                                 else {
-                                    item.observacion = 'Departamento no pertenece al establecimiento';
+                                    item.observacion = 'Departamento no pertenece a la sucursal';
                                 }
 
                             }
@@ -626,7 +627,7 @@ class RelojesControlador {
                             }
                         }
                         else {
-                            item.observacion = 'Establecimiento no existe en el sistema';
+                            item.observacion = 'Sucursal no existe en el sistema';
                         }
                     }
                 });
