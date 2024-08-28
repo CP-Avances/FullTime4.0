@@ -876,7 +876,7 @@ class UsuarioControlador {
     }
   }
 
-  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
+  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO -------------------------VERIFICAR USO
   public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
@@ -884,6 +884,23 @@ class UsuarioControlador {
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
       AND principal = true
       `,
+      [id_empleado]
+    );
+    if (USUARIOS.rowCount != 0) {
+      return res.jsonp(USUARIOS.rows)
+    }
+    else {
+      return res.jsonp(null);
+    }
+  }
+
+  // BUSCAR TODAS LAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
+  public async BuscarAsignacionesUsuario(req: Request, res: Response) {
+    const { id_empleado } = req.body;
+    const USUARIOS = await pool.query(
+      `
+        SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+        `,
       [id_empleado]
     );
     if (USUARIOS.rowCount != 0) {
@@ -905,6 +922,10 @@ class UsuarioControlador {
       // CONSULTA DATOSORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
+      console.log('datos ', datosOriginales)
+      consulta.rows.forEach((au: any) => {
+        console.log('au ', au)
+      })
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -921,27 +942,27 @@ class UsuarioControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
-
-      const datosActuales = await pool.query(
-        `
-        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
-        WHERE id = $1 RETURNING *
-        `
-        , [id, id_departamento, principal, personal, administra]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuario_departamento',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(datosActuales.rows[0]),
-        ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
+      /*
+            const datosActuales = await pool.query(
+              `
+              UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
+              WHERE id = $1 RETURNING *
+              `
+              , [id, id_departamento, principal, personal, administra]);
+      
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuario_departamento',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: JSON.stringify(datosOriginales),
+              datosNuevos: JSON.stringify(datosActuales.rows[0]),
+              ip,
+              observacion: null
+            });
+      
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');*/
       return res.jsonp({ message: 'Registro actualizado.' });
 
     }

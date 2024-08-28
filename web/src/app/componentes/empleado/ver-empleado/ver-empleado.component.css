@@ -8,12 +8,13 @@ p {
 }
 
 #items {
-    font-size: 14px;
+    font-size: 12px;
     margin-top: 8%;
     font-style: normal;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 1px;
     word-wrap: break-word;
+    color: black;
 }
 
 .material-icons {
@@ -423,3 +424,4 @@ td {
     margin-left: 5px;
     padding-top: 9px;
 }
+

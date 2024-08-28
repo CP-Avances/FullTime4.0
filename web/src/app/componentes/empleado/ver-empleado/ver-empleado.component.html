@@ -13,7 +13,7 @@
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
     <mat-tab label="perfil">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">person_pin</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">account_circle</mat-icon>
             <h6 id="items">Perfil Usuario</h6>
         </ng-template>
         <div class="container" *ngFor="let e of empleadoUno" style="padding-top: 15px; padding-bottom: 25px;">
@@ -205,22 +205,10 @@
 
     </mat-tab>
 
-     <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
-     <mat-tab label="historico">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">dvr</mat-icon>
-            <h6 id="items">Historico</h6>
-        </ng-template>
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-        </div>
-    </mat-tab>
-
-
-
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
     <mat-tab label="asignaciones">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">school</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">school</mat-icon>
             <h6 id="items">Asignaciones</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -323,7 +311,7 @@
     <!-- REGISTRO DE VACUNACION -->
     <mat-tab label="vacunacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">local_hospital</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">add_circle</mat-icon>
             <h6 id="items">Vacunación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -400,7 +388,7 @@
     <!-- CONTRATO DEL EMPLEADO Y CARGO DEL EMPLEADO -->
     <mat-tab label="contrato_cargo">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">description</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
             <h6 id="items">Contrato y Cargo</h6>
         </ng-template>
 
@@ -943,7 +931,7 @@
     <!-- HORARIO DEL EMPLEADO -->
     <mat-tab label="planificacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">event</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">event</mat-icon>
             <h6 id="items">Planificación horaria</h6>
         </ng-template>
 
@@ -1607,7 +1595,7 @@
     <!-- PERMISOS -->
     <mat-tab *ngIf="HabilitarPermisos" label="solicitudes_permisos">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">transfer_within_a_station</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">transfer_within_a_station</mat-icon>
             <h6 id="items">Permisos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -1751,7 +1739,7 @@
     <!-- PERIODO DE VACACIONES DEL EMPLEADO Y VACACIONES DEL EMPLEADO -->
     <mat-tab *ngIf="habilitarVacaciones" label="periodo_vacaciones">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">flight_takeoff</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">flight_takeoff</mat-icon>
             <h6 id="items"> Vacaciones</h6>
         </ng-template>
 
@@ -1921,7 +1909,7 @@
     <!-- HORAS EXTRAS -->
     <mat-tab *ngIf="HabilitarHorasE" label="solicitudes_horas_extras">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">query_builder</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">query_builder</mat-icon>
             <h6 id="items"> Horas Extras</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_horas">
@@ -2088,7 +2076,7 @@
     <!-- PLANIFICACION DE ALMUERZO -->
     <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">local_dining</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">local_dining</mat-icon>
             <h6 id="items"> Alimentación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_comida">
@@ -2270,7 +2258,7 @@
     <!-- PROCESOS DEL EMPLEADO -->
     <mat-tab *ngIf="HabilitarAccion" label="accion_personal">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">wc</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">wc</mat-icon>
             <h6 id="items"> Procesos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -2337,7 +2325,7 @@
     <!-- AUTORIZACIONES -->
     <mat-tab *ngIf="autorizar" label="autorizar">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">supervisor_account</mat-icon>
             <h6 id="items">Autorización</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -2421,6 +2409,16 @@
                     </mat-card-content>
                 </mat-card>
             </div>
+        </div>
+    </mat-tab>
+
+    <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
+    <mat-tab label="historico">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">dvr</mat-icon>
+            <h6 id="items">Histórico</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
         </div>
     </mat-tab>
 

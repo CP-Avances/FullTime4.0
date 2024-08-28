@@ -224,7 +224,7 @@ class EmpleadoCargosControlador {
             const { id_empl_contrato } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
-        s.nombre AS sucursal, d.nombre AS departamento, ec.jefe 
+        s.nombre AS sucursal, d.nombre AS departamento, ec.jefe, ec.estado 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
       WHERE ec.id_contrato = $1 AND d.id_sucursal = s.id AND ec.id_departamento = d.id
       `, [id_empl_contrato]);

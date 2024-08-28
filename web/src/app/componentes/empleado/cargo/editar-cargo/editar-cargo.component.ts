@@ -435,17 +435,56 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
   administra: boolean;
+  asignaciones: any = [];
+  principal_false: number = 0;
+  principal_true: number = 0;
   BuscarUsuarioDepartamento() {
+    this.asignaciones = [];
+    this.principal_false = 0;
+    this.principal_true = 0;
     let datos = {
       id_empleado: this.idEmpleado,
     }
-    this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
+    this.usuario.BuscarAsignacionesUsuario(datos).subscribe(res => {
       if (res != null) {
-        this.personal = res[0].personal;
-        this.administra = res[0].administra;
-        this.idAsignacion = res[0].id;
+        console.log('res ', res)
+        this.asignaciones = res;
+        if (this.asignaciones.length === 1) {
+          this.personal = res[0].personal;
+          this.administra = res[0].administra;
+        }
+        else {
+          this.asignaciones.forEach((a: any) => {
+            if (a.principal === true) {
+              this.personal = res[0].personal;
+              this.administra = res[0].administra;
+            }
+            if (a.id_departamento === this.idDepartamento.value && a.principal === false) {
+              this.principal_false = a.id;
+            }
+            else if (a.id_departamento === this.idDepartamento.value && a.principal === true) {
+              this.principal_true = a.id;
+            }
+            else if (a.principal === true) {
+              this.idAsignacion = a.id;
+            }
+          })
+        }
       }
     });
+  }
+
+  // METODO PARA VERIFICAR ASIGNACIONES
+  VerificarAsignaciones() {
+    let id = 0;
+    if (this.principal_false != 0) {
+      if (this.principal_true != 0) {
+        id = this.principal_true;
+      }
+      else {
+        id = this.idAsignacion;
+      }
+    }
   }
 
   // METODO PARA ACTUALIZAR USUARIO - DEPARTAMENTO
@@ -460,6 +499,17 @@ export class EditarCargoComponent implements OnInit {
       ip: this.ip,
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
+    });
+  }
+
+  // METODO PARA ELIMINAR ASIGNACION
+  EliminarAsignacion(id: number) {
+    const datos = {
+      id: id,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });
   }
 

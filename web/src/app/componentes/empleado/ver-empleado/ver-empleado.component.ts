@@ -915,6 +915,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   listaCargos: any = [];
   mostrar_cargo_datos: boolean = false;
   ObtenerContratoSeleccionado(form: any) {
+    this.mostrar_cargo_datos = false;
     this.contratoSeleccionado = [];
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
@@ -935,7 +936,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
       else if (this.listaCargos.length === 1) {
         if (this.listaCargos[0].estado === false) {
-          this.mostrar_cargo_datos = false;
+          this.mostrar_cargo_datos = true;
         }
       }
 
