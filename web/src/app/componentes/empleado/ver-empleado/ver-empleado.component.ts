@@ -262,8 +262,16 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.autorizacionesTotales = [];
   }
 
+  pantalla: string = '';
   // METODO PARA DETECTAR EVENTO DE PESTAÑA
   DetectarEventoTab(event: MatTabChangeEvent) {
+    this.pantalla = event.tab.textLabel;
+
+    console.log('pantalla> ',this.pantalla)
+
+    if (event.tab.textLabel === 'historico') {
+      
+    }
     if (event.tab.textLabel === 'asignaciones') {
       if (this.asignacion === 0) {
         this.ObtenerTituloEmpleado();

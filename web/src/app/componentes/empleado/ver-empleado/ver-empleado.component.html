@@ -1,4 +1,13 @@
 <br>
+<div class="row w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
+    <div class="col-12 text-center">
+        <div class="d-flex bd-highlight" id="resultados">
+            <h6 class="w-100 bd-highlight align-self-center">
+                {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
+            </h6>
+        </div>
+    </div>
+</div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
 
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
@@ -195,6 +204,18 @@
         </div>
 
     </mat-tab>
+
+     <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
+     <mat-tab label="historico">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">dvr</mat-icon>
+            <h6 id="items">Historico</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+        </div>
+    </mat-tab>
+
+
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
     <mat-tab label="asignaciones">
