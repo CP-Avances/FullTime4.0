@@ -905,8 +905,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   });
   contratoSeleccionado: any = [];
   listaCargos: any = [];
+  mostrar_cargo_datos: boolean = false;
   ObtenerContratoSeleccionado(form: any) {
-    this.LimpiarCargo();
     this.contratoSeleccionado = [];
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
@@ -920,6 +920,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.listaCargos.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
       })
+
+      // MOSTRAR INFORMACION DEL CARGO
+      if (this.listaCargos.length > 1) {
+        this.mostrar_cargo_datos = true;
+      }
+      else if (this.listaCargos.length === 1) {
+        if (this.listaCargos[0].estado === false) {
+          this.mostrar_cargo_datos = false;
+        }
+      }
+
     }, error => {
       this.toastr.info('El contrato seleccionado no registra ningún cargo.', 'VERIFICAR', {
         timeOut: 6000,
@@ -934,6 +945,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.listaCargos = [];
     this.contratoForm.reset();
     this.cargoForm.reset();
+    this.mostrar_cargo_datos = false
   }
 
   // METODO DE EDICION DE CONTRATOS
@@ -1027,12 +1039,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // METODO PARA LIMPIAR REGISTRO
-  LimpiarCargo() {
-    this.cargoSeleccionado = [];
-    //this.listaCargos = [];
-    this.cargoForm.reset();
-  }
 
   // METODO PARA VER CARGO SELECCIONADO
   fechaICargo = new FormControl('');
