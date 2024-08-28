@@ -734,10 +734,10 @@ class TimbresControlador {
     crearTimbreJustificadoAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body;
                 console.log(req.body);
                 yield database_1.default.query('BEGIN');
-                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento])
+                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente])
                     .then(result => {
                     return result.rows;
                 });
@@ -748,7 +748,7 @@ class TimbresControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor:'null', id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: 'null }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre} }`,
                     ip: ip,
                     observacion: null
                 });
@@ -768,6 +768,7 @@ class TimbresControlador {
             try {
                 const { fecInicio, fecFinal, codigo } = req.body;
                 // Convertir fechas de entrada a objetos Date
+                console.log("ver body", req.body);
                 let fechaDesde = new Date(fecInicio);
                 let fechaHasta = new Date(fecFinal);
                 const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
