@@ -846,13 +846,13 @@ class EmpleadoControlador {
         , [id]);
 
       let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
-
+      console.log('ruta_temporal_',ruta_temporal);
       if (unEmpleado.rowCount != 0) {
         const imagen = `${unEmpleado.rows[0].codigo}_${anio}_${mes}_${dia}_${req.file?.originalname}`;
         let verificar_imagen = 0;
         // RUTA DE LA CARPETA IMAGENES DEL USUARIO
         const carpetaImagenes = await ObtenerRutaUsuario(id);
-
+        console.log('carpetaImagenes_',carpetaImagenes);
         // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
         fs.access(carpetaImagenes, fs.constants.F_OK, (err) => {
           if (err) {

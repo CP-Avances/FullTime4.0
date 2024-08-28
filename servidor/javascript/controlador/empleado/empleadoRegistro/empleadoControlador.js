@@ -719,11 +719,13 @@ class EmpleadoControlador {
         SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
                 let ruta_temporal = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                console.log('ruta_temporal_', ruta_temporal);
                 if (unEmpleado.rowCount != 0) {
                     const imagen = `${unEmpleado.rows[0].codigo}_${anio}_${mes}_${dia}_${(_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname}`;
                     let verificar_imagen = 0;
                     // RUTA DE LA CARPETA IMAGENES DEL USUARIO
                     const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+                    console.log('carpetaImagenes_', carpetaImagenes);
                     // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
                     fs_1.default.access(carpetaImagenes, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
