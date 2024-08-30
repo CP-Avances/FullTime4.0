@@ -6,7 +6,7 @@
                 {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
             </h6>
         </div>
-    </div>
+        </div>
 </div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
 
@@ -204,18 +204,6 @@
         </div>
 
     </mat-tab>
-
-     <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
-     <mat-tab label="historico">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">dvr</mat-icon>
-            <h6 id="items">Historico</h6>
-        </ng-template>
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-        </div>
-    </mat-tab>
-
-
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
     <mat-tab label="asignaciones">
@@ -2411,6 +2399,26 @@
                                 </table>
                             </div>
                         </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </mat-tab>
+
+    <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
+    <mat-tab label="historico">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">dvr</mat-icon>
+            <h6 id="items">Historico</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+            <div>
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">INFOMRACIÓN CONTRATO CARGO </span>
+                    </div>
+                    <mat-card-content>
+                       
                     </mat-card-content>
                 </mat-card>
             </div>

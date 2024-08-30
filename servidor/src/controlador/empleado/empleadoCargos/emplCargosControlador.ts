@@ -583,40 +583,40 @@ class EmpleadoCargosControlador {
           }
           if (DEPARTAMENTO == undefined) {
             data.departamento = 'No registrado';
-            data.observacion = 'Departamento ' + data.observacion;
+            data.observacion = 'Departamento no registrado';
           }
           if (FECHA_DESDE == undefined) {
             data.fecha_desde = 'No registrado';
-            data.observacion = 'Fecha desde ' + data.observacion;
+            data.observacion = 'Fecha desde no registrado';
           }
           if (FECHA_HASTA == undefined) {
             data.fecha_hasta = 'No registrado';
-            data.observacion = 'Fecha hasta ' + data.observacion;
+            data.observacion = 'Fecha hasta no registrado';
           }
           if (SUCURSAL == undefined) {
             data.sucursal = 'No registrado';
-            data.observacion = 'Sucursal ' + data.observacion;
+            data.observacion = 'Sucursal no registrado';
           }
           if (SUELDO == undefined) {
             data.sueldo = 'No registrado';
-            data.observacion = 'Sueldo ' + data.observacion;
+            data.observacion = 'Sueldo no registrado';
           }
           if (CARGO == undefined) {
             data.cargo = 'No registrado';
-            data.observacion = 'Cargo ' + data.observacion;
+            data.observacion = 'Cargo no registrado';
           }
           if (HORA_TRABAJA == undefined) {
             data.hora_trabaja = 'No registrado';
-            data.observacion = 'Hora trabajo ' + data.observacion;
+            data.observacion = 'Hora trabajo no registrado';
           }
           if (JEFE == undefined) {
             data.admini_depa = 'No registrado';
-            data.observacion = 'Jefe ' + data.observacion;
+            data.observacion = 'Jefe no registrado';
           }
 
           if (CEDULA == undefined) {
             data.cedula = 'No registrado'
-            data.observacion = 'Cédula ' + data.observacion;
+            data.observacion = 'Cédula no registrado';
           }
           else {
             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
