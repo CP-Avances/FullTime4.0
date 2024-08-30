@@ -752,7 +752,7 @@ class UsuarioControlador {
             }
         });
     }
-    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO -------------------------VERIFICAR USO
+    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
     BuscarAsignacionUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
@@ -793,10 +793,6 @@ class UsuarioControlador {
                 // CONSULTA DATOSORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
-                console.log('datos ', datosOriginales);
-                consulta.rows.forEach((au) => {
-                    console.log('au ', au);
-                });
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_usuario_departamento',
@@ -811,30 +807,26 @@ class UsuarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                /*
-                      const datosActuales = await pool.query(
-                        `
-                        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5
-                        WHERE id = $1 RETURNING *
-                        `
-                        , [id, id_departamento, principal, personal, administra]);
-                
-                      // AUDITORIA
-                      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'eu_usuario_departamento',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: JSON.stringify(datosOriginales),
-                        datosNuevos: JSON.stringify(datosActuales.rows[0]),
-                        ip,
-                        observacion: null
-                      });
-                
-                      // FINALIZAR TRANSACCION
-                      await pool.query('COMMIT');*/
+                const datosActuales = yield database_1.default.query(`
+        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
+        WHERE id = $1 RETURNING *
+        `, [id, id_departamento, principal, personal, administra]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosActuales.rows[0]),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });

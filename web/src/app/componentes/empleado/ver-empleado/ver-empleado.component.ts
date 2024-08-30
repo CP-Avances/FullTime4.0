@@ -267,10 +267,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   DetectarEventoTab(event: MatTabChangeEvent) {
     this.pantalla = event.tab.textLabel;
 
-    console.log('pantalla> ',this.pantalla)
+    console.log('pantalla> ', this.pantalla)
 
     if (event.tab.textLabel === 'historico') {
-      
+
     }
     if (event.tab.textLabel === 'asignaciones') {
       if (this.asignacion === 0) {
@@ -992,16 +992,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS
-  ConfirmarEliminacionDatos(data: any, tipo: string) {
+  ConfirmarEliminacionDatos(data: any, tipo: string, estado: any) {
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
+          this.BuscarAsignacionPrincipal();
           if (tipo === 'contrato') {
             this.EliminarDatos(data);
           }
           else {
-            this.EliminarDatosCargos(data);
+            this.EliminarDatosCargos(data, estado);
           }
         }
       });
@@ -1048,6 +1049,33 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // METODO PARA BUSCAR DATOS DE ASIGNACIONES
+  asignaciones: any = [];
+  BuscarUsuarioDepartamento() {
+    let datos = {
+      id_empleado: this.idEmpleado,
+    }
+    this.restU.BuscarAsignacionesUsuario(datos).subscribe(res => {
+      if (res != null) {
+        //console.log('res ', res)
+        this.asignaciones = res;
+      }
+    });
+  }
+
+  // METODO PARA BUSCAR ASIGNACION PRINCIPAL
+  asignacion_principal: any = [];
+  BuscarAsignacionPrincipal() {
+    let datos = {
+      id_empleado: this.idEmpleado,
+    }
+    this.restU.BuscarAsignacionesUsuario(datos).subscribe(res => {
+      if (res != null) {
+        //console.log('res ', res)
+        this.asignacion_principal = res[0];
+      }
+    });
+  }
 
   // METODO PARA VER CARGO SELECCIONADO
   fechaICargo = new FormControl('');
@@ -1097,52 +1125,147 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // METODO PARA CAMBIAR ESTADO
-  CambiarEstadoCargo(event: MatRadioChange, datos: any, opcion: number) {
+  CambiarEstadoCargo(event: MatRadioChange, datos: any) {
+    this.BuscarUsuarioDepartamento();
     if ((datos.estado === true && event.value === true) || (datos.estado === false && event.value === false)) {
     }
-    else if (event.value = true) {
-      this.BuscarDatosCargo(opcion);
-      this.CambiarEstado(datos.id, event.value, opcion);
+    else if (event.value === true) {
+      this.BuscarDatosCargo();
+      this.CambiarEstado(datos, event.value);
     }
-    else if (event.value = false) {
-      this.CambiarEstado(datos.id, event.value, opcion);
+    else if (event.value === false) {
+      this.CambiarEstado(datos, event.value);
     }
   }
 
   // METODO PARA BUSCAR CARGOS ACTIVOS
-  BuscarDatosCargo(opcion: number) {
+  BuscarDatosCargo() {
     let valores = {
       id_empleado: this.idEmpleado,
     }
     this.restCargo.BuscarCargoActivo(valores).subscribe(data => {
       if (data.message === 'contrato_cargo') {
-        this.CambiarEstado(data.datos.id_cargo, false, opcion);
+        let valores = {
+          user_name: this.user_name,
+          id_cargo: data.datos.id_cargo,
+          estado: false,
+          ip: this.ip,
+        }
+        this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
+          this.ControlarActualizacion();
+        });
       }
     });
   }
 
   // METODO PARA EDITAR ESTADO DEL CARGO
-  CambiarEstado(id_cargo: any, estado: any, opcion: number) {
+  CambiarEstado(datos: any, estado: any) {
     let valores = {
       user_name: this.user_name,
-      id_cargo: id_cargo,
+      id_cargo: datos.id,
       estado: estado,
       ip: this.ip,
     }
     this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
-      if (opcion === 2) {
-        this.cargoSeleccionado = [];
-        this.cargoEmpleado = [];
-        this.VerDatosActuales(this.formato_fecha);
-        this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+      this.VerificarAsignaciones(datos, estado);
+      this.ControlarActualizacion();
+    });
+  }
+
+  // METODO PARA CONTROLAR ACTUALIZACION
+  ControlarActualizacion() {
+    this.cargoEmpleado = [];
+    this.VerDatosActuales(this.formato_fecha);
+    this.LimpiarContrato();
+  }
+
+  // METODO PARA VERIFICAR ASIGNACIONES
+  VerificarAsignaciones(datos: any, estado: boolean) {
+    let info = {
+      id: 0,
+      id_empleado: this.idEmpleado,
+      id_departamento: datos.id_departamento,
+      principal: true,
+      personal: true,
+      administra: datos.jefe,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    let principal_false = 0;
+    let principal_true = 0;
+    let registrar = 0;
+
+    // LEER LAS ASIGNACIONES DEL USUARIO Y VERIFICAR LA ACTUALIZACION
+    if (this.asignaciones.length != 0) {
+      this.asignaciones.forEach((a: any) => {
+        //console.log('imprimir a ', a)
+        if (a.id_departamento === datos.id_departamento) {
+          if (a.principal === false) {
+            info.administra = a.administra;
+            principal_false = a.id;
+            info.personal = a.personal;
+          }
+          else if (a.principal === true) {
+            info.administra = a.administra;
+            principal_true = a.id;
+            info.personal = a.personal;
+          }
+        }
+        else if (a.principal === true) {
+          info.administra = a.administra;
+          principal_true = a.id;
+          info.personal = a.personal;
+        }
+        else {
+          //console.log('imprime algo ', a)
+          registrar = 1;
+        }
+      })
+      //console.log('true ', principal_true, ' false ', principal_false, ' info ', info, ' registra ', registrar)
+      if (principal_false != 0) {
+        this.EliminarAsignacion(principal_true);
+        this.ActualizarUsuarioDepartamento(info, principal_false);
       }
-      else {
-        this.cargoEmpleado = [];
-        this.VerDatosActuales(this.formato_fecha);
-        if (this.fechaICargo.value) {
-          this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+      else if (principal_true != 0) {
+        if (estado === false) {
+          this.EliminarAsignacion(principal_true);
+        }
+        else {
+          this.ActualizarUsuarioDepartamento(info, principal_true);
         }
       }
+      else if (registrar != 0) {
+        this.IngresarUsuarioDepartamento(info);
+      }
+    }
+    else {
+      this.IngresarUsuarioDepartamento(info);
+    }
+
+  }
+
+  // METODO PARA ACTUALIZAR USUARIO - DEPARTAMENTO
+  ActualizarUsuarioDepartamento(data: any, id_asignacion: any) {
+    data.id = id_asignacion;
+    this.restU.ActualizarUsuarioDepartamento(data).subscribe(res => {
+    });
+  }
+
+  // METODO PARA ELIMINAR ASIGNACION
+  EliminarAsignacion(id: number) {
+    const datos = {
+      id: id,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restU.EliminarUsuarioDepartamento(datos).subscribe(data => {
+    });
+  }
+
+  // METODO PARA INGRESAR ASIGNACION
+  IngresarUsuarioDepartamento(info: any) {
+    this.restU.RegistrarUsuarioDepartamento(info).subscribe(res => {
     });
   }
 
@@ -1159,7 +1282,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // METODO PARA ELIMINAR DATOS DE CARGO
-  EliminarDatosCargos(dataCargo: any) {
+  EliminarDatosCargos(dataCargo: any, estado: any) {
     const data = { id: dataCargo };
     this.restCargo.EliminarCargo(data).subscribe({
       next: (res: any) => {
@@ -1171,7 +1294,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           this.toastr.success(res.message, 'Correcto.', {
             timeOut: 4500,
           });
-          this.VerDatosActuales(this.formato_fecha);
+          console.log('id ', this.asignacion_principal.id)
+          if (this.asignacion_principal.id && estado === true) {
+            this.EliminarAsignacion(this.asignacion_principal.id);
+          }
+          this.ControlarActualizacion();
         }
       }, error: (err: any) => {
         this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {

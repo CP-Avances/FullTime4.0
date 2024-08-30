@@ -402,7 +402,7 @@
                     id="editarCargo">
                 </app-editar-cargo>
             </div>
-            <div class="row">
+            <div class="row" *ngIf="btnActualizarCargo && !editar_contrato">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="titulo">
@@ -500,7 +500,7 @@
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
                                         class="far fa-trash-alt">
@@ -608,7 +608,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="true"
-                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Activo
                                                         </mat-radio-button>
                                                     </div>
@@ -616,7 +616,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="false"
-                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Inactivo
                                                         </mat-radio-button>
                                                     </div>
@@ -626,14 +626,14 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right; margin-top: 5px;">
-                                    <i type="submit" id="edit" style="margin-right: 6px;" *ngIf="btnActualizarCargo"
+                                    <i type="submit" id="edit" style="margin-right: 6px;"
                                         (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix
+                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
                                         class="far fa-trash-alt">
@@ -646,7 +646,8 @@
                 </div>
             </div>
         </div>
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="contratoBuscado.length > 0">
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;"
+            *ngIf="contratoBuscado.length > 0 && btnActualizarCargo && !editar_contrato">
             <div class="row">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
@@ -760,7 +761,7 @@
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
                                         class="far fa-trash-alt">
@@ -883,7 +884,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="true"
-                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Activo
                                                         </mat-radio-button>
                                                     </div>
@@ -891,7 +892,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="false"
-                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Inactivo
                                                         </mat-radio-button>
                                                     </div>
@@ -911,7 +912,7 @@
                                                 <p>Editar</p>
                                             </i>
                                             <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                                (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix
+                                                (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                                 matTooltipPosition="right"
                                                 matTooltip="Elimina los datos generales de este registro"
                                                 class="far fa-trash-alt">

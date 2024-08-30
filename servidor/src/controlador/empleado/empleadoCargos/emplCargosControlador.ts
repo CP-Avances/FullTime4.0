@@ -292,16 +292,18 @@ class EmpleadoCargosControlador {
 
   // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
   public async BuscarCargosFechaEditar(req: Request, res: Response): Promise<any> {
-    const { id_empleado, fecha_verificar, id_cargo } = req.body;
+    const { id_empleado, fecha_inicio, fecha_fin, id_cargo } = req.body;
     const CARGOS = await pool.query(
       `
-        SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
-        FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
-        WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND $2 < car.fecha_final
-          AND NOT car.id = $3
-        ORDER BY e.id ASC
-        `
-      , [id_empleado, fecha_verificar, id_cargo]);
+      SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
+      FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
+      WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND
+		    (($2 BETWEEN car.fecha_inicio AND car.fecha_final) OR 
+		    ($3 BETWEEN car.fecha_inicio AND car.fecha_final))
+        AND NOT car.id = $4
+      ORDER BY e.id ASC
+      `
+      , [id_empleado, fecha_inicio, fecha_fin, id_cargo]);
     if (CARGOS.rowCount != 0) {
       return res.jsonp(CARGOS.rows)
     }
@@ -702,7 +704,7 @@ class EmpleadoCargosControlador {
             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
             ) {
-              
+
               const ID_CONTRATO_FECHAS: any = await pool.query(
                 ` 
                 SELECT euc.id FROM eu_empleado_contratos AS euc
@@ -713,84 +715,84 @@ class EmpleadoCargosControlador {
                 , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
 
 
-                if(ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '' ){
+              if (ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '') {
 
-                  var VERIFICAR_SUCURSALES = await pool.query(
-                `
+                var VERIFICAR_SUCURSALES = await pool.query(
+                  `
                 SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
                 `
                   , [valor.sucursal.toUpperCase()])
-                  if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
 
-                var VERIFICAR_DEPARTAMENTO: any = await pool.query(
-                  `
+                  var VERIFICAR_DEPARTAMENTO: any = await pool.query(
+                    `
                   SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                   `
-                  , [valor.departamento.toUpperCase()])
-                if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
+                    , [valor.departamento.toUpperCase()])
+                  if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
 
-                  var VERIFICAR_DEP_SUC: any = await pool.query(
-                    `
+                    var VERIFICAR_DEP_SUC: any = await pool.query(
+                      `
                     SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                     `
-                    , [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]
-                  )
-                  if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
-                    var VERFICAR_CARGO = await pool.query(
-                      `
+                      , [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]
+                    )
+                    if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
+                      var VERFICAR_CARGO = await pool.query(
+                        `
                       SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                       `
-                      , [valor.cargo.toUpperCase()])
-                    if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                        , [valor.cargo.toUpperCase()])
+                      if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
-                      if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
-                        valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
-                      }
-                      else {
-                        const fechaRango: any = await pool.query(
-                          `
+                        if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                          valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
+                        }
+                        else {
+                          const fechaRango: any = await pool.query(
+                            `
                           SELECT id FROM eu_empleado_cargos 
                           WHERE id_contrato = $1 AND 
                             ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
                             fecha_inicio BETWEEN $2 AND $3)
                           `
-                          , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
+                            , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
 
-                        if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                          valor.observacion = 'Existe un cargo en esas fechas'
-                        }
-                        else {
-                          // DISCRIMINACION DE ELEMENTOS IGUALES
-                          if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
-                            duplicados.push(valor);
+                          if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                            valor.observacion = 'Existe un cargo en esas fechas'
                           }
                           else {
-                            valor.observacion = '1';
+                            // DISCRIMINACION DE ELEMENTOS IGUALES
+                            if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                              duplicados.push(valor);
+                            }
+                            else {
+                              valor.observacion = '1';
+                            }
                           }
                         }
                       }
+                      else {
+                        valor.observacion = 'Cargo no existe en el sistema'
+                      }
                     }
                     else {
-                      valor.observacion = 'Cargo no existe en el sistema'
+                      valor.observacion = 'Departamento no pertenece a la sucursal'
                     }
                   }
                   else {
-                    valor.observacion = 'Departamento no pertenece a la sucursal'
+                    valor.observacion = 'Departamento no existe en el sistema'
                   }
                 }
                 else {
-                  valor.observacion = 'Departamento no existe en el sistema'
-                }
-                  }
-                  else {
-                valor.observacion = 'Sucursal no existe en el sistema'
-                  }
-
-                }else{
-                  valor.observacion = 'Las fechas debe coresponder con las del contrato vigente'
+                  valor.observacion = 'Sucursal no existe en el sistema'
                 }
 
-             }
+              } else {
+                valor.observacion = 'Las fechas debe coresponder con las del contrato vigente'
+              }
+
+            }
             else {
               valor.observacion = 'Cédula no tiene registrado un contrato'
             }
@@ -913,14 +915,14 @@ class EmpleadoCargosControlador {
           `
           , [id_contrato]);
 
-         if(id_last_cargo.rows[0] != undefined){
+        if (id_last_cargo.rows[0] != undefined) {
           await pool.query(
             `
             UPDATE eu_empleado_cargos set estado = $2 
             WHERE id = $1 AND estado = 'true' RETURNING *
             `
             , [id_last_cargo.rows[0].id, false]);
-         } 
+        }
 
         const response: QueryResult = await pool.query(
           `
@@ -940,7 +942,7 @@ class EmpleadoCargosControlador {
           `
           , [id_empleado]);
 
-         if(id_usuario_depa.rows[0] != undefined){
+        if (id_usuario_depa.rows[0] != undefined) {
           await pool.query(
             `
               UPDATE eu_usuario_departamento 
@@ -949,29 +951,29 @@ class EmpleadoCargosControlador {
               `
             , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
           )
-         }else{
-            
+        } else {
+
           const response2 = await pool.query(
             `
             INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
             VALUES ($1, $2, $3, $4, $5) RETURNING *
             `
             , [id_empleado, id_departamento, true, true, admin_dep]);
-          
-            const [usuarioDep] = response2.rows;
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'eu_usuario_departamento',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(usuarioDep),
-              ip,
-              observacion: null
-            });
-            
-         }
+          const [usuarioDep] = response2.rows;
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_usuario_departamento',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(usuarioDep),
+            ip,
+            observacion: null
+          });
+
+        }
 
 
         // AUDITORIA
@@ -985,7 +987,7 @@ class EmpleadoCargosControlador {
           observacion: null
         });
 
-        
+
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
@@ -1008,27 +1010,11 @@ class EmpleadoCargosControlador {
   public async EliminarCargo(req: Request, res: Response): Promise<any> {
     const { id } = req.body;
     try {
-      const info_cargo = await pool.query(
-        `
-        SELECT emCa.id, emCa.id_contrato, emCa.id_departamento, caEmp.id_empleado, euDe.id AS id_us_depa
-        FROM eu_empleado_cargos AS emCa, cargos_empleado AS caEmp, eu_usuario_departamento AS euDe
-        WHERE emCa.id = $1 AND caEmp.id_cargo = emCa.id AND euDe.id_empleado = caEmp.id_empleado AND 
-          euDe.id_departamento = emCa.id_departamento
-        `
-        ,[id])
-
       await pool.query(
         `
         DELETE FROM eu_empleado_cargos WHERE id = $1
         `
         , [id]);
-
-      await pool.query(
-        `
-        DELETE FROM eu_usuario_departamento WHERE id = $1 AND principal = $2
-        `
-        , [info_cargo.rows[0].id_us_depa, true])
-      
 
       return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 

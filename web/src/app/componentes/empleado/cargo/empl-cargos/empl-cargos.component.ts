@@ -98,6 +98,7 @@ export class EmplCargosComponent implements OnInit {
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
     this.BuscarDatosCargo();
+    this.BuscarUsuarioDepartamento();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
   }
 
@@ -280,7 +281,7 @@ export class EmplCargosComponent implements OnInit {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
-      this.BuscarUsuarioDepartamento(form);
+      this.VerificarAsignaciones(form);
       this.CambiarEstado();
       this.CerrarVentana();
     });
@@ -369,19 +370,51 @@ export class EmplCargosComponent implements OnInit {
    ** *************************************************************************************************** **/
 
   // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
-  BuscarUsuarioDepartamento(form: any) {
+  listar_asignaciones: any = [];
+  BuscarUsuarioDepartamento() {
     let datos = {
       id_empleado: this.idEmpleado,
     }
-    this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
+    this.listar_asignaciones = [];
+    this.usuario.BuscarAsignacionesUsuario(datos).subscribe(res => {
       if (res != null) {
-        const id = res[0].id;
-        this.ActualizarUsuarioDepartamento(form, id);
-      }
-      else {
-        this.IngresarUsuarioDepartamento(form);
+        this.listar_asignaciones = res;
       }
     });
+  }
+
+  // METODO PARA VERIFICAR ASIGNACIONES
+  VerificarAsignaciones(form: any) {
+    let principal_false = 0;
+    let principal_true = 0;
+    console.log('asignaciones ', this.listar_asignaciones)
+    if (this.listar_asignaciones.length != 0) {
+      this.listar_asignaciones.forEach((a: any) => {
+        //console.log('res dep ', form.idDeparForm)
+        if (a.id_departamento === form.idDeparForm) {
+          if (a.principal === false) {
+            principal_false = a.id;
+          }
+          else if (a.principal === true) {
+            principal_true = a.id;
+          }
+        }
+        else if (a.principal === true) {
+          principal_true = a.id;
+        }
+      })
+      console.log('ver datos ', principal_false, ' true ', principal_true)
+      if (principal_false != 0) {
+        this.EliminarAsignacion(principal_true);
+        this.ActualizarUsuarioDepartamento(form, principal_false);
+      }
+      else {
+        this.ActualizarUsuarioDepartamento(form, principal_true);
+      }
+    }
+    else {
+      this.IngresarUsuarioDepartamento(form);
+    }
   }
 
   // METODO PARA REGISTRAR USUARIO - DEPARTAMENTO
@@ -411,6 +444,17 @@ export class EmplCargosComponent implements OnInit {
       ip: this.ip,
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
+    });
+  }
+
+  // METODO PARA ELIMINAR ASIGNACION
+  EliminarAsignacion(id: number) {
+    const datos = {
+      id: id,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });
   }
 

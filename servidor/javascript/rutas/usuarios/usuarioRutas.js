@@ -47,7 +47,7 @@ class UsuarioRutas {
         this.router.post('/buscar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioDepartamento);
         // METODO PARA OBTENER IDS DE USUARIO MEDIANTE DEPARTAMENTO VIGENTE **USADO
         this.router.post('/buscar-ids-usuarios-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerIdUsuariosDepartamento);
-        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO    **USADO                -----VERIFICAR USO
+        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO    **USADO             
         this.router.post('/buscar-asignacion-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
         // METODO BUSCAR TODAS LAS ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO    
         this.router.post('/buscar-todas-asignacion-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarAsignacionesUsuario);

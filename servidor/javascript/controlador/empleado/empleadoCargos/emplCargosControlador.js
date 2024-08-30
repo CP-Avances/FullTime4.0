@@ -257,14 +257,16 @@ class EmpleadoCargosControlador {
     // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFechaEditar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fecha_verificar, id_cargo } = req.body;
+            const { id_empleado, fecha_inicio, fecha_fin, id_cargo } = req.body;
             const CARGOS = yield database_1.default.query(`
-        SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
-        FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
-        WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND $2 < car.fecha_final
-          AND NOT car.id = $3
-        ORDER BY e.id ASC
-        `, [id_empleado, fecha_verificar, id_cargo]);
+      SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
+      FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
+      WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND
+		    (($2 BETWEEN car.fecha_inicio AND car.fecha_final) OR 
+		    ($3 BETWEEN car.fecha_inicio AND car.fecha_final))
+        AND NOT car.id = $4
+      ORDER BY e.id ASC
+      `, [id_empleado, fecha_inicio, fecha_fin, id_cargo]);
             if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
             }
@@ -865,18 +867,9 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.body;
             try {
-                const info_cargo = yield database_1.default.query(`
-        SELECT emCa.id, emCa.id_contrato, emCa.id_departamento, caEmp.id_empleado, euDe.id AS id_us_depa
-        FROM eu_empleado_cargos AS emCa, cargos_empleado AS caEmp, eu_usuario_departamento AS euDe
-        WHERE emCa.id = $1 AND caEmp.id_cargo = emCa.id AND euDe.id_empleado = caEmp.id_empleado AND 
-          euDe.id_departamento = emCa.id_departamento
-        `, [id]);
                 yield database_1.default.query(`
         DELETE FROM eu_empleado_cargos WHERE id = $1
         `, [id]);
-                yield database_1.default.query(`
-        DELETE FROM eu_usuario_departamento WHERE id = $1 AND principal = $2
-        `, [info_cargo.rows[0].id_us_depa, true]);
                 return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {

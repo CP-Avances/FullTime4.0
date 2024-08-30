@@ -128,7 +128,7 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO               ---VERIFICAR SU USO
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO              
   BuscarAsignacionUsuarioDepartamento(data: any) {
     return this.http.post(`${environment.url}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }

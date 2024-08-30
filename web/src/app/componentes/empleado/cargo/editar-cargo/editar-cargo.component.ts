@@ -99,6 +99,8 @@ export class EditarCargoComponent implements OnInit {
     this.BuscarTiposCargos();
     this.ObtenerCargoEmpleado();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+
+    console.log('id cargo ', this.idSelectCargo)
   }
 
   // BUSCAR DATOS DE CONTRATO
@@ -304,7 +306,8 @@ export class EditarCargoComponent implements OnInit {
     let verficar = {
       id_cargo: this.idSelectCargo,
       id_empleado: this.idEmpleado,
-      fecha_verificar: datos.fec_inicio
+      fecha_inicio: datos.fec_inicio,
+      fecha_fin: datos.fec_final
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
       this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
@@ -322,9 +325,15 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO DE ALMACENAMIENTO DE DATOS EN EL SISTEMA
   AlmacenarDatos(form: any, datos: any) {
-    this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
-      this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
-      this.ActualizarUsuarioDepartamento(form);
+    this.restEmplCargos.ActualizarCargoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
+      this.verEmpleado.VerDatosActuales(this.verEmpleado.formato_fecha);
+      if (this.verEmpleado.fechaICargo.value) {
+        this.verEmpleado.ActualizarDatosCargoSeleccionado(this.verEmpleado.fechaICargo.value);
+      }
+      //console.log('estado', this.cargo[0].estado)
+      if (this.cargo[0].estado === true) {
+        this.VerificarAsignaciones(form);
+      }
       this.Cancelar();
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
@@ -449,48 +458,47 @@ export class EditarCargoComponent implements OnInit {
       if (res != null) {
         console.log('res ', res)
         this.asignaciones = res;
-        if (this.asignaciones.length === 1) {
-          this.personal = res[0].personal;
-          this.administra = res[0].administra;
-        }
-        else {
-          this.asignaciones.forEach((a: any) => {
-            if (a.principal === true) {
-              this.personal = res[0].personal;
-              this.administra = res[0].administra;
-            }
-            if (a.id_departamento === this.idDepartamento.value && a.principal === false) {
-              this.principal_false = a.id;
-            }
-            else if (a.id_departamento === this.idDepartamento.value && a.principal === true) {
-              this.principal_true = a.id;
-            }
-            else if (a.principal === true) {
-              this.idAsignacion = a.id;
-            }
-          })
-        }
+        this.asignaciones.forEach((a: any) => {
+          if (a.principal === true) {
+            this.personal = a.personal;
+            this.administra = a.administra;
+          }
+        })
       }
     });
   }
 
   // METODO PARA VERIFICAR ASIGNACIONES
-  VerificarAsignaciones() {
-    let id = 0;
+  VerificarAsignaciones(form: any) {
+    this.asignaciones.forEach((a: any) => {
+      //console.log('res dep ', form.idDeparForm)
+      if (a.id_departamento === form.idDeparForm) {
+        if (a.principal === false) {
+          this.principal_false = a.id;
+        }
+        else if (a.principal === true) {
+          this.principal_true = a.id;
+        }
+      }
+      else if (a.principal === true) {
+        this.principal_true = a.id;
+      }
+    })
+    
+    console.log('ver datos ', this.principal_false, ' true ', this.principal_true)
     if (this.principal_false != 0) {
-      if (this.principal_true != 0) {
-        id = this.principal_true;
-      }
-      else {
-        id = this.idAsignacion;
-      }
+      this.EliminarAsignacion(this.principal_true);
+      this.ActualizarUsuarioDepartamento(form, this.principal_false);
+    }
+    else {
+      this.ActualizarUsuarioDepartamento(form, this.principal_true);
     }
   }
 
   // METODO PARA ACTUALIZAR USUARIO - DEPARTAMENTO
-  ActualizarUsuarioDepartamento(form: any) {
+  ActualizarUsuarioDepartamento(form: any, id_asignacion: any) {
     let datos = {
-      id: this.idAsignacion,
+      id: id_asignacion,
       id_departamento: form.idDeparForm,
       principal: true,
       personal: form.personalForm,
