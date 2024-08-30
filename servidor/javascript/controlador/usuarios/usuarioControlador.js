@@ -393,6 +393,20 @@ class UsuarioControlador {
             return res.status(200).jsonp(respuesta);
         });
     }
+    // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
+    accesoMovil(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let id_empleado = req.params.id_empleado;
+            let respuesta = yield database_1.default.query(`
+        SELECT u.app_habilita 
+        FROM eu_usuarios AS u 
+        WHERE u.id_empleado = $1
+        `, [id_empleado]).then((result) => { return result.rows; });
+            if (respuesta.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            return res.status(200).jsonp(respuesta);
+        });
+    }
     // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
     ActualizarEstadoTimbreMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

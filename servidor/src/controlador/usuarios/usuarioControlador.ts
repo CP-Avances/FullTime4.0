@@ -459,6 +459,24 @@ class UsuarioControlador {
   }
 
 
+    // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
+    public async accesoMovil(req: Request, res: Response) {
+      let id_empleado = req.params.id_empleado;
+  
+      let respuesta = await pool.query(
+        `
+        SELECT u.app_habilita 
+        FROM eu_usuarios AS u 
+        WHERE u.id_empleado = $1
+        `
+        , [id_empleado]
+      ).then((result: any) => { return result.rows });
+  
+      if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
+  
+      return res.status(200).jsonp(respuesta);
+    }
+
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
     try {
@@ -1185,6 +1203,9 @@ class UsuarioControlador {
       });
     }
   };
+
+
+
 
 }
 
