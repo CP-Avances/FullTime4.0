@@ -415,12 +415,12 @@ class FeriadosControlador {
 
                     if (data.fecha == undefined || data.descripcion == '') {
                         data.fecha = 'No registrado';
-                        data.observacion = 'Fecha ' + data.observacion;
+                        data.observacion = 'Fecha no registrada';
                     }
 
                     if (data.descripcion == undefined || data.descripcion == '') {
                         data.descripcion = 'No registrado';
-                        data.observacion = 'Descripción ' + data.observacion;
+                        data.observacion = 'Descripción no registrada';
                     }
 
                     if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
@@ -476,15 +476,15 @@ class FeriadosControlador {
 
                     if (PROVINCIA == undefined) {
                         data_fC.provincia = 'No registrado';
-                        data_fC.observacion = 'Provincia no ' + data_fC.observacion;
+                        data_fC.observacion = 'Provincia no registrado';
                     }
                     if (CIUDAD == undefined) {
                         data_fC.ciudad = 'No registrado';
-                        data_fC.observacion = 'Ciudad no ' + data_fC.observacion;
+                        data_fC.observacion = 'Ciudad no registrado';
                     }
                     if (FERIADO == undefined) {
                         data_fC.feriado = 'No registrado';
-                        data_fC.observacion = 'Feriado no ' + data_fC.observacion;
+                        data_fC.observacion = 'Feriado no registrado';
                     }
 
                     listFeriados_ciudades.push(data_fC);

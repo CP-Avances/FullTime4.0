@@ -382,39 +382,39 @@ class RelojesControlador {
                             }
                             if (ESTABLECIMIENTO == undefined) {
                                 data.establecimiento = 'No registrado';
-                                data.observacion = 'Sucursal, ' + data.observacion;
+                                data.observacion = 'Sucursal no registrado';
                             }
                             if (DEPARTAMENTO == undefined) {
                                 data.departamento = 'No registrado';
-                                data.observacion = 'Departamento, ' + data.observacion;
+                                data.observacion = 'Departamento no registrado';
                             }
                             if (NOMBRE_DISPOSITIVO == undefined) {
                                 data.nombre_dispo = 'No registrado';
-                                data.observacion = 'Nombre dispositivo, ' + data.observacion;
+                                data.observacion = 'Nombre dispositivo no registrado';
                             }
                             if (CODIGO == undefined) {
                                 data.codigo = 'No registrado';
-                                data.observacion = 'Código, ' + data.observacion;
+                                data.observacion = 'Código no registrado';
                             }
                             if (DIRECCION_IP == undefined) {
                                 data.direccion_ip = 'No registrado';
-                                data.observacion = 'Dirección IP, ' + data.observacion;
+                                data.observacion = 'Dirección IP no registrado';
                             }
                             if (PUERTO == undefined) {
                                 data.puerto = 'No registrado';
-                                data.observacion = 'Puerto, ' + data.observacion;
+                                data.observacion = 'Puerto no registrado';
                             }
                             if (TIPO_CONEXION == undefined) {
                                 data.tipo_conexion = 'No registrado';
-                                data.observacion = 'Tipo conexión, ' + data.observacion;
+                                data.observacion = 'Tipo conexión no registrado';
                             }
                             if (TEMPERATURA == undefined) {
                                 data.temperatura = 'No registrado';
-                                data.observacion = 'Función temperatura, ' + data.observacion;
+                                data.observacion = 'Función temperatura no registrado';
                             }
                             if (MARCA == undefined) {
                                 data.marca = 'No registrado';
-                                data.observacion = 'Marca, ' + data.observacion;
+                                data.observacion = 'Marca no registrado';
                             }
                             if (MODELO == undefined) {
                                 data.modelo = ' - ';
@@ -427,7 +427,7 @@ class RelojesControlador {
                             }
                             if (NUMERO_SERIE == undefined) {
                                 data.numero_serie = 'No registrado';
-                                data.observacion = 'Número de serie, ' + data.observacion;
+                                data.observacion = 'Número de serie no registrado';
                             }
                             if (DIRECCION_MAC == undefined) {
                                 data.direccion_mac = ' - ';
