@@ -800,7 +800,7 @@ class TimbresControlador {
                 const response = yield database_1.default.query(`SELECT * FROM eu_timbres 
                  WHERE codigo = $1 
                  AND fecha_hora_timbre_servidor BETWEEN $2 AND $3
-                 ORDER BY fecha_hora_timbre_servidor DESC LIMIT 100`, [id, fechaDesdeStr, fechaHastaStr]);
+                 ORDER BY fecha_hora_timbre_servidor DESC`, [id, fechaDesdeStr, fechaHastaStr]);
                 const timbres = response.rows;
                 return res.jsonp(timbres);
             }

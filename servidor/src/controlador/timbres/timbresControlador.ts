@@ -784,13 +784,13 @@ class TimbresControlador {
 
     public async crearTimbreJustificadoAdmin(req: Request, res: Response) {
         try {
-            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre,conexion, hora_timbre_diferente } = req.body
+            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body
             console.log(req.body);
             await pool.query('BEGIN');
 
 
             const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id',
-                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre , documento , dispositivo_timbre,conexion, hora_timbre_diferente])
+                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente])
                 .then(result => {
                     return result.rows;
                 });
@@ -855,12 +855,12 @@ class TimbresControlador {
             fechaDesde.setMonth(fechaDesde.getMonth() - 2);
             // Establecer la hora inicial del día (00:00:00) para dos meses atrás
             const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
-            
+
             const response: QueryResult = await pool.query(
                 `SELECT * FROM eu_timbres 
                  WHERE codigo = $1 
                  AND fecha_hora_timbre_servidor BETWEEN $2 AND $3
-                 ORDER BY fecha_hora_timbre_servidor DESC LIMIT 100`,
+                 ORDER BY fecha_hora_timbre_servidor DESC`,
                 [id, fechaDesdeStr, fechaHastaStr]
             );
             const timbres: any[] = response.rows;
