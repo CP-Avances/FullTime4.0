@@ -112,7 +112,7 @@ class EmpleadoRutas {
         this.router.get('/horarios/horariosEmpleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.getHorariosEmpleadoByCodigo);
         this.router.get('/todosempleados/lista', verificarToken_1.TokenValidation, empleadoControlador_1.default.getListaEmpleados);
         this.router.get('/horariosempleado/planificacionHorarioEmplCodigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.getPlanificacionMesesCodigoEmple);
-        this.router.get('/infoContratoCargos:id_empleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.getContratosCargos);
+        this.router.post('/infoContratoCargos/', verificarToken_1.TokenValidation, empleadoControlador_1.default.getContratosCargos);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

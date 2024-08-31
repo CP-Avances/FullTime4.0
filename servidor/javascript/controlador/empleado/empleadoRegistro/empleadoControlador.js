@@ -2641,13 +2641,13 @@ class EmpleadoControlador {
     ** **************************************************************************************** **/
     getContratosCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.query;
+            const { id_empleado } = req.body;
             try {
-                var listaCargos;
-                var listaContratos;
+                var listaCargos = [];
+                var listaContratos = [];
                 const contratos = yield database_1.default.query(`
         SELECT 
-	        emC.id, emC.id_empleado as id_contrato, emC.id_modalidad_laboral, 
+	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
           moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
           emC.controlar_asistencia
         FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda
@@ -2659,7 +2659,7 @@ class EmpleadoControlador {
                 listaContratos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     const cargos = yield database_1.default.query(`
           SELECT 
-            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre, 
+            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
             emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
             emC.jefe
           FROM 
@@ -2671,7 +2671,10 @@ class EmpleadoControlador {
             su.id = ed.id_sucursal AND
             carg.id = emC.id_tipo_cargo
           `, [item.id]);
-                    listaCargos.push(cargos.rows);
+                    const Cargos = cargos.rows;
+                    Cargos.forEach((item) => {
+                        listaCargos.push(item);
+                    });
                 }));
                 setTimeout(() => {
                     return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
