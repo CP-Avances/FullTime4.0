@@ -3,6 +3,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Observable, Subject } from 'rxjs';
+import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
@@ -18,6 +20,20 @@ import moment from 'moment';
 })
 
 export class RegistrarTimbreComponent implements OnInit {
+
+
+    // Para manejar la imagen capturada
+    public webcamImage: WebcamImage | null = null;
+    private trigger: Subject<void> = new Subject<void>();
+  
+  
+  
+    public get triggerObservable(): Observable<void> {
+      return this.trigger.asObservable();
+    }
+
+ 
+
 
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
@@ -70,6 +86,22 @@ export class RegistrarTimbreComponent implements OnInit {
     this.BuscarParametroUbicacion();
     this.BuscarParametroCertificado();
     this.BuscarParametroDesconocida();
+  }
+
+  
+  triggerSnapshot(): void {
+    this.trigger.next();
+  }
+
+  handleImage(webcamImage: WebcamImage): void {
+    this.webcamImage = webcamImage;
+  }
+
+  saveImage(): void {
+    if (this.webcamImage) {
+      // Enviar la imagen al backend
+      // Aquí puedes usar un servicio de Angular para hacer una petición HTTP
+    }
   }
 
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA

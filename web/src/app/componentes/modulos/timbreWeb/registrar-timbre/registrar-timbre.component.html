@@ -71,6 +71,23 @@
                     Horario Abierto
                 </button>
             </div>
+
+
+            <div class="camera-container" *ngIf="!webcamImage">
+                <webcam [height]="200" [width]="400" [trigger]="triggerObservable" (imageCapture)="handleImage($event)">
+                </webcam>
+
+                <button (click)="triggerSnapshot()">Tomar Fotografía</button>
+            </div>
+
+
+            <div class="camera-container">
+                <div *ngIf="webcamImage">
+                    <h3>Imagen Capturada:</h3>
+                    <img height="50%" width=50% [src]="webcamImage.imageAsDataUrl" />
+                    <button (click)="saveImage()">Guardar Imagen</button>
+                </div>
+            </div>
         </div>
     </form>
 </div>

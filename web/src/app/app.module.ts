@@ -2,6 +2,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
+import { WebcamModule } from 'ngx-webcam';
 import { FiltrosModule } from './filtros/filtros.module';
 import { MatCardModule } from '@angular/material/card';
 import { BrowserModule } from '@angular/platform-browser';
@@ -314,6 +315,7 @@ import { MainNavService } from './componentes/administracionGeneral/main-nav/mai
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -608,6 +610,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     MatNativeDateModule,
     ReportesModule,
     SpinnerModule,
+    WebcamModule,
   ],
   providers: [
     AuthGuard,
