@@ -888,7 +888,24 @@ class UsuarioControlador {
       `
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
       AND principal = true
-      `,
+      `
+      , [id_empleado]
+    );
+    if (USUARIOS.rowCount != 0) {
+      return res.jsonp(USUARIOS.rows)
+    }
+    else {
+      return res.jsonp(null);
+    }
+  }
+
+  // BUSCAR TODAS LAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
+  public async BuscarAsignacionesUsuario(req: Request, res: Response) {
+    const { id_empleado } = req.body;
+    const USUARIOS = await pool.query(
+      `
+        SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+        `,
       [id_empleado]
     );
     if (USUARIOS.rowCount != 0) {
@@ -951,6 +968,7 @@ class UsuarioControlador {
 
     }
     catch (error) {
+      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });

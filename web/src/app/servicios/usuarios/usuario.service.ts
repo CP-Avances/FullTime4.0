@@ -127,9 +127,14 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO              
   BuscarAsignacionUsuarioDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-asignacion-usuario-departamento`, data);
+  }
+
+  // METODO PARA BUSCAR TODAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO   
+  BuscarAsignacionesUsuario(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-todas-asignacion-usuario-departamento`, data);
   }
 
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS   **USADO

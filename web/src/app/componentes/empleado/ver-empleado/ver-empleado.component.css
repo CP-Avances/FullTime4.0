@@ -8,12 +8,13 @@ p {
 }
 
 #items {
-    font-size: 14px;
+    font-size: 12px;
     margin-top: 8%;
     font-style: normal;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 1px;
     word-wrap: break-word;
+    color: black;
 }
 
 .material-icons {
@@ -29,11 +30,12 @@ p {
 }
 
 #cerrar {
-    color: rgb(38, 0, 255);
+    color: rgb(233, 0, 0);
     margin-right: 5px;
     cursor: pointer;
     margin-left: 15px;
     text-align: center;
+    border-radius: 40px;
 }
 
 mat-tab-group {
@@ -422,3 +424,4 @@ td {
     margin-left: 5px;
     padding-top: 9px;
 }
+

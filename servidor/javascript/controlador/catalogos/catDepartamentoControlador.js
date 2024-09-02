@@ -762,23 +762,23 @@ class DepartamentoControlador {
                         }
                         if (SUCURSAL == undefined) {
                             data.sucursal = 'No registrado';
-                            data.observacion = 'Sucursal ' + data.observacion;
+                            data.observacion = 'Sucursal no registrada';
                         }
                         if (DEPARTAMENTO == undefined) {
                             data.departamento = 'No registrado';
-                            data.observacion = 'Departamento ' + data.observacion;
+                            data.observacion = 'Departamento no registrada';
                         }
                         if (NIVEL == undefined) {
                             data.nivel = 'No registrado';
-                            data.observacion = 'Nivel ' + data.observacion;
+                            data.observacion = 'Nivel no registrada';
                         }
                         if (DEPARTAMENTO_SUPERIOR == undefined) {
                             data.depa_superior = 'No registrado';
-                            data.observacion = 'Departamento superior ' + data.observacion;
+                            data.observacion = 'Departamento superior no registrada';
                         }
                         if (SUCURSAL_DEPARTAMENTO_SUPERIOR == undefined) {
                             data.sucursal_depa_superior = 'No registrado';
-                            data.observacion = 'Sucursal departamento superior ' + data.observacion;
+                            data.observacion = 'Sucursal departamento superior no registrada';
                         }
                         listNivelesDep.push(data);
                     }

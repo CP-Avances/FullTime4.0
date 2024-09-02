@@ -276,8 +276,8 @@ class RelojesControlador {
                         codigo: '',
                         direccion_ip: '',
                         puerto: '',
-                        acciones: '',
-                        numero_acciones: '',
+                        tipo_conexion: '',
+                        temperatura: '',
                         marca: '',
                         modelo: '',
                         id_fabricante: '',
@@ -301,13 +301,13 @@ class RelojesControlador {
                     const regex = /^[0-9]+$/;
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla_dispositivos.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO, CODIGO, DIRECCION_IP, PUERTO, ACCIONES, NUMERO_ACCIONES, MARCA, MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA } = dato;
+                        var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO, CODIGO, DIRECCION_IP, PUERTO, TIPO_CONEXION, TEMPERATURA, MARCA, MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
                             (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
                             (CODIGO != undefined && CODIGO != '') && (DIRECCION_IP != undefined && DIRECCION_IP != '') &&
-                            (PUERTO != undefined && PUERTO != '') && (ACCIONES != undefined && ACCIONES != '') &&
-                            (NUMERO_ACCIONES != undefined && NUMERO_ACCIONES != '') && (MARCA != undefined && MARCA != '') &&
+                            (PUERTO != undefined && PUERTO != '') && (TIPO_CONEXION != undefined && TIPO_CONEXION != '') &&
+                            (TEMPERATURA != undefined && TEMPERATURA != '') && (MARCA != undefined && MARCA != '') &&
                             (MODELO != undefined && MODELO != '') && (ID_FABRICANTE != undefined && ID_FABRICANTE != '') &&
                             (FABRICANTE != undefined && FABRICANTE != '') && (NUMERO_SERIE != undefined && NUMERO_SERIE != '') &&
                             (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '')) {
@@ -318,8 +318,8 @@ class RelojesControlador {
                             data.codigo = CODIGO;
                             data.direccion_ip = DIRECCION_IP;
                             data.puerto = PUERTO;
-                            data.acciones = ACCIONES;
-                            data.numero_acciones = NUMERO_ACCIONES;
+                            data.tipo_conexion = TIPO_CONEXION;
+                            data.temperatura = TEMPERATURA;
                             data.marca = MARCA;
                             data.modelo = MODELO;
                             data.id_fabricante = ID_FABRICANTE;
@@ -366,8 +366,8 @@ class RelojesControlador {
                             data.codigo = CODIGO;
                             data.direccion_ip = DIRECCION_IP;
                             data.puerto = PUERTO;
-                            data.acciones = ACCIONES;
-                            data.numero_acciones = NUMERO_ACCIONES;
+                            data.tipo_conexion = TIPO_CONEXION;
+                            data.temperatura = TEMPERATURA;
                             data.marca = MARCA;
                             data.modelo = MODELO;
                             data.id_fabricante = ID_FABRICANTE;
@@ -382,37 +382,39 @@ class RelojesControlador {
                             }
                             if (ESTABLECIMIENTO == undefined) {
                                 data.establecimiento = 'No registrado';
-                                data.observacion = 'Establecimiento ' + data.observacion;
+                                data.observacion = 'Sucursal no registrado';
                             }
                             if (DEPARTAMENTO == undefined) {
                                 data.departamento = 'No registrado';
-                                data.observacion = 'Departamento ' + data.observacion;
+                                data.observacion = 'Departamento no registrado';
                             }
                             if (NOMBRE_DISPOSITIVO == undefined) {
                                 data.nombre_dispo = 'No registrado';
-                                data.observacion = 'Nombre dispositivo ' + data.observacion;
+                                data.observacion = 'Nombre dispositivo no registrado';
                             }
                             if (CODIGO == undefined) {
                                 data.codigo = 'No registrado';
-                                data.observacion = 'Codigo ' + data.observacion;
+                                data.observacion = 'Código no registrado';
                             }
                             if (DIRECCION_IP == undefined) {
                                 data.direccion_ip = 'No registrado';
-                                data.observacion = 'Dirección IP ' + data.observacion;
+                                data.observacion = 'Dirección IP no registrado';
                             }
                             if (PUERTO == undefined) {
                                 data.puerto = 'No registrado';
-                                data.observacion = 'Puerto ' + data.observacion;
+                                data.observacion = 'Puerto no registrado';
                             }
-                            if (ACCIONES == undefined) {
-                                data.acciones = 'No registrado';
-                                data.observacion = 'Acciones ' + data.observacion;
+                            if (TIPO_CONEXION == undefined) {
+                                data.tipo_conexion = 'No registrado';
+                                data.observacion = 'Tipo conexión no registrado';
                             }
-                            if (NUMERO_ACCIONES == undefined) {
-                                data.numero_acciones = ' - ';
+                            if (TEMPERATURA == undefined) {
+                                data.temperatura = 'No registrado';
+                                data.observacion = 'Función temperatura no registrado';
                             }
                             if (MARCA == undefined) {
-                                data.marca = ' - ';
+                                data.marca = 'No registrado';
+                                data.observacion = 'Marca no registrado';
                             }
                             if (MODELO == undefined) {
                                 data.modelo = ' - ';
@@ -424,7 +426,8 @@ class RelojesControlador {
                                 data.fabricante = ' - ';
                             }
                             if (NUMERO_SERIE == undefined) {
-                                data.numero_serie = ' - ';
+                                data.numero_serie = 'No registrado';
+                                data.observacion = 'Número de serie no registrado';
                             }
                             if (DIRECCION_MAC == undefined) {
                                 data.direccion_mac = ' - ';
@@ -510,37 +513,32 @@ class RelojesControlador {
                                                             item.observacion = 'El puerto debe ser de 6 dígitos';
                                                         }
                                                         else {
-                                                            if (item.acciones.toString().toLowerCase() == 'si' || item.acciones.toString().toLowerCase() == 'no') {
-                                                                if (item.acciones.toString().toLowerCase() == 'si') {
-                                                                    if (item.numero_acciones != ' - ') {
-                                                                        if (!regex.test(item.numero_acciones)) {
-                                                                            item.observacion = 'Número de acciones incorrecta (solo números)';
+                                                            if (item.tipo_conexion.toString().toLowerCase() == 'interna' || item.tipo_conexion.toString().toLowerCase() == 'externa') {
+                                                                if (item.temperatura.toString().toLowerCase() == 'si' || item.temperatura.toString().toLowerCase() == 'no' || item.temperatura.toString().toLowerCase() == ' - ') {
+                                                                    if (item.marca.toString().toLowerCase() == 'zkteco' || item.marca.toString().toLowerCase() == 'hikvision') {
+                                                                        if (item.numero_serie != ' - ') {
+                                                                            var VERIFICAR_SERIE = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE serie = $1`, [item.numero_serie]);
+                                                                            if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != '') {
+                                                                                item.observacion = 'Número de serie ya existe en el sistema';
+                                                                            }
                                                                         }
-                                                                        else {
-                                                                            if (item.numero_acciones < 1 || item.numero_acciones > 8) {
-                                                                                item.observacion = 'El número de acciones debe ser mayor a 0 y menor a 8';
+                                                                        if (item.direccion_mac != ' - ') {
+                                                                            var VERIFICAR_MAC = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE mac = $1`, [item.direccion_mac]);
+                                                                            if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != '') {
+                                                                                item.observacion = 'Dirección MAC ya existe en el sistema';
                                                                             }
                                                                         }
                                                                     }
                                                                     else {
-                                                                        item.observacion = 'Debe ingresar acciones';
+                                                                        item.observacion = 'Marca no válida ingrese (ZKTECO / HIKVISION)';
                                                                     }
                                                                 }
-                                                                if (item.numero_serie != ' - ') {
-                                                                    var VERIFICAR_SERIE = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE serie = $1`, [item.numero_serie]);
-                                                                    if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != '') {
-                                                                        item.observacion = 'Número de serie ya existe en el sistema';
-                                                                    }
-                                                                }
-                                                                if (item.direccion_mac != ' - ') {
-                                                                    var VERIFICAR_MAC = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE mac = $1`, [item.direccion_mac]);
-                                                                    if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != '') {
-                                                                        item.observacion = 'Dirección MAC ya existe en el sistema';
-                                                                    }
+                                                                else {
+                                                                    item.observacion = 'Función temperatura no válida ingrese (SI / NO)';
                                                                 }
                                                             }
                                                             else {
-                                                                item.observacion = 'Acción incorrecta ingrese (SI / NO)';
+                                                                item.observacion = 'Conexión no válida ingrese (interna / externa)';
                                                             }
                                                         }
                                                     }
@@ -561,7 +559,7 @@ class RelojesControlador {
                                         }
                                     }
                                     else {
-                                        item.observacion = 'Departamento no pertenece al establecimiento';
+                                        item.observacion = 'Departamento no pertenece a la sucursal';
                                     }
                                 }
                                 else {
@@ -569,7 +567,7 @@ class RelojesControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'Establecimiento no existe en el sistema';
+                                item.observacion = 'Sucursal no existe en el sistema';
                             }
                         }
                     }));
@@ -652,7 +650,7 @@ class RelojesControlador {
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS DE LA PLANTILLA INGRESADA
-                    const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, acciones, numero_acciones, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena } = data;
+                    const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, tipo_conexion, temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // BUSCAR ID DE LA SUCURSAL INGRESADA
@@ -672,24 +670,48 @@ class RelojesControlador {
                             observacion: `Error al guardar el reloj con nombre: ${nombre_dispo} e ip: ${ip}.`
                         });
                     }
+                    var modelo_data = null;
+                    if (modelo != ' - ') {
+                        modelo_data = modelo;
+                    }
+                    var contrasenia_data = null;
+                    if (contrasena != ' - ') {
+                        contrasenia_data = contrasena;
+                    }
+                    var fabricanteID_data = null;
+                    if (id_fabricante != ' - ') {
+                        fabricanteID_data = id_fabricante;
+                    }
+                    var fabricante_data = null;
+                    if (fabricante != ' - ') {
+                        fabricante_data = fabricante;
+                    }
+                    var mac_data = null;
+                    if (direccion_mac != ' - ') {
+                        mac_data = direccion_mac;
+                    }
                     // VERIFICAR QUE SE HAYA INGRESADO NUMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
-                    var num_accion;
-                    var acciones_boolean;
-                    if (acciones.toLowerCase() === 'si') {
-                        num_accion = numero_acciones;
-                        acciones_boolean = true;
+                    var tipo_conexion_boolean = false;
+                    if (tipo_conexion.toLowerCase() === 'interna') {
+                        tipo_conexion_boolean = true;
                     }
                     else {
-                        num_accion = 0;
-                        acciones_boolean = false;
+                        tipo_conexion_boolean = false;
+                    }
+                    var temperatura_boolean = false;
+                    if (temperatura.toLowerCase() === 'si') {
+                        temperatura_boolean = true;
+                    }
+                    else {
+                        temperatura_boolean = false;
                     }
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
+                        id_fabricacion, fabricante, mac, tipo_conexion, temperatura, codigo) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                    `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca,
-                        modelo, numero_serie, id_fabricante, fabricante, direccion_mac, acciones_boolean, num_accion, codigo]);
+                    `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasenia_data, marca,
+                        modelo_data, numero_serie, fabricanteID_data, fabricante_data, mac_data, tipo_conexion_boolean, temperatura_boolean, codigo]);
                     const [reloj_ingre] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -697,7 +719,7 @@ class RelojesControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{"nombre": "${nombre_dispo}", "ip": "${direccion_ip}", "puerto": "${puerto}", "contrasenia": "${contrasena}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${numero_serie}", "id_fabricacion": "${id_fabricante}", "fabricante": "${fabricante}", "mac": "${direccion_mac}", "tien_funciones": "${acciones_boolean}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo}", "numero_accion": "${num_accion}"}`,
+                        datosNuevos: `{"nombre": "${nombre_dispo}", "ip": "${direccion_ip}", "puerto": "${puerto}", "contrasenia": "${contrasena}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${numero_serie}", "id_fabricacion": "${id_fabricante}", "fabricante": "${fabricante}", "mac": "${direccion_mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo}", "temperatura": "${temperatura}"}`,
                         ip: ip,
                         observacion: null
                     });

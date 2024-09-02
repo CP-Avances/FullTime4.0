@@ -610,35 +610,35 @@ class ContratoEmpleadoControlador {
                         }
                         if (PAIS == undefined) {
                             data.pais = 'No registrado';
-                            data.observacion = 'Pais ' + data.observacion;
+                            data.observacion = 'Pais no registrado';
                         }
                         if (REGIMEN_LABORAL == undefined) {
                             data.regimen_la = 'No registrado';
-                            data.observacion = 'Régimen laboral ' + data.observacion;
+                            data.observacion = 'Régimen laboral no registrado';
                         }
                         if (MODALIDAD_LABORAL == undefined) {
                             data.modalida_la = 'No registrado';
-                            data.observacion = 'Modalidad laboral ' + data.observacion;
+                            data.observacion = 'Modalidad laboral no registrado';
                         }
                         if (FECHA_DESDE == undefined) {
                             data.fecha_desde = 'No registrado';
-                            data.observacion = 'Fecha desde ' + data.observacion;
+                            data.observacion = 'Fecha desde no registrado';
                         }
                         if (FECHA_HASTA == undefined) {
                             data.fecha_hasta = 'No registrado';
-                            data.observacion = 'Fecha hasta ' + data.observacion;
+                            data.observacion = 'Fecha hasta no registrado';
                         }
                         if (CONTROLAR_ASISTENCIA == undefined) {
                             data.control_asis = 'No registrado';
-                            data.observacion = 'Control asistencia ' + data.observacion;
+                            data.observacion = 'Control asistencia no registrado';
                         }
                         if (CONTROLAR_VACACIONES == undefined) {
                             data.control_vaca = 'No registrado';
-                            data.observacion = 'Control vacaciones ' + data.observacion;
+                            data.observacion = 'Control vacaciones no registrado';
                         }
                         if (CEDULA == undefined) {
                             data.cedula = 'No registrado';
-                            data.observacion = 'Cédula ' + data.observacion;
+                            data.observacion = 'Cédula no registrado';
                         }
                         else {
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.

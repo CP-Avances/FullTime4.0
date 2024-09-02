@@ -1401,35 +1401,35 @@ class EmpleadoControlador {
                             }
                             if (APELLIDO == undefined) {
                                 data.apellido = 'No registrado';
-                                data.observacion = 'Apellido ' + data.observacion;
+                                data.observacion = 'Apellido no registrado';
                             }
                             if (NOMBRE == undefined) {
                                 data.nombre = 'No registrado';
-                                data.observacion = 'Nombre ' + data.observacion;
+                                data.observacion = 'Nombre no registrado';
                             }
                             if (ESTADO_CIVIL == undefined) {
                                 data.estado_civil = 'No registrado';
-                                data.observacion = 'Estado civil ' + data.observacion;
+                                data.observacion = 'Estado civil no registrado';
                             }
                             if (GENERO == undefined) {
                                 data.genero = 'No registrado';
-                                data.observacion = 'Género ' + data.observacion;
+                                data.observacion = 'Género no registrado';
                             }
                             if (CORREO == undefined) {
                                 data.correo = 'No registrado';
-                                data.observacion = 'Correo ' + data.observacion;
+                                data.observacion = 'Correo no registrado';
                             }
                             if (FECHA_NACIMIENTO == undefined) {
                                 data.fec_nacimiento = 'No registrado';
-                                data.observacion = 'Fecha de nacimiento ' + data.observacion;
+                                data.observacion = 'Fecha de nacimiento no registrado';
                             }
                             if (LATITUD == undefined) {
                                 data.latitud = 'No registrado';
-                                data.observacion = 'Latitud ' + data.observacion;
+                                data.observacion = 'Latitud no registrado';
                             }
                             if (LONGITUD == undefined) {
                                 data.longitud = 'No registrado';
-                                data.observacion = 'Longitud ' + data.observacion;
+                                data.observacion = 'Longitud no registrado';
                             }
                             if (DOMICILIO == undefined) {
                                 data.domicilio = 'No registrado';
@@ -1441,11 +1441,11 @@ class EmpleadoControlador {
                             }
                             if (NACIONALIDAD == undefined) {
                                 data.nacionalidad = 'No registrado';
-                                data.observacion = 'Nacionalidad ' + data.observacion;
+                                data.observacion = 'Nacionalidad no registrado';
                             }
                             if (USUARIO == undefined) {
                                 data.usuario = 'No registrado';
-                                data.observacion = 'Usuario ' + data.observacion;
+                                data.observacion = 'Usuario no registrado';
                             }
                             if (CONTRASENA == undefined) {
                                 data.contrasena = 'No registrado';
@@ -1453,11 +1453,11 @@ class EmpleadoControlador {
                             }
                             if (ROL == undefined) {
                                 data.rol = 'No registrado';
-                                data.observacion = 'Rol ' + data.observacion;
+                                data.observacion = 'Rol no registrado';
                             }
                             if (CEDULA == undefined) {
                                 data.cedula = 'No registrado';
-                                data.observacion = 'Cédula ' + data.observacion;
+                                data.observacion = 'Cédula no registrado';
                             }
                             else {
                                 if (regex.test(data.cedula)) {
@@ -2012,31 +2012,31 @@ class EmpleadoControlador {
                             }
                             if (APELLIDO == undefined) {
                                 data.apellido = 'No registrado';
-                                data.observacion = 'Apellido ' + data.observacion;
+                                data.observacion = 'Apellido no registrado';
                             }
                             if (NOMBRE == undefined) {
                                 data.nombre = 'No registrado';
-                                data.observacion = 'Nombre ' + data.observacion;
+                                data.observacion = 'Nombre no registrado';
                             }
                             if (CODIGO == undefined) {
                                 data.codigo = 'No registrado';
-                                data.observacion = 'Código ' + data.observacion;
+                                data.observacion = 'Código no registrado';
                             }
                             if (ESTADO_CIVIL == undefined) {
                                 data.estado_civil = 'No registrado';
-                                data.observacion = 'Estado civil ' + data.observacion;
+                                data.observacion = 'Estado civil no registrado';
                             }
                             if (GENERO == undefined) {
                                 data.genero = 'No registrado';
-                                data.observacion = 'Género ' + data.observacion;
+                                data.observacion = 'Género no registrado';
                             }
                             if (CORREO == undefined) {
                                 data.correo = 'No registrado';
-                                data.observacion = 'Correo ' + data.observacion;
+                                data.observacion = 'Correo no registrado';
                             }
                             if (FECHA_NACIMIENTO == undefined) {
                                 data.fec_nacimiento = 'No registrado';
-                                data.observacion = 'Fecha de nacimiento ' + data.observacion;
+                                data.observacion = 'Fecha de nacimiento no registrado';
                             }
                             if (LATITUD == undefined) {
                                 data.latitud = 'No registrado';
@@ -2054,11 +2054,11 @@ class EmpleadoControlador {
                             }
                             if (NACIONALIDAD == undefined) {
                                 data.nacionalidad = 'No registrado';
-                                data.observacion = 'Nacionalidad ' + data.observacion;
+                                data.observacion = 'Nacionalidad no registrado';
                             }
                             if (USUARIO == undefined) {
                                 data.usuario = 'No registrado';
-                                data.observacion = 'Usuario ' + data.observacion;
+                                data.observacion = 'Usuario no registrado';
                             }
                             if (CONTRASENA == undefined) {
                                 data.contrasena = 'No registrado';
@@ -2066,7 +2066,7 @@ class EmpleadoControlador {
                             }
                             if (ROL == undefined) {
                                 data.rol = 'No registrado';
-                                data.observacion = 'Rol ' + data.observacion;
+                                data.observacion = 'Rol no registrado';
                             }
                             if (CODIGO != undefined) {
                                 if (!regex.test(data.codigo)) {
@@ -2635,6 +2635,53 @@ class EmpleadoControlador {
         });
     }
     ;
+    /** **************************************************************************************** **
+    ** **              OPTIENE LA INFORMACION DE CONTRATOS Y CARGOS POR EMPLEADO                **
+    ** **************************************************************************************** **/
+    getContratosCargos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.query;
+            try {
+                var listaCargos;
+                var listaContratos;
+                const contratos = yield database_1.default.query(`
+        SELECT 
+	        emC.id, emC.id_empleado as id_contrato, emC.id_modalidad_laboral, 
+          moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
+          emC.controlar_asistencia
+        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda
+        WHERE 
+	        emc.id_empleado = $1 AND
+	        moda.id = emC.id_modalidad_laboral
+        `, [id_empleado]);
+                listaContratos = contratos.rows;
+                listaContratos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    const cargos = yield database_1.default.query(`
+          SELECT 
+            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre, 
+            emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
+            emC.jefe
+          FROM 
+            eu_empleado_cargos AS emC, ed_departamentos AS ed, 
+            e_sucursales AS su, e_cat_tipo_cargo AS carg
+          WHERE 
+            emc.id_contrato = $1 AND
+            ed.id = emC.id_departamento AND
+            su.id = ed.id_sucursal AND
+            carg.id = emC.id_tipo_cargo
+          `, [item.id]);
+                    listaCargos.push(cargos.rows);
+                }));
+                setTimeout(() => {
+                    return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
+                }, 2000);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
 }
 exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;

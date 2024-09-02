@@ -341,33 +341,36 @@ export class ListarRelojesComponent implements OnInit {
     if (observacion == 'Registro duplicado (código)' ||
       observacion == 'Registro duplicado (dirección IP)' ||
       observacion == 'Registro duplicado (número de serie)' ||
-      observacion == 'Registro duplicado (dirección MAC)'
-    ) {
+      observacion == 'Registro duplicado (dirección MAC)') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'ok') {
+    }
+    else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema' ||
+    }
+    else if (observacion == 'Ya existe en el sistema' ||
       observacion == 'Número de serie ya existe en el sistema' ||
-      observacion == 'Dirección MAC ya existe en el sistema'
-    ) {
+      observacion == 'Dirección MAC ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Establecimiento no existe en el sistema' ||
+    }
+    else if (observacion == 'Sucursal no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+    }
+    else if (observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El puerto debe ser de 6 dígitos' ||
       observacion == 'Debe ingresar acciones' ||
-      observacion == 'El número de acciones debe ser mayor a 0 y menor a 8'
-    ) {
+      observacion == 'El número de acciones debe ser mayor a 0 y menor a 8') {
       return 'rgb(238, 34, 207)';
-    } else if (observacion == 'Dirección IP incorrecta' ||
+    }
+    else if (observacion == 'Dirección IP incorrecta' ||
       observacion == 'Puerto incorrecto (solo números)' ||
-      observacion == 'Acción incorrecta ingrese (SI / NO)' ||
-      observacion == 'Número de acciones incorrecta (solo números)' ||
-      observacion == 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
-    ) {
+      observacion == 'Función temperatura no válida ingrese (SI / NO)' ||
+      observacion == 'Conexión no válida ingrese (interna / externa)' ||
+      observacion == 'Marca no válida ingrese (ZKTECO / HIKVISION)' ||
+      observacion == 'Formato de dirección MAC incorrecta (numeración hexadecimal)') {
       return 'rgb(222, 162, 73)';
-    } else {
+    }
+    else {
       return 'rgb(242, 21, 21)';
     }
   }

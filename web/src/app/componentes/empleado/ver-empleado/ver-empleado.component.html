@@ -1,10 +1,19 @@
 <br>
+<div class="row w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
+    <div class="col-12 text-center">
+        <div class="d-flex bd-highlight" id="resultados">
+            <h6 class="w-100 bd-highlight align-self-center">
+                {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
+            </h6>
+        </div>
+    </div>
+</div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
 
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
     <mat-tab label="perfil">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">person_pin</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">account_circle</mat-icon>
             <h6 id="items">Perfil Usuario</h6>
         </ng-template>
         <div class="container" *ngFor="let e of empleadoUno" style="padding-top: 15px; padding-bottom: 25px;">
@@ -199,7 +208,7 @@
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
     <mat-tab label="asignaciones">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">school</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">school</mat-icon>
             <h6 id="items">Asignaciones</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -302,7 +311,7 @@
     <!-- REGISTRO DE VACUNACION -->
     <mat-tab label="vacunacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">local_hospital</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">add_circle</mat-icon>
             <h6 id="items">Vacunación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -379,7 +388,7 @@
     <!-- CONTRATO DEL EMPLEADO Y CARGO DEL EMPLEADO -->
     <mat-tab label="contrato_cargo">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">description</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
             <h6 id="items">Contrato y Cargo</h6>
         </ng-template>
 
@@ -393,12 +402,12 @@
                     id="editarCargo">
                 </app-editar-cargo>
             </div>
-            <div class="row">
+            <div class="row" *ngIf="btnActualizarCargo && !editar_contrato">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="titulo">
                             <div class="w-100 bd-highlight">
-                                <h5>CONTRATO ACTUAL</h5>
+                                <h5>CONTRATO VIGENTE</h5>
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
                                 *ngIf="!editar_contrato">
@@ -491,121 +500,11 @@
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato')" matSuffix
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
                                         class="far fa-trash-alt">
                                         <p>Eliminar</p>
-                                    </i>
-                                </div>
-                            </div>
-                        </mat-card-content>
-                    </mat-card>
-                    <br>
-                    <mat-card class="mat-elevation-z8">
-                        <div id="titulo">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col" style="text-align: center;">
-                                        <h5>CONTRATOS ANTERIORES</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <mat-card-content>
-                            <div class="container" style="padding-top: 15px; text-align: center;">
-                                <form [formGroup]="contratoForm">
-                                    <mat-form-field>
-                                        <mat-label>Período del contrato</mat-label>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Lista de contratos del empleado">
-                                            help_outline
-                                        </mat-icon>
-                                        <mat-select [formControl]="fechaContrato">
-                                            <mat-option *ngFor="let c of contratoBuscado" [value]="c.id"
-                                                (click)="ObtenerContratoSeleccionado(contratoForm.value)">
-                                                {{c.fec_ingreso_}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </form>
-                            </div>
-                            <div class="container" *ngFor="let ce of contratoSeleccionado" style="padding-top: 15px;">
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Régimen Laboral:</label>
-                                            <label>{{ce.descripcion}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha desde:</label>
-                                            <label>{{ce.fec_ingreso_}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha hasta:</label>
-                                            <label *ngIf="ce.fecha_salida === null">Sin fecha</label>
-                                            <label *ngIf="ce.fecha_salida != null">{{ce.fec_salida_}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Control de asistencia:</label>
-                                            <label *ngIf="ce.controlar_asistencia == true">Si</label>
-                                            <label *ngIf="ce.controlar_asistencia == false">No</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Control de vacaciones:</label>
-                                            <label *ngIf="ce.controlar_vacacion == true">Si</label>
-                                            <label *ngIf="ce.controlar_vacacion == false">No</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Documento contrato:</label>
-                                            <a *ngIf="ce.documento != null && ce.documento != ''"
-                                                class="fas fa-file-alt"
-                                                style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px; font-size: 13px;"
-                                                matSuffix matTooltipPosition="right"
-                                                matTooltip="Dar click para descargar contrato de trabajo"
-                                                href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
-                                                target="_blank">
-                                                <p>{{ce.documento}}</p>
-                                            </a>
-                                            <a *ngIf="ce.documento === null || ce.documento === ''" mat-raised-button
-                                                id="btndocumento" type="submit"
-                                                (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
-                                                [disabled]="!btnActualizarContrato">
-                                                Cargar Contrato de Trabajo
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="text-align: right; margin-top: 5px;">
-                                    <i type="submit" id="cerrar" style="margin-right: 6px;" (click)="LimpiarContrato()"
-                                        matSuffix matTooltipPosition="right" matTooltip="Cerrar Registro"
-                                        class="fa fa-times-circle">
-                                        <p>Cerrar</p>
-                                    </i>
-                                    <i type="submit" id="edit" style="margin-right: 6px;"
-                                        (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
-                                        <p>Editar</p>
                                     </i>
                                 </div>
                             </div>
@@ -616,7 +515,7 @@
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="titulo">
                             <div class="w-100 bd-highlight">
-                                <h5>CARGO ACTUAL</h5>
+                                <h5>CARGO VIGENTE</h5>
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
                                 *ngIf="btnActualizarCargo">
@@ -696,7 +595,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md">
+                                    <div class="col-md" style="padding-bottom: 20px;">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Estado cargo:
                                                 <mat-icon id="refrescar" matTooltip="Actualizar información."
@@ -709,7 +608,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="true"
-                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Activo
                                                         </mat-radio-button>
                                                     </div>
@@ -717,7 +616,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="false"
-                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Inactivo
                                                         </mat-radio-button>
                                                     </div>
@@ -727,14 +626,14 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right; margin-top: 5px;">
-                                    <i type="submit" id="edit" style="margin-right: 6px;" *ngIf="btnActualizarCargo && getEditarDatos()"
+                                    <i type="submit" id="edit" style="margin-right: 6px;"
                                         (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
                                         matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
-                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo')" matSuffix
+                                        (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
                                         class="far fa-trash-alt">
@@ -744,13 +643,142 @@
                             </div>
                         </mat-card-content>
                     </mat-card>
-                    <br>
+                </div>
+            </div>
+        </div>
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;"
+            *ngIf="contratoBuscado.length > 0 && btnActualizarCargo && !editar_contrato">
+            <div class="row">
+                <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
                         <div id="titulo">
                             <div class="container">
                                 <div class="row">
                                     <div class="col" style="text-align: center;">
-                                        <h5>CARGOS ANTERIORES</h5>
+                                        <h5>LISTA DE CONTRATOS
+                                            <mat-icon *ngIf="contratoSeleccionado.length > 0" class="float-right"
+                                                id="cerrar" (click)="LimpiarContrato()" matSuffix
+                                                matTooltipPosition="right" matTooltip="Cerrar Registro">
+                                                highlight_off
+                                            </mat-icon>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <mat-card-content>
+                            <div class="container" style="padding-top: 15px; text-align: center;">
+                                <form [formGroup]="contratoForm">
+                                    <mat-form-field>
+                                        <mat-label>Período del contrato</mat-label>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Lista de contratos del empleado">
+                                            help_outline
+                                        </mat-icon>
+                                        <mat-select [formControl]="fechaContrato">
+                                            <mat-option *ngFor="let c of contratoBuscado" [value]="c.id"
+                                                (click)="ObtenerContratoSeleccionado(contratoForm.value)">
+                                                {{c.fec_ingreso_}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </form>
+                            </div>
+                            <div class="container" *ngFor="let ce of contratoSeleccionado" style="padding-top: 15px;">
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Régimen Laboral:</label>
+                                            <label>{{ce.descripcion}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Fecha desde:</label>
+                                            <label>{{ce.fec_ingreso_}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Fecha hasta:</label>
+                                            <label *ngIf="ce.fecha_salida === null">Sin fecha</label>
+                                            <label *ngIf="ce.fecha_salida != null">{{ce.fec_salida_}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Control de asistencia:</label>
+                                            <label *ngIf="ce.controlar_asistencia == true">Si</label>
+                                            <label *ngIf="ce.controlar_asistencia == false">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Control de vacaciones:</label>
+                                            <label *ngIf="ce.controlar_vacacion == true">Si</label>
+                                            <label *ngIf="ce.controlar_vacacion == false">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF" *ngIf="ce.documento != null && ce.documento != ''">
+                                                Documento contrato:
+                                            </label>
+                                            <a *ngIf="ce.documento != null && ce.documento != ''"
+                                                class="fas fa-file-alt"
+                                                style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px; font-size: 13px;"
+                                                matSuffix matTooltipPosition="right"
+                                                matTooltip="Dar click para descargar contrato de trabajo"
+                                                href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
+                                                target="_blank">
+                                                <p>{{ce.documento}}</p>
+                                            </a>
+                                            <a *ngIf="(ce.documento === null || ce.documento === '') && ce.id != datoActual.id_contrato"
+                                                mat-raised-button id="btndocumento" type="submit"
+                                                (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
+                                                [disabled]="!btnActualizarContrato">
+                                                Cargar Contrato de Trabajo
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div style="text-align: right; margin-top: 5px;"
+                                    *ngIf="ce.id != datoActual.id_contrato">
+                                    <i type="submit" id="edit" style="margin-right: 6px;"
+                                        (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                        <p>Editar</p>
+                                    </i>
+                                    <i type="submit" id="t-eliminar" style="margin-right: 3px;"
+                                        (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Elimina los datos generales de este registro"
+                                        class="far fa-trash-alt">
+                                        <p>Eliminar</p>
+                                    </i>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <div class="col-md" *ngIf="mostrar_cargo_datos">
+                    <mat-card class="mat-elevation-z8">
+                        <div id="titulo">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col" style="text-align: center;">
+                                        <h5>LISTA DE CARGOS</h5>
                                     </div>
                                 </div>
                             </div>
@@ -842,7 +870,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" *ngIf="c.id != datoActual.id_cargo">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Estado cargo:
@@ -856,7 +884,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="true"
-                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Activo
                                                         </mat-radio-button>
                                                     </div>
@@ -864,7 +892,7 @@
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
                                                         <mat-radio-button [value]="false"
-                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            (change)="CambiarEstadoCargo($event, c)">
                                                             Inactivo
                                                         </mat-radio-button>
                                                     </div>
@@ -872,21 +900,23 @@
                                             </div>
                                         </mat-radio-group>
                                     </div>
-                                </div>
-                                <div class="row">
+                                </div><br />
+                                <div class="row" *ngIf="c.id != datoActual.id_cargo">
                                     <div class="col-md">
                                         <div style="text-align: right; margin-top: 5px;">
-                                            <i type="submit" id="cerrar" style="margin-right: 6px;"
-                                                (click)="LimpiarCargo()" matSuffix matTooltipPosition="right"
-                                                matTooltip="Cerrar Registro" class="fa fa-times-circle">
-                                                <p>Cerrar</p>
-                                            </i>
                                             <i type="submit" id="edit" style="margin-right: 6px;"
                                                 (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Modificar los datos generales de este registro"
                                                 class="fas fa-edit">
                                                 <p>Editar</p>
+                                            </i>
+                                            <i type="submit" id="t-eliminar" style="margin-right: 3px;"
+                                                (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
+                                                matTooltipPosition="right"
+                                                matTooltip="Elimina los datos generales de este registro"
+                                                class="far fa-trash-alt">
+                                                <p>Eliminar</p>
                                             </i>
                                         </div>
                                     </div>
@@ -902,7 +932,7 @@
     <!-- HORARIO DEL EMPLEADO -->
     <mat-tab label="planificacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">event</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">event</mat-icon>
             <h6 id="items">Planificación horaria</h6>
         </ng-template>
 
@@ -1566,7 +1596,7 @@
     <!-- PERMISOS -->
     <mat-tab *ngIf="HabilitarPermisos" label="solicitudes_permisos">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">transfer_within_a_station</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">transfer_within_a_station</mat-icon>
             <h6 id="items">Permisos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -1710,7 +1740,7 @@
     <!-- PERIODO DE VACACIONES DEL EMPLEADO Y VACACIONES DEL EMPLEADO -->
     <mat-tab *ngIf="habilitarVacaciones" label="periodo_vacaciones">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">flight_takeoff</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">flight_takeoff</mat-icon>
             <h6 id="items"> Vacaciones</h6>
         </ng-template>
 
@@ -1880,7 +1910,7 @@
     <!-- HORAS EXTRAS -->
     <mat-tab *ngIf="HabilitarHorasE" label="solicitudes_horas_extras">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">query_builder</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">query_builder</mat-icon>
             <h6 id="items"> Horas Extras</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_horas">
@@ -2047,7 +2077,7 @@
     <!-- PLANIFICACION DE ALMUERZO -->
     <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">local_dining</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">local_dining</mat-icon>
             <h6 id="items"> Alimentación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_comida">
@@ -2229,7 +2259,7 @@
     <!-- PROCESOS DEL EMPLEADO -->
     <mat-tab *ngIf="HabilitarAccion" label="accion_personal">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">wc</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">wc</mat-icon>
             <h6 id="items"> Procesos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -2296,7 +2326,7 @@
     <!-- AUTORIZACIONES -->
     <mat-tab *ngIf="autorizar" label="autorizar">
         <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">supervisor_account</mat-icon>
             <h6 id="items">Autorización</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
@@ -2377,6 +2407,26 @@
                                 </table>
                             </div>
                         </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </mat-tab>
+
+    <!-- HISTORICOS DE CONTRATOS Y CARGOS DEL EMPLEADO -->
+    <mat-tab label="historico">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">dvr</mat-icon>
+            <h6 id="items">Histórico</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+            <div>
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">INFOMRACIÓN CONTRATO CARGO </span>
+                    </div>
+                    <mat-card-content>
+
                     </mat-card-content>
                 </mat-card>
             </div>

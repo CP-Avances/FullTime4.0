@@ -772,6 +772,21 @@ class UsuarioControlador {
             }
         });
     }
+    // BUSCAR TODAS LAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
+    BuscarAsignacionesUsuario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const USUARIOS = yield database_1.default.query(`
+        SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+        `, [id_empleado]);
+            if (USUARIOS.rowCount != 0) {
+                return res.jsonp(USUARIOS.rows);
+            }
+            else {
+                return res.jsonp(null);
+            }
+        });
+    }
     // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO   **USADO
     ActualizarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -815,6 +830,7 @@ class UsuarioControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });

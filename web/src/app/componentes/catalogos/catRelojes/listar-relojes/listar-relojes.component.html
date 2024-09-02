@@ -234,8 +234,8 @@
                             <th scope="col">Código</th>
                             <th scope="col">Dirección IP</th>
                             <th scope="col">Puerto</th>
-                            <th scope="col">Acciones</th>
-                            <th scope="col">Número de acciones</th>
+                            <th scope="col">Tipo conexión</th>
+                            <th scope="col">Temperatura</th>
                             <th scope="col">Marca</th>
                             <th scope="col">Modelo</th>
                             <th scope="col">ID fabricante</th>
@@ -272,10 +272,10 @@
                             </td>
                             <td [style.color]="EstiloTextoCelda(d.puerto)" id="letras">{{d.puerto}}
                             </td>
-                            <td [style.color]="EstiloTextoCelda(d.acciones)" style="font-size: 12px;">{{d.acciones}}
+                            <td [style.color]="EstiloTextoCelda(d.tipo_conexion)" style="font-size: 12px;">{{d.tipo_conexion}}
                             </td>
-                            <td [style.color]="EstiloTextoCelda(d.numero_acciones)" id="letras">
-                                {{d.numero_acciones}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.temperatura)" id="letras">
+                                {{d.temperatura}}</td>
                             <td [style.color]="EstiloTextoCelda(d.marca)" style="font-size: 12px;">{{d.marca}}</td>
                             <td [style.color]="EstiloTextoCelda(d.modelo)" id="letras">{{d.modelo}}
                             </td>

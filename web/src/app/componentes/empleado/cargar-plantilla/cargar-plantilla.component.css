@@ -4,13 +4,13 @@
 }
 
 #items {
-    font-size: 13px;
+    font-size: 12px;
     margin-top: 8%;
-    margin-bottom: 3%;
     font-style: normal;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 1px;
     word-wrap: break-word;
+    color: black;
 }
 
 table {

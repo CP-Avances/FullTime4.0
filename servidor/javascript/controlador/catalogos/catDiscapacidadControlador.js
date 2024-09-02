@@ -244,7 +244,7 @@ class DiscapacidadControlador {
                             }
                             if (DISCAPACIDAD == undefined) {
                                 data.discapacidad = 'No registrado';
-                                data.observacion = 'Discapacidad ' + data.observacion;
+                                data.observacion = 'Discapacidad no registrada';
                             }
                             listaDiscapacidad.push(data);
                         }

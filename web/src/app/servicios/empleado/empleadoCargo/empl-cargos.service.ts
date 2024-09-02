@@ -56,7 +56,7 @@ export class EmplCargosService {
   }
 
   // METODO DE ACTUALIZACION DE CARGO    **USADO
-  ActualizarContratoEmpleado(id: number, id_empl_contrato: number, data: any) {
+  ActualizarCargoEmpleado(id: number, id_empl_contrato: number, data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/${id_empl_contrato}/${id}/actualizar`, data);
   }
 

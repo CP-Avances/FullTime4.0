@@ -224,7 +224,7 @@ class EmpleadoCargosControlador {
             const { id_empl_contrato } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
-        s.nombre AS sucursal, d.nombre AS departamento, ec.jefe 
+        s.nombre AS sucursal, d.nombre AS departamento, ec.jefe, ec.estado 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
       WHERE ec.id_contrato = $1 AND d.id_sucursal = s.id AND ec.id_departamento = d.id
       `, [id_empl_contrato]);
@@ -257,14 +257,16 @@ class EmpleadoCargosControlador {
     // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS    **USADO
     BuscarCargosFechaEditar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fecha_verificar, id_cargo } = req.body;
+            const { id_empleado, fecha_inicio, fecha_fin, id_cargo } = req.body;
             const CARGOS = yield database_1.default.query(`
-        SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
-        FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
-        WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND $2 < car.fecha_final
-          AND NOT car.id = $3
-        ORDER BY e.id ASC
-        `, [id_empleado, fecha_verificar, id_cargo]);
+      SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
+      FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
+      WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND
+		    (($2 BETWEEN car.fecha_inicio AND car.fecha_final) OR 
+		    ($3 BETWEEN car.fecha_inicio AND car.fecha_final))
+        AND NOT car.id = $4
+      ORDER BY e.id ASC
+      `, [id_empleado, fecha_inicio, fecha_fin, id_cargo]);
             if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
             }
@@ -519,39 +521,39 @@ class EmpleadoCargosControlador {
                         }
                         if (DEPARTAMENTO == undefined) {
                             data.departamento = 'No registrado';
-                            data.observacion = 'Departamento ' + data.observacion;
+                            data.observacion = 'Departamento no registrado';
                         }
                         if (FECHA_DESDE == undefined) {
                             data.fecha_desde = 'No registrado';
-                            data.observacion = 'Fecha desde ' + data.observacion;
+                            data.observacion = 'Fecha desde no registrado';
                         }
                         if (FECHA_HASTA == undefined) {
                             data.fecha_hasta = 'No registrado';
-                            data.observacion = 'Fecha hasta ' + data.observacion;
+                            data.observacion = 'Fecha hasta no registrado';
                         }
                         if (SUCURSAL == undefined) {
                             data.sucursal = 'No registrado';
-                            data.observacion = 'Sucursal ' + data.observacion;
+                            data.observacion = 'Sucursal no registrado';
                         }
                         if (SUELDO == undefined) {
                             data.sueldo = 'No registrado';
-                            data.observacion = 'Sueldo ' + data.observacion;
+                            data.observacion = 'Sueldo no registrado';
                         }
                         if (CARGO == undefined) {
                             data.cargo = 'No registrado';
-                            data.observacion = 'Cargo ' + data.observacion;
+                            data.observacion = 'Cargo no registrado';
                         }
                         if (HORA_TRABAJA == undefined) {
                             data.hora_trabaja = 'No registrado';
-                            data.observacion = 'Hora trabajo ' + data.observacion;
+                            data.observacion = 'Hora trabajo no registrado';
                         }
                         if (JEFE == undefined) {
                             data.admini_depa = 'No registrado';
-                            data.observacion = 'Jefe ' + data.observacion;
+                            data.observacion = 'Jefe no registrado';
                         }
                         if (CEDULA == undefined) {
                             data.cedula = 'No registrado';
-                            data.observacion = 'Cédula ' + data.observacion;
+                            data.observacion = 'Cédula no registrado';
                         }
                         else {
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
@@ -805,14 +807,16 @@ class EmpleadoCargosControlador {
                         hora_trabaja, admin_dep, true]);
                     const [cargos] = response.rows;
                     const id_usuario_depa = yield database_1.default.query(`
-           SELECT id FROM eu_usuario_departamento WHERE id_empleado = $1
+           SELECT id FROM eu_usuario_departamento 
+           WHERE id_empleado = $1 AND 
+            principal = true AND administra = false 
           `, [id_empleado]);
                     if (id_usuario_depa.rows[0] != undefined) {
                         yield database_1.default.query(`
               UPDATE eu_usuario_departamento 
               SET id_departamento = $2, principal = $3, personal = $4, administra =$5
-              WHERE id_empleado = $1 RETURNING *
-              `, [id_empleado, id_departamento, true, true, admin_dep]);
+              WHERE id = $1 RETURNING *
+              `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
                     }
                     else {
                         const response2 = yield database_1.default.query(`
