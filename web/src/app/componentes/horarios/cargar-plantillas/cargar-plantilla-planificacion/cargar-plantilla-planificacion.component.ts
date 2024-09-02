@@ -192,6 +192,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
   // METODO PARA ORGANIZAR LOS DATOS DE LA PLANIFICACION
   OrganizarDatosPlanificacion(data: any) {
+    console.log(data);
     this.planificacionesHorarias = [];
     this.dias_mes = [];
     this.dia_inicio = data.fechaInicioMes;
@@ -211,10 +212,12 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
                   };
 
                   // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
-                  if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
-                      planificacion.dias[dia.fecha].observacion = 'FD';
-                      planificacion.dias[dia.fecha].observacion3 = 'DEFAULT-FERIADO';
-                  }
+                 if (planificacion.feriados) {
+                   if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
+                       planificacion.dias[dia.fecha].observacion = 'FD';
+                       planificacion.dias[dia.fecha].observacion3 = 'DEFAULT-FERIADO';
+                   }
+                 }
               }
           });
 
