@@ -36,7 +36,8 @@ export class ParametrosService {
 
   // METODO PARA ELIMINAR DETALLE DE PARAMETRO **USADO
   EliminarDetalleParametro(id: number, datos: any) {
-    const url = `${(this.url as string)}/parametrizacion/eliminar-detalle/${id}`;
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    const url = `${(urlPrueba as string)}/parametrizacion/eliminar-detalle/${id}`;
     const httpOptions = {
       body: datos
     };
@@ -45,17 +46,20 @@ export class ParametrosService {
 
   // METODO PARA REGISTRAR DETALLE DE PARAMETRO **USADO
   IngresarDetalleParametro(data: any) {
-    return this.http.post(`${(this.url as string)}/parametrizacion/detalle`, data);
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.post(`${(urlPrueba as string)}/parametrizacion/detalle`, data);
   }
 
   // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO  **USADO
   ActualizarDetalleParametro(datos: any) {
-    return this.http.put(`${(this.url as string)}/parametrizacion/actual-detalle`, datos);
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.put(`${(urlPrueba as string)}/parametrizacion/actual-detalle`, datos);
   }
 
   // METODO PARA COMPARAR CORDENADAS    **USADO
   ObtenerCoordenadas(data: any) {
-    return this.http.post<any>(`${(this.url as string)}/parametrizacion/coordenadas`, data);;
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.post<any>(`${(urlPrueba as string)}/parametrizacion/coordenadas`, data);;
   }
 
 }
