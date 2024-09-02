@@ -14,11 +14,11 @@ export class RelojesService {
 
   // METODO PARA LISTAR DISPOSITIVOS   **USADO
   ConsultarRelojes() {
-    return this.http.get(`${environment.url}/relojes`);
+    return this.http.get<any>(`${environment.url}/relojes`);
   }
 
   // METODO PARA ELIMINAR REGISTRO   **USADO
-  EliminarRegistro(id: number, datos:any) {
+  EliminarRegistro(id: number, datos: any) {
     const url = `${environment.url}/relojes/eliminar/${id}`;
     const httpOtions = {
       body: datos
@@ -44,6 +44,11 @@ export class RelojesService {
   // METODO PARA CONSULTAR DATOS DE UN BIOMETRICO   **USADO
   ConsultarUnReloj(id: number) {
     return this.http.get(`${environment.url}/relojes/${id}`);
+  }
+
+  // METODO PARA CONTAR RELOJES   **USADO
+  ContarRelojes() {
+    return this.http.get<any>(`${environment.url}/relojes/contar/biometricos`);
   }
 
   // METODO PARA REGISTRAR DATOS DE PLANTILLA    **USADO

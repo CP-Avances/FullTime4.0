@@ -252,6 +252,26 @@ class RelojesControlador {
             }
         });
     }
+    // METODO PARA CONTAR DISPOSITIVOS     **USADO
+    ContarDispositivos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const RELOJES = yield database_1.default.query(`
+                SELECT COUNT (id) AS total FROM ed_relojes;
+                `);
+                if (RELOJES.rowCount != 0) {
+                    return res.jsonp(RELOJES.rows[0]);
+                }
+                else {
+                    return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                }
+            }
+            catch (error) {
+                console.log('error ', error);
+                return res.status(500).jsonp({ message: 'Ups!!! algo salio mal. No se han encontrado registros.' });
+            }
+        });
+    }
     // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
     VerificarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

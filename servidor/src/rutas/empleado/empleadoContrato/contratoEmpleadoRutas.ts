@@ -100,7 +100,7 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);
         // METODO PARA ELIMINAR EL CONTRATO REGISTRADO DE LA TABLA EU_EMPLEADOS_CONTRATOS       **USADO
-        this.router.post('/eliminarContrato/:id', [TokenValidation], CONTRATO_EMPLEADO_CONTROLADOR.EliminarContrato);
+        this.router.post('/eliminarContrato', [TokenValidation], CONTRATO_EMPLEADO_CONTROLADOR.EliminarContrato);
 
         /** ********************************************************************************************* **
          ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **

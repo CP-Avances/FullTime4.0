@@ -865,11 +865,47 @@ class EmpleadoCargosControlador {
     // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
     EliminarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
             try {
-                yield database_1.default.query(`
-        DELETE FROM eu_empleado_cargos WHERE id = $1
+                const { id, user_name, ip, } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOS ORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_cargos WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_cargos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const ELIMINAR = yield database_1.default.query(`
+        DELETE FROM eu_empleado_cargos WHERE id = $1 RETURNING *
         `, [id]);
+                const [datosEliminados] = ELIMINAR.rows;
+                const fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_inicio, 'ddd');
+                const fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_final, 'ddd');
+                datosEliminados.fecha_inicio = fechaIngresoE;
+                datosEliminados.fecha_final = fechaSalidaE;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_cargos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosEliminados),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {

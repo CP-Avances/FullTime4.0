@@ -1080,11 +1080,11 @@ class UsuarioControlador {
 
         switch (verificacion) {
           case 1:
-            // INSERTAR NUEVA ASIGNACIÓN
+            // INSERTAR NUEVA ASIGNACION
             error = await RegistrarUsuarioDepartamento(datos);
             break;
           case 2:
-            // ACTUALIZAR ASIGNACIÓN EXISTENTE
+            // ACTUALIZAR ASIGNACION EXISTENTE
             error = await EditarUsuarioDepartamento(datos);
             break;
         }
@@ -1093,7 +1093,7 @@ class UsuarioControlador {
 
     if (error) return res.status(500).jsonp({ message: 'error' });
 
-    return res.json({ message: 'Proceso completado' });
+    return res.json({ message: 'Proceso completado.' });
 
   }
 

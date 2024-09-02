@@ -21,6 +21,8 @@ export class RelojesComponent implements OnInit {
   sucursales: any = [];
   departamento: any = [];
   registrar: boolean = true;
+  totalDispositivos: number = 0;
+  numeroDipositivos: number = 0;
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -73,6 +75,7 @@ export class RelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.totalDispositivos = 15;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
@@ -83,6 +86,22 @@ export class RelojesComponent implements OnInit {
 
     this.FiltrarSucursales();
     this.ValidarFormulario();
+    this.ContarDispositivos();
+  }
+
+  // METODO PARA CONTAR DIPOSITIVOS
+  ContarDispositivos() {
+    this.numeroDipositivos = 0;
+    this.rest.ContarRelojes().subscribe(response => {
+      this.numeroDipositivos = parseInt(response.total) + 1;
+      //console.log('relojes ', this.numeroDipositivos)
+      if (this.numeroDipositivos > this.totalDispositivos) {
+        this.toastr.info('No tienes permitido realizar más registros.', 'Has alcanzado el límite máximo de dispositivos.', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana();
+      }
+    });
   }
 
   // VALIDACIONES DE FORMULARIO

@@ -1008,14 +1008,58 @@ class EmpleadoCargosControlador {
 
   // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
   public async EliminarCargo(req: Request, res: Response): Promise<any> {
-    const { id } = req.body;
     try {
-      await pool.query(
+      const { id, user_name, ip, } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOS ORIGINALES
+      const consulta = await pool.query(`SELECT * FROM eu_empleado_cargos WHERE id = $1`, [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_cargos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      const ELIMINAR = await pool.query(
         `
-        DELETE FROM eu_empleado_cargos WHERE id = $1
+        DELETE FROM eu_empleado_cargos WHERE id = $1 RETURNING *
         `
         , [id]);
 
+      const [datosEliminados] = ELIMINAR.rows;
+
+      const fechaIngresoE = await FormatearFecha2(datosEliminados.fecha_inicio, 'ddd');
+      const fechaSalidaE = await FormatearFecha2(datosEliminados.fecha_final, 'ddd');
+      datosEliminados.fecha_inicio = fechaIngresoE;
+      datosEliminados.fecha_final = fechaSalidaE;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_cargos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosEliminados),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
       return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 
     } catch (error) {

@@ -926,11 +926,11 @@ class UsuarioControlador {
                     const verificacion = yield VerificarAsignaciones(datos, false, isPersonal);
                     switch (verificacion) {
                         case 1:
-                            // INSERTAR NUEVA ASIGNACIÓN
+                            // INSERTAR NUEVA ASIGNACION
                             error = yield RegistrarUsuarioDepartamento(datos);
                             break;
                         case 2:
-                            // ACTUALIZAR ASIGNACIÓN EXISTENTE
+                            // ACTUALIZAR ASIGNACION EXISTENTE
                             error = yield EditarUsuarioDepartamento(datos);
                             break;
                     }
@@ -938,7 +938,7 @@ class UsuarioControlador {
             }
             if (error)
                 return res.status(500).jsonp({ message: 'error' });
-            return res.json({ message: 'Proceso completado' });
+            return res.json({ message: 'Proceso completado.' });
         });
     }
     //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------

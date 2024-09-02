@@ -11,7 +11,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-timbre-admin',
@@ -62,7 +61,6 @@ export class TimbreAdminComponent implements OnInit {
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
     private asignaciones: AsignacionesService,
-    private ventana: MatDialog  // VARIABLE MANEJO DE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -174,6 +172,7 @@ export class TimbreAdminComponent implements OnInit {
     })
   }
 
+  // METODO PARA VER JUSTIFICATIVO
   VerJustificacion(justificacion: any) {
     this.justificacion = justificacion;
     this.verJustificacion = true;

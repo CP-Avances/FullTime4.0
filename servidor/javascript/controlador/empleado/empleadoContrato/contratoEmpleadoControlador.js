@@ -885,14 +885,52 @@ class ContratoEmpleadoControlador {
     //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
     EliminarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
             try {
-                yield database_1.default.query(`
-                DELETE FROM eu_empleado_contratos WHERE id = $1
+                const { id, user_name, ip, } = req.body;
+                //console.log('query ', req.body)
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOS ORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const ELIMINAR = yield database_1.default.query(`
+                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
                 `, [id]);
+                const [datosEliminados] = ELIMINAR.rows;
+                var fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_ingreso, 'ddd');
+                var fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_salida, 'ddd');
+                datosEliminados.fecha_ingreso = fechaIngresoE;
+                datosEliminados.fecha_salida = fechaSalidaE;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosEliminados),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });

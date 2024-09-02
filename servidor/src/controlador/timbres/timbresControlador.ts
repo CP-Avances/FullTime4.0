@@ -255,7 +255,7 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip } = req.body;
+                ubicacion, user_name, ip, imagen } = req.body;
 
             // OBTENER LA FECHA Y HORA ACTUAL
             var now = moment();
@@ -283,7 +283,7 @@ class TimbresControlador {
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, null],
+                    observacion, 'APP_WEB', ubicacion, imagen],
 
                 async (error, results) => {
                     // FORMATEAR FECHAS
@@ -297,7 +297,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB'}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
                         ip,
                         observacion: null
                     });
@@ -317,9 +317,9 @@ class TimbresControlador {
     // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
-            // LA UBICACION ES NULL YA QUE ESTE USUARIO NO TIMBRA CON UBICACION
-            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
-                id_empleado, id_reloj, tipo, ip, user_name, ubicacion, documento } = req.body
+            // ESTE USUARIO NO TIMBRA CON UBICACION
+            const { fec_hora_timbre, accion, tecl_funcion, observacion,
+                id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body
 
             var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
 
@@ -351,11 +351,11 @@ class TimbresControlador {
 
             await pool.query(
                 `
-                SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
+                SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9)
                 `
-                , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, documento]
+                , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
+                    observacion, 'APP_WEB', documento]
 
                 , async (error, results) => {
 
@@ -367,7 +367,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, documento: ${documento} }`,
                         ip,
                         observacion: null
                     });

@@ -390,7 +390,7 @@ export class EmplCargosComponent implements OnInit {
     console.log('asignaciones ', this.listar_asignaciones)
     if (this.listar_asignaciones.length != 0) {
       this.listar_asignaciones.forEach((a: any) => {
-        //console.log('res dep ', form.idDeparForm)
+        console.log('res dep ', form.idDeparForm)
         if (a.id_departamento === form.idDeparForm) {
           if (a.principal === false) {
             principal_false = a.id;
@@ -408,8 +408,11 @@ export class EmplCargosComponent implements OnInit {
         this.EliminarAsignacion(principal_true);
         this.ActualizarUsuarioDepartamento(form, principal_false);
       }
-      else {
+      else if (principal_true != 0) {
         this.ActualizarUsuarioDepartamento(form, principal_true);
+      }
+      else {
+        this.IngresarUsuarioDepartamento(form);
       }
     }
     else {

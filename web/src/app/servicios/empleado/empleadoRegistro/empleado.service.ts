@@ -260,8 +260,8 @@ export class EmpleadoService {
   }
 
   // METODO PARA ELIMINAR EL CONTRATO POR EL ID         **USADO
-  EliminarContrato(id: any, data: any) {
-    return this.http.post<any>(`${environment.url}/contratoEmpleado/eliminarContrato/${id}`, data);
+  EliminarContrato(data: any) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/eliminarContrato`, data);
   }
 
   // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO

@@ -1,7 +1,7 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
-import { Request, Response } from 'express';
+import { Request, Response, query } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import moment from 'moment';
@@ -976,17 +976,62 @@ class ContratoEmpleadoControlador {
 
     //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
     public async EliminarContrato(req: Request, res: Response): Promise<any> {
-        const { id } = req.params;
         try {
-            await pool.query(
+            const { id, user_name, ip, } = req.body;
+            //console.log('query ', req.body)
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTA DATOS ORIGINALES
+            const consulta = await pool.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+            const ELIMINAR = await pool.query(
                 `
-                DELETE FROM eu_empleado_contratos WHERE id = $1
+                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
                 `
                 , [id]);
 
+            const [datosEliminados] = ELIMINAR.rows;
+            var fechaIngresoE = await FormatearFecha2(datosEliminados.fecha_ingreso, 'ddd');
+            var fechaSalidaE = await FormatearFecha2(datosEliminados.fecha_salida, 'ddd');
+            datosEliminados.fecha_ingreso = fechaIngresoE;
+            datosEliminados.fecha_salida = fechaSalidaE;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosEliminados),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
             return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 
         } catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
