@@ -192,7 +192,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
   // METODO PARA ORGANIZAR LOS DATOS DE LA PLANIFICACION
   OrganizarDatosPlanificacion(data: any) {
-    console.log(data);
     this.planificacionesHorarias = [];
     this.dias_mes = [];
     this.dia_inicio = data.fechaInicioMes;
