@@ -270,7 +270,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     console.log('pantalla> ', this.pantalla)
 
     if (event.tab.textLabel === 'historico') {
-
+      this.obtenerContratoCargosEmplrado();
     }
     if (event.tab.textLabel === 'asignaciones') {
       if (this.asignacion === 0) {
@@ -903,6 +903,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.contratoBuscado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
+    });
+  }
+  listaCargosEmple: any = [];
+  listaContratosEmple: any = []
+  obtenerContratoCargosEmplrado(){
+    this.listaCargosEmple = [];
+    this.listaContratosEmple = [];
+    const data = {id_empleado: this.idEmpleado}
+    this.restEmpleado.ObtenerContratosCargos(data).subscribe(res => {
+      console.log('respuesta: ',res) 
+      this.listaContratosEmple = res.listacontratos;
+      this.listaCargosEmple = res.listacargos;
+      console.log('respuesta: ',res.listacontratos) 
     });
   }
 

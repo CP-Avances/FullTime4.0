@@ -2426,7 +2426,61 @@
                         <span class="w-100 bd-highlight">INFOMRACIÓN CONTRATO CARGO </span>
                     </div>
                     <mat-card-content>
-
+                        <br/>
+                        <div *ngFor="let contrato of listaContratosEmple">
+                            <div class="d-flex bd-highlight" id="titulo">
+                                <div class="row w-100">
+                                    <div class="col-3">
+                                        <label><b>Vacaciones </b> {{contrato.controlar_vacacion ? 'Si' : 'No'}}</label>
+                                            <br/>
+                                        <label><b>Asistencia: </b> {{contrato.controlar_asistencia ? 'Si' : 'No'}}</label>
+    
+                                    </div>
+                                    <div class="col-5 text-center" style="vertical-align: middle;">
+                                        <label>Contrato # {{contrato.id}}</label><br/>
+                                        <label>{{contrato.descripcion}}</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <label><b>Fecha inicio: </b> {{contrato.fecha_ingreso | date: 'dd/MM/yyyy'}}</label>
+                                        <br/>
+                                        <label><b>Fecha final: </b> {{contrato.fecha_salida | date: 'dd/MM/yyyy'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div >
+                                <div class="w-100">
+                                    <div class="table-responsive" style="text-align: center;">
+                                        <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                            <thead class="thead-light">
+                                                <tr style="text-align: center;">
+                                                    <th scope="col" id="td_horarios">Cargo</th>
+                                                    <th scope="col" id="td_horarios">Departameto</th>
+                                                    <th scope="col" id="td_horarios">Sucursal</th>
+                                                    <th scope="col" id="td_horarios">Fecha inicio</th>
+                                                    <th scope="col" id="td_horarios">Fecha final</th>
+                                                    <th scope="col" id="td_horarios">Sueldo</th>
+                                                    <th scope="col" id="td_horarios">Horas trabajo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let cargo of listaCargosEmple">
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.cargo}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.nombre}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sucursal}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_inicio | date: 'dd/MM/yyyy'}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_final | date: 'dd/MM/yyyy'}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sueldo}}</td>
+                                                        <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.hora_trabaja}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="w-100 text-center" *ngIf="listaCargosEmple.length == 0">
+                                    <div><label>No existen cargos registrados en este cargo</label></div>
+                                </div>
+                            </div>
+                        </div>  
                     </mat-card-content>
                 </mat-card>
             </div>

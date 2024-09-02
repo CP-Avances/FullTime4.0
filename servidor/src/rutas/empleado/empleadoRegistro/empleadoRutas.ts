@@ -139,7 +139,7 @@ class EmpleadoRutas {
         this.router.get('/todosempleados/lista', TokenValidation, EMPLEADO_CONTROLADOR.getListaEmpleados);
         this.router.get('/horariosempleado/planificacionHorarioEmplCodigo',TokenValidation, EMPLEADO_CONTROLADOR.getPlanificacionMesesCodigoEmple);
     
-        this.router.get('/infoContratoCargos:id_empleado', TokenValidation, EMPLEADO_CONTROLADOR.getContratosCargos)
+        this.router.post('/infoContratoCargos/', TokenValidation, EMPLEADO_CONTROLADOR.getContratosCargos)
     
     }        
 

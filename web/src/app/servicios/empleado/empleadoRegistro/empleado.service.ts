@@ -323,6 +323,15 @@ export class EmpleadoService {
     );
   }
 
+  ObtenerContratosCargos(data: any){
+    return this.http.post<any>(`${environment.url}/empleado/infoContratoCargos`, data).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message });
+      })
+    );
+    
+  }
+
 
 
 }
