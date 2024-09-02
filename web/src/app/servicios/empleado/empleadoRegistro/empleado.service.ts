@@ -327,4 +327,13 @@ export class EmpleadoService {
     );
   }
 
+  ObtenerContratosCargos(data: any){
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/infoContratoCargos`, data).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message });
+      })
+    );
+    
+  }
+
 }

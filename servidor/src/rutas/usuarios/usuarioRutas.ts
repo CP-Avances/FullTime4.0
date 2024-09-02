@@ -45,7 +45,8 @@ class UsuarioRutas {
 
         // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE MOVIL    **USADO
         this.router.get('/lista-app-movil-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovilGeneral);
-
+        // METODO PARA APP_HABILITA
+        this.router.get('/movil/acceso/activo/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.accesoMovil);
         // METODO PARA BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACIONES USUARIO - DEPARTAMENTO
         this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
         // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS    **USADO
