@@ -257,6 +257,7 @@ class TimbresControlador {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen } = req.body;
+                console.log('datos del timbre ', req.body);
                 // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
@@ -272,12 +273,12 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                 `, [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', ubicacion, imagen, true], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     // FORMATEAR FECHAS
                     var hora = (0, moment_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                    var fecha = (0, moment_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY/MM/DD');
+                    var fecha = (0, moment_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -329,9 +330,9 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', documento, true], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({

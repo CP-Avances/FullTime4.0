@@ -1,0 +1,16 @@
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            IMAGEN
+            <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarVentana()" matSuffix
+                matTooltipPosition="right" matTooltip="Cerrar justificación seleccionada." id="cerrar">
+                highlight_off
+            </mat-icon>
+        </div>
+        <mat-card appearance="outlined">
+            <mat-card-content>
+                <img mat-card-image [src]="data" alt="Justificación" id="justificacion">
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

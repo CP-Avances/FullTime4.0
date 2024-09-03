@@ -3,7 +3,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import { MatDialog } from '@angular/material/dialog';
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -11,9 +10,6 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
-
-// IMPORTAR COMPONENTES
-import { RegistrarTimbreComponent } from '../registrar-timbre/registrar-timbre.component';
 
 @Component({
   selector: 'app-timbre-web',
@@ -30,6 +26,8 @@ export class TimbreWebComponent implements OnInit {
   info: any = [];
 
   activar_timbre: boolean = true;
+  ver_principal: boolean = true;
+  ver_timbre: boolean = false;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -45,7 +43,6 @@ export class TimbreWebComponent implements OnInit {
 
   constructor(
     private restTimbres: TimbresService, // SERVICIOS DATOS TIMBRES
-    private ventana: MatDialog, // VARIABLE USADA PARA NAVEGACIÓN ENTRE VENTANAS
     private validar: ValidacionesService, // VALIDACIONES DE SERVICIOS
     private toastr: ToastrService, // VARIABLE USADA PARA NOTIFICACIONES
     public parametro: ParametrosService,
@@ -162,19 +159,8 @@ export class TimbreWebComponent implements OnInit {
 
   // METODO PARA REGISTRAR TIMBRES
   AbrirRegistrarTimbre() {
-    this.ventana.open(RegistrarTimbreComponent, { width: '550px' }).afterClosed().subscribe(data => {
-      if (data !== undefined) {
-        if (!data.close) {
-          this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
-            data.id_empleado = this.idEmpleado;
-            this.BuscarParametro();
-            this.toastr.success(res.message)
-          }, err => {
-            this.toastr.error(err.message)
-          })
-        }
-      }
-    })
+    this.ver_principal = false;
+    this.ver_timbre = true;
   }
 
   // METODO PARA REALIZAR FILTROS DE BUSQUEDA

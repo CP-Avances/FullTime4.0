@@ -257,6 +257,8 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip, imagen } = req.body;
 
+            console.log('datos del timbre ', req.body)
+
             // OBTENER LA FECHA Y HORA ACTUAL
             var now = moment();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
@@ -280,15 +282,15 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen],
+                    observacion, 'APP_WEB', ubicacion, imagen, true],
 
                 async (error, results) => {
                     // FORMATEAR FECHAS
                     var hora = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                    var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY/MM/DD');
+                    var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
                     const fechaHora = await FormatearHora(hora);
                     const fechaTimbre = await FormatearFecha(fecha, 'ddd');
 
@@ -301,6 +303,7 @@ class TimbresControlador {
                         ip,
                         observacion: null
                     });
+
                     //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
@@ -352,10 +355,10 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
                 `
                 , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento]
+                    observacion, 'APP_WEB', documento, true]
 
                 , async (error, results) => {
 

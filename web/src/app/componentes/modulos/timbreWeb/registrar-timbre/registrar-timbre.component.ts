@@ -1,17 +1,20 @@
 // IMPORTAR LIBRERIAS
+import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Observable, Subject } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { MatDialogRef } from '@angular/material/dialog';
-import { Observable, Subject } from 'rxjs';
-import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
+import { interval } from 'rxjs';
+import { map } from 'rxjs/operators';
+import moment from 'moment';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import moment from 'moment';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -21,19 +24,11 @@ import moment from 'moment';
 
 export class RegistrarTimbreComponent implements OnInit {
 
-
-    // Para manejar la imagen capturada
-    public webcamImage: WebcamImage | null = null;
-    private trigger: Subject<void> = new Subject<void>();
-  
-  
-  
-    public get triggerObservable(): Observable<void> {
-      return this.trigger.asObservable();
-    }
-
- 
-
+  // PARA MANEJAR LA IMAGEN CAPTURADA
+  private trigger: Subject<void> = new Subject<void>();
+  public get triggerObservable(): Observable<void> {
+    return this.trigger.asObservable();
+  }
 
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
@@ -46,6 +41,8 @@ export class RegistrarTimbreComponent implements OnInit {
   // VARIABLE DE SELECCION DE OPCION
   botones_normal: boolean = true;
   boton_abierto: boolean = false;
+  ver_timbrar: boolean = true;
+  ver_camara: boolean = false;
 
   // VARIABLES DE ALMACENMAIENTO DE COORDENADAS
   latitud: number;
@@ -69,39 +66,103 @@ export class RegistrarTimbreComponent implements OnInit {
   ip: string | null;
 
   constructor(
+    private restTimbres: TimbresService,
     public restP: ParametrosService,
     public restE: EmpleadoService,
     public restU: EmpleadoUbicacionService,
     public restF: FuncionesService,
-    public ventana: MatDialogRef<RegistrarTimbreComponent>, // VARIABLE DE USO DE VENTANA DE DIÁLOGO
+    public ventana: TimbreWebComponent, // VARIABLE DE USO DE VENTANA DE DIÁLOGO
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
 
+  currentTime: string;
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
-    this.BuscarParametroUbicacion();
-    this.BuscarParametroCertificado();
-    this.BuscarParametroDesconocida();
+    this.BuscarParametros();
   }
 
-  
+  formato = 'HH:mm:ss';
+  // METODO PARA FORMATEAR LA HORA
+  private FormatearHora(date: Date): string {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    if (this.formato === 'hh:mm:ss A') {
+      // CONVERTIR HORAS A FORMATO DE 12 HORAS
+      const formattedHours = hours % 12 || 12;
+      return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    }
+    else {
+      const formattedHours = String(date.getHours()).padStart(2, '0');
+      return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
+  }
+
+  // METODO PARA MOSTRAR HORA EN TIEMPO REAL
+  MostrarHora() {
+    interval(1000)
+      .pipe(map(() => new Date()))
+      .subscribe(date => {
+        this.currentTime = this.FormatearHora(date);
+      });
+
+    // INICIALIZA EL TIEMPO INMEDIATAMENTE
+    this.currentTime = this.FormatearHora(new Date());
+  }
+
+  // METODO PARA MOSTRAR FOTO
   triggerSnapshot(): void {
     this.trigger.next();
   }
 
+  // METODO PARA CONVERTIR LA IMAGEN
   handleImage(webcamImage: WebcamImage): void {
-    this.webcamImage = webcamImage;
+    this.VoltearImagen(webcamImage.imageAsDataUrl)
   }
 
-  saveImage(): void {
-    if (this.webcamImage) {
-      // Enviar la imagen al backend
-      // Aquí puedes usar un servicio de Angular para hacer una petición HTTP
-    }
+  convertida: string | ArrayBuffer | null = null;
+  // METOOD PARA VOLTEAR LA IMAGEN HORIZONTALMENTE
+  flippedImage: any;
+  VoltearImagen(src: any) {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.translate(canvas.width, 0); // MUEVE EL ORIGEN AL BORDE DERECHO DEL CANVAS
+        ctx.scale(-1, 1); // APLICA LA ESCALA NEGATIVA
+        ctx.drawImage(img, 0, 0); // DIBUJA LA IMAGEN EN EL CANVAS
+        const flippedImage = canvas.toDataURL();
+        this.flippedImage = flippedImage;
+        // CONVERTIR A BASE64 CON CALIDAD REDUCIDA
+        const quality = 0.9; // AJUSTA LA CALIDAD SEGUN SEA NECESARIO (0.0 - 1.0)
+        this.convertida = canvas.toDataURL('image/jpeg', quality);
+        //console.log('convertida ', this.convertida)
+      } else {
+        this.toastr.warning(
+          'Ups!!! algo salio mal.', 'Intente nuevamente.', {
+          timeOut: 6000,
+        })
+      }
+    };
+    img.onerror = () => {
+      this.toastr.warning(
+        'Error al cargar la imagen', '', {
+        timeOut: 6000,
+      })
+    };
+    img.src = src;
   }
 
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
@@ -113,50 +174,47 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // METODO PARA OBTENER RANGO DE PERIMETRO
-  rango: any;
-  BuscarParametroUbicacion() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 4
-    let datos: any = [];
-    this.restP.ListarDetalleParametros(4).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.rango = (parseInt(datos[0].descripcion))
-        }
-        else {
-          this.rango = 0
-        }
-      });
-  }
-
-  // METODO PARA PERMITIR TIMBRE EN UBICACION DESCONOCIDA
+  rango: number = 0;
   desconocida: boolean = false;
-  BuscarParametroDesconocida() {
-    // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
+  foto: boolean = false;
+  BuscarParametros() {
     let datos: any = [];
-    this.restP.ListarDetalleParametros(5).subscribe(
+    let detalles = { parametros: '4, 5, 7, 2, 15' };
+    this.restP.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
-        if (datos.length != 0) {
-          if (datos[0].descripcion === 'Si') {
-            this.desconocida = true;
+        console.log('parametros ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro PARA RANGO DE UBICACION = 4
+          if (p.id_parametro === 4) {
+            this.rango = (parseInt(p.descripcion))
           }
-        }
-      });
-  }
-
-  // METODO PARA VERIFICAR USO DE CERTIFICADOS DE SEGURIDAD
-  BuscarParametroCertificado() {
-    // id_tipo_parametro PARA VERIFICAR USO SSL = 7
-    let datos: any = [];
-    this.restP.ListarDetalleParametros(7).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          if (datos[0].descripcion === 'Si') {
-            this.Geolocalizar();
+          // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
+          if (p.id_parametro === 5) {
+            if (p.descripcion === 'Si') {
+              this.desconocida = true;
+            }
           }
-        }
+          // id_tipo_parametro PARA VERIFICAR USO SSL = 7
+          if (p.id_parametro === 7) {
+            if (p.descripcion === 'Si') {
+              this.Geolocalizar();
+            }
+          }
+          // id_tipo_parametro FORMATO DE HORA = 2
+          if (p.id_parametro === 2) {
+            this.formato = p.descripcion;
+          }
+          // id_tipo_parametro PARA VERIFICAR USO DE FOTO  = 15
+          if (p.id_parametro === 15) {
+            if (p.descripcion === 'Si') {
+              this.foto = true;
+            }
+          }
+        })
+        this.MostrarHora();
+      }, vacio => {
+        this.MostrarHora();
       });
   }
 
@@ -275,6 +333,7 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // METODO PARA TOMAR DATOS DE MARCACION 
+  informacion_timbre: any;
   RegistrarDatosTimbre(form: any, ubicacion: any) {
     // OBTENER LA FECHA Y HORA ACTUAL
     var now = moment();
@@ -293,7 +352,36 @@ export class RegistrarTimbreComponent implements OnInit {
       user_name: this.user_name
     }
     console.log('data timbre ', dataTimbre)
-    this.ventana.close(dataTimbre);
+    // VERIFICAR USO DE LA CAMARA
+    if (this.foto === true) {
+      // METODO PARA CAPTURAR IMAGEN
+      this.ver_timbrar = false;
+      this.ver_camara = true;
+      this.informacion_timbre = dataTimbre;
+    }
+    else {
+      this.RegistrarTimbre(dataTimbre);
+    }
+  }
+
+  //  METODO PARA REGISTRAR DATOS DEL TIMBRE
+  RegistrarTimbre(data: any) {
+    this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
+      data.id_empleado = this.id_empl;
+      this.ventana.BuscarParametro();
+      this.CerrarVentana();
+      this.toastr.success(res.message)
+    }, err => {
+      this.toastr.error(err.message)
+    })
+  }
+
+  // METODO PARA GUARDAR TIMBRE CON IMAGEN
+  GuardarImagen(): void {
+    if (this.flippedImage) {
+      this.informacion_timbre.imagen = this.convertida;
+      this.RegistrarTimbre(this.informacion_timbre);
+    }
   }
 
   // METODO QUE VERIFICAR SI EL TIMBRE FUE REALIZADO EN UN PERIMETRO DEFINIDO
@@ -429,6 +517,18 @@ export class RegistrarTimbreComponent implements OnInit {
       })
     }
 
+  }
+
+  // METODO PARA CERRAR VENTANA
+  CerrarVentana() {
+    this.ventana.ver_principal = true;
+    this.ventana.ver_timbre = false;
+  }
+
+  // METODO PARA CERRAR CAMARA
+  CerrarCamara() {
+    // METODO PARA CAPTURAR IMAGEN
+   this.flippedImage = null;
   }
 
 }

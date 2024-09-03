@@ -64,6 +64,20 @@ class ParametrosControlador {
             }
         });
     }
+    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
+    BuscarDetalles(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { parametros } = req.body;
+            console.log('parametros ', parametros);
+            const PARAMETRO = yield database_1.default.query('SELECT id_parametro, descripcion FROM ep_detalle_parametro WHERE id_parametro IN (' + parametros + ')');
+            if (PARAMETRO.rowCount != 0) {
+                return res.jsonp(PARAMETRO.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     EliminarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

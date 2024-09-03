@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import { BuscarFecha , BuscarHora } from '../../libs/settingsMail';
+import { BuscarFecha, BuscarHora } from '../../libs/settingsMail';
 
 class ParametrosControlador {
 
@@ -38,6 +38,7 @@ class ParametrosControlador {
         }
     }
 
+
     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
     public async VerDetalleParametro(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
@@ -55,6 +56,22 @@ class ParametrosControlador {
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
+
+
+    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
+    public async BuscarDetalles(req: Request, res: Response): Promise<any> {
+        const { parametros } = req.body;
+        console.log('parametros ', parametros)
+        const PARAMETRO = await pool.query(
+            'SELECT id_parametro, descripcion FROM ep_detalle_parametro WHERE id_parametro IN (' + parametros + ')');
+        if (PARAMETRO.rowCount != 0) {
+            return res.jsonp(PARAMETRO.rows)
+        }
+        else {
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
 
     // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async EliminarDetalleParametro(req: Request, res: Response): Promise<Response> {
@@ -198,7 +215,7 @@ class ParametrosControlador {
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro exitoso.' });
-            
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -243,7 +260,7 @@ class ParametrosControlador {
 
     //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
 
-    public async BuscarFechasHoras(req: Request,res: Response): Promise<Response> {
+    public async BuscarFechasHoras(req: Request, res: Response): Promise<Response> {
         try {
             let formato_fecha = await BuscarFecha();
             let formato_hora = await BuscarHora();
@@ -257,7 +274,7 @@ class ParametrosControlador {
             return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
         }
     };
-  
+
 
 }
 

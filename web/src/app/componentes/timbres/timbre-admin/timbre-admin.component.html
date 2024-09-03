@@ -1,5 +1,6 @@
 <!--  ************************** LISTA DE TIMBRES DEL USUARIO SELECCIONADO ************************************ -->
-<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="lista && !verJustificacion">
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;"
+    *ngIf="lista && !verJustificacion">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">LISTA DE TIMBRES DE {{selec_nombre.toUpperCase()}}
             <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarTabla()" matSuffix
@@ -57,13 +58,12 @@
                         <td>{{t.longitud}}</td>
                         <td>{{t.id_reloj}}</td>
                         <td class="justify-content-center">
-                          <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
-                              matTooltip="Ver justificación"
-                              *ngIf="t.documento" (click)="VerJustificacion(t.documento)"
-                              fontSet="material-icons-outlined">
-                              image
-                          </mat-icon>
-                      </td>
+                            <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
+                                matTooltip="Ver justificación" *ngIf="t.documento"
+                                (click)="VerJustificacion(t.documento)" fontSet="material-icons-outlined">
+                                image
+                            </mat-icon>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -153,7 +153,7 @@
 </div>
 
 
-<!--Ver justifcicaion-->
+<!--  ***************  VER JUSTIFICACION  ****************  -->
 <div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="verJustificacion">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">
@@ -164,8 +164,9 @@
             </mat-icon>
         </div>
         <mat-card appearance="outlined">
-          <mat-card-content>
-            <img mat-card-image [src]="justificacion" alt="Justificación" id="justificacion">
-          </mat-card-content>
+            <mat-card-content>
+                <img mat-card-image [src]="justificacion" alt="Justificación" id="justificacion">
+            </mat-card-content>
         </mat-card>
     </div>
+</div>

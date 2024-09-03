@@ -86,3 +86,88 @@ mat-form-field {
 #letras {
     font-size: x-small;
 }
+
+.webcam-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* ASEGURA QUE EL CONTENIDO NO SE SALGA DEL BORDE REDONDEADO */
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+}
+
+webcam video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* ASEGURA QUE EL VIDEO SE AJUSTE AL CONTENEDOR */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.circular-image-container {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* PARA QUE LA IMAGEN NO SE SALGA DEL CONTENEDOR CIRCULAR */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* COLOR DE FONDO */
+    background-color: #f0f0f0;
+}
+
+.circular-image-container img {
+    width: 100%;
+    height: 100%;
+    /* PARA  QUE LA IMAGEN LLENE EL CONTENEDOR SIN DISTORSIONARSE */
+    object-fit: cover;
+}
+
+.container1 {
+    place-items: center;
+    /* CENTRA TANTO HORIZONTAL COMO VERTICALMENTE */
+    display: grid;
+
+}
+
+.button-container {
+    /* USAR FLEXBOX PARA ALINEAR LOS BOTONES EN FILA */
+    display: flex;
+    /* ESPACIO ENTRE LOS BOTONES */
+    gap: 40px;
+}
+
+.blue-button,
+.gray-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.blue-button {
+    background-color: rgb(17, 167, 236);
+}
+
+.gray-button {
+    background-color: gray;
+}
+
+/* EFECTOS AL PRESIONAR EL BOTON */
+.blue-button:hover,
+.gray-button:hover {
+    opacity: 0.8;
+}

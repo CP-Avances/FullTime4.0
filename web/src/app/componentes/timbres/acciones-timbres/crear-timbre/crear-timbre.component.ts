@@ -203,8 +203,8 @@ export class CrearTimbreComponent implements OnInit {
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
 
-          // Convertir a base64 con calidad reducida
-          const quality = 0.9; // Ajusta la calidad según sea necesario (0.0 - 1.0)
+          // CONVERTIR A BASE64 CON CALIDAD REDUCIDA
+          const quality = 0.9; // AJUSTA LA CALIDAD SEGÚN SEA NECESARIO (0.0 - 1.0)
           const base64 = canvas.toDataURL('image/jpeg', quality);
           resolve(base64);
         };

@@ -50,4 +50,8 @@ export class ParametrosService {
     return this.http.post<any>(`${environment.url}/parametrizacion/coordenadas`, data);;
   }
 
+  // METODO PARA LISTAR VARIOS DETALLES DE PARAMETRO   **USADO
+  ListarVariosDetallesParametros(data: any) {
+    return this.http.post<any>(`${environment.url}/parametrizacion/buscar/detalle-parametros`, data);
+  }
 }

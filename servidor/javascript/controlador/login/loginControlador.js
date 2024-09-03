@@ -52,6 +52,7 @@ class LoginControlador {
                     });
                     const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
+                    console.log('verificar activo ', empleado, ' usu ', usuario);
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });
                     }
