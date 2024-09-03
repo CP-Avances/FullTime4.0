@@ -778,7 +778,7 @@ class DepartamentoControlador {
                         }
                         if (SUCURSAL_DEPARTAMENTO_SUPERIOR == undefined) {
                             data.sucursal_depa_superior = 'No registrado';
-                            data.observacion = 'Sucursal departamento superior no registrada';
+                            data.observacion = 'Sucursal superior no registrada';
                         }
                         listNivelesDep.push(data);
                     }
