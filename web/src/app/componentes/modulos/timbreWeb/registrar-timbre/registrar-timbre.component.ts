@@ -83,6 +83,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
     this.BuscarParametros();
+    this.VerificarCamara();
   }
 
   formato = 'HH:mm:ss';
@@ -129,8 +130,30 @@ export class RegistrarTimbreComponent implements OnInit {
     this.VoltearImagen(webcamImage.imageAsDataUrl)
   }
 
-  convertida: string | ArrayBuffer | null = null;
+  // VALIDAR EXISTENCIA DE CAMARA
+  existe_camara: boolean = false;
+  permisos_camara: boolean = false;
+  async VerificarCamara(): Promise<void> {
+    try {
+      const dispositivos = await navigator.mediaDevices.enumerateDevices();
+      const camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
+      this.existe_camara = camara_.length > 0;
+      if (this.existe_camara) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          this.permisos_camara = true;
+          stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+          this.permisos_camara = false;
+        }
+      }
+    } catch (err) {
+      this.existe_camara = false;
+    }
+  }
+
   // METOOD PARA VOLTEAR LA IMAGEN HORIZONTALMENTE
+  convertida: string | ArrayBuffer | null = null;
   flippedImage: any;
   VoltearImagen(src: any) {
     const img = new Image();
@@ -313,6 +336,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     this.ver_informacion = true;
     this.ver_timbrar = false;
+    this.ver_camara = false;
     // OBTENER LA FECHA Y HORA ACTUAL
     var now = moment();
     // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
@@ -322,7 +346,34 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS DEL TIMBRE
   InsertarTimbre() {
-    this.ValidarModulo(this.latitud, this.longitud, this.rango);
+    // VERIFICAR USO DE LA CAMARA
+    if (this.foto === true) {
+      if (this.existe_camara) {
+        if (this.permisos_camara === true) {
+          this.ver_camara = true;
+          this.ValidarModulo(this.latitud, this.longitud, this.rango);
+        }
+        else {
+          this.MostrarMensaje('Permisos de cámara no otorgados o denegados.', '');
+        }
+      }
+      else {
+        this.MostrarMensaje('Fotografía es requerida.', 'No se ha encontrado ninguna cámara disponible.');
+      }
+    }
+    else {
+      this.ValidarModulo(this.latitud, this.longitud, this.rango);
+    }
+  }
+
+  // METODO PARA LEER MENSAJE ERROR
+  MostrarMensaje(mensaje1: string, mensaje2: string) {
+    this.ver_camara = false;
+    this.CerrarVentana();
+    this.toastr.warning(
+      mensaje1, mensaje2, {
+      timeOut: 6000,
+    });
   }
 
   // METODO PARA TOMAR DATOS DE MARCACION 
@@ -343,11 +394,6 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     console.log('data timbre ', this.dataTimbre)
     this.informacion_timbre = this.dataTimbre;
-    // VERIFICAR USO DE LA CAMARA
-    if (this.foto === true) {
-      // METODO PARA CAPTURAR IMAGEN
-      this.ver_camara = true;
-    }
   }
 
   //  METODO PARA REGISTRAR DATOS DEL TIMBRE
@@ -524,8 +570,14 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-    this.ventana.ver_principal = true;
-    this.ventana.ver_timbre = false;
+    if (this.ver_informacion === false) {
+      this.ventana.ver_principal = true;
+      this.ventana.ver_timbre = false;
+    }
+    else {
+      this.ver_informacion = false;
+      this.ver_camara = false;
+    }
   }
 
   // METODO PARA CERRAR CAMARA
