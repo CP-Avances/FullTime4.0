@@ -14,6 +14,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 
 @Component({
@@ -39,7 +40,6 @@ export class RegistrarTimbreComponent implements OnInit {
   });
 
   // VARIABLE DE SELECCION DE OPCION
-  botones_normal: boolean = true;
   boton_abierto: boolean = false;
   ver_timbrar: boolean = true;
   ver_camara: boolean = false;
@@ -261,88 +261,78 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
-  // METODO PARA ACTIVAR Y DESACTIVAR BOTONES
-  boton: boolean = false;
-  ActivarBotones() {
-    if (this.boton_abierto === false) {
-      this.boton_abierto = true;
-      this.botones_normal = false;
-    }
-    else {
-      this.boton_abierto = false;
-      this.botones_normal = true;
-    }
-  }
-
   // METODO PARA GUARDAR DATOS DEL TIMBRE SEGUN LA OPCION INGRESADA
   accionF: string = '';
   teclaFuncionF: number;
-  AlmacenarDatos(opcion: number, form: any) {
+  asistencia: string = '';
+  fecha_hora: any;
+  ver_informacion: boolean = false;
+  AlmacenarDatos(opcion: number) {
+    this.boton_abierto = false;
     switch (opcion) {
       case 1:
         this.accionF = 'E';
         this.teclaFuncionF = 0;
+        this.asistencia = 'ENTRADA';
         break;
       case 2:
         this.accionF = 'S';
         this.teclaFuncionF = 1;
+        this.asistencia = 'SALIDA';
         break;
       case 3:
         this.accionF = 'I/A';
         this.teclaFuncionF = 2;
+        this.asistencia = 'INICIO ALIMENTACIÓN';
         break;
       case 4:
         this.accionF = 'F/A';
         this.teclaFuncionF = 3;
+        this.asistencia = 'FIN ALIMENTACIÓN';
         break;
       case 5:
         this.accionF = 'I/P';
         this.teclaFuncionF = 4;
+        this.asistencia = 'INICIO PERMISO';
         break;
       case 6:
         this.accionF = 'F/P';
         this.teclaFuncionF = 5;
+        this.asistencia = 'FIN PERMISO';
         break;
       case 7:
         this.accionF = 'HA';
         this.teclaFuncionF = 7;
+        this.asistencia = 'TIMBRE ESPECIAL';
+        this.boton_abierto = true;
         break;
       default:
         this.accionF = 'D';
+        this.asistencia = 'DESCONOCIDO';
         break;
     }
-    this.InsertarTimbre(form);
+    this.ver_informacion = true;
+    this.ver_timbrar = false;
+    // OBTENER LA FECHA Y HORA ACTUAL
+    var now = moment();
+    // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
+    this.fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+    this.InsertarTimbre();
   }
 
   // METODO PARA TOMAR DATOS DEL TIMBRE
-  InsertarTimbre(form: any) {
-    if (this.boton_abierto === true) {
-      if (form.observacionForm != '' && form.observacionForm != undefined) {
-        this.ValidarModulo(this.latitud, this.longitud, this.rango, form);
-      }
-      else {
-        this.toastr.info(
-          'Ingresar descripción del timbre.', 'Campo de observación es obligatorio.', {
-          timeOut: 6000,
-        })
-      }
-    }
-    else {
-      this.ValidarModulo(this.latitud, this.longitud, this.rango, form);
-    }
+  InsertarTimbre() {
+    this.ValidarModulo(this.latitud, this.longitud, this.rango);
   }
 
   // METODO PARA TOMAR DATOS DE MARCACION 
   informacion_timbre: any;
-  RegistrarDatosTimbre(form: any, ubicacion: any) {
-    // OBTENER LA FECHA Y HORA ACTUAL
-    var now = moment();
-    // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-    var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
-    let dataTimbre = {
-      fec_hora_timbre: fecha_hora,
+  dataTimbre: any;
+  RegistrarDatosTimbre(ubicacion: any) {
+    this.dataTimbre = {
+      fec_hora_timbre: this.fecha_hora,
       tecl_funcion: this.teclaFuncionF,
-      observacion: form.observacionForm,
+      observacion: '',
       ubicacion: ubicacion,
       longitud: this.longitud,
       id_reloj: 98,
@@ -351,16 +341,12 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
-    console.log('data timbre ', dataTimbre)
+    console.log('data timbre ', this.dataTimbre)
+    this.informacion_timbre = this.dataTimbre;
     // VERIFICAR USO DE LA CAMARA
     if (this.foto === true) {
       // METODO PARA CAPTURAR IMAGEN
-      this.ver_timbrar = false;
       this.ver_camara = true;
-      this.informacion_timbre = dataTimbre;
-    }
-    else {
-      this.RegistrarTimbre(dataTimbre);
     }
   }
 
@@ -377,25 +363,42 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
-  GuardarImagen(): void {
+  GuardarImagen(form: any): void {
     if (this.flippedImage) {
       this.informacion_timbre.imagen = this.convertida;
+    }
+
+    this.informacion_timbre.observacion = form.observacionForm;
+    if (this.boton_abierto === true) {
+      if (form.observacionForm != '' && form.observacionForm != undefined) {
+        this.RegistrarTimbre(this.informacion_timbre);
+      }
+      else {
+        this.toastr.info(
+          'Ingresar descripción del timbre.', 'Campo observación es obligatorio.', {
+          timeOut: 6000,
+        })
+      }
+    }
+    else {
       this.RegistrarTimbre(this.informacion_timbre);
     }
+
   }
+
 
   // METODO QUE VERIFICAR SI EL TIMBRE FUE REALIZADO EN UN PERIMETRO DEFINIDO
   contar: number = 0;
   ubicacion: string = '';
   sin_ubicacion: number = 0;
-  CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
+  CompararCoordenadas(informacion: any, descripcion: any, data: any) {
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
           if (this.contar === 1) {
-            this.RegistrarDatosTimbre(form, this.ubicacion);
+            this.RegistrarDatosTimbre(this.ubicacion);
             this.toastr.info(
               'Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
               timeOut: 6000,
@@ -405,14 +408,14 @@ export class RegistrarTimbreComponent implements OnInit {
         else {
           this.sin_ubicacion = this.sin_ubicacion + 1;
           if (this.sin_ubicacion === data.length) {
-            this.ValidarDomicilio(informacion, form);
+            this.ValidarDomicilio(informacion);
           }
         }
       });
   }
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
-  BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
+  BuscarUbicacion(latitud: any, longitud: any, rango: any) {
     var longitud_ = '';
     var latitud_ = '';
 
@@ -438,11 +441,11 @@ export class RegistrarTimbreComponent implements OnInit {
           informacion.lng2 = obj.longitud;
           console.log(informacion.lat1, ' ---------- ', informacion.lng1)
           if (informacion.lat1 && informacion.lng1) {
-            this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
+            this.CompararCoordenadas(informacion, obj.descripcion, datosUbicacion);
           }
           else {
             if (this.desconocida === true) {
-              this.RegistrarDatosTimbre(form, 'SIN UBICACION');
+              this.RegistrarDatosTimbre('SIN UBICACION');
             }
             else {
               this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
@@ -452,23 +455,23 @@ export class RegistrarTimbreComponent implements OnInit {
           }
         })
       }, error => {
-        this.ValidarDomicilio(informacion, form);
+        this.ValidarDomicilio(informacion);
       });
   }
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
-  ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
+  ValidarModulo(latitud: any, longitud: any, rango: any) {
     //console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
-      this.BuscarUbicacion(latitud, longitud, rango, form);
+      this.BuscarUbicacion(latitud, longitud, rango);
     }
     else {
-      this.RegistrarDatosTimbre(form, this.ubicacion);
+      this.RegistrarDatosTimbre(this.ubicacion);
     }
   }
 
   // METODO PARA VALIDAR UBICACION DOMICILIO
-  ValidarDomicilio(informacion: any, form: any) {
+  ValidarDomicilio(informacion: any) {
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
       if (res[0].longitud != null && res[0].latitud != null) {
         informacion.lat2 = res[0].latitud;
@@ -478,13 +481,13 @@ export class RegistrarTimbreComponent implements OnInit {
           this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
             if (resu[0].verificar === 'ok') {
               this.ubicacion = 'DOMICILIO';
-              this.RegistrarDatosTimbre(form, this.ubicacion);
+              this.RegistrarDatosTimbre(this.ubicacion);
               this.toastr.info('Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
                 timeOut: 6000,
               })
             }
             else {
-              this.ProcesoPerimetroDesconocido(form);
+              this.ProcesoPerimetroDesconocido();
             }
           })
         }
@@ -495,18 +498,18 @@ export class RegistrarTimbreComponent implements OnInit {
         }
       }
       else {
-        this.ProcesoPerimetroDesconocido(form)
+        this.ProcesoPerimetroDesconocido()
       }
     })
   }
 
 
   // METODO PARA REGISTRAR TIMBRE CON PERIMETRO DESCONOCIDO
-  ProcesoPerimetroDesconocido(form: any) {
+  ProcesoPerimetroDesconocido() {
     // PUEDE TIMBRAR EN PERIMETROS DESCONOCIDOS
     if (this.desconocida === true) {
       this.ubicacion = 'DESCONOCIDO';
-      this.RegistrarDatosTimbre(form, this.ubicacion);
+      this.RegistrarDatosTimbre(this.ubicacion);
       this.toastr.info('Marcación realizada dentro de un perímetro DESCONOCIDO.', '', {
         timeOut: 6000,
       })
@@ -528,7 +531,7 @@ export class RegistrarTimbreComponent implements OnInit {
   // METODO PARA CERRAR CAMARA
   CerrarCamara() {
     // METODO PARA CAPTURAR IMAGEN
-   this.flippedImage = null;
+    this.flippedImage = null;
   }
 
 }

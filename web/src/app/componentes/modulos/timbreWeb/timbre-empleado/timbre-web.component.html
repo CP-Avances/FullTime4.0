@@ -67,11 +67,12 @@
                             <th scope="col">Latitud</th>
                             <th scope="col">Longitud</th>
                             <th scope="col">Maps</th>
+                            <th scope="col">Foto</th>
+                            <th scope="col">Respaldo</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
                             <td>
                                 <mat-form-field class="input-tables fecha">
                                     <input matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
@@ -84,22 +85,39 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                         <tr
                             *ngFor="let t of timbres | fecTimbre: filtroFechaTimbre | paginate:tamanio_pagina:numero_pagina">
                             <td>{{t.fecha}}</td>
                             <td>{{t.hora}}</td>
-                            <td>{{t.id_reloj}}</td>
+                            <td>{{t.id_reloj}} ({{t.id_reloj_}})</td>
                             <td>{{t.tecla_funcion_}}</td>
                             <td>{{t.observacion}}</td>
                             <td>{{t.ubicacion}}</td>
                             <td>{{t.latitud}}</td>
                             <td>{{t.longitud}}</td>
-                            <td>
+                            <td class="justify-content-center">
                                 <mat-icon *ngIf="t.longitud && t.longitud" aria-hidden="false" id="accion"
                                     (click)="AbrirMapa(t.latitud, t.longitud)" matSuffix matTooltipPosition="right"
-                                    matTooltip="Direccionar al mapa con ubicación del timbre seleccionado.">
+                                    matTooltip="Direccionar al mapa con ubicación del timbre.">
                                     location_on
+                                </mat-icon>
+                            </td>
+                            <td class="justify-content-center">
+                                <mat-icon aria-hidden="false" id="ver" matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver justificación" *ngIf="t.imagen" (click)="VerImagen(t.imagen)"
+                                    fontSet="material-icons-outlined">
+                                    insert_emoticon
+                                </mat-icon>
+                            </td>
+                            <td class="justify-content-center">
+                                <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver fotografía" *ngIf="t.documento" (click)="VerImagen(t.documento)"
+                                    fontSet="material-icons-outlined">
+                                    photo
                                 </mat-icon>
                             </td>
                         </tr>

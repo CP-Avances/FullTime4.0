@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 
 // IMPORTACION DE SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -11,6 +12,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { VerImagenComponent } from '../acciones-timbres/ver-imagen/ver-imagen.component';
 
 @Component({
   selector: 'app-timbre-admin',
@@ -51,15 +53,13 @@ export class TimbreAdminComponent implements OnInit {
   dataSource: any;
   filtroFechaTimbre = '';
 
-  justificacion: any;
-  verJustificacion: boolean = false;
-
   constructor(
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
+    public parametro: ParametrosService,
     private validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
+    public ventana: MatDialog,
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
-    public parametro: ParametrosService,
     private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -142,44 +142,60 @@ export class TimbreAdminComponent implements OnInit {
         }
         data.fecha = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(fecha.split(' ')[1], this.formato_hora);
-        if (data.tecla_funcion === '0') {
-          data.tecla_funcion_ = 'Entrada';
-        }
-        else if (data.tecla_funcion === '1') {
-          data.tecla_funcion_ = 'Salida';
-        }
-        else if (data.tecla_funcion === '2') {
-          data.tecla_funcion_ = 'Inicio alimentación';
-        }
-        else if (data.tecla_funcion === '3') {
-          data.tecla_funcion_ = 'Fin alimentación';
-        }
-        else if (data.tecla_funcion === '4') {
-          data.tecla_funcion_ = 'Inicio permiso';
-        }
-        else if (data.tecla_funcion === '5') {
-          data.tecla_funcion_ = 'Fin permiso';
-        }
-        if (data.tecla_funcion === '7') {
-          data.tecla_funcion_ = 'Timbre libre';
-        }
-        else if (data.tecla_funcion === '99') {
-          data.tecla_funcion_ = 'Desconocido';
-        }
+        this.LeerAcciones(data);
+        this.LeerBiometrico(data);
       })
     }, err => {
       this.toastr.info(err.error.message)
     })
   }
 
-  // METODO PARA VER JUSTIFICATIVO
-  VerJustificacion(justificacion: any) {
-    this.justificacion = justificacion;
-    this.verJustificacion = true;
+  // LEER ACCIONES DEL TIMBRE
+  LeerAcciones(data: any) {
+    if (data.tecla_funcion === '0') {
+      data.tecla_funcion_ = 'Entrada';
+    }
+    else if (data.tecla_funcion === '1') {
+      data.tecla_funcion_ = 'Salida';
+    }
+    else if (data.tecla_funcion === '2') {
+      data.tecla_funcion_ = 'Inicio alimentación';
+    }
+    else if (data.tecla_funcion === '3') {
+      data.tecla_funcion_ = 'Fin alimentación';
+    }
+    else if (data.tecla_funcion === '4') {
+      data.tecla_funcion_ = 'Inicio permiso';
+    }
+    else if (data.tecla_funcion === '5') {
+      data.tecla_funcion_ = 'Fin permiso';
+    }
+    if (data.tecla_funcion === '7') {
+      data.tecla_funcion_ = 'Timbre libre';
+    }
+    else if (data.tecla_funcion === '99') {
+      data.tecla_funcion_ = 'Desconocido';
+    }
   }
 
-  CerrarJustificacion() {
-    this.verJustificacion = false;
+  // METODO PARA LEER TIPO DE BIOMETRICO
+  LeerBiometrico(data: any) {
+    if (data.id_reloj === '97') {
+      data.id_reloj_ = 'APP_MOVIL';
+    }
+    else if (data.id_reloj === '98') {
+      data.id_reloj_ = 'APP_WEB';
+    }
+    else {
+      data.id_reloj_ = 'BIOMÉTRICO';
+    }
+  }
+
+  // METODO PARA VER IMAGEN
+  VerImagen(imagen: any) {
+    this.ventana.open(VerImagenComponent,
+      { width: '400px', height: '400px', data: imagen }).afterClosed().subscribe(item => {
+      });
   }
 
   // METODO DE BUSQUEDA DE DATOS DE ACUERDO A LA FECHA INGRESADA

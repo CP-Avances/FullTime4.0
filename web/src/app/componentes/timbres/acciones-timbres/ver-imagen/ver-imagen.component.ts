@@ -15,11 +15,11 @@ export class VerImagenComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
+    //console.log(this.data)
   }
 
-  CerrarVentana(){
-    
+  CerrarVentana() {
+    this.ventana.close();
   }
 
 }

@@ -10,6 +10,8 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
+import { MatDialog } from '@angular/material/dialog';
+import { VerImagenComponent } from 'src/app/componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
 
 @Component({
   selector: 'app-timbre-web',
@@ -48,6 +50,7 @@ export class TimbreWebComponent implements OnInit {
     public parametro: ParametrosService,
     public funciones: MainNavService,
     public usuario: UsuarioService,
+    public ventana: MatDialog,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -127,34 +130,53 @@ export class TimbreWebComponent implements OnInit {
       this.timbres.forEach((data: any) => {
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
-        if (data.tecla_funcion === '0') {
-          data.tecla_funcion_ = 'Entrada';
-        }
-        else if (data.tecla_funcion === '1') {
-          data.tecla_funcion_ = 'Salida';
-        }
-        else if (data.tecla_funcion === '2') {
-          data.tecla_funcion_ = 'Inicio alimentación';
-        }
-        else if (data.tecla_funcion === '3') {
-          data.tecla_funcion_ = 'Fin alimentación';
-        }
-        else if (data.tecla_funcion === '4') {
-          data.tecla_funcion_ = 'Inicio permiso';
-        }
-        else if (data.tecla_funcion === '5') {
-          data.tecla_funcion_ = 'Fin permiso';
-        }
-        if (data.tecla_funcion === '7') {
-          data.tecla_funcion_ = 'Timbre libre';
-        }
-        else if (data.tecla_funcion === '99') {
-          data.tecla_funcion_ = 'Desconocido';
-        }
+        this.LeerAcciones(data);
+        this.LeerBiometrico(data);
       })
     }, err => {
       this.toastr.info(err.error.message)
     })
+  }
+
+  // METODO PARA LEER DATOS DE ACCIONES
+  LeerAcciones(data: any) {
+    if (data.tecla_funcion === '0') {
+      data.tecla_funcion_ = 'Entrada';
+    }
+    else if (data.tecla_funcion === '1') {
+      data.tecla_funcion_ = 'Salida';
+    }
+    else if (data.tecla_funcion === '2') {
+      data.tecla_funcion_ = 'Inicio alimentación';
+    }
+    else if (data.tecla_funcion === '3') {
+      data.tecla_funcion_ = 'Fin alimentación';
+    }
+    else if (data.tecla_funcion === '4') {
+      data.tecla_funcion_ = 'Inicio permiso';
+    }
+    else if (data.tecla_funcion === '5') {
+      data.tecla_funcion_ = 'Fin permiso';
+    }
+    if (data.tecla_funcion === '7') {
+      data.tecla_funcion_ = 'Timbre libre';
+    }
+    else if (data.tecla_funcion === '99') {
+      data.tecla_funcion_ = 'Desconocido';
+    }
+  }
+
+  // METODO PARA LEER BIOMETRICOS
+  LeerBiometrico(data: any) {
+    if (data.id_reloj === '97') {
+      data.id_reloj_ = 'APP_MOVIL';
+    }
+    else if (data.id_reloj === '98') {
+      data.id_reloj_ = 'APP_WEB';
+    }
+    else {
+      data.id_reloj_ = 'BIOMÉTRICO';
+    }
   }
 
   // METODO PARA REGISTRAR TIMBRES
@@ -185,6 +207,13 @@ export class TimbreWebComponent implements OnInit {
       `Ups!!! al parecer no tienes permisos para timbrar desde la aplicación web. \n`,
       {
         timeOut: 6000,
+      });
+  }
+
+  // METODO PARA VER IMAGEN
+  VerImagen(imagen: any) {
+    this.ventana.open(VerImagenComponent,
+      { width: '400px', height: '400px', data: imagen }).afterClosed().subscribe(item => {
       });
   }
 

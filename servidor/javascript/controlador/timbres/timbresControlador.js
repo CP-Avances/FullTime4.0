@@ -88,7 +88,7 @@ class TimbresControlador {
                 const id = req.userIdEmpleado;
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
-                    t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
+                    t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.documento, t.imagen,
                     CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre 
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
@@ -533,7 +533,7 @@ class TimbresControlador {
                 const { id } = req.params;
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
-                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, 
+                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.imagen,
                     CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
