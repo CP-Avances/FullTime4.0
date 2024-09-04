@@ -31,10 +31,10 @@ export class LoginComponent implements OnInit {
   pass = new FormControl('', Validators.required);
   //EMPRESA
   empresaSel = new FormControl('', Validators.required);
-  //Valor para encriptar codigo empresarial de la vista
+  //Valor para encriptar código empresarial de la vista
   datoEncriptado: string;
 
-  //Se aumenta el valor capturado de la vista para el codigo empresarial
+  //Se aumenta el valor capturado de la vista para el código empresarial
   public formulario = new FormGroup({
     usuarioF: this.userMail,
     passwordF: this.pass,
@@ -81,11 +81,11 @@ export class LoginComponent implements OnInit {
     if (form.passwordF.trim().length === 0) return;
     if (form.empresaF.trim().length === 0) return;
 
-    //Inicio Encriptacion codigo empresarial
+    //Inicio Encriptacion código empresarial
     console.log('empresaF: ', form.empresaF, ' ', form.empresaF.length);
     //this.datoEncriptado = this.rsaKeysService.encriptarLogin(form.empresaF.toString());
     //console.log('Encrypted Data:', this.datoEncriptado, ' ', this.datoEncriptado.length);
-    //Fin Encriptacion codigo empresarial
+    //Fin Encriptacion código empresarial
 
     //Codigo empresarial encriptado a JSON para uso con servicio
     let empresas = {
@@ -103,7 +103,7 @@ export class LoginComponent implements OnInit {
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
           }
           else if (this.mensaje.message === 'vacio') {
-            this.toastr.error('Verifique codigo empresarial', 'Error.', {
+            this.toastr.error('Verifique código empresarial', 'Error.', {
               timeOut: 3000,
             });
           }
@@ -111,7 +111,7 @@ export class LoginComponent implements OnInit {
         error: (e) => 
         {
           //En caso de error, devolvemos error
-          this.toastr.error('Verifique codigo empresarial', 'Error.', {
+          this.toastr.error('Verifique código empresarial', 'Error.', {
             timeOut: 3000,
           });
         },
