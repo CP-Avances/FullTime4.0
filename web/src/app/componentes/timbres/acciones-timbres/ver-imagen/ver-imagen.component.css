@@ -1,0 +1,5 @@
+.responsive-img {
+    width: 100%;
+    height: 300px; /* O el tamaño que desees */
+    object-fit: cover;
+  }

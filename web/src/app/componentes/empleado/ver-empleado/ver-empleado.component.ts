@@ -923,15 +923,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
   listaCargosEmple: any = [];
   listaContratosEmple: any = []
-  obtenerContratoCargosEmplrado(){
+  obtenerContratoCargosEmplrado() {
     this.listaCargosEmple = [];
     this.listaContratosEmple = [];
-    const data = {id_empleado: this.idEmpleado}
+    const data = { id_empleado: this.idEmpleado }
     this.restEmpleado.ObtenerContratosCargos(data).subscribe(res => {
-      console.log('respuesta: ',res) 
+      console.log('respuesta: ', res)
       this.listaContratosEmple = res.listacontratos;
       this.listaCargosEmple = res.listacargos;
-      console.log('respuesta: ',res.listacontratos) 
+      console.log('respuesta: ', res.listacontratos)
     });
   }
 
@@ -999,8 +999,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA ELIMINAR CONTRATOS
   EliminarDatos(dataContrato: any) {
-    const idContrato = dataContrato.id;
-    this.restEmpleado.EliminarContrato(idContrato, dataContrato).subscribe({
+    let eliminar = {
+      id: dataContrato.id,
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.restEmpleado.EliminarContrato(eliminar).subscribe({
       next: (res: any) => {
         if (res.status != '200') {
           this.toastr.warning(res.message, 'VERIFICAR.', {
@@ -1312,7 +1316,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA ELIMINAR DATOS DE CARGO
   EliminarDatosCargos(dataCargo: any, estado: any) {
-    const data = { id: dataCargo };
+    const data = {
+      id: dataCargo,
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.restCargo.EliminarCargo(data).subscribe({
       next: (res: any) => {
         if (res.status != '200') {

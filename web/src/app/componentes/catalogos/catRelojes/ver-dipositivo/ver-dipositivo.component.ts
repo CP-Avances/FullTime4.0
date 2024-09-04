@@ -17,7 +17,7 @@ export class VerDipositivoComponent implements OnInit {
   @Input() pagina: string;
 
   datosReloj: any = [];
-
+  
   constructor(
     public componentel: ListarRelojesComponent,
     public router: Router,

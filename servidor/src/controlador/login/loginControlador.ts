@@ -64,6 +64,7 @@ class LoginControlador {
 
         const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
+        console.log('verificar activo ', empleado, ' usu ', usuario)
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
         }
@@ -73,7 +74,7 @@ class LoginControlador {
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO AA  LAPP_MOVIL
         if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil" })
-
+        
         // BUSQUEDA DE MODULOS DEL SISTEMA
         const [modulos] = await pool.query(
           `

@@ -12,11 +12,11 @@ export class RelojesService {
 
   // METODO PARA LISTAR DISPOSITIVOS   **USADO
   ConsultarRelojes() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/relojes`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/relojes`);
   }
 
   // METODO PARA ELIMINAR REGISTRO   **USADO
-  EliminarRegistro(id: number, datos:any) {
+  EliminarRegistro(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/relojes/eliminar/${id}`;
     const httpOtions = {
       body: datos
@@ -42,6 +42,11 @@ export class RelojesService {
   // METODO PARA CONSULTAR DATOS DE UN BIOMETRICO   **USADO
   ConsultarUnReloj(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/relojes/${id}`);
+  }
+
+  // METODO PARA CONTAR RELOJES   **USADO
+  ContarRelojes() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/relojes/contar/biometricos`);
   }
 
   // METODO PARA REGISTRAR DATOS DE PLANTILLA    **USADO

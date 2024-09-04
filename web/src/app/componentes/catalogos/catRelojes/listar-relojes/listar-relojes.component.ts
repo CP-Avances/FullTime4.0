@@ -38,10 +38,11 @@ export class ListarRelojesComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS
   relojes: any = [];
-
   empleado: any = [];
   idEmpleado: number;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+  totalDispositivos: number = 0;
+  numeroDipositivos: number = 0;
 
   idDepartamentosAcceso: Set<any> = new Set();
 
@@ -99,6 +100,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.totalDispositivos = 4;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
@@ -150,6 +152,8 @@ export class ListarRelojesComponent implements OnInit {
     this.relojes = [];
     this.numero_pagina = 1;
     this.rest.ConsultarRelojes().subscribe(datos => {
+      this.numeroDipositivos = datos.length;
+      //console.log('dispositivos ', this.numeroDipositivos);
       this.relojes = this.rolEmpleado === 1 ? datos : this.FiltrarRelojesAsignados(datos);
     })
   }
@@ -405,14 +409,25 @@ export class ListarRelojesComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip,
       }
-      this.rest.SubirArchivoExcel(data).subscribe(response => {
-        this.toastr.success('Operación exitosa.', 'Plantilla de Dispositivos importada.', {
-          timeOut: 3000,
+      // VERIFICAR NUMERO DE DISPOSITIVOS
+      let total = this.numeroDipositivos + this.listaDispositivosCorrectos.length;
+      //console.log('ver total ', total);
+      if (total <= this.totalDispositivos) {
+        this.rest.SubirArchivoExcel(data).subscribe(response => {
+          this.toastr.success('Operación exitosa.', 'Plantilla de Dispositivos importada.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
         });
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
-      });
+      }
+      else {
+        let ingresar = this.totalDispositivos - this.numeroDipositivos;
+        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos.', 'Permitido ingresar solo ' + ingresar + ' dispositivos.', {
+          timeOut: 4000,
+        });
+      }
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,

@@ -62,4 +62,9 @@ export class ParametrosService {
     return this.http.post<any>(`${(urlPrueba as string)}/parametrizacion/coordenadas`, data);;
   }
 
+  // METODO PARA LISTAR VARIOS DETALLES DE PARAMETRO   **USADO
+  ListarVariosDetallesParametros(data: any) {
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.post<any>(`${urlPrueba as string}/parametrizacion/buscar/detalle-parametros`, data);
+  }
 }

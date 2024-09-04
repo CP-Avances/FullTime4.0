@@ -1096,11 +1096,11 @@ class UsuarioControlador {
 
         switch (verificacion) {
           case 1:
-            // INSERTAR NUEVA ASIGNACIÓN
+            // INSERTAR NUEVA ASIGNACION
             error = await RegistrarUsuarioDepartamento(datos);
             break;
           case 2:
-            // ACTUALIZAR ASIGNACIÓN EXISTENTE
+            // ACTUALIZAR ASIGNACION EXISTENTE
             error = await EditarUsuarioDepartamento(datos);
             break;
         }
@@ -1109,7 +1109,7 @@ class UsuarioControlador {
 
     if (error) return res.status(500).jsonp({ message: 'error' });
 
-    return res.json({ message: 'Proceso completado' });
+    return res.json({ message: 'Proceso completado.' });
 
   }
 
@@ -1191,7 +1191,7 @@ class UsuarioControlador {
   async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
     try {
       const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo, ' +
-        '( e.apellido || \' \' || e.nombre) as fullname, e.nombre, e.apellido, e.correo, e.id, u.id_rol, u.usuario ' +
+        '( e.apellido || \' \' || e.nombre) as fullname, e.nombre, e.apellido, e.correo, e.id, e.telefono, u.id_rol, u.usuario ' +
         'FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
       const usuarios = response.rows;
       console.log(usuarios);

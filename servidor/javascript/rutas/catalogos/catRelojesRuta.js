@@ -36,6 +36,8 @@ class RelojesRuta {
         this.router.put('/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ActualizarReloj);
         // METODO PARA BUSCAR DATOS GENERALES DE DISPOSITIVOS   **USADO
         this.router.get('/datosReloj/:id', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ListarDatosUnReloj);
+        // METODO PARA CONTAR DISPOSITIVOS   **USADO
+        this.router.get('/contar/biometricos', verificarToken_1.TokenValidation, catRelojesControlador_1.default.ContarDispositivos);
         // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catRelojesControlador_1.default.VerificarPlantilla);
         // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO

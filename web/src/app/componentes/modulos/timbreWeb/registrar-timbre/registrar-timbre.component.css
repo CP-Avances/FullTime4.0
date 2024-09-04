@@ -48,41 +48,122 @@ mat-form-field {
     height: 50px;
 }
 
-.scrollbar {
-    float: left;
-    height: 460px;
-    width: 100%;
-    background: #fff;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    margin-bottom: 25px;
-}
-
-.scrollbar-primary::-webkit-scrollbar {
-    width: 12px;
-    background-color: #F5F5F5;
-}
-
-#reloj {
-    color: rgb(234, 231, 241);
-    cursor: pointer;
-}
-
-#redondo {
-    width: 50px;
-    height: 50px;
-    margin: 5px;
-    padding: 10px;
-    -webkit-border-radius: 50px;
-    -moz-border-radius: 50px;
-    border-radius: 50px;
-    font-size: 11px;
-    line-height: 32px;
+#botonTimbre {
+    margin-top: 25px;
+    border-radius: 10px;
+    background: rgb(28, 178, 76);
+    color: white;
+    width: 175px;
     text-transform: uppercase;
-    float: left;
-    background-color: rgb(0, 123, 194);
+    font-size: x-small;
+    height: 50px;
+    font-weight: bolder;
 }
 
 #letras {
     font-size: x-small;
+}
+
+.webcam-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* ASEGURA QUE EL CONTENIDO NO SE SALGA DEL BORDE REDONDEADO */
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+}
+
+webcam video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* ASEGURA QUE EL VIDEO SE AJUSTE AL CONTENEDOR */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.circular-image-container {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* PARA QUE LA IMAGEN NO SE SALGA DEL CONTENEDOR CIRCULAR */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* COLOR DE FONDO */
+    background-color: #f0f0f0;
+}
+
+.circular-image-container img {
+    width: 100%;
+    height: 100%;
+    /* PARA  QUE LA IMAGEN LLENE EL CONTENEDOR SIN DISTORSIONARSE */
+    object-fit: cover;
+}
+
+.camara {
+    place-items: center;
+    /* CENTRA TANTO HORIZONTAL COMO VERTICALMENTE */
+    display: grid;
+    padding-top: 2px;
+
+}
+
+.button-container {
+    /* USAR FLEXBOX PARA ALINEAR LOS BOTONES EN FILA */
+    display: flex;
+    /* ESPACIO ENTRE LOS BOTONES */
+    gap: 40px;
+}
+
+.gray-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.gray-button {
+    background-color: gray;
+}
+
+/* EFECTOS AL PRESIONAR EL BOTON */
+.gray-button:hover {
+    opacity: 0.8;
+}
+
+#fuente {
+    font-size: 12px;
+}
+
+.card-span {
+    width: 300px;
+    display: inline-block;
+    /* Permite el control de dimensiones y aplicar padding */
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: left;
+    vertical-align: middle;
+}
+
+label {
+    padding-top: 2px;
+    font-weight: bolder;
 }

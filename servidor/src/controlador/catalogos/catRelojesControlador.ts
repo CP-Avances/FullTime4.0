@@ -289,6 +289,29 @@ class RelojesControlador {
     }
 
 
+    // METODO PARA CONTAR DISPOSITIVOS     **USADO
+    public async ContarDispositivos(req: Request, res: Response): Promise<Response> {
+        try {
+            const RELOJES = await pool.query(
+                `
+                SELECT COUNT (id) AS total FROM ed_relojes;
+                `
+            );
+
+            if (RELOJES.rowCount != 0) {
+                return res.jsonp(RELOJES.rows[0])
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+
+        } catch (error) {
+            console.log('error ', error)
+            return res.status(500).jsonp({ message: 'Ups!!! algo salio mal. No se han encontrado registros.' });
+        }
+    }
+
+
     // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA    **USADO
     public async VerificarPlantilla(req: Request, res: Response) {
         try {
@@ -578,7 +601,7 @@ class RelojesControlador {
                                                                             item.observacion = 'Número de serie ya existe en el sistema';
                                                                         }
                                                                     }
-        
+
                                                                     if (item.direccion_mac != ' - ') {
                                                                         var VERIFICAR_MAC = await pool.query(
                                                                             `SELECT id FROM ed_relojes WHERE mac = $1`
@@ -587,12 +610,12 @@ class RelojesControlador {
                                                                             item.observacion = 'Dirección MAC ya existe en el sistema';
                                                                         }
                                                                     }
-                                                                }else{
+                                                                } else {
                                                                     item.observacion = 'Marca no válida ingrese (ZKTECO / HIKVISION)';
                                                                 }
 
 
-                                                            }else{
+                                                            } else {
                                                                 item.observacion = 'Función temperatura no válida ingrese (SI / NO)';
                                                             }
                                                         }
@@ -751,28 +774,28 @@ class RelojesControlador {
                 }
 
                 var modelo_data = null
-                if(modelo != ' - '){
+                if (modelo != ' - ') {
                     modelo_data = modelo;
                 }
 
                 var contrasenia_data = null
-                if(contrasena != ' - '){
+                if (contrasena != ' - ') {
                     contrasenia_data = contrasena;
                 }
 
                 var fabricanteID_data = null
-                if(id_fabricante != ' - '){
+                if (id_fabricante != ' - ') {
                     fabricanteID_data = id_fabricante;
                 }
 
                 var fabricante_data = null
-                if(fabricante != ' - '){
+                if (fabricante != ' - ') {
                     fabricante_data = fabricante;
                 }
 
-                
+
                 var mac_data = null
-                if(direccion_mac != ' - '){
+                if (direccion_mac != ' - ') {
                     mac_data = direccion_mac;
                 }
 

@@ -130,9 +130,12 @@ exports.dia_completo = 'dddd';
 const FormatearFecha = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
         let formato = yield (0, exports.BuscarFecha)();
+        console.log('formato ', formato.fecha);
+        console.log(' fecha ', fecha);
         let valor = (0, moment_1.default)(fecha).format(dia).charAt(0).toUpperCase() +
             (0, moment_1.default)(fecha).format(dia).slice(1) +
             ', ' + (0, moment_1.default)(fecha).format(formato.fecha);
+        console.log(' fecha.. ', (0, moment_1.default)(fecha).format(formato.fecha));
         return valor;
     });
 };
