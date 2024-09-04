@@ -934,44 +934,94 @@ class EmpleadoCargosControlador {
             hora_trabaja, admin_dep, true]);
         const [cargos] = response.rows;
 
+
         const id_usuario_depa = await pool.query(
           `
-           SELECT id FROM eu_usuario_departamento 
-           WHERE id_empleado = $1 AND 
-            principal = true AND administra = false 
+           SELECT * FROM eu_usuario_departamento 
+           WHERE id_empleado = $1 AND id_departamento = $2
           `
-          , [id_empleado]);
+          , [id_empleado, id_departamento]);
+
 
         if (id_usuario_depa.rows[0] != undefined) {
-          await pool.query(
-            `
-              UPDATE eu_usuario_departamento 
-              SET id_departamento = $2, principal = $3, personal = $4, administra =$5
-              WHERE id = $1 RETURNING *
+          if(id_usuario_depa.rows[0].principal == true){
+            await pool.query(
               `
-            , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
-          )
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `
+              , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
+            )
+          }else{
+            
+            const id_usuario_depa_principal = await pool.query(
+              `
+               SELECT * FROM eu_usuario_departamento 
+               WHERE id_empleado = $1 AND principal = true;
+              `
+              , [id_empleado, id_departamento]);
+
+            if(id_usuario_depa_principal.rows[0] != undefined){
+              await pool.query(
+                `
+                DELETE FROM eu_usuario_departamento WHERE id = $1
+                `
+                , [id_usuario_depa_principal.rows[0].id]);
+            }
+
+            await pool.query(
+              `
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `
+              , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
+            )
+
+
+          }
+
         } else {
-
-          const response2 = await pool.query(
+          const id_usuario_depa_principal = await pool.query(
             `
-            INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-            VALUES ($1, $2, $3, $4, $5) RETURNING *
+             SELECT * FROM eu_usuario_departamento 
+             WHERE id_empleado = $1 AND principal = true
             `
-            , [id_empleado, id_departamento, true, true, admin_dep]);
+            , [id_empleado]);
 
-          const [usuarioDep] = response2.rows;
+          if(id_usuario_depa_principal.rows[0] != undefined){
+            await pool.query(
+              `
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `
+              , [id_usuario_depa_principal.rows[0].id, id_departamento, true, true, admin_dep]
+            )
+          }else{
 
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_usuario_departamento',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(usuarioDep),
-            ip,
-            observacion: null
-          });
+            const response2 = await pool.query(
+              `
+              INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+              VALUES ($1, $2, $3, $4, $5) RETURNING *
+              `
+              , [id_empleado, id_departamento, true, true, admin_dep]);
+  
+            const [usuarioDep] = response2.rows;
+  
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuario_departamento',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(usuarioDep),
+              ip,
+              observacion: null
+            });
+
+          }
 
         }
 

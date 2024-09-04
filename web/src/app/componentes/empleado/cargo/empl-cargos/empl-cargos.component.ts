@@ -403,6 +403,7 @@ export class EmplCargosComponent implements OnInit {
           principal_true = a.id;
         }
       })
+      
       console.log('ver datos ', principal_false, ' true ', principal_true)
       if (principal_false != 0) {
         this.EliminarAsignacion(principal_true);

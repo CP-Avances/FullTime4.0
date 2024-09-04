@@ -807,33 +807,63 @@ class EmpleadoCargosControlador {
                         hora_trabaja, admin_dep, true]);
                     const [cargos] = response.rows;
                     const id_usuario_depa = yield database_1.default.query(`
-           SELECT id FROM eu_usuario_departamento 
-           WHERE id_empleado = $1 AND 
-            principal = true AND administra = false 
-          `, [id_empleado]);
+           SELECT * FROM eu_usuario_departamento 
+           WHERE id_empleado = $1 AND id_departamento = $2
+          `, [id_empleado, id_departamento]);
                     if (id_usuario_depa.rows[0] != undefined) {
-                        yield database_1.default.query(`
-              UPDATE eu_usuario_departamento 
-              SET id_departamento = $2, principal = $3, personal = $4, administra =$5
-              WHERE id = $1 RETURNING *
-              `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
+                        if (id_usuario_depa.rows[0].principal == true) {
+                            yield database_1.default.query(`
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
+                        }
+                        else {
+                            const id_usuario_depa_principal = yield database_1.default.query(`
+               SELECT * FROM eu_usuario_departamento 
+               WHERE id_empleado = $1 AND principal = true;
+              `, [id_empleado, id_departamento]);
+                            if (id_usuario_depa_principal.rows[0] != undefined) {
+                                yield database_1.default.query(`
+                DELETE FROM eu_usuario_departamento WHERE id = $1
+                `, [id_usuario_depa_principal.rows[0].id]);
+                            }
+                            yield database_1.default.query(`
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
+                        }
                     }
                     else {
-                        const response2 = yield database_1.default.query(`
-            INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-            VALUES ($1, $2, $3, $4, $5) RETURNING *
-            `, [id_empleado, id_departamento, true, true, admin_dep]);
-                        const [usuarioDep] = response2.rows;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'eu_usuario_departamento',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(usuarioDep),
-                            ip,
-                            observacion: null
-                        });
+                        const id_usuario_depa_principal = yield database_1.default.query(`
+             SELECT * FROM eu_usuario_departamento 
+             WHERE id_empleado = $1 AND principal = true
+            `, [id_empleado]);
+                        if (id_usuario_depa_principal.rows[0] != undefined) {
+                            yield database_1.default.query(`
+                UPDATE eu_usuario_departamento 
+                SET id_departamento = $2, principal = $3, personal = $4, administra =$5
+                WHERE id = $1 RETURNING *
+                `, [id_usuario_depa_principal.rows[0].id, id_departamento, true, true, admin_dep]);
+                        }
+                        else {
+                            const response2 = yield database_1.default.query(`
+              INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+              VALUES ($1, $2, $3, $4, $5) RETURNING *
+              `, [id_empleado, id_departamento, true, true, admin_dep]);
+                            const [usuarioDep] = response2.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eu_usuario_departamento',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(usuarioDep),
+                                ip,
+                                observacion: null
+                            });
+                        }
                     }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
