@@ -173,9 +173,9 @@ export class RegistrarTimbreComponent implements OnInit {
 
         camaras.forEach(camara => {
           const label = camara.label.toLowerCase();
-          if (label.includes('front') || label.includes('user')) {
+          if (label.includes('front') || label.includes('user') || label.includes('frontal')) {
             this.camaraFrontal = camara;
-          } else if (label.includes('back') || label.includes('environment')) {
+          } else if (label.includes('back') || label.includes('environment') || label.includes('trasera')) {
             this.camaraTrasera = camara;
           }
         });
