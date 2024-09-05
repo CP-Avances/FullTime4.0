@@ -1,5 +1,5 @@
 <!--  ************************** LISTA DE TIMBRES DEL USUARIO SELECCIONADO ************************************ -->
-<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="lista && !verJustificacion">
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="lista">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">LISTA DE TIMBRES DE {{selec_nombre.toUpperCase()}}
             <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarTabla()" matSuffix
@@ -11,21 +11,21 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Maps</th>
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
+                        <th scope="col">Reloj</th>
                         <th scope="col">Acción</th>
-                        <th scope="col">Asistencia</th>
                         <th scope="col">Observacion</th>
+                        <th scope="col">Ubicación</th>
                         <th scope="col">Latitud</th>
                         <th scope="col">Longitud</th>
-                        <th scope="col">Reloj</th>
-                        <th scope="col">Justificación</th>
+                        <th scope="col">Maps</th>
+                        <th scope="col">Foto</th>
+                        <th scope="col">Respaldo</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td></td>
                         <td>
                             <mat-form-field class="input-tables fecha">
                                 <input matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
@@ -38,32 +38,41 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr
                         *ngFor="let t of timbres | fecTimbre: filtroFechaTimbre | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{t.fecha}}</td>
+                        <td>{{t.hora}}</td>
+                        <td>{{t.id_reloj}} ({{t.id_reloj_}})</td>
+                        <td>{{t.tecla_funcion_}}</td>
+                        <td>{{t.observacion}}</td>
+                        <td>{{t.ubicacion}}</td>
+                        <td>{{t.latitud}}</td>
+                        <td>{{t.longitud}}</td>
                         <td>
                             <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
                                 matSuffix matTooltipPosition="right"
-                                matTooltip="Direccionar al mapa con ubicación del timbre seleccionado.">
+                                matTooltip="Direccionar al mapa con ubicación del timbre.">
                                 location_on
                             </mat-icon>
                         </td>
-                        <td>{{t.fecha}}</td>
-                        <td>{{t.hora}}</td>
-                        <td>{{t.tecla_funcion_}}</td>
-                        <td>{{t.accion}}</td>
-                        <td>{{t.observacion}}</td>
-                        <td>{{t.latitud}}</td>
-                        <td>{{t.longitud}}</td>
-                        <td>{{t.id_reloj}}</td>
                         <td class="justify-content-center">
-                          <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
-                              matTooltip="Ver justificación"
-                              *ngIf="t.documento" (click)="VerJustificacion(t.documento)"
-                              fontSet="material-icons-outlined">
-                              image
-                          </mat-icon>
-                      </td>
+                            <mat-icon aria-hidden="false" id="ver" matSuffix matTooltipPosition="right"
+                                matTooltip="Ver fotografía." *ngIf="t.imagen" (click)="VerImagen(t.imagen)"
+                                fontSet="material-icons-outlined">
+                                insert_emoticon
+                            </mat-icon>
+                        </td>
+                        <td class="justify-content-center">
+                            <mat-icon aria-hidden="false" id="t-editar" matSuffix matTooltipPosition="right"
+                                matTooltip="Ver justificación." *ngIf="t.documento" (click)="VerImagen(t.documento)"
+                                fontSet="material-icons-outlined">
+                                photo
+                            </mat-icon>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -76,7 +85,7 @@
 </div>
 
 <!--  ************************** LISTA DE USUARIOS REGISTRADOS EN EL SISTEMA ************************************ -->
-<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;" *ngIf="!verJustificacion">
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">
             ADMINISTRACIÓN DE TIMBRES
@@ -151,21 +160,3 @@
         <br>
     </div>
 </div>
-
-
-<!--Ver justifcicaion-->
-<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;" *ngIf="verJustificacion">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">
-            JUSTIFICACIÓN
-            <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarJustificacion()" matSuffix
-                matTooltipPosition="right" matTooltip="Cerrar justificación seleccionada." id="cerrar">
-                highlight_off
-            </mat-icon>
-        </div>
-        <mat-card appearance="outlined">
-          <mat-card-content>
-            <img mat-card-image [src]="justificacion" alt="Justificación" id="justificacion">
-          </mat-card-content>
-        </mat-card>
-    </div>

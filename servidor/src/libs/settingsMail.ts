@@ -131,9 +131,13 @@ export const dia_completo: string = 'dddd';
 
 export const FormatearFecha = async function (fecha: string, dia: string) {
   let formato = await BuscarFecha();
+  console.log('formato ', formato.fecha)
+  console.log(' fecha ', fecha)
   let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
     moment(fecha).format(dia).slice(1) +
     ', ' + moment(fecha).format(formato.fecha);
+
+    console.log(' fecha.. ', moment(fecha).format(formato.fecha))
   return valor;
 }
 

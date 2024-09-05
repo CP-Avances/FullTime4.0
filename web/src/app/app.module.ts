@@ -266,6 +266,7 @@ import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/bu
 import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/crear-timbre/crear-timbre.component';
 import { EditarTimbreComponent } from './componentes/timbres/acciones-timbres/editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from './componentes/timbres/acciones-timbres/ver-timbre/ver-timbre.component';
+import { VerImagenComponent } from './componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
 // NOTIFICACIONES
 import { SettingsComponent } from './componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
 import { ConfiguracionNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/configuracion/configuracionNotificacion.component';
@@ -314,6 +315,7 @@ import { MainNavService } from './componentes/administracionGeneral/main-nav/mai
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+
 
 
 @NgModule({
@@ -551,6 +553,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     CrearTimbreComponent,
     EditarTimbreComponent,
     VerTimbreComponent,
+    VerImagenComponent,
 
     SettingsComponent,
     ConfiguracionNotificacionComponent,

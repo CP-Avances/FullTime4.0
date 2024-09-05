@@ -1,17 +1,21 @@
 // IMPORTAR LIBRERIAS
+import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Observable, Subject } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { MatDialogRef } from '@angular/material/dialog';
-import { Observable, Subject } from 'rxjs';
-import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
+import { interval } from 'rxjs';
+import { map } from 'rxjs/operators';
+import moment from 'moment';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import moment from 'moment';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+
+import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -21,19 +25,11 @@ import moment from 'moment';
 
 export class RegistrarTimbreComponent implements OnInit {
 
-
-    // Para manejar la imagen capturada
-    public webcamImage: WebcamImage | null = null;
-    private trigger: Subject<void> = new Subject<void>();
-  
-  
-  
-    public get triggerObservable(): Observable<void> {
-      return this.trigger.asObservable();
-    }
-
- 
-
+  // PARA MANEJAR LA IMAGEN CAPTURADA
+  private trigger: Subject<void> = new Subject<void>();
+  public get triggerObservable(): Observable<void> {
+    return this.trigger.asObservable();
+  }
 
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
@@ -44,8 +40,9 @@ export class RegistrarTimbreComponent implements OnInit {
   });
 
   // VARIABLE DE SELECCION DE OPCION
-  botones_normal: boolean = true;
   boton_abierto: boolean = false;
+  ver_timbrar: boolean = true;
+  ver_camara: boolean = false;
 
   // VARIABLES DE ALMACENMAIENTO DE COORDENADAS
   latitud: number;
@@ -69,39 +66,126 @@ export class RegistrarTimbreComponent implements OnInit {
   ip: string | null;
 
   constructor(
+    private restTimbres: TimbresService,
     public restP: ParametrosService,
     public restE: EmpleadoService,
     public restU: EmpleadoUbicacionService,
     public restF: FuncionesService,
-    public ventana: MatDialogRef<RegistrarTimbreComponent>, // VARIABLE DE USO DE VENTANA DE DIÁLOGO
+    public ventana: TimbreWebComponent, // VARIABLE DE USO DE VENTANA DE DIÁLOGO
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
 
+  currentTime: string;
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
-    this.BuscarParametroUbicacion();
-    this.BuscarParametroCertificado();
-    this.BuscarParametroDesconocida();
+    this.BuscarParametros();
+    this.VerificarCamara();
   }
 
-  
+  formato = 'HH:mm:ss';
+  // METODO PARA FORMATEAR LA HORA
+  private FormatearHora(date: Date): string {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    if (this.formato === 'hh:mm:ss A') {
+      // CONVERTIR HORAS A FORMATO DE 12 HORAS
+      const formattedHours = hours % 12 || 12;
+      return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    }
+    else {
+      const formattedHours = String(date.getHours()).padStart(2, '0');
+      return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
+  }
+
+  // METODO PARA MOSTRAR HORA EN TIEMPO REAL
+  MostrarHora() {
+    interval(1000)
+      .pipe(map(() => new Date()))
+      .subscribe(date => {
+        this.currentTime = this.FormatearHora(date);
+      });
+
+    // INICIALIZA EL TIEMPO INMEDIATAMENTE
+    this.currentTime = this.FormatearHora(new Date());
+  }
+
+  // METODO PARA MOSTRAR FOTO
   triggerSnapshot(): void {
     this.trigger.next();
   }
 
+  // METODO PARA CONVERTIR LA IMAGEN
   handleImage(webcamImage: WebcamImage): void {
-    this.webcamImage = webcamImage;
+    this.VoltearImagen(webcamImage.imageAsDataUrl)
   }
 
-  saveImage(): void {
-    if (this.webcamImage) {
-      // Enviar la imagen al backend
-      // Aquí puedes usar un servicio de Angular para hacer una petición HTTP
+  // VALIDAR EXISTENCIA DE CAMARA
+  existe_camara: boolean = false;
+  permisos_camara: boolean = false;
+  async VerificarCamara(): Promise<void> {
+    try {
+      const dispositivos = await navigator.mediaDevices.enumerateDevices();
+      const camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
+      this.existe_camara = camara_.length > 0;
+      if (this.existe_camara) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          this.permisos_camara = true;
+          stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+          this.permisos_camara = false;
+        }
+      }
+    } catch (err) {
+      this.existe_camara = false;
     }
+  }
+
+  // METOOD PARA VOLTEAR LA IMAGEN HORIZONTALMENTE
+  convertida: string | ArrayBuffer | null = null;
+  flippedImage: any;
+  VoltearImagen(src: any) {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.translate(canvas.width, 0); // MUEVE EL ORIGEN AL BORDE DERECHO DEL CANVAS
+        ctx.scale(-1, 1); // APLICA LA ESCALA NEGATIVA
+        ctx.drawImage(img, 0, 0); // DIBUJA LA IMAGEN EN EL CANVAS
+        const flippedImage = canvas.toDataURL();
+        this.flippedImage = flippedImage;
+        // CONVERTIR A BASE64 CON CALIDAD REDUCIDA
+        const quality = 0.9; // AJUSTA LA CALIDAD SEGUN SEA NECESARIO (0.0 - 1.0)
+        this.convertida = canvas.toDataURL('image/jpeg', quality);
+        //console.log('convertida ', this.convertida)
+      } else {
+        this.toastr.warning(
+          'Ups!!! algo salio mal.', 'Intente nuevamente.', {
+          timeOut: 6000,
+        })
+      }
+    };
+    img.onerror = () => {
+      this.toastr.warning(
+        'Error al cargar la imagen', '', {
+        timeOut: 6000,
+      })
+    };
+    img.src = src;
   }
 
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
@@ -113,50 +197,47 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // METODO PARA OBTENER RANGO DE PERIMETRO
-  rango: any;
-  BuscarParametroUbicacion() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 4
-    let datos: any = [];
-    this.restP.ListarDetalleParametros(4).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.rango = (parseInt(datos[0].descripcion))
-        }
-        else {
-          this.rango = 0
-        }
-      });
-  }
-
-  // METODO PARA PERMITIR TIMBRE EN UBICACION DESCONOCIDA
+  rango: number = 0;
   desconocida: boolean = false;
-  BuscarParametroDesconocida() {
-    // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
+  foto: boolean = false;
+  BuscarParametros() {
     let datos: any = [];
-    this.restP.ListarDetalleParametros(5).subscribe(
+    let detalles = { parametros: '4, 5, 7, 2, 15' };
+    this.restP.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
-        if (datos.length != 0) {
-          if (datos[0].descripcion === 'Si') {
-            this.desconocida = true;
+        console.log('parametros ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro PARA RANGO DE UBICACION = 4
+          if (p.id_parametro === 4) {
+            this.rango = (parseInt(p.descripcion))
           }
-        }
-      });
-  }
-
-  // METODO PARA VERIFICAR USO DE CERTIFICADOS DE SEGURIDAD
-  BuscarParametroCertificado() {
-    // id_tipo_parametro PARA VERIFICAR USO SSL = 7
-    let datos: any = [];
-    this.restP.ListarDetalleParametros(7).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          if (datos[0].descripcion === 'Si') {
-            this.Geolocalizar();
+          // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
+          if (p.id_parametro === 5) {
+            if (p.descripcion === 'Si') {
+              this.desconocida = true;
+            }
           }
-        }
+          // id_tipo_parametro PARA VERIFICAR USO SSL = 7
+          if (p.id_parametro === 7) {
+            if (p.descripcion === 'Si') {
+              this.Geolocalizar();
+            }
+          }
+          // id_tipo_parametro FORMATO DE HORA = 2
+          if (p.id_parametro === 2) {
+            this.formato = p.descripcion;
+          }
+          // id_tipo_parametro PARA VERIFICAR USO DE FOTO  = 15
+          if (p.id_parametro === 15) {
+            if (p.descripcion === 'Si') {
+              this.foto = true;
+            }
+          }
+        })
+        this.MostrarHora();
+      }, vacio => {
+        this.MostrarHora();
       });
   }
 
@@ -203,87 +284,106 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
-  // METODO PARA ACTIVAR Y DESACTIVAR BOTONES
-  boton: boolean = false;
-  ActivarBotones() {
-    if (this.boton_abierto === false) {
-      this.boton_abierto = true;
-      this.botones_normal = false;
-    }
-    else {
-      this.boton_abierto = false;
-      this.botones_normal = true;
-    }
-  }
-
   // METODO PARA GUARDAR DATOS DEL TIMBRE SEGUN LA OPCION INGRESADA
   accionF: string = '';
   teclaFuncionF: number;
-  AlmacenarDatos(opcion: number, form: any) {
+  asistencia: string = '';
+  fecha_hora: any;
+  ver_informacion: boolean = false;
+  AlmacenarDatos(opcion: number) {
+    this.boton_abierto = false;
     switch (opcion) {
       case 1:
         this.accionF = 'E';
         this.teclaFuncionF = 0;
+        this.asistencia = 'ENTRADA';
         break;
       case 2:
         this.accionF = 'S';
         this.teclaFuncionF = 1;
+        this.asistencia = 'SALIDA';
         break;
       case 3:
         this.accionF = 'I/A';
         this.teclaFuncionF = 2;
+        this.asistencia = 'INICIO ALIMENTACIÓN';
         break;
       case 4:
         this.accionF = 'F/A';
         this.teclaFuncionF = 3;
+        this.asistencia = 'FIN ALIMENTACIÓN';
         break;
       case 5:
         this.accionF = 'I/P';
         this.teclaFuncionF = 4;
+        this.asistencia = 'INICIO PERMISO';
         break;
       case 6:
         this.accionF = 'F/P';
         this.teclaFuncionF = 5;
+        this.asistencia = 'FIN PERMISO';
         break;
       case 7:
         this.accionF = 'HA';
         this.teclaFuncionF = 7;
+        this.asistencia = 'TIMBRE ESPECIAL';
+        this.boton_abierto = true;
         break;
       default:
         this.accionF = 'D';
+        this.asistencia = 'DESCONOCIDO';
         break;
     }
-    this.InsertarTimbre(form);
-  }
-
-  // METODO PARA TOMAR DATOS DEL TIMBRE
-  InsertarTimbre(form: any) {
-    if (this.boton_abierto === true) {
-      if (form.observacionForm != '' && form.observacionForm != undefined) {
-        this.ValidarModulo(this.latitud, this.longitud, this.rango, form);
-      }
-      else {
-        this.toastr.info(
-          'Ingresar descripción del timbre.', 'Campo de observación es obligatorio.', {
-          timeOut: 6000,
-        })
-      }
-    }
-    else {
-      this.ValidarModulo(this.latitud, this.longitud, this.rango, form);
-    }
-  }
-
-  // METODO PARA TOMAR DATOS DE MARCACION 
-  RegistrarDatosTimbre(form: any, ubicacion: any) {
+    this.ver_informacion = true;
+    this.ver_timbrar = false;
+    this.ver_camara = false;
     // OBTENER LA FECHA Y HORA ACTUAL
     var now = moment();
     // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-    var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
-    let dataTimbre = {
-      fec_hora_timbre: fecha_hora,
+    this.fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+    this.InsertarTimbre();
+  }
+
+  // METODO PARA TOMAR DATOS DEL TIMBRE
+  InsertarTimbre() {
+    // VERIFICAR USO DE LA CAMARA
+    if (this.foto === true) {
+      if (this.existe_camara) {
+        if (this.permisos_camara === true) {
+          this.ver_camara = true;
+          this.ValidarModulo(this.latitud, this.longitud, this.rango);
+        }
+        else {
+          this.MostrarMensaje('Permisos de cámara no otorgados o denegados.', '');
+        }
+      }
+      else {
+        this.MostrarMensaje('Fotografía es requerida.', 'No se ha encontrado ninguna cámara disponible.');
+      }
+    }
+    else {
+      this.ValidarModulo(this.latitud, this.longitud, this.rango);
+    }
+  }
+
+  // METODO PARA LEER MENSAJE ERROR
+  MostrarMensaje(mensaje1: string, mensaje2: string) {
+    this.ver_camara = false;
+    this.CerrarVentana();
+    this.toastr.warning(
+      mensaje1, mensaje2, {
+      timeOut: 6000,
+    });
+  }
+
+  // METODO PARA TOMAR DATOS DE MARCACION 
+  informacion_timbre: any;
+  dataTimbre: any;
+  RegistrarDatosTimbre(ubicacion: any) {
+    this.dataTimbre = {
+      fec_hora_timbre: this.fecha_hora,
       tecl_funcion: this.teclaFuncionF,
-      observacion: form.observacionForm,
+      observacion: '',
       ubicacion: ubicacion,
       longitud: this.longitud,
       id_reloj: 98,
@@ -292,22 +392,59 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
-    console.log('data timbre ', dataTimbre)
-    this.ventana.close(dataTimbre);
+    console.log('data timbre ', this.dataTimbre)
+    this.informacion_timbre = this.dataTimbre;
   }
+
+  //  METODO PARA REGISTRAR DATOS DEL TIMBRE
+  RegistrarTimbre(data: any) {
+    this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
+      data.id_empleado = this.id_empl;
+      this.ventana.BuscarParametro();
+      this.CerrarProcesos();
+      this.toastr.success(res.message)
+    }, err => {
+      this.toastr.error(err.message)
+    })
+  }
+
+  // METODO PARA GUARDAR TIMBRE CON IMAGEN
+  GuardarImagen(form: any): void {
+    if (this.flippedImage) {
+      this.informacion_timbre.imagen = this.convertida;
+    }
+
+    this.informacion_timbre.observacion = form.observacionForm;
+    if (this.boton_abierto === true) {
+      if (form.observacionForm != '' && form.observacionForm != undefined) {
+        this.RegistrarTimbre(this.informacion_timbre);
+      }
+      else {
+        this.toastr.info(
+          'Ingresar descripción del timbre.', 'Campo observación es obligatorio.', {
+          timeOut: 6000,
+        })
+      }
+    }
+    else {
+      this.RegistrarTimbre(this.informacion_timbre);
+    }
+
+  }
+
 
   // METODO QUE VERIFICAR SI EL TIMBRE FUE REALIZADO EN UN PERIMETRO DEFINIDO
   contar: number = 0;
   ubicacion: string = '';
   sin_ubicacion: number = 0;
-  CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
+  CompararCoordenadas(informacion: any, descripcion: any, data: any) {
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
           if (this.contar === 1) {
-            this.RegistrarDatosTimbre(form, this.ubicacion);
+            this.RegistrarDatosTimbre(this.ubicacion);
             this.toastr.info(
               'Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
               timeOut: 6000,
@@ -317,14 +454,14 @@ export class RegistrarTimbreComponent implements OnInit {
         else {
           this.sin_ubicacion = this.sin_ubicacion + 1;
           if (this.sin_ubicacion === data.length) {
-            this.ValidarDomicilio(informacion, form);
+            this.ValidarDomicilio(informacion);
           }
         }
       });
   }
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
-  BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
+  BuscarUbicacion(latitud: any, longitud: any, rango: any) {
     var longitud_ = '';
     var latitud_ = '';
 
@@ -350,11 +487,11 @@ export class RegistrarTimbreComponent implements OnInit {
           informacion.lng2 = obj.longitud;
           console.log(informacion.lat1, ' ---------- ', informacion.lng1)
           if (informacion.lat1 && informacion.lng1) {
-            this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
+            this.CompararCoordenadas(informacion, obj.descripcion, datosUbicacion);
           }
           else {
             if (this.desconocida === true) {
-              this.RegistrarDatosTimbre(form, 'SIN UBICACION');
+              this.RegistrarDatosTimbre('SIN UBICACION');
             }
             else {
               this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
@@ -364,23 +501,23 @@ export class RegistrarTimbreComponent implements OnInit {
           }
         })
       }, error => {
-        this.ValidarDomicilio(informacion, form);
+        this.ValidarDomicilio(informacion);
       });
   }
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
-  ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
+  ValidarModulo(latitud: any, longitud: any, rango: any) {
     //console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
-      this.BuscarUbicacion(latitud, longitud, rango, form);
+      this.BuscarUbicacion(latitud, longitud, rango);
     }
     else {
-      this.RegistrarDatosTimbre(form, this.ubicacion);
+      this.RegistrarDatosTimbre(this.ubicacion);
     }
   }
 
   // METODO PARA VALIDAR UBICACION DOMICILIO
-  ValidarDomicilio(informacion: any, form: any) {
+  ValidarDomicilio(informacion: any) {
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
       if (res[0].longitud != null && res[0].latitud != null) {
         informacion.lat2 = res[0].latitud;
@@ -390,13 +527,13 @@ export class RegistrarTimbreComponent implements OnInit {
           this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
             if (resu[0].verificar === 'ok') {
               this.ubicacion = 'DOMICILIO';
-              this.RegistrarDatosTimbre(form, this.ubicacion);
+              this.RegistrarDatosTimbre(this.ubicacion);
               this.toastr.info('Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
                 timeOut: 6000,
               })
             }
             else {
-              this.ProcesoPerimetroDesconocido(form);
+              this.ProcesoPerimetroDesconocido();
             }
           })
         }
@@ -407,18 +544,18 @@ export class RegistrarTimbreComponent implements OnInit {
         }
       }
       else {
-        this.ProcesoPerimetroDesconocido(form)
+        this.ProcesoPerimetroDesconocido()
       }
     })
   }
 
 
   // METODO PARA REGISTRAR TIMBRE CON PERIMETRO DESCONOCIDO
-  ProcesoPerimetroDesconocido(form: any) {
+  ProcesoPerimetroDesconocido() {
     // PUEDE TIMBRAR EN PERIMETROS DESCONOCIDOS
     if (this.desconocida === true) {
       this.ubicacion = 'DESCONOCIDO';
-      this.RegistrarDatosTimbre(form, this.ubicacion);
+      this.RegistrarDatosTimbre(this.ubicacion);
       this.toastr.info('Marcación realizada dentro de un perímetro DESCONOCIDO.', '', {
         timeOut: 6000,
       })
@@ -429,6 +566,30 @@ export class RegistrarTimbreComponent implements OnInit {
       })
     }
 
+  }
+
+  // METODO PARA CERRAR VENTANA
+  CerrarVentana() {
+    if (this.ver_informacion === false) {
+      this.ventana.ver_principal = true;
+      this.ventana.ver_timbre = false;
+    }
+    else {
+      this.ver_informacion = false;
+      this.ver_camara = false;
+    }
+  }
+
+  // METODO PARA CERRAR PROCESO
+  CerrarProcesos() {
+    this.ventana.ver_principal = true;
+    this.ventana.ver_timbre = false;
+  }
+
+  // METODO PARA CERRAR CAMARA
+  CerrarCamara() {
+    // METODO PARA CAPTURAR IMAGEN
+    this.flippedImage = null;
   }
 
 }

@@ -3,7 +3,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import { MatDialog } from '@angular/material/dialog';
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -11,9 +10,8 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
-
-// IMPORTAR COMPONENTES
-import { RegistrarTimbreComponent } from '../registrar-timbre/registrar-timbre.component';
+import { MatDialog } from '@angular/material/dialog';
+import { VerImagenComponent } from 'src/app/componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
 
 @Component({
   selector: 'app-timbre-web',
@@ -30,6 +28,8 @@ export class TimbreWebComponent implements OnInit {
   info: any = [];
 
   activar_timbre: boolean = true;
+  ver_principal: boolean = true;
+  ver_timbre: boolean = false;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -45,12 +45,12 @@ export class TimbreWebComponent implements OnInit {
 
   constructor(
     private restTimbres: TimbresService, // SERVICIOS DATOS TIMBRES
-    private ventana: MatDialog, // VARIABLE USADA PARA NAVEGACIÓN ENTRE VENTANAS
     private validar: ValidacionesService, // VALIDACIONES DE SERVICIOS
     private toastr: ToastrService, // VARIABLE USADA PARA NOTIFICACIONES
     public parametro: ParametrosService,
     public funciones: MainNavService,
     public usuario: UsuarioService,
+    public ventana: MatDialog,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -130,51 +130,59 @@ export class TimbreWebComponent implements OnInit {
       this.timbres.forEach((data: any) => {
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
-        if (data.tecla_funcion === '0') {
-          data.tecla_funcion_ = 'Entrada';
-        }
-        else if (data.tecla_funcion === '1') {
-          data.tecla_funcion_ = 'Salida';
-        }
-        else if (data.tecla_funcion === '2') {
-          data.tecla_funcion_ = 'Inicio alimentación';
-        }
-        else if (data.tecla_funcion === '3') {
-          data.tecla_funcion_ = 'Fin alimentación';
-        }
-        else if (data.tecla_funcion === '4') {
-          data.tecla_funcion_ = 'Inicio permiso';
-        }
-        else if (data.tecla_funcion === '5') {
-          data.tecla_funcion_ = 'Fin permiso';
-        }
-        if (data.tecla_funcion === '7') {
-          data.tecla_funcion_ = 'Timbre libre';
-        }
-        else if (data.tecla_funcion === '99') {
-          data.tecla_funcion_ = 'Desconocido';
-        }
+        this.LeerAcciones(data);
+        this.LeerBiometrico(data);
       })
     }, err => {
       this.toastr.info(err.error.message)
     })
   }
 
+  // METODO PARA LEER DATOS DE ACCIONES
+  LeerAcciones(data: any) {
+    if (data.tecla_funcion === '0') {
+      data.tecla_funcion_ = 'Entrada';
+    }
+    else if (data.tecla_funcion === '1') {
+      data.tecla_funcion_ = 'Salida';
+    }
+    else if (data.tecla_funcion === '2') {
+      data.tecla_funcion_ = 'Inicio alimentación';
+    }
+    else if (data.tecla_funcion === '3') {
+      data.tecla_funcion_ = 'Fin alimentación';
+    }
+    else if (data.tecla_funcion === '4') {
+      data.tecla_funcion_ = 'Inicio permiso';
+    }
+    else if (data.tecla_funcion === '5') {
+      data.tecla_funcion_ = 'Fin permiso';
+    }
+    if (data.tecla_funcion === '7') {
+      data.tecla_funcion_ = 'Timbre libre';
+    }
+    else if (data.tecla_funcion === '99') {
+      data.tecla_funcion_ = 'Desconocido';
+    }
+  }
+
+  // METODO PARA LEER BIOMETRICOS
+  LeerBiometrico(data: any) {
+    if (data.id_reloj === '97') {
+      data.id_reloj_ = 'APP_MOVIL';
+    }
+    else if (data.id_reloj === '98') {
+      data.id_reloj_ = 'APP_WEB';
+    }
+    else {
+      data.id_reloj_ = 'BIOMÉTRICO';
+    }
+  }
+
   // METODO PARA REGISTRAR TIMBRES
   AbrirRegistrarTimbre() {
-    this.ventana.open(RegistrarTimbreComponent, { width: '550px' }).afterClosed().subscribe(data => {
-      if (data !== undefined) {
-        if (!data.close) {
-          this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
-            data.id_empleado = this.idEmpleado;
-            this.BuscarParametro();
-            this.toastr.success(res.message)
-          }, err => {
-            this.toastr.error(err.message)
-          })
-        }
-      }
-    })
+    this.ver_principal = false;
+    this.ver_timbre = true;
   }
 
   // METODO PARA REALIZAR FILTROS DE BUSQUEDA
@@ -199,6 +207,13 @@ export class TimbreWebComponent implements OnInit {
       `Ups!!! al parecer no tienes permisos para timbrar desde la aplicación web. \n`,
       {
         timeOut: 6000,
+      });
+  }
+
+  // METODO PARA VER IMAGEN
+  VerImagen(imagen: any) {
+    this.ventana.open(VerImagenComponent,
+      { width: '400px', height: '400px', data: imagen }).afterClosed().subscribe(item => {
       });
   }
 

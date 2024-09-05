@@ -174,13 +174,14 @@ export class RegistroDispositivosComponent implements OnInit {
 
   // METODO PARA LISTAR DISPOSITIVOS
   ObtenerDispositivosRegistrados() {
-    this.usuariosService.BuscarDispositivoMovill().subscribe(res => {
+    this.dispositivosRegistrados = [];
+    this.usuariosService.BuscarDispositivoMovil().subscribe(res => {
       this.dispositivosRegistrados = res;
-      if (this.rolEmpleado !==1) {
+      if (this.rolEmpleado !== 1) {
         this.dispositivosRegistrados = this.dispositivosRegistrados.filter((item: any) => this.idUsuariosAcceso.has(item.id_empleado));
       }
     }, err => {
-      this.toastr.info(err.error.message)
+      this.toastr.info(err.error.message);
     })
   }
 
@@ -217,7 +218,7 @@ export class RegistroDispositivosComponent implements OnInit {
             this.dispositivo.push(item.id_dispositivo);
           });
           this.usuariosService.EliminarDispositivoMovil(this.dispositivo, datos).subscribe(res => {
-            this.toastr.success('Registro eliminado exitosamnete.');
+            this.toastr.success('Registros eliminados exitosamente.');
             this.ObtenerDispositivosRegistrados();
             this.selectionEmp.clear();
             this.multiple = false;
