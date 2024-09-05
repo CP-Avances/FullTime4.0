@@ -945,7 +945,10 @@ class EmpleadoCargosControlador {
 
 
         if (id_usuario_depa.rows[0] != undefined) {
-          if(id_usuario_depa.rows[0].principal == true){
+          //console.log('departamento ', id_usuario_depa.rows[0])
+          if (id_usuario_depa.rows[0].principal == true) {
+
+            console.log('ingresa if 2',)
             await pool.query(
               `
                 UPDATE eu_usuario_departamento 
@@ -954,16 +957,18 @@ class EmpleadoCargosControlador {
                 `
               , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
             )
-          }else{
-            
+          } else {
+
+            //console.log('ingresa else 2',)
             const id_usuario_depa_principal = await pool.query(
               `
                SELECT * FROM eu_usuario_departamento 
                WHERE id_empleado = $1 AND principal = true;
               `
-              , [id_empleado, id_departamento]);
+              , [id_empleado]);
 
-            if(id_usuario_depa_principal.rows[0] != undefined){
+            //console.log('departamento 2 ', id_usuario_depa_principal.rows[0])
+            if (id_usuario_depa_principal.rows[0] != undefined) {
               await pool.query(
                 `
                 DELETE FROM eu_usuario_departamento WHERE id = $1
@@ -979,8 +984,6 @@ class EmpleadoCargosControlador {
                 `
               , [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]
             )
-
-
           }
 
         } else {
@@ -991,7 +994,7 @@ class EmpleadoCargosControlador {
             `
             , [id_empleado]);
 
-          if(id_usuario_depa_principal.rows[0] != undefined){
+          if (id_usuario_depa_principal.rows[0] != undefined) {
             await pool.query(
               `
                 UPDATE eu_usuario_departamento 
@@ -1000,7 +1003,7 @@ class EmpleadoCargosControlador {
                 `
               , [id_usuario_depa_principal.rows[0].id, id_departamento, true, true, admin_dep]
             )
-          }else{
+          } else {
 
             const response2 = await pool.query(
               `
@@ -1008,9 +1011,9 @@ class EmpleadoCargosControlador {
               VALUES ($1, $2, $3, $4, $5) RETURNING *
               `
               , [id_empleado, id_departamento, true, true, admin_dep]);
-  
+
             const [usuarioDep] = response2.rows;
-  
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
               tabla: 'eu_usuario_departamento',
