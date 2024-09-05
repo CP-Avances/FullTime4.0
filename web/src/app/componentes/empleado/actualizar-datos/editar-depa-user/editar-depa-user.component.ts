@@ -329,7 +329,7 @@ export class EditarDepaUserComponent implements OnInit {
   
       this.empleadosDep.push({
         id: obj.id_empleado,
-        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+        nombre: (obj.apellido).toUpperCase() + ' ' + (obj.nombre).toUpperCase(),
         codigo: obj.codigo,
         cedula: obj.cedula,
         correo: obj.correo,

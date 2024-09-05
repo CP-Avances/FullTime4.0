@@ -330,7 +330,7 @@ export class EditarRolUserComponent implements OnInit {
 
       this.empleados.push({
         id: obj.id,
-        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+        nombre: (obj.apellido).toUpperCase() + ' ' + (obj.nombre).toUpperCase(),
         codigo: obj.codigo,
         cedula: obj.cedula,
         correo: obj.correo,

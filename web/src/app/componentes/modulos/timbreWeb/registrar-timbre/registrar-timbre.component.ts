@@ -207,6 +207,7 @@ export class RegistrarTimbreComponent implements OnInit {
   ver: any = '';
   SeleccionarCamara(): void {
     this.ver = 'ingresa'
+    this.CerrarCamara();
     if (this.camara_ && this.camara_.length > 1) {
       // Aumentar el índice y utilizar el módulo para alternar en caso de que sea el último dispositivo
       this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
