@@ -1,6 +1,14 @@
-.btn {
-    background-color: rgb(80, 87, 97);
+
+#botonTimbre {
+    margin-top: 5px;
+    border-radius: 10px;
+    background: rgb(0, 123, 194);
     color: white;
+    width: 175px;
+    text-transform: uppercase;
+    font-size:small;
+    height: 50px;
+    font-weight: bolder;
 }
 
 .timbre {
