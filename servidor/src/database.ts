@@ -8,7 +8,6 @@ const pool = new Pool({
   port: 5432,
   database: 'fulltime_pruebas1',
   password: 'fulltime'
-
 })
 
 pool.query('SELECT NOW()', (err, res) => {

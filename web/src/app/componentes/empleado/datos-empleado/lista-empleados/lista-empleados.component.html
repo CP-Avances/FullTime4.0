@@ -84,7 +84,7 @@
             <div class="col-md">
                 <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
                     (click)="Deshabilitar(2)">
-                    Habilitar
+                    Activar
                 </button>
             </div>
             <div class="col-md">
@@ -152,22 +152,17 @@
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
+                        <td colspan="2">
                             <mat-form-field class="input-tables cedula">
                                 <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
                                     (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td></td>
+                        <td></td>
                     </tr>
                     <tr
-                        *ngFor="let e of desactivados | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value |  paginate:tamanio_paginaDes:numero_paginaDes">
+                        *ngFor="let e of desactivados | emplCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value |  paginate:tamanio_paginaDes:numero_paginaDes">
                         <td>
                             <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
@@ -225,7 +220,7 @@
             <div class="col-md">
                 <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
                     (click)="Deshabilitar(1)">
-                    Confirmar
+                    Inactivar
                 </button>
             </div>
 
@@ -290,18 +285,13 @@
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
+                        <td colspan="2">
                             <mat-form-field class="input-tables cedula">
                                 <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
                                     (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
+                   
                         <td></td>
                         <td></td>
                         <td>
@@ -312,7 +302,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"

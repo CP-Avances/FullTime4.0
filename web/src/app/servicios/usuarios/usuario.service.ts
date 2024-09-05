@@ -66,7 +66,7 @@ export class UsuarioService {
   }
 
   // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS     **USADO
-  BuscarDispositivoMovill() {
+  BuscarDispositivoMovil() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/registro-dispositivos`);
   }
 

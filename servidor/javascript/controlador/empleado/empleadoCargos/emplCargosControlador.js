@@ -790,6 +790,7 @@ class EmpleadoCargosControlador {
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
+                    //Optener el ultimo cargo
                     const id_last_cargo = yield database_1.default.query(`
            SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `, [id_contrato]);
@@ -811,7 +812,9 @@ class EmpleadoCargosControlador {
            WHERE id_empleado = $1 AND id_departamento = $2
           `, [id_empleado, id_departamento]);
                     if (id_usuario_depa.rows[0] != undefined) {
+                        //console.log('departamento ', id_usuario_depa.rows[0])
                         if (id_usuario_depa.rows[0].principal == true) {
+                            console.log('ingresa if 2');
                             yield database_1.default.query(`
                 UPDATE eu_usuario_departamento 
                 SET id_departamento = $2, principal = $3, personal = $4, administra =$5
@@ -819,10 +822,12 @@ class EmpleadoCargosControlador {
                 `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
                         }
                         else {
+                            //console.log('ingresa else 2',)
                             const id_usuario_depa_principal = yield database_1.default.query(`
                SELECT * FROM eu_usuario_departamento 
                WHERE id_empleado = $1 AND principal = true;
-              `, [id_empleado, id_departamento]);
+              `, [id_empleado]);
+                            //console.log('departamento 2 ', id_usuario_depa_principal.rows[0])
                             if (id_usuario_depa_principal.rows[0] != undefined) {
                                 yield database_1.default.query(`
                 DELETE FROM eu_usuario_departamento WHERE id = $1

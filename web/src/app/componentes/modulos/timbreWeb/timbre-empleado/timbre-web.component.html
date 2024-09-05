@@ -34,24 +34,25 @@
             </div>
         </div>
     </div>
-    <div class="container" style="margin: 0px 0px 10px 0px; padding-top: 10px;">
+    <div class="container" style="margin: 0px 0px 10px 0px; padding-top: 5px;">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm">
             </div>
-            <div class="col-sm-4" *ngIf="getTimbreVirtual()">
-                <button class="timbre btn btn-md btn-block" (click)="VerMensaje()" *ngIf="activar_timbre">
-                    Timbre Virtual
-                </button>
-                <button class="btn btn-md btn-block" (click)="AbrirRegistrarTimbre()" *ngIf="!activar_timbre">
-                    Timbre Virtual
-                </button>
-                <br>
+            <div class="col-sm" *ngIf="getTimbreVirtual()">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <button class="timbre btn btn-md btn-block" (click)="VerMensaje()" *ngIf="activar_timbre">
+                        Timbre Virtual
+                    </button>
+                    <button mat-raised-button id="botonTimbre" (click)="AbrirRegistrarTimbre()" *ngIf="!activar_timbre">
+                        TIMBRE VIRTUAL
+                    </button>
+                </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm">
             </div>
         </div>
     </div>
-    <div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="container" style="padding-top: 5px; padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">LISTA DE TIMBRES</div>
             <div class="table-responsive">

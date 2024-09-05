@@ -27,6 +27,14 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // PARA MANEJAR LA IMAGEN CAPTURADA
   private trigger: Subject<void> = new Subject<void>();
+  camara_: MediaDeviceInfo[] = [];
+  convertida: string | ArrayBuffer | null = null;
+  imagenCamara: any;
+  existe_camara: boolean = false;
+  permisos_camara: boolean = false;
+  indiceDispositivo: number = 0;  // INDICE PARA RASTREAR LA CAMARA ACTUAL
+  seleccionarDispositivo: string | null = null;
+
   public get triggerObservable(): Observable<void> {
     return this.trigger.asObservable();
   }
@@ -57,6 +65,8 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // VARIABLES DE ALMACENAMIENTO DE FECHA Y HORA DEL TIMBRE
   f: Date = new Date();
+  currentTime: string;
+  formato = 'HH:mm:ss';
 
   // ID EMPLEADO QUE INICIO SESION
   id_empl: number;
@@ -67,17 +77,16 @@ export class RegistrarTimbreComponent implements OnInit {
 
   constructor(
     private restTimbres: TimbresService,
+    public ventana: TimbreWebComponent, // VARIABLE DE USO DE VENTANA DE DIALOGO
     public restP: ParametrosService,
     public restE: EmpleadoService,
     public restU: EmpleadoUbicacionService,
     public restF: FuncionesService,
-    public ventana: TimbreWebComponent, // VARIABLE DE USO DE VENTANA DE DIÁLOGO
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  currentTime: string;
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
@@ -86,7 +95,6 @@ export class RegistrarTimbreComponent implements OnInit {
     this.VerificarCamara();
   }
 
-  formato = 'HH:mm:ss';
   // METODO PARA FORMATEAR LA HORA
   private FormatearHora(date: Date): string {
     const hours = date.getHours();
@@ -131,17 +139,16 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // VALIDAR EXISTENCIA DE CAMARA
-  existe_camara: boolean = false;
-  permisos_camara: boolean = false;
   async VerificarCamara(): Promise<void> {
     try {
       const dispositivos = await navigator.mediaDevices.enumerateDevices();
-      const camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
-      this.existe_camara = camara_.length > 0;
+      this.camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
+      this.existe_camara = this.camara_.length > 0;
       if (this.existe_camara) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: true });
           this.permisos_camara = true;
+          this.seleccionarDispositivo = this.camara_[0].deviceId;
           stream.getTracks().forEach(track => track.stop());
         } catch (err) {
           this.permisos_camara = false;
@@ -152,9 +159,16 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
+  // METODO PARA SELECCIONAR ENTRE LAS CAMARA EXISTENTES
+  SeleccionarCamara(): void {
+    if (this.camara_.length > 1) {
+      // CAMBIAR AL SIGUIENTE ÍNDICE DE LA LISTA DE DISPOSITIVOS
+      this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
+      this.seleccionarDispositivo = this.camara_[this.indiceDispositivo].deviceId;
+    }
+  }
+
   // METOOD PARA VOLTEAR LA IMAGEN HORIZONTALMENTE
-  convertida: string | ArrayBuffer | null = null;
-  flippedImage: any;
   VoltearImagen(src: any) {
     const img = new Image();
     img.onload = () => {
@@ -167,11 +181,10 @@ export class RegistrarTimbreComponent implements OnInit {
         ctx.scale(-1, 1); // APLICA LA ESCALA NEGATIVA
         ctx.drawImage(img, 0, 0); // DIBUJA LA IMAGEN EN EL CANVAS
         const flippedImage = canvas.toDataURL();
-        this.flippedImage = flippedImage;
+        this.imagenCamara = flippedImage;
         // CONVERTIR A BASE64 CON CALIDAD REDUCIDA
         const quality = 0.9; // AJUSTA LA CALIDAD SEGUN SEA NECESARIO (0.0 - 1.0)
         this.convertida = canvas.toDataURL('image/jpeg', quality);
-        //console.log('convertida ', this.convertida)
       } else {
         this.toastr.warning(
           'Ups!!! algo salio mal.', 'Intente nuevamente.', {
@@ -290,11 +303,11 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR DATOS DEL TIMBRE SEGUN LA OPCION INGRESADA
-  accionF: string = '';
+  ver_informacion: boolean = false;
   teclaFuncionF: number;
   asistencia: string = '';
   fecha_hora: any;
-  ver_informacion: boolean = false;
+  accionF: string = '';
   AlmacenarDatos(opcion: number) {
     this.boton_abierto = false;
     switch (opcion) {
@@ -406,7 +419,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
       data.id_empleado = this.id_empl;
       this.ventana.BuscarParametro();
-      this.CerrarVentana();
+      this.CerrarProcesos();
       this.toastr.success(res.message)
     }, err => {
       this.toastr.error(err.message)
@@ -415,10 +428,9 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
   GuardarImagen(form: any): void {
-    if (this.flippedImage) {
+    if (this.imagenCamara) {
       this.informacion_timbre.imagen = this.convertida;
     }
-
     this.informacion_timbre.observacion = form.observacionForm;
     if (this.boton_abierto === true) {
       if (form.observacionForm != '' && form.observacionForm != undefined) {
@@ -434,7 +446,6 @@ export class RegistrarTimbreComponent implements OnInit {
     else {
       this.RegistrarTimbre(this.informacion_timbre);
     }
-
   }
 
 
@@ -469,12 +480,10 @@ export class RegistrarTimbreComponent implements OnInit {
   BuscarUbicacion(latitud: any, longitud: any, rango: any) {
     var longitud_ = '';
     var latitud_ = '';
-
     if (longitud && latitud) {
       longitud_ = String(longitud);
       latitud_ = String(latitud)
     }
-
     var datosUbicacion: any = [];
     this.contar = 0;
     let informacion = {
@@ -490,7 +499,7 @@ export class RegistrarTimbreComponent implements OnInit {
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;
           informacion.lng2 = obj.longitud;
-          console.log(informacion.lat1, ' ---------- ', informacion.lng1)
+          //console.log(informacion.lat1, ' ---------- ', informacion.lng1)
           if (informacion.lat1 && informacion.lng1) {
             this.CompararCoordenadas(informacion, obj.descripcion, datosUbicacion);
           }
@@ -527,7 +536,7 @@ export class RegistrarTimbreComponent implements OnInit {
       if (res[0].longitud != null && res[0].latitud != null) {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
-        console.log('lat ', informacion.lat1, ' long ', informacion.lng1, 'res ', res, 'informacion ', informacion)
+        //console.log('lat ', informacion.lat1, ' long ', informacion.lng1, 'res ', res, 'informacion ', informacion)
         if (informacion.lat2 && informacion.lng2) {
           this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
             if (resu[0].verificar === 'ok') {
@@ -585,10 +594,16 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
+  // METODO PARA CERRAR PROCESO
+  CerrarProcesos() {
+    this.ventana.ver_principal = true;
+    this.ventana.ver_timbre = false;
+  }
+
   // METODO PARA CERRAR CAMARA
   CerrarCamara() {
     // METODO PARA CAPTURAR IMAGEN
-    this.flippedImage = null;
+    this.imagenCamara = null;
   }
 
 }

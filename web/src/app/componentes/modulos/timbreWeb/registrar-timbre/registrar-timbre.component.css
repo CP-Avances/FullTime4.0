@@ -46,6 +46,9 @@ mat-form-field {
     text-transform: uppercase;
     font-size: x-small;
     height: 50px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
 }
 
 #botonTimbre {
@@ -122,9 +125,10 @@ webcam video {
     gap: 40px;
 }
 
-.gray-button {
-    width: 45px;
-    height: 45px;
+.gray-button,
+.elegir-button {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     color: white;
     border: none;
@@ -132,15 +136,20 @@ webcam video {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .gray-button {
     background-color: gray;
 }
 
+.elegir-button {
+    background-color: gray;
+}
+
 /* EFECTOS AL PRESIONAR EL BOTON */
-.gray-button:hover {
+.gray-button:hover,
+.elegir-button:hover {
     opacity: 0.8;
 }
 
@@ -151,7 +160,6 @@ webcam video {
 .card-span {
     width: 300px;
     display: inline-block;
-    /* Permite el control de dimensiones y aplicar padding */
     padding: 5px;
     margin: 5px;
     border: 1px solid #ccc;
@@ -166,4 +174,10 @@ webcam video {
 label {
     padding-top: 2px;
     font-weight: bolder;
+}
+
+.camera-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }

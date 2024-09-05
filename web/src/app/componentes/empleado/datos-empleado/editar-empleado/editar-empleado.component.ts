@@ -236,12 +236,12 @@ export class EditarEmpleadoComponent implements OnInit {
       ip: this.ip,
     };
 
-    // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
+    // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOLA VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
     if (this.contador === 0) {
       this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(
         (response: any) => {
           if (response.message === 'Registro actualizado.') {
-            this.ActualizarUser(form3, form1);
+            this.ActualizarUser(form3, form1, form2);
           }
         },
         error => {
@@ -252,19 +252,24 @@ export class EditarEmpleadoComponent implements OnInit {
       );
     }
     else {
-      this.ActualizarUser(form3, form1);
+      this.ActualizarUser(form3, form1, form2);
     }
   }
 
   // METODO PARA ACTUALIZAR INFORMACION DE USUARIO
   contador: number = 0;
-  ActualizarUser(form3: any, form1: any) {
+  ActualizarUser(form3: any, form1: any, form2: any) {
+    let estado_user: boolean = false;
+    if (form2.estadoForm === 1) {
+      estado_user = true;
+    }
     this.contador = 0;
     let dataUser = {
       id_empleado: this.idEmpleado,
       contrasena: this.usuario[0].contrasena,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
+      estado: estado_user,
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -280,16 +285,18 @@ export class EditarEmpleadoComponent implements OnInit {
           timeOut: 6000,
         });
         this.ActualizarCodigo(form1.codigoForm);
-        this.Navegar(form3);
+        this.Navegar(form3, estado_user);
         this.contador = 0;
       }
     });
   }
 
   // METODO PARA VALIDAR NAVEGABILIDAD
-  Navegar(form3: any) {
+  Navegar(form3: any, estado: any) {
     if (this.idEmpleado === this.empleado_inicia) {
-      if (form3.userForm != this.usuario[0].usuario || form3.rolForm != this.usuario[0].id_rol) {
+      if (form3.userForm != this.usuario[0].usuario || form3.rolForm != this.usuario[0].id_rol
+        || estado != this.usuario[0].estado
+      ) {
         this.ventana.close(false);
         this.loginService.logout();
       }
