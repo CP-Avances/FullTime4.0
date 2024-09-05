@@ -170,7 +170,19 @@ export class RegistrarTimbreComponent implements OnInit {
       this.existe_camara = camaras.length > 0;
 
       if (this.existe_camara) {
+
+        camaras.forEach(camara => {
+          const label = camara.label.toLowerCase();
+          if (label.includes('front') || label.includes('user')) {
+            this.camaraFrontal = camara;
+          } else if (label.includes('back') || label.includes('environment')) {
+            this.camaraTrasera = camara;
+          }
+        });
+
+
         await this.VerificarPermisosCamara();
+
       } else {
         console.warn('No se encontraron cámaras.');
       }
@@ -187,8 +199,8 @@ export class RegistrarTimbreComponent implements OnInit {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       this.permisos_camara = true;
 
-      // Seleccionar la primera cámara disponible
-      this.seleccionarDispositivo = this.camara_[0].deviceId;
+      // Si se detecta alguna cámara, seleccionar una por defecto
+      this.seleccionarDispositivo = this.camaraFrontal?.deviceId || this.camaraTrasera?.deviceId || '';
 
       // Detener el stream después de verificar el acceso
       stream.getTracks().forEach(track => track.stop());
@@ -200,28 +212,22 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
 
-
+  camaraFrontal: MediaDeviceInfo | null = null;
+  camaraTrasera: MediaDeviceInfo | null = null;
   mostrarWebcam = true; // Controla la visualización del componente webcam
   videoOptions: MediaTrackConstraints = {
     deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
   };
 
-  // MÉTODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
-  ver: any = '';
+  // METODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
   SeleccionarCamara(): void {
-    this.ver = 'ingresa'
-    if (this.camara_ && this.camara_.length > 1) {
-      // Aumentar el índice y utilizar el módulo para alternar en caso de que sea el último dispositivo
-      this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
+    if (this.camaraFrontal && this.camaraTrasera) {
+      // Alternar entre cámara frontal y trasera
+      this.seleccionarDispositivo = this.seleccionarDispositivo === this.camaraFrontal.deviceId
+        ? this.camaraTrasera.deviceId
+        : this.camaraFrontal.deviceId;
 
-      // Seleccionar el nuevo dispositivo
-      this.seleccionarDispositivo = this.camara_[this.indiceDispositivo].deviceId;
-
-      // Forzar una nueva referencia en videoOptions para que Angular detecte el cambio
-      this.videoOptions = { deviceId: { exact: this.seleccionarDispositivo } };
-      this.ver = this.seleccionarDispositivo;
-
-
+      // Forzar la recreación del componente 'webcam'
       this.mostrarWebcam = false;
       setTimeout(() => {
         this.videoOptions = {
@@ -229,15 +235,15 @@ export class RegistrarTimbreComponent implements OnInit {
         };
         this.mostrarWebcam = true;
       }, 0);
-      // Imprimir el label de la cámara seleccionada
-      const labelCamaraSeleccionada = this.camara_[this.indiceDispositivo].label || 'Cámara sin nombre';
-      alert(labelCamaraSeleccionada);
-      console.log(`Cambiando a la cámara ${this.indiceDispositivo + 1} de ${this.camara_.length}: ${this.seleccionarDispositivo}`);
 
-    } else if (this.camara_ && this.camara_.length === 1) {
-      console.log('Solo hay una cámara disponible, no se puede alternar.');
+      // Imprimir el label de la cámara seleccionada
+      const camaraSeleccionada = this.seleccionarDispositivo === this.camaraFrontal?.deviceId
+        ? 'Cámara Frontal'
+        : 'Cámara Trasera';
+      console.log(`Cambiando a: ${camaraSeleccionada}`);
+      alert(`Cambiando a: ${camaraSeleccionada}`)
     } else {
-      console.warn('No hay cámaras disponibles para seleccionar.');
+      console.warn('No hay suficientes cámaras para alternar.');
     }
   }
 
