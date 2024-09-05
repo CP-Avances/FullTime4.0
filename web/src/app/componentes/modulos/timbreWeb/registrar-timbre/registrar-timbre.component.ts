@@ -220,7 +220,7 @@ export class RegistrarTimbreComponent implements OnInit {
       // Forzar una nueva referencia en videoOptions para que Angular detecte el cambio
       this.videoOptions = { deviceId: { exact: this.seleccionarDispositivo } };
       this.ver = this.seleccionarDispositivo;
-      alert(this.seleccionarDispositivo);
+
 
       this.mostrarWebcam = false;
       setTimeout(() => {
@@ -229,6 +229,9 @@ export class RegistrarTimbreComponent implements OnInit {
         };
         this.mostrarWebcam = true;
       }, 0);
+      // Imprimir el label de la cámara seleccionada
+      const labelCamaraSeleccionada = this.camara_[this.indiceDispositivo].label || 'Cámara sin nombre';
+      alert(labelCamaraSeleccionada);
       console.log(`Cambiando a la cámara ${this.indiceDispositivo + 1} de ${this.camara_.length}: ${this.seleccionarDispositivo}`);
 
     } else if (this.camara_ && this.camara_.length === 1) {
