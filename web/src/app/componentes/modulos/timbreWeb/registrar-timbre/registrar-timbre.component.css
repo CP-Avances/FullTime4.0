@@ -46,6 +46,9 @@ mat-form-field {
     text-transform: uppercase;
     font-size: x-small;
     height: 50px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
 }
 
 #botonTimbre {

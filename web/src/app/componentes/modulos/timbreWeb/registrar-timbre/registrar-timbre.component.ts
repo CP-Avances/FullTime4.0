@@ -401,7 +401,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
       data.id_empleado = this.id_empl;
       this.ventana.BuscarParametro();
-      this.CerrarVentana();
+      this.CerrarProcesos();
       this.toastr.success(res.message)
     }, err => {
       this.toastr.error(err.message)
@@ -578,6 +578,12 @@ export class RegistrarTimbreComponent implements OnInit {
       this.ver_informacion = false;
       this.ver_camara = false;
     }
+  }
+
+  // METODO PARA CERRAR PROCESO
+  CerrarProcesos() {
+    this.ventana.ver_principal = true;
+    this.ventana.ver_timbre = false;
   }
 
   // METODO PARA CERRAR CAMARA

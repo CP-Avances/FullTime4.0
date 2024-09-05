@@ -67,7 +67,7 @@ export class UsuarioService {
   }
 
   // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS     **USADO
-  BuscarDispositivoMovill() {
+  BuscarDispositivoMovil() {
     return this.http.get<any>(`${environment.url}/usuarios/registro-dispositivos`);
   }
 
