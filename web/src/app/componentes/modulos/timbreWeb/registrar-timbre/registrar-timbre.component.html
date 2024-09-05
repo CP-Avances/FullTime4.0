@@ -81,7 +81,7 @@
 
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-hand-o-right"></i>
-                    Tipo timbre:
+                    Tipo timbre: {{ver}}
                 </label>
                 {{asistencia}}
             </span>
@@ -111,8 +111,7 @@
         <div class="col-md">
             <div *ngIf="ver_camara" class="camara">
                 <div class="webcam-container" *ngIf="!imagenCamara">
-                    <webcam [height]="300" [width]="300" [trigger]="triggerObservable"
-                        [videoOptions]="{ deviceId: { exact: seleccionarDispositivo || ''} }"
+                    <webcam [height]="300" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
                         (imageCapture)="handleImage($event)">
                     </webcam>
                 </div>
