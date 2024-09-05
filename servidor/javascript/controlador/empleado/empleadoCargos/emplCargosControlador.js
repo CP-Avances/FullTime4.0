@@ -790,6 +790,7 @@ class EmpleadoCargosControlador {
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
+                    //Optener el ultimo cargo
                     const id_last_cargo = yield database_1.default.query(`
            SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `, [id_contrato]);

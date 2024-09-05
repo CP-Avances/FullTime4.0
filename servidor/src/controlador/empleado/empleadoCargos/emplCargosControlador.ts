@@ -909,6 +909,7 @@ class EmpleadoCargosControlador {
           admin_dep = true;
         }
 
+        //Optener el ultimo cargo
         const id_last_cargo = await pool.query(
           `
            SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
