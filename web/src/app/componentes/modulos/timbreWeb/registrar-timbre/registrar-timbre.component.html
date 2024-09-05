@@ -110,7 +110,7 @@
         <!--  ******************  USO DE LA CAMARA  ********************  -->
         <div class="col-md">
             <div *ngIf="ver_camara" class="camara">
-                <div class="webcam-container" *ngIf="!imagenCamara">
+                <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
                     <webcam [height]="300" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
                         (imageCapture)="handleImage($event)">
                     </webcam>
