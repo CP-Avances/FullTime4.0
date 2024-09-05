@@ -199,15 +199,17 @@ export class RegistrarTimbreComponent implements OnInit {
     }
   }
 
+
+
+  mostrarWebcam = true; // Controla la visualización del componente webcam
   videoOptions: MediaTrackConstraints = {
-    deviceId: { exact: this.seleccionarDispositivo || '' }
+    deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
   };
 
   // MÉTODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
   ver: any = '';
   SeleccionarCamara(): void {
     this.ver = 'ingresa'
-    this.CerrarCamara();
     if (this.camara_ && this.camara_.length > 1) {
       // Aumentar el índice y utilizar el módulo para alternar en caso de que sea el último dispositivo
       this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
@@ -219,6 +221,14 @@ export class RegistrarTimbreComponent implements OnInit {
       this.videoOptions = { deviceId: { exact: this.seleccionarDispositivo } };
       this.ver = this.seleccionarDispositivo;
       alert(this.seleccionarDispositivo);
+
+      this.mostrarWebcam = false;
+      setTimeout(() => {
+        this.videoOptions = {
+          deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
+        };
+        this.mostrarWebcam = true;
+      }, 0);
       console.log(`Cambiando a la cámara ${this.indiceDispositivo + 1} de ${this.camara_.length}: ${this.seleccionarDispositivo}`);
 
     } else if (this.camara_ && this.camara_.length === 1) {
