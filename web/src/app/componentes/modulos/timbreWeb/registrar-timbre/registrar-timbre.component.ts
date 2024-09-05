@@ -204,7 +204,9 @@ export class RegistrarTimbreComponent implements OnInit {
   };
 
   // MÉTODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
+  ver: any = '';
   SeleccionarCamara(): void {
+    this.ver = 'ingresa'
     if (this.camara_ && this.camara_.length > 1) {
       // Aumentar el índice y utilizar el módulo para alternar en caso de que sea el último dispositivo
       this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
@@ -214,7 +216,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
       // Forzar una nueva referencia en videoOptions para que Angular detecte el cambio
       this.videoOptions = { deviceId: { exact: this.seleccionarDispositivo } };
-
+      this.ver = this.seleccionarDispositivo;
       alert(this.seleccionarDispositivo);
       console.log(`Cambiando a la cámara ${this.indiceDispositivo + 1} de ${this.camara_.length}: ${this.seleccionarDispositivo}`);
 
