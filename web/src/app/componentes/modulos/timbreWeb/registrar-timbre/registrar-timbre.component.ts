@@ -139,7 +139,7 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   // VALIDAR EXISTENCIA DE CAMARA
-  async VerificarCamara(): Promise<void> {
+ /* async VerificarCamara(): Promise<void> {
     try {
       const dispositivos = await navigator.mediaDevices.enumerateDevices();
       this.camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
@@ -157,16 +157,64 @@ export class RegistrarTimbreComponent implements OnInit {
     } catch (err) {
       this.existe_camara = false;
     }
-  }
+  }*/
 
-  // METODO PARA SELECCIONAR ENTRE LAS CAMARA EXISTENTES
-  SeleccionarCamara(): void {
-    if (this.camara_.length > 1) {
-      // CAMBIAR AL SIGUIENTE ÍNDICE DE LA LISTA DE DISPOSITIVOS
-      this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
-      this.seleccionarDispositivo = this.camara_[this.indiceDispositivo].deviceId;
+    async VerificarCamara(): Promise<void> {
+      try {
+        // Obtener todos los dispositivos
+        const dispositivos = await navigator.mediaDevices.enumerateDevices();
+        
+        // Filtrar para encontrar las cámaras
+        const camaras = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
+        this.camara_ = camaras;
+        this.existe_camara = camaras.length > 0;
+    
+        if (this.existe_camara) {
+          await this.VerificarPermisosCamara();
+        } else {
+          console.warn('No se encontraron cámaras.');
+        }
+      } catch (error) {
+        console.error('Error al enumerar dispositivos:', error);
+        this.existe_camara = false;
+      }
     }
-  }
+    
+    // MÉTODO SEPARADO PARA VERIFICAR LOS PERMISOS DE LA CÁMARA
+    async VerificarPermisosCamara(): Promise<void> {
+      try {
+        // Intentar obtener acceso a la cámara
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        this.permisos_camara = true;
+    
+        // Seleccionar la primera cámara disponible
+        this.seleccionarDispositivo = this.camara_[0].deviceId;
+    
+        // Detener el stream después de verificar el acceso
+        stream.getTracks().forEach(track => track.stop());
+        console.log('Permisos de cámara obtenidos correctamente.');
+      } catch (error) {
+        console.error('No se pudieron obtener permisos para la cámara:', error);
+        this.permisos_camara = false;
+      }
+    }
+    
+    // MÉTODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
+    SeleccionarCamara(): void {
+      if (this.camara_ && this.camara_.length > 1) {
+        // Aumentar el índice y utilizar el módulo para alternar en caso de que sea el último dispositivo
+        this.indiceDispositivo = (this.indiceDispositivo + 1) % this.camara_.length;
+    
+        // Seleccionar el nuevo dispositivo
+        this.seleccionarDispositivo = this.camara_[this.indiceDispositivo].deviceId;
+    
+        console.log(`Cambiando a la cámara ${this.indiceDispositivo + 1} de ${this.camara_.length}: ${this.seleccionarDispositivo}`);
+      } else if (this.camara_ && this.camara_.length === 1) {
+        console.log('Solo hay una cámara disponible, no se puede alternar.');
+      } else {
+        console.warn('No hay cámaras disponibles para seleccionar.');
+      }
+    }
 
   // METOOD PARA VOLTEAR LA IMAGEN HORIZONTALMENTE
   VoltearImagen(src: any) {
@@ -592,6 +640,7 @@ export class RegistrarTimbreComponent implements OnInit {
       this.ver_informacion = false;
       this.ver_camara = false;
     }
+    this.CerrarCamara();
   }
 
   // METODO PARA CERRAR PROCESO
