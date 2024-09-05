@@ -548,11 +548,11 @@ class DepartamentoControlador {
                         }
                         if (NOMBRE == undefined) {
                             data.nombre = 'No registrado';
-                            data.observacion = 'Departamento ' + data.observacion;
+                            data.observacion = 'Departamento no registrado';
                         }
                         if (SUCURSAL == undefined) {
                             data.sucursal = 'No registrado';
-                            data.observacion = 'Sucursal ' + data.observacion;
+                            data.observacion = 'Sucursal no registrado';
                         }
                         listDepartamentos.push(data);
                     }
