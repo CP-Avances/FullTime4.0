@@ -327,6 +327,7 @@ export class ValidacionesService {
       });
     });
     seleccionados[0].empleados = datos;
+    console.log("ver empleados web ", seleccionados )
     return seleccionados;
   }
 

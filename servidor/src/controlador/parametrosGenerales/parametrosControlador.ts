@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import { BuscarFecha , BuscarHora } from '../../libs/settingsMail';
+import { BuscarFecha, BuscarHora } from '../../libs/settingsMail';
 
 class ParametrosControlador {
 
@@ -198,7 +198,7 @@ class ParametrosControlador {
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro exitoso.' });
-            
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -232,6 +232,7 @@ class ParametrosControlador {
                 `
                 , [lat1, lng1, lat2, lng2, valor]);
 
+            console.log("ver datos body de  CompararCoordenadas: ", req.body);
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
             console.log('error --> ', error)
@@ -243,7 +244,7 @@ class ParametrosControlador {
 
     //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
 
-    public async BuscarFechasHoras(req: Request,res: Response): Promise<Response> {
+    public async BuscarFechasHoras(req: Request, res: Response): Promise<Response> {
         try {
             let formato_fecha = await BuscarFecha();
             let formato_hora = await BuscarHora();
@@ -257,7 +258,7 @@ class ParametrosControlador {
             return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
         }
     };
-  
+
 
 }
 
