@@ -106,6 +106,13 @@
                 </label>
                 {{latitud}}
             </span>
+
+            <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
+                <label><i id="ver" class="fa fa-location-arrow"></i>
+                    Cámara en uso:
+                </label>
+                {{camaraSeleccionada}}
+            </span>
         </div>
         <!--  ******************  USO DE LA CAMARA  ********************  -->
         <div class="col-md">
@@ -119,7 +126,7 @@
                     <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
                         <mat-icon>photo_camera</mat-icon>
                     </button>
-                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 0"
+                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 1"
                         (click)="SeleccionarCamara()">
                         <mat-icon>loop</mat-icon>
                     </button>
