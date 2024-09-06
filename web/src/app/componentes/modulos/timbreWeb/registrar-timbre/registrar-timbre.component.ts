@@ -34,6 +34,12 @@ export class RegistrarTimbreComponent implements OnInit {
   permisos_camara: boolean = false;
   indiceDispositivo: number = 0;  // INDICE PARA RASTREAR LA CAMARA ACTUAL
   seleccionarDispositivo: string | null = null;
+  camaraFrontal: MediaDeviceInfo | null = null;
+  camaraTrasera: MediaDeviceInfo | null = null;
+  mostrarWebcam = true; // CONTROLA LA VISUALIZACION DEL COMPONENTE WEBCAM
+  videoOptions: MediaTrackConstraints = {
+    deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
+  };
 
   public get triggerObservable(): Observable<void> {
     return this.trigger.asObservable();
@@ -138,39 +144,16 @@ export class RegistrarTimbreComponent implements OnInit {
     this.VoltearImagen(webcamImage.imageAsDataUrl)
   }
 
-  // VALIDAR EXISTENCIA DE CAMARA
-  /* async VerificarCamara(): Promise<void> {
-     try {
-       const dispositivos = await navigator.mediaDevices.enumerateDevices();
-       this.camara_ = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
-       this.existe_camara = this.camara_.length > 0;
-       if (this.existe_camara) {
-         try {
-           const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-           this.permisos_camara = true;
-           this.seleccionarDispositivo = this.camara_[0].deviceId;
-           stream.getTracks().forEach(track => track.stop());
-         } catch (err) {
-           this.permisos_camara = false;
-         }
-       }
-     } catch (err) {
-       this.existe_camara = false;
-     }
-   }*/
-
   async VerificarCamara(): Promise<void> {
     try {
-      // Obtener todos los dispositivos
+      // OBTENER TODOS LOS DISPOSITIVOS
       const dispositivos = await navigator.mediaDevices.enumerateDevices();
-
-      // Filtrar para encontrar las cámaras
+      // FILTRAR PARA ENCONTRAR LAS CAMARAS
       const camaras = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
       this.camara_ = camaras;
       this.existe_camara = camaras.length > 0;
-
       if (this.existe_camara) {
-
+        await this.VerificarPermisosCamara();
         camaras.forEach(camara => {
           const label = camara.label.toLowerCase();
           if (label.includes('front') || label.includes('user') || label.includes('frontal')) {
@@ -179,55 +162,36 @@ export class RegistrarTimbreComponent implements OnInit {
             this.camaraTrasera = camara;
           }
         });
-
-
-        await this.VerificarPermisosCamara();
-
       } else {
-        console.warn('No se encontraron cámaras.');
       }
     } catch (error) {
-      console.error('Error al enumerar dispositivos:', error);
       this.existe_camara = false;
     }
   }
 
-  // MÉTODO SEPARADO PARA VERIFICAR LOS PERMISOS DE LA CÁMARA
+  // METODO SEPARADO PARA VERIFICAR LOS PERMISOS DE LA CAMARA
   async VerificarPermisosCamara(): Promise<void> {
     try {
-      // Intentar obtener acceso a la cámara
+      // INTENTAR OBTENER ACCESO A LA CAMARA
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       this.permisos_camara = true;
-
-      // Si se detecta alguna cámara, seleccionar una por defecto
+      // SI SE DETECTA ALGUNA CAMARA, SELECCIONAR UNA POR DEFECTO
       this.seleccionarDispositivo = this.camaraFrontal?.deviceId || this.camaraTrasera?.deviceId || '';
-
-      // Detener el stream después de verificar el acceso
+      // DETENER EL STREAM DESPUES DE VERIFICAR EL ACCESO
       stream.getTracks().forEach(track => track.stop());
-      console.log('Permisos de cámara obtenidos correctamente.');
     } catch (error) {
-      console.error('No se pudieron obtener permisos para la cámara:', error);
       this.permisos_camara = false;
     }
   }
 
-
-  camaraFrontal: MediaDeviceInfo | null = null;
-  camaraTrasera: MediaDeviceInfo | null = null;
-  mostrarWebcam = true; // Controla la visualización del componente webcam
-  videoOptions: MediaTrackConstraints = {
-    deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
-  };
-
-  // METODO PARA SELECCIONAR ENTRE LAS CÁMARAS EXISTENTES
+  // METODO PARA SELECCIONAR ENTRE LAS CAMARAS EXISTENTES
   SeleccionarCamara(): void {
     if (this.camaraFrontal && this.camaraTrasera) {
-      // Alternar entre cámara frontal y trasera
+      // ALTERNAR ENTRE CAMARA FRONTAL Y TRASERA
       this.seleccionarDispositivo = this.seleccionarDispositivo === this.camaraFrontal.deviceId
         ? this.camaraTrasera.deviceId
         : this.camaraFrontal.deviceId;
-
-      // Forzar la recreación del componente 'webcam'
+      // FORZAR LA RECREACION DEL COMPONENTE WEBCAM
       this.mostrarWebcam = false;
       setTimeout(() => {
         this.videoOptions = {
@@ -235,15 +199,13 @@ export class RegistrarTimbreComponent implements OnInit {
         };
         this.mostrarWebcam = true;
       }, 0);
-
-      // Imprimir el label de la cámara seleccionada
+      // IMPRIMIR EL LABEL DE LA CAMARA SELECCIONADA
       const camaraSeleccionada = this.seleccionarDispositivo === this.camaraFrontal?.deviceId
         ? 'Cámara Frontal'
         : 'Cámara Trasera';
-      console.log(`Cambiando a: ${camaraSeleccionada}`);
-      alert(`Cambiando a: ${camaraSeleccionada}`)
+      //console.log(`Cambiando a: ${camaraSeleccionada}`);
     } else {
-      console.warn('No hay suficientes cámaras para alternar.');
+      //console.warn('No hay suficientes cámaras para alternar.');
     }
   }
 
