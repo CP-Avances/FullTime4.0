@@ -2874,7 +2874,7 @@ class EmpleadoControlador {
 
   public async getListaEmpleados(req: Request, res: Response): Promise<Response> {
     try {
-      const response: QueryResult = await pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname, name_cargo, name_suc, name_dep, name_regimen  FROM informacion_general ORDER BY fullname ASC');
+      const response: QueryResult = await pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname, name_cargo as cargo, name_suc as sucursal, name_dep as departamento, name_regimen as regimen  FROM informacion_general ORDER BY fullname ASC');
       const empleados: any[] = response.rows;
       console.log(empleados);
 
