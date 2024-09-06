@@ -106,6 +106,13 @@
                 </label>
                 {{latitud}}
             </span>
+
+            <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
+                <label><i id="ver" class="fa fa-location-arrow"></i>
+                    Cámara en uso:
+                </label>
+                {{camaraSeleccionada}}
+            </span>
         </div>
         <!--  ******************  USO DE LA CAMARA  ********************  -->
         <div class="col-md">

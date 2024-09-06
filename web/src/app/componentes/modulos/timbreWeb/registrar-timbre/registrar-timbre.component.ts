@@ -37,6 +37,7 @@ export class RegistrarTimbreComponent implements OnInit {
   camaraFrontal: MediaDeviceInfo | null = null;
   camaraTrasera: MediaDeviceInfo | null = null;
   mostrarWebcam = true; // CONTROLA LA VISUALIZACION DEL COMPONENTE WEBCAM
+  camaraSeleccionada: any = '';
   videoOptions: MediaTrackConstraints = {
     deviceId: this.seleccionarDispositivo ? { exact: this.seleccionarDispositivo } : undefined
   };
@@ -200,7 +201,7 @@ export class RegistrarTimbreComponent implements OnInit {
         this.mostrarWebcam = true;
       }, 0);
       // IMPRIMIR EL LABEL DE LA CAMARA SELECCIONADA
-      const camaraSeleccionada = this.seleccionarDispositivo === this.camaraFrontal?.deviceId
+      this.camaraSeleccionada = this.seleccionarDispositivo === this.camaraFrontal?.deviceId
         ? 'Cámara Frontal'
         : 'Cámara Trasera';
       //console.log(`Cambiando a: ${camaraSeleccionada}`);
