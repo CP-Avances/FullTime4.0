@@ -121,6 +121,9 @@ table {
     width: 100%;
     font-size: 13px;
 }
+.th_cargo{
+    background-color: rgb(172, 220, 234) !important;
+}
 
 td {
     padding-top: 10px;
