@@ -177,53 +177,11 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
-
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: obj.nombre + ' ' + obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_ // TIPO DE CARGO
-      })
-    })
-
-    this.OmitirDuplicados();
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
@@ -252,57 +210,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     }
 
     this.mostrarTablas = true;
-  }
-
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
@@ -544,132 +451,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     }
   }
 
-  // MODELO PARA MOSTRAR DATOS DE SUCURSALES
-  ModelarSucursal(id: number) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionSuc.selected.find((selec: any) => {
-          if (empl.id_suc === selec.id) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_suc === id) {
-          usuarios.push(empl)
-        }
-      })
-    }
-
-    if (usuarios.length === 1) {
-      this.RegistrarPermiso(usuarios[0]);
-    } else {
-      this.RegistrarMultiple(usuarios);
-    }
-  }
-
-  // MODELO PARA MOSTRAR DATOS DE REGIMEN
-  ModelarRegimen(id: number, sucursal: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find((selec: any) => {
-          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_regimen === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-
-    if (usuarios.length === 1) {
-      this.RegistrarPermiso(usuarios[0]);
-    } else {
-      this.RegistrarMultiple(usuarios);
-    }
-  }
-
-  // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number, sucursal: number) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find((selec: any) => {
-          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    if (usuarios.length === 1) {
-      this.RegistrarPermiso(usuarios[0]);
-    } else {
-      this.RegistrarMultiple(usuarios);
-    }
-  }
-
-  // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number, sucursal: number) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find((selec: any) => {
-          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_depa === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-
-    if (usuarios.length === 1) {
-      this.RegistrarPermiso(usuarios[0]);
-    } else {
-      this.RegistrarMultiple(usuarios);
-    }
-  }
-
-  // METODO PARA MOSTRAR DATOS DE EMPLEADO
-  ModelarEmpleados() {
-    let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find((obj1: any) => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-
-    if (respuesta.length === 1) {
-      this.RegistrarPermiso(respuesta[0]);
-    } else {
-      this.RegistrarMultiple(respuesta);
-    }
-  }
-
-
   /** ************************************************************************************** **
    ** **                       METODOS DE REGISTRO DE PERMISOS                            ** **
    ** ************************************************************************************** **/
@@ -716,20 +497,26 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(valor: any) {
+    let usuarios = [];
     if (this.opcion === 's') {
-      this.ModelarSucursal(valor.id);
-    }
-    else if (this.opcion === 'r') {
-      this.ModelarRegimen(valor.id, valor.id_suc);
+      usuarios = this.validar.ModelarSucursal_(this.empleados, this.selectionSuc, valor.id);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(valor.id, valor.id_suc);
+      usuarios = this.validar.ModelarCargo_(this.empleados, this.selectionCarg, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(valor.id, valor.id_suc);
+      usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc);
+    }
+    else if (this.opcion === 'r') {
+      usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc);
     }
     else {
-      this.ModelarEmpleados();
+      usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
+    }
+    if (usuarios.length === 1) {
+      this.RegistrarPermiso(usuarios[0]);
+    } else {
+      this.RegistrarMultiple(usuarios);
     }
   }
 

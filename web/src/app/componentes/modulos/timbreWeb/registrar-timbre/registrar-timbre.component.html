@@ -119,7 +119,7 @@
                     <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
                         <mat-icon>photo_camera</mat-icon>
                     </button>
-                    <button class="elegir-button" *ngIf="!imagenCamara && camaraFrontal && camaraTrasera"
+                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 0"
                         (click)="SeleccionarCamara()">
                         <mat-icon>loop</mat-icon>
                     </button>
