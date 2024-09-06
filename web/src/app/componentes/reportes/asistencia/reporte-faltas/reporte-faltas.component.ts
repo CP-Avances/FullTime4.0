@@ -260,6 +260,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             'Seleccione empleados.'
           );
         seleccionados = this.validar.ModelarEmpleados(this.empleados, this.selectionEmp);
+        console.log("ver seleccionado", seleccionados)
         break;
       default:
         this.toastr.error(
@@ -395,8 +396,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let c = 0;
     data.forEach((selec: any) => {
       let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length })
-      let reg = this.validar.SumarRegistros(arr_reg);
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let reg = this.validar.SumarRegistros(arr_reg);
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
       let opcion = selec.nombre;

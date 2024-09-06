@@ -7,6 +7,7 @@ class FaltasControlador {
     public async ReporteFaltas(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
+        console.log("ver datos, ", req.body);
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.faltas = await BuscarFaltas(desde, hasta, o.id);

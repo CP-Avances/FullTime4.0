@@ -249,6 +249,7 @@ class ParametrosControlador {
                 `
                 , [lat1, lng1, lat2, lng2, valor]);
 
+            console.log("ver datos body de  CompararCoordenadas: ", req.body);
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
             console.log('error --> ', error)
