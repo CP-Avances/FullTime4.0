@@ -404,7 +404,7 @@ export class ValidacionesService {
     let arreglo_procesar: any = [];
     informacion.forEach((obj: any) => {
       arreglo_procesar.push({
-        id: obj.id,
+        id: obj.id ?? obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
         nombre: obj.nombre,
         apellido: obj.apellido,
         codigo: obj.codigo,
@@ -422,12 +422,126 @@ export class ValidacionesService {
         regimen: obj.name_regimen,
         departamento: obj.name_dep,
         cargo: obj.name_cargo,
-        hora_trabaja: obj.hora_trabaja
+        hora_trabaja: obj.hora_trabaja,
+        rol: obj.name_rol,
+        userid: obj.userid,
+        app_habilita: obj.app_habilita,
+        web_habilita: obj.web_habilita,
+        comunicado_mail: obj.comunicado_mail,
+        comunicado_noti: obj.comunicado_notificacion
       })
     })
     return arreglo_procesar;
   }
 
+
+  /** ********************************************************************************* **
+   ** **                MODELAMIENTO DE DATOS DE PANTALLAS DEL SISTEMA               ** **
+   ** ********************************************************************************* **/
+
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal_(array_general: any, datos_seleccionados: any, id: any) {
+    let seleccionados: any = [];
+    if (id === 0 || id === undefined) {
+      array_general.forEach((empl: any) => {
+        datos_seleccionados.selected.find((selec: any) => {
+          if (empl.id_suc === selec.id) {
+            seleccionados.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      array_general.forEach((empl: any) => {
+        if (empl.id_suc === id) {
+          seleccionados.push(empl)
+        }
+      })
+    }
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen_(array_general: any, datos_seleccionados: any, id: any, id_sucursal: any) {
+    let seleccionados: any = [];
+    if (id === 0 || id === undefined) {
+      array_general.forEach((empl: any) => {
+        datos_seleccionados.selected.find((selec: any) => {
+          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
+            seleccionados.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      array_general.forEach((empl: any) => {
+        if (empl.id_regimen === id && empl.id_suc === id_sucursal) {
+          seleccionados.push(empl)
+        }
+      })
+    }
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento_(array_general: any, datos_seleccionados: any, id: any, id_sucursal: any) {
+    let seleccionados: any = [];
+    if (id === 0 || id === undefined) {
+      array_general.forEach((empl: any) => {
+        datos_seleccionados.selected.find((selec: any) => {
+          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
+            seleccionados.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      array_general.forEach((empl: any) => {
+        if (empl.id_depa === id && empl.id_suc === id_sucursal) {
+          seleccionados.push(empl)
+        }
+      })
+    }
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo_(array_general: any, datos_seleccionados: any, id: any, id_sucursal: any) {
+    let seleccionados: any = [];
+    if (id === 0 || id === undefined) {
+      array_general.forEach((empl: any) => {
+        datos_seleccionados.selected.find((selec: any) => {
+          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
+            seleccionados.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      array_general.forEach((empl: any) => {
+        if (empl.id_cargo_ === id && empl.id_suc === id_sucursal) {
+          seleccionados.push(empl)
+        }
+      })
+    }
+    return seleccionados;
+  }
+
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados_(array_general: any, datos_seleccionados: any) {
+    let seleccionados: any = [];
+    array_general.forEach((empl: any) => {
+      datos_seleccionados.selected.find((selec: any) => {
+        if (selec.id === empl.id) {
+          seleccionados.push(empl)
+        }
+      })
+    })
+    return seleccionados;
+  }
+
 }
+
+
 
 

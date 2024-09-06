@@ -468,7 +468,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                    *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp.toggle(e) : null"
@@ -478,7 +478,7 @@
                                     <td>{{e.sucursal}}</td>
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
-                                    <td>{{e.nombre}}</td>
+                                    <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td class="justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 2)" id="plan" *ngIf="individual"
                                             class="fa fa-thumbs-down" matSuffix matTooltipPosition="right"
@@ -1004,7 +1004,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados_dh | sucNombre: dh_filtroNombreSuc | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | emplNombre: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
+                                    *ngFor="let e of empleados_dh | sucNombre: dh_filtroNombreSuc | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | nombreCompleto: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp_dh.toggle(e) : null"
@@ -1015,7 +1015,7 @@
                                     <td>{{e.sucursal}}</td>
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
-                                    <td>{{e.nombre}}</td>
+                                    <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td class="d-flex justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 1)" id="plan_dh" *ngIf="individual_dh"
                                             class="fa fa-thumbs-up" matSuffix matTooltipPosition="right"

@@ -96,9 +96,9 @@ export class RegistrarTimbreComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.VerificarCamara();
     this.VerificarFunciones();
     this.BuscarParametros();
-    this.VerificarCamara();
   }
 
   // METODO PARA FORMATEAR LA HORA
@@ -264,7 +264,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.restP.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
-        console.log('parametros ', datos)
+        //console.log('parametros ', datos)
         datos.forEach((p: any) => {
           // id_tipo_parametro PARA RANGO DE UBICACION = 4
           if (p.id_parametro === 4) {

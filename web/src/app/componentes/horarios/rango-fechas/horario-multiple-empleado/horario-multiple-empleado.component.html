@@ -55,7 +55,7 @@
                     </mat-radio-button>
                 </mat-radio-group>
             </form>
-             <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
+            <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
             <form *ngIf="_booleanOptions.bool_reg">
                 <div class="row">
                     <div class="col-md">
@@ -86,7 +86,7 @@
                     </div>
                 </div>
             </form>
-             <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+            <!--  *********************************  FORM PARA CARGOS  ****************************  -->
             <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="row">
                     <div class="col-md">
@@ -166,9 +166,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Nombres</mat-label>
-                                <input matInput placeholder="Buscar"
-                                    (input)="Filtrar(nombre_emp.value, 5)" [formControl]="nombre_emp" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 5)"
+                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por nombre.">
                                     help_outline
@@ -442,7 +441,7 @@
                 <br>
             </div>
 
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+            <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
@@ -552,7 +551,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmp.toggle(e) : null"
@@ -562,7 +561,7 @@
                                 <td>{{e.sucursal}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
-                                <td>{{e.nombre}}</td>
+                                <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td>
                                     <i (click)="PlanificarIndividual(e, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"

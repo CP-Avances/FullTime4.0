@@ -2959,11 +2959,12 @@ class EmpleadoControlador {
         SELECT 
 	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
           moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
-          emC.controlar_asistencia
-        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda
+          emC.controlar_asistencia,  reg.descripcion as regimen
+        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda, ere_cat_regimenes AS reg
         WHERE 
 	        emc.id_empleado = $1 AND
-	        moda.id = emC.id_modalidad_laboral
+	        moda.id = emC.id_modalidad_laboral AND
+			    reg.id = emc.id_regimen
         `, [id_empleado]);
       listaContratos = contratos.rows;
       
@@ -2973,7 +2974,7 @@ class EmpleadoControlador {
           SELECT 
             emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
             emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
-            emC.jefe
+            emC.jefe, emC.estado
           FROM 
             eu_empleado_cargos AS emC, ed_departamentos AS ed, 
             e_sucursales AS su, e_cat_tipo_cargo AS carg

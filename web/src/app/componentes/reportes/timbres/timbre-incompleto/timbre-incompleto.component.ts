@@ -194,6 +194,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
     this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
     this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
+    //console.log('empleados ', this.empleados)
   }
 
   // METODO PARA OBTENER DATOS SEGUN EL ESTADO DEL USUARIO

@@ -14,7 +14,7 @@
                     </mat-radio-button>
                 </mat-radio-group>
             </form>
-             <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+            <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
             <form *ngIf="_booleanOptions.bool_suc">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
@@ -27,7 +27,7 @@
                     </mat-form-field>
                 </div>
             </form>
-             <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
+            <!--  ***********************  FORM PARA REGIMEN LABORAL  **************************  -->
             <form *ngIf="_booleanOptions.bool_reg">
                 <div class="row">
                     <div class="col-md">
@@ -58,7 +58,7 @@
                     </div>
                 </div>
             </form>
-             <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+            <!--  *********************************  FORM PARA CARGOS  ****************************  -->
             <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="row">
                     <div class="col-md">
@@ -364,7 +364,7 @@
                 <br>
             </div>
 
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+            <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
@@ -463,7 +463,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmp.toggle(e) : null"
@@ -473,7 +473,7 @@
                                 <td>{{e.sucursal}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
-                                <td>{{e.nombre}}</td>
+                                <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td class="justify-content-center">
                                     <i (click)="ConfirmarTimbre(e)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
                                         class="fas fa-clock" matSuffix matTooltipPosition="right"

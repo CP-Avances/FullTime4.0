@@ -136,8 +136,8 @@
                                 </mat-checkbox>
                             </th>
                             <th scope="col">Rol</th>
-                            <th scope="col">Departamento</th>
                             <th scope="col">Nombre</th>
+                            <th scope="col">Departamento</th>
                             <th scope="col">Asignaciones</th>
                         </tr>
                     </thead>
@@ -151,18 +151,18 @@
                             </td>
                             <td>
                                 <mat-form-field class="input-tables">
-                                    <input matInput placeholder="Buscar" type="text" [formControl]="departamento">
+                                    <input matInput placeholder="Buscar" type="text" [formControl]="nombre">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables">
-                                    <input matInput placeholder="Buscar" type="text" [formControl]="nombre">
+                                    <input matInput placeholder="Buscar" type="text" [formControl]="departamento">
                                 </mat-form-field>
                             </td>
                             <td></td>
                         </tr>
                         <tr
-                            *ngFor="let u of usuarios | sucRolEmpleado: rol.value | sucNomEmpleado: nombre.value | sucDepEmpleado: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
+                            *ngFor="let u of usuarios | sucRolEmpleado: rol.value | nombreCompleto: nombre.value | sucDepEmpleado: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
                             <td>
                                 <mat-checkbox (click)="$event.stopPropagation()"
                                     (change)="$event ? usuariosSeleccionados.toggle(u) : null"
@@ -170,8 +170,8 @@
                                 </mat-checkbox>
                             </td>
                             <td>{{u.name_rol}}</td>
-                            <td>{{u.name_dep}}</td>
                             <td>{{u.apellido}} {{u.nombre}} </td>
+                            <td>{{u.name_dep}}</td>
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
