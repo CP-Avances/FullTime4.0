@@ -30,6 +30,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { EmpleadoElemento } from '../../../../model/empleado.model';
 
@@ -62,7 +63,6 @@ export class ListaEmpleadosComponent implements OnInit {
   get habilitarHorasExtras(): boolean { return this.funciones.horasExtras; }
 
   // CAMPOS DEL FORMULARIO
-  apellido = new FormControl('', [Validators.minLength(2)]);
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
@@ -105,6 +105,7 @@ export class ListaEmpleadosComponent implements OnInit {
   usuariosCorrectos: number = 0;
 
   constructor(
+    public loginService: LoginService,
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS DE DIÁLOGO
     public router: Router, // VARIABLE DE USO DE PÁGINAS CON URL
@@ -282,44 +283,51 @@ export class ListaEmpleadosComponent implements OnInit {
         data: { opcion: opcion, lista: EmpleadosSeleccionados }
       });
       dialogRef.afterClosed().subscribe(async item => {
-          if (item) {
-            try {
-              const datos = {
-                arrayIdsEmpleados: EmpleadosSeleccionados.map((obj: any) => obj.id),
-                user_name: this.user_name,
-                ip: this.ip
-              }
-
-              let res: { message: string | undefined; } = { message: undefined };
-
-              // INACTIVAR EMPLEADOS
-              if (opcion === 1) {
-                res = await this.rest.DesactivarVariosUsuarios(datos);
-              }
-              // ACTIVAR EMPLEADOS
-              else if (opcion === 2) {
-                res = await this.rest.ActivarVariosUsuarios(datos);
-              }
-              // REACTIVAR EMPLEADOS
-              else if (opcion === 3) {
-                res = await this.rest.ReActivarVariosUsuarios(datos);
-              }
-              this.toastr.success(res.message, '', {
-                timeOut: 6000,
-              });
-              this.GetEmpleados();
-            } catch (error) {
-              this.toastr.error('Error al actualizar usuarios.', '', {
-                timeOut: 6000,
-              });
+        if (item) {
+          try {
+            const datos = {
+              arrayIdsEmpleados: EmpleadosSeleccionados.map((obj: any) => obj.id),
+              user_name: this.user_name,
+              ip: this.ip
             }
-          };
-          this.btnCheckHabilitar = false;
-          this.btnCheckDeshabilitado = false;
-          this.selectionUno.clear();
-          this.selectionDos.clear();
-          EmpleadosSeleccionados = [];
-        });
+
+            let res: { message: string | undefined; } = { message: undefined };
+
+            // INACTIVAR EMPLEADOS
+            if (opcion === 1) {
+              res = await this.rest.DesactivarVariosUsuarios(datos);
+            }
+            // ACTIVAR EMPLEADOS
+            else if (opcion === 2) {
+              res = await this.rest.ActivarVariosUsuarios(datos);
+            }
+            // REACTIVAR EMPLEADOS
+            else if (opcion === 3) {
+              res = await this.rest.ReActivarVariosUsuarios(datos);
+            }
+            this.toastr.success(res.message, '', {
+              timeOut: 6000,
+            });
+            if (res.message === 'Usuarios inhabilitados exitosamente.' && opcion === 1) {
+              const objetoEncontrado = EmpleadosSeleccionados.find((objeto: any) => objeto.id === this.idEmpleado);
+              console.log('verificar ', objetoEncontrado);
+              if (objetoEncontrado) {
+                this.loginService.logout();
+              }
+            }
+            this.GetEmpleados();
+          } catch (error) {
+            this.toastr.error('Error al actualizar usuarios.', '', {
+              timeOut: 6000,
+            });
+          }
+        };
+        this.btnCheckHabilitar = false;
+        this.btnCheckDeshabilitado = false;
+        this.selectionUno.clear();
+        this.selectionDos.clear();
+        EmpleadosSeleccionados = [];
+      });
     }
     else {
       this.toastr.info('No ha seleccionado usuarios.', '', {
@@ -396,8 +404,8 @@ export class ListaEmpleadosComponent implements OnInit {
     }
 
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
-      console.log('empleados', empleados);
-      console.log('desactivados', desactivados);
+      //console.log('empleados', empleados);
+      //console.log('desactivados', desactivados);
       this.ProcesarEmpleados(empleados, desactivados);
     });
   }
@@ -414,7 +422,7 @@ export class ListaEmpleadosComponent implements OnInit {
   FiltrarEmpleados(empleados$: Observable<any>, idsEmpleadosActuales: Set<unknown>): Observable<any> {
     return empleados$.pipe(
       map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.has(empleado.id) || (this.idDepartamentosAcceso.size>0 && !idsEmpleadosActuales.has(empleado.id))
+        this.idUsuariosAcceso.has(empleado.id) || (this.idDepartamentosAcceso.size > 0 && !idsEmpleadosActuales.has(empleado.id))
       ))
     );
   }
@@ -447,7 +455,6 @@ export class ListaEmpleadosComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.apellido.reset();
     this.DataEmpleados = null;
     this.archivoSubido = [];
     this.nameFile = '';
@@ -796,7 +803,7 @@ export class ListaEmpleadosComponent implements OnInit {
     };
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a' , 'Unión de Hecho', ];
+  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Unión de Hecho',];
   GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
   PresentarDataPDFEmpleados(numero: any) {

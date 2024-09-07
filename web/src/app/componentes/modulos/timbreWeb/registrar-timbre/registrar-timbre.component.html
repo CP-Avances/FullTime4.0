@@ -1,5 +1,4 @@
 <div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;">
-
     <div id="titulo">
         <span>
             REGISTRAR TIMBRE
@@ -23,7 +22,7 @@
                 <span>Seleccione una opción para registrar</span>
             </div>
             <div class="row" style="padding-top: 20px;">
-                <div class="col-sm">
+                <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-center">
                         <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(1)">
                             Inicio Jornada Laboral
@@ -40,7 +39,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-sm">
+                <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-center">
                         <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(2)">
                             Fin Jornada Laboral
@@ -107,24 +106,36 @@
                 </label>
                 {{latitud}}
             </span>
+
+            <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
+                <label><i id="ver" class="fa fa-location-arrow"></i>
+                    Cámara en uso:
+                </label>
+                {{camaraSeleccionada}}
+            </span>
         </div>
         <!--  ******************  USO DE LA CAMARA  ********************  -->
         <div class="col-md">
             <div *ngIf="ver_camara" class="camara">
-                <div class="webcam-container" *ngIf="!flippedImage">
-                    <webcam [height]="300" [width]="300" [trigger]="triggerObservable"
+                <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
+                    <webcam [height]="300" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
                         (imageCapture)="handleImage($event)">
                     </webcam>
                 </div>
-                <button mat-mini-fab *ngIf="!flippedImage" (click)="triggerSnapshot()">
-                    <mat-icon>photo_camera</mat-icon>
-                </button>
-
-                <div *ngIf="flippedImage" class="circular-image-container">
-                    <img [src]="flippedImage" />
+                <div class="button-container">
+                    <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
+                        <mat-icon>photo_camera</mat-icon>
+                    </button>
+                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 1"
+                        (click)="SeleccionarCamara()">
+                        <mat-icon>loop</mat-icon>
+                    </button>
+                </div>
+                <div *ngIf="imagenCamara" class="circular-image-container">
+                    <img [src]="imagenCamara" />
                 </div>
                 <div class="button-container">
-                    <button class="gray-button" *ngIf="flippedImage" (click)="CerrarCamara()">
+                    <button class="gray-button" *ngIf="imagenCamara" (click)="CerrarCamara()">
                         <mat-icon>clear</mat-icon>
                     </button>
                 </div>
@@ -151,7 +162,7 @@
             </form>
         </div>
         <div class="col-4" class="col-4 d-flex justify-content-center">
-            <button *ngIf="flippedImage" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
+            <button *ngIf="imagenCamara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
                 ENVIAR TIMBRE
             </button>
             <button *ngIf="!ver_camara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">

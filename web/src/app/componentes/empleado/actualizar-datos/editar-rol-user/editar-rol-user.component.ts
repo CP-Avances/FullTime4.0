@@ -55,12 +55,12 @@ export class EditarRolUserComponent implements OnInit {
   nombre_rolRol = new FormControl('', [Validators.minLength(2)])
   seleccionRol = new FormControl('');
 
-  
+
   filtro_sucursal: any;
 
   //FILTRO ROLES
   // FILTROS SUCURSALES
-  get filtroNombreSuc() {return this.restR.filtroNombreSuc}
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
   // FILTROS DEPARTAMENTOS
   get filtroNombreDep() { return this.restR.filtroNombreDep }
   // FILTROS EMPLEADO
@@ -71,8 +71,8 @@ export class EditarRolUserComponent implements OnInit {
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.restR.filtroNombreReg };
-   // FILTRO REOL
-   get filtroRolEmp() { return this.restR.filtroRolEmp};
+  // FILTRO REOL
+  get filtroRolEmp() { return this.restR.filtroRolEmp };
 
 
   public _booleanOptions: FormCriteriosBusqueda = {
@@ -169,9 +169,9 @@ export class EditarRolUserComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this,this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
       this.listaRoles = respuesta
-      console.log('this.listaRoles: ',this.listaRoles)
+      console.log('this.listaRoles: ', this.listaRoles)
     })
 
     this.BuscarInformacionGeneral();
@@ -180,16 +180,16 @@ export class EditarRolUserComponent implements OnInit {
   }
 
   Lsucursales: any;
-  ObtenerSucursalesPorEmpresa(){
+  ObtenerSucursalesPorEmpresa() {
     this.Lsucursales = []
     this.restSuc.BuscarSucursalEmpresa(this.idEmpresa).subscribe(datos => {
       this.Lsucursales = datos;
     });
   }
   Ldepatamentos: any;
-  selecctSucu(id: any){
+  selecctSucu(id: any) {
     this.Ldepatamentos = []
-    if(id){
+    if (id) {
       this.restDep.BuscarDepartamentoSucursal(id).subscribe(datos => {
         this.Ldepatamentos = datos;
       }, (error: any) => {
@@ -219,16 +219,16 @@ export class EditarRolUserComponent implements OnInit {
         );
     });
   }
-   // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
-   limpiarData: any = [];
-   QuitarTodos() {
+  // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
+  limpiarData: any = [];
+  QuitarTodos() {
 
-   }
-    // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
-    Listdepartamentos: any = [];
-    ObtenerDepartamentos() {
-      this.QuitarTodos();
-    }
+  }
+  // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
+  Listdepartamentos: any = [];
+  ObtenerDepartamentos() {
+    this.QuitarTodos();
+  }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
   BuscarInformacionGeneral() {
@@ -299,54 +299,12 @@ export class EditarRolUserComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
 
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        hora_trabaja: obj.hora_trabaja,
-        rol: obj.name_rol
-      })
-    })
-
-    this.OmitirDuplicados();
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
     if (this.rolEmpleado !== 1) {
@@ -363,59 +321,7 @@ export class EditarRolUserComponent implements OnInit {
         this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
       );
     }
-
     this.mostrarTablas = true;
-  }
-
-  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-  OmitirDuplicados() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursales = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimen = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentos = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargos = verificados_car;
   }
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
@@ -442,7 +348,7 @@ export class EditarRolUserComponent implements OnInit {
       case 5: this.restR.setFiltroNombreEmp(e); break;
       case 6: this.restR.setFiltroNombreSuc(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
-      case 8: this.restR.setFiltroRolEmp(e);break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -481,7 +387,7 @@ export class EditarRolUserComponent implements OnInit {
   BuscarPorTipo(e: MatRadioChange, tipo: string) {
     this.opcion = e.value;
     this.activar_boton = true;
-    if(tipo == 'rol'){
+    if (tipo == 'rol') {
       this.MostrarLista();
       switch (this.opcion) {
         case 's':
@@ -510,7 +416,7 @@ export class EditarRolUserComponent implements OnInit {
           break;
       }
     }
-    
+
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
     this.restR.GuardarCheckOpcion(this.opcion)
 
@@ -564,7 +470,6 @@ export class EditarRolUserComponent implements OnInit {
       this.Filtrar('', 6);
     }
   }
-  
 
   // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA ROL
   ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
@@ -574,7 +479,7 @@ export class EditarRolUserComponent implements OnInit {
     this._booleanOptions.bool_emp = empleado;
     this._booleanOptions.bool_reg = regimen;
   }
-  
+
   // METODO PARA CONTROLAR VISTA DE BOTONES
   ControlarBotones(seleccion: boolean, multiple: boolean, individual: boolean) {
     this.plan_multiple = multiple;
@@ -582,30 +487,30 @@ export class EditarRolUserComponent implements OnInit {
     this.auto_individual = individual;
     this.activar_seleccion = seleccion;
   }
-  
+
 
   /** ************************************************************************************** **
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
-   isAllSelectedSuc() {
-     const numSelected = this.selectionSucRol.selected.length;
-     return numSelected === this.sucursales.length
-   }
-   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
-   masterToggleSuc() {
-     this.isAllSelectedSuc() ?
-       this.selectionSucRol.clear() :
-       this.sucursales.forEach((row: any) => this.selectionSucRol.select(row));
-   }
-   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-   checkboxLabelSuc(row?: ITableEmpleados): string {
-     if (!row) {
-       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
-     }
-     return `${this.selectionSucRol.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
-   }
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedSuc() {
+    const numSelected = this.selectionSucRol.selected.length;
+    return numSelected === this.sucursales.length
+  }
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleSuc() {
+    this.isAllSelectedSuc() ?
+      this.selectionSucRol.clear() :
+      this.sucursales.forEach((row: any) => this.selectionSucRol.select(row));
+  }
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelSuc(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionSucRol.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
 
   isAllSelectedRol() {
     const numSelected = this.selectionRol.selected.length;
@@ -698,10 +603,9 @@ export class EditarRolUserComponent implements OnInit {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
-
   }
 
-  
+
   // EVENTO DE PAGINACION DE TABLAS
   ManejarPaginaResultados(e: PageEvent) {
     if (this._booleanOptions.bool_suc === true) {
@@ -730,192 +634,85 @@ export class EditarRolUserComponent implements OnInit {
     }
   }
 
-  ModelarSucursal(id: number, tipo: string) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionSucRol.selected.find((selec: any) => {
-          if (empl.id_suc === selec.id) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_suc === id) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.SeleccionarProceso(tipo, usuarios);
-  }
-
-  // CONSULTA DE LOS DATOS REGIMEN
-  ModelarRegimen(id: number, tipo: string, sucursal: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionReg.selected.find((selec: any) => {
-          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_regimen === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.SeleccionarProceso(tipo, usuarios);
-  }
-
-  // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number, tipo: string, sucursal: number) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionCarg.selected.find((selec: any) => {
-          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-
-    this.SeleccionarProceso(tipo, usuarios);
-  }
-
-  // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number, tipo: string, sucursal: number) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find((selec: any) => {
-          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      this.empleados.forEach((empl: any) => {
-        if (empl.id_depa === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-
-    console.log('ver usuarios ', usuarios);
-
-    this.SeleccionarProceso(tipo, usuarios);
-  }
-
-  // METODO PARA MOSTRAR DATOS DE EMPLEADOS
-  ModelarEmpleados(tipo: string) {
-    let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find((obj1: any) => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-
-    this.SeleccionarProceso(tipo, respuesta);
-  }
-
-
   // METODO DE SELECCTION DE TIPO DE PROCESO DEP
   SeleccionarProceso(tipo: string, datos: any) {
     if (tipo === 'p') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
     else if (tipo === 'b') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
     else if (tipo === 'e') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
     else if (tipo === 'm') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
     else if (tipo === 't') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
     else if (tipo === 'c') {
-      this.abriEditarRolUser(datos);
+      this.AbrirEditarRolUser(datos);
     }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   MetodosFiltro(valor: any, tipo: string) {
+    let usuarios = [];
     if (this.opcion === 's') {
-      this.ModelarSucursal(valor.id, tipo);
+      usuarios = this.validar.ModelarSucursal_(this.empleados, this.selectionSucRol, valor.id);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarCargo_(this.empleados, this.selectionCarg, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'r') {
-      this.ModelarRegimen(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc);
     }
     else {
-      this.ModelarEmpleados(tipo);
+      usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
     }
-
+    this.SeleccionarProceso(tipo, usuarios);
   }
 
-  abriEditarRolUser(datos: any) {    
+  // METODO PARA EDITAR ROL DEL USUARIO SELECCIONADO
+  AbrirEditarRolUser(datos: any) {
     if (datos.length > 0) {
       const data = {
         idRol: this.formulario.get('nombreRolF')?.value,
         listaUsuarios: datos
       }
 
-      if(data.idRol == ''){
+      if (data.idRol == '') {
         this.toastr.warning('Seleccione el rol.', '', {
           timeOut: 4000,
         });
-      }else{
+      } else {
         var existeUserLogueado = false;
-        datos.forEach(item => {
-          if(item.id == this.idEmpleadoLogueado){
+        datos.forEach((item: any) => {
+          if (item.id == this.idEmpleadoLogueado) {
             existeUserLogueado = true;
           }
         })
 
-        this.restRol.actualizarRoles( data).subscribe((res: any) => {
+        this.restRol.actualizarRoles(data).subscribe((res: any) => {
           this.toastr.success(res.message, '', {
             timeOut: 4000,
           });
-          this.LimpiarFormulario();          
+          this.LimpiarFormulario();
           this.BuscarInformacionGeneral();
-          if(res.status == 200 && existeUserLogueado == true){
+          if (res.status == 200 && existeUserLogueado == true) {
             this.loginService.logout()
           };
-          
         })
       }
-      
     } else {
       this.toastr.warning('Seleccione usuarios para actualizar.', '', {
         timeOut: 4000,
       });
     }
-      
   }
 
 }

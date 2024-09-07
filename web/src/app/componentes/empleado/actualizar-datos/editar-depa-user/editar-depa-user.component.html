@@ -482,7 +482,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | emplCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | emplNombre: filtroNombreEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
+                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | emplCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | nombreCompleto: filtroNombreEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_Dep" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmpDep.toggle(e) : null"
@@ -492,8 +492,8 @@
                                 <td>{{e.sucursal}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
-                                <td>{{e.nombre}}</td>
-                                <td>{{e.dep}}</td>
+                                <td>{{e.apellido}} {{e.nombre}}</td>
+                                <td>{{e.departamento}}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -258,26 +258,13 @@ export class ListaWebComponent implements OnInit {
 
   // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
   AdministrarInformacion() {
-    // LIMPIAR DATOS DE ALMACENAMIENTO
-    this.departamentos = [];
-    this.sucursales = [];
-    this.empleados = [];
-    this.regimen = [];
-    this.cargos = [];
-
-    this.departamentos_dh = [];
-    this.sucursales_dh = [];
-    this.empleados_dh = [];
-    this.regimen_dh = [];
-    this.cargos_dh = [];
-
-    this.BuscarInformacionGeneral(false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
-    this.BuscarInformacionGeneral(true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
+    this.BuscarInformacionGeneral(false);
+    this.BuscarInformacionGeneral(true);
 
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES TIMBRE WEB
-  BuscarInformacionGeneral(estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
+  BuscarInformacionGeneral(estado: any) {
     this.informacion.UsuariosTimbreWebGeneral(1, estado).subscribe((res: any[]) => {
       if (estado === false) {
         this.inactivar = true;
@@ -288,7 +275,7 @@ export class ListaWebComponent implements OnInit {
         this.ver_imagen = true;
       }
 
-      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
+      this.ProcesarDatos(res, estado);
     }, err => {
       if (estado === false) {
         this.inactivar = false;
@@ -300,59 +287,22 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
-  ProcesarDatos(informacion: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any, estado: boolean) {
-    informacion.forEach((obj: any) => {
-      sucursales_.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
-
-      regimenes_.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      departamentos_.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      cargos_.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      empleados_.push({
-        id: obj.id,
-        nombre: obj.nombre + ' ' + obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        web_habilita: obj.web_habilita,
-        userid: obj.userid,
-      })
-    })
-
+  ProcesarDatos(informacion: any, estado: boolean) {
     this.ObtenerAsignaciones();
-
-
     // RETIRAR DUPLICADOS DE LA LISTA
     if (estado === true) {
-      this.cargos = this.validar.OmitirDuplicadosCargos(cargos_);
-      this.regimen = this.validar.OmitirDuplicadosRegimen(regimenes_);
-      this.sucursales = this.validar.OmitirDuplicadosSucursales(sucursales_);
-      this.departamentos = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
+      // LIMPIAR DATOS DE ALMACENAMIENTO
+      this.departamentos = [];
+      this.sucursales = [];
+      this.empleados = [];
+      this.regimen = [];
+      this.cargos = [];
+
+      this.cargos = this.validar.ProcesarDatosCargos(informacion);
+      this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+      this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+      this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+      this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
 
       // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
       // SI ES SUPERADMINISTRADOR NO FILTRAR
@@ -366,7 +316,7 @@ export class ListaWebComponent implements OnInit {
           this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
           this.idCargosAcceso.add(empleadoSesion.id_cargo_);
         } else {
-           // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
+          // SI LOS IDSUCURSALESACCESO NO SE ENCUENTRA EN LA LISTA DE EMPLEADOS.ID_SUC, ELIMINARLO DEL SET
           this.idSucursalesAcceso.forEach((id_suc: any) => {
             if (!this.empleados.some((empleado: any) => empleado.id_suc === id_suc)) {
               this.idSucursalesAcceso.delete(id_suc);
@@ -380,7 +330,6 @@ export class ListaWebComponent implements OnInit {
             }
           });
         }
-
 
         this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
         this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
@@ -401,11 +350,17 @@ export class ListaWebComponent implements OnInit {
       }
     }
     else {
-      this.cargos_dh = this.validar.OmitirDuplicadosCargos(cargos_);
-      this.regimen_dh = this.validar.OmitirDuplicadosRegimen(regimenes_);
-      this.sucursales_dh = this.validar.OmitirDuplicadosSucursales(sucursales_);
-      this.departamentos_dh = this.validar.OmitirDuplicadosDepartamentos(departamentos_);
-      this.ObtenerAsignaciones();
+      this.departamentos_dh = [];
+      this.sucursales_dh = [];
+      this.empleados_dh = [];
+      this.regimen_dh = [];
+      this.cargos_dh = [];
+
+      this.cargos_dh = this.validar.ProcesarDatosCargos(informacion);
+      this.regimen_dh = this.validar.ProcesarDatosRegimen(informacion);
+      this.empleados_dh = this.validar.ProcesarDatosEmpleados(informacion);
+      this.sucursales_dh = this.validar.ProcesarDatosSucursales(informacion);
+      this.departamentos_dh = this.validar.ProcesarDatosDepartamentos(informacion);
 
       // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
       // SI ES SUPERADMINISTRADOR NO FILTRAR
@@ -546,21 +501,23 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros_DH(valor: any) {
     let tipo: number = 1;
-    if (this.opcion_dh === 's') {
-      this.ModelarSucursal(valor.id, tipo, this.empleados_dh, this.selectionSuc_dh);
+    let usuarios = [];
+    if (this.opcion === 's') {
+      usuarios = this.validar.ModelarSucursal_(this.empleados_dh, this.selectionSuc_dh, valor.id);
     }
-    else if (this.opcion_dh === 'r') {
-      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionReg_dh);
+    else if (this.opcion === 'r') {
+      usuarios = this.validar.ModelarRegimen_(this.empleados_dh, this.selectionReg_dh, valor.id, valor.id_suc);
     }
-    else if (this.opcion_dh === 'c') {
-      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionCarg_dh);
+    else if (this.opcion === 'c') {
+      usuarios = this.validar.ModelarCargo_(this.empleados_dh, this.selectionCarg_dh, valor.id, valor.id_suc);
     }
-    else if (this.opcion_dh === 'd') {
-      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionDep_dh);
+    else if (this.opcion === 'd') {
+      usuarios = this.validar.ModelarDepartamento_(this.empleados_dh, this.selectionDep_dh, valor.id, valor.id_suc);
     }
     else {
-      this.ModelarEmpleados(tipo, this.empleados_dh, this.selectionEmp_dh);
+      usuarios = this.validar.ModelarEmpleados_(this.empleados_dh, this.selectionEmp_dh);
     }
+    this.RegistrarMultiple(usuarios, tipo);
   }
 
   // MOSTRAR DATOS DE USUARIOS
@@ -1037,107 +994,6 @@ export class ListaWebComponent implements OnInit {
     }
   }
 
-  // METODO PARA PRESENTAR DATOS DE SUCURSALES
-  ModelarSucursal(id: number, tipo: number, lista: any, selector: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      lista.forEach((empl: any) => {
-        selector.selected.find((selec: any) => {
-          if (empl.id_suc === selec.id) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      lista.forEach((empl: any) => {
-        if (empl.id_suc === id) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.RegistrarMultiple(usuarios, tipo);
-  }
-
-  // METODO PARA PRESENTAR DATOS DE REGIMEN
-  ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      lista.forEach((empl: any) => {
-        selector.selected.find((selec: any) => {
-          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      lista.forEach((empl: any) => {
-        if (empl.id_regimen === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.RegistrarMultiple(usuarios, tipo);
-  }
-
-  // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      lista.forEach((empl: any) => {
-        selector.selected.find((selec: any) => {
-          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      lista.forEach((empl: any) => {
-        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.RegistrarMultiple(usuarios, tipo);
-  }
-
-  // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
-    let usuarios: any = [];
-    if (id === 0 || id === undefined) {
-      lista.forEach((empl: any) => {
-        selector.selected.find((selec: any) => {
-          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
-            usuarios.push(empl)
-          }
-        })
-      })
-    }
-    else {
-      lista.forEach((empl: any) => {
-        if (empl.id_depa === id && empl.id_suc === sucursal) {
-          usuarios.push(empl)
-        }
-      })
-    }
-    this.RegistrarMultiple(usuarios, tipo);
-  }
-
-  // METODO PARA PRESENTAR DATOS DE EMPLEADO
-  ModelarEmpleados(tipo: any, lista: any, selector: any) {
-    let respuesta: any = [];
-    lista.forEach((obj: any) => {
-      selector.selected.find((obj1: any) => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-    this.RegistrarMultiple(respuesta, tipo);
-  }
-
 
   /** ************************************************************************************** **
    ** **               METODOS DE ACTUALIZACION DE ESTADO DE TIMBRE WEB                   ** **
@@ -1183,21 +1039,23 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(valor: any) {
     let tipo: number = 2;
+    let usuarios = [];
     if (this.opcion === 's') {
-      this.ModelarSucursal(valor.id, tipo, this.empleados, this.selectionSuc);
+      usuarios = this.validar.ModelarSucursal_(this.empleados, this.selectionSuc, valor.id);
     }
     else if (this.opcion === 'r') {
-      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados, this.selectionReg);
+      usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados, this.selectionCarg);
+      usuarios = this.validar.ModelarCargo_(this.empleados, this.selectionCarg, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados, this.selectionDep);
+      usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc);
     }
     else {
-      this.ModelarEmpleados(tipo, this.empleados, this.selectionEmp);
+      usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
     }
+    this.RegistrarMultiple(usuarios, tipo);
   }
 
   // METODO PARA LIMPIAR FORMULARIOS

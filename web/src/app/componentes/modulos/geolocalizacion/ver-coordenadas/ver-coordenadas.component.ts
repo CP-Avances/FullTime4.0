@@ -279,55 +279,11 @@ export class VerCoordenadasComponent implements OnInit {
 
   //METODO PARA PROCESAR DATOS
   ProcesarDatos(informacion: any) {
-    informacion.forEach((obj: any) => {
-      this.sucursales.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
-
-      this.regimen.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.departamentos.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-
-      this.cargos.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-
-      this.empleados.push({
-        id: obj.id,
-        nombre: obj.nombre + ' ' + obj.apellido,
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_ // TIPO DE CARGO
-      })
-    })
-
-    // RETIRAR DUPLICADOS DE LA LISTA
-    this.cargos = this.validar.OmitirDuplicadosCargos(this.cargos);
-    this.regimen = this.validar.OmitirDuplicadosRegimen(this.regimen);
-    this.sucursales = this.validar.OmitirDuplicadosSucursales(this.sucursales);
-    this.departamentos = this.validar.OmitirDuplicadosDepartamentos(this.departamentos);
+    this.cargos = this.validar.ProcesarDatosCargos(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
 
     if (this.rolEmpleado !== 1) {
       this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
@@ -699,7 +655,6 @@ export class VerCoordenadasComponent implements OnInit {
         }
       })
     })
-
     this.RegistrarUbicacionUsuario(usuarios);
   }
 

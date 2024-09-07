@@ -56,7 +56,7 @@ export class EditarDepaUserComponent implements OnInit {
   filtro_sucursal: any;
 
   // FILTROS SUCURSALES
-  get filtroNombreSucDep() {return this.restR.filtroNombreSuc}
+  get filtroNombreSucDep() { return this.restR.filtroNombreSuc }
   // FILTROS DEPARTAMENTOS
   get filtroNombreDepDep() { return this.restR.filtroNombreDep }
   // FILTROS EMPLEADO
@@ -68,8 +68,8 @@ export class EditarDepaUserComponent implements OnInit {
   get filtroNombreCargDep() { return this.restR.filtroNombreCarg };
   // FILTRO REGIMEN
   get filtroNombreRegDep() { return this.restR.filtroNombreReg };
-   // FILTRO REOL
-  get filtroRolEmpDep() { return this.restR.filtroRolEmp};
+  // FILTRO REOL
+  get filtroRolEmpDep() { return this.restR.filtroRolEmp };
 
   public _booleanOptionsDep: FormCriteriosBusqueda = {
     bool_dep: false,
@@ -97,38 +97,38 @@ export class EditarDepaUserComponent implements OnInit {
   selectionRegDep = new SelectionModel<ITableEmpleados>(true, []);
 
   //PAGINACION DEPARTAMENTO
-   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
-   pageSizeOptions_sucDep = [5, 10, 20, 50];
-   tamanio_pagina_sucDep: number = 5;
-   numero_pagina_sucDep: number = 1;
- 
-   // ITEMS DE PAGINACION DE LA TABLA CARGO
-   pageSizeOptions_carDep = [5, 10, 20, 50];
-   tamanio_pagina_carDep: number = 5;
-   numero_pagina_carDep: number = 1;
- 
-   // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
-   pageSizeOptions_depDep = [5, 10, 20, 50];
-   tamanio_pagina_depDep: number = 5;
-   numero_pagina_depDep: number = 1;
- 
-   // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-   pageSizeOptions_empDep = [5, 10, 20, 50];
-   tamanio_pagina_empDep: number = 5;
-   numero_pagina_empDep: number = 1;
- 
-   // ITEMS DE PAGINACION DE LA TABLA REGIMEN
-   pageSizeOptions_regDep = [5, 10, 20, 50];
-   tamanio_pagina_regDep: number = 5;
-   numero_pagina_regDep: number = 1;
- 
-   // ITEMS DE PAGINACION DE LA TABLA USUARIO ROL
-   pageSizeOptions_rolDep = [5, 10, 20, 50];
-   tamanio_pagina_rolDep: number = 5;
-   numero_pagina_rolDep: number = 1;
+  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
+  pageSizeOptions_sucDep = [5, 10, 20, 50];
+  tamanio_pagina_sucDep: number = 5;
+  numero_pagina_sucDep: number = 1;
 
-   public check: checkOptions[];
-   public checkDep: checkOptions[];
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_carDep = [5, 10, 20, 50];
+  tamanio_pagina_carDep: number = 5;
+  numero_pagina_carDep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  pageSizeOptions_depDep = [5, 10, 20, 50];
+  tamanio_pagina_depDep: number = 5;
+  numero_pagina_depDep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  pageSizeOptions_empDep = [5, 10, 20, 50];
+  tamanio_pagina_empDep: number = 5;
+  numero_pagina_empDep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_regDep = [5, 10, 20, 50];
+  tamanio_pagina_regDep: number = 5;
+  numero_pagina_regDep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA USUARIO ROL
+  pageSizeOptions_rolDep = [5, 10, 20, 50];
+  tamanio_pagina_rolDep: number = 5;
+  numero_pagina_rolDep: number = 1;
+
+  public check: checkOptions[];
+  public checkDep: checkOptions[];
 
   idsucursal = new FormControl('', [Validators.required]);
   idDepa = new FormControl('', [Validators.required]);
@@ -144,17 +144,17 @@ export class EditarDepaUserComponent implements OnInit {
   idEmpresa: any;
 
   constructor(
+    private asignaciones: AsignacionesService,
     private restSuc: SucursalService,//SERVICIO DE DATOS PARA OBTENER EL LISTADO DE LAS SUCURSALES
     private restDep: DepartamentosService,//SERVICIO DE DATOS PARA OBTENER EL DEPA POR EL ID DE LA SUCURSAL
     private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
+    private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public restCargo: EmplCargosService,
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
+    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public restR: ReportesService,
     public plan: PlanGeneralService,
-    private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
-    private asignaciones: AsignacionesService,
-    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string);
@@ -168,9 +168,9 @@ export class EditarDepaUserComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this,this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
       this.listaRoles = respuesta
-      console.log('this.listaRoles: ',this.listaRoles)
+      console.log('this.listaRoles: ', this.listaRoles)
     })
 
     this.BuscarInformacionGeneralDepa();
@@ -179,16 +179,16 @@ export class EditarDepaUserComponent implements OnInit {
   }
 
   Lsucursales: any;
-  ObtenerSucursalesPorEmpresa(){
+  ObtenerSucursalesPorEmpresa() {
     this.Lsucursales = []
     this.restSuc.BuscarSucursalEmpresa(this.idEmpresa).subscribe(datos => {
       this.Lsucursales = datos;
     });
   }
   Ldepatamentos: any;
-  selecctSucu(id: any){
+  selecctSucu(id: any) {
     this.Ldepatamentos = []
-    if(id){
+    if (id) {
       this.restDep.BuscarDepartamentoSucursal(id).subscribe(datos => {
         this.Ldepatamentos = datos;
       }, (error: any) => {
@@ -230,7 +230,7 @@ export class EditarDepaUserComponent implements OnInit {
     this.QuitarTodos();
   }
 
-  BuscarInformacionGeneralDepa(){
+  BuscarInformacionGeneralDepa() {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentosDep = [];
     this.sucursalesDep = [];
@@ -243,7 +243,6 @@ export class EditarDepaUserComponent implements OnInit {
       this.toastr.error(err.error.message)
     })
   }
-
 
   // METODO DE VALIDACION DE INGRESO DE LETRAS Y NUMEROS
   IngresarSoloLetras(e: any) {
@@ -298,127 +297,33 @@ export class EditarDepaUserComponent implements OnInit {
   }
 
   ProcesarDatosDep(informacion: any) {
-    informacion.forEach((obj: any) => {
-      //console.log('ver obj ', obj)
-      this.sucursalesDep.push({
-        id: obj.id_suc,
-        sucursal: obj.name_suc
-      })
-  
-      this.regimenDep.push({
-        id: obj.id_regimen,
-        nombre: obj.name_regimen,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-  
-      this.departamentosDep.push({
-        id: obj.id_depa,
-        departamento: obj.name_dep,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-      })
-  
-      this.cargosDep.push({
-        id: obj.id_cargo_,
-        nombre: obj.name_cargo,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc
-      })
-  
-      this.empleadosDep.push({
-        id: obj.id_empleado,
-        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-        codigo: obj.codigo,
-        cedula: obj.cedula,
-        correo: obj.correo,
-        id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
-        id_suc: obj.id_suc,
-        id_regimen: obj.id_regimen,
-        id_depa: obj.id_depa,
-        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        hora_trabaja: obj.hora_trabaja,
-        dep: obj.name_dep
-      })
-    })
-  
-    this.OmitirDuplicadosDep();
-    console.log('regimen ---', this.regimenDep)
-  
+    this.cargosDep = this.validar.ProcesarDatosCargos(informacion);
+    this.regimenDep = this.validar.ProcesarDatosRegimen(informacion);
+    this.empleadosDep = this.validar.ProcesarDatosEmpleados(informacion);
+    this.sucursalesDep = this.validar.ProcesarDatosSucursales(informacion);
+    this.departamentosDep = this.validar.ProcesarDatosDepartamentos(informacion);
+    //console.log('regimen ---', this.regimenDep)
+
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
-    console.log('id rol ', this.rolEmpleado)
+    //console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
-      console.log('ingresa')
+      //console.log('ingresa')
       this.empleadosDep = this.empleadosDep.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
       this.departamentosDep = this.departamentosDep.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursalesDep = this.sucursalesDep.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimenDep = this.regimenDep.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
-  
+
       this.empleadosDep.forEach((empleado: any) => {
         this.idCargosAcceso.add(empleado.id_cargo_);
       });
-  
+
       this.cargosDep = this.cargosDep.filter((cargo: any) =>
         this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
       );
     }
-  
     this.mostrarTablas = true;
     console.log('regimen ', this.regimenDep)
-  }
-
-  OmitirDuplicadosDep() {
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-    let verificados_suc = this.sucursalesDep.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.sucursalesDep = verificados_suc;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
-    let verificados_reg = this.regimenDep.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.regimenDep = verificados_reg;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentosDep.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.departamentosDep = verificados_dep;
-
-    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargosDep.filter((objeto: any, indice: any, valor: any) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    this.cargosDep = verificados_car;
   }
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
@@ -444,7 +349,7 @@ export class EditarDepaUserComponent implements OnInit {
       case 5: this.restR.setFiltroNombreEmp(e); break;
       case 6: this.restR.setFiltroNombreSuc(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
-      case 8: this.restR.setFiltroRolEmp(e);break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -482,42 +387,41 @@ export class EditarDepaUserComponent implements OnInit {
   BuscarPorTipo(e: MatRadioChange, tipo: string) {
     this.opcion = e.value;
     this.activar_boton = true;
-      this.MostrarListaDep();
-      switch (this.opcion) {
-        case 's':
-          this.ControlarOpcionesDep(true, false, false, false, false);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-        case 'c':
-          this.ControlarOpcionesDep(false, true, false, false, false);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-        case 'd':
-          this.ControlarOpcionesDep(false, false, true, false, false);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-        case 'e':
-          this.ControlarOpcionesDep(false, false, false, true, false);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-        case 'r':
-          this.ControlarOpcionesDep(false, false, false, false, true);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-        default:
-          this.ControlarOpcionesDep(false, false, false, false, false);
-          this.ControlarBotonesDep(true, false, true);
-          break;
-      
+    this.MostrarListaDep();
+    switch (this.opcion) {
+      case 's':
+        this.ControlarOpcionesDep(true, false, false, false, false);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+      case 'c':
+        this.ControlarOpcionesDep(false, true, false, false, false);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+      case 'd':
+        this.ControlarOpcionesDep(false, false, true, false, false);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+      case 'e':
+        this.ControlarOpcionesDep(false, false, false, true, false);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+      case 'r':
+        this.ControlarOpcionesDep(false, false, false, false, true);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+      default:
+        this.ControlarOpcionesDep(false, false, false, false, false);
+        this.ControlarBotonesDep(true, false, true);
+        break;
+
     }
-    
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptionsDep);
     this.restR.GuardarCheckOpcion(this.opcion)
 
   }
 
   // METODO PARA MOSTRAR METODOS DE CONSULTAS DEPA
-  MostrarListaDep(){
+  MostrarListaDep() {
     if (this.opcion === 's') {
       this.nombre_regDep.reset();
       this.nombre_sucDep.reset();
@@ -592,18 +496,18 @@ export class EditarDepaUserComponent implements OnInit {
     return numSelected === this.sucursalesDep.length
   }
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
- masterToggleSucDep() {
-   this.isAllSelectedSucDep() ?
-     this.selectionSucDep.clear() :
-     this.sucursalesDep.forEach((row: any) => this.selectionSucDep.select(row));
- }
+  masterToggleSucDep() {
+    this.isAllSelectedSucDep() ?
+      this.selectionSucDep.clear() :
+      this.sucursalesDep.forEach((row: any) => this.selectionSucDep.select(row));
+  }
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelSucDep(row?: ITableEmpleados): string {
-   if (!row) {
-     return `${this.isAllSelectedSucDep() ? 'select' : 'deselect'} all`;
-   }
-   return `${this.selectionSucDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
- }
+    if (!row) {
+      return `${this.isAllSelectedSucDep() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionSucDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
 
   isAllSelectedRolDep() {
     const numSelected = this.selectionRolDep.selected.length;
@@ -623,21 +527,21 @@ export class EditarDepaUserComponent implements OnInit {
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedRegDep() {
-      const numSelected = this.selectionRegDep.selected.length;
-      return numSelected === this.regimenDep.length
+    const numSelected = this.selectionRegDep.selected.length;
+    return numSelected === this.regimenDep.length
   }
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleRegDep() {
-      this.isAllSelectedRegDep() ?
-        this.selectionRegDep.clear() :
-        this.regimenDep.forEach((row: any) => this.selectionRegDep.select(row));
+    this.isAllSelectedRegDep() ?
+      this.selectionRegDep.clear() :
+      this.regimenDep.forEach((row: any) => this.selectionRegDep.select(row));
   }
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelRegDep(row?: ITableEmpleados): string {
-      if (!row) {
-        return `${this.isAllSelectedRegDep() ? 'select' : 'deselect'} all`;
-      }
-      return `${this.selectionRegDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    if (!row) {
+      return `${this.isAllSelectedRegDep() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionRegDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -726,173 +630,68 @@ export class EditarDepaUserComponent implements OnInit {
     }
   }
 
-     // CONSULTA DE LOS DATOS REGIMEN DEP
-     ModelarRegimenDep(id: number, tipo: string, sucursal: any) {
-      let usuarios: any = [];
-      if (id === 0 || id === undefined) {
-        this.empleadosDep.forEach((empl: any) => {
-          this.selectionRegDep.selected.find((selec: any) => {
-            if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
-              usuarios.push(empl)
-            }
-          })
-        })
-      }
-      else {
-        this.empleadosDep.forEach((empl: any) => {
-          if (empl.id_regimen === id && empl.id_suc === sucursal) {
-            usuarios.push(empl)
-          }
-        })
-      }
-      this.SeleccionarProcesoDep(tipo, usuarios);
+  // METODO PARA PROCESAR DATOS
+  SeleccionarProcesoDep(tipo: string, datos: any) {
+    if (tipo === 'p') {
+      this.AbrirEditarDepaUser(datos);
     }
+    else if (tipo === 'b') {
+      this.AbrirEditarDepaUser(datos);
+    }
+    else if (tipo === 'e') {
+      this.AbrirEditarDepaUser(datos);
+    }
+    else if (tipo === 'm') {
+      this.AbrirEditarDepaUser(datos);
+    }
+    else if (tipo === 't') {
+      this.AbrirEditarDepaUser(datos);
+    }
+    else if (tipo === 'c') {
+      this.AbrirEditarDepaUser(datos);
+    }
+  }
 
-    // METODO PARA MOSTRAR DATOS DE SUCURSAL DEP
-    ModelarSucursal(id: number, tipo: string) {
-      let usuarios: any = [];
-      if (id === 0 || id === undefined) {
-        this.empleadosDep.forEach((empl: any) => {
-          this.selectionSucDep.selected.find((selec: any) => {
-            if (empl.id_suc === selec.id) {
-              usuarios.push(empl)
-            }
-          })
-        })
-      }
-      else {
-        this.empleadosDep.forEach((empl: any) => {
-          if (empl.id_suc === id) {
-            usuarios.push(empl)
-          }
-        })
-      }
-      this.SeleccionarProcesoDep(tipo, usuarios);
-    }
-  
-    // METODO PARA MOSTRAR DATOS DE CARGOS DEP
-    ModelarCargoDep(id: number, tipo: string, sucursal: number) {
-      let usuarios: any = [];
-      if (id === 0 || id === undefined) {
-        this.empleadosDep.forEach((empl: any) => {
-          this.selectionCargDep.selected.find((selec: any) => {
-            if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
-              usuarios.push(empl)
-            }
-          })
-        })
-      }
-      else {
-        this.empleadosDep.forEach((empl: any) => {
-          if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
-            usuarios.push(empl)
-          }
-        })
-      }
-  
-      this.SeleccionarProcesoDep(tipo, usuarios);
-    }
-  
-    // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS DEP
-    ModelarDepartamentosDep(id: number, tipo: string, sucursal: number) {
-      let usuarios: any = [];
-      if (id === 0 || id === undefined) {
-        this.empleadosDep.forEach((empl: any) => {
-          this.selectionDepDep.selected.find((selec: any) => {
-            if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
-              usuarios.push(empl)
-            }
-          })
-        })
-      }
-      else {
-        this.empleadosDep.forEach((empl: any) => {
-          if (empl.id_depa === id && empl.id_suc === sucursal) {
-            usuarios.push(empl)
-          }
-        })
-      }
-  
-      console.log('ver usuarios ', usuarios);
-  
-      this.SeleccionarProcesoDep(tipo, usuarios);
-    }
-  
-    // METODO PARA MOSTRAR DATOS DE EMPLEADOS DEP
-    ModelarEmpleadosDep(tipo: string) {
-      let respuesta: any = [];
-      this.empleadosDep.forEach((obj: any) => {
-        this.selectionEmpDep.selected.find((obj1: any) => {
-          if (obj1.id === obj.id) {
-            respuesta.push(obj)
-          }
-        })
-      })
-  
-      this.SeleccionarProcesoDep(tipo, respuesta);
-    }
-
-
-    SeleccionarProcesoDep(tipo: string, datos: any) {
-      if (tipo === 'p') {
-        this.abriEditarDepaUser(datos);
-      }
-      else if (tipo === 'b') {
-        this.abriEditarDepaUser(datos);
-      }
-      else if (tipo === 'e') {
-        this.abriEditarDepaUser(datos);
-      }
-      else if (tipo === 'm') {
-        this.abriEditarDepaUser(datos);
-      }
-      else if (tipo === 't') {
-        this.abriEditarDepaUser(datos);
-      }
-      else if (tipo === 'c') {
-        this.abriEditarDepaUser(datos);
-      }
-    }
-
-    // METODO PARA TOMAR DATOS SELECCIONADOS DEP
+  // METODO PARA TOMAR DATOS SELECCIONADOS ACTUALIZAR DEPARTAMENTO
   MetodosFiltroDep(valor: any, tipo: string) {
+    let usuarios = [];
     if (this.opcion === 's') {
-      this.ModelarSucursal(valor.id, tipo);
+      usuarios = this.validar.ModelarSucursal_(this.empleadosDep, this.selectionSucDep, valor.id);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargoDep(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarCargo_(this.empleadosDep, this.selectionCargDep, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentosDep(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarDepartamento_(this.empleadosDep, this.selectionDepDep, valor.id, valor.id_suc);
     }
     else if (this.opcion === 'r') {
-      this.ModelarRegimenDep(valor.id, tipo, valor.id_suc);
+      usuarios = this.validar.ModelarRegimen_(this.empleadosDep, this.selectionRegDep, valor.id, valor.id_suc);
     }
     else {
-      this.ModelarEmpleadosDep(tipo);
+      usuarios = this.validar.ModelarEmpleados_(this.empleadosDep, this.selectionEmpDep);
     }
+    this.SeleccionarProcesoDep(tipo, usuarios);
 
   }
 
-  abriEditarDepaUser(datos: any) {    
-    console.log('datos: ',datos)
-    
+  // METODO PARA EDITAR EL DEPARTAMENTO DEL USUARIO SELECCIONADO
+  AbrirEditarDepaUser(datos: any) {
+    console.log('datos: ', datos)
     if (datos.length > 0) {
       const data = {
         idSucursal: this.formularioDep.get('sucursal')?.value,
         idDepartamento: this.formularioDep.get('idDepa')?.value,
         listaUsuarios: datos
       }
-
-      if(data.idSucursal == ''){
+      if (data.idSucursal == '') {
         this.toastr.warning('Seleccione la sucursal.', '', {
           timeOut: 4000,
         });
-      }else if(data.idDepartamento == '' ){
+      } else if (data.idDepartamento == '') {
         this.toastr.warning('Seleccione el departamento.', '', {
           timeOut: 4000,
         });
-      }else{
+      } else {
         this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
           this.toastr.success(res.message, '', {
             timeOut: 4000,
@@ -905,13 +704,12 @@ export class EditarDepaUserComponent implements OnInit {
           });
         })
       }
-      
     } else {
       this.toastr.warning('Seleccione usuarios para actualizar.', '', {
         timeOut: 4000,
       });
     }
-    
+
   }
 
 

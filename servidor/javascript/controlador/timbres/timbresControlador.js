@@ -757,7 +757,7 @@ class TimbresControlador {
                 yield database_1.default.query('COMMIT');
                 if (!timbre)
                     return res.status(400).jsonp({ message: "No se inserto timbre" });
-                return res.status(200).jsonp({ message: "Timbre Creado exitosamente" });
+                return res.status(200).jsonp({ message: "Tímbre creado exitosamente" });
             }
             catch (error) {
                 return res.status(400).jsonp({ message: error });
