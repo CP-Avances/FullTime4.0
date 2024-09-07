@@ -1,11 +1,9 @@
 <br>
-<div class="row w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
-    <div class="col-12 text-center">
-        <div class="d-flex bd-highlight" id="resultados">
-            <h6 class="w-100 bd-highlight align-self-center">
-                {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
-            </h6>
-        </div>
+<div class="w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
+    <div class="d-flex bd-highlight" id="resultados">
+        <h6 class="w-100 bd-highlight align-self-center m-0 p-0">
+            {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
+        </h6>
     </div>
 </div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
