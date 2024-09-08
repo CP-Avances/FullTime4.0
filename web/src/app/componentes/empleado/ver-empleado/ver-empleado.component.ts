@@ -90,6 +90,7 @@ import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-car
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { MatRadioChange } from '@angular/material/radio';
 import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
+import { color } from 'echarts';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -3241,6 +3242,184 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       };
     }
   }
+
+  GenerarPdf_Historico(action = 'open') {
+    const documentDefinition = this.DefinirInfoHistóricoPDF();
+    switch (action) {
+      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download(this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + '.pdf'); break;
+      default: pdfMake.createPdf(documentDefinition).open(); break;
+    }
+  }
+  DefinirInfoHistóricoPDF(){
+    return {
+      pageOrientation: 'portrait',
+      watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
+      header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      // PIE DE PAGINA
+      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var f = moment();
+        fecha = f.format('YYYY-MM-DD');
+        hora = f.format('HH:mm:ss');
+        return {
+          margin: 10,
+          columns: [
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
+            {
+              text: [
+                {
+                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  alignment: 'right', opacity: 0.3
+                }
+              ],
+            }
+          ], fontSize: 10
+        }
+      },
+      content: [
+        { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
+        { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        this.PresentarDataPDFContratosCargo(),
+      ],
+      styles: {
+        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 10, alignment: 'center' },
+        itemsTableD: { fontSize: 10 }
+      }
+    };
+  }
+
+
+  PresentarDataPDFContratosCargo(){
+
+
+    // Agrupar cargos por contrato
+    this.listaContratosEmple.forEach(contrato => {
+      contrato.cargosAsociados = this.listaCargosEmple.filter(cargo => cargo.contrato === contrato.id);
+    });
+
+    return this.listaContratosEmple.map(contrato => {
+      return [
+        // Salto en blanco o espacio antes de la primera parte
+        {
+          text: '', // Objeto vacío para crear espacio en blanco
+          margin: [0, 10, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
+        },
+        // Primera parte con la información del régimen laboral de forma dinámica
+        {
+          table: {
+            widths: ['*', '*', '*'], // Ajusta el número de columnas según tus necesidades
+            body: [
+              [
+                { 
+                  text: `Régimen laboral: ${contrato.regimen}`, 
+                  style: 'headerText', 
+                  margin: [7, 5, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff', // Cambia a azul
+                  color: 'white'
+                },
+                { 
+                  text: `Fecha desde: ${moment(contrato.fecha_ingreso).format('DD/MM/YYYY')}`, 
+                  alignment: 'center',
+                  style: 'headerText', 
+                  margin: [7, 5, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff',
+                  color: 'white'
+                },
+                { 
+                  text: `Controlar vacaciones: ${contrato.controlar_vacacion ? 'Si' : 'No'}`, 
+                  alignment: 'right',
+                  style: 'headerText', 
+                  margin: [7, 5, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff', 
+                  color: 'white'
+                }
+              ],
+              [
+                { 
+                  text: `Modalidad laboral: ${contrato.descripcion}`, 
+                  style: 'headerText', 
+                  margin: [7, 0, 7,5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff',
+                  color: 'white'
+                },
+                { 
+                  text: `Fecha hasta: ${moment(contrato.fecha_salida).format('DD/MM/YYYY')}`, 
+                  alignment: 'center', 
+                  style: 'headerText', 
+                  margin: [7, 0, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff',
+                  color: 'white'
+                },
+                { 
+                  text: `Controlar asistencia: ${contrato.controlar_asistencia ? 'Si' : 'No'}`, 
+                  alignment: 'right', 
+                  style: 'headerText', 
+                  margin: [7, 0, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#3e85ff',
+                  color: 'white'
+                }
+              ]
+            ]
+          },
+          layout: 'noBorders',// Elimina los bordes de la tabla
+          with: 100
+        },      
+        // Tabla principal con los datos de los empleados o cargos
+        {
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: 'Sucursal', style: 'tableHeader', fontSize: 9 },
+                { text: 'Departamento', style: 'tableHeader', fontSize: 9 },
+                { text: 'Cargo', style: 'tableHeader', fontSize: 9 },
+                { text: 'Fecha Desde', style: 'tableHeader', fontSize: 9 },
+                { text: 'Fecha Hasta', style: 'tableHeader', fontSize: 9 },
+                { text: 'Horas de Trabajo', style: 'tableHeader', fontSize: 9 },
+                { text: 'Sueldo', style: 'tableHeader', fontSize: 9 },
+                { text: 'Administra Dep.', style: 'tableHeader', fontSize: 9 },
+                { text: 'Estado', style: 'tableHeader', fontSize: 9 }
+              ],
+              ...contrato.cargosAsociados.map((obj: any) => {
+                return [
+                  { text: obj.sucursal, style: 'itemsTable', fontSize: 9 },
+                  { text: obj.nombre, style: 'itemsTable', fontSize: 9 },
+                  { text: obj.cargo, style: 'itemsTable', fontSize: 9 },
+                  { text: moment(obj.fecha_inicio).format('DD/MM/YYYY'), style: 'itemsTable', fontSize: 9 },
+                  { text: moment(obj.fecha_final).format('DD/MM/YYYY'), style: 'itemsTable', fontSize: 9 },
+                  { text: obj.hora_trabaja, style: 'itemsTable', fontSize: 9 },
+                  { text: obj.sueldo, style: 'itemsTable', fontSize: 9 },
+                  { text: obj.cargo.jefe ? 'Si' : 'No', style: 'itemsTable', fontSize: 9 },
+                  { text: obj.estado ? 'Activado' : 'Desactivado', style: 'itemsTable', fontSize: 9 }
+                ];
+              })
+            ]
+          },
+          layout: {
+            fillColor: function (i: any) {
+              return (i % 2 === 0) ? '#CCD1D1' : null;
+            },
+            hLineWidth: function(i: number, node: any) {
+              return (i === 0 || i === node.table.body.length) ? 1 : 0.5;
+            },
+            vLineWidth: function(i: number, node: any) {
+              return (i === 0 || i === node.table.widths.length) ? 1 : 0.5;
+            }
+          }
+        }
+      ];
+    });
+
+  }
+
 
   /** ******************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *

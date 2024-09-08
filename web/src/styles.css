@@ -160,9 +160,7 @@ body {
 
 /* ESTILO PARA BARRA DE TÍTULOS PARA LAS TABLAS*/
 #titulo_tabla {
-    font-size: 18px;
-    text-align: center;
-    background: rgb(2, 85, 110);
+    background: rgb(0, 121, 202);
     color: white;
     padding-top: 14px;
     padding-bottom: 10px;
