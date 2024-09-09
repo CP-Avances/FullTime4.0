@@ -142,6 +142,24 @@ class ReportesControlador {
         });
     }
     ;
+    getInfoReporteTimbresNovedad(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { codigo, fec_inicio, fec_final, conexion } = req.query;
+                const response = yield database_1.default.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+                const timbres = response.rows;
+                // console.log(timbres);
+                if (timbres.length === 0)
+                    return res.status(400).jsonp({ message: 'No hay timbres resgistrados' });
+                return res.status(200).jsonp(timbres);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    ;
 }
 exports.REPORTES_CONTROLADOR = new ReportesControlador();
 exports.default = exports.REPORTES_CONTROLADOR;
