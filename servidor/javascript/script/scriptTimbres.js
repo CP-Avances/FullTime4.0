@@ -89,18 +89,18 @@ const generarTimbres = function (codigo, inicio, fin) {
             if (fecha) {
                 yield database_1.default.query(`
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
-                    codigo, id_reloj, fecha_hora_timbre_servidor)
-                values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
-                `, [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]);
+                    codigo, id_reloj, fecha_hora_timbre_servidor, fecha_hora_timbre_validado)
+                values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)         
+                `, [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha, fecha]);
             }
         }));
         /*
             `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud,
-                    codigo, id_reloj, fecha_hora_timbre_servidor)
-                values($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    codigo, id_reloj, fecha_hora_timbre_servidor, fecha_hora_timbre_validado)
+                values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
-                , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
+                , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha, fecha]
     
         */
     });

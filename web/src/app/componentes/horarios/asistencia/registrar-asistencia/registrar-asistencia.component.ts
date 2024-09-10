@@ -210,7 +210,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
           }
           let proceso = {
             duracion: duration,
-            fec_hora_timbre_servidor: obj.fecha_hora_timbre_servidor,
+            fec_hora_timbre_servidor: obj.fecha_hora_timbre_validado,
             fecha: obj.t_fec_timbre,
             hora: obj.t_hora_timbre,
             id: obj.id

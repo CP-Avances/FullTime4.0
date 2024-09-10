@@ -128,7 +128,14 @@ class ReportesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { codigo, fec_inicio, fec_final } = req.query;
-                const response = yield database_1.default.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+                const response = yield database_1.default.query(`
+                SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, 
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor,
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre_valido
+                FROM eu_timbres AS t 
+                WHERE codigo = $3 AND fecha_hora_timbre_valido BETWEEN $1 AND $2 
+                ORDER BY fecha_hora_timbre_valido DESC LIMIT 100
+                `, [fec_inicio, fec_final, codigo]);
                 const timbres = response.rows;
                 // console.log(timbres);
                 if (timbres.length === 0)
@@ -146,7 +153,7 @@ class ReportesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { codigo, fec_inicio, fec_final, conexion } = req.query;
-                const response = yield database_1.default.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+                const response = yield database_1.default.query('SELECT t.*, CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
                 const timbres = response.rows;
                 // console.log(timbres);
                 if (timbres.length === 0)

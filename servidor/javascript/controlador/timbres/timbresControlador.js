@@ -90,10 +90,11 @@ class TimbresControlador {
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.documento, t.imagen,
-                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre, conversion_timbre
+                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre, 
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR)
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 100
+                ORDER BY t.fecha_hora_timbre_validado DESC LIMIT 100
                 `, [id]).then((result) => {
                     return result.rows
                         .map((obj) => {
@@ -208,12 +209,14 @@ class TimbresControlador {
                 }
                 let timbresRows = 0;
                 let timbres = yield database_1.default.query(`
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id, t.conversion_timbre 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id,
+                    CAST(fecha_hora_timbre_validado AS VARCHAR) 
                 FROM eu_timbres AS t, informacion_general AS da
                 WHERE t.codigo = $1 
-                    AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
+                    AND CAST(t.fecha_hora_timbre_validado AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `, [codigo, fecha, cedula]).then((result) => {
@@ -259,23 +262,24 @@ class TimbresControlador {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
                 var now;
-                var fecha_hora;
-                var conversion;
+                var fecha_servidor;
+                var fecha_validada;
                 var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 console.log('datos del timbre ', req.body);
                 // OBTENER LA FECHA Y HORA ACTUAL
                 now = (0, moment_timezone_1.default)();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+                fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
+                fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
                 if (zona_dispositivo != zona_servidor) {
                     const now_ = new Date();
                     const convertToTimeZone = (date, timeZone) => {
                         return (0, moment_timezone_1.default)(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
                     };
                     var fecha = convertToTimeZone(now_, zona_dispositivo);
-                    conversion = (0, moment_timezone_1.default)(fecha).format('DD/MM/YYYY, h:mm:ss a');
+                    fecha_validada = (0, moment_timezone_1.default)(fecha).format('DD/MM/YYYY, h:mm:ss a');
                 }
-                console.log('fecha_ hora ', fecha_hora);
+                console.log('fecha_ hora ', fecha_servidor);
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM eu_empleados WHERE id = $1
@@ -287,10 +291,11 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
-                     $11, $12, $13, $14, $15, $16)
-                `, [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen, true, zona_servidor, zona_dispositivo, conversion], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
+                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, zona_dispositivo], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
                     // FORMATEAR FECHAS
                     var hora = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
@@ -302,7 +307,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
                         ip,
                         observacion: null
                     });
@@ -347,9 +352,9 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento, true], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -377,9 +382,9 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo, fec_inicio, fec_final } = req.body;
             const TIMBRES = yield database_1.default.query("SELECT * FROM eu_timbres " +
-                "WHERE fecha_hora_timbre_servidor BETWEEN $1 AND $2 " +
+                "WHERE fecha_hora_timbre_validado BETWEEN $1 AND $2 " +
                 "AND codigo IN (" + codigo + ") " +
-                "ORDER BY codigo, fecha_hora_timbre_servidor ASC", [fec_inicio, fec_final]);
+                "ORDER BY codigo, fecha_hora_timbre_validado ASC", [fec_inicio, fec_final]);
             if (TIMBRES.rowCount === 0) {
                 return res.status(404).jsonp({ message: 'vacio' });
             }
@@ -390,7 +395,7 @@ class TimbresControlador {
                     yield database_1.default.query(`
                     SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                             $3::character varying, $4::integer, $5::character varying)  
-                    `, [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
+                    `, [obj.fecha_hora_timbre_validado, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
                 }));
                 if (contador === TIMBRES.rowCount) {
                     return res.jsonp({ message: 'OK', respuesta: TIMBRES.rows });
@@ -551,10 +556,11 @@ class TimbresControlador {
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
                     t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.imagen,
-                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento,
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR)
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 50
+                ORDER BY t.fecha_hora_timbre_validado DESC LIMIT 50
                 `, [id]).then((result) => {
                     return result.rows
                         .map((obj) => {
@@ -612,11 +618,11 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fecha, funcion, codigo } = req.body;
             const TIMBRE = yield database_1.default.query(`
-            SELECT t.*, t.fecha_hora_timbre_servidor::date AS t_fec_timbre, 
-                t.fecha_hora_timbre_servidor::time AS t_hora_timbre 
+            SELECT t.*, t.fecha_hora_timbre_validado::date AS t_fec_timbre, 
+                t.fecha_hora_timbre_validado::time AS t_hora_timbre 
             FROM eu_timbres AS t
-            WHERE codigo = $1 AND fecha_hora_timbre_servidor::date = $2 AND tecla_funcion = $3 
-            ORDER BY t.fecha_hora_timbre_servidor ASC;
+            WHERE codigo = $1 AND fecha_hora_timbre_validado::date = $2 AND tecla_funcion = $3 
+            ORDER BY t.fecha_hora_timbre_validado ASC;
             `, [codigo, fecha, funcion]);
             if (TIMBRE.rowCount != 0) {
                 return res.jsonp({ message: 'OK', respuesta: TIMBRE.rows });
@@ -792,7 +798,11 @@ class TimbresControlador {
                 const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
                 const fechaHastaStr = fechaHasta.toISOString().split('T')[0] + " 23:59:59";
                 console.log(req.body);
-                const response = yield database_1.default.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre_servidor DESC ', [fechaDesdeStr, fechaHastaStr, codigo]);
+                const response = yield database_1.default.query(`
+                SELECT * FROM eu_timbres 
+                WHERE codigo = $3 AND fecha_hora_timbre_validado BETWEEN $1 AND $2 
+                ORDER BY fecha_hora_timbre_valido DESC
+                `, [fechaDesdeStr, fechaHastaStr, codigo]);
                 const timbres = response.rows;
                 return res.jsonp(timbres);
             }
@@ -815,10 +825,12 @@ class TimbresControlador {
                 fechaDesde.setMonth(fechaDesde.getMonth() - 2);
                 // Establecer la hora inicial del día (00:00:00) para dos meses atrás
                 const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
-                const response = yield database_1.default.query(`SELECT * FROM eu_timbres 
-                 WHERE codigo = $1 
-                 AND fecha_hora_timbre_servidor BETWEEN $2 AND $3
-                 ORDER BY fecha_hora_timbre_servidor DESC`, [id, fechaDesdeStr, fechaHastaStr]);
+                const response = yield database_1.default.query(`
+                SELECT * FROM eu_timbres 
+                WHERE codigo = $1 
+                    AND fecha_hora_timbre_validado BETWEEN $2 AND $3
+                ORDER BY fecha_hora_timbre_validado DESC
+                `, [id, fechaDesdeStr, fechaHastaStr]);
                 const timbres = response.rows;
                 return res.jsonp(timbres);
             }

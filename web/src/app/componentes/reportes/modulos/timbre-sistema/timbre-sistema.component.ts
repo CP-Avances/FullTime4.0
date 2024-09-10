@@ -545,10 +545,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         const CrearFilasCuerpo = (timbres: any[], conDispositivo: boolean) => timbres.map((t: any) => {
           let servidor_fecha = '';
           let servidor_hora = '';
-          if (t.fecha_hora_timbre_servidor) {
+          if (t.fecha_hora_timbre_validado) {
             [servidor_fecha, servidor_hora] = [
-              this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado),
-              this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora)
+              this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado),
+              this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora)
             ];
           }
           const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
@@ -615,9 +615,9 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           let ele: any;
           let servidor_fecha: any = '';
           let servidor_hora = '';
-          if (t.fecha_hora_timbre_servidor != '' && t.fecha_hora_timbre_servidor != null) {
-            servidor_fecha = new Date(t.fecha_hora_timbre_servidor);
-            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
+            servidor_fecha = new Date(t.fecha_hora_timbre_validado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           };
           const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           switch (t.accion) {
@@ -681,9 +681,9 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           n = n + 1;
           let servidor_fecha = '';
           let servidor_hora = '';
-          if (t.fecha_hora_timbre_servidor != '' && t.fecha_hora_timbre_servidor != null) {
-            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
-            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
+            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           }
           const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
           const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);

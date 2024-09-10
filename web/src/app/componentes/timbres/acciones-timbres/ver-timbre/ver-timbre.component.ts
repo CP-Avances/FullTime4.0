@@ -51,8 +51,8 @@ export class VerTimbreComponent implements OnInit {
   fecha_timbre: any;
   hora_timbre: any;
   ObtenerTimbre(formato_fecha: string, formato_hora: string) {
-    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fecha_hora_timbre_servidor, formato_fecha, this.validar.dia_completo);
-    this.hora_timbre = this.validar.FormatearHora(this.timbre.fecha_hora_timbre_servidor.split(' ')[1], formato_hora);
+    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fecha_hora_timbre_validado, formato_fecha, this.validar.dia_completo);
+    this.hora_timbre = this.validar.FormatearHora(this.timbre.fecha_hora_timbre_validado.split(' ')[1], formato_hora);
   }
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA

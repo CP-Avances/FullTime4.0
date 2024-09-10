@@ -4,7 +4,7 @@ import { QueryResult } from 'pg';
 
 class ReportesControlador {
 
-   
+
     public async ListarEntradaSalidaEmpleado(req: Request, res: Response) {
         // id_empleado hace referencia al código del empleado
         const { id_empleado } = req.params;
@@ -125,7 +125,16 @@ class ReportesControlador {
     public async getInfoReporteTimbres(req: Request, res: Response): Promise<Response> {
         try {
             const { codigo, fec_inicio, fec_final } = req.query;
-            const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+            const response: QueryResult = await pool.query(
+                `
+                SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, 
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor,
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre_valido
+                FROM eu_timbres AS t 
+                WHERE codigo = $3 AND fecha_hora_timbre_valido BETWEEN $1 AND $2 
+                ORDER BY fecha_hora_timbre_valido DESC LIMIT 100
+                `
+                , [fec_inicio, fec_final, codigo]);
             const timbres: any[] = response.rows;
             // console.log(timbres);
             if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
@@ -138,14 +147,14 @@ class ReportesControlador {
     };
 
 
-    public async getInfoReporteTimbresNovedad(req: Request, res: Response): Promise<Response>  {
+    public async getInfoReporteTimbresNovedad(req: Request, res: Response): Promise<Response> {
         try {
-            const { codigo, fec_inicio, fec_final, conexion} = req.query;
-            const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+            const { codigo, fec_inicio, fec_final, conexion } = req.query;
+            const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
             const timbres: any[] = response.rows;
             // console.log(timbres);
             if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
-    
+
             return res.status(200).jsonp(timbres);
         } catch (error) {
             console.log(error);
