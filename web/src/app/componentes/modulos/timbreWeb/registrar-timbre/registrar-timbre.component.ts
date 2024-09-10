@@ -178,6 +178,12 @@ export class RegistrarTimbreComponent implements OnInit {
       this.permisos_camara = true;
       // SI SE DETECTA ALGUNA CAMARA, SELECCIONAR UNA POR DEFECTO
       this.seleccionarDispositivo = this.camaraFrontal?.deviceId || this.camaraTrasera?.deviceId || '';
+      if (this.camaraFrontal && this.camaraTrasera) {
+        // IMPRIMIR EL LABEL DE LA CAMARA SELECCIONADA
+        this.camaraSeleccionada = this.seleccionarDispositivo === this.camaraFrontal?.deviceId
+          ? 'Cámara Frontal'
+          : 'Cámara Trasera';
+      }
       // DETENER EL STREAM DESPUES DE VERIFICAR EL ACCESO
       stream.getTracks().forEach(track => track.stop());
     } catch (error) {

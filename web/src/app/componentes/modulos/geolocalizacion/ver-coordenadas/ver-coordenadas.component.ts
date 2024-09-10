@@ -23,6 +23,7 @@ import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coorden
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { NumericLiteral } from 'typescript';
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -211,9 +212,11 @@ export class VerCoordenadasComponent implements OnInit {
   ListarUsuarios(id: number) {
     this.datosUsuarios = [];
     this.restU.ListarCoordenadasUsuarioU(id).subscribe((datos: any) => {
-      // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
-      this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
-
+      this.datosUsuarios = datos;
+      if (this.rolEmpleado !== 1) {
+        // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
+        this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
+      }
     })
   }
 
@@ -688,10 +691,10 @@ export class VerCoordenadasComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE EMPLEADO
   ModelarEmpleados() {
     let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find((obj1: any) => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
+    this.empleados.forEach((empl: any) => {
+      this.selectionEmp.selected.find((selec: any) => {
+        if (selec.id === empl.id) {
+          respuesta.push(empl)
         }
       })
     })
@@ -717,6 +720,7 @@ export class VerCoordenadasComponent implements OnInit {
 
   // METODO PARA REGISTRAR UBICACIONES
   cont: number = 0;
+  error: number = 0;
   RegistrarUbicacionUsuario(data: any) {
     if (data.length > 0) {
       this.cont = 0;
@@ -727,15 +731,14 @@ export class VerCoordenadasComponent implements OnInit {
           user_name: this.user_name,
           ip: this.ip
         }
+        console.log('coordenada ', datos)
         this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
           this.cont = this.cont + 1;
-          if (this.cont === data.length) {
-            this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
-              timeOut: 6000,
-            });
-            this.ConsultarDatos();
-            this.AbrirVentanaBusqueda();
+          console.log('ver ', res)
+          if (res.message === 'error') {
+            this.error = this.error + 1;
           }
+          this.MostrarMensajes(data);
         });
       })
     }
@@ -745,6 +748,29 @@ export class VerCoordenadasComponent implements OnInit {
       });
     }
 
+  }
+
+  // METODO PARA MOSTRAR MENSAJES
+  MostrarMensajes(data: any) {
+    if (data.length === this.error) {
+      this.toastr.warning('Los registros de ubicación ya existen en el sistema.', '', {
+        timeOut: 6000,
+      });
+    }
+    else if (this.cont === data.length) {
+      if (this.error != 0) {
+        this.toastr.success('Algunos registros ya existen en el sistema.', 'Registros de ubicación asignados exitosamente.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
+          timeOut: 6000,
+        });
+      }
+    }
+    this.ConsultarDatos();
+    this.AbrirVentanaBusqueda();
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS

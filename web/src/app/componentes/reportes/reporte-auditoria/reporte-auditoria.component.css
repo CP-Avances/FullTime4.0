@@ -1,5 +1,10 @@
-mat-form-field {
-  padding: 10px 15px 0px 15px;
+mat-form-field.input-tables {
+  background: transparent;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  fill: none;
+  height: 65px;
 }
 
 table {

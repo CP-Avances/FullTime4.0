@@ -1,33 +1,32 @@
 // IMPORTAR LIBRERIAS
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
 
+import * as moment from 'moment';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from '../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
-
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-
-
+import { FormControl } from '@angular/forms';
 
 interface Tablas {
     nombre: string;
     modulo: string;
     disponibilidad: boolean;
 }
+
 interface TablasD {
     nombre: string;
     modulo: string;
@@ -39,8 +38,17 @@ interface TablasD {
     styleUrls: ['./reporte-auditoria.component.css']
 })
 
-export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
+export class ReporteAuditoriaComponent implements OnInit {
 
+    // ITEMS DE PAGINACION DE LA TABLA
+    @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
+    pageSizeOptions = [5, 10, 20, 50];
+    tamanio_pagina: number = 5;
+    numero_pagina: number = 1;
+
+    // CAMPOS DEL FORMULARIO
+    tabla_ = new FormControl('');
+    modulo_ = new FormControl('');
 
     // VARIABLES PROGRESS SPINNER
     habilitarprogress: boolean = false;
@@ -48,46 +56,16 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     color: ThemePalette = 'primary';
     value = 10;
 
-    // FORMATO FECHA HORA   
+    // VARIABLES  
     formato_fecha: string = 'DD/MM/YYYY';
     formato_hora: string = 'HH:mm:ss';
-
-    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-    BuscarParametro() {
-        // id_tipo_parametro Formato fecha = 1
-        this.parametro.ListarDetalleParametros(1).subscribe(
-            res => {
-                this.formato_fecha = res[0].descripcion;
-            });
-    }
-
-    BuscarHora() {
-        // id_tipo_parametro Formato hora = 2
-        this.parametro.ListarDetalleParametros(2).subscribe(
-            res => {
-                this.formato_hora = res[0].descripcion;
-            });
-    }
-
     verDetalle: boolean = false;
     accionesSeleccionadas = [];
-
+    tablasSolicitadas: any = [];
+    tablasD: TablasD[] = [];
 
     // CRITERIOS DE BUSQUEDA POR FECHAS
     get rangoFechas() { return this.reporteService.rangoFechas };
-
-    // SELECCIÓN DE BUSQUEDA DE DATOS SEGÚN OPCIÓN
-    //get bool() { return this.reporteService.criteriosBusqueda };
-
-
-
-    tablasSolicitadas: any = [];
-    // ITEMS DE PAGINACION DE LA TABLA
-    @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
-    pageSizeOptions = [5, 10, 20, 50];
-    tamanio_pagina: number = 5;
-    numero_pagina: number = 1;
-
 
     // BUSQUEDA DE FUNCIONES ACTIVAS
     get geolocalizacion(): boolean { return this.varificarFunciones.geolocalizacion; }
@@ -99,21 +77,61 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     get acciones_personal(): boolean { return this.varificarFunciones.accionesPersonal; }
     get reloj_virtual(): boolean { return this.varificarFunciones.app_movil; }
 
+    constructor(
+        private varificarFunciones: MainNavService,
+        private reporteService: ReportesService,
+        private toastr: ToastrService,
+        private restAuditoria: AuditoriaService,
+        private restEmpre: EmpresaService,
+        public validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
+        public parametro: ParametrosService,
+    ) {
+        this.ObtenerLogo();
+        this.ObtenerColores();
+    }
+
+    ngOnInit(): void {
+        this.ContruirTablaDefinitiva(this.tablas);
+        this.BuscarParametro();
+        this.BuscarHora();
+    }
+
+    // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
+    ManejarPagina(e: PageEvent) {
+        this.numero_pagina = e.pageIndex + 1;
+        this.tamanio_pagina = e.pageSize;
+    }
+
+    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+    BuscarParametro() {
+        // id_tipo_parametro Formato fecha = 1
+        this.parametro.ListarDetalleParametros(1).subscribe(
+            res => {
+                this.formato_fecha = res[0].descripcion;
+            });
+    }
+
+    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
+    BuscarHora() {
+        // id_tipo_parametro Formato hora = 2
+        this.parametro.ListarDetalleParametros(2).subscribe(
+            res => {
+                this.formato_hora = res[0].descripcion;
+            });
+    }
+
+    // METODO PARA OBTENER TIPO DE ACCIONES
     ObtenerTipoAccion($event: any) {
         this.accionesSeleccionadas = $event;
-        //console.log(this.accionesSeleccionadas);
-
         return this.accionesSeleccionadas;
     }
 
-
-    // Inicialización directa de la lista de objetos Tablas
+    // INICIALIZACION DIRECTA DE LA LISTA DE OBJETOS TABLAS
     tablas: Tablas[] = [
         { nombre: "e_empresa", modulo: "", disponibilidad: true },
         { nombre: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "e_ciudades", modulo: "", disponibilidad: true },
         { nombre: "e_sucursales", modulo: "", disponibilidad: true },
-        //e_cat_tipo_cargo
         { nombre: "e_cat_tipo_cargo", modulo: "", disponibilidad: true },
         { nombre: "e_cat_modalidad_trabajo", modulo: "", disponibilidad: true },
         { nombre: "e_message_birthday", modulo: "", disponibilidad: true },
@@ -156,7 +174,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "ecm_autorizaciones", modulo: "", disponibilidad: true },
         { nombre: "ecm_realtime_notificacion", modulo: "", disponibilidad: true },
         { nombre: "ecm_realtime_timbres", modulo: "", disponibilidad: true },
-        //ma_cg_comidas
+        // MODULO DE ALIMENTACION
         { nombre: "ma_cat_comidas", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_detalle_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_detalle_plan_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
@@ -165,81 +183,55 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "ma_invitados_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_solicitud_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "map_cargo_propuesto", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
-        //map_cat_procesos
+        // MODULO DE ACCIONES DE PERSONAL
         { nombre: "map_cat_procesos", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_contexto_legal_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_detalle_tipo_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_empleado_procesos", modulo: " acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_solicitud_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_tipo_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
-        //nombre diferente en excel
+        // MODULO DE GEOLOCALIZACION
         { nombre: "mg_cat_ubicaciones", modulo: "geolocalizacion", disponibilidad: this.geolocalizacion },
         { nombre: "mg_empleado_ubicacion", modulo: "geolocalizacion", disponibilidad: this.geolocalizacion },
+        // MODULO DE HORAS EXTRAS
         { nombre: "mhe_calcular_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_configurar_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_detalle_plan_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_empleado_plan_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_solicitud_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
-        //mp_cat_tipo_permisos
+        // MODULO DE PERMISOS
         { nombre: "mp_cat_tipo_permisos", modulo: "permisos", disponibilidad: this.permisos },
         { nombre: "mp_solicitud_permiso", modulo: "permisos", disponibilidad: this.permisos },
+        // MODULO DE RELOJ VIRTUAL
         { nombre: "mrv_dispositivos", modulo: "reloj_virtual", disponibilidad: this.reloj_virtual },
+        // MODULO DE VACACIONES
         { nombre: "mv_periodo_vacacion", modulo: "vacaciones", disponibilidad: this.vacaciones },
         { nombre: "mv_solicitud_vacacion", modulo: "vacaciones", disponibilidad: this.vacaciones }
 
     ];
 
-    tablasD: TablasD[] = [];
-
+    // METODO PARA CONSTRUIR TABLAS
     ContruirTablaDefinitiva(tabla: any) {
-
-
-
         tabla.map((x: any) => {
-
             if (x.disponibilidad == true) {
                 this.tablasD.push({
                     nombre: x.nombre,
                     modulo: x.modulo,
                 })
             }
-
         })
-
     }
-
-
-    constructor(
-        private varificarFunciones: MainNavService,
-        private reporteService: ReportesService,
-        private toastr: ToastrService,
-        private restAuditoria: AuditoriaService,
-        private restEmpre: EmpresaService,
-        public validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
-        public parametro: ParametrosService,
-
-
-    ) {
-
-        this.ObtenerLogo();
-        this.ObtenerColores();
-
-
-    }
-
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
-
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
         this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
-
     }
+
 
     blobToArraynoString(blob: Blob): Promise<any[]> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-
             reader.onload = () => {
                 try {
                     const result = reader.result;
@@ -267,7 +259,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                                 }
                             }
                         }
-
                         resolve(objects);
                     } else {
                         reject(new Error("Expected an ArrayBuffer but got a different type"));
@@ -295,15 +286,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                     console.log("para ver como es este array", dataArray)
                     let jsonString = new TextDecoder('utf-8').decode(dataArray);
 
-                    // console.log('Contenido original del Blob:', jsonString); // Imprimir el contenido original del Blob
-
                     // Añadir las comas antes de {"plataforma": excepto la primera vez
                     jsonString = jsonString.replace(/(\{"plataforma":)/g, (match, p1, offset) => offset === 0 ? p1 : `,${p1}`);
 
-                    // Añadir los corchetes al principio y al final
+                    // AÑADIR LOS CORCHETES AL PRINCIPIO Y AL FINAL
                     jsonString = `[${jsonString}]`;
 
-                    console.log('Contenido modificado del Blob:', jsonString); // Imprimir el contenido modificado del Blob
+                    console.log('Contenido modificado del Blob:', jsonString); // IMPRIMIR EL CONTENIDO MODIFICADO DEL BLOB
 
                     const data = JSON.parse(jsonString);
                     resolve(data);
@@ -319,9 +308,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     }
 
     //BUSCAR REGISTROS AUDITORIA
-
     ModelarTablasAuditoria(accion: any) {
-
         this.data_pdf = [];
         var tablas = '';
         var acciones = '';
@@ -335,19 +322,12 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             action: acciones,
         };
 
-
         this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
             (response: HttpResponse<Blob>) => {
                 if (response.body !== null) {
-                    //const data_pdf: Blob = response.body;
-                    //console.log("para ver", response.body);
                     this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
-                        //console.log(data_pdf); // Aquí puedes manejar los datos recibidos, como guardarlos o procesarlos
-                        this.data_pdf = data_pdf;
-
+                     this.data_pdf = data_pdf;
                         switch (accion) {
-                            // Agrega aquí tu lógica para manejar las diferentes acciones
-                            // case 'excel': this.ExportarExcelCargoRegimen(); break;
                             case 'ver': this.VerDatos(); break;
                             default: this.GenerarPDF(data_pdf, accion); break;
                         }
@@ -371,9 +351,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     datosbusqueda: any = [];
     data_pdf: any = [];
-
-
-
     dataSource: any;
     async ModelarTablasAuditoriaPorTablas(accion: any) {
         this.data_pdf = [];
@@ -425,19 +402,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     }
 
     datosPdF: any = []
-
-
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
         this.habilitarprogress = true;
-
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
-
         // Array para almacenar todas las promesas de consulta
         const consultasPromesas: Promise<any>[] = [];
-
         for (let i = 0; i < this.tablasSolicitadas.length; i++) {
-
             const tabla = this.tablasSolicitadas[i];
             const buscarTabla = {
                 tabla: tabla.nombre,
@@ -469,7 +440,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                     }
                 );
             });
-
 
             consultasPromesas.push(consultaPromise); // Agregar la promesa al array
         }
@@ -504,29 +474,14 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         }
     }
 
-
-    ngOnDestroy(): void {
-        //this.ModelarTablasAuditoria();
-    }
-    ngOnInit(): void {
-        //this.obtenerDatosPdf();
-
-        this.ContruirTablaDefinitiva(this.tablas);
-        this.BuscarParametro();
-        this.BuscarHora();
-    }
-    // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
-    ManejarPagina(e: PageEvent) {
-        this.numero_pagina = e.pageIndex + 1;
-        this.tamanio_pagina = e.pageSize;
-    }
-
-
-
     // METODOS PARA LA SELECCION MULTIPLE
-
     plan_multiple: boolean = false;
     plan_multiple_: boolean = false;
+    auto_individual: boolean = true;
+    activar_seleccion: boolean = true;
+    seleccion_vacia: boolean = true;
+
+    selectionAuditoria = new SelectionModel<TablasD>(true, []);
 
     HabilitarSeleccion() {
         this.plan_multiple = true;
@@ -535,20 +490,11 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.activar_seleccion = false;
     }
 
-    auto_individual: boolean = true;
-    activar_seleccion: boolean = true;
-    seleccion_vacia: boolean = true;
-
-    selectionAuditoria = new SelectionModel<TablasD>(true, []);
-
-
-
     // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
     isAllSelectedPag() {
         const numSelected = this.selectionAuditoria.selected.length;
         return numSelected === this.tablasD.length
     }
-
 
     // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
     masterTogglePag() {
@@ -557,18 +503,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             this.tablasD.forEach((row: any) => this.selectionAuditoria.select(row));
     }
 
-
     // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
     checkboxLabelPag(row?: TablasD): string {
         if (!row) {
             return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
         }
         this.tablasSolicitadas = this.selectionAuditoria.selected;
-
-
-        // console.log(this.selectionAuditoria.selected)
         return `${this.selectionAuditoria.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
     }
 
     /** ****************************************************************************************** **
@@ -594,9 +535,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         });
     }
 
-
-
-
     /** ****************************************************************************************** **
     **                                              PDF                                           **
     ** ****************************************************************************************** **/
@@ -611,12 +549,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
             default: pdfMake.createPdf(documentDefinition).open(); break;
         }
-
-        //pdfMake.createPdf(documentDefinition).open();
-
     }
-
-
 
     DefinirInformacionPDF(data: any) {
         return {
@@ -675,14 +608,9 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         };
     }
 
-
-
-
     EstructurarDatosPDF(data: any[]): Array<any> {
         let n: any = []
-
         let totalAuditoria = 0;
-
         // Añadir la cabecera con información de la plataforma
         n.push({
             style: 'tableMarginCabecera',

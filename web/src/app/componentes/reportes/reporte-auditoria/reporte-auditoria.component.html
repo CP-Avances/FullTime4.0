@@ -36,8 +36,6 @@
             </mat-card>
         </div>
     </div>
-
-
 </div>
 
 
@@ -54,7 +52,6 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-
                         <th>
                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -69,6 +66,19 @@
                         </th>
                         <th scope="col">Tablas</th>
                         <th scope="col">Módulo</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>
+                            <mat-form-field class="input-tables">
+                                <input matInput placeholder="Buscar" [formControl]="tabla_">
+                            </mat-form-field>
+                        </th>
+                        <th>
+                            <mat-form-field class="input-tables">
+                                <input matInput placeholder="Buscar" [formControl]="modulo_">
+                            </mat-form-field>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
