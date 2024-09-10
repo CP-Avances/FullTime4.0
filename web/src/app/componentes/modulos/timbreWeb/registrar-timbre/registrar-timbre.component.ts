@@ -74,6 +74,7 @@ export class RegistrarTimbreComponent implements OnInit {
   f: Date = new Date();
   currentTime: string;
   formato = 'HH:mm:ss';
+  timeZone: string;
 
   // ID EMPLEADO QUE INICIO SESION
   id_empl: number;
@@ -97,6 +98,8 @@ export class RegistrarTimbreComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    console.log('zona horaria ', this.timeZone)
     this.VerificarCamara();
     this.VerificarFunciones();
     this.BuscarParametros();
@@ -442,6 +445,7 @@ export class RegistrarTimbreComponent implements OnInit {
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
     this.dataTimbre = {
+      zona_dispositivo: this.timeZone,
       fec_hora_timbre: this.fecha_hora,
       tecl_funcion: this.teclaFuncionF,
       observacion: '',
@@ -451,7 +455,7 @@ export class RegistrarTimbreComponent implements OnInit {
       latitud: this.latitud,
       accion: this.accionF,
       ip: this.ip,
-      user_name: this.user_name
+      user_name: this.user_name,
     }
     console.log('data timbre ', this.dataTimbre)
     this.informacion_timbre = this.dataTimbre;

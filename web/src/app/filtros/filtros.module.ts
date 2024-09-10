@@ -59,6 +59,7 @@ import { SucRolEmpleadoPipe } from './sucursales/filtroSucRolEmpleado/suc-rol-em
 import { SucDepEmpleadoPipe } from './sucursales/filtroSucDepEmpleado/suc-dep-empleado.pipe';
 import { OrdenarAsignacionesPipe } from './administrarInformacion/ordenarAsignaciones/ordenar-asignaciones.pipe';
 import { NombreCompletoPipe } from './empleado/nombreCompleto/nombre-completo.pipe';
+import { ModulosPipe } from './modulos/modulos.pipe';
 
 @NgModule({
   declarations: [
@@ -122,6 +123,7 @@ import { NombreCompletoPipe } from './empleado/nombreCompleto/nombre-completo.pi
     OrdenarAsignacionesPipe,
     EmplRolPipe,
     NombreCompletoPipe,
+    ModulosPipe,
   ],
   exports: [
     DepartamentoPipe,
@@ -184,6 +186,7 @@ import { NombreCompletoPipe } from './empleado/nombreCompleto/nombre-completo.pi
     OrdenarAsignacionesPipe,
     EmplRolPipe,
     NombreCompletoPipe,
+    ModulosPipe
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

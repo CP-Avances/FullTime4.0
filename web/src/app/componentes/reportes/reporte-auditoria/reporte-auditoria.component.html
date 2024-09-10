@@ -38,7 +38,6 @@
     </div>
 </div>
 
-
 <div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;" [hidden]="verDetalle">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -82,7 +81,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <ng-container *ngFor="let tabla of tablasD | paginate:tamanio_pagina:numero_pagina">
+                    <ng-container
+                        *ngFor="let tabla of tablasD | nombreCompleto:tabla_.value | modulos:modulo_.value | paginate:tamanio_pagina:numero_pagina">
                         <tr>
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
@@ -91,8 +91,8 @@
                                     [aria-label]="checkboxLabelPag(tabla)">
                                 </mat-checkbox>
                             </td>
-                            <td style="font-size: 14px;">{{tabla.nombre}}</td>
-                            <td style="font-size: 14px;">{{tabla.modulo}}</td>
+                            <td style="text-align: left;">{{tabla.nombre}}</td>
+                            <td>{{tabla.modulo}}</td>
                         </tr>
                     </ng-container>
                 </tbody>
@@ -118,16 +118,16 @@
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                                <th class="t_horarios" scope="col" rowspan="2">PLATAFORMA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">USUARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">IP</th>
-                                <th class="t_horarios" scope="col" rowspan="2">NOMBRE TABLA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
-                                <th class="t_horarios" scope="col" rowspan="2">FECHA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">HORA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">DATOS ORIGINALES</th>
-                                <th class="t_horarios" scope="col" colspan="2">DATOS NUEVOS</th>
+                                <th class="t_horarios" scope="col">N°</th>
+                                <th class="t_horarios" scope="col">PLATAFORMA</th>
+                                <th class="t_horarios" scope="col">USUARIO</th>
+                                <th class="t_horarios" scope="col">IP</th>
+                                <th class="t_horarios" scope="col">NOMBRE TABLA</th>
+                                <th class="t_horarios" scope="col">ACCIÓN</th>
+                                <th class="t_horarios" scope="col">FECHA</th>
+                                <th class="t_horarios" scope="col">HORA</th>
+                                <th class="t_horarios" scope="col">DATOS ORIGINALES</th>
+                                <th class="t_horarios" scope="col">DATOS NUEVOS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,10 +139,14 @@
                                 <td class="t_horarios">{{ e.ip_address }}</td>
                                 <td class="t_horarios">{{ e.table_name }}</td>
                                 <td class="t_horarios">{{ transformAction(e.action) }}</td>
-                                <td class="t_horarios">{{validar.FormatearFecha(e.fecha_hora, this.formato_fecha,
-                                    this.validar.dia_abreviado)}}</td>
-                                <td class="t_horarios">{{validar.FormatearHora(e.fecha_hora.split(' ')[1],
-                                    this.formato_hora)}}</td>
+                                <td class="t_horarios">
+                                    {{validar.FormatearFecha(e.fecha_hora,
+                                    this.formato_fecha,this.validar.dia_abreviado)}}
+                                </td>
+                                <td class="t_horarios">
+                                    {{validar.FormatearHora(e.fecha_hora.split(' ')[1],
+                                    this.formato_hora)}}
+                                </td>
                                 <td class="t_horarios">{{ e.original_data }}</td>
                                 <td class="t_horarios">{{ e.new_data }}</td>
                             </tr>

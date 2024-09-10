@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { QueryResult } from 'pg';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
-import moment from 'moment';
+import moment from 'moment-timezone';
+//import * as moment_ from 'moment-timezone';
 import pool from '../../database';
 
 class TimbresControlador {
@@ -85,7 +86,7 @@ class TimbresControlador {
                 `
                 SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.documento, t.imagen,
-                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre, conversion_timbre
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 100
@@ -205,7 +206,7 @@ class TimbresControlador {
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id, t.conversion_timbre 
                 FROM eu_timbres AS t, informacion_general AS da
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
@@ -255,14 +256,32 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip, imagen } = req.body;
+                ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
+
+            var now: any;
+            var fecha_hora: any;
+            var conversion: any;
+            var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
             console.log('datos del timbre ', req.body)
 
             // OBTENER LA FECHA Y HORA ACTUAL
-            var now = moment();
+            now = moment();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+            fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+
+
+            if (zona_dispositivo != zona_servidor) {
+                const now_ = new Date();
+                const convertToTimeZone = (date: Date, timeZone: string): string => {
+                    return moment(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+                };
+                var fecha: any = convertToTimeZone(now_, zona_dispositivo)
+                conversion = moment(fecha).format('DD/MM/YYYY, h:mm:ss a');
+            }
+
+            console.log('fecha_ hora ', fecha_hora)
+
 
             const id_empleado = req.userIdEmpleado;
 
@@ -282,12 +301,14 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
+                     $11, $12, $13, $14, $15, $16)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen, true],
+                    observacion, 'APP_WEB', ubicacion, imagen, true, zona_servidor, zona_dispositivo, conversion],
 
                 async (error, results) => {
+                    console.log('error ', error)
                     // FORMATEAR FECHAS
                     var hora = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
                     var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
@@ -311,6 +332,7 @@ class TimbresControlador {
             )
 
         } catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });

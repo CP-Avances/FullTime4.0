@@ -128,8 +128,12 @@ export class TimbreWebComponent implements OnInit {
       this.cuenta = res.cuenta;
       this.info = res.info;
       this.timbres.forEach((data: any) => {
-        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
+        let fecha: any = data.fecha_hora_timbre;
+        if (data.fecha_hora_timbre_servidor) {
+          fecha = data.fecha_hora_timbre_servidor;
+        }
+        data.fecha = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(fecha.split(' ')[1], formato_hora);
         this.LeerAcciones(data);
         this.LeerBiometrico(data);
       })

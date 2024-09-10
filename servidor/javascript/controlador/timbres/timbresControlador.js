@@ -15,7 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const settingsMail_1 = require("../../libs/settingsMail");
-const moment_1 = __importDefault(require("moment"));
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
+//import * as moment_ from 'moment-timezone';
 const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
@@ -89,7 +90,7 @@ class TimbresControlador {
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.documento, t.imagen,
-                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre, conversion_timbre
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 100
@@ -209,7 +210,7 @@ class TimbresControlador {
                 let timbres = yield database_1.default.query(`
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id, t.conversion_timbre 
                 FROM eu_timbres AS t, informacion_general AS da
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
@@ -256,12 +257,25 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
+                var now;
+                var fecha_hora;
+                var conversion;
+                var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 console.log('datos del timbre ', req.body);
                 // OBTENER LA FECHA Y HORA ACTUAL
-                var now = (0, moment_1.default)();
+                now = (0, moment_timezone_1.default)();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+                fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+                if (zona_dispositivo != zona_servidor) {
+                    const now_ = new Date();
+                    const convertToTimeZone = (date, timeZone) => {
+                        return (0, moment_timezone_1.default)(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+                    };
+                    var fecha = convertToTimeZone(now_, zona_dispositivo);
+                    conversion = (0, moment_timezone_1.default)(fecha).format('DD/MM/YYYY, h:mm:ss a');
+                }
+                console.log('fecha_ hora ', fecha_hora);
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM eu_empleados WHERE id = $1
@@ -273,12 +287,14 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
+                     $11, $12, $13, $14, $15, $16)
                 `, [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen, true], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, 'APP_WEB', ubicacion, imagen, true, zona_servidor, zona_dispositivo, conversion], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    console.log('error ', error);
                     // FORMATEAR FECHAS
-                    var hora = (0, moment_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                    var fecha = (0, moment_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                    var hora = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
+                    var fecha = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -296,6 +312,7 @@ class TimbresControlador {
                 }));
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: error });
@@ -308,9 +325,9 @@ class TimbresControlador {
             try {
                 // ESTE USUARIO NO TIMBRA CON UBICACION
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body;
-                var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
+                var hora_fecha_timbre = (0, moment_timezone_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
-                var now = (0, moment_1.default)();
+                var now = (0, moment_timezone_1.default)();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
                 let servidor;
