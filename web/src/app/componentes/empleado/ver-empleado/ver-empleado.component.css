@@ -429,9 +429,17 @@ td {
 }
 
 .btnPDF{
-    background-color: #ff3e3e;
-    color: rgb(255, 255, 255);
-    border-color: #ffb9ad;
+    background-color: #2ba869;
+    color: #ffffff;
+    border-color: #dcdcdc;
     border-radius: 10px;
+    font-size: small;
+    padding: 3px;
+    width: 100%;
+}
+
+.btnPDF:hover{
+    background-color: #44c182;
+    border-color: #b2fce9;
 }
 

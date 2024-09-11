@@ -2424,9 +2424,8 @@
                         <span class="w-100 bd-highlight">INFORMACIÓN CONTRATO - CARGOS </span>
                     </div>
                     <mat-card-content>
-                        <br/>
-                        <div class="w-100" *ngIf="listaContratosEmple?.length > 0">
-                            <div class="col-4">
+                        <div class="w-100 mt-2 mb-2" *ngIf="listaContratosEmple?.length > 0">
+                            <div class="col-6 col-md-3">
                                 <button class="btnPDF" (click)="GenerarPdf_Historico('download')">Descargar PDF</button>
                             </div>
                         </div>
@@ -2465,23 +2464,22 @@
                                                     <th scope="col" id="td_horarios" class="th_cargo">FECHA HASTA</th>
                                                     <th scope="col" id="td_horarios" class="th_cargo">HORAS DE TRABAJO</th>
                                                     <th scope="col" id="td_horarios" class="th_cargo">SUELDO</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">ADMINISTRA DEP.</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">JEFATURA</th>
                                                     <th scope="col" id="td_horarios" class="th_cargo">ESTADO</th>
                                                     
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngFor="let cargo of listaCargosEmple; let i = index">
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sucursal}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.nombre}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.cargo}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_inicio | date: 'dd/MM/yyyy'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_final | date: 'dd/MM/yyyy'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.hora_trabaja}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sueldo}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.jefe ? 'Si' : 'No'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios"><b>{{cargo.estado ? 'Activado' : 'Desactivado'}}</b></td>
-                                                    
+                                                <tr *ngFor="let cargo of contrato.cargosAsociados; let i = index">
+                                                    <td id="td_horarios">{{cargo.sucursal}}</td>
+                                                    <td id="td_horarios">{{cargo.nombre}}</td>
+                                                    <td id="td_horarios">{{cargo.cargo}}</td>
+                                                    <td id="td_horarios">{{cargo.fecha_inicio | date: 'dd/MM/yyyy'}}</td>
+                                                    <td id="td_horarios">{{cargo.fecha_final | date: 'dd/MM/yyyy'}}</td>
+                                                    <td id="td_horarios">{{cargo.hora_trabaja}}</td>
+                                                    <td id="td_horarios">{{cargo.sueldo}}</td>
+                                                    <td id="td_horarios">{{cargo.jefe ? 'Si' : 'No'}}</td>
+                                                    <td id="td_horarios"><b>{{cargo.estado ? 'Activado' : 'Desactivado'}}</b></td>
                                                 </tr>
                                             </tbody>
                                         </table>
