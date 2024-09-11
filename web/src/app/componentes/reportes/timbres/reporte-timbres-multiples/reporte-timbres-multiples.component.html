@@ -286,7 +286,7 @@
                                 </th>
                                 <th class="t_horarios" scope="col" rowspan="2">RELOJ</th>
                                 <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
-                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACION</th>
+                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACIÓN</th>
                                 <th class="t_horarios" scope="col" rowspan="2">LONGITUD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">LATITUD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">MAPS</th>
@@ -303,6 +303,7 @@
                                 <td class="t_horarios">{{ t.n }}</td>
                                 <td class="t_horarios">{{ t.codigo }}</td>
                                 <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios" colspan="2">{{ t.zona_horaria_servidor }}</td>
                                 <td class="t_horarios">{{ t.fechaTimbreServidor }}</td>
                                 <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
                                 <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>

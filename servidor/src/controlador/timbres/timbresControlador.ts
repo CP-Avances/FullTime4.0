@@ -260,31 +260,63 @@ class TimbresControlador {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
-
+            console.log('datos del timbre ', req.body)
             var now: any;
+            var hora_diferente: boolean = false;
             var fecha_servidor: any;
             var fecha_validada: any;
             var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            console.log('datos del timbre ', req.body)
+            const id_empleado = req.userIdEmpleado;
 
             // OBTENER LA FECHA Y HORA ACTUAL
             now = moment();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
             fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
             fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
+            // FORMATEAR FECHA Y HORA DEL TIMBRE INGRESADO
+            var hora_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
+            var fecha_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
 
             if (zona_dispositivo != zona_servidor) {
                 const now_ = new Date();
                 const convertToTimeZone = (date: Date, timeZone: string): string => {
                     return moment(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
                 };
-                var fecha: any = convertToTimeZone(now_, zona_dispositivo)
-                fecha_validada = moment(fecha).format('DD/MM/YYYY, h:mm:ss a');
+                var fecha_: any = convertToTimeZone(now_, zona_dispositivo)
+                fecha_validada = moment(fecha_).format('DD/MM/YYYY, h:mm:ss a');
             }
-            console.log('fecha_ hora ', fecha_servidor)
-
-            const id_empleado = req.userIdEmpleado;
+            else {
+                // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
+                var fecha_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
+                if (fecha_valida != fecha_timbre) {
+                    hora_diferente = true;
+                }
+                else {
+                    // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
+                    var hora_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
+                    var hora_timbre_ = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
+                    var resta_hora_valida = moment(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
+                    //console.log(' hora_valida ', hora_valida)
+                    //console.log('resta ', resta_hora_valida)
+                    //console.log('hora_timbre.... ', hora_timbre_)
+                    if (hora_timbre_.isAfter(hora_valida)) {
+                        //console.log('ingresa true, hora mayor');
+                        hora_diferente = true;
+                    }
+                    else {
+                        if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
+                            //console.log('ingresa false');
+                            hora_diferente = false;
+                        }
+                        else {
+                            //console.log('ingresa true, hora menor');
+                            hora_diferente = true;
+                        }
+                    }
+                }
+            }
+            //console.log(' hora diferente ', hora_diferente)
 
             let code = await pool.query(
                 `
@@ -304,18 +336,16 @@ class TimbresControlador {
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
-                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, zona_dispositivo],
+                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor,
+                    zona_dispositivo, hora_diferente],
 
                 async (error, results) => {
                     console.log('error ', error)
-                    // FORMATEAR FECHAS
-                    var hora = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                    var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
-                    const fechaHora = await FormatearHora(hora);
-                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
+                    const fechaHora = await FormatearHora(hora_timbre);
+                    const fechaTimbre = await FormatearFecha(fecha_timbre, 'ddd');
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
@@ -334,7 +364,7 @@ class TimbresControlador {
             )
 
         } catch (error) {
-            console.log('error ', error)
+            console.log('error 500 ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });
@@ -348,7 +378,8 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion,
                 id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body
 
-            var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
+            //console.log('req ', req.body)
+            var hora_fecha_timbre = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY, h:mm:ss a');
 
             // OBTENER LA FECHA Y HORA ACTUAL
             var now = moment();
@@ -356,6 +387,8 @@ class TimbresControlador {
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
             var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
             let servidor: any;
+
+            //console.log('req... ', hora_fecha_timbre)
 
             if (tipo === 'administrar') {
                 servidor = hora_fecha_timbre;
@@ -376,18 +409,22 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            pool.query(
                 `
-                SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
-                `
+                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
+                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
+                 `
                 , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
                     observacion, 'APP_WEB', documento, true, servidor]
 
                 , async (error, results) => {
-
-                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
-                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre, 'ddd')
+                    //console.log('error ', error)
+                    // FORMATEAR FECHAS
+                    var hora = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
+                    var fecha = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
+                    const fechaHora = await FormatearHora(hora);
+                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
@@ -403,7 +440,6 @@ class TimbresControlador {
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }
             )
-
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');

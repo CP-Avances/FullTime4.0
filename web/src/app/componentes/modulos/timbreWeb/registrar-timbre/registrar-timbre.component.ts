@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
@@ -99,14 +99,13 @@ export class RegistrarTimbreComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    console.log('zona horaria ', this.timeZone)
     this.VerificarCamara();
     this.VerificarFunciones();
     this.BuscarParametros();
   }
 
   // METODO PARA FORMATEAR LA HORA
-  private FormatearHora(date: Date): string {
+  private FormatearHora(date: Date, opcion: number): string {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
@@ -115,15 +114,27 @@ export class RegistrarTimbreComponent implements OnInit {
     const formattedMinutes = String(minutes).padStart(2, '0');
     const formattedSeconds = String(seconds).padStart(2, '0');
 
-    if (this.formato === 'hh:mm:ss A') {
-      // CONVERTIR HORAS A FORMATO DE 12 HORAS
-      const formattedHours = hours % 12 || 12;
-      return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    if (opcion === 1) {
+      if (this.formato === 'hh:mm:ss A') {
+        // CONVERTIR HORAS A FORMATO DE 12 HORAS
+        const formattedHours = hours % 12 || 12;
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+      }
+      else {
+        const formattedHours = String(date.getHours()).padStart(2, '0');
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+      }
     }
     else {
-      const formattedHours = String(date.getHours()).padStart(2, '0');
-      return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+      // OBTENER LA FECHA (DIA, MES, AÑO)
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // LOS MESES COMIENZAN DESDE 0
+      const year = date.getFullYear();
+      // CONVERTIR HORAS A FORMATO DE 12 HORAS
+      const formattedHours = hours % 12 || 12;
+      return `${day}/${month}/${year} ${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;;
     }
+
   }
 
   // METODO PARA MOSTRAR HORA EN TIEMPO REAL
@@ -131,11 +142,13 @@ export class RegistrarTimbreComponent implements OnInit {
     interval(1000)
       .pipe(map(() => new Date()))
       .subscribe(date => {
-        this.currentTime = this.FormatearHora(date);
+        this.currentTime = this.FormatearHora(date, 1);
+        this.fecha_hora = this.FormatearHora(date, 2)
       });
 
     // INICIALIZA EL TIEMPO INMEDIATAMENTE
-    this.currentTime = this.FormatearHora(new Date());
+    this.currentTime = this.FormatearHora(new Date(), 1);
+    this.fecha_hora = this.FormatearHora(new Date(), 2);
   }
 
   // METODO PARA MOSTRAR FOTO
@@ -401,10 +414,6 @@ export class RegistrarTimbreComponent implements OnInit {
     this.ver_informacion = true;
     this.ver_timbrar = false;
     this.ver_camara = false;
-    // OBTENER LA FECHA Y HORA ACTUAL
-    var now = moment();
-    // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-    this.fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
     this.InsertarTimbre();
   }
 
@@ -446,7 +455,7 @@ export class RegistrarTimbreComponent implements OnInit {
   RegistrarDatosTimbre(ubicacion: any) {
     this.dataTimbre = {
       zona_dispositivo: this.timeZone,
-      fec_hora_timbre: this.fecha_hora,
+      fec_hora_timbre: '',
       tecl_funcion: this.teclaFuncionF,
       observacion: '',
       ubicacion: ubicacion,
@@ -457,12 +466,15 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name,
     }
-    console.log('data timbre ', this.dataTimbre)
+    //console.log('data timbre ', this.dataTimbre)
     this.informacion_timbre = this.dataTimbre;
   }
 
   //  METODO PARA REGISTRAR DATOS DEL TIMBRE
   RegistrarTimbre(data: any) {
+    data.fec_hora_timbre = this.fecha_hora;
+    //data.fec_hora_timbre = '11/09/2024 5:09:00 PM'
+    console.log('data timbre ', data)
     this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
       data.id_empleado = this.id_empl;
       this.ventana.BuscarParametro();

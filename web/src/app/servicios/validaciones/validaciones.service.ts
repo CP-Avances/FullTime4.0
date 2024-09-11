@@ -122,6 +122,10 @@ export class ValidacionesService {
     }
   }
 
+
+  /** ******************************************************************** **
+   ** **                     FORMATO DE FECHA Y HORA                    ** **
+   ** ** ***************************************************************** **/
   // METODO PARA FORMATEAR FECHA
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
@@ -145,6 +149,22 @@ export class ValidacionesService {
   FormatearHora(hora: string, formato: string) {
     let valor = moment(hora, 'HH:mm:ss').format(formato);
     return valor;
+  }
+
+
+  /** ******************************************************************** **
+   ** **                          ZONA HORARIA                          ** **
+   ** ** ***************************************************************** **/
+
+  ObtenerZonaHoraria(timeZone: string) {
+    var zona_horaria = moment.tz(timeZone).utcOffset();
+    // CONVERTIR LA ZONA HORARIA A FORMATO GMT (HH:mm)
+    var formato_gmt = `GMT${zona_horaria >= 0 ? '+' : '-'}${Math.abs(Math.floor(zona_horaria / 60))
+      .toString()
+      .padStart(2, '0')}:${Math.abs(zona_horaria % 60).toString().padStart(2, '0')}`;
+
+    //console.log('Zona horaria en formato GMT:', formato_gmt);
+    return formato_gmt;
   }
 
 
@@ -327,7 +347,7 @@ export class ValidacionesService {
       });
     });
     seleccionados[0].empleados = datos;
-    console.log("ver empleados web ", seleccionados )
+    console.log("ver empleados web ", seleccionados)
     return seleccionados;
   }
 
