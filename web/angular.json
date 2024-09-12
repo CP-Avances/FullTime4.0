@@ -19,8 +19,7 @@
               "pdfmake",
               "file-saver",
               "ts-md5/dist/md5",
-              "xml2js",
-              "moment-timezone"
+              "xml2js"
            ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",

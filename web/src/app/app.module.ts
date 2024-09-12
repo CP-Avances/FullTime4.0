@@ -289,6 +289,7 @@ import { ReportesModule } from './componentes/reportes/reportes.module';
 import { ConfigReportFirmasHorasExtrasComponent } from './componentes/reportes/configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
 import { ConfigEmpleadosComponent } from './componentes/reportes/configuracion-reportes/config-report-empleados/config-empleados.component';
 import { ConfigAsistenciaComponent } from './componentes/reportes/configuracion-reportes/config-report-asistencia/config-asistencia.component';
+import { InformacionNovedadesComponent } from './componentes/reportes/configuracion-reportes/informacion-novedades/informacion-novedades.component';
 // REPORTES  // REPORTE  --MODULO HORAS EXTRAS
 import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
 import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
@@ -589,6 +590,8 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     MarcacionesEmpMacroComponent,
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
+    InformacionNovedadesComponent,
+
 
   ],
 

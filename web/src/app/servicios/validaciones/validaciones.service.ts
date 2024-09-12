@@ -151,23 +151,6 @@ export class ValidacionesService {
     return valor;
   }
 
-
-  /** ******************************************************************** **
-   ** **                          ZONA HORARIA                          ** **
-   ** ** ***************************************************************** **/
-
-  ObtenerZonaHoraria(timeZone: string) {
-    var zona_horaria = moment.tz(timeZone).utcOffset();
-    // CONVERTIR LA ZONA HORARIA A FORMATO GMT (HH:mm)
-    var formato_gmt = `GMT${zona_horaria >= 0 ? '+' : '-'}${Math.abs(Math.floor(zona_horaria / 60))
-      .toString()
-      .padStart(2, '0')}:${Math.abs(zona_horaria % 60).toString().padStart(2, '0')}`;
-
-    //console.log('Zona horaria en formato GMT:', formato_gmt);
-    return formato_gmt;
-  }
-
-
   /** ******************************************************************** **
    ** **                  METODO PARA OMITIR DUPLICADOS                    **
    ** ** ***************************************************************** **/

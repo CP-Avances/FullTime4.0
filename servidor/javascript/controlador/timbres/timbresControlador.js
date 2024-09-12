@@ -260,13 +260,19 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
                 console.log('datos del timbre ', req.body);
                 var now;
                 var hora_diferente = false;
                 var fecha_servidor;
                 var fecha_validada;
                 var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                // OBTENER EL OFFSET GMT EN MINUTOS
+                const gmt_minutos = new Date().getTimezoneOffset();
+                // CONVERTIR EL OFFSET A HORAS
+                const gmt_horas = -gmt_minutos / 60;
+                // FORMATEAR COMO GMT
+                const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
                 const id_empleado = req.userIdEmpleado;
                 // OBTENER LA FECHA Y HORA ACTUAL
                 now = (0, moment_timezone_1.default)();
@@ -328,10 +334,10 @@ class TimbresControlador {
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
-                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor,
-                    zona_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
+                    zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha_timbre, 'ddd');

@@ -262,7 +262,8 @@ const BuscarTimbres = async function (fec_inicio: string, fec_final: string, cod
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
             latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
-            CAST(fecha_hora_timbre_validado AS VARCHAR), zona_horaria_dispositivo, zona_horaria_servidor
+            CAST(fecha_hora_timbre_validado AS VARCHAR), zona_horaria_dispositivo, zona_horaria_servidor,
+            formato_gmt_servidor, formato_gmt_dispositivo
         FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
         ORDER BY fecha_hora_timbre_validado ASC

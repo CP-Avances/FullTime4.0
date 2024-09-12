@@ -75,6 +75,7 @@ export class RegistrarTimbreComponent implements OnInit {
   currentTime: string;
   formato = 'HH:mm:ss';
   timeZone: string;
+  gmt_dispositivo: string;
 
   // ID EMPLEADO QUE INICIO SESION
   id_empl: number;
@@ -98,7 +99,7 @@ export class RegistrarTimbreComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    this.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    this.ObtenerZonaHoraria();
     this.VerificarCamara();
     this.VerificarFunciones();
     this.BuscarParametros();
@@ -149,6 +150,17 @@ export class RegistrarTimbreComponent implements OnInit {
     // INICIALIZA EL TIEMPO INMEDIATAMENTE
     this.currentTime = this.FormatearHora(new Date(), 1);
     this.fecha_hora = this.FormatearHora(new Date(), 2);
+  }
+
+  // METODO PARA OBTENER ZONA HORARIA
+  ObtenerZonaHoraria() {
+    this.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // OBTENER EL OFFSET GMT EN MINUTOS
+    const gmt_minutos = new Date().getTimezoneOffset();
+    // CONVERTIR EL OFFSET A HORAS
+    const gmt_horas = -gmt_minutos / 60;
+    // FORMATEAR COMO GMT
+    this.gmt_dispositivo = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
   }
 
   // METODO PARA MOSTRAR FOTO
@@ -455,6 +467,7 @@ export class RegistrarTimbreComponent implements OnInit {
   RegistrarDatosTimbre(ubicacion: any) {
     this.dataTimbre = {
       zona_dispositivo: this.timeZone,
+      gmt_dispositivo: this.gmt_dispositivo,
       fec_hora_timbre: '',
       tecl_funcion: this.teclaFuncionF,
       observacion: '',

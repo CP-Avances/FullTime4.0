@@ -717,7 +717,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             reloj: t.id_reloj,
             latitud: t.latitud,
             longitud: t.longitud,
-            observacion: t.observacion
+            observacion: t.observacion,
+            zona_horaria_servidor: (t.zona_horaria_servidor ?? '') + (t.gmt_servidor ? '(' + t.gmt_servidor + ')' : ''),
+            zona_horaria_dispositivo: (t.zona_horaria_dispositivo ?? '') + (t.gmt_dispositivo ? '(' + t.gmt_dispositivo + ')' : '')
           }
           this.timbres.push(ele);
         })

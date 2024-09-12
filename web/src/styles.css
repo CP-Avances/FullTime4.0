@@ -322,4 +322,13 @@ mat-progress-spinner {
     color: rgb(0, 113, 179);
 }
 
+/* ICONO DE NOVEDADES */
+#comentarios {
+    color: rgb(220, 0, 0);
+    cursor: pointer;
+    margin-right: 5px;
+    margin-left: 15px;
+    text-align: center;
+}
+
 @import "~leaflet/dist/leaflet.css";

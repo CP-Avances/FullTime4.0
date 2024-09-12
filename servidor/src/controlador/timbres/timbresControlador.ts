@@ -259,13 +259,19 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip, imagen, zona_dispositivo } = req.body;
+                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
             console.log('datos del timbre ', req.body)
             var now: any;
             var hora_diferente: boolean = false;
             var fecha_servidor: any;
             var fecha_validada: any;
             var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // OBTENER EL OFFSET GMT EN MINUTOS
+            const gmt_minutos = new Date().getTimezoneOffset();
+            // CONVERTIR EL OFFSET A HORAS
+            const gmt_horas = -gmt_minutos / 60;
+            // FORMATEAR COMO GMT
+            const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
             const id_empleado = req.userIdEmpleado;
 
             // OBTENER LA FECHA Y HORA ACTUAL
@@ -336,11 +342,11 @@ class TimbresControlador {
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 `
                 , [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
-                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor,
-                    zona_dispositivo, hora_diferente],
+                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
+                    zona_dispositivo, gmt_dispositivo, hora_diferente],
 
                 async (error, results) => {
                     console.log('error ', error)
