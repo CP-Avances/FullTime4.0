@@ -272,9 +272,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         break;
     }
     // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
+
+    console.log("ver seleccionados : ",seleccionados )
     if (seleccionados.length != 0) {
       this.MostrarInformacion(seleccionados, accion);
     }
+
   }
 
   // METODO PARA MOSTRAR INFORMACION

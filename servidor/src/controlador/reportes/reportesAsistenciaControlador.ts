@@ -138,6 +138,8 @@ class ReportesAsistenciaControlador {
     public async ReporteTimbresMultiple(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
+
+        console.log("ver req.body", req.body)
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
@@ -185,6 +187,7 @@ class ReportesAsistenciaControlador {
     public async ReporteTimbreSistema(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
+        console.log("ver req.body",req.body )
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
