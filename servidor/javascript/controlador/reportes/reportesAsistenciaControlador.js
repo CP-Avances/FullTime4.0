@@ -134,6 +134,7 @@ class ReportesAsistenciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
             let datos = req.body;
+            console.log("ver req.body", req.body);
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbres(desde, hasta, o.codigo);
@@ -178,6 +179,7 @@ class ReportesAsistenciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
             let datos = req.body;
+            console.log("ver req.body", req.body);
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbreSistemas(desde, hasta, o.codigo);
