@@ -16,7 +16,22 @@ export class InformacionNovedadesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('data ', this.data)
+    this.VerificarTipo();
+  }
 
+  /** ************************************************************************************************** **
+   ** **                          INFORMACION RESPECTO A LA ZONA HORARIA                              ** **
+   ** ************************************************************************************************** **/
+  zona_horaria: boolean = false;
+  hora_diferente: boolean = false;
+  VerificarTipo() {
+    if (this.data.tipo === 'zona_horaria') {
+      this.zona_horaria = true;
+    }
+    else if(this.data.tipo === 'hora_diferente'){
+      this.hora_diferente = true;
+    }
   }
 
   // METODO PARA CERRAR EL MODAL

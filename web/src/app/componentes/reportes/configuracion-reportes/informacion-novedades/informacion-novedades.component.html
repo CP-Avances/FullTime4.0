@@ -1,19 +1,97 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-      OBSERVACIONES
+        OBSERVACIONES
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
-  </div>
-  
-  <div class="container">
-    <div class="nota" id="espacio">
-        <span>
-            OBSERVACIONES DEL DÍA :
-        </span>
-        <br>
-        <ul>
-           
-        </ul>
+</div>
+
+<div class="container">
+    <!--  *************  INFORMACION DE LA ZONA HORARIA DEL TIMBRE  **************  -->
+    <div class="row" *ngIf="zona_horaria">
+        <div class="nota" id="espacio" style="text-align: justify; font-size: 11px;">
+            <span>
+                <i id="ver" class="fa fa-comment" style="color: rgb(12, 68, 197);"></i>
+                La marcación fue realizada en una zona horaria diferente a la zona horaria en la que se encuentra el
+                servidor.
+            </span>
+        </div>
+        <div class="col-md">
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-calendar" style="color:green"></i>
+                    Información Servidor
+                </label>
+                <br>
+                {{data.informacion.fechaTimbreServidor}}, {{data.informacion.horaTimbreServidor}}
+            </span>
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-globe" style="color:green"></i>
+                    Zona Horaria Servidor
+                </label>
+                <br>
+                {{data.informacion.zona_horaria_servidor }}
+            </span>
+        </div>
+        <div class="col-md">
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-calendar" style="color:blue"></i>
+                    Información Dispositivo
+                </label>
+                <br>
+                {{data.informacion.fechaTimbre}}, {{data.informacion.horaTimbre}}
+            </span>
+
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-globe" style="color:blue"></i>
+                    Zona Horaria Dispositivo
+                </label>
+                <br>
+                <span style="color:red">{{data.informacion.zona_horaria_dispositivo }}</span>
+            </span>
+        </div>
     </div>
-  </div>
+
+    <!--  *************  INFORMACION DE LA DIFERENCIA EN LA FECHA Y HORA DEL TIMBRE  **************  -->
+    <div class="row" *ngIf="hora_diferente">
+        <div class="nota" id="espacio" style="text-align: justify; font-size: 11px;">
+            <span>
+                <i id="ver" class="fa fa-comment" style="color: rgb(12, 68, 197);"></i>
+                La fecha u hora de la marcación realizada en el dispositivo varia con la hora del servidor.
+            </span>
+        </div>
+        <div class="col-md">
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-calendar" style="color:green"></i>
+                    Información Servidor
+                </label>
+                <br>
+                {{data.informacion.fechaTimbreServidor}},
+                {{data.informacion.horaTimbreServidor}}
+            </span>
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-globe" style="color:green"></i>
+                    Zona Horaria Servidor
+                </label>
+                <br>
+                {{data.informacion.zona_horaria_servidor }}
+            </span>
+        </div>
+        <div class="col-md">
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-calendar" style="color:blue"></i>
+                    Información Dispositivo
+                </label>
+                <br>
+                <span style="color:red">{{data.informacion.fechaTimbre}}, {{data.informacion.horaTimbre}}</span>
+            </span>
+
+            <span class="card-span">
+                <label><i id="ver" class="fa fa-globe" style="color:blue"></i>
+                    Zona Horaria Dispositivo
+                </label>
+                <br>
+                {{data.informacion.zona_horaria_dispositivo }}
+            </span>
+        </div>
+    </div>
+</div>

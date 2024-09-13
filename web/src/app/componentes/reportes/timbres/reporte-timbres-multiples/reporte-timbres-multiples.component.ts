@@ -21,6 +21,8 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { MatDialog } from '@angular/material/dialog';
+import { InformacionNovedadesComponent } from '../../configuracion-reportes/informacion-novedades/informacion-novedades.component';
 
 @Component({
   selector: 'app-reporte-timbres-multiples',
@@ -119,6 +121,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    public ventana: MatDialog,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -273,7 +276,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     }
     // METODO PARA MOSTRAR DATOS DE REGISTROS DEL USUARIO
 
-    console.log("ver seleccionados : ",seleccionados )
+    console.log("ver seleccionados : ", seleccionados)
     if (seleccionados.length != 0) {
       this.MostrarInformacion(seleccionados, accion);
     }
@@ -721,8 +724,11 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             latitud: t.latitud,
             longitud: t.longitud,
             observacion: t.observacion,
-            zona_horaria_servidor: (t.zona_horaria_servidor ?? '') + (t.gmt_servidor ? '(' + t.gmt_servidor + ')' : ''),
-            zona_horaria_dispositivo: (t.zona_horaria_dispositivo ?? '') + (t.gmt_dispositivo ? '(' + t.gmt_dispositivo + ')' : '')
+            zona_horaria_servidor: (t.zona_horaria_servidor ?? '---') + ' ' + (t.formato_gmt_servidor ? '(' + t.formato_gmt_servidor + ')' : '---'),
+            zona_horaria_dispositivo: (t.zona_horaria_dispositivo ?? '---') + ' ' + (t.formato_gmt_dispositivo ? '(' + t.formato_gmt_dispositivo + ')' : '---'),
+            zona_servidor: t.zona_horaria_servidor,
+            zona_dispositivo: t.zona_horaria_dispositivo,
+            hora_diferente: t.hora_timbre_diferente
           }
           this.timbres.push(ele);
         })
@@ -897,6 +903,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   Regresar() {
     this.verDetalle = false;
     this.paginatorDetalle.firstPage();
+  }
+
+  // METODO PARA ABRIR VENTANA DE VISUALIZACION DE OBSERVACIONES
+  VisualizarObservacion(tipo: string, timbre: any) {
+    let observacion = {
+      tipo: tipo,
+      informacion: timbre,
+    }
+    this.ventana.open(InformacionNovedadesComponent, {
+      data: observacion,
+      width: '600px',
+      height: '300px',
+    });
+
   }
 
 }
