@@ -470,6 +470,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Administrar Timbres', url: '/timbres-admin', color: true, ver: true },
           { name: 'Registrar Timbres', url: '/timbres-multiples', color: true, ver: true },
           { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
+          { name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true },
         ]
       },
       {
