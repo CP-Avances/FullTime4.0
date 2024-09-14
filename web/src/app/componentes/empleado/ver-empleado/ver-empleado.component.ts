@@ -3150,9 +3150,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                           text: [
                             'CI: '+ this.empleadoUno[0].cedula+ '\n',
                             'Nacionalidad: ' + nacionalidad + '\n',
-                            'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                            'Fecha Nacimiento: '+ '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                             'Estado civil: ' + estadoCivil+ '\n',
-                            'Género: ' + genero
+                            'Género: ' + genero+ '\n',
+                            'Teléfono: ' + this.empleadoUno[0].telefono
                           ],
                           style: 'item' 
                         },
@@ -3161,8 +3162,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                             'Código: ' + this.empleadoUno[0].codigo+ '\n',
                             'Estado: ' + estado+ '\n',
                             'Domicilio: ' + this.empleadoUno[0].domicilio+ '\n',
-                            'Correo: ' + this.empleadoUno[0].correo+ '\n',
-                            'Teléfono: ' + this.empleadoUno[0].telefono
                           ],
                           style: 'item' 
                         },  
@@ -3171,6 +3170,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                   },
                   layout: 'noBorders', // Esto elimina los bordes de la tabla
                   alignment: 'left', // Alinea la tabla a la izquierda
+                },
+                {
+                  text:'Correo: ' + this.empleadoUno[0].correo, style: 'item' 
                 }
               ]
             }
@@ -3180,10 +3182,54 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
          } ,
          layout: 'noBorders', // Esto elimina los bordes de la tabla
         },
-        { text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''), style: 'header' },
-        this.PresentarDataPDFdiscapacidadEmpleado(),
-        { text: (this.tituloEmpleado.length > 0 ? 'TÍTULOS' : ''), style: 'header' },
-        this.PresentarDataPDFtitulosEmpleado(),
+        { 
+          table: {
+            widths: ['100%'],
+            body:[
+              [
+                { 
+                  text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''),
+                  margin: [0,2, 0, 2],
+                  fillColor: (this.discapacidadUser.length > 0 ? '#0099ff' : 'white'), 
+                  color: 'white',            // Texto en color blanco
+                  alignment: 'center',
+                  bold: true,    
+                  fontSize: 12,  
+                },
+              ],
+              [
+                this.PresentarDataPDFdiscapacidadEmpleado() || { text: '', border: [false, false, false, false], margin: [0, 0, 0, 5] }
+              ]
+            ]
+          },
+          layout: 'noBorders',
+          alignment: 'left',
+          margin: [0, 10, 0, 10]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body:[
+              [
+                { 
+                  text: 'TÍTULOS',
+                  margin: [0,2, 0, 2],
+                  fillColor: '#0099ff', 
+                  color: 'white',            // Texto en color blanco
+                  alignment: 'center',
+                  bold: true,    
+                  fontSize: 12,  
+                },
+              ],
+              [
+                this.PresentarDataPDFtitulosEmpleado() || { text: 'No tiene registrado títulos', border: [false, false, false, false], alignment: 'center', margin: [0, 0, 0, 5] }
+              ]
+            ]
+          },
+          layout: 'noBorders',
+          alignment: 'left',
+          margin: [0, 0, 0, 10]
+        },  
         { 
           table: {
             widths: ['50%', '50%'],
@@ -3248,17 +3294,22 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     if (this.tituloEmpleado.length > 0) {
       return {
         table: {
-          widths: ['*', '*'],
+          widths: ['*'],
           body: [
-            [
-              { text: 'NOMBRE', style: 'tableHeader' },
-              { text: 'NIVEL', style: 'tableHeader' }
-            ],
             ...this.tituloEmpleado.map((obj: any) => {
-              return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
+              return [
+                {
+                  text:[
+                    { text: 'NOMBRE: '+obj.nombre+' ' },
+                    { text: 'NIVEL: '+ obj.nivel}
+                  ],
+                }
+              ];
             })
           ]
-        }
+        }, 
+        layout: 'noBorders',
+        alignment: 'left',
       };
     }
 
@@ -3272,13 +3323,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           ...this.contratoEmpleado.map(contrato => {
             return [
               {
-                text:[
-                  'Régimen: '+contrato.descripcion+ '\n',
-                  'Desde: '+contrato.fec_ingreso_+ '\n',
-                  'Hasta: '+ (contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_)+ '\n',
-                  'Modalidad laboral: '+contrato.nombre_contrato+ '\n',
-                  'Control asistencias: '+ (contrato.controlar_asistencia ? 'Si' : 'No')+ '\n',
-                  'Control vacaciones: '+ (contrato.controlar_vacacion ? 'Si' : 'No')+ '\n',
+                stack:[
+                  { text: 'Régimen: '+contrato.descripcion,},
+                  { text: 'Desde: '+contrato.fec_ingreso_,},
+                  { text: 'Hasta: '+ (contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_),},
+                  { text: 'Modalidad laboral: '+contrato.nombre_contrato,},
+                  { text: 'Control asistencias: '+ (contrato.controlar_asistencia ? 'Si' : 'No'),},
+                  { text: 'Control vacaciones: '+ (contrato.controlar_vacacion ? 'Si' : 'No'),},
                 ]
               }
             ];
@@ -3293,33 +3344,26 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   PresentarDataPDFcargoEmpleado() {
     return {
       table: {
-        widths: ['auto', 'auto'],
+        widths: ['auto'],
         body: [
           ...this.cargoEmpleado.map(cargo => {
             return [
               {
-                stack:[{ text: 'SUCURSAL:', bold: true,  },
-                { text: 'DEPARTAMENTO:', bold: true,  },
-                { text: 'CARGO:', bold: true,   },
-                { text: 'FECHA DESDE:', bold: true,  },
-                { text: 'FECHA HASTA:',  bold: true,  },
-                { text: 'HORAS DE TRABAJO:', bold: true,  },
-                { text: 'SUELDO:', bold: true,  }]
-              },
-              {
-                stack:[{ text: cargo.sucursal, },
-                { text: cargo.departamento,  },
-                { text: cargo.nombre_cargo,  },
-                { text: cargo.fec_inicio_,  },
-                { text: cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_, },
-                { text: cargo.hora_trabaja,  },
-                { text: cargo.sueldo,  }],
+                stack:[
+                { text: 'Sucursal: '+cargo.sucursal,  },
+                { text: 'Departamento: '+cargo.departamento,  },
+                { text: 'Cargo: '+cargo.nombre_cargo,   },
+                { text: 'Desde: '+cargo.fec_inicio_,  },
+                { text: 'Hasta: '+cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,  },
+                { text: 'Horas de trabajo: '+cargo.hora_trabaja,  },
+                { text: 'Sueldo: '+cargo.sueldo,  }]
               }
             ]
           })
         ]
       },
       layout: 'noBorders',
+      alignment: 'left',
     };
   }
 
@@ -3327,22 +3371,23 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     if (this.discapacidadUser.length > 0) {
       return {
         table: {
-          widths: ['*', '*', '*'],
+          widths: ['*'],
           body: [
-            [
-              { text: 'CARNET CONADIS', style: 'tableHeader' },
-              { text: 'TIPO', style: 'tableHeader' },
-              { text: 'PORCENTAJE', style: 'tableHeader' },
-            ],
             ...this.discapacidadUser.map((obj: any) => {
               return [
-                { text: obj.carnet_conadis, style: 'tableCell' },
-                { text: obj.tipo, style: 'tableCell' },
-                { text: obj.porcentaje + ' %', style: 'tableCell' },
+                {
+                  text: [
+                    { text: 'Carnet conadis: '+ obj.carnet_conadis +' ', alignment: 'left'},
+                    { text: 'tipo: '+ obj.nom_tipo+' ',alignment: 'center' },
+                    { text: 'porcentaje:  '+obj.porcentaje+' %'+' ', alignment: 'right' },
+                  ],
+                }
               ];
-            })
+            }) 
           ]
-        }
+        },
+        layout: 'noBorders',
+        alignment: 'left',
       };
     }
   }
