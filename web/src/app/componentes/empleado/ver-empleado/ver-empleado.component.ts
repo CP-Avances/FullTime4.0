@@ -3152,14 +3152,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                             'Nacionalidad: ' + nacionalidad + '\n',
                             'Fecha Nacimiento: '+ '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                             'Estado civil: ' + estadoCivil+ '\n',
-                            'Género: ' + genero+ '\n',
-                            'Teléfono: ' + this.empleadoUno[0].telefono
+                            'Género: ' + genero+ '\n'
                           ],
                           style: 'item' 
                         },
                         { 
                           text: [
                             'Código: ' + this.empleadoUno[0].codigo+ '\n',
+                            'Teléfono: ' + this.empleadoUno[0].telefono+'\n',
                             'Estado: ' + estado+ '\n',
                             'Domicilio: ' + this.empleadoUno[0].domicilio+ '\n',
                           ],
@@ -3181,30 +3181,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           ]
          } ,
          layout: 'noBorders', // Esto elimina los bordes de la tabla
-        },
-        { 
-          table: {
-            widths: ['100%'],
-            body:[
-              [
-                { 
-                  text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''),
-                  margin: [0,2, 0, 2],
-                  fillColor: (this.discapacidadUser.length > 0 ? '#0099ff' : 'white'), 
-                  color: 'white',            // Texto en color blanco
-                  alignment: 'center',
-                  bold: true,    
-                  fontSize: 12,  
-                },
-              ],
-              [
-                this.PresentarDataPDFdiscapacidadEmpleado() || { text: '', border: [false, false, false, false], margin: [0, 0, 0, 5] }
-              ]
-            ]
-          },
-          layout: 'noBorders',
-          alignment: 'left',
-          margin: [0, 10, 0, 10]
         },
         {
           table: {
@@ -3228,7 +3204,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           },
           layout: 'noBorders',
           alignment: 'left',
-          margin: [0, 0, 0, 10]
+          margin: [0, 10, 0, 10]
         },  
         { 
           table: {
@@ -3255,8 +3231,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                 }
               ],
               [
-                this.PresentarDataPDFcontratoEmpleado(),
-                this.PresentarDataPDFcargoEmpleado(),
+                this.PresentarDataPDFcontratoEmpleado() || { text: 'No tiene registrado un contrato activo', border: [false, false, false, false], alignment: 'center', margin: [0, 0, 0, 5] },
+                this.PresentarDataPDFcargoEmpleado() || { text: 'No tiene registrado un cargo activo', border: [false, false, false, false], alignment: 'center', margin: [0, 0, 0, 5] },
               ]
             ]
           },
@@ -3273,6 +3249,54 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           },
           alignment: 'left', // Alinea la tabla a la izquierda
         },
+        { 
+          table: {
+            widths: ['100%'],
+            body:[
+              [
+                { 
+                  text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''),
+                  margin: [0,2, 0, 2],
+                  fillColor: (this.discapacidadUser.length > 0 ? '#0099ff' : 'white'), 
+                  color: 'white',            // Texto en color blanco
+                  alignment: 'center',
+                  bold: true,    
+                  fontSize: 12,  
+                },
+              ],
+              [
+                this.PresentarDataPDFdiscapacidadEmpleado() || { text: '', border: [false, false, false, false], margin: [0, 0, 0, 0] }
+              ]
+            ]
+          },
+          layout: 'noBorders',
+          alignment: 'left',
+          margin: [0, 0, 0, 10]
+        },
+        { 
+          table: {
+            widths: ['100%'],
+            body:[
+              [
+                { 
+                  text: (this.datosVacuna.length > 0 ? 'VACUNAS' : ''),
+                  margin: [0,2, 0, 2],
+                  fillColor: (this.datosVacuna.length > 0 ? '#0099ff' : 'white'), 
+                  color: 'white',            // Texto en color blanco
+                  alignment: 'center',
+                  bold: true,    
+                  fontSize: 12,  
+                },
+              ],
+              [
+                this.PresentarDataPDFvacunasEmpleado() || { text: '', border: [false, false, false, false], margin: [0, 0, 0, 0] }
+              ]
+            ]
+          },
+          layout: 'noBorders',
+          alignment: 'left',
+          margin: [0, 0, 0, 10]
+        },
       ],
       info: {
         title: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + '_PERFIL',
@@ -3283,9 +3307,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       styles: {
         header: { fontSize: 14, bold: true, margin: [0, 20, 0, 10] },
         name: { fontSize: 14, bold: true },
-        item: { fontSize: 11, bold: false, },
+        item: { fontSize: 10, bold: false, },
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        tableCell: { fontSize: 12, alignment: 'center', },
+        tableCell: { fontSize: 10, alignment: 'center', },
       }
     };
   }
@@ -3315,8 +3339,36 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   }
 
+  PresentarDataPDFvacunasEmpleado(){
+    if (this.datosVacuna.length > 0) {
+      return {
+        table: {
+          widths: ['*'],
+          body: [
+            ...this.datosVacuna.map((obj: any) => {
+              return [
+                {
+                  text:[
+                    { text: 'Vacuna: '+obj.nombre+' ' },
+                    { text: 'descripcion: '+ obj.Descripción+' '},
+                    { text: 'fecha: '+obj.fecha_+' '},
+                    { text: 'carnet: '+obj.carnet}
+                  ],
+                }
+              ];
+            })
+          ]
+        }, 
+        layout: 'noBorders',
+        alignment: 'left',
+        margin: [0, 0, 0, 5]
+      };
+    }
+  }
+
   PresentarDataPDFcontratoEmpleado() {
-    return {
+    if (this.contratoEmpleado.length > 0) {
+      return {
       table: {
         widths: ['auto'],
         body: [
@@ -3338,33 +3390,37 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       },
       layout: 'noBorders',
       alignment: 'left',
-    };
+      };
+    }
   }
 
   PresentarDataPDFcargoEmpleado() {
-    return {
-      table: {
-        widths: ['auto'],
-        body: [
-          ...this.cargoEmpleado.map(cargo => {
-            return [
-              {
-                stack:[
-                { text: 'Sucursal: '+cargo.sucursal,  },
-                { text: 'Departamento: '+cargo.departamento,  },
-                { text: 'Cargo: '+cargo.nombre_cargo,   },
-                { text: 'Desde: '+cargo.fec_inicio_,  },
-                { text: 'Hasta: '+cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,  },
-                { text: 'Horas de trabajo: '+cargo.hora_trabaja,  },
-                { text: 'Sueldo: '+cargo.sueldo,  }]
-              }
-            ]
-          })
-        ]
-      },
-      layout: 'noBorders',
-      alignment: 'left',
-    };
+    if (this.cargoEmpleado.length > 0) {
+      return {
+        table: {
+          widths: ['auto'],
+          body: [
+            ...this.cargoEmpleado.map(cargo => {
+              return [
+                {
+                  stack:[
+                  { text: 'Sucursal: '+cargo.sucursal,  },
+                  { text: 'Departamento: '+cargo.departamento,  },
+                  { text: 'Cargo: '+cargo.nombre_cargo,   },
+                  { text: 'Desde: '+cargo.fec_inicio_,  },
+                  { text: 'Hasta: '+cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,  },
+                  { text: 'Horas de trabajo: '+cargo.hora_trabaja,  },
+                  { text: 'Sueldo: '+cargo.sueldo,  }]
+                }
+              ]
+            })
+          ]
+        },
+        layout: 'noBorders',
+        alignment: 'left',
+      };
+    }
+    
   }
 
   PresentarDataPDFdiscapacidadEmpleado() {
@@ -3388,6 +3444,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         },
         layout: 'noBorders',
         alignment: 'left',
+        margin: [0, 0, 0, 5]
       };
     }
   }

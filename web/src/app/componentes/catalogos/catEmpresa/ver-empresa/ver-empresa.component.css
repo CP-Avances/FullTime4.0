@@ -35,10 +35,19 @@ p {
     cursor: pointer;
 }
 
-td {
-    padding-top: 10px;
-    text-align: center;
+/* Estilo para las celdas de la tabla */
+th, td {
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* Evita el ajuste de texto en las celdas */
+    border-bottom: 1px solid #dee2e6;
 }
+
+th {
+    background-color: #f8f9fa;
+}
+
+
 
 .caja1 {
     padding: 0px 15px 0px 15px;
@@ -112,6 +121,7 @@ mat-radio-group {
 table {
     width: 100%;
     font-size: 14px;
+    border-collapse: collapse;
 
 }
 
@@ -120,4 +130,15 @@ a.matTooltip.tooltip {
     color: red !important;
     background-color:yellow;
     border: 1px solid black;
+}
+
+.table_horario {
+    max-height: 400px; /* Ajusta según sea necesario */
+    overflow-y: auto; /* Permite el scroll vertical si el contenido excede la altura */
+}
+
+/* Contenedor para manejar el scroll horizontal */
+.table-wrapper {
+    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
+    display: block;
 }

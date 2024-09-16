@@ -274,3 +274,9 @@ mat-progress-spinner {
   }
 
 }
+
+@media(max-width: 550px){
+  #nombreUsuario{
+    display: none !important;
+  }
+}
