@@ -394,6 +394,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let general: any = [];
     let n: any = [];
     let c = 0;
+    console.log("ver la data del pdf",data)
     data.forEach((selec: any) => {
       let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length })
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
