@@ -125,6 +125,17 @@ table {
 
 }
 
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .Tabla_titulo h5{
+        font-size: medium;
+    }
+
+    #num {
+        font-size: 16px;
+    }
+}
+
 a.matTooltip.tooltip {
     font-size: 11px;
     color: red !important;

@@ -1,5 +1,6 @@
 table {
     width: 100%;
+    margin: 0% !important;
     font-size: 14px;
 }
 
@@ -7,6 +8,7 @@ p {
     font-size: x-small;
     text-align: center;
 }
+
 
 td {
     padding-top: 10px;
@@ -38,4 +40,20 @@ label{
     background-color: rgb(80, 87, 97);
     margin-left: 15px;
     color: white;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .Tabla_titulo span{
+        font-size: small;
+    }
+
+    mat-card-content{
+        padding: 0px;
+
+        .container{
+            margin: 0%;
+            width: 100%;
+        }
+    }
 }

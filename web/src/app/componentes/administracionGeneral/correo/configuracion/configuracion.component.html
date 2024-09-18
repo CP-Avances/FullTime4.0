@@ -67,7 +67,9 @@
                         </div>
                         <div class="d-flex flex-wrap justify-content-start">
                             <label id="datosF">Correo principal:</label>
-                            <label>{{e.correo}}</label>
+                            <div class="flex-grow-1" style="overflow: hidden; text-overflow: ellipsis;">
+                                <label>{{e.correo}}</label>
+                            </div>
                         </div>
                         <div class="d-flex flex-wrap justify-content-start">
                             <label id="datosF">Servidor de correo:</label>

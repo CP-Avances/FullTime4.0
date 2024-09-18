@@ -169,20 +169,20 @@
                 <!--  ************************* TABLA LISTA DE ESTABLECIMIENTOS ******************************** -->
                 <div class="container" style="padding-bottom: 50px; text-align: center; padding: 0%;">
                     <div class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="flex-shrink-1 bd-highlight" style="margin-left: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        <div class="row w-100 m-auto" id="titulo">
+                            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: left;"
                                     (click)="AbrirVentanaRegistrarSucursal()">
                                     Crear {{e.establecimiento}}
                                 </button>
                             </div>
-                            <div class="w-100 bd-highlight">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                                 <h5>
                                     LISTA DE {{nombre_establecimiento.toUpperCase()}}
                                 </h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
                                     (click)="ConfirmarDeleteMultiple()">
                                     Eliminar {{e.establecimiento}}
                                 </button>
@@ -223,7 +223,7 @@
                                             </td>
                                             <td>{{ds.nombre}}</td>
                                             <td>{{ds.descripcion}}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 <i matSuffix matTooltipPosition="right"
                                                     matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
                                                     (click)="VerDepartamentos(ds.id)">
