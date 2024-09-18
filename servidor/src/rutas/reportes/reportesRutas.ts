@@ -17,8 +17,8 @@ class CiudadRutas {
         this.router.post('/horasExtrasReales/listaPedidos/total/solicitudes', TokenValidation, REPORTES_CONTROLADOR.ListarPedidosTodos);
         this.router.get('/reportePermisos/horarios/:codigo', TokenValidation, REPORTES_CONTROLADOR.ListarPermisoHorarioEmpleado);
         this.router.get('/timbres', TokenValidation, REPORTES_CONTROLADOR.getInfoReporteTimbres);
-        this.router.get('/timbresConNovedad', TokenValidation, REPORTES_CONTROLADOR.getInfoReporteTimbresNovedad);
-
+        this.router.post('/timbresConNovedad/:desde/:hasta', TokenValidation, REPORTES_CONTROLADOR.getInfoReporteTimbresNovedad);
+        
 
     }
 }

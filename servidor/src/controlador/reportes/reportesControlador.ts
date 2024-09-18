@@ -146,7 +146,7 @@ class ReportesControlador {
         }
     };
 
-
+/*
     public async getInfoReporteTimbresNovedad(req: Request, res: Response): Promise<Response> {
         try {
             const { codigo, fec_inicio, fec_final, conexion } = req.query;
@@ -162,6 +162,53 @@ class ReportesControlador {
         }
     };
 
+*/
+    public async getInfoReporteTimbresNovedad(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        console.log("ver req.body", req.body)
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbresConNovedades(desde, hasta, o.codigo, false );
+                console.log('Timbres: ', o);
+                return o;
+            }));
+            return obj;
+        }));
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres con novedad en ese periodo.' })
+        return res.status(200).jsonp(nuevo)
+    }
+}
+
+const BuscarTimbresConNovedades = async function (fec_inicio: string, fec_final: string, codigo: string | number, conexion: any) {
+    return await pool.query(
+         `SELECT t.*, CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%'  AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100 `
+        , [fec_inicio, fec_final, codigo, conexion])
+        .then(res => {
+            return res.rows;
+        })
+}
+
+
+const BuscarTimbres = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
+    return await pool.query(
+        `
+        SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR)
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
+        ORDER BY fecha_hora_timbre_validado ASC
+        `
+        , [fec_inicio, fec_final, codigo])
+        .then(res => {
+            return res.rows;
+        })
 }
 
 export const REPORTES_CONTROLADOR = new ReportesControlador();
