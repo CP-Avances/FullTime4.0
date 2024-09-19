@@ -186,8 +186,8 @@ class ReportesControlador {
 
 const BuscarTimbresConNovedades = async function (fec_inicio: string, fec_final: string, codigo: string | number, conexion: any) {
     return await pool.query(
-         `SELECT t.*, CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%'  AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100 `
+         `SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, conexion, novedades_conexion, CAST(t.fecha_hora_timbre_validado AS VARCHAR), CAST(t.fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  FROM eu_timbres as t WHERE codigo = $3 AND CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%'  AND conexion = $4 ORDER BY fecha_hora_timbre_validado ASC`
         , [fec_inicio, fec_final, codigo, conexion])
         .then(res => {
             return res.rows;

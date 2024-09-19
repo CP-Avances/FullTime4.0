@@ -778,9 +778,6 @@ class TimbresControlador {
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
-            // const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
-            // const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
-
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
                 usuario: timbre.user_name,
@@ -858,7 +855,7 @@ class TimbresControlador {
                 `
                 SELECT * FROM eu_timbres 
                 WHERE codigo = $3 AND fecha_hora_timbre_validado BETWEEN $1 AND $2 
-                ORDER BY fecha_hora_timbre_valido DESC
+                ORDER BY fecha_hora_timbre_validado DESC
                 `
                 , [fechaDesdeStr, fechaHastaStr, codigo])
             const timbres = response.rows;
