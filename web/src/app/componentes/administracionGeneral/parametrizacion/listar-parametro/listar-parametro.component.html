@@ -2,14 +2,14 @@
 <div *ngIf="ver_lista">
     <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
         <div class="mat-elevation-z8" style="background: white;">
-            <div class="d-flex bd-highlight" id="titulo">
-                <div class="w-100 bd-highlight">
-                    <h5>
+            <div id="titulo" class="row w-100 m-auto align-items-center">
+                <div class="col-12 col-md-10 mb-2 mb-md-0 order-1 order-md-1" >
+                    <h5 class="Tabla_titulo">
                         PARÁMETROS GENERALES
                     </h5>
                 </div>
-                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2 ">
+                    <button type="submit" class="btn btn-outline-light btn-sm w-100 m-auto"
                         (click)="LimpiarCampos()">
                         Mostrar lista
                     </button>
