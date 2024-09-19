@@ -45,6 +45,8 @@ th, td {
 
 th {
     background-color: #f8f9fa;
+    text-align: center;
+    position:sticky;
 }
 
 
@@ -145,7 +147,6 @@ a.matTooltip.tooltip {
 
 .table_horario {
     max-height: 400px; /* Ajusta según sea necesario */
-    overflow-y: auto; /* Permite el scroll vertical si el contenido excede la altura */
 }
 
 /* Contenedor para manejar el scroll horizontal */
