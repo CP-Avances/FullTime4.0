@@ -8,9 +8,18 @@ p {
     text-align: center;
 }
 
+
+
+/* Estilo para las celdas de la tabla */
+th, td {
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap; /* Evita el ajuste de texto en las celdas */
+    border-bottom: 1px solid #dee2e6;
+}
+
 td {
     padding-top: 10px;
-    text-align: center;
     vertical-align: middle;
 }
 
@@ -29,4 +38,10 @@ table {
 
 .scrollme {
     overflow-x: scroll;
+}
+
+/* Contenedor para manejar el scroll horizontal */
+.table-wrapper {
+    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
+    display: block;
 }
