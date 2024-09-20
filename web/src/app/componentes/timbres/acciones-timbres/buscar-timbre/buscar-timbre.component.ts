@@ -151,8 +151,8 @@ export class BuscarTimbreComponent implements OnInit {
           })
         }
         this.timbres.forEach((data: any) => {
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-          data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado);
+          data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           if (data.tecla_funcion === '0') {
             data.tecla_funcion_ = 'Entrada';
           }

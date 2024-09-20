@@ -286,7 +286,7 @@
                                 </th>
                                 <th class="t_horarios" scope="col" rowspan="2">RELOJ</th>
                                 <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
-                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACION</th>
+                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACIÓN</th>
                                 <th class="t_horarios" scope="col" rowspan="2">LONGITUD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">LATITUD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">MAPS</th>
@@ -299,28 +299,54 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td class="t_horarios">{{ t.n }}</td>
-                                <td class="t_horarios">{{ t.codigo }}</td>
-                                <td class="t_horarios">{{ t.empleado }}</td>
-                                <td class="t_horarios">{{ t.fechaTimbreServidor }}</td>
-                                <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
-                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
-                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
-                                <td class="t_horarios">{{ t.reloj }}</td>
-                                <td class="t_horarios">{{ t.accion }}</td>
-                                <td class="t_horarios">{{ t.observacion }}</td>
-                                <td class="t_horarios">{{ t.longitud }}</td>
-                                <td class="t_horarios">{{ t.latitud }}</td>
-                                <td class="t_horarios">
-                                    <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
-                                        matSuffix matTooltipPtosition="right"
-                                        matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
-                                        *ngIf="t.longitud && t.latitud">
-                                        location_on
-                                    </mat-icon>
-                                </td>
-                            </tr>
+                            <ng-container *ngFor="let t of timbres | paginate: tamanio_pagina : numero_pagina">
+                                <tr>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.n }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.codigo }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.empleado }}</td>
+                                    <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;">
+                                        <i id="comentarios" class="fa fa-comment"
+                                            *ngIf="t.zona_servidor != t.zona_dispositivo"
+                                            (click)="VisualizarObservacion('zona_horaria', t)">
+                                        </i>
+                                        {{t.zona_horaria_servidor }}
+                                    </td>
+                                    <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;"
+                                        *ngIf="timbreDispositivo">
+                                        {{t.zona_horaria_dispositivo }}
+                                    </td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.reloj }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.accion }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.observacion }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.longitud }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.latitud }}</td>
+                                    <td [attr.rowspan]="2" class="t_horarios">
+                                        <mat-icon aria-hidden="false" id="accion"
+                                            (click)="AbrirMapa(t.latitud, t.longitud)" matSuffix
+                                            matTooltipPtosition="right"
+                                            matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
+                                            *ngIf="t.longitud && t.latitud">
+                                            location_on
+                                        </mat-icon>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="t_horarios">
+                                        <i id="comentarios" class="fa fa-comment"
+                                            *ngIf="t.zona_servidor === t.zona_dispositivo && t.hora_diferente === true"
+                                            (click)="VisualizarObservacion('hora_diferente', t)">
+                                        </i>
+                                        {{ t.fechaTimbreServidor }}
+                                    </td>
+                                    <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
+                                    <td class="t_horarios" *ngIf="timbreDispositivo">
+                                        {{ t.fechaTimbre }}
+                                    </td>
+                                    <td class="t_horarios" *ngIf="timbreDispositivo">
+                                        {{ t.horaTimbre }}
+                                    </td>
+                                </tr>
+                            </ng-container>
                         </tbody>
                     </table>
                 </div>

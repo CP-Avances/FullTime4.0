@@ -243,32 +243,46 @@ class UbicacionControlador {
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
             const { id_empl, id_ubicacion, user_name, ip } = req.body;
+            console.log('ubicacion ', req.body)
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            await pool.query(
+            const existe = await pool.query(
                 `
-                INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                VALUES ($1, $2)
+                SELECT * FROM mg_empleado_ubicacion WHERE id_empleado = $1 AND id_ubicacion = $2
                 `
-                ,
-                [id_empl, id_ubicacion]);
+                , [id_empl, id_ubicacion]);
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'mg_empleado_ubicacion',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
-                ip,
-                observacion: null
-            });
+            console.log(' existe ', existe.rows)
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            res.jsonp({ message: 'Registro guardado.' });
+            if (existe.rowCount != 0) {
+                res.jsonp({ message: 'error' });
+            }
+            else {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                await pool.query(
+                    `
+                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                    VALUES ($1, $2)
+                    `
+                    ,
+                    [id_empl, id_ubicacion]);
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'mg_empleado_ubicacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
 
         } catch (error) {
             // REVERTIR TRANSACCION

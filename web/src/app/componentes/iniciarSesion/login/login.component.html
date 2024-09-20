@@ -3,9 +3,9 @@
         <div class="home-inner">
             <div class="container">
                 <div class="row">
-                    <div class="col d-flex align-items-center justify-content-center">
-                        <mat-card class="mat-elevation-z8">
-                            <img src="../../../../assets/imagenes/logo/logoAdmin.png"> <br>
+                    <div class="col  d-flex align-items-center justify-content-center m-auto">
+                        <mat-card class="mat-elevation-z8 p-3">
+                            <img class="m-auto" src="../../../../assets/imagenes/logo/logoAdmin.png"> <br>
                             <form [formGroup]="formulario">
                                 <mat-form-field>
                                     <mat-label>Ingresa tu Usuario</mat-label>
@@ -39,7 +39,7 @@
                                 <a [routerLink]="['/olvidar-contrasenia']" class="verde">Olvidó su contraseña?</a>
                             </div>
                             <div style="margin: auto;">
-                                <button type="submit" class="btn btn-lg btn-block"
+                                <button type="submit" class="btn btn-lg btn-block m-auto"
                                     (click)="ValidarUsuario(formulario.value)"
                                     [disabled]="!formulario.valid">Ingresar</button>
                             </div>

@@ -26,7 +26,6 @@ export class TimbresService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/admin/`, datos);
   }
 
-
   // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
@@ -36,23 +35,54 @@ export class TimbresService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbresfechaemple`, { params });
   }
 
-
   // METODO PARA EDITAR TIMBRES    **USADO
   EditarTimbreEmpleado(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbre/editar`, data);
   }
-
 
   // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
   BuscarTimbresAsistencia(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/buscar/timbres-asistencia`, datos);
   }
 
-
   // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)   **USADO
   BuscarTimbresPlanificacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/buscar/timbres-planificacion`, datos);
   }
+
+  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
+  ObtenerTimbresEmpleado(id: number) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/ver/timbres/${id}`);
+  }
+
+  /** ********************************************************************************** **
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** ********************************************************************************** **/
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-opciones-timbre`, datos);
+  }
+
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  IngresarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/opciones-timbre`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  ActualizarOpcionesMarcacion(datos: any) {
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/actualizar-opciones-timbre`, datos);
+  }
+
+
+
+
+
+
+
+
+
+
 
   /**
    * METODO PARA TRAER LAS NOTIFICACIONES DE ATRASOS O SALIDAS ANTES SOLO VIENEN 5 NOTIFICACIONES
@@ -82,9 +112,5 @@ export class TimbresService {
   }
 
 
-  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
-  ObtenerTimbresEmpleado(id: number) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/ver/timbres/${id}`);
-  }
 
 }

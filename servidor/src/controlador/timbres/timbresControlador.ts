@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { QueryResult } from 'pg';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
-import moment from 'moment';
+import moment from 'moment-timezone';
+//import * as moment_ from 'moment-timezone';
 import pool from '../../database';
 
 class TimbresControlador {
@@ -85,10 +86,11 @@ class TimbresControlador {
                 `
                 SELECT CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.documento, t.imagen,
-                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), dispositivo_timbre, 
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR)
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 100
+                ORDER BY t.fecha_hora_timbre_validado DESC LIMIT 100
                 `
                 , [id]).then((result: any) => {
                     return result.rows
@@ -203,12 +205,14 @@ class TimbresControlador {
 
             let timbres = await pool.query(
                 `
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, 
+                    CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id,
+                    CAST(fecha_hora_timbre_validado AS VARCHAR) 
                 FROM eu_timbres AS t, informacion_general AS da
                 WHERE t.codigo = $1 
-                    AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
+                    AND CAST(t.fecha_hora_timbre_validado AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `
@@ -255,16 +259,70 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip, imagen } = req.body;
-
+                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
             console.log('datos del timbre ', req.body)
+            var now: any;
+            var hora_diferente: boolean = false;
+            var fecha_servidor: any;
+            var fecha_validada: any;
+            var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // OBTENER EL OFFSET GMT EN MINUTOS
+            const gmt_minutos = new Date().getTimezoneOffset();
+            // CONVERTIR EL OFFSET A HORAS
+            const gmt_horas = -gmt_minutos / 60;
+            // FORMATEAR COMO GMT
+            const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
+            const id_empleado = req.userIdEmpleado;
 
             // OBTENER LA FECHA Y HORA ACTUAL
-            var now = moment();
+            now = moment();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+            fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
+            fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
+            // FORMATEAR FECHA Y HORA DEL TIMBRE INGRESADO
+            var hora_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
+            var fecha_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
 
-            const id_empleado = req.userIdEmpleado;
+            if (zona_dispositivo != zona_servidor) {
+                const now_ = new Date();
+                const convertToTimeZone = (date: Date, timeZone: string): string => {
+                    return moment(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+                };
+                var fecha_: any = convertToTimeZone(now_, zona_dispositivo)
+                fecha_validada = moment(fecha_).format('DD/MM/YYYY, h:mm:ss a');
+            }
+            else {
+                // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
+                var fecha_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
+                if (fecha_valida != fecha_timbre) {
+                    hora_diferente = true;
+                }
+                else {
+                    // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
+                    var hora_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
+                    var hora_timbre_ = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
+                    var resta_hora_valida = moment(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
+                    //console.log(' hora_valida ', hora_valida)
+                    //console.log('resta ', resta_hora_valida)
+                    //console.log('hora_timbre.... ', hora_timbre_)
+                    if (hora_timbre_.isAfter(hora_valida)) {
+                        //console.log('ingresa true, hora mayor');
+                        hora_diferente = true;
+                    }
+                    else {
+                        if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
+                            //console.log('ingresa false');
+                            hora_diferente = false;
+                        }
+                        else {
+                            //console.log('ingresa true, hora menor');
+                            hora_diferente = true;
+                        }
+                    }
+                }
+            }
+            //console.log(' hora diferente ', hora_diferente)
 
             let code = await pool.query(
                 `
@@ -282,24 +340,25 @@ class TimbresControlador {
             await pool.query(
                 `
                 SELECT * FROM public.timbres_web ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 `
-                , [codigo, id_reloj, fec_hora_timbre, fecha_hora, accion, tecl_funcion, latitud, longitud,
-                    observacion, 'APP_WEB', ubicacion, imagen, true],
+                , [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
+                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
+                    zona_dispositivo, gmt_dispositivo, hora_diferente],
 
                 async (error, results) => {
-                    // FORMATEAR FECHAS
-                    var hora = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                    var fecha = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
-                    const fechaHora = await FormatearHora(hora);
-                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
+                    console.log('error ', error)
+                    const fechaHora = await FormatearHora(hora_timbre);
+                    const fechaTimbre = await FormatearFecha(fecha_timbre, 'ddd');
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
                         ip,
                         observacion: null
                     });
@@ -311,6 +370,7 @@ class TimbresControlador {
             )
 
         } catch (error) {
+            console.log('error 500 ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });
@@ -324,7 +384,8 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion,
                 id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body
 
-            var hora_fecha_timbre = moment(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
+            //console.log('req ', req.body)
+            var hora_fecha_timbre = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY, h:mm:ss a');
 
             // OBTENER LA FECHA Y HORA ACTUAL
             var now = moment();
@@ -332,6 +393,8 @@ class TimbresControlador {
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
             var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
             let servidor: any;
+
+            //console.log('req... ', hora_fecha_timbre)
 
             if (tipo === 'administrar') {
                 servidor = hora_fecha_timbre;
@@ -352,18 +415,22 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            pool.query(
                 `
-                SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10)
-                `
+                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
+                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
+                 `
                 , [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento, true]
+                    observacion, 'APP_WEB', documento, true, servidor]
 
                 , async (error, results) => {
-
-                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
-                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre, 'ddd')
+                    //console.log('error ', error)
+                    // FORMATEAR FECHAS
+                    var hora = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
+                    var fecha = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
+                    const fechaHora = await FormatearHora(hora);
+                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
@@ -379,7 +446,6 @@ class TimbresControlador {
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }
             )
-
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -395,9 +461,9 @@ class TimbresControlador {
 
         const TIMBRES = await pool.query(
             "SELECT * FROM eu_timbres " +
-            "WHERE fecha_hora_timbre_servidor BETWEEN $1 AND $2 " +
+            "WHERE fecha_hora_timbre_validado BETWEEN $1 AND $2 " +
             "AND codigo IN (" + codigo + ") " +
-            "ORDER BY codigo, fecha_hora_timbre_servidor ASC",
+            "ORDER BY codigo, fecha_hora_timbre_validado ASC",
             [fec_inicio, fec_final]);
 
         if (TIMBRES.rowCount === 0) {
@@ -412,7 +478,7 @@ class TimbresControlador {
                     SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                             $3::character varying, $4::integer, $5::character varying)  
                     `
-                    , [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
+                    , [obj.fecha_hora_timbre_validado, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
             })
 
             if (contador === TIMBRES.rowCount) {
@@ -599,10 +665,11 @@ class TimbresControlador {
                 `
                 SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
                     t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, t.ubicacion, t.imagen,
-                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento
+                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR), t.documento,
+                    CAST(t.fecha_hora_timbre_validado AS VARCHAR)
                 FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fecha_hora_timbre_servidor DESC LIMIT 50
+                ORDER BY t.fecha_hora_timbre_validado DESC LIMIT 50
                 `
                 , [id]).then((result: any) => {
                     return result.rows
@@ -639,11 +706,11 @@ class TimbresControlador {
         const { fecha, funcion, codigo } = req.body;
         const TIMBRE = await pool.query(
             `
-            SELECT t.*, t.fecha_hora_timbre_servidor::date AS t_fec_timbre, 
-                t.fecha_hora_timbre_servidor::time AS t_hora_timbre 
+            SELECT t.*, t.fecha_hora_timbre_validado::date AS t_fec_timbre, 
+                t.fecha_hora_timbre_validado::time AS t_hora_timbre 
             FROM eu_timbres AS t
-            WHERE codigo = $1 AND fecha_hora_timbre_servidor::date = $2 AND tecla_funcion = $3 
-            ORDER BY t.fecha_hora_timbre_servidor ASC;
+            WHERE codigo = $1 AND fecha_hora_timbre_validado::date = $2 AND tecla_funcion = $3 
+            ORDER BY t.fecha_hora_timbre_validado ASC;
             `
             , [codigo, fecha, funcion]);
 
@@ -655,7 +722,191 @@ class TimbresControlador {
         }
     }
 
-    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+    /** ************************************************************************************************* **
+     ** **                CONSULTAS DE CONFIGURACION DE OPCIONES DE MARCACIONES                        ** **
+     ** ************************************************************************************************* **/
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
+    public async IngresarOpcionTimbre(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial) 
+                VALUES ($1, $2, $3, $4) RETURNING *
+                `
+                , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
+
+            const [opciones] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mrv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            console.log('error ', error)
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE      **USADO
+    public async ActualizarOpcionTimbre(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+
+            var opciones: any;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            if (timbre_internet && timbre_foto && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet && timbre_foto) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_foto]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_foto = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_foto]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_especial = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mrv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+
+    // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
+    public async BuscarOpcionesTimbre(req: Request, res: Response): Promise<any> {
+
+        const { id_empleado } = req.body;
+        const OPCIONES = await pool.query(
+            `
+            SELECT * FROM mrv_opciones_marcacion 
+            WHERE id_empleado = $1
+            `
+            , [id_empleado]);
+
+        if (OPCIONES.rowCount != 0) {
+            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
+        }
+    }
+
+
+
+    /** ************************************************************************************************* **
+     ** **                                 METODOS PARA APP MOVIL                                      ** **
+     ** ************************************************************************************************* **/
+
     public async crearTimbre(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();
@@ -671,13 +922,7 @@ class TimbresControlador {
             const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
             const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
             if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
-                if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                    timbre.hora_timbre_diferente = false;
-                } else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                    timbre.hora_timbre_diferente = false;
-                } else {
-                    timbre.hora_timbre_diferente = true;
-                }
+                timbre.hora_timbre_diferente = true;
             } else {
                 timbre.hora_timbre_diferente = false;
             }
@@ -687,8 +932,8 @@ class TimbresControlador {
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                 'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);',
+                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado ) ' +
+                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $11);',
                 [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
                 timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
                 timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
@@ -729,6 +974,7 @@ class TimbresControlador {
             const hoy: Date = new Date();
             const timbre: any = req.body;
             await pool.query('BEGIN');
+            console.log("ver req.body",req.body )
 
             timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
             const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
@@ -749,18 +995,15 @@ class TimbresControlador {
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                 'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);',
+                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado) ' +
+                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $11);',
                 [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
                 timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
-                timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
+                timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre,
                 timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
-            // const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
-            // const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
-
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
                 usuario: timbre.user_name,
@@ -792,7 +1035,7 @@ class TimbresControlador {
             await pool.query('BEGIN');
 
 
-            const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id',
+            const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1) RETURNING id',
                 [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente])
                 .then(result => {
                     return result.rows;
@@ -834,8 +1077,13 @@ class TimbresControlador {
             const fechaHastaStr = fechaHasta.toISOString().split('T')[0] + " 23:59:59";
 
             console.log(req.body);
-            const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre_servidor DESC ',
-                [fechaDesdeStr, fechaHastaStr, codigo])
+            const response: QueryResult = await pool.query(
+                `
+                SELECT * FROM eu_timbres 
+                WHERE codigo = $3 AND fecha_hora_timbre_validado BETWEEN $1 AND $2 
+                ORDER BY fecha_hora_timbre_validado DESC
+                `
+                , [fechaDesdeStr, fechaHastaStr, codigo])
             const timbres = response.rows;
             return res.jsonp(timbres);
         } catch (error) {
@@ -860,11 +1108,13 @@ class TimbresControlador {
             const fechaDesdeStr = fechaDesde.toISOString().split('T')[0] + " 00:00:00";
 
             const response: QueryResult = await pool.query(
-                `SELECT * FROM eu_timbres 
-                 WHERE codigo = $1 
-                 AND fecha_hora_timbre_servidor BETWEEN $2 AND $3
-                 ORDER BY fecha_hora_timbre_servidor DESC`,
-                [id, fechaDesdeStr, fechaHastaStr]
+                `
+                SELECT * FROM eu_timbres 
+                WHERE codigo = $1 
+                    AND fecha_hora_timbre_validado BETWEEN $2 AND $3
+                ORDER BY fecha_hora_timbre_validado DESC
+                `
+                , [id, fechaDesdeStr, fechaHastaStr]
             );
             const timbres: any[] = response.rows;
             return res.jsonp(timbres);

@@ -267,6 +267,9 @@ import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/cre
 import { EditarTimbreComponent } from './componentes/timbres/acciones-timbres/editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from './componentes/timbres/acciones-timbres/ver-timbre/ver-timbre.component';
 import { VerImagenComponent } from './componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
+import { ConfigurarOpcionesTimbresComponent } from './componentes/timbres/configurar-opciones/configurar-opciones-timbres/configurar-opciones-timbres.component';
+import { VerConfiguracionTimbreComponent } from './componentes/timbres/configurar-opciones/ver-configuracion-timbre/ver-configuracion-timbre.component';
+
 // NOTIFICACIONES
 import { SettingsComponent } from './componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
 import { ConfiguracionNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/configuracion/configuracionNotificacion.component';
@@ -289,6 +292,7 @@ import { ReportesModule } from './componentes/reportes/reportes.module';
 import { ConfigReportFirmasHorasExtrasComponent } from './componentes/reportes/configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
 import { ConfigEmpleadosComponent } from './componentes/reportes/configuracion-reportes/config-report-empleados/config-empleados.component';
 import { ConfigAsistenciaComponent } from './componentes/reportes/configuracion-reportes/config-report-asistencia/config-asistencia.component';
+import { InformacionNovedadesComponent } from './componentes/reportes/configuracion-reportes/informacion-novedades/informacion-novedades.component';
 // REPORTES  // REPORTE  --MODULO HORAS EXTRAS
 import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
 import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
@@ -315,7 +319,6 @@ import { MainNavService } from './componentes/administracionGeneral/main-nav/mai
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
-
 
 
 @NgModule({
@@ -554,6 +557,8 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     EditarTimbreComponent,
     VerTimbreComponent,
     VerImagenComponent,
+    ConfigurarOpcionesTimbresComponent,
+    VerConfiguracionTimbreComponent,
 
     SettingsComponent,
     ConfiguracionNotificacionComponent,
@@ -589,6 +594,8 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     MarcacionesEmpMacroComponent,
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
+    InformacionNovedadesComponent,
+
 
   ],
 

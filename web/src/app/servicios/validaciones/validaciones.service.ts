@@ -123,6 +123,10 @@ export class ValidacionesService {
     }
   }
 
+
+  /** ******************************************************************** **
+   ** **                     FORMATO DE FECHA Y HORA                    ** **
+   ** ** ***************************************************************** **/
   // METODO PARA FORMATEAR FECHA
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
@@ -147,7 +151,6 @@ export class ValidacionesService {
     let valor = moment(hora, 'HH:mm:ss').format(formato);
     return valor;
   }
-
 
   /** ******************************************************************** **
    ** **                  METODO PARA OMITIR DUPLICADOS                    **
@@ -328,7 +331,7 @@ export class ValidacionesService {
       });
     });
     seleccionados[0].empleados = datos;
-    console.log("ver empleados web ", seleccionados )
+    console.log("ver empleados web ", seleccionados)
     return seleccionados;
   }
 

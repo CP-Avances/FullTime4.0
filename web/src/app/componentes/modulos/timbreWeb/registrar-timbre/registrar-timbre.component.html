@@ -75,8 +75,15 @@
         <div class="col-md" style="text-align: left;">
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-calendar"></i>
-                    {{fecha_hora}}
+                    {{this.fecha_hora}}
                 </label>
+            </span>
+
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-globe"></i>
+                    Zona Horaria:
+                </label>
+                {{timeZone}} ({{gmt_dispositivo}})
             </span>
 
             <span id="fuente" class="card-span">
@@ -108,7 +115,7 @@
             </span>
 
             <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
-                <label><i id="ver" class="fa fa-location-arrow"></i>
+                <label><i id="ver" class="fa fa-camera"></i>
                     Cámara en uso:
                 </label>
                 {{camaraSeleccionada}}

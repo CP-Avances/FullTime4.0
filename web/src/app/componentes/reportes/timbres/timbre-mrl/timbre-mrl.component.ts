@@ -293,8 +293,8 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
           n = n + 1;
-          const servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_servidor.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
-          const servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          const servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           switch (t.accion) {
             case 'EoS': accionT = '1'; break;
             case 'AES': accionT = '2'; break;

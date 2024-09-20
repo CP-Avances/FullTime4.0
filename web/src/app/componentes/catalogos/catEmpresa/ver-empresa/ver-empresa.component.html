@@ -14,11 +14,12 @@
                             <figure>
                                 <div *ngIf="imagen_default; else logoEmpresa">
                                     <img src="../../../../../assets/imagenes/photo.png" alt="logo_default" srcset=""
-                                        width="30%" height="30%">
+                                        width="50%" height="50%">
                                 </div>
                                 <ng-template #logoEmpresa>
                                     <div class="d-flex flex-wrap justify-content-center">
-                                        <img src="{{logo}}" alt="logo de empresa" srcset="" width="50%" height="50%">
+                                        <img src="{{logo}}" alt="logo de empresa" srcset="" width="50%
+                                        " height="50%">
                                     </div>
                                 </ng-template>
                                 <br>
@@ -168,74 +169,80 @@
                 <!--  ************************* TABLA LISTA DE ESTABLECIMIENTOS ******************************** -->
                 <div class="container" style="padding-bottom: 50px; text-align: center; padding: 0%;">
                     <div class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="flex-shrink-1 bd-highlight" style="margin-left: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistrarSucursal()" *ngIf="getCrearSucursales()">Crear {{e.establecimiento}}</button>
+                        <div class="row w-100 m-auto" id="titulo">
+                            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: left;"
+                                    (click)="AbrirVentanaRegistrarSucursal()" *ngIf="getCrearSucursales()">
+                                    Crear {{e.establecimiento}}
+                                </button>
                             </div>
-                            <div class="w-100 bd-highlight">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                                 <h5>
                                     LISTA DE {{nombre_establecimiento.toUpperCase()}}
                                 </h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarSucursales()">Eliminar {{e.establecimiento}}</button>
+                            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                                    (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarSucursales()">
+                                    Eliminar {{e.establecimiento}}
+                                </button>
                             </div>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-sm">
-                                <thead class="thead-light">
-                                    <tr style="text-align: center;">
-                                        <th>
-                                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight"
-                                                matSuffix matTooltipPosition="right"
-                                                matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
-                                                (click)="HabilitarSeleccion()">
-                                                library_add_check
-                                            </mat-icon>
-                                            <mat-checkbox *ngIf="plan_multiple"
-                                                (change)="$event ? masterTogglePag() : null"
-                                                [checked]="selectionSucursales.hasValue() && isAllSelectedPag()"
-                                                [indeterminate]="selectionSucursales.hasValue() && !isAllSelectedPag()"
-                                                [aria-label]="checkboxLabelPag()">
-                                            </mat-checkbox>
-                                        </th>
-                                        <th scope="col">{{nombre_establecimiento | titlecase}}</th>
-                                        <th scope="col">Ciudad</th>
-                                        <th scope="col">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let ds of datosSucursales | paginate:tamanio_pagina:numero_pagina">
-                                        <td>
-                                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                                (change)="$event ? selectionSucursales.toggle(ds) : null"
-                                                [checked]="selectionSucursales.isSelected(ds)"
-                                                [aria-label]="checkboxLabelPag(ds)">
-                                            </mat-checkbox>
-                                        </td>
-                                        <td>{{ds.nombre}}</td>
-                                        <td>{{ds.descripcion}}</td>
-                                        <td>
-                                            <i matSuffix matTooltipPosition="right"
-                                                matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
-                                                (click)="VerDepartamentos(ds.id)" *ngIf="getSucursalesDepartamento()">
-                                                <p>Departamento</p>
-                                            </i>
-                                            <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
-                                                matTooltipPosition="right"
-                                                matTooltip="Modificar datos de este registro." class="fas fa-edit" *ngIf="getEditarSucursales()">
-                                                <p>Editar</p>
-                                            </i>
-                                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(ds)" id="t-eliminar"
-                                                matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarSucursales()">
-                                                <p>Eliminar</p>
-                                            </i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="table-responsive table_horario">
+                            <div class="table-wrapper">
+                                <table class="table table-hover table-sm">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th>
+                                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight"
+                                                    matSuffix matTooltipPosition="right"
+                                                    matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                                    (click)="HabilitarSeleccion()">
+                                                    library_add_check
+                                                </mat-icon>
+                                                <mat-checkbox *ngIf="plan_multiple"
+                                                    (change)="$event ? masterTogglePag() : null"
+                                                    [checked]="selectionSucursales.hasValue() && isAllSelectedPag()"
+                                                    [indeterminate]="selectionSucursales.hasValue() && !isAllSelectedPag()"
+                                                    [aria-label]="checkboxLabelPag()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <th scope="col">{{nombre_establecimiento | titlecase}}</th>
+                                            <th scope="col">Ciudad</th>
+                                            <th scope="col" class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let ds of datosSucursales | paginate:tamanio_pagina:numero_pagina">
+                                            <td>
+                                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                                    (change)="$event ? selectionSucursales.toggle(ds) : null"
+                                                    [checked]="selectionSucursales.isSelected(ds)"
+                                                    [aria-label]="checkboxLabelPag(ds)">
+                                                </mat-checkbox>
+                                            </td>
+                                            <td>{{ds.nombre}}</td>
+                                            <td>{{ds.descripcion}}</td>
+                                            <td class="text-center">
+                                                <i matSuffix matTooltipPosition="right"
+                                                    matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
+                                                    (click)="VerDepartamentos(ds.id)" *ngIf="getSucursalesDepartamento()">
+                                                    <p>Departamento</p>
+                                                </i>
+                                                <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
+                                                    matTooltipPosition="right"
+                                                    matTooltip="Modificar datos de este registro." class="fas fa-edit" *ngIf="getEditarSucursales()">
+                                                    <p>Editar</p>
+                                                </i>
+                                                <i class="far fa-trash-alt" (click)="ConfirmarDelete(ds)" id="t-eliminar"
+                                                    matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarSucursales()">
+                                                    <p>Eliminar</p>
+                                                </i>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <mat-paginator id="pagina" [length]="datosSucursales.length" [pageSize]="tamanio_pagina"
                             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>

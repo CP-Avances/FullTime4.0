@@ -160,9 +160,7 @@ body {
 
 /* ESTILO PARA BARRA DE TÍTULOS PARA LAS TABLAS*/
 #titulo_tabla {
-    font-size: 18px;
-    text-align: center;
-    background: rgb(2, 85, 110);
+    background: rgb(0, 121, 202);
     color: white;
     padding-top: 14px;
     padding-bottom: 10px;
@@ -322,6 +320,15 @@ mat-progress-spinner {
 #icono_pestaña {
     font-size: 20px;
     color: rgb(0, 113, 179);
+}
+
+/* ICONO DE NOVEDADES */
+#comentarios {
+    color: rgb(220, 0, 0);
+    cursor: pointer;
+    margin-right: 5px;
+    margin-left: 15px;
+    text-align: center;
 }
 
 @import "~leaflet/dist/leaflet.css";

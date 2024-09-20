@@ -1,11 +1,9 @@
 <br>
-<div class="row w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
-    <div class="col-12 text-center">
-        <div class="d-flex bd-highlight" id="resultados">
-            <h6 class="w-100 bd-highlight align-self-center">
-                {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
-            </h6>
-        </div>
+<div class="w-100" *ngIf="pantalla != 'perfil' && pantalla != ''">
+    <div class="d-flex bd-highlight" id="resultados">
+        <h6 class="w-100 bd-highlight align-self-center m-0 p-0">
+            {{this.empleadoUno[0].nombre.toUpperCase()}} {{this.empleadoUno[0].apellido.toUpperCase()}}
+        </h6>
     </div>
 </div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
@@ -2423,65 +2421,72 @@
             <div>
                 <mat-card class="mat-elevation-z8">
                     <div class="d-flex bd-highlight" id="titulo">
-                        <span class="w-100 bd-highlight">INFOMRACIÓN CONTRATO - CARGOS </span>
+                        <span class="w-100 bd-highlight">INFORMACIÓN CONTRATO - CARGOS </span>
                     </div>
                     <mat-card-content>
-                        <br/>
-                        <div *ngFor="let contrato of listaContratosEmple">
+                        <div class="w-100 mt-2 mb-2" *ngIf="listaContratosEmple?.length > 0">
+                            <div class="col-6 col-md-3">
+                                <button class="btnPDF" (click)="GenerarPdf_Historico('download')">Descargar PDF</button>
+                            </div>
+                        </div>
+                        <div *ngFor="let contrato of listaContratosEmple" style="margin-top: 5px;">
                             <div class="d-flex bd-highlight" id="titulo_tabla">
                                 <div class="row w-100">
-                                    <div class="col-3">
-                                        <label><b>Administra vacaciones </b> {{contrato.controlar_vacacion ? 'Si' : 'No'}}</label>
+                                    <div class="col-5" style="padding-left: 30px;">
+                                        <label style="font-size: small !important;">
+                                            <b>Régimen laboral: </b> {{contrato.regimen.toUpperCase()}}</label>
                                             <br/>
-                                        <label><b>Administra asistencia </b> {{contrato.controlar_asistencia ? 'Si' : 'No'}}</label>
-    
+                                        <label style="font-size: small !important;">
+                                            <b>Modalidad laboral: </b> {{contrato.descripcion.toUpperCase()}}</label>
                                     </div>
-                                    <div class="col-5 text-center" style="vertical-align: middle;">
-                                        <label>{{contrato.regimen.toUpperCase()}}</label><br/>
-                                        <label>{{contrato.descripcion.toUpperCase()}}</label>
+                                    <div class="col-4" style="vertical-align: middle;">
+                                        <label style="font-size: small !important;"><b>Fecha desde: </b> {{contrato.fecha_ingreso | date: 'dd/MM/yyyy'}}</label>
+                                            <br/>
+                                            <label style="font-size: small !important;"><b>Fecha hasta: </b> {{contrato.fecha_salida | date: 'dd/MM/yyyy'}}</label>
                                     </div>
-                                    <div class="col-4">
-                                        <label><b>Fecha desde </b> {{contrato.fecha_ingreso | date: 'dd/MM/yyyy'}}</label>
-                                        <br/>
-                                        <label><b>Fecha hasta </b> {{contrato.fecha_salida | date: 'dd/MM/yyyy'}}</label>
+                                    <div class="col-3" style="text-align: right;">
+                                        <label style="font-size: small !important;"><b>Controlar vacaciones: </b> {{contrato.controlar_vacacion ? 'Si' : 'No'}}</label>
+                                            <br/>
+                                        <label style="font-size: small !important;"><b>Controlar asistencia: </b> {{contrato.controlar_asistencia ? 'Si' : 'No'}}</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div >
+                                </div>
+                                <div >
                                 <div class="w-100">
                                     <div class="table-responsive" style="text-align: center;">
                                         <table id="table_acciones" class="table table-hover table-sm table-striped" style="margin: 0 auto;">
                                             <thead class="thead-light">
                                                 <tr style="text-align: center;">
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Cargo</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Departameto</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Sucursal</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Fecha inicio</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Fecha final</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Sueldo</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Horas trabajo</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Administra</th>
-                                                    <th scope="col" id="td_horarios" class="th_cargo">Estado</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">SUCURSAL</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">DEPARTAMENTO</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">CARGO</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">FECHA DESDE</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">FECHA HASTA</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">HORAS DE TRABAJO</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">SUELDO</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">JEFATURA</th>
+                                                    <th scope="col" id="td_horarios" class="th_cargo">ESTADO</th>
+                                                    
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngFor="let cargo of listaCargosEmple; let i = index">
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.cargo}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.nombre}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sucursal}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_inicio | date: 'dd/MM/yyyy'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.fecha_final | date: 'dd/MM/yyyy'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.sueldo}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.hora_trabaja}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.jefe ? 'Si' : 'No'}}</td>
-                                                    <td *ngIf="cargo.contrato == contrato.id" id="td_horarios">{{cargo.estado ? 'Activado' : 'Desactivado'}}</td>
+                                                <tr *ngFor="let cargo of contrato.cargosAsociados; let i = index">
+                                                    <td id="td_horarios">{{cargo.sucursal}}</td>
+                                                    <td id="td_horarios">{{cargo.nombre}}</td>
+                                                    <td id="td_horarios">{{cargo.cargo}}</td>
+                                                    <td id="td_horarios">{{cargo.fecha_inicio | date: 'dd/MM/yyyy'}}</td>
+                                                    <td id="td_horarios">{{cargo.fecha_final | date: 'dd/MM/yyyy'}}</td>
+                                                    <td id="td_horarios">{{cargo.hora_trabaja}}</td>
+                                                    <td id="td_horarios">{{cargo.sueldo}}</td>
+                                                    <td id="td_horarios">{{cargo.jefe ? 'Si' : 'No'}}</td>
+                                                    <td id="td_horarios"><b>{{cargo.estado ? 'Activado' : 'Desactivado'}}</b></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                                 <div class="w-100 text-center" *ngIf="listaCargosEmple.length == 0">
-                                    <div><label>No existen cargos registrados en este cargo</label></div>
+                                    <div><label>No existen cargos registrados en este contrato</label></div>
                                 </div>
                             </div>
                         </div>  

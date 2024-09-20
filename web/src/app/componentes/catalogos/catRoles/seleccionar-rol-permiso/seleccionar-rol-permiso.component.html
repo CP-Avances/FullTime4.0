@@ -1,16 +1,21 @@
 <br>
 <div class="mat-elevation-z8" style="background: white;">
-    <div class="d-flex bd-highlight" id="resultados">
-        <button class="btn btn-outline-light btn-sm" (click)="VerRoles()" style="float: right; margin-right: 10px;">
-            Atras
-        </button>
-        <span class="w-100 bd-highlight">
-            FUNCIONES QUE TIENE EL ROL {{nombreRol}}
-        </span>
-        <button *ngIf="id_rol != 1 && getVerFuncionesEliminar()" (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
-            style="float: right; margin-right: 10px;">
-            Eliminar
-        </button>
+    <div id="titulo" class="row w-100 m-auto align-items-center">
+        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1" >
+            <button class="btn btn-outline-light btn-sm" (click)="VerRoles()">
+                Atras
+            </button>
+        </div>
+        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+            <span class="w-100 bd-highlight">
+                FUNCIONES QUE TIENE EL ROL {{nombreRol}}
+            </span>
+        </div>
+        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+            <button *ngIf="id_rol != 1 && getVerFuncionesEliminar()" (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm">
+                Eliminar
+            </button>
+        </div>
     </div>
     <div class="table-responsive">
         <table class="table table-hover table-sm">
@@ -66,11 +71,11 @@
 <mat-accordion  >
   <mat-expansion-panel *ngIf="id_rol != 1" (opened)="expansion = true" (closed)="expansion = false" style="margin-top: 15px; margin-bottom: 25px;">
     <mat-expansion-panel-header style="background: rgb(52, 65, 84); font-size: 14px; color: white;">
-      <mat-panel-title class="panel-title" style="color: white;">
-
-          <span id="titulo">FUNCIONES DE LA APLICACIÓN WEB</span>
-
-      </mat-panel-title>
+        <div class="row w-100 m-auto text-center">
+            <mat-panel-title class="panel-title" style="color: white;">
+                <span class="m-2">FUNCIONES DE LA APLICACIÓN WEB</span>
+            </mat-panel-title>
+        </div>
     </mat-expansion-panel-header>
     <div class="nota">
         <span>
@@ -93,7 +98,7 @@
                                     Todos los links
                                 </label>
                                 <div class="row" style="text-align: center; padding-top: 10px;">
-                                    <div class="col-md-6 col-lg-6 col-6"
+                                    <div class="col-12 col-md-6 col-lg-6 col-6"
                                         style="text-align:left; padding-bottom: 10px;"
                                         *ngFor="let n of nombresMenu; index as i" id="verticalLine">
                                         <input class="form-check-input" type="checkbox"
@@ -119,7 +124,7 @@
                                                             style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                             Todos las acciones
                                                         </label>
-                                                        <div class="col-md-6 col-lg-6 col-6"
+                                                        <div class="col-12 col-md-6 col-lg-6 col-6"
                                                             style="text-align:left; padding-bottom: 10px; "
                                                             *ngFor="let accion of pagina; index as i">
                                                             <input class="form-check-input" type="checkbox"
@@ -157,9 +162,11 @@
 
   <mat-expansion-panel *ngIf="id_rol != 1 && ver_modulo === true"  (opened)="expansion = true" (closed)="expansion = false" style="margin-top: 15px; margin-bottom: 25px;">
     <mat-expansion-panel-header style="background: rgb(52, 65, 84); font-size: 14px; color: white;">
-      <mat-panel-title class="panel-title" style="color: white;">
-          <span id="titulo">MÓDULOS DE LA APLICACIÓN WEB</span>
-      </mat-panel-title>
+        <div class="row w-100 m-auto text-center">
+            <mat-panel-title class="panel-title" style="color: white;">
+                <span class="m-2">MÓDULOS DE LA APLICACIÓN WEB</span>
+            </mat-panel-title>
+        </div>
     </mat-expansion-panel-header>
     <div class="nota">
       <span>
@@ -182,7 +189,7 @@
                                         style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
                                         Todos los links de {{modulo}}
                                     </label>
-                                    <div class="col-md-6 col-lg-6 col-6"
+                                    <div class="col-12 col-md-6 col-lg-6 col-6"
                                         style="text-align:left; padding-bottom: 10px;"
                                         *ngFor="let n of paginasModulos[modulo]; index as i" id="verticalLine">
                                         <input class="form-check-input" type="checkbox"
@@ -209,7 +216,7 @@
                                                             style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                             Todos las acciones
                                                         </label>
-                                                        <div class="col-md-6 col-lg-6 col-6"
+                                                        <div class="col-12 col-md-6 col-lg-6 col-6"
                                                             style="text-align:left; padding-bottom: 10px; "
                                                             *ngFor="let accion of pagina; index as i">
                                                             <input class="form-check-input" type="checkbox"

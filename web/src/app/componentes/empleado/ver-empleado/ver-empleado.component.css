@@ -122,7 +122,7 @@ table {
     font-size: 13px;
 }
 .th_cargo{
-    background-color: rgb(172, 220, 234) !important;
+    background-color: rgb(212, 237, 254) !important;
 }
 
 td {
@@ -426,5 +426,20 @@ td {
     text-align: center;
     margin-left: 5px;
     padding-top: 9px;
+}
+
+.btnPDF{
+    background-color: #2ba869;
+    color: #ffffff;
+    border-color: #dcdcdc;
+    border-radius: 10px;
+    font-size: small;
+    padding: 3px;
+    width: 100%;
+}
+
+.btnPDF:hover{
+    background-color: #44c182;
+    border-color: #b2fce9;
 }
 

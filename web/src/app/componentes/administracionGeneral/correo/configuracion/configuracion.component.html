@@ -7,7 +7,7 @@
             <div class="container" style="padding-top: 15px;">
                 <br>
                 <div class="row" *ngIf="getConfigurarImagenes()">
-                    <div class="col-6">
+                    <div class="col-6 text-center">
                         <div class="d-flex justify-content-around">
                             <label id="datosF">CABECERA DE CORREO</label>
                         </div>
@@ -33,8 +33,8 @@
                         </div>
                     </div>
                     <br>
-                    <div class="col-6" id="verticalLine">
-                        <div class="d-flex justify-content-around">
+                    <div class="col-6 text-center" id="verticalLine">
+                        <div class="d-flex justify-content-center">
                             <label id="datosF">PIE DE FIRMA CORREO</label>
                         </div>
                         <div class="btn-contenedor">
@@ -67,7 +67,7 @@
                         </div>
                         <div class="d-flex flex-wrap justify-content-start">
                             <label id="datosF">Correo principal:</label>
-                            <label>{{e.correo}}</label>
+                            <label style="word-break: break-all">{{e.correo}}</label>
                         </div>
                         <div class="d-flex flex-wrap justify-content-start">
                             <label id="datosF">Servidor de correo:</label>

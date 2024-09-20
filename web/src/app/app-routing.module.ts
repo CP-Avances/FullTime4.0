@@ -79,6 +79,8 @@ import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/rel
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
+import { ConfigurarOpcionesTimbresComponent } from './componentes/timbres/configurar-opciones/configurar-opciones-timbres/configurar-opciones-timbres.component';
+
 // NOTIFICACIONES
 import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
@@ -236,6 +238,7 @@ const routes: Routes = [
   { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard] },
   { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard] },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard] },
+  { path: 'configurar-timbre', component: ConfigurarOpcionesTimbresComponent, canActivate: [AuthGuard] },
 
   // NOTIFICACIONES
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },

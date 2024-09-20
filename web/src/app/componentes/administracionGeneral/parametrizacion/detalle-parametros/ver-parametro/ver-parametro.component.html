@@ -1,12 +1,14 @@
 <div class="container" *ngFor="let tp of parametros" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight" id="titulo">
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+        <div id="titulo" class="row w-100 m-auto align-items-center">
+            <div class="col-12 col-md-3 mb-2 mb-md-0 order-2 order-md-1" >
+                <button class="btn btn-outline-light btn-sm w-100 m-auto" style="float: left;"
                 (click)="VerListaParametro()">
-                Listar parámetros
-            </button>
-            <div class="w-100 bd-highlight">
-                <h5>{{tp.descripcion.toUpperCase()}}</h5>
+                    Listar parámetros
+                </button>
+            </div>
+            <div class="col-12 col-md-5 mb-2 mb-md-0 order-1 order-md-2">
+                <span class="Tabla_titulo">{{tp.descripcion.toUpperCase()}}</span>
             </div>
         </div>
         <mat-card-content>
@@ -373,16 +375,21 @@
             </div>
 
             <!-- CONTENIDO VISTA DE DETALLE DE PARAMETOS -->
-            <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;"
+            <div class="container contenedor_tabla" style="padding-bottom: 25px; text-align: center; padding-top: 5px;"
                 *ngIf="ver_detalles">
                 <div class="mat-elevation-z8" style="background: white;">
-                    <div id="titulo">
-                        <span>DETALLES DE PARÁMETRO GENERAL</span>
-                        <button *ngIf="boton_registrar && getVerParametroEditarDetalleParametro()" class="btn btn-outline-light btn-sm"
-                            style="float: right; margin-right: 10px;" (click)="AbrirVentanaDetalles(tp)">
-                            Registrar detalle
-                        </button>
+                    <div id="titulo" class="row w-100 m-auto align-items-center text-center">
+                        <div class="col-12 col-md-10 mb-2 mb-md-0 order-1 order-md-1" >
+                            <span class="Tabla_titulo">DETALLES DE PARÁMETRO GENERAL</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2 ">
+                            <button  class="btn btn-outline-light btn-sm w-100 m-auto"
+                            (click)="AbrirVentanaDetalles(tp)" *ngIf="getVerParametroEditarDetalleParametro()">
+                                Registrar detalle
+                            </button>
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">

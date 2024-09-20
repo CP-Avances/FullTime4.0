@@ -36,11 +36,11 @@ export default REPORTES_TIMBRES_MRL_CONTROLADOR;
 const BuscarTimbres = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `
-        SELECT CAST(fecha_hora_timbre_servidor AS VARCHAR), accion 
+        SELECT CAST(fecha_hora_timbre_validado AS VARCHAR), accion 
         FROM eu_timbres 
-        WHERE CAST(fecha_hora_timbre_servidor AS VARCHAR) BETWEEN $1 || \'%\' 
+        WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || \'%\' 
             AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion != \'99\' 
-        ORDER BY fecha_hora_timbre_servidor ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {

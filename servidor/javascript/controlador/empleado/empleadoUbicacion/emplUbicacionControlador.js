@@ -225,25 +225,35 @@ class UbicacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl, id_ubicacion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                VALUES ($1, $2)
+                console.log('ubicacion ', req.body);
+                const existe = yield database_1.default.query(`
+                SELECT * FROM mg_empleado_ubicacion WHERE id_empleado = $1 AND id_ubicacion = $2
                 `, [id_empl, id_ubicacion]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mg_empleado_ubicacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
+                console.log(' existe ', existe.rows);
+                if (existe.rowCount != 0) {
+                    res.jsonp({ message: 'error' });
+                }
+                else {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    yield database_1.default.query(`
+                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                    VALUES ($1, $2)
+                    `, [id_empl, id_ubicacion]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mg_empleado_ubicacion',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    res.jsonp({ message: 'Registro guardado.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION

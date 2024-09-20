@@ -34,6 +34,14 @@ class TimbresRutas {
         this.router.put('/timbre/editar', TokenValidation, TIMBRES_CONTROLADOR.EditarTimbreEmpleadoFecha);
         // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA   **USADO
         this.router.post('/buscar/timbres-planificacion', TokenValidation, TIMBRES_CONTROLADOR.BuscarTimbresPlanificacion);
+        // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.IngresarOpcionTimbre);
+        // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+        this.router.put('/actualizar-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.ActualizarOpcionTimbre);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/listar-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarOpcionesTimbre);
+
+
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
@@ -47,8 +55,8 @@ class TimbresRutas {
         this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
         this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
-        this.router.post('/atraso',TokenValidation, TIMBRES_CONTROLADOR.justificarAtraso);
-        this.router.get('/timbreEmpleado/:idUsuario',TokenValidation,  TIMBRES_CONTROLADOR.getTimbreByCodigo);
+        this.router.post('/atraso', TokenValidation, TIMBRES_CONTROLADOR.justificarAtraso);
+        this.router.get('/timbreEmpleado/:idUsuario', TokenValidation, TIMBRES_CONTROLADOR.getTimbreByCodigo);
     }
 }
 

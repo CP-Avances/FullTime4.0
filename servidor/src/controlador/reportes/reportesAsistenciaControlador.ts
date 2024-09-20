@@ -138,6 +138,8 @@ class ReportesAsistenciaControlador {
     public async ReporteTimbresMultiple(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
+
+        console.log("ver req.body", req.body)
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
@@ -185,6 +187,7 @@ class ReportesAsistenciaControlador {
     public async ReporteTimbreSistema(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
+        console.log("ver req.body",req.body )
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
@@ -261,10 +264,12 @@ const BuscarTimbres = async function (fec_inicio: string, fec_final: string, cod
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR), zona_horaria_dispositivo, zona_horaria_servidor,
+            formato_gmt_servidor, formato_gmt_dispositivo, hora_timbre_diferente
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -293,11 +298,12 @@ const BuscarTimbreSistemas = async function (fec_inicio: string, fec_final: stri
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR), 
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND id_reloj = '98' 
             AND NOT accion = 'HA'
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -310,11 +316,12 @@ const BuscarTimbreRelojVirtual = async function (fec_inicio: string, fec_final: 
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || \'%\' 
             AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = \'97\' 
             AND NOT accion = \'HA\' 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -327,10 +334,11 @@ const BuscarTimbreHorarioAbierto = async function (fec_inicio: string, fec_final
     return await pool.query(
         `
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND accion = 'HA' 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {

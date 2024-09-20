@@ -134,6 +134,7 @@ class ReportesAsistenciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
             let datos = req.body;
+            console.log("ver req.body", req.body);
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbres(desde, hasta, o.codigo);
@@ -178,6 +179,7 @@ class ReportesAsistenciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
             let datos = req.body;
+            console.log("ver req.body", req.body);
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbreSistemas(desde, hasta, o.codigo);
@@ -247,10 +249,12 @@ const BuscarTimbres = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR), zona_horaria_dispositivo, zona_horaria_servidor,
+            formato_gmt_servidor, formato_gmt_dispositivo, hora_timbre_diferente
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
@@ -277,11 +281,12 @@ const BuscarTimbreSistemas = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR), 
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND id_reloj = '98' 
             AND NOT accion = 'HA'
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
@@ -293,11 +298,12 @@ const BuscarTimbreRelojVirtual = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || \'%\' 
             AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = \'97\' 
             AND NOT accion = \'HA\' 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
@@ -309,10 +315,11 @@ const BuscarTimbreHorarioAbierto = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR) 
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre AS VARCHAR) BETWEEN $1 || '%' 
+            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
+            CAST(fecha_hora_timbre_validado AS VARCHAR) 
+        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
             AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 AND accion = 'HA' 
-        ORDER BY fecha_hora_timbre ASC
+        ORDER BY fecha_hora_timbre_validado ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

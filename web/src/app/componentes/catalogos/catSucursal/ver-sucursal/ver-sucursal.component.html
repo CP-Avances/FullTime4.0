@@ -2,16 +2,22 @@
 <div class="div" *ngIf="ver_sucursal">
     <div class="container" *ngFor="let s of datosSucursal" style="padding-top: 20px;">
         <mat-card class="example-card mat-elevation-z8">
-            <div id="titulo">
-                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                    (click)="VerSucursales()">
-                    Listar establecimientos
-                </button>
-                <span>{{s.nombre.toUpperCase()}}</span>
-                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                    (click)="EditarDatosSucursal(s)" *ngIf="getEditarSucursal()">
-                    Editar
-                </button>
+            <div id="titulo" class="row w-100 m-auto align-items-center">
+                <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1" >
+                    <button class="btn btn-outline-light btn-sm" style="float: left;"
+                        (click)="VerSucursales()">
+                        Listar establecimientos
+                    </button>
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span class="text-uppercase">{{s.nombre}}</span>
+                </div>
+                <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                    <button class="btn btn-outline-light btn-sm" style="float: right; "
+                        (click)="EditarDatosSucursal(s)" *ngIf="getEditarSucursal()">
+                        Editar
+                    </button>
+                </div>
             </div>
             <mat-card-content>
                 <div class="container" style="padding-top: 20px;">
@@ -31,82 +37,82 @@
                     </div>
                 </div>
                 <hr>
-                <div class="container table-responsive" style="padding-bottom: 25px; padding-top: 10px;">
-                    <div id="titulo">
-
-                        <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                            (click)="AbrirVentanaRegistrarDepartamento()" *ngIf="getVerDepartamentoCrearDepartamento()">
-                            Crear departamento
-                        </button>
-                        <span>LISTA DE DEPARTAMENTOS</span>
-
-
-                        <button  class="btn btn-outline-light btn-sm"
-                            style=" float: right; margin-right: 10px;" (click)="ConfirmarDeleteMultiple()" *ngIf="getVerDepartamentoEliminarDepartamento()">Eliminar
-                            departamento</button>
-
-
+                <div class="container" style="padding-top: 10px;">
+                    <div id="titulo" class="row align-items-center">
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1" >
+                            <button class="btn btn-outline-light btn-sm" style="float: left;"
+                                (click)="AbrirVentanaRegistrarDepartamento()" *ngIf="getVerDepartamentoCrearDepartamento()">
+                                Crear departamento
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>LISTA DE DEPARTAMENTOS</span>
+                        </div>
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3 ">
+                            <button class="btn btn-outline-light btn-sm" style="float: right; "
+                                (click)="ConfirmarDeleteMultiple()" *ngIf="getVerDepartamentoEliminarDepartamento()">
+                                Eliminar departamento
+                            </button>
+                        </div>
                     </div>
-                    <table class="mat-elevation-z8 table table-hover table-sm">
-                        <thead class="thead-light">
-                            <tr style="text-align: center;">
-
-                                <th>
-                                    <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
-                                        (click)="HabilitarSeleccion()">
-                                        library_add_check
-                                    </mat-icon>
-                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                                        [checked]="selectionDepartamentos.hasValue() && isAllSelectedPag()"
-                                        [indeterminate]="selectionDepartamentos.hasValue() && !isAllSelectedPag()"
-                                        [aria-label]="checkboxLabelPag()">
-                                    </mat-checkbox>
-
-
-
-                                </th>
-                                <th scope="col">Departamento</th>
-                                <th scope="col">Nivel</th>
-                                <th scope="col">Departamento Superior</th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-
-                            <tr *ngFor="let d of datosDepartamentos | paginate:tamanio_pagina:numero_pagina">
-
-                                <td>
-                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                        (change)="$event ? selectionDepartamentos.toggle(d) : null"
-                                        [checked]="selectionDepartamentos.isSelected(d)"
-                                        [aria-label]="checkboxLabelPag(d)">
-                                    </mat-checkbox>
-                                </td>
-                                <td>{{d.nombre | titlecase}}</td>
-                                <td>{{d.nivel}}</td>
-                                <td>{{d.departamento_padre | titlecase}}
-                                </td>
-                                <td>
-                                    <i class="fa fa-navicon" matSuffix matTooltipPosition="right" id="t-detalles"
-                                        matTooltip="Registrar niveles de autorización." (click)="VerNiveles(d.id)" *ngIf="getVerDepartamentoVerNiveles()">
-                                        <p>Niveles</p>
-                                    </i>
-                                    <i id="t-editar" (click)="AbrirVentanaEditarDepartamento(d)" matSuffix
-                                        matTooltipPosition="right" matTooltip="Modificar datos de este registro."
-                                        class="fas fa-edit" *ngIf="getVerDepartamentoEditarDepartamento()">
-                                        <p>Editar</p>
-                                    </i>
-                                    <i class="far fa-trash-alt" (click)="ConfirmarDelete(d)" id="t-eliminar" matSuffix
-                                        matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getVerDepartamentoEliminarDepartamento()">
-                                        <p>Eliminar</p>
-                                    </i>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                </div>
+                <div class="table-responsive table_horario">  
+                    <div class="table-wrapper">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th>
+                                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                                    matTooltipPosition="right"
+                                                    matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                                    (click)="HabilitarSeleccion()">
+                                                    library_add_check
+                                                </mat-icon>
+                                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                                    [checked]="selectionDepartamentos.hasValue() && isAllSelectedPag()"
+                                                    [indeterminate]="selectionDepartamentos.hasValue() && !isAllSelectedPag()"
+                                                    [aria-label]="checkboxLabelPag()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <th scope="col">Departamento</th>
+                                            <th scope="col">Nivel</th>
+                                            <th scope="col">Departamento Superior</th>
+                                            <th scope="col">Acciones</th>
+                                        </tr>
+                            </thead>
+                            <tbody>
+                                        <tr *ngFor="let d of datosDepartamentos | paginate:tamanio_pagina:numero_pagina">
+                                            <td>
+                                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                                    (change)="$event ? selectionDepartamentos.toggle(d) : null"
+                                                    [checked]="selectionDepartamentos.isSelected(d)"
+                                                    [aria-label]="checkboxLabelPag(d)">
+                                                </mat-checkbox>
+                                            </td>
+                                            <td>{{d.nombre | titlecase}}</td>
+                                            <td>{{d.nivel}}</td>
+                                            <td>{{d.departamento_padre | titlecase}}
+                                            </td>
+                                            <td>
+                                                <i class="fa fa-navicon" matSuffix matTooltipPosition="right" id="t-detalles"
+                                                    matTooltip="Registrar niveles de autorización." (click)="VerNiveles(d.id)" *ngIf="getVerDepartamentoVerNiveles()">
+                                                    <p>Niveles</p>
+                                                </i>
+                                                <i id="t-editar" (click)="AbrirVentanaEditarDepartamento(d)" matSuffix
+                                                    matTooltipPosition="right" matTooltip="Modificar datos de este registro."
+                                                    class="fas fa-edit" *ngIf="getVerDepartamentoEditarDepartamento()">
+                                                    <p>Editar</p>
+                                                </i>
+                                                <i class="far fa-trash-alt" (click)="ConfirmarDelete(d)" id="t-eliminar" matSuffix
+                                                    matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getVerDepartamentoEliminarDepartamento()">
+                                                    <p>Eliminar</p>
+                                                </i>
+                                            </td>
+                                        </tr>
+                            </tbody>
+                        </table>
+                    </div>  
+                    
                     <mat-paginator id="pagina" [length]="datosDepartamentos.length" [pageSize]="tamanio_pagina"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
                         showFirstLastButtons>

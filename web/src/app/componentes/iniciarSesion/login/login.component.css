@@ -1,9 +1,3 @@
-@media (max-width: 992px) {
-    .home-inner {
-        padding-top: 100px;
-    }
-}
-
 mat-form-field {
     width: 230px;
 }
@@ -34,12 +28,29 @@ mat-card {
     padding-bottom: 25px;
 }
 
-#home-section {
-    background: url('../../../../assets/imagenes/entrepreneur.jpg') no-repeat;
-    min-height: 100vh;
-    background-size: cover;
-    background-attachment: fixed;
+@media (max-width: 550px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+
+    #home-section {
+        background: url('../../../../assets/imagenes/login_mobil.png') no-repeat !important;
+        min-height: 100vh;
+        background-size: cover !important;
+        background-attachment: scroll !important;
+    }
 }
+
+@media (min-width: 551px) {
+    #home-section {
+        background: url('../../../../assets/imagenes/entrepreneur.jpg') no-repeat;
+        min-height: 100vh;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+}
+
+
 
 .dark-overlay {
     top: 0;
