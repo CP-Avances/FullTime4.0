@@ -883,6 +883,7 @@ class TimbresControlador {
                 const hoy = new Date();
                 const timbre = req.body;
                 yield database_1.default.query('BEGIN');
+                console.log("ver req.body", req.body);
                 timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
                 const timbreRV = new Date(timbre.fecha_hora_timbre || '');
                 const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
@@ -905,14 +906,12 @@ class TimbresControlador {
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
                     'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $10);', [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $11);', [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
                     timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
-                    timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
+                    timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre,
                     timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
-                // const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
-                // const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
@@ -982,7 +981,7 @@ class TimbresControlador {
                 const response = yield database_1.default.query(`
                 SELECT * FROM eu_timbres 
                 WHERE codigo = $3 AND fecha_hora_timbre_validado BETWEEN $1 AND $2 
-                ORDER BY fecha_hora_timbre_valido DESC
+                ORDER BY fecha_hora_timbre_validado DESC
                 `, [fechaDesdeStr, fechaHastaStr, codigo]);
                 const timbres = response.rows;
                 return res.jsonp(timbres);
