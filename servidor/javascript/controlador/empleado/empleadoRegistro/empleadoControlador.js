@@ -2562,7 +2562,7 @@ class EmpleadoControlador {
     getListaEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.default.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
+                const response = yield database_1.default.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname, name_cargo as cargo, name_suc as sucursal, name_dep as departamento, name_regimen as regimen  FROM informacion_general ORDER BY fullname ASC');
                 const empleados = response.rows;
                 console.log(empleados);
                 return res.status(200).jsonp(empleados);
