@@ -39,3 +39,28 @@ td {
     text-align: center;
     vertical-align: middle;
 }
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .Tabla_titulo{
+        font-size: smaller;
+    }
+
+    mat-card-content{
+        padding: 0px;
+
+        .container{
+            margin: 0%;
+            width: 100%;
+        }
+    }
+
+    .contenedor_tabla{
+        padding: 0px !important;
+    }
+}
+
+table{
+    width: 100%;
+    margin: 0% !important;
+}
