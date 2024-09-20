@@ -27,7 +27,6 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/admin/`, datos);
   }
 
-
   // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
@@ -37,23 +36,53 @@ export class TimbresService {
     return this.http.get<any>(`${environment.url}/timbres/timbresfechaemple`, { params });
   }
 
-
   // METODO PARA EDITAR TIMBRES    **USADO
   EditarTimbreEmpleado(data: any) {
     return this.http.put(`${environment.url}/timbres/timbre/editar`, data);
   }
-
 
   // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
   BuscarTimbresAsistencia(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-asistencia`, datos);
   }
 
-
   // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)   **USADO
   BuscarTimbresPlanificacion(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-planificacion`, datos);
   }
+
+  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
+  ObtenerTimbresEmpleado(id: number) {
+    return this.http.get<any>(`${environment.url}/timbres/ver/timbres/${id}`);
+  }
+
+  /** ********************************************************************************** **
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** ********************************************************************************** **/
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/listar-opciones-timbre`, datos);
+  }
+
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  IngresarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/opciones-timbre`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  ActualizarOpcionesMarcacion(datos: any) {
+    return this.http.put<any>(`${environment.url}/timbres/actualizar-opciones-timbre`, datos);
+  }
+
+
+
+
+
+
+
+
+
 
 
   /**
@@ -84,9 +113,6 @@ export class TimbresService {
   }
 
 
-  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
-  ObtenerTimbresEmpleado(id: number) {
-    return this.http.get<any>(`${environment.url}/timbres/ver/timbres/${id}`);
-  }
+
 
 }

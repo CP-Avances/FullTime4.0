@@ -252,7 +252,7 @@ export class ListaAppComponent implements OnInit {
     this.idSucursalesAcceso_dh = this.asignaciones.idSucursalesAcceso;
   }
 
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  // METODO PARA BUSCAR DATOS DE USUARIOS
   AdministrarInformacion() {
     this.BuscarInformacionGeneral(false);
     this.BuscarInformacionGeneral(true);

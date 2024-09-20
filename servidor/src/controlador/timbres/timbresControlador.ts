@@ -722,7 +722,191 @@ class TimbresControlador {
         }
     }
 
-    //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+    /** ************************************************************************************************* **
+     ** **                CONSULTAS DE CONFIGURACION DE OPCIONES DE MARCACIONES                        ** **
+     ** ************************************************************************************************* **/
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
+    public async IngresarOpcionTimbre(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial) 
+                VALUES ($1, $2, $3, $4) RETURNING *
+                `
+                , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
+
+            const [opciones] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mrv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            console.log('error ', error)
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE      **USADO
+    public async ActualizarOpcionTimbre(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+
+            var opciones: any;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            if (timbre_internet && timbre_foto && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet && timbre_foto) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_foto]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto && timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_internet) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_internet = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_internet]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_foto = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_foto]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_especial) {
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mrv_opciones_marcacion SET timbre_especial = $2
+                    WHERE id_empleado = $1
+                    `
+                    , [id_empleado, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mrv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+
+    // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
+    public async BuscarOpcionesTimbre(req: Request, res: Response): Promise<any> {
+
+        const { id_empleado } = req.body;
+        const OPCIONES = await pool.query(
+            `
+            SELECT * FROM mrv_opciones_marcacion 
+            WHERE id_empleado = $1
+            `
+            , [id_empleado]);
+
+        if (OPCIONES.rowCount != 0) {
+            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
+        }
+    }
+
+
+
+    /** ************************************************************************************************* **
+     ** **                                 METODOS PARA APP MOVIL                                      ** **
+     ** ************************************************************************************************* **/
+
     public async crearTimbre(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();

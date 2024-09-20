@@ -1,5 +1,9 @@
-<div style="padding-top: 20px;">
-    <div id="titulo">CONFIGURAR OPCIONES EN MARCACIONES</div>
+<div style="padding-top: 20px;" *ngIf="configurar">
+    <div id="titulo">
+        <span>CONFIGURAR OPCIONES EN MARCACIONES</span>
+        <mat-icon *ngIf="activar_boton" class="float-right" id="cerrar"
+            (click)="LimpiarFormulario()">highlight_off</mat-icon>
+    </div>
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
             <div id="resultados">
@@ -176,24 +180,49 @@
                     </div>
                 </div>
             </form>
-
-            <form>
-                <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
-                    <mat-radio-button class="example-radio-button" *ngFor="let o of opciones_timbre" [value]="o.opcion">
-                        <label id="textoradiobtn">{{o.opcion}}</label>
-                    </mat-radio-button>
-                </mat-radio-group>
-            </form>
-
-            <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)">Timbrar</button>
-                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
+            <div class="row" *ngIf="activar_boton" style="text-align: center; font-size: 12px;">
+                <div class="col-md">
+                    <span id="fuente">INTERNET REQUERIDO</span>
+                    <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_internet">
+                        <mat-radio-button class="example-radio-button" [value]="true">
+                            <label id="textoradiobtn">Si</label>
+                        </mat-radio-button>
+                        <mat-radio-button class="example-radio-button" [value]="false">
+                            <label id="textoradiobtn">No</label>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-md">
+                    <span id="fuente">ENVIAR FOTO</span>
+                    <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_foto">
+                        <mat-radio-button class="example-radio-button" [value]="true">
+                            <label id="textoradiobtn">Si</label>
+                        </mat-radio-button>
+                        <mat-radio-button class="example-radio-button" [value]="false">
+                            <label id="textoradiobtn">No</label>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-md">
+                    <span id="fuente">TIMBRE ESPECIAL</span>
+                    <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_especial">
+                        <mat-radio-button class="example-radio-button" [value]="true">
+                            <label id="textoradiobtn">Si</label>
+                        </mat-radio-button>
+                        <mat-radio-button class="example-radio-button" [value]="false">
+                            <label id="textoradiobtn">No</label>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
             </div>
-
             <hr>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="GuardarRegistros(0)">
+                        Guardar
+                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO SUCURSALES
                     </span>
@@ -254,11 +283,17 @@
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="GuardarRegistros(0)">
+                        Guardar
+                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO RÉGIMEN LABORAL
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button>
+                        (click)="MostrarLista()">
+                        Mostrar lista
+                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -315,11 +350,17 @@
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="GuardarRegistros(0)">
+                        Guardar
+                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO CARGOS
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button>
+                        (click)="MostrarLista()">
+                        Mostrar lista
+                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -375,6 +416,10 @@
             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="GuardarRegistros(0)">
+                        Guardar
+                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO DEPARTAMENTOS
                     </span>
@@ -437,6 +482,10 @@
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="GuardarRegistros(0)">
+                        Guardar
+                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO USUARIOS
                     </span>
@@ -483,9 +532,9 @@
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td class="justify-content-center">
-                                    <i id="accion" *ngIf="auto_individual" class="fas fa-clock" matSuffix
-                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
-                                        [ngStyle]="habilitado">
+                                    <i id="accion" *ngIf="auto_individual" class="fas fa-clock"
+                                        (click)="RegistrarMultiple([e])" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>
@@ -501,4 +550,8 @@
             </div>
         </mat-card-content>
     </mat-card>
+</div>
+
+<div style="padding-top: 20px;" *ngIf="ver_configurar">
+<app-ver-configuracion-timbre [informacion]="ver_informacion"></app-ver-configuracion-timbre>
 </div>

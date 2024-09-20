@@ -5,8 +5,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -21,7 +19,6 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
-
 @Component({
   selector: 'app-configurar-opciones-timbres',
   templateUrl: './configurar-opciones-timbres.component.html',
@@ -35,6 +32,12 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   mostrarTablas: boolean = false;
   habilitado: any;
   opciones_timbre: any = [];
+  configurar: boolean = true;
+  ver_configurar: boolean = false;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // VARIABLES DE ASIGNACIONES DE INFORMACION
   idCargosAcceso: Set<any> = new Set();
@@ -53,6 +56,10 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+  seleccion_opcion = new FormControl('');
+  seleccion_internet = new FormControl('');
+  seleccion_foto = new FormControl('');
+  seleccion_especial = new FormControl('');
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
@@ -117,15 +124,12 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   constructor(
-    public informacion: DatosGeneralesService,
     private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
     private restEmpresa: EmpresaService,
     private restUsuario: UsuarioService,
     private validar: ValidacionesService,
-    private ventana: MatDialog,
     private toastr: ToastrService,
-    private router: Router,
     private restR: ReportesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -133,6 +137,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
 
   ngOnInit(): void {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -149,7 +155,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionGeneral(1).subscribe((res: any[]) => {
+    this.restUsuario.UsuariosTimbreMovilGeneral(1, true).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
@@ -451,7 +457,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
     }
-    //this.RegistrarMultiple(usuarios);
+    this.RegistrarMultiple(usuarios);
   }
 
   // METODO PARA LIMPIAR FORMULARIOS
@@ -493,8 +499,11 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.selectionCarg.clear();
     }
 
-    this.seleccion.reset();
     this.activar_boton = false;
+    this.seleccion_internet.reset();
+    this.seleccion_especial.reset();
+    this.seleccion_foto.reset();
+    this.seleccion.reset();
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS
@@ -551,6 +560,101 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.Filtrar('', 5);
       this.Filtrar('', 6);
     }
+    this.seleccion_internet.reset();
+    this.seleccion_especial.reset();
+    this.seleccion_foto.reset()
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE
+  contador: number = 0;
+  RegistrarMultiple(data: any) {
+    //console.log(data, ' lenght ', data.length)
+    //console.log('timbre especial ', this.seleccion_especial.value)
+    //console.log('timbre internet ', this.seleccion_internet.value)
+    //console.log('timbre foto ', this.seleccion_foto.value)
+    this.contador = 0;
+    var info = {
+      id_empleado: '',
+      timbre_internet: this.seleccion_internet.value,
+      timbre_foto: this.seleccion_foto.value,
+      timbre_especial: this.seleccion_especial.value,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    if (this.seleccion_especial.value === null && this.seleccion_foto.value === null && this.seleccion_internet.value === null) {
+      this.toastr.warning('No ha seleccionado ninguna opción para la marcación', '', {
+        timeOut: 6000,
+      });
+      //console.log('ingresa en null')
+    }
+    else {
+      //console.log('ingresa en data')
+      if (data.length > 0) {
+        data.forEach((empl: any) => {
+          let buscar = {
+            id_empleado: empl.id
+          }
+          //console.log('ingresa en data ', buscar)
+          this.restTimbres.BuscarOpcionesMarcacion(buscar).subscribe(o => {
+            this.contador = this.contador + 1;
+            info.id_empleado = empl.id;
+            this.ActualizarOpcionMarcacion(info, this.contador, data);
+          }, vacio => {
+            this.contador = this.contador + 1;
+            info.id_empleado = empl.id;
+            this.IngresarOpcionMarcacion(info, this.contador, data);
+          })
+        })
+      }
+      else {
+        this.toastr.warning('No ha seleccionado usuarios.', '', {
+          timeOut: 6000,
+        });
+      }
+    }
+  }
+
+  // METODO PARA INGRESAR OPCION DE MARCACION
+  IngresarOpcionMarcacion(informacion: any, contador: number, data: any) {
+    if (this.seleccion_especial.value === null) {
+      informacion.timbre_especial = false;
+    }
+    if (this.seleccion_foto.value === null) {
+      informacion.timbre_foto = false;
+    }
+    if (this.seleccion_internet.value === null) {
+      informacion.timbre_internet = true;
+    }
+    //console.log('info ', informacion)
+    this.restTimbres.IngresarOpcionesMarcacion(informacion).subscribe(i => {
+      this.MostrarMensaje(contador, data);
+    })
+  }
+
+  // METODO PARA ACTUALIZAR OPCION DE MARCACION
+  ActualizarOpcionMarcacion(informacion: any, contador: number, data: any) {
+    this.restTimbres.ActualizarOpcionesMarcacion(informacion).subscribe(a => {
+      this.MostrarMensaje(contador, data);
+    })
+  }
+
+
+  // METODO DE ALMACENAMIENTO DE DATOS
+  MostrarMensaje(contador: number, data: any) {
+    if (data.length === contador) {
+      this.toastr.success('Registros ingresados exitosamente.', '', {
+        timeOut: 6000,
+      });
+      this.LimpiarFormulario();
+    }
+  }
+
+  // METODO PARA VER INFORMACION DE OPCIONES MARCACION
+  ver_informacion: any;
+  VerOpciones(seleccionados: any) {
+    this.configurar = false;
+    this.ver_configurar = true;
+    this.ver_informacion = seleccionados;
   }
 
   // VALIDAR INGRESO DE LETRAS

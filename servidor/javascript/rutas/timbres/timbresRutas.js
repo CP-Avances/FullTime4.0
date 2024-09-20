@@ -28,6 +28,12 @@ class TimbresRutas {
         this.router.put('/timbre/editar', verificarToken_1.TokenValidation, timbresControlador_1.default.EditarTimbreEmpleadoFecha);
         // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA   **USADO
         this.router.post('/buscar/timbres-planificacion', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresPlanificacion);
+        // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.IngresarOpcionTimbre);
+        // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+        this.router.put('/actualizar-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarOpcionTimbre);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/listar-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarOpcionesTimbre);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

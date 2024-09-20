@@ -15,11 +15,11 @@ mat-form-field {
 
 table {
     width: 100%;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 p {
-    font-size: x-small;
+    font-size:xx-small;
 }
 
 #SelectCheck {
@@ -28,7 +28,7 @@ p {
 }
 
 #accion {
-    font-size: 15px;
+    font-size: 12px;
     color: rgb(38, 0, 255);
     cursor: pointer;
     text-align: center;
@@ -36,4 +36,8 @@ p {
 
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 20px;
+  }
+
+  #fuente {
+    font-weight: bolder;
   }
