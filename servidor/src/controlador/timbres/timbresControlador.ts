@@ -691,6 +691,11 @@ class TimbresControlador {
             console.log('Contenido de req.body:', timbre);
 
             timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+            const fechaHoraEnZonaHorariaDispositivo = moment(timbre.fecha_hora_timbre_servidor)
+                .tz(timbre.zona_horaria_dispositivo)
+                .format('YYYY-MM-DD HH:mm:ss');
+
+
             const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
             const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
             const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
@@ -706,12 +711,12 @@ class TimbresControlador {
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                 'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado ) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $11);',
+                'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_dispositivo ) ' +
+                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $19, $18);',
                 [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
                 timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
                 timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
-                timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
+                timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.zona_horaria_dispositivo, fechaHoraEnZonaHorariaDispositivo]);
 
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
@@ -748,7 +753,7 @@ class TimbresControlador {
             const hoy: Date = new Date();
             const timbre: any = req.body;
             await pool.query('BEGIN');
-            console.log("ver req.body",req.body )
+            console.log("ver req.body", req.body)
 
             timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
             const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
