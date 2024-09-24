@@ -331,7 +331,8 @@ class TimbresControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-                SELECT * FROM public.timbres_web ($1, $2, $3, 
+                SELECT * FROM public.timbres_web ($1, $2, 
+                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
@@ -392,10 +393,10 @@ class TimbresControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 database_1.default.query(`
-                 SELECT * FROM public.timbres_crear ($1, $2, $3, 
-                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
-                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
+                SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
+                    to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
+                `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
                     observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     //console.log('error ', error)
                     // FORMATEAR FECHAS
