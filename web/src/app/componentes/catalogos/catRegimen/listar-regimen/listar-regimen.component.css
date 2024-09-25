@@ -40,8 +40,5 @@ table {
     overflow-x: scroll;
 }
 
-/* Contenedor para manejar el scroll horizontal */
-.table-wrapper {
-    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
-    display: block;
-}
+
+

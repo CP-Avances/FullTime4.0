@@ -331,4 +331,38 @@ mat-progress-spinner {
     text-align: center;
 }
 
+.form-check-input{
+    border-color: rgb(82, 82, 82)
+}
+
+/*para ajustar el boton de eliminar del encabezado*/
+.btn_eliminar{
+    float: right;
+}
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .Tabla_titulo span{
+        font-size: medium;
+    }
+
+    mat-card-content{
+        padding: 0px;
+
+        .container{
+            margin: 0%;
+            width: 100%;
+        }
+    }
+}
+
+.table_horario {
+    max-height: 400px; /* Ajusta según sea necesario */
+}
+
+/* Contenedor para manejar el scroll horizontal */
+.table-wrapper {
+    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
+    display: block;
+}
+
 @import "~leaflet/dist/leaflet.css";
