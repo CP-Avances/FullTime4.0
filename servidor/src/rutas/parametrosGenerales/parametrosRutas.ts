@@ -21,6 +21,8 @@ class ParametrosRutas {
         this.router.get('/ver-parametro/:id', TokenValidation, PARAMETROS_CONTROLADOR.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
         this.router.get('/:id', TokenValidation, PARAMETROS_CONTROLADOR.VerDetalleParametro);
+        this.router.get('/opciones-marcacion/:id_empleado', TokenValidation, PARAMETROS_CONTROLADOR.VerDetalleParametroUsuario);
+
         // METODO PARA ELIMINAR DETALLE DE PARAMETRO  **USADO
         this.router.delete('/eliminar-detalle/:id', TokenValidation, PARAMETROS_CONTROLADOR.EliminarDetalleParametro);
         // METODO PARA REGISTRAR DETALLE DE PARAMETRO  **USADO
@@ -29,6 +31,8 @@ class ParametrosRutas {
         this.router.put('/actual-detalle', TokenValidation, PARAMETROS_CONTROLADOR.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', TokenValidation, PARAMETROS_CONTROLADOR.CompararCoordenadas);
+
+
 
     }
 }

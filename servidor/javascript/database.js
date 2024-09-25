@@ -15,11 +15,11 @@ const pool = new Pool({
 })
 */
 const pool = new pg_pool_1.default({
-    user: 'fulltime',
-    host: 'localhost', //'186.4.226.49',
+    user: 'postgres',
+    host: '192.168.0.148', //'186.4.226.49',
     port: 5432,
     database: 'prueba_empresa',
-    password: 'fulltime'
+    password: 'fu11tim3'
 });
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {

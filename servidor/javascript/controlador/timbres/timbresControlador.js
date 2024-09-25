@@ -645,6 +645,7 @@ class TimbresControlador {
                 const fechaHoraEnZonaHorariaDispositivo = (0, moment_timezone_1.default)(timbre.fecha_hora_timbre_servidor)
                     .tz(timbre.zona_horaria_dispositivo)
                     .format('YYYY-MM-DD HH:mm:ss');
+                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
                 const timbreRV = new Date(timbre.fecha_hora_timbre || '');
                 const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
                 const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
@@ -659,11 +660,11 @@ class TimbresControlador {
                 console.log('Valor de timbre.accion:', timbre.accion);
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_dispositivo ) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $19, $18);', [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
+                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_dispositivo, zona_horaria_servidor ) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $19, $18, $20);', [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
                     timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
                     timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
-                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.zona_horaria_dispositivo, fechaHoraEnZonaHorariaDispositivo]);
+                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.zona_horaria_dispositivo, fechaHoraEnZonaHorariaDispositivo, zonaHorariaServidor]);
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
@@ -699,6 +700,10 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 console.log("ver req.body", req.body);
                 timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+                const fechaHoraEnZonaHorariaDispositivo = (0, moment_timezone_1.default)(timbre.fecha_hora_timbre_servidor)
+                    .tz(timbre.zona_horaria_dispositivo)
+                    .format('YYYY-MM-DD HH:mm:ss');
+                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
                 const timbreRV = new Date(timbre.fecha_hora_timbre || '');
                 const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
                 const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
@@ -719,11 +724,11 @@ class TimbresControlador {
                 }
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $11);', [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
+                    'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_servidor) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19);', [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
                     timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
                     timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre,
-                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen]);
+                    timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.fecha_hora_timbre, zonaHorariaServidor]);
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -755,7 +760,8 @@ class TimbresControlador {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body;
                 console.log(req.body);
                 yield database_1.default.query('BEGIN');
-                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente])
+                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
                     .then(result => {
                     return result.rows;
                 });
@@ -777,6 +783,7 @@ class TimbresControlador {
                 return res.status(200).jsonp({ message: "Tímbre creado exitosamente" });
             }
             catch (error) {
+                console.log("ver error", error);
                 return res.status(400).jsonp({ message: error });
             }
         });
@@ -823,7 +830,7 @@ class TimbresControlador {
                 SELECT * FROM eu_timbres 
                 WHERE codigo = $1 
                     AND fecha_hora_timbre_validado BETWEEN $2 AND $3
-                ORDER BY fecha_hora_timbre_validado DESC
+                ORDER BY fecha_hora_timbre_servidor DESC
                 `, [id, fechaDesdeStr, fechaHastaStr]);
                 const timbres = response.rows;
                 return res.jsonp(timbres);
