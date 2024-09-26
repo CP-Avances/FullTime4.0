@@ -398,6 +398,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             children: [
               { name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true },
+              { name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true },
               { name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true },
             ]
           },
@@ -469,8 +470,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Dispositivos', url: '/listarRelojes', color: true, ver: true },
           { name: 'Administrar Timbres', url: '/timbres-admin', color: true, ver: true },
           { name: 'Registrar Timbres', url: '/timbres-multiples', color: true, ver: true },
-          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
-          { name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true }
         ]
       },
       {

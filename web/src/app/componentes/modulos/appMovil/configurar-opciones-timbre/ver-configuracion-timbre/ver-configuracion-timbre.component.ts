@@ -10,8 +10,14 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
   @Input() informacion: any;
 
+  configuracion: any = [];
+
   ngOnInit(): void {
     console.log('ver info ', this.informacion)
+
+  }
+
+  Regresar() {
 
   }
 }

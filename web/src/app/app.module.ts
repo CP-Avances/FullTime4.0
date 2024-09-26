@@ -267,8 +267,8 @@ import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/cre
 import { EditarTimbreComponent } from './componentes/timbres/acciones-timbres/editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from './componentes/timbres/acciones-timbres/ver-timbre/ver-timbre.component';
 import { VerImagenComponent } from './componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
-import { ConfigurarOpcionesTimbresComponent } from './componentes/timbres/configurar-opciones/configurar-opciones-timbres/configurar-opciones-timbres.component';
-import { VerConfiguracionTimbreComponent } from './componentes/timbres/configurar-opciones/ver-configuracion-timbre/ver-configuracion-timbre.component';
+import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/configurar-opciones-timbres/configurar-opciones-timbres.component';
+import { VerConfiguracionTimbreComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/ver-configuracion-timbre/ver-configuracion-timbre.component';
 
 // NOTIFICACIONES
 import { SettingsComponent } from './componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
