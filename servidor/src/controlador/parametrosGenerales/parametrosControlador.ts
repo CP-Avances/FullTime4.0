@@ -57,6 +57,24 @@ class ParametrosControlador {
         }
     }
 
+     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
+     public async VerDetalleParametroUsuario(req: Request, res: Response): Promise<any> {
+        const { id_empleado } = req.params;
+        const PARAMETRO = await pool.query(
+            `
+            SELECT *
+            FROM mrv_opciones_marcacion AS tp
+            WHERE tp.id_empleado = $1
+            `
+            , [id_empleado]);
+        if (PARAMETRO.rowCount != 0) {
+            return res.jsonp(PARAMETRO.rows)
+        }
+        else {
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
 
     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
     public async BuscarDetalles(req: Request, res: Response): Promise<any> {
