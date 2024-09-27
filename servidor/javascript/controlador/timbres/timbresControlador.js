@@ -726,55 +726,63 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+                //console.log(req.body)
                 var opciones;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                if (timbre_internet && timbre_foto && timbre_especial) {
+                if (timbre_internet != null && timbre_foto != null && timbre_especial != null) {
+                    //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_internet && timbre_foto) {
+                else if (timbre_internet != null && timbre_foto != null) {
+                    //console.log('2')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_internet, timbre_foto]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_internet && timbre_especial) {
+                else if (timbre_internet != null && timbre_especial != null) {
+                    //console.log('3')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_internet, timbre_especial]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_foto && timbre_especial) {
+                else if (timbre_foto != null && timbre_especial != null) {
+                    //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_foto, timbre_especial]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_internet) {
+                else if (timbre_internet != null) {
+                    //console.log('5')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_internet]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_foto) {
+                else if (timbre_foto != null) {
+                    //console.log('6')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_foto]);
                     [opciones] = response.rows;
                 }
-                else if (timbre_especial) {
+                else if (timbre_especial != null) {
+                    //console.log('7')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `, [id_empleado, timbre_especial]);
                     [opciones] = response.rows;
                 }
@@ -790,6 +798,7 @@ class TimbresControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
+                //console.log('opciones ', opciones)
                 if (opciones) {
                     return res.status(200).jsonp(opciones);
                 }
@@ -812,6 +821,22 @@ class TimbresControlador {
             SELECT * FROM mrv_opciones_marcacion 
             WHERE id_empleado = $1
             `, [id_empleado]);
+            if (OPCIONES.rowCount != 0) {
+                return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'vacio' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR OPCIONES DE TIMBRES DE VARIOS USUARIOS    **USADO
+    BuscarMultipleOpcionesTimbre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const OPCIONES = yield database_1.default.query("SELECT e.nombre, e.apellido, e.cedula, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
+                "   om.timbre_foto, om.timbre_especial " +
+                "FROM mrv_opciones_marcacion AS om, eu_empleados AS e " +
+                "WHERE e.id = om.id_empleado AND om.id_empleado IN (" + id_empleado + ") ");
             if (OPCIONES.rowCount != 0) {
                 return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
             }

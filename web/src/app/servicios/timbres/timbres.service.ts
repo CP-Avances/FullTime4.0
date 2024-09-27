@@ -65,6 +65,11 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/listar-opciones-timbre`, datos);
   }
 
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/listar-varias-opciones-timbre`, datos);
+  }
+
   // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
   IngresarOpcionesMarcacion(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/opciones-timbre`, datos);

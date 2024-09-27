@@ -778,76 +778,84 @@ class TimbresControlador {
 
         try {
             const { id_empleado, timbre_internet, timbre_foto, timbre_especial, user_name, ip } = req.body;
+            //console.log(req.body)
 
             var opciones: any;
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            if (timbre_internet && timbre_foto && timbre_especial) {
+            if (timbre_internet != null && timbre_foto != null && timbre_especial != null) {
+                //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_internet && timbre_foto) {
+            else if (timbre_internet != null && timbre_foto != null) {
+                //console.log('2')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_internet, timbre_foto]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_internet && timbre_especial) {
+            else if (timbre_internet != null && timbre_especial != null) {
+                //console.log('3')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_internet, timbre_especial]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_foto && timbre_especial) {
+            else if (timbre_foto != null && timbre_especial != null) {
+                //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_foto, timbre_especial]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_internet) {
+            else if (timbre_internet != null) {
+                //console.log('5')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_internet]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_foto) {
+            else if (timbre_foto != null) {
+                //console.log('6')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_foto]);
 
                 [opciones] = response.rows;
             }
-            else if (timbre_especial) {
+            else if (timbre_especial != null) {
+                //console.log('7')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1
+                    WHERE id_empleado = $1 RETURNING *
                     `
                     , [id_empleado, timbre_especial]);
 
@@ -867,6 +875,7 @@ class TimbresControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+            //console.log('opciones ', opciones)
 
             if (opciones) {
                 return res.status(200).jsonp(opciones)
@@ -893,6 +902,26 @@ class TimbresControlador {
             WHERE id_empleado = $1
             `
             , [id_empleado]);
+
+        if (OPCIONES.rowCount != 0) {
+            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
+        }
+    }
+
+
+    // METODO PARA BUSCAR OPCIONES DE TIMBRES DE VARIOS USUARIOS    **USADO
+    public async BuscarMultipleOpcionesTimbre(req: Request, res: Response): Promise<any> {
+
+        const { id_empleado } = req.body;
+        const OPCIONES = await pool.query(
+            "SELECT e.nombre, e.apellido, e.cedula, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
+            "   om.timbre_foto, om.timbre_especial " +
+            "FROM mrv_opciones_marcacion AS om, eu_empleados AS e " +
+            "WHERE e.id = om.id_empleado AND om.id_empleado IN (" + id_empleado + ") "
+        );
 
         if (OPCIONES.rowCount != 0) {
             return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
@@ -1012,7 +1041,7 @@ class TimbresControlador {
                 [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
                 timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
                 timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre,
-                timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.fecha_hora_timbre,zonaHorariaServidor ]);
+                timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.fecha_hora_timbre, zonaHorariaServidor]);
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
