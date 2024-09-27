@@ -848,6 +848,7 @@ class TimbresControlador {
     /** ************************************************************************************************* **
      ** **                                 METODOS PARA APP MOVIL                                      ** **
      ** ************************************************************************************************* **/
+    //METODO PARA CREAR TIMBRE
     crearTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -861,10 +862,11 @@ class TimbresControlador {
                     .tz(timbre.zona_horaria_dispositivo)
                     .format('YYYY-MM-DD HH:mm:ss');
                 const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
-                const timbreRV = new Date(timbre.fecha_hora_timbre || '');
-                const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
-                const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
-                const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
+                const timbreRV = new Date(fechaHoraEnZonaHorariaDispositivo || '');
+                const timbreDispositivo = new Date(timbre.fecha_hora_timbre || '');
+                const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
+                const restaTimbresMinutos = timbreRV.getMinutes() - timbreDispositivo.getMinutes();
+                const restaTimbresDias = timbreRV.getDate() - timbreDispositivo.getDate();
                 if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
                     timbre.hora_timbre_diferente = true;
                 }
@@ -907,6 +909,7 @@ class TimbresControlador {
         });
     }
     ;
+    // METODO PARA CREAR TIMBRE SIN CONEXION A INTERNET
     crearTimbreDesconectado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -915,28 +918,8 @@ class TimbresControlador {
                 yield database_1.default.query('BEGIN');
                 console.log("ver req.body", req.body);
                 timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-                const fechaHoraEnZonaHorariaDispositivo = (0, moment_timezone_1.default)(timbre.fecha_hora_timbre_servidor)
-                    .tz(timbre.zona_horaria_dispositivo)
-                    .format('YYYY-MM-DD HH:mm:ss');
                 const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
-                const timbreRV = new Date(timbre.fecha_hora_timbre || '');
-                const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
-                const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
-                const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
-                if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
-                    if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                        timbre.hora_timbre_diferente = false;
-                    }
-                    else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                        timbre.hora_timbre_diferente = false;
-                    }
-                    else {
-                        timbre.hora_timbre_diferente = true;
-                    }
-                }
-                else {
-                    timbre.hora_timbre_diferente = false;
-                }
+                timbre.hora_timbre_diferente = false;
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
                     'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_servidor) ' +

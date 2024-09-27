@@ -937,6 +937,7 @@ class TimbresControlador {
      ** **                                 METODOS PARA APP MOVIL                                      ** **
      ** ************************************************************************************************* **/
 
+    //METODO PARA CREAR TIMBRE
     public async crearTimbre(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();
@@ -952,10 +953,13 @@ class TimbresControlador {
                 .format('YYYY-MM-DD HH:mm:ss');
 
             const zonaHorariaServidor = moment.tz.guess();
-            const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
-            const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
-            const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
-            const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
+            const timbreRV: Date = new Date(fechaHoraEnZonaHorariaDispositivo || '');
+            const timbreDispositivo: Date = new Date(timbre.fecha_hora_timbre || '');
+
+
+            const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
+            const restaTimbresMinutos = timbreRV.getMinutes() - timbreDispositivo.getMinutes();
+            const restaTimbresDias = timbreRV.getDate() - timbreDispositivo.getDate();
             if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
                 timbre.hora_timbre_diferente = true;
             } else {
@@ -1003,7 +1007,7 @@ class TimbresControlador {
         }
     };
 
-
+    // METODO PARA CREAR TIMBRE SIN CONEXION A INTERNET
     public async crearTimbreDesconectado(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();
@@ -1012,27 +1016,8 @@ class TimbresControlador {
             console.log("ver req.body", req.body)
 
             timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-            const fechaHoraEnZonaHorariaDispositivo = moment(timbre.fecha_hora_timbre_servidor)
-                .tz(timbre.zona_horaria_dispositivo)
-                .format('YYYY-MM-DD HH:mm:ss');
             const zonaHorariaServidor = moment.tz.guess();
-
-
-            const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
-            const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
-            const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
-            const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
-            if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
-                if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                    timbre.hora_timbre_diferente = false;
-                } else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                    timbre.hora_timbre_diferente = false;
-                } else {
-                    timbre.hora_timbre_diferente = true;
-                }
-            } else {
-                timbre.hora_timbre_diferente = false;
-            }
+            timbre.hora_timbre_diferente = false;
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                 'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
