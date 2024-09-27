@@ -179,7 +179,7 @@ const BuscarTimbresConNovedades = function (fec_inicio, fec_final, codigo, conex
          conexion, novedades_conexion, CAST(fecha_hora_timbre_validado AS VARCHAR),
          CAST(fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  
          FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%'  AND codigo = $3 AND conexion = 'false' OR hora_timbre_diferente = 'true'  ORDER BY fecha_hora_timbre_validado ASC`, [fec_inicio, fec_final, codigo])
+            AND ($2::timestamp + '1 DAY') || '%'  AND codigo = $3 AND (conexion = 'false' OR hora_timbre_diferente = 'true')  ORDER BY fecha_hora_timbre_validado ASC`, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });
