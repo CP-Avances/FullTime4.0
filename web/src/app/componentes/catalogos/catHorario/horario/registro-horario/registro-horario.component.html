@@ -1,9 +1,15 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR HORARIO
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR HORARIO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
 </div>
 <div class="container">
     <!-- FORMULARIO COMPLETO -->
@@ -63,7 +69,7 @@
 
                     <div class="d-flex flex-wrap justify-content-start">
                         <label
-                            style="padding-top: 15px; padding-bottom: 5px; position: relative; left:40px; font-size: 14px;">
+                            style="padding-top: 10px; padding-bottom: 5px; position: relative; left:40px; font-size: 14px;">
                             Tipo horario:
                         </label>
                     </div>
