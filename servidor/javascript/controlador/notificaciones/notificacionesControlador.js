@@ -688,6 +688,7 @@ class NotificacionTiempoRealControlador {
         });
     }
     //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+    // METODO PARA OBTENER LA INFORMACION GENERAL DEL EMPLEADO POR SU CODIGO
     getInfoEmpleadoByCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -713,6 +714,7 @@ class NotificacionTiempoRealControlador {
         });
     }
     ;
+    // METODO PARA OBTENER LAS NOTIFICACIONES
     getNotificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -731,6 +733,7 @@ class NotificacionTiempoRealControlador {
         });
     }
     ;
+    // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
     getNotificacionTimbres(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -737,6 +737,7 @@ class TimbresControlador {
         });
     }
     ;
+    //METODO PARA CREAR TIMBRE POR EL ADMINISTRADOR
     crearTimbreJustificadoAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -771,11 +772,11 @@ class TimbresControlador {
             }
         });
     }
+    //METODO PARA LEER TIMBRES POR UN RANGO DE FECHA
     FiltrarTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecInicio, fecFinal, codigo } = req.body;
-                // Convertir fechas de entrada a objetos Date
                 console.log("ver body", req.body);
                 let fechaDesde = new Date(fecInicio);
                 let fechaHasta = new Date(fecFinal);
@@ -796,6 +797,7 @@ class TimbresControlador {
             }
         });
     }
+    //METODO PARA LEER TIMBRES POR CODIGO DEL EMPLEADO
     getTimbreByCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -821,47 +823,6 @@ class TimbresControlador {
             catch (error) {
                 console.log(error);
                 return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
-    ;
-    justificarAtraso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, fec_justifica, codigo, create_time, codigo_create_user, user_name, ip } = req.body;
-                yield database_1.default.query('BEGIN');
-                const [atraso] = yield database_1.default.query('INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, id_empleado, fecha_hora, id_empleado_justifica) ' +
-                    'VALUES($1, $2, $3, $4, $5) RETURNING id', [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
-                    .then(res => {
-                    return res.rows;
-                });
-                const fechaHora = yield (0, settingsMail_1.FormatearHora)(create_time.toLocaleString().split('T')[1]);
-                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(create_time.toLocaleString(), 'ddd');
-                const fechaHoraJustificacion = yield (0, settingsMail_1.FormatearHora)(fec_justifica.toLocaleString().split('T')[1]);
-                const fechaTimbreJustificacion = yield (0, settingsMail_1.FormatearFecha2)(fec_justifica.toLocaleString(), 'ddd');
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_justificacion_atraso',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{fecha_hora: ${fechaTimbre + ' ' + fechaHora}, fecha_justifica: ${fechaTimbreJustificacion + ' ' + fechaHoraJustificacion}, descripcion: ${descripcion}, id_empleado: ${codigo}, id_empleado_justifica: ${codigo_create_user} }`,
-                    ip: ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (!atraso)
-                    return res.status(400).jsonp({ message: "Atraso no insertado" });
-                return res.status(200).jsonp({
-                    body: {
-                        mensaje: "Atraso justificado",
-                        response: atraso.rows
-                    }
-                });
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Error al crear justificación' });
             }
         });
     }

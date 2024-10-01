@@ -212,7 +212,7 @@ class NotificacionTiempoRealControlador {
     try {
       const id = req.params.id;
       const { visto, user_name, ip } = req.body;
-      console.log("ver parametros", req.body )
+      console.log("ver parametros", req.body)
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -540,9 +540,9 @@ class NotificacionTiempoRealControlador {
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
 
-     // OBTENER RUTA DE LOGOS
-     let separador = path.sep;
-     const path_folder = ObtenerRutaLogos();
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     var datos = await Credenciales(req.id_empresa);
 
@@ -698,9 +698,9 @@ class NotificacionTiempoRealControlador {
     var hora = await FormatearHora(tiempo.hora);
     var dispositivo = ''
 
-     // OBTENER RUTA DE LOGOS
-     let separador = path.sep;
-     const path_folder = ObtenerRutaLogos();
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
 
     const { id_envia, correo, mensaje, asunto } = req.body.datosCorreo;
     const solicitudes = req.body.solicitudes;
@@ -796,6 +796,7 @@ class NotificacionTiempoRealControlador {
 
   //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
 
+  // METODO PARA OBTENER LA INFORMACION GENERAL DEL EMPLEADO POR SU CODIGO
   public async getInfoEmpleadoByCodigo(req: Request, res: Response): Promise<Response> {
     try {
 
@@ -823,7 +824,7 @@ class NotificacionTiempoRealControlador {
     }
   };
 
-
+  // METODO PARA OBTENER LAS NOTIFICACIONES
   public async getNotificacion(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empleado } = req.query;
@@ -841,6 +842,7 @@ class NotificacionTiempoRealControlador {
     }
   };
 
+  // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
   public async getNotificacionTimbres(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empleado } = req.query;

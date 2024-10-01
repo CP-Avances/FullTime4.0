@@ -122,37 +122,15 @@ class ReportesControlador {
         }
     }
 
-    public async getInfoReporteTimbres(req: Request, res: Response): Promise<Response> {
-        try {
-            const { codigo, fec_inicio, fec_final } = req.query;
-            const response: QueryResult = await pool.query(
-                `
-                SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, 
-                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor,
-                    CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre_valido
-                FROM eu_timbres AS t 
-                WHERE codigo = $3 AND fecha_hora_timbre_valido BETWEEN $1 AND $2 
-                ORDER BY fecha_hora_timbre_valido DESC LIMIT 100
-                `
-                , [fec_inicio, fec_final, codigo]);
-            const timbres: any[] = response.rows;
-            // console.log(timbres);
-            if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
-
-            return res.status(200).jsonp(timbres);
-        } catch (error) {
-            console.log(error);
-            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-        }
-    };
-
+   
+    // METODO PARA OBTENER LOS TIMBRES CON NOVEDADES EN UN FECHA DETERMINADA
     public async getInfoReporteTimbresNovedad(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         console.log("ver req.body", req.body)
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbresConNovedades(desde, hasta, o.codigo, false );
+                o.timbres = await BuscarTimbresConNovedades(desde, hasta, o.codigo, false);
                 console.log('Timbres: ', o);
                 return o;
             }));
@@ -167,9 +145,10 @@ class ReportesControlador {
     }
 }
 
+// METODO PARA DEFINIR LOS REGISTROS DE TIMBRES CON NOVEDADES
 const BuscarTimbresConNovedades = async function (fec_inicio: string, fec_final: string, codigo: string | number, conexion: any) {
     return await pool.query(
-         `SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 
+        `SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 
          ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, 
          conexion, novedades_conexion, CAST(fecha_hora_timbre_validado AS VARCHAR),
          CAST(fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  

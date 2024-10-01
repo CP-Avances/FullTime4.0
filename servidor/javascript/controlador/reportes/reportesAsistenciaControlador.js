@@ -129,7 +129,7 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(respuesta);
         });
     }
-    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO     **USADO
+    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO   
     ReporteTimbresMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -152,7 +152,7 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS     **USADO
+    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS   
     ReporteTimbresIncompletos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -174,7 +174,7 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA       **USADO
+    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA      
     ReporteTimbreSistema(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -197,7 +197,7 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL       **USADO
+    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL    
     ReporteTimbreRelojVirtual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -219,7 +219,7 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    // REPORTE DE TIMBRES HORARIO ABIERTO     **USADO
+    // REPORTE DE TIMBRES HORARIO ABIERTO   
     ReporteTimbreHorarioAbierto(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
