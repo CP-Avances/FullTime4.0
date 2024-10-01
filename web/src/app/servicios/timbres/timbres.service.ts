@@ -80,6 +80,10 @@ export class TimbresService {
     return this.http.put<any>(`${environment.url}/timbres/actualizar-opciones-timbre`, datos);
   }
 
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  EliminarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/eliminar-opcion-marcacion`, datos);
+  }
 
 
 

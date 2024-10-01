@@ -1,34 +1,36 @@
 #detalle {
-    width: 100%;
-    font-size: 12px;
-    border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
 }
 
-#detalle .t_horarios {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-    vertical-align: middle;
+.t_horarios {
+  padding: 3px;
+  text-align: center;
+  vertical-align: middle;
 }
 
-#detalle {
-    border-spacing: 0;
-}
-
-#detalle th,
-#detalle td {
-    border-right: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-}
-
-#detalle tbody tr {
-    background-color: #fbfbfb;
-}
-
-#detalle tbody tr:nth-child(2n) {
-    background-color: #e6f3ff;
+th {
+  text-align: center;
+  vertical-align: middle;
 }
 
 p {
-    font-size: x-small;
+  font-size: x-small;
+}
+
+mat-form-field.input-tables {
+  background: transparent;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  fill: none;
+  height: 60px;
+}
+
+.codigo {
+  width: 150px;
+}
+
+.nombre {
+  width: 200px;
 }

@@ -845,6 +845,55 @@ class TimbresControlador {
             }
         });
     }
+    // METODO PARA ELIMINAR REGISTROS    **USADO
+    EliminarRegistros(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { user_name, ip, id } = req.body;
+                //console.log('req.body ', req.body)
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mrv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM mrv_opciones_marcacion WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mrv_opciones_marcacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     /** ************************************************************************************************* **
      ** **                                 METODOS PARA APP MOVIL                                      ** **
      ** ************************************************************************************************* **/

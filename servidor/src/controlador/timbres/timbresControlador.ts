@@ -932,6 +932,64 @@ class TimbresControlador {
     }
 
 
+    // METODO PARA ELIMINAR REGISTROS    **USADO
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        try {
+            const { user_name, ip, id } = req.body;
+            //console.log('req.body ', req.body)
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM mrv_opciones_marcacion WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'mrv_opciones_marcacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM mrv_opciones_marcacion WHERE id = $1
+                `
+                , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mrv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.jsonp({ message: 'error' });
+
+        }
+    }
+
+
 
     /** ************************************************************************************************* **
      ** **                                 METODOS PARA APP MOVIL                                      ** **

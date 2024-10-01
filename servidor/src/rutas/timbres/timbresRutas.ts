@@ -42,6 +42,8 @@ class TimbresRutas {
         this.router.post('/listar-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarOpcionesTimbre);
         // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
         this.router.post('/listar-varias-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbre);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistros);
 
 
         // METODO DE BUSQUEDA DE AVISOS GENERALES

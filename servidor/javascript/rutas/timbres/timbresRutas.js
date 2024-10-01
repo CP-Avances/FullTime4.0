@@ -36,6 +36,8 @@ class TimbresRutas {
         this.router.post('/listar-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarOpcionesTimbre);
         // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
         this.router.post('/listar-varias-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbre);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistros);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
