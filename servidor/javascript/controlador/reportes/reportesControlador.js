@@ -124,31 +124,7 @@ class ReportesControlador {
             }
         });
     }
-    getInfoReporteTimbres(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { codigo, fec_inicio, fec_final } = req.query;
-                const response = yield database_1.default.query(`
-                SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, 
-                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor,
-                    CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre_valido
-                FROM eu_timbres AS t 
-                WHERE codigo = $3 AND fecha_hora_timbre_valido BETWEEN $1 AND $2 
-                ORDER BY fecha_hora_timbre_valido DESC LIMIT 100
-                `, [fec_inicio, fec_final, codigo]);
-                const timbres = response.rows;
-                // console.log(timbres);
-                if (timbres.length === 0)
-                    return res.status(400).jsonp({ message: 'No hay timbres resgistrados' });
-                return res.status(200).jsonp(timbres);
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
-    ;
+    // METODO PARA OBTENER LOS TIMBRES CON NOVEDADES EN UN FECHA DETERMINADA
     getInfoReporteTimbresNovedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -172,6 +148,7 @@ class ReportesControlador {
         });
     }
 }
+// METODO PARA DEFINIR LOS REGISTROS DE TIMBRES CON NOVEDADES
 const BuscarTimbresConNovedades = function (fec_inicio, fec_final, codigo, conexion) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 

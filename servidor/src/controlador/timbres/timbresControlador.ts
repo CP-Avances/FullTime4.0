@@ -1112,6 +1112,7 @@ class TimbresControlador {
 
     };
 
+    //METODO PARA CREAR TIMBRE POR EL ADMINISTRADOR
     public async crearTimbreJustificadoAdmin(req: Request, res: Response) {
         try {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body
@@ -1151,11 +1152,10 @@ class TimbresControlador {
         }
     }
 
+    //METODO PARA LEER TIMBRES POR UN RANGO DE FECHA
     public async FiltrarTimbre(req: Request, res: Response) {
         try {
             const { fecInicio, fecFinal, codigo } = req.body
-            // Convertir fechas de entrada a objetos Date
-
             console.log("ver body", req.body)
             let fechaDesde = new Date(fecInicio);
             let fechaHasta = new Date(fecFinal);
@@ -1178,6 +1178,7 @@ class TimbresControlador {
         }
     }
 
+    //METODO PARA LEER TIMBRES POR CODIGO DEL EMPLEADO
     public async getTimbreByCodigo(req: Request, res: Response): Promise<Response> {
         try {
 
@@ -1210,51 +1211,7 @@ class TimbresControlador {
         }
     };
 
-    public async justificarAtraso(req: Request, res: Response) {
-        try {
-            const { descripcion, fec_justifica, codigo, create_time, codigo_create_user, user_name, ip } = req.body;
-            await pool.query('BEGIN');
-            const [atraso] = await pool.query(
-                'INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, id_empleado, fecha_hora, id_empleado_justifica) ' +
-                'VALUES($1, $2, $3, $4, $5) RETURNING id',
-                [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
-                .then(res => {
-                    return res.rows;
-                });
-
-            const fechaHora = await FormatearHora(create_time.toLocaleString().split('T')[1]);
-            const fechaTimbre = await FormatearFecha2(create_time.toLocaleString(), 'ddd');
-
-            const fechaHoraJustificacion = await FormatearHora(fec_justifica.toLocaleString().split('T')[1]);
-            const fechaTimbreJustificacion = await FormatearFecha2(fec_justifica.toLocaleString(), 'ddd');
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_empleado_justificacion_atraso',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{fecha_hora: ${fechaTimbre + ' ' + fechaHora}, fecha_justifica: ${fechaTimbreJustificacion + ' ' + fechaHoraJustificacion}, descripcion: ${descripcion}, id_empleado: ${codigo}, id_empleado_justifica: ${codigo_create_user} }`,
-                ip: ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-
-            if (!atraso) return res.status(400).jsonp({ message: "Atraso no insertado" });
-
-            return res.status(200).jsonp({
-                body: {
-                    mensaje: "Atraso justificado",
-                    response: atraso.rows
-                }
-            })
-
-        } catch (error) {
-            console.log(error);
-            return res.status(500).jsonp({ message: 'Error al crear justificación' });
-        }
-    };
-
+   
 }
 
 export const timbresControlador = new TimbresControlador;

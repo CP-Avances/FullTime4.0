@@ -943,6 +943,7 @@ class UsuarioControlador {
         });
     }
     //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
+    // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
     getidDispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -961,6 +962,7 @@ class UsuarioControlador {
         });
     }
     ;
+    // BUSCAR EL DISPOSITIVO POR ID DEL DISPOSITIVO
     getDispositivoPorIdDispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -984,6 +986,7 @@ class UsuarioControlador {
         });
     }
     ;
+    // METODO PARA REGISTRAR EL DISPOSITIVO
     ingresarIDdispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1019,6 +1022,7 @@ class UsuarioControlador {
         });
     }
     ;
+    //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
     getEmpleadosActivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1040,6 +1044,7 @@ class UsuarioControlador {
         });
     }
     ;
+    // METODO PARA OBTENER LA INFORMACION DEL USUARIO
     getUserById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
