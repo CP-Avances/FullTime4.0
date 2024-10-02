@@ -97,11 +97,11 @@
 
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
             <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar reporte en formato PDF.">
+                matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                 <p>PDF</p>
             </i>
             <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar reporte en formato EXCEL.">
+                matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel()">
                 <p>XLSL</p>
             </i>
         </div>

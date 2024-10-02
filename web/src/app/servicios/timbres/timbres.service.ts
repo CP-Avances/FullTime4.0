@@ -86,6 +86,31 @@ export class TimbresService {
   }
 
 
+  /** ********************************************************************************** **
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** ********************************************************************************** **/
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/listar-varias-opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  IngresarOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  ActualizarOpcionesMarcacionWeb(datos: any) {
+    return this.http.put<any>(`${environment.url}/timbres/actualizar-opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  EliminarOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/eliminar-opcion-marcacion-web`, datos);
+  }
+
+
 
 
 

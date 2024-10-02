@@ -305,11 +305,11 @@
                                     <td [attr.rowspan]="2" class="t_horarios">{{ t.codigo }}</td>
                                     <td [attr.rowspan]="2" class="t_horarios">{{ t.empleado }}</td>
                                     <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;">
-                                        <i id="comentarios" class="fa fa-comment"
-                                            *ngIf="t.zona_servidor != t.zona_dispositivo"
-                                            (click)="VisualizarObservacion('zona_horaria', t)">
+                                        <i id="comentarios" class="fa fa-eye"
+                                            *ngIf="t.zona_servidor != t.zona_dispositivo || t.hora_diferente === true"
+                                            (click)="VisualizarObservacion(t)">
                                         </i>
-                                        {{t.zona_horaria_servidor }}
+                                        {{t.zona_horaria_dispositivo }}
                                     </td>
                                     <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;"
                                         *ngIf="timbreDispositivo">
@@ -332,10 +332,6 @@
                                 </tr>
                                 <tr>
                                     <td class="t_horarios">
-                                        <i id="comentarios" class="fa fa-comment"
-                                            *ngIf="t.zona_servidor === t.zona_dispositivo && t.hora_diferente === true"
-                                            (click)="VisualizarObservacion('hora_diferente', t)">
-                                        </i>
                                         {{ t.fechaTimbreServidor }}
                                     </td>
                                     <td class="t_horarios">{{ t.horaTimbreServidor }}</td>

@@ -266,8 +266,8 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver" (click)="GuardarRegistros(s, 'ver')"
-                                        matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(s, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
@@ -329,8 +329,8 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver" (click)="GuardarRegistros(r, 'ver')"
-                                        matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(r, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
@@ -393,8 +393,8 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver" (click)="GuardarRegistros(c, 'ver')"
-                                        matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(c, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
@@ -456,8 +456,8 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver" (click)="GuardarRegistros(d, 'ver')"
-                                        matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(d, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
@@ -523,8 +523,8 @@
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver" (click)="VerOpciones([e])"
-                                        matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="VerOpciones([e], 'e')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
@@ -549,5 +549,5 @@
 </div>
 
 <div style="padding-top: 20px;" *ngIf="ver_configurar">
-    <app-ver-configuracion-timbre [informacion]="ver_informacion"></app-ver-configuracion-timbre>
+    <app-ver-configuracion-timbre [informacion]="ver_informacion" [opcion]="tipo_opcion"></app-ver-configuracion-timbre>
 </div>

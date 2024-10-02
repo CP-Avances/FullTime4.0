@@ -261,10 +261,10 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
             console.log('datos del timbre ', req.body)
-            var now: any;
+            const id_empleado = req.userIdEmpleado;
             var hora_diferente: boolean = false;
-            var fecha_servidor: any;
             var fecha_validada: any;
+
             var zona_servidor = Intl.DateTimeFormat().resolvedOptions().timeZone;
             // OBTENER EL OFFSET GMT EN MINUTOS
             const gmt_minutos = new Date().getTimezoneOffset();
@@ -272,57 +272,36 @@ class TimbresControlador {
             const gmt_horas = -gmt_minutos / 60;
             // FORMATEAR COMO GMT
             const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
-            const id_empleado = req.userIdEmpleado;
 
-            // OBTENER LA FECHA Y HORA ACTUAL
-            now = moment();
+            // OBTENER LA FECHA Y HORA ACTUAL DEL SERVIDOR DEL APLICATIVO
+            var now = moment();
+            const now_ = new Date();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-            fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
+            var fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
             fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
+
             // FORMATEAR FECHA Y HORA DEL TIMBRE INGRESADO
             var hora_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
             var fecha_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
 
+            // VERIFICAR ZONA HORARIA
             if (zona_dispositivo != zona_servidor) {
-                const now_ = new Date();
                 const convertToTimeZone = (date: Date, timeZone: string): string => {
                     return moment(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
                 };
                 var fecha_: any = convertToTimeZone(now_, zona_dispositivo)
                 fecha_validada = moment(fecha_).format('DD/MM/YYYY, h:mm:ss a');
+                var verificar_fecha = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
             }
             else {
+                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
+                var verificar_fecha = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
                 // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
-                var fecha_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
-                // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
-                if (fecha_valida != fecha_timbre) {
-                    hora_diferente = true;
-                }
-                else {
-                    // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
-                    var hora_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
-                    var hora_timbre_ = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
-                    var resta_hora_valida = moment(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
-                    //console.log(' hora_valida ', hora_valida)
-                    //console.log('resta ', resta_hora_valida)
-                    //console.log('hora_timbre.... ', hora_timbre_)
-                    if (hora_timbre_.isAfter(hora_valida)) {
-                        //console.log('ingresa true, hora mayor');
-                        hora_diferente = true;
-                    }
-                    else {
-                        if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
-                            //console.log('ingresa false');
-                            hora_diferente = false;
-                        }
-                        else {
-                            //console.log('ingresa true, hora menor');
-                            hora_diferente = true;
-                        }
-                    }
-                }
+                hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
             }
-            //console.log(' hora diferente ', hora_diferente)
+
+            console.log(' hora diferente ', hora_diferente)
 
             let code = await pool.query(
                 `
@@ -724,7 +703,7 @@ class TimbresControlador {
     }
 
     /** ************************************************************************************************* **
-     ** **                CONSULTAS DE CONFIGURACION DE OPCIONES DE MARCACIONES                        ** **
+     ** **           CONSULTAS DE CONFIGURACION DE OPCIONES DE MARCACIONES APLICACION MOVIL            ** **
      ** ************************************************************************************************* **/
 
     // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
@@ -990,6 +969,216 @@ class TimbresControlador {
     }
 
 
+    /** ************************************************************************************************* **
+     ** **             CONSULTAS DE CONFIGURACION DE OPCIONES DE MARCACIONES SISTEMA WEB               ** **
+     ** ************************************************************************************************* **/
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
+    public async IngresarOpcionTimbreWeb(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_foto, timbre_especial, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO mtv_opciones_marcacion (id_empleado, timbre_foto, timbre_especial) 
+                VALUES ($1, $2, $3) RETURNING *
+                `
+                , [id_empleado, timbre_foto, timbre_especial]);
+
+            const [opciones] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mtv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            console.log('error ', error)
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+    // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE      **USADO
+    public async ActualizarOpcionTimbreWeb(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_empleado, timbre_foto, timbre_especial, user_name, ip } = req.body;
+            //console.log(req.body)
+
+            var opciones: any;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            if (timbre_foto != null && timbre_especial != null) {
+                //console.log('1')
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
+                    WHERE id_empleado = $1 RETURNING *
+                    `
+                    , [id_empleado, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto != null && timbre_especial != null) {
+                //console.log('4')
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
+                    WHERE id_empleado = $1 RETURNING *
+                    `
+                    , [id_empleado, timbre_foto, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_foto != null) {
+                //console.log('6')
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mtv_opciones_marcacion SET timbre_foto = $2
+                    WHERE id_empleado = $1 RETURNING *
+                    `
+                    , [id_empleado, timbre_foto]);
+
+                [opciones] = response.rows;
+            }
+            else if (timbre_especial != null) {
+                //console.log('7')
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE mtv_opciones_marcacion SET timbre_especial = $2
+                    WHERE id_empleado = $1 RETURNING *
+                    `
+                    , [id_empleado, timbre_especial]);
+
+                [opciones] = response.rows;
+            }
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mtv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(opciones),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            //console.log('opciones ', opciones)
+
+            if (opciones) {
+                return res.status(200).jsonp(opciones)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+    // METODO PARA BUSCAR OPCIONES DE TIMBRES DE VARIOS USUARIOS    **USADO
+    public async BuscarMultipleOpcionesTimbreWeb(req: Request, res: Response): Promise<any> {
+
+        const { id_empleado } = req.body;
+        const OPCIONES = await pool.query(
+            "SELECT * FROM mtv_opciones_marcacion " +
+            "WHERE id_empleado IN (" + id_empleado + ") "
+        );
+
+        if (OPCIONES.rowCount != 0) {
+            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
+        }
+    }
+
+
+    // METODO PARA ELIMINAR REGISTROS    **USADO
+    public async EliminarRegistrosWeb(req: Request, res: Response): Promise<Response> {
+        try {
+            const { user_name, ip, id } = req.body;
+            //console.log('req.body ', req.body)
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM mtv_opciones_marcacion WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'mtv_opciones_marcacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM mtv_opciones_marcacion WHERE id = $1
+                `
+                , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mtv_opciones_marcacion',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.jsonp({ message: 'error' });
+
+        }
+    }
+
 
     /** ************************************************************************************************* **
      ** **                                 METODOS PARA APP MOVIL                                      ** **
@@ -1211,9 +1400,42 @@ class TimbresControlador {
         }
     };
 
-   
+
 }
 
 export const timbresControlador = new TimbresControlador;
 
-export default timbresControlador
+export default timbresControlador;
+
+export function ValidarZonaHoraria(fecha_valida: any, fecha_timbre: any, fecha_validada: any, fec_hora_timbre: any) {
+    var hora_diferente: boolean;
+    // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
+    if (fecha_valida != fecha_timbre) {
+        hora_diferente = true;
+    }
+    else {
+        // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
+        var hora_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
+        var hora_timbre_ = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
+        var resta_hora_valida = moment(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
+        //console.log(' hora_valida ', hora_valida)
+        //console.log('resta ', resta_hora_valida)
+        //console.log('hora_timbre.... ', hora_timbre_)
+        if (hora_timbre_.isAfter(hora_valida)) {
+            //console.log('ingresa true, hora mayor');
+            hora_diferente = true;
+        }
+        else {
+            if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
+                //console.log('ingresa false');
+                hora_diferente = false;
+            }
+            else {
+                //console.log('ingresa true, hora menor');
+                hora_diferente = true;
+            }
+        }
+    }
+
+    return hora_diferente;
+}

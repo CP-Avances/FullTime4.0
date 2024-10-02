@@ -531,7 +531,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       );
     }
     if (tipo === 'ver') {
-      this.VerOpciones(usuarios);
+      this.VerOpciones(usuarios, this.opcion);
     }
     else {
       this.RegistrarMultiple(usuarios);
@@ -736,11 +736,13 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
 
   // METODO PARA VER INFORMACION DE OPCIONES MARCACION
   ver_informacion: any;
-  VerOpciones(seleccionados: any) {
+  tipo_opcion: any;
+  VerOpciones(seleccionados: any, opcion: any) {
     if (seleccionados.length > 0) {
       this.configurar = false;
       this.ver_configurar = true;
       this.ver_informacion = seleccionados;
+      this.tipo_opcion = opcion;
     } else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
         timeOut: 6000,

@@ -324,7 +324,7 @@ mat-progress-spinner {
 
 /* ICONO DE NOVEDADES */
 #comentarios {
-    color: rgb(220, 0, 0);
+    color: red;
     cursor: pointer;
     margin-right: 5px;
     margin-left: 15px;

@@ -38,6 +38,14 @@ class TimbresRutas {
         this.router.post('/listar-varias-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbre);
         // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.post('/eliminar-opcion-marcacion', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistros);
+        // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.IngresarOpcionTimbreWeb);
+        // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+        this.router.put('/actualizar-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarOpcionTimbreWeb);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbreWeb);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion-web', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistrosWeb);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

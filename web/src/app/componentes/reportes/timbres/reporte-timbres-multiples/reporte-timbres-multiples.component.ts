@@ -906,14 +906,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   }
 
   // METODO PARA ABRIR VENTANA DE VISUALIZACION DE OBSERVACIONES
-  VisualizarObservacion(tipo: string, timbre: any) {
+  VisualizarObservacion(timbre: any) {
     let observacion = {
-      tipo: tipo,
       informacion: timbre,
     }
     this.ventana.open(InformacionNovedadesComponent, {
       data: observacion,
-      width: '600px',
+      width: '700px',
       height: '300px',
     });
 

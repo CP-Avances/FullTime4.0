@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   templateUrl: './informacion-novedades.component.html',
   styleUrl: './informacion-novedades.component.css'
 })
+
 export class InformacionNovedadesComponent implements OnInit {
 
   constructor(
@@ -26,10 +27,11 @@ export class InformacionNovedadesComponent implements OnInit {
   zona_horaria: boolean = false;
   hora_diferente: boolean = false;
   VerificarTipo() {
-    if (this.data.tipo === 'zona_horaria') {
+    if (this.data.informacion.zona_servidor != this.data.informacion.zona_dispositivo) {
       this.zona_horaria = true;
     }
-    else if(this.data.tipo === 'hora_diferente'){
+
+    if (this.data.informacion.hora_diferente === true) {
       this.hora_diferente = true;
     }
   }

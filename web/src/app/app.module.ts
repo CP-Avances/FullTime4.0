@@ -251,11 +251,17 @@ import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacio
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
 import { RegistrarTimbreComponent } from './componentes/modulos/timbreWeb/registrar-timbre/registrar-timbre.component';
+import { OpcionesTimbreWebComponent } from './componentes/modulos/timbreWeb/opcionesTimbreWeb/opciones-timbre-web/opciones-timbre-web.component';
+import { VerOpcionesTimbreWebComponent } from './componentes/modulos/timbreWeb/opcionesTimbreWeb/ver-opciones-timbre-web/ver-opciones-timbre-web.component';
+
 // MODULO  --APLICACION MOVIL
 import { ListaAppComponent } from './componentes/modulos/appMovil/lista-app/lista-app.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VerDipositivoComponent } from './componentes/catalogos/catRelojes/ver-dipositivo/ver-dipositivo.component';
 import { DeleteRegistroDispositivoComponent } from './componentes/modulos/appMovil/delete-registro-dispositivo/delete-registro-dispositivo.component';
+import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/configurar-opciones-timbres/configurar-opciones-timbres.component';
+import { VerConfiguracionTimbreComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/ver-configuracion-timbre/ver-configuracion-timbre.component';
+
 // TIMBRES
 import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/relojes.component';
 import { EditarRelojComponent } from './componentes/catalogos/catRelojes/editar-reloj/editar-reloj.component';
@@ -267,8 +273,6 @@ import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/cre
 import { EditarTimbreComponent } from './componentes/timbres/acciones-timbres/editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from './componentes/timbres/acciones-timbres/ver-timbre/ver-timbre.component';
 import { VerImagenComponent } from './componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
-import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/configurar-opciones-timbres/configurar-opciones-timbres.component';
-import { VerConfiguracionTimbreComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/ver-configuracion-timbre/ver-configuracion-timbre.component';
 
 // NOTIFICACIONES
 import { SettingsComponent } from './componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
@@ -541,11 +545,15 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     ListaWebComponent,
     TimbreWebComponent,
     RegistrarTimbreComponent,
+    OpcionesTimbreWebComponent,
+    VerOpcionesTimbreWebComponent,
 
     ListaAppComponent,
     RegistroDispositivosComponent,
     VerDipositivoComponent,
     DeleteRegistroDispositivoComponent,
+    ConfigurarOpcionesTimbresComponent,
+    VerConfiguracionTimbreComponent,
 
     RelojesComponent,
     EditarRelojComponent,
@@ -557,8 +565,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     EditarTimbreComponent,
     VerTimbreComponent,
     VerImagenComponent,
-    ConfigurarOpcionesTimbresComponent,
-    VerConfiguracionTimbreComponent,
+
 
     SettingsComponent,
     ConfiguracionNotificacionComponent,
