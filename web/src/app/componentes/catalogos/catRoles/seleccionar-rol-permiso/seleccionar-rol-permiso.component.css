@@ -50,8 +50,20 @@ td {
             width: 100%;
         }
     }
+    .modal_body{
+        margin-left: 0px; 
+    }
+    .todos_links{
+        margin-left: 2px;
+    }
 }
 
+.todos_links{
+    margin-left: 5px;
+}
+.modal_body{
+    margin-left: 60px; 
+}
 .table_horario {
     max-height: 400px; /* Ajusta según sea necesario */
 }

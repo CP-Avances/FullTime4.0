@@ -13,37 +13,41 @@
                 </div>
                 <div class="row">
                     <div class="col-md">
-                        <mat-form-field>
-                            <mat-label>Nombre</mat-label>
-                            <input matInput [formControl]="nombre">
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el nombre del usuario.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Apellido</mat-label>
-                            <input matInput [formControl]="apellido">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                                matTooltip="Ingresar el apellido del usuario.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombre</mat-label>
+                                <input matInput [formControl]="nombre">
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el nombre del usuario.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Apellido</mat-label>
+                                <input matInput [formControl]="apellido">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar el apellido del usuario.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div> 
                     </div>
                     <div class="col-md">
-                        <mat-form-field>
-                            <mat-label>Código</mat-label>
-                            <input matInput [formControl]="codigo">
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el código de usuario.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Cédula</mat-label>
-                            <input matInput [formControl]="cedula">
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Código</mat-label>
+                                <input matInput [formControl]="codigo">
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el código de usuario.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Cédula</mat-label>
+                                <input matInput [formControl]="cedula">
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
@@ -77,9 +81,8 @@
                 </div>
             </div>
         </form>
-
         <hr>
-        <div class="container" style="padding-top: 5px; text-align: center;">
+        <div class="container" style="padding-top: 10px; text-align: center;">
             <div class="mat-elevation-z8" style="background: white;">
                 <div id="resultados">RESULTADO DE BÚSQUEDA</div>
                 <div class="table-responsive">
@@ -127,8 +130,10 @@
                     [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
             </div>
+            <br/>
         </div>
     </mat-card>
+    <br/>
 </div>
 
 <!--  ***************************  PANTALLA REVISION DE ASISTENCIA  ********************************  -->

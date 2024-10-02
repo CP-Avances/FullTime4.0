@@ -16,57 +16,55 @@
         <div class="container d-flex flex-wrap justify-content-center">
             <span><b>{{ currentTime }}</b></span>
         </div>
+        <div class="nota" style="text-align: center;">
+            <span>Seleccione una opción para registrar</span>
+        </div>
+        <div class="row m-auto" style="padding-top: 20px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio"    style="float: right; margin-right: 2px;"mat-raised-button  (click)="AlmacenarDatos(1)">
+                        Inicio Jornada Laboral
+                </button>    
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio"   style="float: left; margin-left: 2px;" mat-raised-button (click)="AlmacenarDatos(3)">
+                        Inicio Alimentación
+                </button>
+            </div>
+        </div>
+        <div class="row m-auto" style="padding-top: 10px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio"    style="float: right; margin-right: 2px;"mat-raised-button  (click)="AlmacenarDatos(5)">
+                        Inicio Permiso
+                </button>    
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin"   style="float: left; margin-left: 2px;" mat-raised-button (click)="AlmacenarDatos(2)">
+                    Fin Jornada Laboral
+                </button>
+            </div>
+        </div>
+        <div class="row m-auto" style="padding-top: 10px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin"     style="float: right; margin-right: 2px;"mat-raised-button  (click)="AlmacenarDatos(4)">
+                    Fin Alimentación
+                </button>    
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin"   style="float: left; margin-left: 2px;" mat-raised-button (click)="AlmacenarDatos(6)">
+                    Fin Permiso
+                </button>
+            </div>
+        </div>
 
         <div class="container">
-            <div class="nota" style="text-align: center;">
-                <span>Seleccione una opción para registrar</span>
-            </div>
-            <div class="row" style="padding-top: 20px;">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(1)">
-                            Inicio Jornada Laboral
-                        </button>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(3)">
-                            Inicio Alimentación
-                        </button>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(5)">
-                            Inicio Permiso
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(2)">
-                            Fin Jornada Laboral
-                        </button>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(4)">
-                            Fin Alimentación
-                        </button>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(6)">
-                            Fin Permiso
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm"></div>
-                <div class="col-sm">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <button mat-raised-button id="botonTimbreAbierto" (click)="AlmacenarDatos(7)">
+            <div class="row mt-2">
+                <div class="col-12 col-md-8 m-auto">
+                    <div>
+                        <button mat-raised-button id="botonTimbreAbierto" style="width: 200px;" (click)="AlmacenarDatos(7)">
                             Timbre Especial
                         </button>
                     </div>
                 </div>
-                <div class="col-sm"></div>
             </div>
         </div>
     </div>

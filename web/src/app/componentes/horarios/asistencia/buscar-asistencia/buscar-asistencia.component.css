@@ -10,7 +10,7 @@ mat-label {
 
 mat-form-field {
     width: 225px;
-    padding: 10px 10px 0px 10px;
+    padding: 5px 10px 0px 10px;
 }
 
 tr {
@@ -26,6 +26,7 @@ table {
 td {
     padding-top: 10px;
     text-align: center;
+    white-space: nowrap;
     vertical-align: middle;
     border: 1px solid #ccc;
 }
@@ -37,4 +38,22 @@ td {
 
 p {
     font-size: x-small;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    mat-form-field {
+        width: 225px;
+        margin: auto;
+    }
+
+    hr{
+        width: 90%;
+        margin: auto;
+    }
+
+    .container{
+        margin: 0px;
+        padding: 0px;
+    }
 }

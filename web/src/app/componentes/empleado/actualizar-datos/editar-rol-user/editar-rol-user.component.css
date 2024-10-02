@@ -6,6 +6,7 @@
 
 td {
     padding-top: 10px;
+    white-space: nowrap;
     text-align: center;
 }
 
