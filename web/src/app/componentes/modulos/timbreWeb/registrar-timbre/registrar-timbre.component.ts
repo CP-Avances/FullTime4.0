@@ -6,7 +6,6 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
-import moment from 'moment-timezone';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';

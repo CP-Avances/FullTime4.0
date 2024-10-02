@@ -34,6 +34,24 @@ class EmpleadoHorariosControlador {
             }
         });
     }
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
+    VerificarHorariosExistentes2(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { fechaInicio, fechaFinal, ids } = req.body;
+            const HORARIO = yield database_1.default.query(`
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_, pg.id_empleado
+            FROM eu_asistencia_general AS pg, eh_cat_horarios AS ch
+            WHERE pg.id_empleado = ANY($3) AND pg.id_horario = ch.id AND
+                (fecha_horario BETWEEN $1 AND $2)
+            `, [fechaInicio, fechaFinal, ids]);
+            if (HORARIO.rowCount != 0) {
+                return res.jsonp(HORARIO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
     // METODO PARA CONSULTAR HORARIO DEL USUARIO POR DIAS-HORAS Y NUMERO DE HORAS DE TRABAJO EN EL MISMO DIA (MD)
     ObtenerHorarioHorasMD(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -175,8 +193,28 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
+    // VERIFICAR EXISTENCIA DE PLANIFICACION PARA VARIOS EMPLEADOS
     VerificarFechasHorario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { fechaInicio, fechaFinal, id_horario, ids } = req.body; // 'ids' es un array de id_empleado
+            // Consulta para verificar planificaciones duplicadas
+            const HORARIOS = yield database_1.default.query(`
+        SELECT DISTINCT id_empleado FROM eu_asistencia_general 
+        WHERE id_empleado = ANY($3) AND id_horario = $4 AND
+            (fecha_horario BETWEEN $1 AND $2)
+        `, [fechaInicio, fechaFinal, ids, id_horario]);
+            if (HORARIOS.rowCount != 0) {
+                // Devolver solo los id_empleado que tienen registros duplicados
+                const duplicados = HORARIOS.rows.map((row) => row.id_empleado);
+                return res.jsonp({ duplicados });
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados' });
+            }
+        });
+    }
+    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
+    VerificarFechasHorario2(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal, id_horario } = req.body;
             const { id_empleado } = req.params;

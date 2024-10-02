@@ -12,6 +12,11 @@ export class EmpleadoHorariosService {
     private http: HttpClient,
   ) { }
 
+
+  VerificarDuplicidadHorarios2( datos: any) {
+    return this.http.post(`${environment.url}/empleadoHorario/validarFechas`, datos);
+  }
+
   // METODO PARA VERIFICAR HORARIOS DUPLICADOS  **USADO
   VerificarDuplicidadHorarios(id_empleado: string, datos: any) {
     return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${id_empleado}`, datos);
@@ -19,6 +24,11 @@ export class EmpleadoHorariosService {
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
   VerificarHorariosExistentes(id_empleado: string, datos: any) {
     return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes/${id_empleado}`, datos);
+  }
+
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
+  VerificarHorariosExistentes2(datos: any) {
+    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes`, datos);
   }
   // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
   BuscarHorarioHorasMD(datos: any) {

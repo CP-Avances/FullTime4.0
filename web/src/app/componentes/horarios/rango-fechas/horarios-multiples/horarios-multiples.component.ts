@@ -341,42 +341,48 @@ export class HorariosMultiplesComponent implements OnInit {
     let duplicados = [];
     this.usuarios_invalidos = [];
 
-    this.datos.map((dh: any) => {
-      // METODO PARA BUSCAR DATOS DUPLICADOS DE HORARIOS
-      this.rest.VerificarDuplicidadHorarios(dh.id, fechas).subscribe(response => {
-        this.contador = this.contador + 1;
+    const ids = this.datos.map((dh: any) => dh.id);
+    this.rest.VerificarDuplicidadHorarios2({ ids, fechas }).subscribe((response: any) => {
+      this.contador = this.datos.length; // Todos los datos se procesan en la misma llamada
+      // Procesar la respuesta para determinar duplicados y correctos
+      this.datos.forEach((dh: any) => {
+        if (response.duplicados && response.duplicados.includes(dh.id)) {
+          // Si el id está en la lista de duplicados
+          dh.observacion = 'En las fechas ingresadas ya existe una planificación horaria.';
+          duplicados.concat(dh);
+          this.usuarios = this.usuarios.concat(dh);
+          this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
 
-        dh.observacion = 'En las fechas ingresadas ya existe una planificación horaria.'
-        duplicados = duplicados.concat(dh);
-        this.usuarios = this.usuarios.concat(dh);
-        this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
-
-        if (this.contador === this.datos.length) {
-
-          if (duplicados.length === this.datos.length) {
-            this.ControlarBotones(false, true, true, false, true);
-            this.observaciones = true;
-          }
-          else {
-            this.VerificarContrato(form, correctos);
-          }
-        }
-      }, error => {
-        // NO EXISTEN REGISTRO DUPLICADOS
-        this.contador = this.contador + 1;
-
-        dh.observacion = 'OK'
-        correctos = correctos.concat(dh);
-
-        if (this.contador === this.datos.length) {
-          this.VerificarContrato(form, correctos);
+        } else {
+          // Si el id no es duplicado
+          dh.observacion = 'OK';
+          correctos = correctos.concat(dh);
         }
       });
-    })
+
+      // Evaluar si todos los datos son duplicados
+      if (duplicados.length === this.datos.length) {
+        this.ControlarBotones(false, true, true, false, true);
+        this.observaciones = true;
+      } else {
+        // Continuar con los datos correctos
+        this.VerificarContrato(form, correctos);
+      }
+    }, error => {
+      // Caso en que no hay duplicados (manejar como éxito)
+      console.log('No hay duplicados, error recibido:', error);
+      const correctos = this.datos.map((dh: any) => {
+        dh.observacion = 'OK';
+        return dh;
+      });
+      this.VerificarContrato(form, correctos); // Continuar con los registros correctos
+    });
   }
 
   // METODO PARA VERIFICAR FECHAS DE CONTRATO
   cont2: number = 0;
+
+  /*
   VerificarContrato(form: any, correctos: any) {
     this.cont2 = 0;
     let contrato = [];
@@ -423,12 +429,72 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
   }
+  */
+
+  VerificarContrato(form: any, correctos: any) {
+    this.cont2 = 0;
+    let contrato = [];
+    let sin_contrato = [];
+
+    const ids = correctos.map((dh: any) => dh.id);
+    this.restE.BuscarFechaContrato({ ids }).subscribe((response: any) => {
+      response.fechaContrato.forEach(element => {
+        this.cont2 = this.cont2 + 1;
+
+        console.log("ver element servidor", element)
+        if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
+          (Date.parse(element.fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
+
+          const correcto = correctos
+            .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
+            .map(item => ({ ...item, observacion: 'OK' })); // Modifica la propiedad
+
+          // Si hay elementos actualizados, concatenar al contrato
+          if (correcto.length > 0) {
+            contrato = contrato.concat(correcto);
+          }
+
+          if (this.cont2 === correctos.length) {
+            this.ValidarHorarioByHorasTrabaja(form, contrato);
+          }
+        }
+        else {
+          // FECHAS NO CORRESPONDEN AL REGISTRO DE CONTRATO
+          const correcto = correctos
+            .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
+            .map(item => ({ ...item, observacion: 'Las fechas ingresadas no corresponde al periodo registrado en su contrato.' })); // Modifica la propiedad
+
+          // Si hay elementos actualizados, concatenar al contrato
+          if (correcto.length > 0) {
+            sin_contrato = sin_contrato.concat(correcto);
+            this.usuarios = this.usuarios.concat(correcto);
+            this.usuarios_invalidos = this.usuarios_invalidos.concat(correcto);
+          }
+
+          if (this.cont2 === correctos.length) {
+
+            if (sin_contrato.length === correctos.length) {
+              this.ControlarBotones(false, true, true, false, true);
+              this.observaciones = true;
+            }
+            else {
+              this.ValidarHorarioByHorasTrabaja(form, contrato);
+            }
+          }
+        }
+      });
+
+    });
+  }
+
 
   // METODO PARA VALIDAR HORAS DE TRABAJO SEGUN CONTRATO
   sumHoras: any;
   suma = '00:00:00';
   horariosEmpleado: any = []
   cont3: number = 0;
+
+
   ValidarHorarioByHorasTrabaja(form: any, correctos: any) {
     let horas_correctas = [];
     let horas_incorrectas = [];
@@ -550,6 +616,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
+
   // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
   IndicarNotificacionHoras(horas: any, dh: any) {
     if (this.StringTimeToSegundosTime(horas) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
@@ -662,6 +729,9 @@ export class HorariosMultiplesComponent implements OnInit {
       this.validos = this.validos + 1;
       this.RegistrarPlanificacion(form, obj, this.validos);
     })
+
+
+
   }
 
   // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
