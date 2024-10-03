@@ -5,6 +5,7 @@ p {
 
 td {
     padding-top: 10px;
+    white-space: nowrap;
     text-align: center;
 }
 
@@ -48,4 +49,28 @@ table {
 #SelectCheck {
     cursor: pointer;
     margin-left: 8px;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    mat-card-content{
+        margin: 0%;
+        padding: 0%;
+
+        .container{
+            margin: 0%;
+            padding: 0%;
+            width: 100%;
+        }
+    }
+
+    .opciones{
+        margin-left: 10px;
+    }
+
+    hr{
+        width: 95%;
+        margin: auto;
+        margin-bottom: 10px;
+    }
 }

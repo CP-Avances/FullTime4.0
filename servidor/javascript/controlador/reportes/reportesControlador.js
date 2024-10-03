@@ -124,48 +124,7 @@ class ReportesControlador {
             }
         });
     }
-    getInfoReporteTimbres(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { codigo, fec_inicio, fec_final } = req.query;
-                const response = yield database_1.default.query(`
-                SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, 
-                    CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor,
-                    CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre_valido
-                FROM eu_timbres AS t 
-                WHERE codigo = $3 AND fecha_hora_timbre_valido BETWEEN $1 AND $2 
-                ORDER BY fecha_hora_timbre_valido DESC LIMIT 100
-                `, [fec_inicio, fec_final, codigo]);
-                const timbres = response.rows;
-                // console.log(timbres);
-                if (timbres.length === 0)
-                    return res.status(400).jsonp({ message: 'No hay timbres resgistrados' });
-                return res.status(200).jsonp(timbres);
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
-    ;
-    /*
-        public async getInfoReporteTimbresNovedad(req: Request, res: Response): Promise<Response> {
-            try {
-                const { codigo, fec_inicio, fec_final, conexion } = req.query;
-                const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre_validado AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
-                const timbres: any[] = response.rows;
-                // console.log(timbres);
-                if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
-    
-                return res.status(200).jsonp(timbres);
-            } catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        };
-    
-    */
+    // METODO PARA OBTENER LOS TIMBRES CON NOVEDADES EN UN FECHA DETERMINADA
     getInfoReporteTimbresNovedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -189,25 +148,15 @@ class ReportesControlador {
         });
     }
 }
+// METODO PARA DEFINIR LOS REGISTROS DE TIMBRES CON NOVEDADES
 const BuscarTimbresConNovedades = function (fec_inicio, fec_final, codigo, conexion) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query(`SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, conexion, novedades_conexion, CAST(t.fecha_hora_timbre_validado AS VARCHAR), CAST(t.fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  FROM eu_timbres as t WHERE codigo = $3 AND CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%'  AND conexion = $4 ORDER BY fecha_hora_timbre_validado ASC`, [fec_inicio, fec_final, codigo, conexion])
-            .then(res => {
-            return res.rows;
-        });
-    });
-};
-const BuscarTimbres = function (fec_inicio, fec_final, codigo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query(`
-        SELECT CAST(fecha_hora_timbre AS VARCHAR), id_reloj, accion, observacion, 
-            latitud, longitud, CAST(fecha_hora_timbre_servidor AS VARCHAR),
-            CAST(fecha_hora_timbre_validado AS VARCHAR)
-        FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%' AND codigo = $3 
-        ORDER BY fecha_hora_timbre_validado ASC
-        `, [fec_inicio, fec_final, codigo])
+        return yield database_1.default.query(`SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 
+         ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, 
+         conexion, novedades_conexion, CAST(fecha_hora_timbre_validado AS VARCHAR),
+         CAST(fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  
+         FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%'  AND codigo = $3 AND (conexion = 'false' OR hora_timbre_diferente = 'true')  ORDER BY fecha_hora_timbre_validado ASC`, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });

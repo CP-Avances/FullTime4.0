@@ -21,14 +21,14 @@
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
-        <div class="d-flex bd-highlight" id="titulo">
-            <div class="w-100 bd-highlight">
-                <h5>
-                    RESULTADO DE BÚSQUEDA
-                </h5>
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
             </div>
-            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;" *ngIf="getEliminarCiudad()"
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>RESULTADO DE BÚSQUEDA</span>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;" *ngIf="getEliminarCiudad()"
                     (click)="ConfirmarDeleteMultiple()">
                     Eliminar
                 </button>

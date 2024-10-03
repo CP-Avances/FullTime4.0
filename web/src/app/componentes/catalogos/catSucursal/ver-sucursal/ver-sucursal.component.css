@@ -47,32 +47,6 @@ label{
     color: white;
 }
 
-/*Estilo para ajustar el texto del titulo de las tablas*/
-@media (max-width: 530px) {
-    .Tabla_titulo span{
-        font-size: small;
-    }
-
-    mat-card-content{
-        padding: 0px;
-
-        .container{
-            margin: 0%;
-            width: 100%;
-        }
-    }
-}
-
-.table_horario {
-    max-height: 400px; /* Ajusta según sea necesario */
-}
-
-/* Contenedor para manejar el scroll horizontal */
-.table-wrapper {
-    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
-    display: block;
-}
-
 .thead{
     position:sticky;
 }

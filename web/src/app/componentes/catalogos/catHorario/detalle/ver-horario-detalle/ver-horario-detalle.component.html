@@ -14,7 +14,7 @@
         </div>
         <mat-card-content>
             <div class="container" style="padding-top: 15px;">
-                <div class="row">
+                <div class="row opciones">
                     <div class="col-md">
                         <div class="espacio d-flex justify-content-start">
                             <label id="datosF">Código:</label>
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="text-align: right;">
+                <div class="opciones" style="text-align: right;">
                     <mat-icon (click)="CalcularHorasTrabaja()" style="margin: 0px 10px; cursor: pointer; color: blue;"
                         matTooltip="Verificar que detalle de horario se encuentre acorde a los datos de horario registrados."
                         *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">

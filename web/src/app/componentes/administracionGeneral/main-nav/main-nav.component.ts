@@ -134,10 +134,12 @@ export class MainNavComponent implements OnInit {
   childrenTimbreVirtual: any = [];
   vistaModulosTimbreVirtualTimbresWeb: boolean = false;
   vistaModulosTimbreVirtualTimbresPersonal: boolean = false;
+  vistaModulosTimbreVirtualConfigurarTimbreVirtual: boolean = false;
   subItemModulosAplicacionMovil: boolean = false;
   childrenAplicacionMovil: any = [];
   vistaModulosAplicacionMovilAppMovil: boolean = false;
   vistaModulosAplicacionMovilRegistroDispositivos: boolean = false;
+  vistaModulosAplicacionMovilConfigurarTimbre: boolean = false;
   
   itemTimbres: boolean = false;
   childrenTimbres: any = [];
@@ -1058,7 +1060,19 @@ export class MainNavComponent implements OnInit {
                         }
                       }
                       if(!this.vistaModulosTimbreVirtualTimbresWeb){
-                        this.childrenTimbreVirtual.push({name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true, ver: true});
+                        this.childrenTimbreVirtual.push({name: 'Timbre Virtual', url: '/timbresWeb', color: true, ver: true});
+                      }
+                      break;
+                    case 'configurar-timbre-web':
+                      this.itemModulos = true;
+                      this.subItemModulosTimbreVirtual = true;
+                      for (const parametrizacion of this.childrenTimbreVirtual) {
+                        if(parametrizacion.url === '/configurar-timbre-web'){
+                          this.vistaModulosTimbreVirtualConfigurarTimbreVirtual = true;
+                        }
+                      }
+                      if(!this.vistaModulosTimbreVirtualConfigurarTimbreVirtual){
+                        this.childrenTimbreVirtual.push({name: 'Configurar Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true});
                       }
                       break;
                     case 'timbres-personal':
@@ -1083,6 +1097,18 @@ export class MainNavComponent implements OnInit {
                       }
                       if(!this.vistaModulosAplicacionMovilAppMovil){
                         this.childrenAplicacionMovil.push({name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true});
+                      }
+                      break;
+                    case 'configurar-timbre':
+                      this.itemModulos = true;
+                      this.subItemModulosAplicacionMovil = true;
+                      for (const parametrizacion of this.childrenAplicacionMovil) {
+                        if(parametrizacion.url === '/configurar-timbre'){
+                          this.vistaModulosAplicacionMovilConfigurarTimbre = true;
+                        }
+                      }
+                      if(!this.vistaModulosAplicacionMovilConfigurarTimbre){
+                        this.childrenAplicacionMovil.push({name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true});
                       }
                       break;
                     case 'registro-dispositivos':

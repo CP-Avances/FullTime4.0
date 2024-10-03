@@ -1,0 +1,109 @@
+<div class="container" style="padding-top: 15px">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            <span>OPCIONES DE MARCACIÓN APLICACIÓN MÓVIL</span>
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+                matTooltip="Regresar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button *ngIf="!btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()" matTooltip="Eliminar Múltiple">
+                Eliminación Múltiple
+            </button>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                style="float: right; margin-right: 10px;" (click)="ConfirmarDeleteMultiple()"
+                matTooltip="Eliminar Múltiple">
+                Eliminar datos
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm" id="detalle">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th rowspan="2" *ngIf="btnCheckHabilitar">
+                            <mat-checkbox (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionUsuario.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionUsuario.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
+                        <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                        <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                        <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                        <th class="t_horarios" scope="col" rowspan="1" colspan="3">CONFIGURACIÓN</th>
+                        <th class="t_horarios" scope="col" rowspan="2">ACCIONES</th>
+                    </tr>
+                    <tr style="text-align: center">
+                        <th class="t_horarios" scope="col" rowspan="1">REQUERIDO INTERNET</th>
+                        <th class="t_horarios" scope="col" rowspan="1">ENVIAR FOTO</th>
+                        <th class="t_horarios" scope="col" rowspan="1">TIMBRE ESPECIAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td class="t_horarios">
+                            <mat-form-field class="input-tables codigo">
+                                <input matInput placeholder="Buscar" [formControl]="codigoF">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables nombre">
+                                <input matInput placeholder="Buscar" [formControl]="nombreF">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="t_horarios">
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de horario por el nombre.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let c of configuracion | nombreCompleto: nombreF.value | paginate:tamanio_pagina:numero_pagina">
+                        <td *ngIf="btnCheckHabilitar">
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUsuario.toggle(c) : null"
+                                [checked]="selectionUsuario.isSelected(c)" [aria-label]="checkboxLabelPag(c)">
+                            </mat-checkbox>
+                        </td>
+                        <td class="t_horarios">{{ c.n }}</td>
+                        <td class="t_horarios">{{ c.codigo }}</td>
+                        <td class="t_horarios">{{ c.apellido }} {{c.nombre}} </td>
+                        <td class="t_horarios" *ngIf="c.timbre_internet === true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_internet === false">No</td>
+                        <td class="t_horarios" *ngIf="c.timbre_foto === true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_foto === false">No</td>
+                        <td class="t_horarios" *ngIf="c.timbre_especial === true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_especial === false">No</td>
+                        <td class="t_horarios">
+                            <i id="t-eliminar" *ngIf="auto_individual" class="far fa-trash-alt t_horarios"
+                                (click)="ConfirmarDelete(c)" matSuffix matTooltipPosition="right"
+                                matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="configuracion.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons
+            aria-label="Seleccionar pagina">
+        </mat-paginator>
+
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+            <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
+                <p>PDF</p>
+            </i>
+            <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel()">
+                <p>XLSL</p>
+            </i>
+        </div>
+    </div>
+</div>

@@ -64,6 +64,11 @@ export class TimbresService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-opciones-timbre`, datos);
   }
 
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre`, datos);
+  }
+
   // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
   IngresarOpcionesMarcacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/opciones-timbre`, datos);
@@ -74,6 +79,35 @@ export class TimbresService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/actualizar-opciones-timbre`, datos);
   }
 
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  EliminarOpcionesMarcacion(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion`, datos);
+  }
+
+
+  /** ********************************************************************************** **
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** ********************************************************************************** **/
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  IngresarOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  ActualizarOpcionesMarcacionWeb(datos: any) {
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/actualizar-opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  EliminarOpcionesMarcacionWeb(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion-web`, datos);
+  }
 
 
 

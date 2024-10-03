@@ -64,6 +64,23 @@ class ParametrosControlador {
             }
         });
     }
+    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
+    VerDetalleParametroUsuario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const PARAMETRO = yield database_1.default.query(`
+            SELECT *
+            FROM mrv_opciones_marcacion AS tp
+            WHERE tp.id_empleado = $1
+            `, [id_empleado]);
+            if (PARAMETRO.rowCount != 0) {
+                return res.jsonp(PARAMETRO.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
     BuscarDetalles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

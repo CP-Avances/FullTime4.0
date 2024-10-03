@@ -6,7 +6,6 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
-import moment from 'moment-timezone';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
@@ -102,6 +101,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.ObtenerZonaHoraria();
     this.VerificarCamara();
     this.VerificarFunciones();
+    this.BuscarOpcionMarcacion();
     this.BuscarParametros();
   }
 
@@ -293,6 +293,7 @@ export class RegistrarTimbreComponent implements OnInit {
   rango: number = 0;
   desconocida: boolean = false;
   foto: boolean = false;
+  especial: boolean = false;
   BuscarParametros() {
     let datos: any = [];
     let detalles = { parametros: '4, 5, 7, 2, 15' };
@@ -321,17 +322,25 @@ export class RegistrarTimbreComponent implements OnInit {
           if (p.id_parametro === 2) {
             this.formato = p.descripcion;
           }
-          // id_tipo_parametro PARA VERIFICAR USO DE FOTO  = 15
-          if (p.id_parametro === 15) {
-            if (p.descripcion === 'Si') {
-              this.foto = true;
-            }
-          }
         })
         this.MostrarHora();
       }, vacio => {
         this.MostrarHora();
       });
+  }
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION DEL USUARIO
+  BuscarOpcionMarcacion() {
+    let buscar = {
+      id_empleado: this.id_empl,
+    }
+    this.foto = false;
+    this.especial = false;
+    this.restTimbres.BuscarVariasOpcionesMarcacionWeb(buscar).subscribe((a) => {
+      //console.log('veificar datos ', a.respuesta);
+      this.foto = a.respuesta[0].timbre_foto;
+      this.especial = a.respuesta[0].timbre_especial;
+    });
   }
 
   // METODO PARA TOMAR COORDENAS DE UBICACION

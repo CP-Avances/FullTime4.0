@@ -21,6 +21,7 @@ class ParametrosRutas {
         this.router.get('/ver-parametro/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
         this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
+        this.router.get('/opciones-marcacion/:id_empleado', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametroUsuario);
         // METODO PARA ELIMINAR DETALLE DE PARAMETRO  **USADO
         this.router.delete('/eliminar-detalle/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.EliminarDetalleParametro);
         // METODO PARA REGISTRAR DETALLE DE PARAMETRO  **USADO

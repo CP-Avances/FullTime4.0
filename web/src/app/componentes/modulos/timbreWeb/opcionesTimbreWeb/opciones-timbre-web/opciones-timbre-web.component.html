@@ -182,17 +182,6 @@
             </form>
             <div class="row" *ngIf="activar_boton" style="text-align: center; font-size: 12px;">
                 <div class="col-md">
-                    <span id="fuente">INTERNET REQUERIDO</span>
-                    <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_internet">
-                        <mat-radio-button class="example-radio-button" [value]="true">
-                            <label id="textoradiobtn">Si</label>
-                        </mat-radio-button>
-                        <mat-radio-button class="example-radio-button" [value]="false">
-                            <label id="textoradiobtn">No</label>
-                        </mat-radio-button>
-                    </mat-radio-group>
-                </div>
-                <div class="col-md">
                     <span id="fuente">ENVIAR FOTO</span>
                     <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_foto">
                         <mat-radio-button class="example-radio-button" [value]="true">
@@ -216,20 +205,23 @@
                 </div>
             </div>
             <hr>
+            <div *ngIf="activar_boton" style="padding-bottom: 10px; text-align: center;">
+                <button class="btn btn-sm" (click)="GuardarRegistros(0, '')">
+                    Guardar
+                </button>
+                <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')">
+                    Ver Configuración
+                </button>
+                <button class="btn btn-sm" (click)="MostrarLista()">
+                    Mostrar lista
+                </button>
+            </div>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
-                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                        (click)="GuardarRegistros(0)">
-                        Guardar
-                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO SUCURSALES
                     </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -249,7 +241,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -263,10 +255,15 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(s)" id="accion" *ngIf="auto_individual"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
-                                        <p>Timbrar</p>
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(s, 'ver')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(s, '')" id="accion" *ngIf="auto_individual"
+                                        class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Configurar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -283,17 +280,9 @@
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
-                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                        (click)="GuardarRegistros(0)">
-                        Guardar
-                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO RÉGIMEN LABORAL
                     </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -314,7 +303,7 @@
                                 </th>
                                 <th scope="col">Sucursal</th>
                                 <th scope="col">Régimen Laboral</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -329,10 +318,15 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(r)" id="accion" *ngIf="auto_individual"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
-                                        <p>Timbrar</p>
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(r, 'ver')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(r, '')" id="accion" *ngIf="auto_individual"
+                                        class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Configurar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -350,17 +344,9 @@
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
-                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                        (click)="GuardarRegistros(0)">
-                        Guardar
-                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO CARGOS
                     </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -381,7 +367,7 @@
                                 </th>
                                 <th scope="col">Sucursal</th>
                                 <th scope="col">Cargo</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -396,10 +382,15 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(c)" id="accion" *ngIf="auto_individual"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
-                                        <p>Timbrar</p>
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(c, 'ver')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(c, '')" id="accion" *ngIf="auto_individual"
+                                        class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Configurar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -416,17 +407,9 @@
             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
-                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                        (click)="GuardarRegistros(0)">
-                        Guardar
-                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO DEPARTAMENTOS
                     </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -447,7 +430,7 @@
                                 </th>
                                 <th scope="col">Sucursal</th>
                                 <th scope="col">Departamento</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -462,10 +445,15 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(d)" id="accion" *ngIf="auto_individual"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
-                                        <p>Timbrar</p>
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="GuardarRegistros(d, 'ver')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(d, '')" id="accion" *ngIf="auto_individual"
+                                        class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Configurar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -482,17 +470,9 @@
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
-                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                        (click)="GuardarRegistros(0)">
-                        Guardar
-                    </button>
                     <span class="w-100 bd-highlight">
                         RESULTADO USUARIOS
                     </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
@@ -515,7 +495,7 @@
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -532,10 +512,15 @@
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td class="justify-content-center">
-                                    <i id="accion" *ngIf="auto_individual" class="fas fa-clock"
+                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                        (click)="VerOpciones([e], 'e')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i id="accion" *ngIf="auto_individual" class="fa fa-hand-pointer-o"
                                         (click)="RegistrarMultiple([e])" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
-                                        <p>Timbrar</p>
+                                        matTooltip="Abrir formulario de registro de timbres.">
+                                        <p>Configurar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -553,5 +538,5 @@
 </div>
 
 <div style="padding-top: 20px;" *ngIf="ver_configurar">
-<app-ver-configuracion-timbre [informacion]="ver_informacion"></app-ver-configuracion-timbre>
+    <app-ver-opciones-timbre-web [informacion]="ver_informacion" [opcion]="tipo_opcion"></app-ver-opciones-timbre-web>
 </div>

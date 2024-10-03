@@ -47,3 +47,18 @@ p {
 hr {
     background-color: rgb(243, 239, 239);
 }
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 600px) {
+
+    .btn_editar{
+        float:none;
+    }
+
+    .btn-sm{
+        width: 100%;
+        margin: auto;
+    }
+
+
+}

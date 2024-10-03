@@ -60,7 +60,7 @@ class LoginControlador {
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
                     if (!web_access)
                         return res.status(404).jsonp({ message: "sin_permiso_acceso" });
-                    // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO AA  LAPP_MOVIL
+                    // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
                     if (!app_habilita && movil == true)
                         return res.jsonp({ message: "sin_permiso_acces_movil" });
                     // BUSQUEDA DE MODULOS DEL SISTEMA

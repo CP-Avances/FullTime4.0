@@ -34,12 +34,26 @@ class TimbresRutas {
         this.router.put('/timbre/editar', TokenValidation, TIMBRES_CONTROLADOR.EditarTimbreEmpleadoFecha);
         // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA   **USADO
         this.router.post('/buscar/timbres-planificacion', TokenValidation, TIMBRES_CONTROLADOR.BuscarTimbresPlanificacion);
+
         // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
         this.router.post('/opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.IngresarOpcionTimbre);
         // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
         this.router.put('/actualizar-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.ActualizarOpcionTimbre);
         // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
         this.router.post('/listar-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarOpcionesTimbre);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbre);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistros);
+
+        // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.IngresarOpcionTimbreWeb);
+        // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+        this.router.put('/actualizar-opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.ActualizarOpcionTimbreWeb);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbreWeb);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion-web', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistrosWeb);
 
 
         // METODO DE BUSQUEDA DE AVISOS GENERALES
@@ -55,7 +69,6 @@ class TimbresRutas {
         this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
         this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
-        this.router.post('/atraso', TokenValidation, TIMBRES_CONTROLADOR.justificarAtraso);
         this.router.get('/timbreEmpleado/:idUsuario', TokenValidation, TIMBRES_CONTROLADOR.getTimbreByCodigo);
     }
 }

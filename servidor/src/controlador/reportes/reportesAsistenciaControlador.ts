@@ -134,7 +134,7 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(respuesta)
     }
 
-    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO     **USADO
+    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO   
     public async ReporteTimbresMultiple(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
@@ -160,7 +160,7 @@ class ReportesAsistenciaControlador {
 
     }
 
-    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS     **USADO
+    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS   
     public async ReporteTimbresIncompletos(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
@@ -183,7 +183,7 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA       **USADO
+    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA      
     public async ReporteTimbreSistema(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
@@ -207,7 +207,7 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL       **USADO
+    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL    
     public async ReporteTimbreRelojVirtual(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
@@ -230,7 +230,7 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(nuevo);
     }
 
-    // REPORTE DE TIMBRES HORARIO ABIERTO     **USADO
+    // REPORTE DE TIMBRES HORARIO ABIERTO   
     public async ReporteTimbreHorarioAbierto(req: Request, res: Response) {
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;

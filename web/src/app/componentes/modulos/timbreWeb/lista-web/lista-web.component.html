@@ -2,7 +2,7 @@
     <div id="titulo">CONFIGURAR USUARIOS TIMBRE VIRTUAL</div>
     <mat-card class="example-card mat-elevation-z9">
         <!--  **************************  LISTA DE USUARIOS HABILITADOS  ************************************  -->
-        <div style="padding-top: 20px;" *ngIf="activar_habilitados">
+        <div style="padding-top: 15px;" *ngIf="activar_habilitados">
             <mat-card-content>
                 <div id="resultados">
                     <span>LISTAR USUARIOS ACTIVOS TIMBRE VIRTUAL</span>
@@ -494,10 +494,21 @@
         <!--  ******************************  LISTA DE USUARIOS DESHABILITADOS  ************************************  -->
         <div style="padding-top: 20px;" *ngIf="activar_deshabilitados">
             <mat-card-content>
-                <div id="resultados_dh">
-                    <span>LISTAR USUARIOS INACTIVOS TIMBRE VIRTUAL</span>
-                    <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario(1)">highlight_off</mat-icon>
+
+                <div id="resultados_dh" class="row w-100 m-auto">
+                    <div class="col-1 col-md-2 mb-2 mb-md-0"> 
+                    </div>
+                    <div class="col-10 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+                        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                            LISTAR USUARIOS INACTIVOS TIMBRE VIRTUAL
+                        </span>
+                    </div>
+                    <div class="col-1 col-md-2 mb-2 mb-md-0">
+                        <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario(1)">highlight_off</mat-icon>
+                    </div>
                 </div>
+
+
                 <br>
                 <form>
                     <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_dh">
@@ -695,15 +706,20 @@
 
                 <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_suc" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados_dh">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO SUCURSALES
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;" matSuffix
-                            matTooltipPosition="right"
-                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista</button>
+                    <div id="resultados_dh" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>RESULTADO SUCURSALES</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            (click)="MostrarLista_DH()">Mostrar lista
+                            </button>
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">
@@ -757,14 +773,18 @@
 
                 <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_reg" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados_dh">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO RÉGIMEN LABORAL
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;" matSuffix
-                            matTooltipPosition="right"
-                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista</button>
+                    <div id="resultados_dh" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>RESULTADO RÉGIMEN LABORAL</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            (click)="MostrarLista_DH()">Mostrar lista
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
@@ -821,12 +841,18 @@
 
                 <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_cargo" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados_dh">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO CARGOS
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="MostrarLista_DH()">Mostrar lista</button>
+                    <div id="resultados_dh" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>RESULTADO CARGOS</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                            matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            (click)="MostrarLista_DH()">Mostrar lista
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
@@ -883,12 +909,18 @@
 
                 <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_dep" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados_dh">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO DEPARTAMENTOS
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="MostrarLista_DH()">Mostrar lista</button>
+                    <div id="resultados_dh" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>RESULTADO DEPARTAMENTOS</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            (click)="MostrarLista_DH()">Mostrar lista
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
@@ -945,12 +977,18 @@
 
                 <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_emp" class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="resultados_dh">
-                        <span class="w-100 bd-highlight">
-                            RESULTADO USUARIOS
-                        </span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="MostrarLista_DH()">Mostrar lista</button>
+                    <div id="resultados_dh" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>RESULTADO USUARIOS</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            (click)="MostrarLista_DH()">Mostrar lista
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
@@ -1024,7 +1062,7 @@
                             <!--  ************************  LISTAR USUARIOS INACTIVOS  ****************************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
                                 <mat-card-content>
-                                    <div style="padding-top: 20px; padding-bottom: 20px;">
+                                    <div style="padding-top: 2px; padding-bottom: 20px;">
                                         <mat-icon>thumb_up</mat-icon> &nbsp;&nbsp;
                                         <mat-label>
                                             ACTIVAR USUARIOS

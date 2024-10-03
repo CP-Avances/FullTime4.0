@@ -70,6 +70,7 @@ import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacio
 // MODULO  --TIMBRE VIRTUAL
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
+import { OpcionesTimbreWebComponent } from './componentes/modulos/timbreWeb/opcionesTimbreWeb/opciones-timbre-web/opciones-timbre-web.component';
 // MODULO  --APLICACION MOVIL
 import { ListaAppComponent } from './componentes/modulos/appMovil/lista-app/lista-app.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
@@ -79,7 +80,7 @@ import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/rel
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
-import { ConfigurarOpcionesTimbresComponent } from './componentes/timbres/configurar-opciones/configurar-opciones-timbres/configurar-opciones-timbres.component';
+import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/configurar-opciones-timbres/configurar-opciones-timbres.component';
 
 // NOTIFICACIONES
 import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
@@ -227,10 +228,12 @@ const routes: Routes = [
   // MODULO  --TIMBRE VIRTUAL
   { path: 'timbresWeb', component: ListaWebComponent, canActivate: [AuthGuard] },
   { path: 'timbres-personal', component: TimbreWebComponent, canActivate: [AuthGuard] },
+  { path: 'configurar-timbre-web', component: OpcionesTimbreWebComponent, canActivate: [AuthGuard] },
 
   // MODULO  --APLICACION MOVIL
   { path: 'app-movil', component: ListaAppComponent, canActivate: [AuthGuard] },
   { path: 'registro-dispositivos', component: RegistroDispositivosComponent, canActivate: [AuthGuard] },
+  { path: 'configurar-timbre', component: ConfigurarOpcionesTimbresComponent, canActivate: [AuthGuard] },
 
   // TIMBRES
   { path: 'listarRelojes', component: ListarRelojesComponent, canActivate: [AuthGuard] },
@@ -238,7 +241,7 @@ const routes: Routes = [
   { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard] },
   { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard] },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard] },
-  { path: 'configurar-timbre', component: ConfigurarOpcionesTimbresComponent, canActivate: [AuthGuard] },
+
 
   // NOTIFICACIONES
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },

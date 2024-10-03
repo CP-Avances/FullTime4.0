@@ -34,6 +34,18 @@ class TimbresRutas {
         this.router.put('/actualizar-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarOpcionTimbre);
         // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
         this.router.post('/listar-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarOpcionesTimbre);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbre);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistros);
+        // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
+        this.router.post('/opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.IngresarOpcionTimbreWeb);
+        // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+        this.router.put('/actualizar-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarOpcionTimbreWeb);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbreWeb);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
+        this.router.post('/eliminar-opcion-marcacion-web', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistrosWeb);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
@@ -47,7 +59,6 @@ class TimbresRutas {
         this.router.post('/timbreSinConexion', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreDesconectado);
         this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
-        this.router.post('/atraso', verificarToken_1.TokenValidation, timbresControlador_1.default.justificarAtraso);
         this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
     }
 }

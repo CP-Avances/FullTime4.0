@@ -67,22 +67,20 @@
 
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!dataHorarios">
         <div class="mat-elevation-z8" style="background: white;">
-            <div class="d-flex bd-highlight" id="titulo">
-                <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
-                    (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
-                    matTooltip="Elimar múltiples registros." id="SelectCheck">
-                    library_add_check
-                </mat-icon>
-                <div class="w-100 bd-highlight">
-                    <h5>
-                        LISTA DE PLANIFICACIÓN HORARIA
-                    </h5>
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
+                        (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
+                        matTooltip="Elimar múltiples registros." id="SelectCheck">
+                        library_add_check
+                    </mat-icon>
                 </div>
-                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarHorario()">
-                        Eliminar
-                    </button>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>LISTA DE PLANIFICACIÓN HORARIA</span>
+                </div>
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -2px;"
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarHorario()">Eliminar</button>
                 </div>
             </div>
             <div class="table-responsive">

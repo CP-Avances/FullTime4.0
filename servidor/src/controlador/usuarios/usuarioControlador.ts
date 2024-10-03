@@ -464,23 +464,23 @@ class UsuarioControlador {
   }
 
 
-    // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
-    public async accesoMovil(req: Request, res: Response) {
-      let id_empleado = req.params.id_empleado;
-  
-      let respuesta = await pool.query(
-        `
+  // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
+  public async accesoMovil(req: Request, res: Response) {
+    let id_empleado = req.params.id_empleado;
+
+    let respuesta = await pool.query(
+      `
         SELECT u.app_habilita 
         FROM eu_usuarios AS u 
         WHERE u.id_empleado = $1
         `
-        , [id_empleado]
-      ).then((result: any) => { return result.rows });
-  
-      if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-  
-      return res.status(200).jsonp(respuesta);
-    }
+      , [id_empleado]
+    ).then((result: any) => { return result.rows });
+
+    if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
+
+    return res.status(200).jsonp(respuesta);
+  }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
@@ -1116,6 +1116,7 @@ class UsuarioControlador {
 
   //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
 
+  // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
   public async getidDispositivo(req: Request, res: Response): Promise<Response> {
     try {
       const id_empleado = req.params.id_empleado;
@@ -1131,6 +1132,7 @@ class UsuarioControlador {
     }
   };
 
+  // BUSCAR EL DISPOSITIVO POR ID DEL DISPOSITIVO
   public async getDispositivoPorIdDispositivo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_dispositivo } = req.body;
@@ -1151,6 +1153,7 @@ class UsuarioControlador {
     }
   };
 
+  // METODO PARA REGISTRAR EL DISPOSITIVO
   public async ingresarIDdispositivo(req: Request, res: Response) {
     try {
       const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
@@ -1189,6 +1192,7 @@ class UsuarioControlador {
     }
   };
 
+  //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
   async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
     try {
       const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo, ' +
@@ -1206,6 +1210,8 @@ class UsuarioControlador {
         });
     }
   };
+
+  // METODO PARA OBTENER LA INFORMACION DEL USUARIO
   public async getUserById(req: Request, res: Response): Promise<Response> {
     try {
       const id = parseInt(req.params.id);
@@ -1220,9 +1226,6 @@ class UsuarioControlador {
       });
     }
   };
-
-
-
 
 }
 

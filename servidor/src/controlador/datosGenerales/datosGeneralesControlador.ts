@@ -4,8 +4,7 @@ import pool from '../../database';
 
 class DatosGeneralesControlador {
 
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    **USADO
-    //LOOKME C
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    
     public async BuscarDataGeneral(req: Request, res: Response) {
         let estado = req.params.estado;
         let informacion = await pool.query(
@@ -608,108 +607,6 @@ class DatosGeneralesControlador {
         }
     }
 
-
-    //-------------------------------------------------------------------- METODOS PARA APP MOVIL -------------------------------------------------------------------------
-
-    public async DatosGeneralesParaMovil(req: Request, res: Response): Promise<Response> {
-        try {
-
-            let estado = req.params.estado;
-            console.log('Estado: ', estado);
-
-            let suc = await pool.query(
-                `
-                SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM e_sucursales AS s, 
-                e_ciudades AS c WHERE s.id_ciudad = c.id ORDER BY s.id
-                `
-            ).then(result => { return result.rows });
-
-            if (suc.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-            let departamentos = await Promise.all(suc.map(async (ele: any) => {
-                ele.departamentos = await pool.query(
-                    `
-                    SELECT d.id as id_depa, d.nombre as name_dep FROM ed_departamentos AS d
-                    WHERE d.id_sucursal = $1
-                    `
-                    , [ele.id_suc])
-                    .then(result => {
-                        return result.rows.filter(obj => {
-                            return obj.name_dep != 'Ninguno'
-                        })
-                    });
-                return ele
-            }));
-
-            let depa = departamentos.filter(obj => {
-                return obj.departamentos.length > 0
-            });
-
-            if (depa.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-            let lista = await Promise.all(depa.map(async (obj: any) => {
-                obj.departamentos = await Promise.all(obj.departamentos.map(async (ele: any) => {
-                    if (estado === '1') {
-                        ele.empleado = await pool.query(
-                            `
-                            SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido) 
-                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
-                            cn.comunicado_notificacion 
-                            FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
-                            eu_configurar_alertas AS cn 
-                            WHERE ca.id = (SELECT MAX(id_cargo) AS cargo_id FROM cargos_empleado WHERE 
-                            codigo = e.codigo) 
-                            AND ca.id_departamento = $1 
-                            AND co.id = (SELECT MAX(id_contrato) AS contrato_id FROM contrato_cargo_vigente WHERE 
-                            id_empleado = e.id) 
-                            AND e.id = cn.id_empleado 
-                            AND co.id_regimen = r.id AND e.estado = $2
-                            `
-                            , [ele.id_depa, estado])
-                            .then(result => { return result.rows })
-                    } else {
-                        ele.empleado = await pool.query(
-                            `
-                            SELECT DISTINCT e.id, CONCAT(nombre, \' \', apellido) 
-                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
-                            cn.comunicado_notificacion, ca.fecha_final 
-                            FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
-                            eu_configurar_alertas AS cn 
-                            WHERE ca.id = (SELECT MAX(id_cargo) AS cargo_id FROM cargos_empleado WHERE 
-                            codigo = e.codigo) AND ca.id_departamento = $1 
-                            AND co.id = (SELECT MAX(id_contrato) AS contrato_id FROM contrato_cargo_vigente WHERE 
-                            id_empleado = e.id) 
-                            AND e.id = cn.id_empleado 
-                            AND co.id_regimen = r.id AND e.estado = $2
-                            `,
-                            [ele.id_depa, estado])
-                            .then(result => { return result.rows })
-                    }
-
-                    return ele
-                }));
-                return obj
-            }))
-
-            if (lista.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-            let respuesta = lista.map(obj => {
-                obj.departamentos = obj.departamentos.filter((ele: any) => {
-                    return ele.empleado.length > 0
-                })
-                return obj
-            }).filter(obj => {
-                return obj.departamentos.length > 0
-            });
-
-            if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-            return res.status(200).jsonp(respuesta)
-        } catch (error) {
-            console.log(error);
-            return res.status(500).jsonp({ message: 'No se han encontrado datos.' });
-        }
-    };
 
 }
 

@@ -8,29 +8,26 @@ import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
+import { checkOptions, FormCriteriosBusqueda, } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
-  selector: 'app-configurar-opciones-timbres',
-  templateUrl: './configurar-opciones-timbres.component.html',
-  styleUrl: './configurar-opciones-timbres.component.css'
+  selector: 'app-opciones-timbre-web',
+  templateUrl: './opciones-timbre-web.component.html',
+  styleUrl: './opciones-timbre-web.component.css'
 })
 
-export class ConfigurarOpcionesTimbresComponent implements OnInit {
+export class OpcionesTimbreWebComponent implements OnInit {
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
   mostrarTablas: boolean = false;
-  habilitado: any;
   opciones_timbre: any = [];
   configurar: boolean = true;
   ver_configurar: boolean = false;
@@ -56,9 +53,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
-  seleccion_opcion = new FormControl('');
-  seleccion_internet = new FormControl('');
   seleccion_foto = new FormControl('');
+  seleccion_opcion = new FormControl('');
   seleccion_especial = new FormControl('');
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
@@ -107,32 +103,47 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   numero_pagina_emp: number = 1;
 
   // FILTROS SUCURSALES
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+  get filtroNombreSuc() {
+    return this.restR.filtroNombreSuc;
+  }
 
   // FILTROS DEPARTAMENTOS
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
+  get filtroNombreDep() {
+    return this.restR.filtroNombreDep;
+  }
 
   // FILTROS EMPLEADO
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
+  get filtroNombreEmp() {
+    return this.restR.filtroNombreEmp;
+  }
+  get filtroCodigo() {
+    return this.restR.filtroCodigo;
+  }
+  get filtroCedula() {
+    return this.restR.filtroCedula;
+  }
 
   // FILTRO CARGOS
-  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
+  get filtroNombreCarg() {
+    return this.restR.filtroNombreCarg;
+  }
 
   // FILTRO REGIMEN
-  get filtroNombreReg() { return this.restR.filtroNombreReg };
+  get filtroNombreReg() {
+    return this.restR.filtroNombreReg;
+  }
 
   constructor(
     private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
-    private restEmpresa: EmpresaService,
     private restUsuario: UsuarioService,
     private validar: ValidacionesService,
     private toastr: ToastrService,
-    private restR: ReportesService,
+    private restR: ReportesService
   ) {
-    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+    this.idEmpleadoLogueado = parseInt(
+      localStorage.getItem('empleado') as string
+    );
   }
 
   ngOnInit(): void {
@@ -142,8 +153,18 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
-    this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
-    this.opciones_timbre = [{ opcion: 'Enviar Foto' }, { opcion: 'Internet Requerido' }, { opcion: 'Timbre Especial' }];
+    this.check = this.restR.checkOptions([
+      { opcion: 's' },
+      { opcion: 'r' },
+      { opcion: 'd' },
+      { opcion: 'c' },
+      { opcion: 'e' },
+    ]);
+    this.opciones_timbre = [
+      { opcion: 'Enviar Foto' },
+      { opcion: 'Internet Requerido' },
+      { opcion: 'Timbre Especial' },
+    ];
     this.BuscarInformacionGeneral();
   }
 
@@ -155,11 +176,14 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.restUsuario.UsuariosTimbreMovilGeneral(1, true).subscribe((res: any[]) => {
-      this.ProcesarDatos(res);
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    this.restUsuario.UsuariosTimbreWebGeneral(1, true).subscribe(
+      (res: any[]) => {
+        this.ProcesarDatos(res);
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
   }
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
@@ -173,26 +197,38 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
     if (this.rolEmpleado !== 1) {
-      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+      this.empleados = this.empleados.filter((empleado: any) =>
+        this.idUsuariosAcceso.has(empleado.id)
+      );
 
       // SI EL EMPLEADO TIENE ACCESO PERSONAL AÑADIR LOS DATOS A LOS ACCESOS CORRESPONDIENTES PARA VISUALIZAR
-      const empleadoSesion = this.empleados.find((empleado: any) => empleado.id === this.idEmpleadoLogueado);
+      const empleadoSesion = this.empleados.find(
+        (empleado: any) => empleado.id === this.idEmpleadoLogueado
+      );
       if (empleadoSesion) {
         this.idSucursalesAcceso.add(empleadoSesion.id_suc);
         this.idDepartamentosAcceso.add(empleadoSesion.id_depa);
         this.idCargosAcceso.add(empleadoSesion.id_cargo_);
       }
 
-      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
-      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
-      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+      this.departamentos = this.departamentos.filter((departamento: any) =>
+        this.idDepartamentosAcceso.has(departamento.id)
+      );
+      this.sucursales = this.sucursales.filter((sucursal: any) =>
+        this.idSucursalesAcceso.has(sucursal.id)
+      );
+      this.regimen = this.regimen.filter((regimen: any) =>
+        this.idSucursalesAcceso.has(regimen.id_suc)
+      );
 
       this.empleados.forEach((empleado: any) => {
         this.idCargosAcceso.add(empleado.id_cargo_);
       });
 
-      this.cargos = this.cargos.filter((cargo: any) =>
-        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      this.cargos = this.cargos.filter(
+        (cargo: any) =>
+          this.idSucursalesAcceso.has(cargo.id_suc) &&
+          this.idCargosAcceso.has(cargo.id)
       );
     }
     this.mostrarTablas = true;
@@ -244,12 +280,17 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    this.restR.GuardarCheckOpcion(this.opcion)
-
+    this.restR.GuardarCheckOpcion(this.opcion);
   }
 
   // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
-  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
+  ControlarOpciones(
+    sucursal: boolean,
+    cargo: boolean,
+    departamento: boolean,
+    empleado: boolean,
+    regimen: boolean
+  ) {
     this._booleanOptions.bool_suc = sucursal;
     this._booleanOptions.bool_cargo = cargo;
     this._booleanOptions.bool_dep = departamento;
@@ -269,13 +310,27 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   Filtrar(e: any, orden: number) {
     this.ControlarFiltrado(e);
     switch (orden) {
-      case 1: this.restR.setFiltroNombreSuc(e); break;
-      case 2: this.restR.setFiltroNombreCarg(e); break;
-      case 3: this.restR.setFiltroNombreDep(e); break;
-      case 4: this.restR.setFiltroCodigo(e); break;
-      case 5: this.restR.setFiltroCedula(e); break;
-      case 6: this.restR.setFiltroNombreEmp(e); break;
-      case 7: this.restR.setFiltroNombreReg(e); break;
+      case 1:
+        this.restR.setFiltroNombreSuc(e);
+        break;
+      case 2:
+        this.restR.setFiltroNombreCarg(e);
+        break;
+      case 3:
+        this.restR.setFiltroNombreDep(e);
+        break;
+      case 4:
+        this.restR.setFiltroCodigo(e);
+        break;
+      case 5:
+        this.restR.setFiltroCedula(e);
+        break;
+      case 6:
+        this.restR.setFiltroNombreEmp(e);
+        break;
+      case 7:
+        this.restR.setFiltroNombreReg(e);
+        break;
       default:
         break;
     }
@@ -286,21 +341,18 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (e === '') {
       if (this.plan_multiple === true) {
         this.activar_seleccion = false;
-      }
-      else {
+      } else {
         if (this.activar_seleccion === false) {
           this.plan_multiple = true;
           this.auto_individual = false;
         }
       }
-    }
-    else {
+    } else {
       if (this.activar_seleccion === true) {
         this.activar_seleccion = false;
         this.plan_multiple_ = true;
         this.auto_individual = false;
-      }
-      else {
+      } else {
         this.plan_multiple = false;
       }
     }
@@ -313,14 +365,14 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
-    return numSelected === this.sucursales.length
+    return numSelected === this.sucursales.length;
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
-    this.isAllSelectedSuc() ?
-      this.selectionSuc.clear() :
-      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
+    this.isAllSelectedSuc()
+      ? this.selectionSuc.clear()
+      : this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -328,20 +380,21 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
-    return numSelected === this.regimen.length
+    return numSelected === this.regimen.length;
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
-    this.isAllSelectedReg() ?
-      this.selectionReg.clear() :
-      this.regimen.forEach((row: any) => this.selectionReg.select(row));
+    this.isAllSelectedReg()
+      ? this.selectionReg.clear()
+      : this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -349,20 +402,21 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
-    return numSelected === this.cargos.length
+    return numSelected === this.cargos.length;
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
-    this.isAllSelectedCarg() ?
-      this.selectionCarg.clear() :
-      this.cargos.forEach((row: any) => this.selectionCarg.select(row));
+    this.isAllSelectedCarg()
+      ? this.selectionCarg.clear()
+      : this.cargos.forEach((row: any) => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -370,20 +424,21 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
-    return numSelected === this.departamentos.length
+    return numSelected === this.departamentos.length;
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
-    this.isAllSelectedDep() ?
-      this.selectionDep.clear() :
-      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
+    this.isAllSelectedDep()
+      ? this.selectionDep.clear()
+      : this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -391,20 +446,21 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
-    return numSelected === this.empleados.length
+    return numSelected === this.empleados.length;
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
-    this.isAllSelectedEmp() ?
-      this.selectionEmp.clear() :
-      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
+    this.isAllSelectedEmp()
+      ? this.selectionEmp.clear()
+      : this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -412,7 +468,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // METODO PARA MANEJAR PAGINACION DE LOS DATOS
@@ -420,19 +477,19 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    }
+    } 
     else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    }
+    } 
     else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
-    }
+    } 
     else if (this._booleanOptions.bool_cargo === true) {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
-    }
+    } 
     else if (this._booleanOptions.bool_reg === true) {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
@@ -440,24 +497,47 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
-  GuardarRegistros(valor: any) {
+  GuardarRegistros(valor: any, tipo: any) {
     let usuarios = [];
     if (this.opcion === 's') {
-      usuarios = this.validar.ModelarSucursal_(this.empleados, this.selectionSuc, valor.id);
+      usuarios = this.validar.ModelarSucursal_(
+        this.empleados,
+        this.selectionSuc,
+        valor.id
+      );
+    } else if (this.opcion === 'c') {
+      usuarios = this.validar.ModelarCargo_(
+        this.empleados,
+        this.selectionCarg,
+        valor.id,
+        valor.id_suc
+      );
+    } else if (this.opcion === 'd') {
+      usuarios = this.validar.ModelarDepartamento_(
+        this.empleados,
+        this.selectionDep,
+        valor.id,
+        valor.id_suc
+      );
+    } else if (this.opcion === 'r') {
+      usuarios = this.validar.ModelarRegimen_(
+        this.empleados,
+        this.selectionReg,
+        valor.id,
+        valor.id_suc
+      );
+    } else {
+      usuarios = this.validar.ModelarEmpleados_(
+        this.empleados,
+        this.selectionEmp
+      );
     }
-    else if (this.opcion === 'c') {
-      usuarios = this.validar.ModelarCargo_(this.empleados, this.selectionCarg, valor.id, valor.id_suc);
-    }
-    else if (this.opcion === 'd') {
-      usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc);
-    }
-    else if (this.opcion === 'r') {
-      usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc);
+    if (tipo === 'ver') {
+      this.VerOpciones(usuarios, this.opcion);
     }
     else {
-      usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
+      this.RegistrarMultiple(usuarios);
     }
-    this.RegistrarMultiple(usuarios);
   }
 
   // METODO PARA LIMPIAR FORMULARIOS
@@ -500,7 +580,6 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     }
 
     this.activar_boton = false;
-    this.seleccion_internet.reset();
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
     this.seleccion.reset();
@@ -560,9 +639,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.Filtrar('', 5);
       this.Filtrar('', 6);
     }
-    this.seleccion_internet.reset();
     this.seleccion_especial.reset();
-    this.seleccion_foto.reset()
+    this.seleccion_foto.reset();
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
@@ -575,38 +653,42 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.contador = 0;
     var info = {
       id_empleado: '',
-      timbre_internet: this.seleccion_internet.value,
       timbre_foto: this.seleccion_foto.value,
       timbre_especial: this.seleccion_especial.value,
       user_name: this.user_name,
       ip: this.ip,
-    }
-    if (this.seleccion_especial.value === null && this.seleccion_foto.value === null && this.seleccion_internet.value === null) {
-      this.toastr.warning('No ha seleccionado ninguna opción para la marcación', '', {
-        timeOut: 6000,
-      });
+    };
+    if (
+      this.seleccion_especial.value === null &&
+      this.seleccion_foto.value === null
+    ) {
+      this.toastr.warning('No ha seleccionado ninguna opción para la marcación', '',
+        { timeOut: 6000 }
+      );
       //console.log('ingresa en null')
-    }
-    else {
+    } else {
       //console.log('ingresa en data')
       if (data.length > 0) {
         data.forEach((empl: any) => {
           let buscar = {
-            id_empleado: empl.id
-          }
-          //console.log('ingresa en data ', buscar)
-          this.restTimbres.BuscarOpcionesMarcacion(buscar).subscribe(o => {
-            this.contador = this.contador + 1;
-            info.id_empleado = empl.id;
-            this.ActualizarOpcionMarcacion(info, this.contador, data);
-          }, vacio => {
-            this.contador = this.contador + 1;
-            info.id_empleado = empl.id;
-            this.IngresarOpcionMarcacion(info, this.contador, data);
-          })
-        })
-      }
-      else {
+            id_empleado: empl.id,
+          };
+          console.log('ingresa en data ', buscar);
+          this.restTimbres.BuscarVariasOpcionesMarcacionWeb(buscar).subscribe(
+            (o) => {
+              console.log('ingresa busqueda ');
+              this.contador = this.contador + 1;
+              info.id_empleado = empl.id;
+              this.ActualizarOpcionMarcacion(info, this.contador, data);
+            },
+            (vacio) => {
+              this.contador = this.contador + 1;
+              info.id_empleado = empl.id;
+              this.IngresarOpcionMarcacion(info, this.contador, data);
+            }
+          );
+        });
+      } else {
         this.toastr.warning('No ha seleccionado usuarios.', '', {
           timeOut: 6000,
         });
@@ -622,25 +704,23 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (this.seleccion_foto.value === null) {
       informacion.timbre_foto = false;
     }
-    if (this.seleccion_internet.value === null) {
-      informacion.timbre_internet = true;
-    }
     //console.log('info ', informacion)
-    this.restTimbres.IngresarOpcionesMarcacion(informacion).subscribe(i => {
+    this.restTimbres.IngresarOpcionesMarcacionWeb(informacion).subscribe((i) => {
       this.MostrarMensaje(contador, data);
-    })
+    });
   }
 
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
   ActualizarOpcionMarcacion(informacion: any, contador: number, data: any) {
-    this.restTimbres.ActualizarOpcionesMarcacion(informacion).subscribe(a => {
+    this.restTimbres.ActualizarOpcionesMarcacionWeb(informacion).subscribe((a) => {
+      //console.log('actualiza ', a);
       this.MostrarMensaje(contador, data);
-    })
+    });
   }
-
 
   // METODO DE ALMACENAMIENTO DE DATOS
   MostrarMensaje(contador: number, data: any) {
+    //console.log('data ', data.length, 'contador ', contador);
     if (data.length === contador) {
       this.toastr.success('Registros ingresados exitosamente.', '', {
         timeOut: 6000,
@@ -651,10 +731,18 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
 
   // METODO PARA VER INFORMACION DE OPCIONES MARCACION
   ver_informacion: any;
-  VerOpciones(seleccionados: any) {
-    this.configurar = false;
-    this.ver_configurar = true;
-    this.ver_informacion = seleccionados;
+  tipo_opcion: any;
+  VerOpciones(seleccionados: any, opcion: any) {
+    if (seleccionados.length > 0) {
+      this.configurar = false;
+      this.ver_configurar = true;
+      this.ver_informacion = seleccionados;
+      this.tipo_opcion = opcion;
+    } else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // VALIDAR INGRESO DE LETRAS

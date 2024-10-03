@@ -50,13 +50,6 @@ class CiudadRutas {
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);
 
-        //-------------------------------- METODOS APP MOVIL -------------------------------------------------------------
-
-        this.router.get('/datos_generales/ver/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesParaMovil);
-
-
-
-
 
     }
 }
