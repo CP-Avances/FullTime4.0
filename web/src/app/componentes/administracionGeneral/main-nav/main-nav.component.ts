@@ -376,7 +376,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true, ver: true },
+              { name: 'Timbre Virtual', url: '/timbresWeb', color: true, ver: true },
+              { name: 'Configurar Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true },
               { name: 'Timbrar', url: '/timbres-personal', color: true, ver: true },
             ]
           },
