@@ -55,9 +55,19 @@ export class FeriadosService {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados/ciudad`, datos);
   }
 
+  // METODO PARA LISTAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS   **USADO
+  ListarFeriadosCiudad2(datos: any) {
+    return this.http.post<any>(`${environment.url}/feriados/listar-feriados/ciudad2`, datos);
+  }
+
   // METODO PARA LISTAR FECHAS DE RECUPERACION DE FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
   ListarFeriadosRecuperarCiudad(datos: any) {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados-recuperar/ciudad`, datos);
+  }
+
+  // METODO PARA LISTAR FECHAS DE RECUPERACION DE FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+  ListarFeriadosRecuperarCiudad2(datos: any) {
+    return this.http.post<any>(`${environment.url}/feriados/listar-feriados-recuperar/ciudad2`, datos);
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
@@ -66,12 +76,12 @@ export class FeriadosService {
   }
 
   // METODO PARA REGISTRAR DATOS DE PLANTILLA
-  Crear_feriados(form: any){
+  Crear_feriados(form: any) {
     return this.http.post<any>(environment.url + '/feriados/upload/crearFeriado', form);
   }
 
   // METODO PARA CEAR UN FERIADO CIUDAD  PLANTILLA  **USADO  
-  Crear_feriados_ciudad(form: any){
+  Crear_feriados_ciudad(form: any) {
     return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
   }
 

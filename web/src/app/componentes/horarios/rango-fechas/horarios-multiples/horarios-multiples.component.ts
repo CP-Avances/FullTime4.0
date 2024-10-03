@@ -381,56 +381,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VERIFICAR FECHAS DE CONTRATO
   cont2: number = 0;
-
-  /*
-  VerificarContrato(form: any, correctos: any) {
-    this.cont2 = 0;
-    let contrato = [];
-    let sin_contrato = [];
-
-    correctos.map((dh: any) => {
-      let datosBusqueda = {
-        id_cargo: dh.id_cargo,
-        id_empleado: dh.id
-      }
-      // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
-      this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
-        this.cont2 = this.cont2 + 1;
-
-        // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
-          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
-
-          dh.observacion = 'OK';
-          contrato = contrato.concat(dh);
-
-          if (this.cont2 === correctos.length) {
-            this.ValidarHorarioByHorasTrabaja(form, contrato);
-          }
-        }
-        else {
-          // FECHAS NO CORRESPONDEN AL REGISTRO DE CONTRATO
-          dh.observacion = 'Las fechas ingresadas no corresponde al periodo registrado en su contrato.'
-          sin_contrato = sin_contrato.concat(dh);
-          this.usuarios = this.usuarios.concat(dh);
-          this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
-
-          if (this.cont2 === correctos.length) {
-
-            if (sin_contrato.length === correctos.length) {
-              this.ControlarBotones(false, true, true, false, true);
-              this.observaciones = true;
-            }
-            else {
-              this.ValidarHorarioByHorasTrabaja(form, contrato);
-            }
-          }
-        }
-      });
-    })
-  }
-  */
-
   VerificarContrato(form: any, correctos: any) {
     this.cont2 = 0;
     let contrato = [];
@@ -441,7 +391,6 @@ export class HorariosMultiplesComponent implements OnInit {
       response.fechaContrato.forEach(element => {
         this.cont2 = this.cont2 + 1;
 
-        console.log("ver element servidor", element)
         if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
           (Date.parse(element.fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
 
@@ -470,9 +419,7 @@ export class HorariosMultiplesComponent implements OnInit {
             this.usuarios = this.usuarios.concat(correcto);
             this.usuarios_invalidos = this.usuarios_invalidos.concat(correcto);
           }
-
           if (this.cont2 === correctos.length) {
-
             if (sin_contrato.length === correctos.length) {
               this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
@@ -483,7 +430,6 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
       });
-
     });
   }
 
@@ -506,114 +452,131 @@ export class HorariosMultiplesComponent implements OnInit {
     const { hora_trabajo } = obj_res;
     this.cont3 = 0;
 
-    correctos.map((dh: any) => {
-      // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
-      this.horariosEmpleado = [];
-      let fechas = {
-        fechaInicio: form.fechaInicioForm,
-        fechaFinal: form.fechaFinalForm,
-      };
-
-      this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
-        this.suma = '00:00:00';
-        this.sumHoras = '00:00:00';
-        this.cont3 = this.cont3 + 1;
-
-        this.horariosEmpleado = existe;
-
-        this.horariosEmpleado.map((h: any) => {
-          // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
-          if (h.default_ != 'DL' && h.default_ != 'DFD') {
-            this.suma = this.SumarHoras(this.suma, h.hora_trabajo);
-          }
-        })
-        // SUMA DE HORAS TOTALES DE HORARIO CON HORAS DE HORARIO SELECCIONADO
-        this.sumHoras = this.SumarHoras(this.suma, hora_trabajo);
-
-        // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
-        this.IndicarNotificacionHoras(this.sumHoras, dh);
-
-        // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
-        let verificador = this.VerificarHorarioRangos(obj_res);
-        // LIMPIAR EXISTENCIAS
-        this.horariosEmpleado = [];
-        if (verificador === 2) {
-          dh.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
-          dh.nota = '';
-          horas_incorrectas = horas_incorrectas.concat(dh);
-          this.usuarios = this.usuarios.concat(dh);
-          this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
-          if (this.cont3 === correctos.length) {
-            if (horas_incorrectas.length === correctos.length) {
-              this.ControlarBotones(false, true, true, false, true);
-              this.observaciones = true;
-            }
-            else {
-              // FINALIZACION DEL CICLO
-              this.observaciones = true;
-              this.usuarios = this.usuarios.concat(horas_correctas);
-              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
-              // CREACION DE LA DATA DE PLANIFICACION GENERAL
-              this.CrearData(form);
-            }
-          }
-        }
-        else {
-          dh.observacion = 'OK';
-          horas_correctas = horas_correctas.concat(dh);
-          if (this.cont3 === correctos.length) {
-            // FINALIZACION DEL CICLO
-            this.observaciones = true;
-            this.usuarios = this.usuarios.concat(horas_correctas);
-            this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
-            // CREACION DE LA DATA DE PLANIFICACION GENERAL
-            this.CrearData(form);
-          }
-        }
-      }, error => {
-        this.cont3 = this.cont3 + 1;
-        // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO CUANDO NO EXISTEN HORARIOS EN LAS FECHAS INDICADAS
-        this.IndicarNotificacionHoras(hora_trabajo, dh);
-        // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
-        let verificador = this.VerificarHorarioRangos(obj_res);
-        // LIMPIAR EXISTENCIAS
-        this.horariosEmpleado = [];
-
-        if (verificador === 2) {
-          dh.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
-          dh.nota = '';
-          horas_incorrectas = horas_incorrectas.concat(dh);
-          this.usuarios = this.usuarios.concat(dh);
-          this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
-          if (this.cont3 === correctos.length) {
-            if (horas_incorrectas.length === correctos.length) {
-              this.ControlarBotones(false, true, true, false, true);
-              this.observaciones = true;
-            }
-            else {
-              // FINALIZACION DEL CICLO
-              this.observaciones = true;
-              this.usuarios = this.usuarios.concat(horas_correctas);
-              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
-              // CREACION DE LA DATA DE PLANIFICACION GENERAL
-              this.CrearData(form);
-            }
-          }
-        }
-        else {
-          dh.observacion = 'OK';
-          horas_correctas = horas_correctas.concat(dh);
-          if (this.cont3 === correctos.length) {
-            // FINALIZACION DEL CICLO
-            this.observaciones = true;
-            this.usuarios = this.usuarios.concat(horas_correctas);
-            this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
-            // CREACION DE LA DATA DE PLANIFICACION GENERAL
-            this.CrearData(form);
+    //correctos.map((dh: any) => {
+    // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
+    this.horariosEmpleado = [];
+    const ids = correctos.map((dh: any) => dh.id);
+    this.rest.VerificarHorariosExistentes2({
+      fechaInicio: form.fechaInicioForm,
+      fechaFinal: form.fechaFinalForm,
+      ids
+    }).subscribe(existe => {
+      this.suma = '00:00:00';
+      this.sumHoras = '00:00:00';
+      this.horariosEmpleado = existe;
+      let sumaHorasPorEmpleado: { [key: string]: any } = {};
+      // Usar map o forEach para recorrer cada horario
+      this.horariosEmpleado.forEach((h: any) => {
+        // Verificar la condición para filtrar horarios
+        if (h.default_ != 'DL' && h.default_ != 'DFD') {
+          const idEmpleado = h.id_empleado;
+          // Si el empleado ya tiene una suma, sumamos las nuevas horas
+          if (sumaHorasPorEmpleado[idEmpleado]) {
+            sumaHorasPorEmpleado[idEmpleado] = this.SumarHoras(sumaHorasPorEmpleado[idEmpleado], h.hora_trabajo);
+          } else {
+            // Si no existe aún una suma para este empleado, inicializamos con '00:00:00' y sumamos las horas actuales
+            sumaHorasPorEmpleado[idEmpleado] = this.SumarHoras('00:00:00', h.hora_trabajo);
           }
         }
       });
-    })
+
+      correctos.forEach(item => {
+        this.cont3 = this.cont3 + 1;
+        sumaHorasPorEmpleado[item.id] = this.SumarHoras(sumaHorasPorEmpleado[item.id], hora_trabajo);
+
+        if (!sumaHorasPorEmpleado[item.id]) {
+          this.IndicarNotificacionHoras(hora_trabajo, item)
+        } else {
+          this.IndicarNotificacionHoras(sumaHorasPorEmpleado[item.id], item);
+
+        }
+
+        // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
+        let verificador = this.VerificarHorarioRangos(obj_res);
+        // LIMPIAR EXISTENCIAS
+        this.horariosEmpleado = [];
+
+        if (verificador === 2) {
+          item.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
+          item.nota = '';
+          horas_incorrectas = horas_incorrectas.concat(item);
+          this.usuarios = this.usuarios.concat(item);
+          this.usuarios_invalidos = this.usuarios_invalidos.concat(item);
+          if (this.cont3 === correctos.length) {
+            if (horas_incorrectas.length === correctos.length) {
+              this.ControlarBotones(false, true, true, false, true);
+              this.observaciones = true;
+            }
+            else {
+              // FINALIZACION DEL CICLO
+              this.observaciones = true;
+              this.usuarios = this.usuarios.concat(horas_correctas);
+              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
+              // CREACION DE LA DATA DE PLANIFICACION GENERAL
+              this.CrearData2(form);
+            }
+          }
+        }
+        else {
+          item.observacion = 'OK';
+          horas_correctas = horas_correctas.concat(item);
+          if (this.cont3 === correctos.length) {
+            // FINALIZACION DEL CICLO
+            this.observaciones = true;
+            this.usuarios = this.usuarios.concat(horas_correctas);
+            this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
+            // CREACION DE LA DATA DE PLANIFICACION GENERAL
+            this.CrearData2(form);
+          }
+        }
+
+      })
+
+    }, error => {
+
+      correctos.forEach(item => {
+        this.cont3 = this.cont3 + 1;
+        this.IndicarNotificacionHoras(hora_trabajo, item);
+        // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
+        let verificador = this.VerificarHorarioRangos(obj_res);
+        // LIMPIAR EXISTENCIAS
+        this.horariosEmpleado = [];
+
+        if (verificador === 2) {
+          item.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
+          item.nota = '';
+          horas_incorrectas = horas_incorrectas.concat(item);
+          this.usuarios = this.usuarios.concat(item);
+          this.usuarios_invalidos = this.usuarios_invalidos.concat(item);
+          if (this.cont3 === correctos.length) {
+            if (horas_incorrectas.length === correctos.length) {
+              this.ControlarBotones(false, true, true, false, true);
+              this.observaciones = true;
+            }
+            else {
+              // FINALIZACION DEL CICLO
+              this.observaciones = true;
+              this.usuarios = this.usuarios.concat(horas_correctas);
+              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
+              // CREACION DE LA DATA DE PLANIFICACION GENERAL
+              this.CrearData2(form);
+            }
+          }
+        }
+        else {
+          item.observacion = 'OK';
+          horas_correctas = horas_correctas.concat(item);
+          if (this.cont3 === correctos.length) {
+            // FINALIZACION DEL CICLO
+            this.observaciones = true;
+            this.usuarios = this.usuarios.concat(horas_correctas);
+            this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
+            // CREACION DE LA DATA DE PLANIFICACION GENERAL
+            this.CrearData2(form);
+          }
+        }
+      })
+    });
   }
 
 
@@ -729,10 +692,16 @@ export class HorariosMultiplesComponent implements OnInit {
       this.validos = this.validos + 1;
       this.RegistrarPlanificacion(form, obj, this.validos);
     })
-
-
-
   }
+
+  CrearData2(form: any) {
+    this.plan_general = [];
+    this.validos = 0;
+    this.RegistrarPlanificacion2(form, this.usuarios_validos, this.validos);
+  }
+
+
+
 
   // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
   RegistrarPlanificacion(form: any, valor: any, validos: number) {
@@ -753,6 +722,41 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
+  feriados2: { [key: number]: any } = {};
+
+  // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
+  RegistrarPlanificacion2(form: any, valor: any, validos: number) {
+    // METODO DE BUSQUEDA DE FERIADOS
+    const ids = valor.map((dh: any) => dh.id);
+    let datos = {
+      fecha_inicio: form.fechaInicioForm,
+      fecha_final: form.fechaFinalForm,
+      ids
+    }
+
+    this.feriado.ListarFeriadosCiudad2(datos).subscribe(data => {
+      console.log("Ver feriados2: ", data);
+      this.feriados2 = data.reduce((acc: { [key: number]: any[] }, item: any) => {
+        // Si el id ya existe en el diccionario, agrega el item al array
+        if (acc[item.id]) {
+          acc[item.id].push(item);
+        } else {
+          // Si el id no existe, crea un nuevo array con el item
+          acc[item.id] = [item];
+        }
+        return acc;
+      });
+      this.BuscarFeriadosRecuperar2(form, valor, validos);
+    },
+      vacio => {
+        console.log("Ver feriados2: ", "vacio");
+
+        // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
+        this.BuscarFeriadosRecuperar2(form, valor, validos);
+      });
+  }
+
+
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   recuperar: any = [];
   BuscarFeriadosRecuperar(form: any, valor: any, validos: number) {
@@ -763,12 +767,44 @@ export class HorariosMultiplesComponent implements OnInit {
       id_empleado: parseInt(valor.id)
     }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
+
       this.recuperar = data;
       // METODO PARA CREAR PLANIFICACION GENERAL
       this.CrearPlanGeneral(form, valor, validos);
     }, vacio => {
       // METODO PARA CREAR PLANIFICACION GENERAL
       this.CrearPlanGeneral(form, valor, validos);
+    })
+  }
+
+  recuperar2: { [key: number]: any } = {};
+  // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
+  BuscarFeriadosRecuperar2(form: any, valor: any, validos: number) {
+    const ids = valor.map((dh: any) => dh.id);
+    let datos = {
+      fecha_inicio: form.fechaInicioForm,
+      fecha_final: form.fechaFinalForm,
+      ids
+    }
+    this.feriado.ListarFeriadosRecuperarCiudad2(datos).subscribe(data => {
+      console.log("Ver recuperar2: ", data);
+
+      this.recuperar2 = data.reduce((acc: { [key: number]: any[] }, item: any) => {
+        // Si el id ya existe en el diccionario, agrega el item al array
+        if (acc[item.id]) {
+          acc[item.id].push(item);
+        } else {
+          // Si el id no existe, crea un nuevo array con el item
+          acc[item.id] = [item];
+        }
+        return acc;
+      });
+      // METODO PARA CREAR PLANIFICACION GENERAL
+      this.CrearPlanGeneral2(form, valor, validos);
+    }, vacio => {
+      console.log("Ver recuperar2: ", "vacio");
+      // METODO PARA CREAR PLANIFICACION GENERAL
+      this.CrearPlanGeneral2(form, valor, validos);
     })
   }
 
@@ -927,6 +963,178 @@ export class HorariosMultiplesComponent implements OnInit {
       this.ValidarLimites();
     }
   }
+
+
+  CrearPlanGeneral2(form: any, valor: any, validos: number) {
+    console.log("Ver valor que entra en CrearPlanGeneral2", valor)
+
+    valor.forEach(dh => {
+      const [obj_res] = this.horarios.filter((o: any) => {
+        return o.id === parseInt(form.horarioForm)
+      })
+
+      if (!obj_res) return this.toastr.warning('Horario no válido.');
+      const { default_ } = obj_res;
+      console.log("ver default_ ", default_);
+
+      this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
+      this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+      this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
+
+      // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
+      while (this.inicioDate <= this.finDate) {
+        this.fechasHorario.push(this.inicioDate);
+        var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
+        this.inicioDate = newDate;
+      }
+
+      var tipo: any = null;
+      var origen: string = '';
+      var tipo_dia: string = '';
+
+      console.log("ver this.fechasHorario ", this.fechasHorario );
+      this.fechasHorario.map((obj: any) => {
+        // DEFINICION DE TIPO DE DIA SEGUN HORARIO
+        tipo_dia = default_;
+        origen = default_;
+        tipo = null;
+        var day = moment(obj).day();
+        if (moment.weekdays(day) === 'lunes') {
+          if (form.lunesForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'martes') {
+          if (form.martesForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'miércoles') {
+          if (form.miercolesForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'jueves') {
+          if (form.juevesForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'viernes') {
+          if (form.viernesForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'sábado') {
+          if (form.sabadoForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+        if (moment.weekdays(day) === 'domingo') {
+          if (form.domingoForm === true) {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+          }
+        }
+
+
+        console.log("ver tipo", tipo)
+        console.log("ver tipo_dia", tipo_dia)
+        console.log("ver origen", origen)
+
+
+        if (default_ === 'FD' || default_ === 'L') {
+          tipo = default_;
+          tipo_dia = default_;
+          origen = 'H' + default_;
+        }
+        else {
+          // BUSCAR FERIADOS
+          console.log("ver los feriados por id", this.feriados2[dh.id])
+          if (this.feriados2[dh.id]) {
+            let feri = this.feriados2[dh.id]
+            for (let i = 0; i < feri.length; i++) {
+              if (moment(feri[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+                tipo = 'DFD';
+                tipo_dia = 'DFD';
+                break;
+              }
+            }
+          }
+        }
+
+        // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
+        if (this.recuperar2[dh.id]) {
+          let recu = this.recuperar2[dh.id]
+          for (let j = 0; j < recu.length; j++) {
+            if (moment(recu[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+              tipo = 'REC';
+              tipo_dia = 'REC';
+              break;
+            }
+          }
+        }
+        // METODO PARA CREACION DE DATA DE REGISTRO DE HORARIOS
+        let fechas = {
+          fechaInicio: obj,
+          fechaFinal: obj,
+        };
+        if (tipo_dia === 'N' || tipo_dia === 'REC' || tipo_dia === 'DHA' || origen === 'HFD' || origen === 'HL') {
+          this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, this.detalles);
+        }
+        // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
+        else if (tipo_dia === 'DFD') {
+          console.log("entra a  tipo_dia === 'DFD'", tipo_dia);
+
+          this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
+            this.EliminarRegistrosH(existe, obj, dh);
+          });
+          this.lista_descanso.forEach((desc: any) => {
+            if (desc.tipo === 'DFD') {
+              tipo = 'FD';
+              tipo_dia = 'FD';
+              origen = 'FD';
+              this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
+            }
+          })
+        }
+        else if (tipo_dia === 'L' && origen === 'L') {
+          console.log("entra a  tipo_dia === 'L' && origen === 'L'", tipo_dia + " " + origen);
+
+          this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
+            this.EliminarRegistrosH(existe, obj, dh);
+          });
+
+          this.lista_descanso.forEach((desc: any) => {
+            if (desc.tipo === 'DL') {
+              tipo = 'L';
+              tipo_dia = 'L';
+              origen = 'L';
+              this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
+            }
+          })
+        }
+      });
+      // SE VALIDA QUE EL LIMITE DE REGISTROS SEA EL ADECUADO PARA EL SISTEMA
+      if (validos === this.usuarios_validos.length) {
+        this.ValidarLimites();
+      }
+    })
+    // CONSULTAR HORARIO
+  }
+
 
   // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
   EliminarRegistrosH(existe: any, obj: any, dh: any) {
