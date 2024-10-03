@@ -104,7 +104,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
   ActualizarOpcionMarcacion(informacion: any) {
     this.configuracion = [];
     let numero = 1;
-    this.opciones.BuscarVariasOpcionesMarcacion(informacion).subscribe((a) => {
+    this.opciones.BuscarVariasOpcionesMarcacionWeb(informacion).subscribe((a) => {
       //console.log('ver datos ', a)
       // FILTRAR Y COMBINAR LOS ARRAYS SOLO SI EXISTE COINCIDENCIA EN EL id DEL EMPLEADO
       this.configuracion = this.informacion
@@ -114,7 +114,6 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
           return {
             ...info,
             // COMBINAR CON LA INFORMACION DE LA CONFIGURACION
-            timbre_internet: res.timbre_internet,
             timbre_especial: res.timbre_especial,
             timbre_foto: res.timbre_foto,
             n: numero++
@@ -196,7 +195,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
       id: id_opcion
     };
     console.log('ver datos ', datos)
-    this.opciones.EliminarOpcionesMarcacion(datos).subscribe((res: any) => {
+    this.opciones.EliminarOpcionesMarcacionWeb(datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -237,7 +236,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
       this.configuracion = this.configuracion.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
       data.id = datos.id;
-      this.opciones.EliminarOpcionesMarcacion(data).subscribe((res: any) => {
+      this.opciones.EliminarOpcionesMarcacionWeb(data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con el usuario ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
