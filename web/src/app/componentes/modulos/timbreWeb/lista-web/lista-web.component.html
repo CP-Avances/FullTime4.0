@@ -1058,7 +1058,7 @@
                 <div class="col-md">
                     <div class="col-md">
                         <br>
-                        <div (click)="VerTablas(2)" style="padding-top: 20px; padding-bottom: 10px;" *ngIf="inactivar">
+                        <div (click)="VerTablas(2)" style=" padding-bottom: 10px;" *ngIf="inactivar">
                             <!--  ************************  LISTAR USUARIOS INACTIVOS  ****************************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
                                 <mat-card-content>
@@ -1075,11 +1075,11 @@
                                 </mat-card-content>
                             </mat-card>
                         </div>
-                        <div (click)="VerTablas(1)" style="padding-top: 10px; padding-bottom: 10px;" *ngIf="activar">
+                        <div (click)="VerTablas(1)" style="padding-bottom: 10px;" *ngIf="activar">
                             <!--  ***********************  LISTAR USUARIOS ACTIVO  **********************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
                                 <mat-card-content>
-                                    <div style="padding-top: 20px; padding-bottom: 20px;">
+                                    <div style="padding-top: 2px; padding-bottom: 20px;">
                                         <mat-icon>thumb_down</mat-icon> &nbsp;&nbsp;
                                         <mat-label>INACTIVAR USUARIOS</mat-label>
                                         <br>
