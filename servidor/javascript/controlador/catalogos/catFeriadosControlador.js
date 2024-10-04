@@ -267,6 +267,7 @@ class FeriadosControlador {
                     AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount != 0) {
+                    console.log(FERIADO.rows);
                     return res.jsonp(FERIADO.rows);
                 }
                 else {
@@ -290,6 +291,7 @@ class FeriadosControlador {
                     AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = ANY($3)
                 `, [fecha_inicio, fecha_final, ids]);
                 if (FERIADO.rowCount != 0) {
+                    console.log(FERIADO.rows);
                     return res.jsonp(FERIADO.rows);
                 }
                 else {
@@ -340,6 +342,7 @@ class FeriadosControlador {
                         AND f.fecha_recuperacion IS NOT null
                     `, [fecha_inicio, fecha_final, ids]);
                 if (FERIADO.rowCount != 0) {
+                    console.log("ver feriado: ", FERIADO.rows);
                     return res.jsonp(FERIADO.rows);
                 }
                 else {

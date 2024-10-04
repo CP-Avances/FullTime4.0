@@ -19,6 +19,7 @@ class EmpleadoHorariosControlador {
     VerificarHorariosExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal } = req.body;
+            console.log(" ver body", req.body);
             const { id_empleado } = req.params;
             const HORARIO = yield database_1.default.query(`
             SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_  

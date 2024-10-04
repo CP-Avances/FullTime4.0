@@ -10,6 +10,8 @@ class EmpleadoHorariosControlador {
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
     public async VerificarHorariosExistentes(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal } = req.body;
+
+        console.log(" ver body", req.body);
         const { id_empleado } = req.params;
         const HORARIO = await pool.query(
             `

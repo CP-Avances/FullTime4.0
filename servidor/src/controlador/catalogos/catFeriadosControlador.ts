@@ -309,6 +309,7 @@ class FeriadosControlador {
                 , [fecha_inicio, fecha_final, id_empleado]);
 
             if (FERIADO.rowCount != 0) {
+                console.log(FERIADO.rows)
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -334,6 +335,7 @@ class FeriadosControlador {
                 , [fecha_inicio, fecha_final, ids]);
 
             if (FERIADO.rowCount != 0) {
+                console.log(FERIADO.rows)
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -389,7 +391,9 @@ class FeriadosControlador {
                     , [fecha_inicio, fecha_final, ids]);
     
                 if (FERIADO.rowCount != 0) {
+                    console.log("ver feriado: ", FERIADO.rows)
                     return res.jsonp(FERIADO.rows)
+
                 }
                 else {
                     res.status(404).jsonp({ text: 'Registros no encontrados.' });
