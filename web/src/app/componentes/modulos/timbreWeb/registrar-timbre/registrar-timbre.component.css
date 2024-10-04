@@ -67,8 +67,8 @@ mat-form-field {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 200px;
-    height: 200px;
+    width: 210px;
+    height: 210px;
     border-radius: 50%;
     /* ASEGURA QUE EL CONTENIDO NO SE SALGA DEL BORDE REDONDEADO */
     overflow: hidden;
@@ -87,8 +87,8 @@ webcam video {
 }
 
 .circular-image-container {
-    width: 200px;
-    height: 200px;
+    width: 210px;
+    height: 210px;
     border-radius: 50%;
     /* PARA QUE LA IMAGEN NO SE SALGA DEL CONTENEDOR CIRCULAR */
     overflow: hidden;
@@ -115,6 +115,7 @@ webcam video {
 }
 
 .button-container {
+    margin-top: 4px;
     /* USAR FLEXBOX PARA ALINEAR LOS BOTONES EN FILA */
     display: flex;
     /* ESPACIO ENTRE LOS BOTONES */

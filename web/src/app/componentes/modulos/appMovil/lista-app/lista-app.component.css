@@ -5,6 +5,8 @@
 }
 
 td {
+    white-space: nowrap;
+    vertical-align: middle; 
     padding-top: 10px;
     text-align: center;
     outline: none;
@@ -96,4 +98,11 @@ p {
 
 .fuente {
     font-size: xx-small;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    #titulo{
+        font-size: medium;
+    }
 }
