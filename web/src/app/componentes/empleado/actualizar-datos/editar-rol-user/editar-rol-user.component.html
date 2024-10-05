@@ -468,20 +468,20 @@
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
-                </div>
-                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
-                    <span>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
                         RESULTADO USUARIOS
-                    </span>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
+                    </div>
                 </div>
-                <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
-                </div>
-            </div>
                 
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">

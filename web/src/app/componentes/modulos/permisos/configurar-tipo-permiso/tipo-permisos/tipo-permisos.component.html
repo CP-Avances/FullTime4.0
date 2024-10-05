@@ -1,8 +1,16 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>REGISTRAR NUEVO TIPO DE PERMISO</span>
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1,0)">highlight_off</mat-icon>
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+            </div>
+            <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    REGISTRAR NUEVO TIPO DE PERMISO
+                </span>
+            </div>
+            <div class="col-2 col-md-2 mb-2 mb-md-0">
+                <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1,0)">highlight_off</mat-icon>
+            </div>
         </div>
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
             <mat-step [stepControl]="primeroFormGroup">
@@ -24,8 +32,8 @@
                         </span>
                     </div>
                     <div class="container">
-                        <div class="row">
-                            <div class="col">
+                        <div class="row p-0 m-0">
+                            <div class="col-12 col-md-4 m-auto">
                                 <mat-form-field>
                                     <mat-label>Tipo de permiso</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -70,7 +78,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
-                            <div class="col">
+                            <div class="col-12 col-md-4">
                                 <mat-form-field>
                                     <mat-label>Solicitar permiso por:</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -106,7 +114,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
-                            <div class="col">
+                            <div class="col-12 col-md-4">
                                 <mat-form-field>
                                     <mat-label id="usuario">Usuario podrá solicitar</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -317,7 +325,7 @@
                 </div>
                 <form [formGroup]="tercerFormGroup">
                     <div class="row">
-                        <div class="col" id="fuente">
+                        <div class="col-12 col-md-4" id="fuente">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label style="padding-top: 10px; position: relative; left:10px;">
                                     Notificar solicitud de permiso al:
@@ -345,7 +353,7 @@
                                 </mat-checkbox>
                             </div>
                         </div>
-                        <div class="col" id="fuente">
+                        <div class="col-12 col-md-4" id="fuente">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label style="padding-top: 10px; position: relative; left:10px;">
                                     Notificar aprobación de solicitud de permiso al:
@@ -373,7 +381,7 @@
                                 </mat-checkbox>
                             </div>
                         </div>
-                        <div class="col" id="fuente">
+                        <div class="col-12 col-md-4" id="fuente">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label style="padding-top: 10px; position: relative; left:10px;">
                                     Notificar aprobación de solicitud de permiso al:
