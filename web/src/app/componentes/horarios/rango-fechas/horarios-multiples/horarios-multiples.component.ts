@@ -747,6 +747,8 @@ export class HorariosMultiplesComponent implements OnInit {
       data.forEach(feriado => {
 
         if (!this.feriados2[feriado.id]) {
+
+
           this.feriados2[feriado.id] = [feriado]
         } else {
           this.feriados2[feriado.id] = this.feriados2[feriado.id].push(feriado);
@@ -969,13 +971,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
   CrearPlanGeneral2(form: any, valor: any, validos: number) {
     console.log("Ver valor que entra en CrearPlanGeneral2", valor)
+    let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
     valor.forEach(dh => {
-
-
-      let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
-
-
       const [obj_res] = this.horarios.filter((o: any) => {
         return o.id === parseInt(form.horarioForm)
       })
@@ -1001,7 +999,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
       console.log("ver this.fechasHorario ", this.fechasHorario);
       this.fechasHorario.map((obj: any) => {
-
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo_dia = default_;
         origen = default_;
@@ -1089,7 +1086,7 @@ export class HorariosMultiplesComponent implements OnInit {
             }
           }
         }
-
+        console.log("ver id del usuario: ", dh.id)
         console.log("VER VALORES DIARIOS: ")
         console.log("obj: ", obj)
         console.log("dia: ", moment.weekdays(day))
@@ -1141,78 +1138,84 @@ export class HorariosMultiplesComponent implements OnInit {
           })
         }
       });
+    })
 
-      let fechas = {
-        fechaInicio: this.inicioDate,
-        fechaFinal: this.finDate,
-      };
-
-      this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(
-        existe => {
-          // Si el servicio tiene éxito, continuamos con la lógica
-          horariosEliminar.forEach(horarioDia => {
-            let datos = {
-              id_plan: [],
-              user_name: this.user_name,
-              ip: this.ip,
-            }
-
-            existe.forEach((h: any) => {
-              if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
-                let plan_fecha = {
-                  id_empleado: dh.id,
-                  fec_final: horarioDia.obj,
-                  fec_inicio: horarioDia.obj,
-                  id_horario: h.id_horario,
-                };
-
-                this.restP.BuscarFechas(plan_fecha).subscribe(
-                  (res: any) => {
-                    datos.id_plan = res;
-                    // METODO PARA ELIMINAR DE LA BASE DE DATOS
-                    this.restP.EliminarRegistro(datos).subscribe(datos => {
-                      // Procesar la respuesta de eliminación si es necesario
-                    });
-                  },
-                  (error: any) => {
-                    // Manejar errores en BuscarFechas si es necesario
-                    if (error.status === 404) {
-                      console.error('No se encontraron fechas para el horario:', plan_fecha);
-                    } else {
-                      console.error('Otro error ocurrió en BuscarFechas:', error);
-                    }
-                  }
-                );
-              }
-            });
-          });
-        },
-        (error: any) => {
-          // Manejar el error si el servicio VerificarHorariosExistentes devuelve un error
-          if (error.status === 404) {
-            console.error('No se encontraron horarios existentes para el id:', dh.id);
-            // Aquí puedes realizar alguna acción adicional, como mostrar un mensaje al usuario
+    this.ValidarLimites();
+    // ELIMINACION DE HORARIOS
+    const ids = valor.map((dh: any) => dh.id);
+    let horariosEliminarPorUsuario: { [key: number]: any } = {};
+    let fechas = {
+      fechaInicio: form.fechaInicioForm,
+      fechaFinal: form.fechaFinalForm,
+      ids
+    };
+    this.rest.VerificarHorariosExistentes2(fechas).subscribe(
+      existe => {
+        existe.forEach(horario => {
+          if (!horariosEliminarPorUsuario[horario.id_empleado]) {
+            horariosEliminarPorUsuario[horario.id_empleado] = [horario]
           } else {
-            console.error('Otro error ocurrió en VerificarHorariosExistentes:', error);
+            horariosEliminarPorUsuario[horario.id_empleado] = horariosEliminarPorUsuario[horario.id_empleado].push(horario);
           }
+        })
+      },
+      (error: any) => {
+        // Manejar el error si el servicio VerificarHorariosExistentes devuelve un error
+        if (error.status === 404) {
+          console.error('No se encontraron horarios existentes ');
+          // Aquí puedes realizar alguna acción adicional, como mostrar un mensaje al usuario
+        } else {
+          console.error('Otro error ocurrió en VerificarHorariosExistentes:', error);
         }
-      );
-      console.log("ver validos : ", validos)
-      // SE VALIDA QUE EL LIMITE DE REGISTROS SEA EL ADECUADO PARA EL SISTEMA
-      if (validos === this.usuarios_validos.length) {
-        this.ValidarLimites();
+      }
+    );
+
+    valor.forEach(u => {
+      if (horariosEliminarPorUsuario[u.id]) {
+
+        horariosEliminar.forEach(horarioDia => {
+          let datos = {
+            id_plan: [],
+            user_name: this.user_name,
+            ip: this.ip,
+          }
+
+          horariosEliminarPorUsuario[u.id].forEach(h => {
+            if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
+              let plan_fecha = {
+                id_empleado: u.id,
+                fec_final: horarioDia.obj,
+                fec_inicio: horarioDia.obj,
+                id_horario: h.id_horario,
+              };
+
+              this.restP.BuscarFechas(plan_fecha).subscribe(
+                (res: any) => {
+                  datos.id_plan = res;
+                  // METODO PARA ELIMINAR DE LA BASE DE DATOS
+                  this.restP.EliminarRegistro(datos).subscribe(datos => {
+                    // Procesar la respuesta de eliminación si es necesario
+                  });
+                },
+                (error: any) => {
+                  // Manejar errores en BuscarFechas si es necesario
+                  if (error.status === 404) {
+                    console.error('No se encontraron fechas para el horario:', plan_fecha);
+                  } else {
+                    console.error('Otro error ocurrió en BuscarFechas:', error);
+                  }
+                }
+              );
+            }
+          })
+        })
       }
     })
-    console.log(" ver observacione ", this.observaciones)
-    // CONSULTAR HORARIO
   }
 
 
   // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
   EliminarRegistrosH(existe: any, obj: any, dh: any) {
-
-
-
     let datos = {
       id_plan: [],
       user_name: this.user_name,
@@ -1238,6 +1241,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
+   /*
     if (this.plan_general.length > 99200) {
       this.guardar = false;
       this.cargar = false;
@@ -1248,10 +1252,11 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     }
     else {
+    */
       this.guardar = true;
       this.btn_eliminar = false;
       this.cargar = false;
-    }
+    //}
   }
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
@@ -1310,7 +1315,6 @@ export class HorariosMultiplesComponent implements OnInit {
     this.eliminar_horarios = [];
     this.eliminar = [];
     this.contar_eliminar = 0;
-
     this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
         id: obj.id_horario,
