@@ -442,11 +442,13 @@ export class HorariosMultiplesComponent implements OnInit {
   horariosEmpleado: any = []
   cont3: number = 0;
 
+  horariosPorEmpleado: { [key: string]: any } = {};
 
   ValidarHorarioByHorasTrabaja(form: any, correctos: any) {
     let horas_correctas = [];
     let horas_incorrectas = [];
     this.usuarios_validos = [];
+
     const [obj_res] = this.horarios.filter((o: any) => {
       return o.id === parseInt(form.horarioForm)
     })
@@ -463,9 +465,20 @@ export class HorariosMultiplesComponent implements OnInit {
       fechaFinal: form.fechaFinalForm,
       ids
     }).subscribe(existe => {
+
       this.suma = '00:00:00';
       this.sumHoras = '00:00:00';
       this.horariosEmpleado = existe;
+      console.log("ver si existen horarios: ", this.horariosEmpleado)
+
+      this.horariosEmpleado.forEach(horario => {
+        if (!this.horariosPorEmpleado[horario.id_empleado]) {
+          this.horariosPorEmpleado[horario.id_empleado] = [horario]
+        } else {
+          this.horariosPorEmpleado[horario.id_empleado].push(horario);
+        }
+      })
+
       let sumaHorasPorEmpleado: { [key: string]: any } = {};
       // Usar map o forEach para recorrer cada horario
       this.horariosEmpleado.forEach((h: any) => {
@@ -496,9 +509,12 @@ export class HorariosMultiplesComponent implements OnInit {
         }
 
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
-        let verificador = this.VerificarHorarioRangos(obj_res);
+        let verificador = this.VerificarHorarioRangos(obj_res, this.horariosPorEmpleado[item.id]);
+        console.log("ver verificador", verificador)
+
         // LIMPIAR EXISTENCIAS
         this.horariosEmpleado = [];
+        this.horariosPorEmpleado[item.id] = [];
 
         if (verificador === 2) {
           item.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
@@ -542,7 +558,8 @@ export class HorariosMultiplesComponent implements OnInit {
         this.cont3 = this.cont3 + 1;
         this.IndicarNotificacionHoras(hora_trabajo, item);
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
-        let verificador = this.VerificarHorarioRangos(obj_res);
+        let verificador = this.VerificarHorarioRangos(obj_res, this.horariosPorEmpleado[item.id]);
+        console.log("ver verificador", verificador)
         // LIMPIAR EXISTENCIAS
         this.horariosEmpleado = [];
 
@@ -598,14 +615,19 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VERIFICAR QUE NO EXISTAN HORARIOS DENTRO DE LOS MISMOS RANGOS
   feriados_eliminar: any = [];
-  VerificarHorarioRangos(ingresado: any) {
+  VerificarHorarioRangos(ingresado: any, horarioPorEmpleado: any) {
+
     let verificador = 0;
+
+    if (!horarioPorEmpleado) {
+      horarioPorEmpleado = [];
+    }
     // DATOS TOMADOS DE LA BUSQUEDA (existe ---> this.horariosEmpleados)
-    for (var i = 0; i < this.horariosEmpleado.length; i++) {
+    for (var i = 0; i < horarioPorEmpleado.length; i++) {
 
       for (var j = 0; j < this.horarios.length; j++) {
 
-        if (this.horariosEmpleado[i].id_horario === this.horarios[j].id) {
+        if (horarioPorEmpleado[i].id_horario === this.horarios[j].id) {
 
           if (this.horarios[j].default_ === 'N' || this.horarios[j].default_ === 'DHA' || this.horarios[j].default_ === 'L' || this.horarios[j].default_ === 'FD') {
 
@@ -747,11 +769,9 @@ export class HorariosMultiplesComponent implements OnInit {
       data.forEach(feriado => {
 
         if (!this.feriados2[feriado.id]) {
-
-
           this.feriados2[feriado.id] = [feriado]
         } else {
-          this.feriados2[feriado.id] = this.feriados2[feriado.id].push(feriado);
+          this.feriados2[feriado.id].push(feriado);
         }
       })
       console.log("Ver feriados2 armado -----------------------------------: ", this.feriados2);
@@ -801,7 +821,7 @@ export class HorariosMultiplesComponent implements OnInit {
         if (!this.recuperar2[feriadorec.id]) {
           this.recuperar2[feriadorec.id] = [feriadorec]
         } else {
-          this.recuperar2[feriadorec.id] = this.recuperar2[feriadorec.id].push(feriadorec);
+          this.recuperar2[feriadorec.id].push(feriadorec);
         }
       })
       // METODO PARA CREAR PLANIFICACION GENERAL
@@ -1087,13 +1107,6 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
         console.log("ver id del usuario: ", dh.id)
-        console.log("VER VALORES DIARIOS: ")
-        console.log("obj: ", obj)
-        console.log("dia: ", moment.weekdays(day))
-        console.log("tipo: ", tipo)
-        console.log("tipo_dia: ", tipo_dia)
-        console.log("origen: ", origen)
-
         const miObjeto: { obj: string, dia: string; tipo: string; tipo_dia: string; origen: string } = {
           obj: obj,
           dia: moment.weekdays(day),
@@ -1140,22 +1153,24 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
 
-    this.ValidarLimites();
     // ELIMINACION DE HORARIOS
     const ids = valor.map((dh: any) => dh.id);
     let horariosEliminarPorUsuario: { [key: number]: any } = {};
-    let fechas = {
+
+    this.rest.VerificarHorariosExistentes2({
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinalForm,
       ids
-    };
-    this.rest.VerificarHorariosExistentes2(fechas).subscribe(
+    }).subscribe(
       existe => {
+        console.log("ver horarios existenter segunda vez", existe)
+
         existe.forEach(horario => {
+
           if (!horariosEliminarPorUsuario[horario.id_empleado]) {
             horariosEliminarPorUsuario[horario.id_empleado] = [horario]
           } else {
-            horariosEliminarPorUsuario[horario.id_empleado] = horariosEliminarPorUsuario[horario.id_empleado].push(horario);
+            horariosEliminarPorUsuario[horario.id_empleado].push(horario);
           }
         })
       },
@@ -1211,6 +1226,9 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       }
     })
+
+    this.ValidarLimites();
+
   }
 
 
@@ -1241,21 +1259,21 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
-   /*
-    if (this.plan_general.length > 99200) {
-      this.guardar = false;
-      this.cargar = false;
-      this.toastr.error(
-        'Intentar con un número menor de usuarios o planificar con periodos más cortos de tiempo.',
-        'Ups!!! se ha producido un error.', {
-        timeOut: 6000,
-      });
-    }
-    else {
-    */
-      this.guardar = true;
-      this.btn_eliminar = false;
-      this.cargar = false;
+    /*
+     if (this.plan_general.length > 99200) {
+       this.guardar = false;
+       this.cargar = false;
+       this.toastr.error(
+         'Intentar con un número menor de usuarios o planificar con periodos más cortos de tiempo.',
+         'Ups!!! se ha producido un error.', {
+         timeOut: 6000,
+       });
+     }
+     else {
+     */
+    this.guardar = true;
+    this.btn_eliminar = false;
+    this.cargar = false;
     //}
   }
 
@@ -1306,6 +1324,7 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
+      console.log("ver plan general: ", this.plan_general)
     }
   }
 
@@ -1315,49 +1334,42 @@ export class HorariosMultiplesComponent implements OnInit {
     this.eliminar_horarios = [];
     this.eliminar = [];
     this.contar_eliminar = 0;
+    console.log("ver lista_descanso", this.lista_descanso);
     this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
         id: obj.id_horario,
       }
       this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
     })
+    console.log(" ver eliminar_horarios", this.eliminar_horarios);
     let total = 0;
     this.usuarios_validos.forEach((obj: any) => {
       this.eliminar_horarios.forEach((eh: any) => {
         total = total + 1;
       })
     })
-    this.usuarios_validos.forEach((obj: any) => {
-      this.eliminar_horarios.forEach((eh: any) => {
-        let plan_fecha = {
-          id_empleado: obj.id,
-          fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-          fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-          id_horario: eh.id,
-        };
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
-          this.contar_eliminar = this.contar_eliminar + 1;
-          // METODO PARA ALMACENAR TODAS LAS FECHAS A ELIMINARSE
-          this.eliminar = this.eliminar.concat(res);
 
-          if (this.contar_eliminar === total) {
-            this.BorrarDescanso();
-          }
+    console.log(" ver usuarios_validos", this.usuarios_validos);
 
-        }, error => {
-          this.contar_eliminar = this.contar_eliminar + 1;
-          if (this.contar_eliminar === total) {
-            if (this.eliminar.length != 0) {
-              this.BorrarDescanso();
-            }
-            else {
-              this.GuardarInformacion();
-            }
-          }
-        })
-      })
+    let datos = {
+      usuarios_validos: this.usuarios_validos,
+      eliminar_horarios: this.eliminar_horarios,
+      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+      fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+    };
+
+    this.rest.BuscarFechasMultiples(datos).subscribe(res => {
+      this.eliminar = res;
+      this.BorrarDescanso();
+
+    }, error => {
+      if (this.eliminar.length != 0) {
+        this.BorrarDescanso();
+      }
+      else {
+        this.GuardarInformacion();
+      }
     })
-
   }
 
   // METODO PARA ELIMINAR DESCANSOS - FERIADOS
@@ -1389,24 +1401,55 @@ export class HorariosMultiplesComponent implements OnInit {
       plan_general: this.plan_general,
       user_name: this.user_name,
       ip: this.ip,
-    }
-    this.restP.CrearPlanGeneral(datos).subscribe(res => {
-      if (res.message === 'OK') {
-        this.cargar = true;
-        this.guardar = false;
-        this.toastr.success(
-          'Operación exitosa.', 'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
-          timeOut: 6000,
-        })
-      }
-      else {
-        this.toastr.error(
-          'Ups!!! algo salio mal.', '', {
-          timeOut: 6000,
-        })
-      }
-    })
+    };
+
+    // Dividir el objeto plan_general en partes más pequeñas
+    const partes = this.dividirPlanGeneral(datos.plan_general);
+    const totalPartes = partes.length; // Obtén la cantidad total de partes
+
+    // Enviar cada parte por separado
+    partes.forEach((parte, index) => {
+      const datosParcial = {
+        parte: parte,
+        user_name: this.user_name,
+        ip: this.ip,
+        parteIndex: index, // Puedes enviar el índice de la parte para referencia
+        totalPartes: totalPartes // Agrega el total de partes al objeto de datos
+
+      };
+
+      this.restP.CrearPlanGeneral(datosParcial).subscribe(res => {
+        if (res.message === 'OK') {
+          // Manejar éxito para cada parte
+          console.log(`Parte ${index} guardada exitosamente.`);
+        } else {
+          // Manejar error para cada parte
+          this.toastr.error('Ups!!! algo salió mal.', '', {
+            timeOut: 6000,
+          });
+        }
+      });
+    });
   }
+
+  dividirPlanGeneral(plan_general: any[]): any[][] {
+    const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
+    const tamañoParte = 100000; // Ajusta el tamaño de cada parte según sea necesario
+    // Verifica si el tamaño total es menor que el tamaño de cada parte
+    if (plan_general.length <= tamañoParte) {
+      return [plan_general]; // Devuelve el array original como la única parte
+    }
+    for (let i = 0; i < plan_general.length; i += tamañoParte) {
+      const parte = plan_general.slice(i, i + tamañoParte); // Obtener una parte del array
+
+      // Verifica si la parte es no vacía y la agrega
+      if (parte.length > 0) {
+        partes.push(parte); // Agregar la parte al array de partes
+      }
+    }
+    return partes; // Devuelve el array de partes
+  }
+
 
   // METODO PARA CARGAR TIMBRES
   CargarTimbres(form: any) {

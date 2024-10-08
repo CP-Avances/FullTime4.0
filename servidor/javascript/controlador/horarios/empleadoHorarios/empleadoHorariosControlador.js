@@ -233,6 +233,40 @@ class EmpleadoHorariosControlador {
             }
         });
     }
+    BuscarFechasMultiples(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
+                const resultados = []; // Arreglo para almacenar los resultados
+                for (const obj of usuarios_validos) {
+                    for (const eh of eliminar_horarios) {
+                        // Llamar a BuscarFechas y almacenar el resultado en una variable
+                        const filas = yield this.BuscarFechas(fec_inicio, fec_final, eh.id, obj.id);
+                        // Verificar si se encontraron filas y agregarlas al arreglo
+                        if (filas && filas.length > 0) {
+                            resultados.push(...filas); // Agregar las filas al arreglo de resultados
+                        }
+                    }
+                }
+                // Aquí podrías hacer algo con el arreglo de resultados, por ejemplo, devolverlo en la respuesta
+                return res.json(resultados);
+            }
+            catch (error) {
+                console.error('Error al registrar la planificación horaria:', error);
+                return res.status(500).json({ message: 'Error al registrar la planificación horaria' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
+    BuscarFechas(fec_inicio, fec_final, id_horario, id_empleado) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const FECHAS = yield database_1.default.query(`
+            SELECT id FROM eu_asistencia_general 
+            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+            `, [fec_inicio, fec_final, id_horario, id_empleado]);
+            return FECHAS.rows;
+        });
+    }
 }
 exports.EMPLEADO_HORARIOS_CONTROLADOR = new EmpleadoHorariosControlador();
 exports.default = exports.EMPLEADO_HORARIOS_CONTROLADOR;

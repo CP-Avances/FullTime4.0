@@ -17,6 +17,77 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
+    constructor() {
+        this.partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
+        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let errores = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            // const { user_name, ip, plan_general } = req.body;
+            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+            if (!this.partesRecibidas) {
+                this.partesRecibidas = []; // Inicializar si no está definida
+            }
+            this.partesRecibidas[parteIndex] = parte;
+            //const totalPartes = 5; // Define cuántas partes esperas recibir (esto puede cambiar según tu lógica)
+            const partesValidas = this.partesRecibidas.filter(p => p !== undefined);
+            if (this.partesRecibidas.length === totalPartes) { // totalPartes debe ser conocido de alguna manera
+                const plan_generalCompleto = partesValidas.flat(); // Reconstruir el objeto
+                // Ahora puedes procesar el objeto completo
+                console.log('Plan general completo:', plan_generalCompleto);
+                for (let i = 0; i < plan_generalCompleto.length; i++) {
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const result = yield database_1.default.query(`
+                        INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                            fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                            minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        `, [
+                            plan_generalCompleto[i].fec_hora_horario, plan_generalCompleto[i].tolerancia, plan_generalCompleto[i].estado_timbre,
+                            plan_generalCompleto[i].id_det_horario, plan_generalCompleto[i].fec_horario, plan_generalCompleto[i].id_empl_cargo,
+                            plan_generalCompleto[i].tipo_entr_salida, plan_generalCompleto[i].id_empleado, plan_generalCompleto[i].id_horario, plan_generalCompleto[i].tipo_dia,
+                            plan_generalCompleto[i].salida_otro_dia, plan_generalCompleto[i].min_antes, plan_generalCompleto[i].min_despues, plan_generalCompleto[i].estado_origen,
+                            plan_generalCompleto[i].min_alimentacion
+                        ]);
+                        const [plan] = result.rows;
+                        const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_generalCompleto[i].fec_hora_horario.split(' ')[1]);
+                        const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_generalCompleto[i].fec_hora_horario, 'ddd');
+                        const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_generalCompleto[i].fec_horario, 'ddd');
+                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                        plan.fecha_horario = fecha_horario;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(plan),
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                        ocurrioError = true;
+                        mensajeError = error.message;
+                        codigoError = 500;
+                        errores++;
+                        break;
+                    }
+                }
+                return res.status(200).jsonp({ message: 'OK' });
+            }
+            else {
+                res.send({ message: 'Parte recibida.' });
+            }
+        });
+    }
     // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

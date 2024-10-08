@@ -25,6 +25,7 @@ class EmpleadoHorariosRutas {
         this.router.post('/horario-comida-horas-dias-diferentes', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ObtenerComidaHorarioHorasDD);
         // METODO PARA VERIFICAR SI EXISTE PLANIFICACION   **USADO
         this.router.post('/validarFechas', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarFechasHorario);
+        this.router.post('/buscar-horarios-multiples ', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.BuscarFechasMultiples);
     }
 }
 const EMPLEADO_HORARIOS_RUTAS = new EmpleadoHorariosRutas();

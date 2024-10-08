@@ -17,6 +17,10 @@ export class EmpleadoHorariosService {
     return this.http.post(`${environment.url}/empleadoHorario/validarFechas`, datos);
   }
 
+  BuscarFechasMultiples( datos: any) {
+    return this.http.post(`${environment.url}/empleadoHorario/buscar-horarios-multiples`, datos);
+  }
+
   // METODO PARA VERIFICAR HORARIOS DUPLICADOS  **USADO
   VerificarDuplicidadHorarios(id_empleado: string, datos: any) {
     return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${id_empleado}`, datos);
