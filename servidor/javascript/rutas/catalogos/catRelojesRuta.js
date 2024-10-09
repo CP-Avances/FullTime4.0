@@ -42,6 +42,11 @@ class RelojesRuta {
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catRelojesControlador_1.default.VerificarPlantilla);
         // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
         this.router.post('/plantillaExcel/', verificarToken_1.TokenValidation, catRelojesControlador_1.default.CargaPlantillaRelojes);
+        /** ***************************************************************************************** **
+         ** **                                  ZONAS HORARIAS                                     ** **
+         ** ***************************************************************************************** **/
+        // METODO PARA BUSCAR ZONAS HORARIAS   **USADO
+        this.router.get('/zonas_horarias/buscar', verificarToken_1.TokenValidation, catRelojesControlador_1.default.BuscarZonasHorarias);
     }
 }
 const RELOJES_RUTA = new RelojesRuta();

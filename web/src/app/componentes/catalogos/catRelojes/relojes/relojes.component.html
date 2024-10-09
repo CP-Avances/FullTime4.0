@@ -230,6 +230,20 @@
                                     </mat-icon>
                                     <mat-error *ngIf="contraseniaF.invalid">Ingresar una contraseña válida.</mat-error>
                                 </mat-form-field>
+                                <mat-form-field>
+                                    <input type="text" placeholder="Zona horaria*" aria-label="Number" matInput
+                                        [formControl]="zonasF" [matAutocomplete]="auto" required>
+                                    <mat-autocomplete #auto="matAutocomplete">
+                                        <mat-option *ngFor="let option of filteredOptions | async"
+                                            [value]="option.nombre_general">
+                                            {{option.nombre_general}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Seleccionar la nacionalidad del colaborador.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
                             </div>
                         </div>
                     </div>

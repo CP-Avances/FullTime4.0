@@ -26,7 +26,8 @@ class RelojesControlador {
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, 
                 cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
-                e.nombre AS nomempresa, c.descripcion AS nomciudad, cr.temperatura
+                e.nombre AS nomempresa, c.descripcion AS nomciudad, cr.temperatura,
+                cr.zona_horaria_dispositivo, cr.formato_gmt_dispositivo
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
@@ -93,7 +94,7 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 var VERIFICAR_CODIGO;
@@ -110,10 +111,13 @@ class RelojesControlador {
                 if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura,
+                        zona_horaria_dispositivo, formato_gmt_dispositivo)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
                     `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
+                        formato_gmt_dispositivo
+                    ]);
                     const [reloj] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -139,6 +143,7 @@ class RelojesControlador {
                 }
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
@@ -164,7 +169,7 @@ class RelojesControlador {
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -202,17 +207,23 @@ class RelojesControlador {
                     yield database_1.default.query(`
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, temperatura = $15
-                    WHERE id = $16
+                        tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, temperatura = $15,
+                        zona_horaria_dispositivo = $16, formato_gmt_dispositivo = $17
+                    WHERE id = $18
                     `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, id_real]);
+                        tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
+                        formato_gmt_dispositivo, id_real]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ed_relojes',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
-                        datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}"}`,
+                        datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}",
+                     "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", 
+                     "fabricante": "${fabricante}", "mac": "${mac}", "tipo_conexion": "${tipo_conexion}", 
+                     "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}",
+                     "zona_horaria_dispositivo":"${zona_horaria_dispositivo}", "formato_gmt_dispositivo":"${formato_gmt_dispositivo}"}`,
                         ip: user_ip,
                         observacion: null
                     });
@@ -225,6 +236,7 @@ class RelojesControlador {
                 }
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
@@ -239,7 +251,7 @@ class RelojesControlador {
             SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tipo_conexion, cr.id_sucursal, cr.temperatura,
                 cr.id_departamento, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
-                e.nombre AS nomempresa, c.descripcion AS nomciudad
+                e.nombre AS nomempresa, c.descripcion AS nomciudad, cr.zona_horaria_dispositivo, cr.formato_gmt_dispositivo
             FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
@@ -760,6 +772,23 @@ class RelojesControlador {
                 // ROLLBACK SI HAY ERROR
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
+    /** ***************************************************************************************** **
+     ** **                                  ZONAS HORARIAS                                     ** **
+     ** ***************************************************************************************** **/
+    // METODO PARA BUSCAR ZONAS HORARIAS    **USADO
+    BuscarZonasHorarias(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ZONAS = yield database_1.default.query(`
+            SELECT * FROM ed_zonas_horarias;
+            `);
+            if (ZONAS.rowCount != 0) {
+                return res.jsonp(ZONAS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

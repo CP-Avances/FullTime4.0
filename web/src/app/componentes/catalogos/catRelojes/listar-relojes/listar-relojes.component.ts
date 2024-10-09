@@ -501,7 +501,7 @@ export class ListarRelojesComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
@@ -518,6 +518,7 @@ export class ListarRelojesComponent implements OnInit {
                 { text: 'Mac', style: 'tableHeader' },
                 { text: 'ID Fabricanción', style: 'tableHeader' },
                 { text: 'Fabricante', style: 'tableHeader' },
+                { text: 'Zona Horaria', style: 'tableHeader' },
               ],
               ...this.relojes.map((obj: any) => {
                 return [
@@ -535,6 +536,7 @@ export class ListarRelojesComponent implements OnInit {
                   { text: obj.mac, style: 'itemsTable' },
                   { text: obj.id_fabricacion, style: 'itemsTable' },
                   { text: obj.fabricante, style: 'itemsTable' },
+                  { text: obj.zona_horaria_dispositivo + ' (' + obj.formato_gmt_dispositivo + ')', style: 'itemsTable' }
                 ];
               })
             ]
@@ -615,6 +617,7 @@ export class ListarRelojesComponent implements OnInit {
           "mac": obj.mac,
           "id_fabricacion": obj.id_fabricacion,
           "fabricante": obj.fabricante,
+          "zona_horaria": obj.zona_horaria_dispositivo + ' (' + obj.formato_gmt_dispositivo + ')'
         }
       }
       arregloRelojes.push(objeto)
