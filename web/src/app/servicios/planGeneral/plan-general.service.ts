@@ -13,7 +13,7 @@ export class PlanGeneralService {
 
   // METODO PARA CREAR PLAN GENERAL   **USADO
   CrearPlanGeneral(datos: any) {
-    return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
+    return this.http.post<any>(`${environment.url}/planificacion_general/cargar-planificacion`, datos);
   }
 
   // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO

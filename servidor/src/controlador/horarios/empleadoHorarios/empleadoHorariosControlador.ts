@@ -10,6 +10,8 @@ class EmpleadoHorariosControlador {
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
     public async VerificarHorariosExistentes(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal } = req.body;
+
+        console.log(" ver body", req.body);
         const { id_empleado } = req.params;
         const HORARIO = await pool.query(
             `
@@ -26,6 +28,27 @@ class EmpleadoHorariosControlador {
             return res.status(404).jsonp({ text: 'Registros no encontrados.' });
         }
     }
+
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
+    public async VerificarHorariosExistentes2(req: Request, res: Response): Promise<any> {
+        const { fechaInicio, fechaFinal, ids } = req.body;
+        console.log("ver body", req.body);
+        const HORARIO = await pool.query(
+            `
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_, pg.id_empleado
+            FROM eu_asistencia_general AS pg, eh_cat_horarios AS ch
+            WHERE pg.id_empleado = ANY($3) AND pg.id_horario = ch.id AND
+                (fecha_horario BETWEEN $1 AND $2)
+            `
+            , [fechaInicio, fechaFinal, ids]);
+        if (HORARIO.rowCount != 0) {
+            return res.jsonp(HORARIO.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+        }
+    }
+
 
 
     // METODO PARA CONSULTAR HORARIO DEL USUARIO POR DIAS-HORAS Y NUMERO DE HORAS DE TRABAJO EN EL MISMO DIA (MD)
@@ -197,9 +220,30 @@ class EmpleadoHorariosControlador {
             return res.status(200).jsonp({ message: 'CASO_4', respuesta: CASO_4 });
         }
     }
+    // VERIFICAR EXISTENCIA DE PLANIFICACION PARA VARIOS EMPLEADOS
+    public async VerificarFechasHorario(req: Request, res: Response): Promise<any> {
+        const { fechaInicio, fechaFinal, id_horario, ids } = req.body; // 'ids' es un array de id_empleado
+
+        // Consulta para verificar planificaciones duplicadas
+        const HORARIOS = await pool.query(
+            `
+        SELECT DISTINCT id_empleado FROM eu_asistencia_general 
+        WHERE id_empleado = ANY($3) AND id_horario = $4 AND
+            (fecha_horario BETWEEN $1 AND $2)
+        `
+            , [fechaInicio, fechaFinal, ids, id_horario]);
+
+        if (HORARIOS.rowCount != 0) {
+            // Devolver solo los id_empleado que tienen registros duplicados
+            const duplicados = HORARIOS.rows.map((row: any) => row.id_empleado);
+            return res.jsonp({ duplicados });
+        } else {
+            return res.status(404).jsonp({ text: 'Registros no encontrados' });
+        }
+    }
 
     // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
-    public async VerificarFechasHorario(req: Request, res: Response): Promise<any> {
+    public async VerificarFechasHorario2(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id_horario } = req.body;
         const { id_empleado } = req.params;
         const HORARIO = await pool.query(
@@ -215,6 +259,45 @@ class EmpleadoHorariosControlador {
         else {
             return res.status(404).jsonp({ text: 'Registros no encontrados' });
         }
+    }
+
+    public async BuscarFechasMultiples(req: Request, res: Response): Promise<any> {
+        try {
+            const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
+            const resultados: any[] = []; // Arreglo para almacenar los resultados
+    
+            for (const obj of usuarios_validos) {
+                for (const eh of eliminar_horarios) {
+                    // Llamar a BuscarFechas y almacenar el resultado en una variable
+                    const filas = await this.BuscarFechas(fec_inicio, fec_final, eh.id, obj.id);
+                    
+                    // Verificar si se encontraron filas y agregarlas al arreglo
+                    if (filas && filas.length > 0) {
+                        resultados.push(...filas); // Agregar las filas al arreglo de resultados
+                    }
+                }
+            }
+    
+            // Aquí podrías hacer algo con el arreglo de resultados, por ejemplo, devolverlo en la respuesta
+            return res.json(resultados);
+    
+        } catch (error) {
+            console.error('Error al registrar la planificación horaria:', error);
+            return res.status(500).json({ message: 'Error al registrar la planificación horaria' });
+        }
+    }
+
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
+    public async BuscarFechas(fec_inicio: string, fec_final: string, id_horario: number, id_empleado: number): Promise<any> {
+        const FECHAS = await pool.query(
+            `
+            SELECT id FROM eu_asistencia_general 
+            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+            `
+            , [fec_inicio, fec_final, id_horario, id_empleado]);
+
+        return FECHAS.rows;
+
     }
 
 

@@ -38,8 +38,11 @@ class FeriadosRuta {
         this.router.get('/:id', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.ObtenerUnFeriado);
         // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados/ciudad', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FeriadosCiudad);
+        this.router.post('/listar-feriados/ciudad2', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FeriadosCiudad2);
         // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados-recuperar/ciudad', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FeriadosRecuperacionCiudad);
+        // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
+        this.router.post('/listar-feriados-recuperar/ciudad2', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FeriadosRecuperacionCiudad2);
         // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos);
         // METODO PARA REGISTRAR DATOS DE FERIADOS DE PLANTILLA   **USADO

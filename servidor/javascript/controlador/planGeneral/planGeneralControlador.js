@@ -17,6 +17,77 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
+    constructor() {
+        this.partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
+        this.contador = 0;
+        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let errores = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            // const { user_name, ip, plan_general } = req.body;
+            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+            console.log("ver parteIndex", parteIndex);
+            console.log("ver totalPartes", totalPartes);
+            if (!this.partesRecibidas) {
+                this.partesRecibidas = [];
+            } // Inicializar si no está definida
+            this.contador++;
+            this.partesRecibidas.push(...parte);
+            //const partesValidas = this.partesRecibidas.filter(p => p !== undefined);
+            if ((parteIndex + 1) === totalPartes) {
+                for (let i = 0; i < this.partesRecibidas.length; i++) {
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const result = yield database_1.default.query(`
+                        INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                            fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                            minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        `, [
+                            this.partesRecibidas[i].fec_hora_horario, this.partesRecibidas[i].tolerancia, this.partesRecibidas[i].estado_timbre,
+                            this.partesRecibidas[i].id_det_horario, this.partesRecibidas[i].fec_horario, this.partesRecibidas[i].id_empl_cargo,
+                            this.partesRecibidas[i].tipo_entr_salida, this.partesRecibidas[i].id_empleado, this.partesRecibidas[i].id_horario, this.partesRecibidas[i].tipo_dia,
+                            this.partesRecibidas[i].salida_otro_dia, this.partesRecibidas[i].min_antes, this.partesRecibidas[i].min_despues, this.partesRecibidas[i].estado_origen,
+                            this.partesRecibidas[i].min_alimentacion
+                        ]);
+                        const [plan] = result.rows;
+                        const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(this.partesRecibidas[i].fec_hora_horario.split(' ')[1]);
+                        const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(this.partesRecibidas[i].fec_hora_horario, 'ddd');
+                        const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(this.partesRecibidas[i].fec_horario, 'ddd');
+                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                        plan.fecha_horario = fecha_horario;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(plan),
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                        ocurrioError = true;
+                        mensajeError = error.message;
+                        codigoError = 500;
+                        errores++;
+                        break;
+                    }
+                }
+                return res.status(200).jsonp({ message: 'OK' });
+            }
+            else {
+                return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + 'de: ' + totalPartes });
+            }
+        });
+    }
     // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -83,6 +154,121 @@ class PlanGeneralControlador {
             }
         });
     }
+    /*
+        public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
+            let errores: number = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+    
+            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+    
+            console.log("ver parteIndex", parteIndex);
+            console.log("ver totalPartes", totalPartes);
+    
+            if (!this.partesRecibidas) {
+                this.partesRecibidas = [];
+            }
+    
+            this.partesRecibidas.push(...parte);
+    
+            // Procesar todas las partes cuando se recibe la última parte
+            if ((parteIndex + 1) === totalPartes) {
+                try {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+    
+                    // Crear un array para los valores y la consulta de inserción
+                    const valores: string[] = [];
+                    const params: any[] = [];
+    
+                    // Construir la consulta de inserción por lotes
+                    this.partesRecibidas.forEach((parte: any, index: any) => {
+                        const idx = index * 15; // Asumiendo que tienes 15 columnas a insertar
+                        valores.push(`($${idx + 1},
+                        $${idx + 2}, $${idx + 3},
+                         $${idx + 4}, $${idx + 5},
+                          $${idx + 6}, $${idx + 7},
+                           $${idx + 8}, $${idx + 9},
+                           $${idx + 10}, $${idx + 11},
+                            $${idx + 12}, $${idx + 13},
+                             $${idx + 14}, $${idx + 15})`);
+    
+                        // Agregar los parámetros
+                        params.push(
+                            parte.fec_hora_horario,
+                            parte.tolerancia,
+                            parte.estado_timbre,
+                            parte.id_det_horario,
+                            parte.fec_horario,
+                            parte.id_empl_cargo,
+                            parte.tipo_entr_salida,
+                            parte.id_empleado,
+                            parte.id_horario,
+                            parte.tipo_dia,
+                            parte.salida_otro_dia,
+                            parte.min_antes,
+                            parte.min_despues,
+                            parte.estado_origen,
+                            parte.min_alimentacion
+                        );
+                    });
+    
+                    // Formar la consulta final
+                    const consulta = `
+                    INSERT INTO eu_asistencia_general (
+                        fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
+                        id_horario, tipo_dia, salida_otro_dia, minutos_antes,
+                        minutos_despues, estado_origen, minutos_alimentacion
+                    ) VALUES ${valores.join(', ')} RETURNING *
+                `;
+    
+                    const result = await pool.query(consulta, params);
+    
+                    // Manejar la respuesta de las inserciones
+                    const insertedRows = result.rows;
+    
+                    // Realiza la auditoría por cada registro insertado (opcional)
+                    for (const plan of insertedRows) {
+                        const fecha_hora_horario1 = await FormatearHora(plan.fecha_hora_horario.split(' ')[1]);
+                        const fecha_hora_horario = await FormatearFecha2(plan.fecha_hora_horario, 'ddd');
+                        const fecha_horario = await FormatearFecha2(plan.fecha_horario, 'ddd');
+    
+                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                        plan.fecha_horario = fecha_horario;
+    
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(plan),
+                            ip,
+                            observacion: null
+                        });
+                    }
+    
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+    
+                    return res.status(200).jsonp({ message: 'OK', insertedRows });
+                } catch (error) {
+                    // REVERTIR TRANSACCION
+                    await pool.query('ROLLBACK');
+                    ocurrioError = true;
+                    mensajeError = error.message;
+                    codigoError = 500;
+                    errores++;
+                    return res.status(codigoError).jsonp({ message: mensajeError });
+                }
+            } else {
+                return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + ' de: ' + totalPartes });
+            }
+        };
+    
+    */
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     BuscarFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

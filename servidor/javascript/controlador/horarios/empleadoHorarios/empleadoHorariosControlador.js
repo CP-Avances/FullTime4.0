@@ -19,6 +19,7 @@ class EmpleadoHorariosControlador {
     VerificarHorariosExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal } = req.body;
+            console.log(" ver body", req.body);
             const { id_empleado } = req.params;
             const HORARIO = yield database_1.default.query(`
             SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_  
@@ -26,6 +27,25 @@ class EmpleadoHorariosControlador {
             WHERE pg.id_empleado = $3 AND pg.id_horario = ch.id AND
                 (fecha_horario BETWEEN $1 AND $2)
             `, [fechaInicio, fechaFinal, id_empleado]);
+            if (HORARIO.rowCount != 0) {
+                return res.jsonp(HORARIO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  **USADO
+    VerificarHorariosExistentes2(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { fechaInicio, fechaFinal, ids } = req.body;
+            console.log("ver body", req.body);
+            const HORARIO = yield database_1.default.query(`
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_, pg.id_empleado
+            FROM eu_asistencia_general AS pg, eh_cat_horarios AS ch
+            WHERE pg.id_empleado = ANY($3) AND pg.id_horario = ch.id AND
+                (fecha_horario BETWEEN $1 AND $2)
+            `, [fechaInicio, fechaFinal, ids]);
             if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows);
             }
@@ -175,8 +195,28 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
+    // VERIFICAR EXISTENCIA DE PLANIFICACION PARA VARIOS EMPLEADOS
     VerificarFechasHorario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { fechaInicio, fechaFinal, id_horario, ids } = req.body; // 'ids' es un array de id_empleado
+            // Consulta para verificar planificaciones duplicadas
+            const HORARIOS = yield database_1.default.query(`
+        SELECT DISTINCT id_empleado FROM eu_asistencia_general 
+        WHERE id_empleado = ANY($3) AND id_horario = $4 AND
+            (fecha_horario BETWEEN $1 AND $2)
+        `, [fechaInicio, fechaFinal, ids, id_horario]);
+            if (HORARIOS.rowCount != 0) {
+                // Devolver solo los id_empleado que tienen registros duplicados
+                const duplicados = HORARIOS.rows.map((row) => row.id_empleado);
+                return res.jsonp({ duplicados });
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados' });
+            }
+        });
+    }
+    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
+    VerificarFechasHorario2(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal, id_horario } = req.body;
             const { id_empleado } = req.params;
@@ -191,6 +231,40 @@ class EmpleadoHorariosControlador {
             else {
                 return res.status(404).jsonp({ text: 'Registros no encontrados' });
             }
+        });
+    }
+    BuscarFechasMultiples(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
+                const resultados = []; // Arreglo para almacenar los resultados
+                for (const obj of usuarios_validos) {
+                    for (const eh of eliminar_horarios) {
+                        // Llamar a BuscarFechas y almacenar el resultado en una variable
+                        const filas = yield this.BuscarFechas(fec_inicio, fec_final, eh.id, obj.id);
+                        // Verificar si se encontraron filas y agregarlas al arreglo
+                        if (filas && filas.length > 0) {
+                            resultados.push(...filas); // Agregar las filas al arreglo de resultados
+                        }
+                    }
+                }
+                // Aquí podrías hacer algo con el arreglo de resultados, por ejemplo, devolverlo en la respuesta
+                return res.json(resultados);
+            }
+            catch (error) {
+                console.error('Error al registrar la planificación horaria:', error);
+                return res.status(500).json({ message: 'Error al registrar la planificación horaria' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
+    BuscarFechas(fec_inicio, fec_final, id_horario, id_empleado) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const FECHAS = yield database_1.default.query(`
+            SELECT id FROM eu_asistencia_general 
+            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+            `, [fec_inicio, fec_final, id_horario, id_empleado]);
+            return FECHAS.rows;
         });
     }
 }
