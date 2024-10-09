@@ -48,6 +48,18 @@ mat-form-field {
     padding: 10px 10px 0px 10px;
 }
 
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    mat-form-field {
+        width: 100%;
+        padding: 0px;
+    }
+
+    .container{
+        padding: auto;
+    }
+}
+
 #formulario {
     padding: 0px 10px 0px 0px;
     width: 230px;
