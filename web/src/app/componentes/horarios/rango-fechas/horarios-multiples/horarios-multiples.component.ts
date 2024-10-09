@@ -1419,14 +1419,23 @@ export class HorariosMultiplesComponent implements OnInit {
       };
 
       this.restP.CrearPlanGeneral(datosParcial).subscribe(res => {
+
         if (res.message === 'OK') {
-          // Manejar éxito para cada parte
-          console.log(`Parte ${index} guardada exitosamente.`);
+          this.cargar = true;
+          this.guardar = false;
+          this.toastr.success(
+            'Operación exitosa.', 'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
+            timeOut: 6000,
+          })
         } else {
           // Manejar error para cada parte
+          console.log(res.message);
+
+          /*
           this.toastr.error('Ups!!! algo salió mal.', '', {
             timeOut: 6000,
           });
+          */
         }
       });
     });
@@ -1434,7 +1443,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   dividirPlanGeneral(plan_general: any[]): any[][] {
     const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
-    const tamañoParte = 100000; // Ajusta el tamaño de cada parte según sea necesario
+    const tamañoParte = 90000; // Ajusta el tamaño de cada parte según sea necesario
     // Verifica si el tamaño total es menor que el tamaño de cada parte
     if (plan_general.length <= tamañoParte) {
       return [plan_general]; // Devuelve el array original como la única parte
