@@ -13,6 +13,11 @@ export class PlanGeneralService {
 
   // METODO PARA CREAR PLAN GENERAL   **USADO
   CrearPlanGeneral(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
+  }
+
+  // METODO PARA CREAR PLAN GENERAL   **USADO
+  CrearPlanGeneral2(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/cargar-planificacion`, datos);
   }
 

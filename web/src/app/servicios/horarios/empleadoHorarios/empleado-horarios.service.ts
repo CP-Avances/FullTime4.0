@@ -27,7 +27,7 @@ export class EmpleadoHorariosService {
   }
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
   VerificarHorariosExistentes(id_empleado: string, datos: any) {
-    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes/${id_empleado}`, datos);
+    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes1/${id_empleado}`, datos);
   }
 
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO

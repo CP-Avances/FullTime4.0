@@ -1418,7 +1418,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
       };
 
-      this.restP.CrearPlanGeneral(datosParcial).subscribe(res => {
+      this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
 
         if (res.message === 'OK') {
           this.cargar = true;
