@@ -29,6 +29,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   @Input() datosSeleccionados: any;
 
+
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl;
   fechaFinalF = new FormControl();
@@ -70,6 +71,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA INCIALIZAR VARIABLES
   InicialiciarDatos() {
     let index = 0;
+    console.log("ver datos seleccionados: ", this.datosSeleccionados)
     this.datosSeleccionados.usuarios.forEach((obj: any) => {
       obj.asignado = [];
       obj.existencias = [];
@@ -469,8 +471,8 @@ export class PlanificacionMultipleComponent implements OnInit {
     let fecha = dia + '-' + mes
 
     let fechas = {
-      fechaInicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-      fechaFinal: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+      fechaInicio: moment(fecha, 'DD-MM-YYYY').format('YYYY-MM-DD'),
+      fechaFinal: moment(fecha, 'DD-MM-YYYY').format('YYYY-MM-DD')
     };
 
     this.horario.VerificarHorariosExistentes(id_empleado, fechas).subscribe(existe => {
@@ -830,6 +832,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA ASIGNAR FERIADO
   AsignarFeriado(feriado: any, usuario: any) {
+    console.log("ver feriado: ", feriado)
     const [datoHorario] = this.horarios.filter((o: any) => {
       return o.default_ === 'DFD';
     })
@@ -889,48 +892,60 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
   }
 
+  feriados2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FERIADOS
-  BuscarFeriados(inicio: any, fin: any, validos: any, verificar: boolean) {
+  async BuscarFeriados(inicio: any, fin: any, validos: any, verificar: boolean) {
     let cont = 0;
-    validos.forEach((val: any) => {
-      let datos = {
-        fecha_inicio: inicio,
-        fecha_final: fin,
-        id_empleado: val.id
-      }
-      this.feriado.ListarFeriadosCiudad(datos).subscribe(fer => {
+    const ids = validos.map((dh: any) => dh.id);
+    let datos = {
+      fecha_inicio: inicio,
+      fecha_final: fin,
+      ids
+    }
+    await this.feriado.ListarFeriadosCiudad2(datos).subscribe(data => {
+      console.log("Ver feriados2-----------------------------------: ", data);
+      data.forEach(feriado => {
+        if (!this.feriados2[feriado.id]) {
+          this.feriados2[feriado.id] = [feriado]
+        } else {
+          this.feriados2[feriado.id].push(feriado);
+        }
+      })
+      console.log("Ver feriados2 armado -----------------------------------: ", this.feriados2);
+
+      validos.forEach((val: any) => {
         cont = cont + 1;
-        let feriado: any = [];
-        feriado = fer;
-        feriado.forEach((f: any) => {
-          for (var a = 0; a < val.asignado.length; a++) {
-            if (val.asignado[a].dia === parseInt(moment(f.fecha).format('D'))) {
-              // SI EL HORARIO ASIGNADO ES DE TIPO LABORABLE SE RETIRA DE LA LISTA
-              if (val.asignado[a].tipo_dia != 'FD' && val.asignado[a].tipo_dia != 'L') {
-                val.asignado.splice(a, 1);
+        if (this.feriados2[val.id]) {
+          this.feriados2[val.id].forEach((f: any) => {
+            for (var a = 0; a < val.asignado.length; a++) {
+              if (val.asignado[a].dia === parseInt(moment(f.fecha).format('D'))) {
+                // SI EL HORARIO ASIGNADO ES DE TIPO LABORABLE SE RETIRA DE LA LISTA
+                if (val.asignado[a].tipo_dia != 'FD' && val.asignado[a].tipo_dia != 'L') {
+                  val.asignado.splice(a, 1);
+                }
               }
             }
-          }
-        })
-
-        this.AsignarFeriado(feriado, val);
-
-        if (cont === validos.length) {
-          this.datosSeleccionados.usuario = validos;
-          this.CrearDataHorario(validos, verificar);
+          })
+          this.AsignarFeriado(this.feriados2[val.id], val);
         }
-      }, vacio => {
-        cont = cont + 1;
+
         if (cont === validos.length) {
           this.datosSeleccionados.usuario = validos;
           this.CrearDataHorario(validos, verificar);
         }
       })
-    })
+    }, vacio => {
+      if (cont === validos.length) {
+        this.datosSeleccionados.usuario = validos;
+        this.CrearDataHorario(validos, verificar);
+      }
+    }
+    )
   }
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
   plan_general: any = [];
+
   CrearDataHorario(lista: any, validar: boolean) {
     var contador = 0;
     var asignados = 0;
@@ -944,41 +959,51 @@ export class PlanificacionMultipleComponent implements OnInit {
     if (lista.length != 0) {
 
       lista.forEach((li: any) => {
+        const ids_horario = li.asignado.map((asig: any) => asig.id_horario);
+        let horarios2: { [key: number]: any } = {};
+        this.restD.ConsultarUnDetalleHorario2({ ids_horario }).subscribe(det1 => {
+          det1.forEach(horario => {
+            if (!horarios2[horario.id]) {
+              horarios2[horario.id] = [horario]
+            } else {
+              horarios2[horario.id].push(horario);
+            }
+          })
 
-        li.asignado.forEach((asig: any) => {
-          asig.rango = '';
-          let dia_tipo = '';
-          let origen = '';
-          let tipo: any = null;
-          if (asig.tipo_dia === 'DFD') {
-            dia_tipo = 'FD';
-            origen = 'FD';
-            tipo = 'FD';
-          }
-          else if (asig.tipo_dia === 'DL') {
-            dia_tipo = 'L';
-            origen = 'L';
-            tipo = 'L';
-          }
-          else if (asig.tipo_dia === 'FD') {
-            dia_tipo = 'FD';
-            origen = 'HFD';
-            tipo = 'FD';
-          }
-          else if (asig.tipo_dia === 'L') {
-            dia_tipo = 'L';
-            origen = 'HL';
-            tipo = 'L';
-          }
-          else {
-            dia_tipo = 'N';
-            origen = 'N';
-          }
-
-          this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
+          li.asignado.forEach((asig: any) => {
             contador = contador + 1;
-            // COLOCAR DETALLE DE DIA SEGUN HORARIO
-            det.map((element: any) => {
+
+            asig.rango = '';
+            let dia_tipo = '';
+            let origen = '';
+            let tipo: any = null;
+
+            if (asig.tipo_dia === 'DFD') {
+              dia_tipo = 'FD';
+              origen = 'FD';
+              tipo = 'FD';
+            }
+            else if (asig.tipo_dia === 'DL') {
+              dia_tipo = 'L';
+              origen = 'L';
+              tipo = 'L';
+            }
+            else if (asig.tipo_dia === 'FD') {
+              dia_tipo = 'FD';
+              origen = 'HFD';
+              tipo = 'FD';
+            }
+            else if (asig.tipo_dia === 'L') {
+              dia_tipo = 'L';
+              origen = 'HL';
+              tipo = 'L';
+            }
+            else {
+              dia_tipo = 'N';
+              origen = 'N';
+            }
+
+            horarios2[asig.id_horario].map((element: any) => {
               var accion = 0;
               var nocturno: number = 0;
               if (element.tipo_accion === 'E') {
@@ -993,7 +1018,6 @@ export class PlanificacionMultipleComponent implements OnInit {
               else {
                 nocturno = 0;
               }
-
               let plan = {
                 id_empleado: li.id,
                 tipo_dia: dia_tipo,
@@ -1020,7 +1044,6 @@ export class PlanificacionMultipleComponent implements OnInit {
               // ALMACENAMIENTO DE PLANIFICACION GENERAL
               this.plan_general = this.plan_general.concat(plan);
             })
-
             if (contador === asignados) {
               if (validar === true) {
                 this.ValidarRangos(this.plan_general)

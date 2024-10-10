@@ -421,26 +421,24 @@ class ContratoEmpleadoControlador {
         });
     }
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-    /*
-    public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
-        const { id_empleado } = req.body;
-        const FECHA = await pool.query(
-            `
+    EncontrarFechaContrato(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const FECHA = yield database_1.default.query(`
             SELECT cv.id_contrato, ec.fecha_ingreso, ec.fecha_salida
             FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec
             WHERE cv.id_empleado = $1 AND ec.id = cv.id_contrato
-            `
-            , [id_empleado]);
-        if (FECHA.rowCount != 0) {
-            return res.jsonp(FECHA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
+            `, [id_empleado]);
+            if (FECHA.rowCount != 0) {
+                return res.jsonp(FECHA.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
     }
-*/
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-    EncontrarFechaContrato(req, res) {
+    EncontrarFechaContratoUsuarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { ids } = req.body;

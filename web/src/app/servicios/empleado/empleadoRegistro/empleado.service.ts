@@ -268,6 +268,10 @@ export class EmpleadoService {
   BuscarFechaContrato(datos: any) {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha`, datos);
   }
+  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
+  BuscarFechaContratoUsuarios(datos: any) {
+    return this.http.post(`${environment.url}/contratoEmpleado/buscarFechaUsuarios`, datos);
+  }
 
   // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
   BuscarEmpleadoNombre(data: any) {
@@ -323,13 +327,13 @@ export class EmpleadoService {
     );
   }
 
-  ObtenerContratosCargos(data: any){
+  ObtenerContratosCargos(data: any) {
     return this.http.post<any>(`${environment.url}/empleado/infoContratoCargos`, data).pipe(
       catchError(error => {
         return of({ error: true, message: error.error.message });
       })
     );
-    
+
   }
 
 
