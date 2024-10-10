@@ -74,20 +74,20 @@ export class PlanHoraExtraComponent implements OnInit {
     public componenteb: ListaEmplePlanHoraEComponent,
     public validar: ValidacionesService,
     public aviso: RealTimeService,
-    public ventana: MatDialogRef<PlanHoraExtraComponent>,
+
     private restPE: PlanHoraExtraService,
     private toastr: ToastrService,
     private parametro: ParametrosService,
-    @Optional() @Inject(MAT_DIALOG_DATA) public datos: any
+
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    if (this.datos) {
+  /*  if (this.datos) {
       this.data = this.datos;
-    }
+    }*/
 
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -437,7 +437,7 @@ export class PlanHoraExtraComponent implements OnInit {
     this.componenteb.ver_busqueda = true;
     this.componenteb.ver_planificar = false;
     this.componenteb.LimpiarFormulario();
-    this.ventana.close();
+   // this.ventana.close();
   }
 
 }
