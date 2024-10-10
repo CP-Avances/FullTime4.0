@@ -256,16 +256,19 @@ class PlanGeneralControlador {
                     return res.status(200).jsonp({ message: 'OK', insertedRows });
                 } catch (error) {
                     // REVERTIR TRANSACCION
+                    
                     await pool.query('ROLLBACK');
                     ocurrioError = true;
                     mensajeError = error.message;
                     codigoError = 500;
                     errores++;
                     return res.status(codigoError).jsonp({ message: mensajeError });
-                }
+                    
+                   console.log("ver el error ",)
+    }
             } else {
-                return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + ' de: ' + totalPartes });
-            }
+        return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + ' de: ' + totalPartes });
+    }
         };
     
     */

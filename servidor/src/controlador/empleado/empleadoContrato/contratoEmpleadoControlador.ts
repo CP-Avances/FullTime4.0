@@ -460,7 +460,7 @@ class ContratoEmpleadoControlador {
     }
 
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-    /*
+    
     public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
@@ -477,10 +477,10 @@ class ContratoEmpleadoControlador {
             return res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
-*/
+
     
       // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-    public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
+    public async EncontrarFechaContratoUsuarios(req: Request, res: Response): Promise<any> {
         try{
             const { ids } = req.body;
             const FECHA = await pool.query(

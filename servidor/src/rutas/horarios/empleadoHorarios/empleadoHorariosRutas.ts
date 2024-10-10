@@ -12,7 +12,7 @@ class EmpleadoHorariosRutas {
     configuracion(): void {
 
         // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS  **USADO                     
-        this.router.post('/horarios-existentes/:id_empleado', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.VerificarHorariosExistentes);
+        this.router.post('/horarios-existentes1/:id_empleado', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.VerificarHorariosExistentes);
         this.router.post('/horarios-existentes', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.VerificarHorariosExistentes2);
 
         // METODO PARA OBTENER HORARIO DEL USUARIO POR HORAS EN EL MISMO DIA
