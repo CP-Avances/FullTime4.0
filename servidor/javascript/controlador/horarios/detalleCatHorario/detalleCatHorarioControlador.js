@@ -67,13 +67,13 @@ class DetalleCatalogoHorarioControlador {
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
     ListarUnDetalleTodosHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_horario } = req.body;
+            const { ids_horario } = req.body;
             const HORARIO = yield database_1.default.query(`
             SELECT dh.*, cg.minutos_comida
             FROM eh_detalle_horarios AS dh, eh_cat_horarios AS cg
             WHERE dh.id_horario = cg.id AND dh.id_horario = ANY($1)
             ORDER BY orden ASC
-            `, [id_horario])
+            `, [ids_horario])
                 .then((result) => {
                 if (result.rowCount === 0)
                     return [];

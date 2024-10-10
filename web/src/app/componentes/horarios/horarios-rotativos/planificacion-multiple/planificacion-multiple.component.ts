@@ -959,14 +959,16 @@ export class PlanificacionMultipleComponent implements OnInit {
     if (lista.length != 0) {
 
       lista.forEach((li: any) => {
-        const ids_horario = li.asignado.map((asig: any) => asig.id_horario);
+        let ids_horario = []
+        ids_horario = li.asignado.map((asig: any) => asig.id_horario);
         let horarios2: { [key: number]: any } = {};
         this.restD.ConsultarUnDetalleHorario2({ ids_horario }).subscribe(det1 => {
+          console.log("ver detalles de horarios", det1 )
           det1.forEach(horario => {
-            if (!horarios2[horario.id]) {
-              horarios2[horario.id] = [horario]
+            if (!horarios2[horario.id_horario]) {
+              horarios2[horario.id_horario] = [horario]
             } else {
-              horarios2[horario.id].push(horario);
+              horarios2[horario.id_horario].push(horario);
             }
           })
 
@@ -1044,6 +1046,109 @@ export class PlanificacionMultipleComponent implements OnInit {
               // ALMACENAMIENTO DE PLANIFICACION GENERAL
               this.plan_general = this.plan_general.concat(plan);
             })
+            if (contador === asignados) {
+              if (validar === true) {
+                this.ValidarRangos(this.plan_general)
+              }
+            }
+          })
+        })
+      })
+    }
+  }
+
+
+  CrearDataHorario2(lista: any, validar: boolean) {
+    var contador = 0;
+    var asignados = 0;
+
+    lista.forEach((li: any) => {
+      asignados = asignados + li.asignado.length;
+    })
+
+    this.plan_general = [];
+
+    if (lista.length != 0) {
+
+      lista.forEach((li: any) => {
+
+        li.asignado.forEach((asig: any) => {
+          asig.rango = '';
+          let dia_tipo = '';
+          let origen = '';
+          let tipo: any = null;
+          if (asig.tipo_dia === 'DFD') {
+            dia_tipo = 'FD';
+            origen = 'FD';
+            tipo = 'FD';
+          }
+          else if (asig.tipo_dia === 'DL') {
+            dia_tipo = 'L';
+            origen = 'L';
+            tipo = 'L';
+          }
+          else if (asig.tipo_dia === 'FD') {
+            dia_tipo = 'FD';
+            origen = 'HFD';
+            tipo = 'FD';
+          }
+          else if (asig.tipo_dia === 'L') {
+            dia_tipo = 'L';
+            origen = 'HL';
+            tipo = 'L';
+          }
+          else {
+            dia_tipo = 'N';
+            origen = 'N';
+          }
+
+          this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
+            console.log("ver horarios detallado", det)
+            contador = contador + 1;
+            // COLOCAR DETALLE DE DIA SEGUN HORARIO
+            det.map((element: any) => {
+              var accion = 0;
+              var nocturno: number = 0;
+              if (element.tipo_accion === 'E') {
+                accion = element.tolerancia;
+              }
+              if (element.segundo_dia === true) {
+                nocturno = 1;
+              }
+              else if (element.tercer_dia === true) {
+                nocturno = 2;
+              }
+              else {
+                nocturno = 0;
+              }
+
+              let plan = {
+                id_empleado: li.id,
+                tipo_dia: dia_tipo,
+                min_antes: element.minutos_antes,
+                tolerancia: accion,
+                id_horario: element.id_horario,
+                min_despues: element.minutos_despues,
+                fec_horario: asig.fecha,
+                estado_origen: origen,
+                estado_timbre: tipo,
+                id_empl_cargo: li.id_cargo,
+                id_det_horario: element.id,
+                salida_otro_dia: nocturno,
+                tipo_entr_salida: element.tipo_accion,
+                fec_hora_horario: asig.fecha + ' ' + element.hora,
+                min_alimentacion: element.minutos_comida,
+              };
+              if (element.segundo_dia === true) {
+                plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+              }
+              if (element.tercer_dia === true) {
+                plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+              }
+              // ALMACENAMIENTO DE PLANIFICACION GENERAL
+              this.plan_general = this.plan_general.concat(plan);
+            })
+
             if (contador === asignados) {
               if (validar === true) {
                 this.ValidarRangos(this.plan_general)
