@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class DatosGeneralesControlador {
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    
+    // METODO PARA LEER DATOS DEL USUARIO   
     BuscarDataGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM informacion_general2 AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [estado]).then((result) => { return result.rows; });
@@ -62,7 +62,7 @@ class DatosGeneralesControlador {
             return res.status(200).jsonp(resultados);
         });
     }
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR POR ROL **USADO
+    // METODO PARA LEER DATOS PERFIL **USADO
     BuscarDataGeneralRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;

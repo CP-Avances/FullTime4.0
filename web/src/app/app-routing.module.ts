@@ -43,7 +43,6 @@ import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/rango-f
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 // MODULO  --PERMISOS
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
-import { PermisosMultiplesComponent } from './componentes/modulos/permisos/multiples/permisos-multiples/permisos-multiples.component';
 import { ListarEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
 import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
 // MODULO  --VACACIONES
@@ -144,6 +143,7 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
+import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 
 const routes: Routes = [
 
@@ -198,7 +198,7 @@ const routes: Routes = [
 
   // MODULO  --PERMISOS
   { path: 'verTipoPermiso', component: VistaElementosComponent, canActivate: [AuthGuard] },
-  { path: 'permisosMultiples', component: PermisosMultiplesComponent, canActivate: [AuthGuard] },
+  { path: 'permisosMultiples', component: PermisosMultiplesEmpleadosComponent, canActivate: [AuthGuard] },
   { path: 'permisos-solicitados', component: ListarEmpleadoPermisoComponent, canActivate: [AuthGuard] },
 
   // MODULO  --VACACIONES

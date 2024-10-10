@@ -15,7 +15,6 @@ import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-permisos-multiples-empleados',
@@ -126,7 +125,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     private toastr: ToastrService,
     private validar: ValidacionesService,
     private funciones: MainNavService,
-    private restUsuario: UsuarioService,
     private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
