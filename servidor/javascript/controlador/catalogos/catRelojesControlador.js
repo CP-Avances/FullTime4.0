@@ -317,6 +317,7 @@ class RelojesControlador {
                         numero_serie: '',
                         direccion_mac: '',
                         contrasena: '',
+                        zona_horaria: '',
                         observacion: ''
                     };
                     var listDispositivos = [];
@@ -333,7 +334,7 @@ class RelojesControlador {
                     const regex = /^[0-9]+$/;
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla_dispositivos.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO, CODIGO, DIRECCION_IP, PUERTO, TIPO_CONEXION, TEMPERATURA, MARCA, MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA } = dato;
+                        var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO, CODIGO, DIRECCION_IP, PUERTO, TIPO_CONEXION, TEMPERATURA, MARCA, MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA, ZONA_HORARIA } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
                             (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
@@ -342,7 +343,8 @@ class RelojesControlador {
                             (TEMPERATURA != undefined && TEMPERATURA != '') && (MARCA != undefined && MARCA != '') &&
                             (MODELO != undefined && MODELO != '') && (ID_FABRICANTE != undefined && ID_FABRICANTE != '') &&
                             (FABRICANTE != undefined && FABRICANTE != '') && (NUMERO_SERIE != undefined && NUMERO_SERIE != '') &&
-                            (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '')) {
+                            (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '') &&
+                            (ZONA_HORARIA != undefined && ZONA_HORARIA != '')) {
                             data.fila = ITEM;
                             data.establecimiento = ESTABLECIMIENTO;
                             data.departamento = DEPARTAMENTO;
@@ -359,6 +361,7 @@ class RelojesControlador {
                             data.numero_serie = NUMERO_SERIE;
                             data.direccion_mac = DIRECCION_MAC;
                             data.contrasena = CONTRASENA;
+                            data.zona_horaria = ZONA_HORARIA;
                             data.observacion = 'no registrado';
                             // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
                             if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
@@ -407,6 +410,7 @@ class RelojesControlador {
                             data.numero_serie = NUMERO_SERIE;
                             data.direccion_mac = DIRECCION_MAC;
                             data.contrasena = CONTRASENA;
+                            data.zona_horaria = ZONA_HORARIA;
                             data.observacion = 'no registrado';
                             if (data.fila == '' || data.fila == undefined) {
                                 data.fila = 'error';
@@ -466,6 +470,10 @@ class RelojesControlador {
                             }
                             if (CONTRASENA == undefined) {
                                 data.contrasena = ' - ';
+                            }
+                            if (ZONA_HORARIA == undefined) {
+                                data.zona_horaria = 'No registrado';
+                                data.observacion = 'Zona horaria no registrada';
                             }
                             if (data.observacion == 'no registrado') {
                                 if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
@@ -548,6 +556,12 @@ class RelojesControlador {
                                                             if (item.tipo_conexion.toString().toLowerCase() == 'interna' || item.tipo_conexion.toString().toLowerCase() == 'externa') {
                                                                 if (item.temperatura.toString().toLowerCase() == 'si' || item.temperatura.toString().toLowerCase() == 'no' || item.temperatura.toString().toLowerCase() == ' - ') {
                                                                     if (item.marca.toString().toLowerCase() == 'zkteco' || item.marca.toString().toLowerCase() == 'hikvision') {
+                                                                        if (item.zona_horaria != 'No registrado') {
+                                                                            var VERIFICAR_ZONA_HORARIA = yield database_1.default.query(`SELECT * FROM ed_zonas_horarias WHERE nombre_general = $1`, [item.zona_horaria]);
+                                                                            if (VERIFICAR_ZONA_HORARIA.rows[0] == undefined || VERIFICAR_ZONA_HORARIA.rows[0] == '') {
+                                                                                item.observacion = 'Zona horaria no existe en el sistema';
+                                                                            }
+                                                                        }
                                                                         if (item.numero_serie != ' - ') {
                                                                             var VERIFICAR_SERIE = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE serie = $1`, [item.numero_serie]);
                                                                             if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != '') {
@@ -579,7 +593,7 @@ class RelojesControlador {
                                                     }
                                                 }
                                                 else {
-                                                    item.observacion = 'Ya existe en el sistema';
+                                                    item.observacion = 'IP ya existe en el sistema';
                                                 }
                                             }
                                             else {
@@ -587,7 +601,7 @@ class RelojesControlador {
                                             }
                                         }
                                         else {
-                                            item.observacion = 'Ya existe en el sistema';
+                                            item.observacion = 'Código ya existe en el sistema';
                                         }
                                     }
                                     else {
@@ -682,7 +696,7 @@ class RelojesControlador {
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS DE LA PLANTILLA INGRESADA
-                    const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, tipo_conexion, temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena } = data;
+                    const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, tipo_conexion, temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena, zona_horaria } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // BUSCAR ID DE LA SUCURSAL INGRESADA
@@ -702,23 +716,23 @@ class RelojesControlador {
                             observacion: `Error al guardar el reloj con nombre: ${nombre_dispo} e ip: ${ip}.`
                         });
                     }
-                    var modelo_data = null;
+                    var modelo_data = '';
                     if (modelo != ' - ') {
                         modelo_data = modelo;
                     }
-                    var contrasenia_data = null;
+                    var contrasenia_data = '';
                     if (contrasena != ' - ') {
                         contrasenia_data = contrasena;
                     }
-                    var fabricanteID_data = null;
+                    var fabricanteID_data = '';
                     if (id_fabricante != ' - ') {
                         fabricanteID_data = id_fabricante;
                     }
-                    var fabricante_data = null;
+                    var fabricante_data = '';
                     if (fabricante != ' - ') {
                         fabricante_data = fabricante;
                     }
-                    var mac_data = null;
+                    var mac_data = '';
                     if (direccion_mac != ' - ') {
                         mac_data = direccion_mac;
                     }
@@ -737,13 +751,18 @@ class RelojesControlador {
                     else {
                         temperatura_boolean = false;
                     }
+                    var zona = zona_horaria;
+                    var [nombre_zona, formatogmt] = zona.split(" ("); // DIVIDIMOS EN DOS PARTES
+                    var gmt = formatogmt.slice(0, -1); // QUITAMOS EL ULTIMO PARENTESIS
+                    console.log('nombre zona: ', nombre_zona);
+                    console.log('GMT: ', gmt);
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
-                    INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tipo_conexion, temperatura, codigo) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                    `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasenia_data, marca,
-                        modelo_data, numero_serie, fabricanteID_data, fabricante_data, mac_data, tipo_conexion_boolean, temperatura_boolean, codigo]);
+                    INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, codigo, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tipo_conexion, temperatura, zona_horaria_dispositivo, formato_gmt_dispositivo ) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
+                    `, [id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, codigo, direccion_ip, puerto, contrasenia_data, marca,
+                        modelo_data, numero_serie, fabricanteID_data, fabricante_data, mac_data, tipo_conexion_boolean, temperatura_boolean, nombre_zona, gmt]);
                     const [reloj_ingre] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({

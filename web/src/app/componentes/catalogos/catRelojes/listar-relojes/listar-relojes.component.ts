@@ -353,11 +353,14 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     }
     else if (observacion == 'Ya existe en el sistema' ||
+      observacion == 'IP ya existe en el sistema' ||
+      observacion == 'Código ya existe en el sistema' ||
       observacion == 'Número de serie ya existe en el sistema' ||
       observacion == 'Dirección MAC ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'Sucursal no existe en el sistema' ||
+      observacion == 'Zona horaria no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     }

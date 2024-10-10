@@ -243,6 +243,7 @@
                             <th scope="col">Número de serie</th>
                             <th scope="col">Dirección MAC</th>
                             <th scope="col">Contraseña</th>
+                            <th scope="col">Zona horaria</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -290,6 +291,9 @@
                                 {{d.direccion_mac}}</td>
                             <td [style.color]="EstiloTextoCelda(d.contrasena)" id="letras">
                                 {{d.contrasena}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.zona_horaria)" id="letras">
+                                {{d.zona_horaria}}</td>
+                                
                         </tr>
                     </tbody>
                 </table>
