@@ -386,7 +386,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let sin_contrato = [];
 
     const ids = correctos.map((dh: any) => dh.id);
-    this.restE.BuscarFechaContrato({ ids }).subscribe((response: any) => {
+    this.restE.BuscarFechaContratoUsuarios({ ids }).subscribe((response: any) => {
       console.log("ver BuscarFechaContrato ", response.fechaContrato)
       response.fechaContrato.forEach(element => {
         this.cont2 = this.cont2 + 1;
@@ -1418,7 +1418,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
       };
 
-      this.restP.CrearPlanGeneral(datosParcial).subscribe(res => {
+      this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
 
         if (res.message === 'OK') {
           this.cargar = true;

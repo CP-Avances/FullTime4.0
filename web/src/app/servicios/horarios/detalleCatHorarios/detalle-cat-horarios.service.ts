@@ -16,6 +16,11 @@ export class DetalleCatHorariosService {
     return this.http.get<any>(`${environment.url}/detalleHorario/${id}`);
   }
 
+  ConsultarUnDetalleHorario2(datos: any) {
+    return this.http.post<any>(`${environment.url}/detalleHorario/todos_horario`, datos);
+  }
+
+
   // METODO PARA ELIMINAR REGISTRO    **USADO
   EliminarRegistro(id: number, datos: any) {
     const url = `${environment.url}/detalleHorario/eliminar/${id}`;

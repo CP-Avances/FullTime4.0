@@ -4,12 +4,12 @@ import pool from '../../database';
 
 class DatosGeneralesControlador {
 
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR    
+    // METODO PARA LEER DATOS DEL USUARIO   
     public async BuscarDataGeneral(req: Request, res: Response) {
         let estado = req.params.estado;
         let informacion = await pool.query(
             `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM informacion_general2 AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -61,7 +61,7 @@ class DatosGeneralesControlador {
     }
 
 
-    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR POR ROL **USADO
+    // METODO PARA LEER DATOS PERFIL **USADO
     public async BuscarDataGeneralRol(req: Request, res: Response) {
         let estado = req.params.estado;
         let informacion = await pool.query(
