@@ -16,6 +16,11 @@ export class ParametrosService {
     return this.http.get<any>(`${environment.url}/parametrizacion`);
   }
 
+  // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
+  BuscarDetallesParametros() {
+    return this.http.get<any>(`${environment.url}/parametrizacion/detalle-parametros/buscar`);
+  }
+
   // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
     return this.http.get<any>(`${environment.url}/parametrizacion/ver-parametro/${id}`);

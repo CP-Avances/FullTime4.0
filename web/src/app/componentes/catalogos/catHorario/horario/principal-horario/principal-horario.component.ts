@@ -553,7 +553,6 @@ export class PrincipalHorarioComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
   PresentarDataPDFHorarios(): Array<any> {
     let n: any = []
-
     this.horarios.forEach((obj: any) => {
       n.push({
         style: 'tableMarginCabeceraHorario',

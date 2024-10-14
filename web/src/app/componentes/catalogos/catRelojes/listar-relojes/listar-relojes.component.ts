@@ -101,7 +101,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.totalDispositivos = 4;
+    this.totalDispositivos = 10;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
@@ -427,8 +427,7 @@ export class ListarRelojesComponent implements OnInit {
         });
       }
       else {
-        let ingresar = this.totalDispositivos - this.numeroDipositivos;
-        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos.', 'Permitido ingresar solo ' + ingresar + ' dispositivos.', {
+        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos (' + this.listaDispositivosCorrectos.length+ ').', 'Permitido ingresar solo ' + this.totalDispositivos + ' dispositivos.', {
           timeOut: 4000,
         });
       }

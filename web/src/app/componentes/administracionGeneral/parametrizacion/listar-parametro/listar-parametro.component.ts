@@ -107,6 +107,20 @@ export class ListarParametroComponent implements OnInit {
     this.restP.ListarParametros().subscribe(datos => {
       datos.sort((a: any, b: any) => a.id - b.id);
       this.parametros = datos;
+      this.ObtenerDetallesParametro();
+    });
+  }
+
+  // METOOD PARA OBTENER DETALLES DE PARAMETROS
+  detalles: any = [];
+  ObtenerDetallesParametro() {
+    this.detalles = [];
+    this.restP.BuscarDetallesParametros().subscribe(datos => {
+      datos.sort((a: any, b: any) => a.id - b.id);
+      this.detalles = datos;
+      this.parametros.forEach((parametro: any) => {
+        parametro.detalles = this.detalles.filter((detalle: any) => detalle.id_parametro === parametro.id);
+      });
     });
   }
 
@@ -174,49 +188,70 @@ export class ListarParametroComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Parámetros con su detalle', bold: true, fontSize: 20, alignment: 'center', margin: [0, -5, 0, 10] },
-        this.presentarDataPDFTipoPermisos(),
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'PARÁMETROS GENERALES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.presentarDataPDFTipoPermisos(),
       ],
       styles: {
-        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 8, alignment: 'center', }
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        itemsTableInfo: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
       }
     };
   }
 
-  presentarDataPDFTipoPermisos() {
-    return {
-      columns: [
-        { width: '*', text: '' },
-        {
-          width: 'auto',
+  // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
+  presentarDataPDFTipoPermisos(): Array<any> {
+    let n: any = []
+    this.parametros.forEach((obj: any) => {
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*'],
+          headerRows: 1,
+          body: [
+            [
+              { text: `PARÁMETRO: ${obj.descripcion}`, style: 'itemsTableInfo', border: [true, true, true, true] },
+            ],
+          ]
+        },
+      });
+
+      if (obj.detalles.length > 0) {
+        n.push({
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto'],
+            widths: ['auto', '*', '*'],
+            headerRows: 1,
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Descripción', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'DETALLE', style: 'tableHeader' },
+                { text: 'DESCRIPCIÓN', style: 'tableHeader' },
               ],
-              ...this.parametros.map((obj: any) => {
+              ...obj.detalles.map((detalle: any) => {
                 return [
-                  { text: obj.id, style: 'itemsTable' },
-                  { text: obj.descripcion, style: 'itemsTable' },
+                  { text: detalle.id, style: 'itemsTableCentrado' },
+                  { text: detalle.descripcion, style: 'itemsTableCentrado' },
+                  { text: detalle.observacion, style: 'itemsTableCentrado' },
                 ];
               })
             ]
           },
-          // ESTILO DE COLORES FORMATO ZEBRA
           layout: {
-            fillColor: function (i: any) {
-              return (i % 2 === 0) ? '#CCD1D1' : null;
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
-        },
-        { width: '*', text: '' },
-      ]
-    };
+        });
+      }
+    });
+    return n;
   }
+
 
   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **

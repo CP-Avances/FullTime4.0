@@ -15,13 +15,14 @@ class ParametrosRutas {
         this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
+        // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
+        this.router.get('/detalle-parametros/buscar', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarDetallesParametros);
         // BUSCAR LISTA DE DETALLE DE PARAMETROS      **USADO
         this.router.post('/buscar/detalle-parametros', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarDetalles);
         // METODO PARA VER DATOS DE UN PARAMETRO **USADO
         this.router.get('/ver-parametro/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
         this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
-        this.router.get('/opciones-marcacion/:id_empleado', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametroUsuario);
         // METODO PARA ELIMINAR DETALLE DE PARAMETRO  **USADO
         this.router.delete('/eliminar-detalle/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.EliminarDetalleParametro);
         // METODO PARA REGISTRAR DETALLE DE PARAMETRO  **USADO

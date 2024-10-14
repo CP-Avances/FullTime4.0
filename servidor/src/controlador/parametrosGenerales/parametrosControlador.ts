@@ -1,8 +1,7 @@
+import { BuscarFecha, BuscarHora } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
-import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import { BuscarFecha, BuscarHora } from '../../libs/settingsMail';
 
 class ParametrosControlador {
 
@@ -19,6 +18,21 @@ class ParametrosControlador {
         }
         else {
             res.status(404).jsonp({ text: 'Registros no encontrados.' });
+        }
+    }
+
+    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
+    public async ListarDetallesParametros(req: Request, res: Response): Promise<any> {
+        const PARAMETRO = await pool.query(
+            `
+            SELECT * FROM ep_detalle_parametro
+            `
+        );
+        if (PARAMETRO.rowCount != 0) {
+            return res.jsonp(PARAMETRO.rows)
+        }
+        else {
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
 
@@ -57,31 +71,13 @@ class ParametrosControlador {
         }
     }
 
-     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
-     public async VerDetalleParametroUsuario(req: Request, res: Response): Promise<any> {
-        const { id_empleado } = req.params;
-        const PARAMETRO = await pool.query(
-            `
-            SELECT *
-            FROM mrv_opciones_marcacion AS tp
-            WHERE tp.id_empleado = $1
-            `
-            , [id_empleado]);
-        if (PARAMETRO.rowCount != 0) {
-            return res.jsonp(PARAMETRO.rows)
-        }
-        else {
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
-    }
-
-
     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
     public async BuscarDetalles(req: Request, res: Response): Promise<any> {
         const { parametros } = req.body;
-        console.log('parametros ', parametros)
+        //console.log('parametros ', parametros)
         const PARAMETRO = await pool.query(
-            'SELECT id_parametro, descripcion FROM ep_detalle_parametro WHERE id_parametro IN (' + parametros + ')');
+            'SELECT id_parametro, descripcion FROM ep_detalle_parametro WHERE id_parametro IN (' + parametros + ')'
+        );
         if (PARAMETRO.rowCount != 0) {
             return res.jsonp(PARAMETRO.rows)
         }
@@ -151,7 +147,7 @@ class ParametrosControlador {
     // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async IngresarDetalleParametro(req: Request, res: Response): Promise<any> {
         try {
-            const { id_tipo, descripcion, user_name, ip } = req.body;
+            const { id_tipo, descripcion, observacion, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -159,9 +155,9 @@ class ParametrosControlador {
             await pool.query(
                 `
                 INSERT INTO ep_detalle_parametro
-                (id_parametro, descripcion) VALUES ($1, $2)
+                (id_parametro, descripcion, observacion) VALUES ($1, $2, $3)
                 `
-                , [id_tipo, descripcion]);
+                , [id_tipo, descripcion, observacion]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -169,7 +165,7 @@ class ParametrosControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify({ id_tipo, descripcion }),
+                datosNuevos: JSON.stringify({ id_tipo, descripcion, observacion }),
                 ip,
                 observacion: null
             });
@@ -188,13 +184,17 @@ class ParametrosControlador {
     // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async ActualizarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, descripcion, user_name, ip } = req.body;
+            const { id, descripcion, observacion, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
+            const consulta = await pool.query(
+                `
+                SELECT * FROM ep_detalle_parametro WHERE id = $1
+                `
+                , [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
@@ -215,9 +215,9 @@ class ParametrosControlador {
 
             const datosNuevos = await pool.query(
                 `
-                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2 RETURNING *
+                UPDATE ep_detalle_parametro SET descripcion = $1, observacion = $2 WHERE id = $3 RETURNING *
                 `
-                , [descripcion, id]);
+                , [descripcion, observacion, id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({

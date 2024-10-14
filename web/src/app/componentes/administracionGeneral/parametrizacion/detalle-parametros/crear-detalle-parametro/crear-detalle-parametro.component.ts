@@ -36,25 +36,30 @@ export class CrearDetalleParametroComponent implements OnInit {
 
   nota: string = '';
   especificacion: string = '';
+  observacion: any = '';
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.observacion = '';
+    this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
+      'Guardar.'
     // PARAMETRO TOLERANCIA UBICACION
     if (this.data.parametros.id === 4) {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.'
       this.especificacion = 'Rango de perímetro en metros.';
+      this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
     }
     // PARAMETRO LIMITE CORREO
     else if (this.data.parametros.id === 33) {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.'
       this.especificacion = 'Ingrese el número máximo de correos permitidos.';
+      this.observacion = 'Número de correos electrónicos que se podrán enviar.';
+    }
+    // PARAMETRO DISPOSITIVOS MOVILES
+    else if (this.data.parametros.id === 6) {
+      this.especificacion = 'Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres en la aplicación móvil.';
+      this.observacion = 'Número de dispositivos móviles en los que el usuario podrá iniciar sesión en la aplicación móvil.';
     }
     else {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.'
       this.especificacion = '';
     }
   }
@@ -64,6 +69,7 @@ export class CrearDetalleParametroComponent implements OnInit {
     let datos = {
       id_tipo: this.data.parametros.id,
       descripcion: form.descripcionForm,
+      observacion: this.observacion,
       user_name: this.user_name,
       ip: this.ip,
     };

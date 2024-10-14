@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
+const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const settingsMail_1 = require("../../libs/settingsMail");
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
     ListarParametros(req, res) {
@@ -29,6 +29,20 @@ class ParametrosControlador {
             }
             else {
                 res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
+    ListarDetallesParametros(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const PARAMETRO = yield database_1.default.query(`
+            SELECT * FROM ep_detalle_parametro
+            `);
+            if (PARAMETRO.rowCount != 0) {
+                return res.jsonp(PARAMETRO.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -64,28 +78,11 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES
-    VerDetalleParametroUsuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const PARAMETRO = yield database_1.default.query(`
-            SELECT *
-            FROM mrv_opciones_marcacion AS tp
-            WHERE tp.id_empleado = $1
-            `, [id_empleado]);
-            if (PARAMETRO.rowCount != 0) {
-                return res.jsonp(PARAMETRO.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     // METODO PARA LISTAR DETALLE DE PARAMETROS GENERALES       **USADO
     BuscarDetalles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { parametros } = req.body;
-            console.log('parametros ', parametros);
+            //console.log('parametros ', parametros)
             const PARAMETRO = yield database_1.default.query('SELECT id_parametro, descripcion FROM ep_detalle_parametro WHERE id_parametro IN (' + parametros + ')');
             if (PARAMETRO.rowCount != 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -148,20 +145,20 @@ class ParametrosControlador {
     IngresarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, user_name, ip } = req.body;
+                const { id_tipo, descripcion, observacion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 INSERT INTO ep_detalle_parametro
-                (id_parametro, descripcion) VALUES ($1, $2)
-                `, [id_tipo, descripcion]);
+                (id_parametro, descripcion, observacion) VALUES ($1, $2, $3)
+                `, [id_tipo, descripcion, observacion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ep_detalle_parametro',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify({ id_tipo, descripcion }),
+                    datosNuevos: JSON.stringify({ id_tipo, descripcion, observacion }),
                     ip,
                     observacion: null
                 });
@@ -180,11 +177,13 @@ class ParametrosControlador {
     ActualizarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, descripcion, user_name, ip } = req.body;
+                const { id, descripcion, observacion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
+                const consulta = yield database_1.default.query(`
+                SELECT * FROM ep_detalle_parametro WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -201,8 +200,8 @@ class ParametrosControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2 RETURNING *
-                `, [descripcion, id]);
+                UPDATE ep_detalle_parametro SET descripcion = $1, observacion = $2 WHERE id = $3 RETURNING *
+                `, [descripcion, observacion, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ep_detalle_parametro',
