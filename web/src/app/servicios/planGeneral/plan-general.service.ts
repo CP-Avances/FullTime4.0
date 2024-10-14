@@ -26,6 +26,12 @@ export class PlanGeneralService {
     return this.http.post(`${environment.url}/planificacion_general/buscar_fechas`, datos);
   }
 
+  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
+  BuscarFechasMultiples(datos: any) {
+    return this.http.post(`${environment.url}/planificacion_general/buscar_fechas_multiple`, datos);
+  }
+
+
   // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {
     return this.http.post<any>(`${environment.url}/planificacion_general/eliminar`, data);

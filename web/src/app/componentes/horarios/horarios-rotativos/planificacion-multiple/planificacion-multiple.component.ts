@@ -500,6 +500,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
           verificar = 0;
         }
+
         else {
           if (existe[i].codigo === data[0].horario) {
             verificar = 1;
@@ -851,7 +852,6 @@ export class PlanificacionMultipleComponent implements OnInit {
         tipo_dia: 'DFD',
       }]
       lista_feriados = lista_feriados.concat(data);
-
       // PREPARAR DATA PARA ELIMINAR HORARIO
       let plan_fecha = {
         id_empleado: usuario.id,
@@ -892,31 +892,30 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
   }
 
-  feriados2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FERIADOS
   async BuscarFeriados(inicio: any, fin: any, validos: any, verificar: boolean) {
+    let feriados2: { [key: number]: any } = {};
     let cont = 0;
     const ids = validos.map((dh: any) => dh.id);
+
     let datos = {
       fecha_inicio: inicio,
       fecha_final: fin,
       ids
     }
+
     await this.feriado.ListarFeriadosCiudad2(datos).subscribe(data => {
-      console.log("Ver feriados2-----------------------------------: ", data);
       data.forEach(feriado => {
-        if (!this.feriados2[feriado.id]) {
-          this.feriados2[feriado.id] = [feriado]
+        if (!feriados2[feriado.id]) {
+          feriados2[feriado.id] = [feriado]
         } else {
-          this.feriados2[feriado.id].push(feriado);
+          feriados2[feriado.id].push(feriado);
         }
       })
-      console.log("Ver feriados2 armado -----------------------------------: ", this.feriados2);
-
       validos.forEach((val: any) => {
         cont = cont + 1;
-        if (this.feriados2[val.id]) {
-          this.feriados2[val.id].forEach((f: any) => {
+        if (feriados2[val.id]) {
+          feriados2[val.id].forEach((f: any) => {
             for (var a = 0; a < val.asignado.length; a++) {
               if (val.asignado[a].dia === parseInt(moment(f.fecha).format('D'))) {
                 // SI EL HORARIO ASIGNADO ES DE TIPO LABORABLE SE RETIRA DE LA LISTA
@@ -926,19 +925,18 @@ export class PlanificacionMultipleComponent implements OnInit {
               }
             }
           })
-          this.AsignarFeriado(this.feriados2[val.id], val);
+          this.AsignarFeriado(feriados2[val.id], val);
         }
 
         if (cont === validos.length) {
+          console.log("entra al metodo CrearDataHorario")
           this.datosSeleccionados.usuario = validos;
           this.CrearDataHorario(validos, verificar);
         }
       })
     }, vacio => {
-      if (cont === validos.length) {
-        this.datosSeleccionados.usuario = validos;
-        this.CrearDataHorario(validos, verificar);
-      }
+      this.datosSeleccionados.usuario = validos;
+      this.CrearDataHorario(validos, verificar);
     }
     )
   }
@@ -954,23 +952,25 @@ export class PlanificacionMultipleComponent implements OnInit {
       asignados = asignados + li.asignado.length;
     })
 
+    let horarios2: { [key: number]: any } = {};
     this.plan_general = [];
+    let ids_horario = []
 
     if (lista.length != 0) {
-
       lista.forEach((li: any) => {
-        let ids_horario = []
         ids_horario = li.asignado.map((asig: any) => asig.id_horario);
-        let horarios2: { [key: number]: any } = {};
-        this.restD.ConsultarUnDetalleHorario2({ ids_horario }).subscribe(det1 => {
-          console.log("ver detalles de horarios", det1 )
-          det1.forEach(horario => {
-            if (!horarios2[horario.id_horario]) {
-              horarios2[horario.id_horario] = [horario]
-            } else {
-              horarios2[horario.id_horario].push(horario);
-            }
-          })
+      })
+      this.restD.ConsultarUnDetalleHorario2({ ids_horario }).subscribe(det1 => {
+        det1.forEach(horario => {
+          if (!horarios2[horario.id_horario]) {
+            horarios2[horario.id_horario] = [horario]
+          } else {
+            horarios2[horario.id_horario].push(horario);
+          }
+        })
+        console.log("ver detalles de los horarios", horarios2)
+        lista.forEach((li: any) => {
+          console.log("ver asignado ", li.asignado);
 
           li.asignado.forEach((asig: any) => {
             contador = contador + 1;
@@ -1005,160 +1005,61 @@ export class PlanificacionMultipleComponent implements OnInit {
               origen = 'N';
             }
 
-            horarios2[asig.id_horario].map((element: any) => {
-              var accion = 0;
-              var nocturno: number = 0;
-              if (element.tipo_accion === 'E') {
-                accion = element.tolerancia;
-              }
-              if (element.segundo_dia === true) {
-                nocturno = 1;
-              }
-              else if (element.tercer_dia === true) {
-                nocturno = 2;
-              }
-              else {
-                nocturno = 0;
-              }
-              let plan = {
-                id_empleado: li.id,
-                tipo_dia: dia_tipo,
-                min_antes: element.minutos_antes,
-                tolerancia: accion,
-                id_horario: element.id_horario,
-                min_despues: element.minutos_despues,
-                fec_horario: asig.fecha,
-                estado_origen: origen,
-                estado_timbre: tipo,
-                id_empl_cargo: li.id_cargo,
-                id_det_horario: element.id,
-                salida_otro_dia: nocturno,
-                tipo_entr_salida: element.tipo_accion,
-                fec_hora_horario: asig.fecha + ' ' + element.hora,
-                min_alimentacion: element.minutos_comida,
-              };
-              if (element.segundo_dia === true) {
-                plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
-              }
-              if (element.tercer_dia === true) {
-                plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
-              }
-              // ALMACENAMIENTO DE PLANIFICACION GENERAL
-              this.plan_general = this.plan_general.concat(plan);
-            })
+            if (horarios2[asig.id_horario]) {
+              horarios2[asig.id_horario].map((element: any) => {
+                var accion = 0;
+                var nocturno: number = 0;
+                if (element.tipo_accion === 'E') {
+                  accion = element.tolerancia;
+                }
+                if (element.segundo_dia === true) {
+                  nocturno = 1;
+                }
+                else if (element.tercer_dia === true) {
+                  nocturno = 2;
+                }
+                else {
+                  nocturno = 0;
+                }
+                let plan = {
+                  id_empleado: li.id,
+                  tipo_dia: dia_tipo,
+                  min_antes: element.minutos_antes,
+                  tolerancia: accion,
+                  id_horario: element.id_horario,
+                  min_despues: element.minutos_despues,
+                  fec_horario: asig.fecha,
+                  estado_origen: origen,
+                  estado_timbre: tipo,
+                  id_empl_cargo: li.id_cargo,
+                  id_det_horario: element.id,
+                  salida_otro_dia: nocturno,
+                  tipo_entr_salida: element.tipo_accion,
+                  fec_hora_horario: asig.fecha + ' ' + element.hora,
+                  min_alimentacion: element.minutos_comida,
+                };
+                if (element.segundo_dia === true) {
+                  plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+                }
+                if (element.tercer_dia === true) {
+                  plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+                }
+                // ALMACENAMIENTO DE PLANIFICACION GENERAL
+                this.plan_general = this.plan_general.concat(plan);
+              })
+            }
             if (contador === asignados) {
               if (validar === true) {
                 this.ValidarRangos(this.plan_general)
               }
             }
           })
-        })
+        }
+        )
       })
     }
   }
 
-
-  CrearDataHorario2(lista: any, validar: boolean) {
-    var contador = 0;
-    var asignados = 0;
-
-    lista.forEach((li: any) => {
-      asignados = asignados + li.asignado.length;
-    })
-
-    this.plan_general = [];
-
-    if (lista.length != 0) {
-
-      lista.forEach((li: any) => {
-
-        li.asignado.forEach((asig: any) => {
-          asig.rango = '';
-          let dia_tipo = '';
-          let origen = '';
-          let tipo: any = null;
-          if (asig.tipo_dia === 'DFD') {
-            dia_tipo = 'FD';
-            origen = 'FD';
-            tipo = 'FD';
-          }
-          else if (asig.tipo_dia === 'DL') {
-            dia_tipo = 'L';
-            origen = 'L';
-            tipo = 'L';
-          }
-          else if (asig.tipo_dia === 'FD') {
-            dia_tipo = 'FD';
-            origen = 'HFD';
-            tipo = 'FD';
-          }
-          else if (asig.tipo_dia === 'L') {
-            dia_tipo = 'L';
-            origen = 'HL';
-            tipo = 'L';
-          }
-          else {
-            dia_tipo = 'N';
-            origen = 'N';
-          }
-
-          this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
-            console.log("ver horarios detallado", det)
-            contador = contador + 1;
-            // COLOCAR DETALLE DE DIA SEGUN HORARIO
-            det.map((element: any) => {
-              var accion = 0;
-              var nocturno: number = 0;
-              if (element.tipo_accion === 'E') {
-                accion = element.tolerancia;
-              }
-              if (element.segundo_dia === true) {
-                nocturno = 1;
-              }
-              else if (element.tercer_dia === true) {
-                nocturno = 2;
-              }
-              else {
-                nocturno = 0;
-              }
-
-              let plan = {
-                id_empleado: li.id,
-                tipo_dia: dia_tipo,
-                min_antes: element.minutos_antes,
-                tolerancia: accion,
-                id_horario: element.id_horario,
-                min_despues: element.minutos_despues,
-                fec_horario: asig.fecha,
-                estado_origen: origen,
-                estado_timbre: tipo,
-                id_empl_cargo: li.id_cargo,
-                id_det_horario: element.id,
-                salida_otro_dia: nocturno,
-                tipo_entr_salida: element.tipo_accion,
-                fec_hora_horario: asig.fecha + ' ' + element.hora,
-                min_alimentacion: element.minutos_comida,
-              };
-              if (element.segundo_dia === true) {
-                plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
-              }
-              if (element.tercer_dia === true) {
-                plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
-              }
-              // ALMACENAMIENTO DE PLANIFICACION GENERAL
-              this.plan_general = this.plan_general.concat(plan);
-            })
-
-            if (contador === asignados) {
-              if (validar === true) {
-                this.ValidarRangos(this.plan_general)
-              }
-            }
-          })
-        })
-      })
-    }
-  }
 
   // METODO PARA VALIDAR RANGOS DE TIEMPOS EN HORARIOS
   ValidarRangos(lista: any) {
@@ -1217,29 +1118,20 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA GURADAR DATOS EN BASE DE DATOS
   GuardarPlanificacion() {
     let contador = 0;
-
-    let datos = {
-      id_plan: this.plan_general,
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-
+    console.log("ver lista a elminar", this.eliminar_lista)
     if (this.eliminar_lista.length === 0) {
       this.RegistrarPlanificacionMultiple();
     }
     else {
-      // METODO PARA ELIMINAR HORARIOS
-      this.eliminar_lista.forEach((h: any) => {
-        let plan_fecha = {
-          id_empleado: h.id_empleado,
-          fec_final: h.fec_final,
-          fec_inicio: h.fec_inicio,
-          id_horario: h.id_horario,
-        };
+      let listaEliminar = this.eliminar_lista
+      this.restP.BuscarFechasMultiples({ listaEliminar }).subscribe((res: any) => {
+        res.forEach(item => {
+          let datos = {
+            id_plan: item.id,
+            user_name: this.user_name,
+            ip: this.ip,
+          }
 
-        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-          datos.id_plan = res;
-          // METODO PARA ELIMINAR DE LA BASE DE DATOS
           this.restP.EliminarRegistro(datos).subscribe(datos => {
             contador = contador + 1;
             if (contador === this.eliminar_lista.length) {
@@ -1251,18 +1143,16 @@ export class PlanificacionMultipleComponent implements OnInit {
               this.RegistrarPlanificacionMultiple();
             }
           })
-        }, error => {
-          contador = contador + 1;
-          if (contador === this.eliminar_lista.length) {
-            this.RegistrarPlanificacionMultiple();
-          }
         })
+      }, error => {
+        this.RegistrarPlanificacionMultiple();
       })
     }
   }
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
+    /*
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
@@ -1288,7 +1178,70 @@ export class PlanificacionMultipleComponent implements OnInit {
       });
       this.CerrarVentana();
     })
+*/
 
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    // Dividir el objeto plan_general en partes más pequeñas
+    const partes = this.dividirPlanGeneral(datos.plan_general);
+    const totalPartes = partes.length; // Obtén la cantidad total de partes
+
+    // Enviar cada parte por separado
+    partes.forEach((parte, index) => {
+      const datosParcial = {
+        parte: parte,
+        user_name: this.user_name,
+        ip: this.ip,
+        parteIndex: index, // Puedes enviar el índice de la parte para referencia
+        totalPartes: totalPartes // Agrega el total de partes al objeto de datos
+
+      };
+
+      this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
+
+        if (res.message === 'OK') {
+          this.ver_guardar = false;
+          this.cargar = true;
+          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+            timeOut: 6000,
+          });
+          this.CerrarVentana();
+        }
+      }
+        , error => {
+          this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+            timeOut: 6000,
+          });
+          this.CerrarVentana();
+        });
+    });
+
+  }
+
+  dividirPlanGeneral(plan_general: any[]): any[][] {
+    const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
+    const tamañoParte = 90000; // Ajusta el tamaño de cada parte según sea necesario
+    // Verifica si el tamaño total es menor que el tamaño de cada parte
+    if (plan_general.length <= tamañoParte) {
+      return [plan_general]; // Devuelve el array original como la única parte
+    }
+    for (let i = 0; i < plan_general.length; i += tamañoParte) {
+      const parte = plan_general.slice(i, i + tamañoParte); // Obtener una parte del array
+
+      // Verifica si la parte es no vacía y la agrega
+      if (parte.length > 0) {
+        partes.push(parte); // Agregar la parte al array de partes
+      }
+    }
+    return partes; // Devuelve el array de partes
   }
 
   // METODO PARA CARGAR TIMBRES
