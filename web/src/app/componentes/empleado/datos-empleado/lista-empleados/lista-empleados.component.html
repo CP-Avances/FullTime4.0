@@ -210,22 +210,22 @@
     class="container" style="padding-bottom: 50px; text-align: center;">
 
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
-        <div class="row">
-            <div class="col-md">
-                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+        <div class="row w-100">
+            <div class="col-3 col-md-4">
+                <button class="btn btn-primary btn-outline-light"
                     (click)="Deshabilitar(1)">
                     Inactivar
                 </button>
             </div>
 
-            <div class="col-md" *ngIf="mostrarCrearCarpeta">
+            <div class="col-6 col-md-4" *ngIf="mostrarCrearCarpeta">
                 <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
-                    style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+                    style="text-align: center;" (click)="CrearCarpeta(1)">
                     Crear Carpeta
                 </button>
             </div>
-            <div class="col-md">
-                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+            <div class="col-3 col-md-4">
+                <button class="btn btn-primary btn-outline-light"
                     (click)="ConfirmarDeleteMultiple(1)">
                     Eliminar
                 </button>

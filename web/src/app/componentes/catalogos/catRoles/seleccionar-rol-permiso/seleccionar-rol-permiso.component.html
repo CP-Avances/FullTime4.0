@@ -1,18 +1,18 @@
 <br>
 <div class="mat-elevation-z8" style="background: white;">
     <div id="titulo" class="row w-100 m-auto align-items-center">
-        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1" >
-            <button class="btn btn-outline-light btn-sm" (click)="VerRoles()">
+        <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-1" >
+            <button class="btn btn-outline-light btn-sm" style="float: left;" (click)="VerRoles()">
                 Atras
             </button>
         </div>
-        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
             <span class="w-100 bd-highlight">
                 FUNCIONES QUE TIENE EL ROL {{nombreRol}}
             </span>
         </div>
-        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
-            <button *ngIf="id_rol != 1" (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm">
+        <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-3">
+            <button *ngIf="id_rol != 1" (click)="ConfirmarDelete()" style="float: right;" class="btn btn-outline-light btn-sm">
                 Eliminar
             </button>
         </div>

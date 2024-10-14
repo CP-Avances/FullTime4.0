@@ -360,7 +360,7 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'Sucursal no existe en el sistema' ||
-      observacion == 'Zona horaria no existe en el sistema' ||
+      observacion == 'Verificar zona horaria' ||
       observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     }

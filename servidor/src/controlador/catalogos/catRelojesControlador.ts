@@ -620,7 +620,7 @@ class RelojesControlador {
                                                                             `SELECT * FROM ed_zonas_horarias WHERE nombre_general = $1`
                                                                             , [item.zona_horaria])
                                                                         if (VERIFICAR_ZONA_HORARIA.rows[0] == undefined || VERIFICAR_ZONA_HORARIA.rows[0] == '') {
-                                                                            item.observacion = 'Zona horaria no existe en el sistema';
+                                                                            item.observacion = 'Verificar zona horaria';
                                                                         } 
                                                                     }
 

@@ -3,12 +3,12 @@
 }
 
 .separar {
-    padding: 10px 10px 0px 10px
+    padding: 5px 5px 0px 5px
 }
 
 mat-form-field {
     width: 250px;
-    padding: 10px 10px 0px 10px;
+    padding: 5px 5px 0px 5px;
 }
 
 #respaldo {
@@ -25,8 +25,8 @@ mat-form-field {
 
 mat-radio-group {
     width: 210px;
-    padding: 15px 20px 15px 20x;
-    margin-bottom: 10px;
+    padding: 0px 10px 10px 10px;
+    margin-bottom: 0px;
 }
 
 #fechas {
@@ -100,4 +100,41 @@ mat-radio-group {
 .scrollbar-primary::-webkit-scrollbar {
     width: 12px;
     background-color: #F5F5F5;
+}
+
+@media (max-width: 530px) {
+    
+    mat-card-content{
+        padding: 0px;
+    }
+
+    mat-form-field {
+        width: 250px;
+        padding: 0px 0px 0px 0px;
+    }
+
+    mat-radio-group {
+        width: 210px;
+        padding: 0px 0px 0px 0px;
+        margin-bottom: 0px;
+    }
+
+
+    form{
+        margin: 0%;
+        padding: 0%;
+    }
+
+    .fechas{
+        margin: 0px;
+        padding: 0%;
+    }
+
+    #fechas{
+        width: 50px !important;
+    }
+
+    .separar {
+        padding: 0px 0px 0px 0px
+    }
 }

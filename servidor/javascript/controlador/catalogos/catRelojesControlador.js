@@ -559,7 +559,7 @@ class RelojesControlador {
                                                                         if (item.zona_horaria != 'No registrado') {
                                                                             var VERIFICAR_ZONA_HORARIA = yield database_1.default.query(`SELECT * FROM ed_zonas_horarias WHERE nombre_general = $1`, [item.zona_horaria]);
                                                                             if (VERIFICAR_ZONA_HORARIA.rows[0] == undefined || VERIFICAR_ZONA_HORARIA.rows[0] == '') {
-                                                                                item.observacion = 'Zona horaria no existe en el sistema';
+                                                                                item.observacion = 'Verificar zona horaria';
                                                                             }
                                                                         }
                                                                         if (item.numero_serie != ' - ') {

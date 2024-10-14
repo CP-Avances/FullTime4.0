@@ -205,7 +205,7 @@ export class VistaRolesComponent implements OnInit {
       },
       content: [
         { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Roles del Sistema', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: 'Funciones registradas para cada rol', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 10] },
         this.PresentarDataPDFRoles(),
       ],
       styles: {

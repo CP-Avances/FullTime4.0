@@ -175,7 +175,7 @@ export class ListarParametroComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Tipos de Permisos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'Parámetros con su detalle', bold: true, fontSize: 20, alignment: 'center', margin: [0, -5, 0, 10] },
         this.presentarDataPDFTipoPermisos(),
       ],
       styles: {

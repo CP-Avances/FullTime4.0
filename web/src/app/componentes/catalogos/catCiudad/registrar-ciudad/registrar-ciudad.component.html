@@ -1,10 +1,17 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR CIUDAD
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR CIUDAD
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
 </div>
+
 <form [formGroup]="formulario">
     <mat-card-content>
         <div class="container">
@@ -15,9 +22,8 @@
                 </span>
             </div>
             <div class="row">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-between">
-                        <mat-form-field>
+                <div class="col-12 col-md-6">
+                    <mat-form-field>
                             <mat-label>Seleccionar continente</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Lista de continentes registrados en el sistema.">
@@ -28,8 +34,10 @@
                                     {{c.continente}}
                                 </mat-option>
                             </mat-select>
-                        </mat-form-field>
-                        <mat-form-field>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-md-6">
+                    <mat-form-field>
                             <mat-label>Seleccionar país</mat-label>
                             <input type="text" aria-label="Number" matInput [formControl]="nombrePaisF"
                                 [matAutocomplete]="auto" required [readonly]="ver_pais">
@@ -43,12 +51,10 @@
                                 matTooltip="Lista de paises ubicados en el continente seleccionado.">
                                 help_outline
                             </mat-icon>
-                        </mat-form-field>
-                    </div>
+                    </mat-form-field>
                 </div>
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-between">
-                        <mat-form-field>
+                <div class="col-12 col-md-6">
+                    <mat-form-field>
                             <mat-label>Seleccionar provincia</mat-label>
                             <input type="text" aria-label="Number" matInput [formControl]="idProvinciaF"
                                 [matAutocomplete]="auto1" required [readonly]="ver_provincia">
@@ -62,8 +68,10 @@
                                 matTooltip="Lista de provincias, departamentos o estados ubicados en el país seleccionado.">
                                 help_outline
                             </mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-md-6">
+                    <mat-form-field>
                             <mat-label>Ingresar ciudad</mat-label>
                             <input matInput placeholder="Ej: Quito" [formControl]="nombreF"
                                 (keypress)="IngresarSoloLetras($event)" required [readonly]="ver_ciudad">
@@ -72,8 +80,7 @@
                                 help_outline
                             </mat-icon>
                             <mat-error *ngIf="nombreF.invalid">Ingresar un nombre válido</mat-error>
-                        </mat-form-field>
-                    </div>
+                    </mat-form-field>   
                 </div>
             </div>
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
