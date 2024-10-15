@@ -1259,22 +1259,10 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
-    /*
-     if (this.plan_general.length > 99200) {
-       this.guardar = false;
-       this.cargar = false;
-       this.toastr.error(
-         'Intentar con un número menor de usuarios o planificar con periodos más cortos de tiempo.',
-         'Ups!!! se ha producido un error.', {
-         timeOut: 6000,
-       });
-     }
-     else {
-     */
+    
     this.guardar = true;
     this.btn_eliminar = false;
     this.cargar = false;
-    //}
   }
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
@@ -1419,7 +1407,6 @@ export class HorariosMultiplesComponent implements OnInit {
       };
 
       this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
-
         if (res.message === 'OK') {
           this.cargar = true;
           this.guardar = false;
@@ -1428,9 +1415,7 @@ export class HorariosMultiplesComponent implements OnInit {
             timeOut: 6000,
           })
         } else {
-          // Manejar error para cada parte
           console.log(res.message);
-
           /*
           this.toastr.error('Ups!!! algo salió mal.', '', {
             timeOut: 6000,
