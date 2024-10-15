@@ -87,6 +87,31 @@ class PlanGeneralControlador {
                 return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + 'de: ' + totalPartes });
             }
         });
+        this.BuscarFechasMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar } = req.body;
+            console.log("ver req body", req.body);
+            let resultados = []; // Array para almacenar todos los objetos de los resultados
+            for (const item of listaEliminar) {
+                // Convertir las fechas al formato 'YYYY-MM-DD'
+                const fec_inicio = new Date(item.fec_inicio).toISOString().split('T')[0]; // Convierte a 'YYYY-MM-DD'
+                const fec_final = new Date(item.fec_final).toISOString().split('T')[0]; // Convierte a 'YYYY-MM-DD'
+                console.log("ver fec_inicio", fec_inicio);
+                console.log("ver fec_final", fec_final);
+                const FECHAS = yield database_1.default.query(`
+                    SELECT id FROM eu_asistencia_general 
+                    WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+                `, [fec_inicio, fec_final, item.id_horario, item.id_empleado]);
+                // Concatena los resultados obtenidos en cada iteración
+                resultados = resultados.concat(FECHAS.rows); // `rows` contiene los registros devueltos por la consulta
+            }
+            // Si no se encontró ningún resultado en ninguna consulta
+            if (resultados.length === 0) {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+            else {
+                return res.jsonp(resultados); // Devuelve un único array con todos los resultados concatenados
+            }
+        });
     }
     // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     CrearPlanificacion(req, res) {
@@ -154,124 +179,6 @@ class PlanGeneralControlador {
             }
         });
     }
-    /*
-        public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
-            let errores: number = 0;
-            let ocurrioError = false;
-            let mensajeError = '';
-            let codigoError = 0;
-    
-            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
-    
-            console.log("ver parteIndex", parteIndex);
-            console.log("ver totalPartes", totalPartes);
-    
-            if (!this.partesRecibidas) {
-                this.partesRecibidas = [];
-            }
-    
-            this.partesRecibidas.push(...parte);
-    
-            // Procesar todas las partes cuando se recibe la última parte
-            if ((parteIndex + 1) === totalPartes) {
-                try {
-                    // INICIAR TRANSACCION
-                    await pool.query('BEGIN');
-    
-                    // Crear un array para los valores y la consulta de inserción
-                    const valores: string[] = [];
-                    const params: any[] = [];
-    
-                    // Construir la consulta de inserción por lotes
-                    this.partesRecibidas.forEach((parte: any, index: any) => {
-                        const idx = index * 15; // Asumiendo que tienes 15 columnas a insertar
-                        valores.push(`($${idx + 1},
-                        $${idx + 2}, $${idx + 3},
-                         $${idx + 4}, $${idx + 5},
-                          $${idx + 6}, $${idx + 7},
-                           $${idx + 8}, $${idx + 9},
-                           $${idx + 10}, $${idx + 11},
-                            $${idx + 12}, $${idx + 13},
-                             $${idx + 14}, $${idx + 15})`);
-    
-                        // Agregar los parámetros
-                        params.push(
-                            parte.fec_hora_horario,
-                            parte.tolerancia,
-                            parte.estado_timbre,
-                            parte.id_det_horario,
-                            parte.fec_horario,
-                            parte.id_empl_cargo,
-                            parte.tipo_entr_salida,
-                            parte.id_empleado,
-                            parte.id_horario,
-                            parte.tipo_dia,
-                            parte.salida_otro_dia,
-                            parte.min_antes,
-                            parte.min_despues,
-                            parte.estado_origen,
-                            parte.min_alimentacion
-                        );
-                    });
-    
-                    // Formar la consulta final
-                    const consulta = `
-                    INSERT INTO eu_asistencia_general (
-                        fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
-                        id_horario, tipo_dia, salida_otro_dia, minutos_antes,
-                        minutos_despues, estado_origen, minutos_alimentacion
-                    ) VALUES ${valores.join(', ')} RETURNING *
-                `;
-    
-                    const result = await pool.query(consulta, params);
-    
-                    // Manejar la respuesta de las inserciones
-                    const insertedRows = result.rows;
-    
-                    // Realiza la auditoría por cada registro insertado (opcional)
-                    for (const plan of insertedRows) {
-                        const fecha_hora_horario1 = await FormatearHora(plan.fecha_hora_horario.split(' ')[1]);
-                        const fecha_hora_horario = await FormatearFecha2(plan.fecha_hora_horario, 'ddd');
-                        const fecha_horario = await FormatearFecha2(plan.fecha_horario, 'ddd');
-    
-                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                        plan.fecha_horario = fecha_horario;
-    
-                        // AUDITORIA
-                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'eu_asistencia_general',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(plan),
-                            ip,
-                            observacion: null
-                        });
-                    }
-    
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-    
-                    return res.status(200).jsonp({ message: 'OK', insertedRows });
-                } catch (error) {
-                    // REVERTIR TRANSACCION
-                    
-                    await pool.query('ROLLBACK');
-                    ocurrioError = true;
-                    mensajeError = error.message;
-                    codigoError = 500;
-                    errores++;
-                    return res.status(codigoError).jsonp({ message: mensajeError });
-                    
-                   console.log("ver el error ",)
-    }
-            } else {
-        return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + ' de: ' + totalPartes });
-    }
-        };
-    
-    */
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     BuscarFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

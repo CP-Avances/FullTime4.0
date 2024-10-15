@@ -17,6 +17,8 @@ class DepartamentoRutas {
         this.router.post('/cargar-planificacion', verificarToken_1.TokenValidation, planGeneralControlador_1.default.CrearPlanificacion2);
         // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL  **USADO
         this.router.post('/buscar_fechas', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarFechas);
+        // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL MULTIPLE 
+        this.router.post('/buscar_fechas_multiple', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarFechasMultiples);
         // METODO PARA ELIMINAR REGISTROS  **USADO
         this.router.post('/eliminar', verificarToken_1.TokenValidation, planGeneralControlador_1.default.EliminarRegistros);
         // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS

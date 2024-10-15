@@ -58,7 +58,7 @@ class DetalleCatalogoHorarioControlador {
 
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
     public async ListarUnDetalleTodosHorarios(req: Request, res: Response): Promise<any> {
-        const { id_horario } = req.body;
+        const { ids_horario } = req.body;
         const HORARIO = await pool.query(
             `
             SELECT dh.*, cg.minutos_comida
@@ -66,7 +66,7 @@ class DetalleCatalogoHorarioControlador {
             WHERE dh.id_horario = cg.id AND dh.id_horario = ANY($1)
             ORDER BY orden ASC
             `
-            , [id_horario])
+            , [ids_horario])
             .then((result: any) => {
                 if (result.rowCount === 0) return [];
 
