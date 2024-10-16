@@ -274,16 +274,20 @@
                             </mat-form-field>
                         </div> 
                     </div>
-                    <div style="text-align: center; padding-top: 15px;">
-                        <button mat-raised-button matStepperPrevious class="float-left" id="btn-raised-">Atrás</button>
-
-                        <button button mat-raised-button id="btn-raised" (click)="stepper.reset()">Cancelar</button>
-
-                        <button button mat-raised-button class="float-right" id="btn-raised_"
+                    <div class="row" style="text-align: center; padding-top: 15px;">
+                        <div class="col-4 text-center">
+                            <button mat-raised-button matStepperPrevious id="btn-raised-">Atrás</button>
+                        </div> 
+                        <div class="col-4 text-center">
+                            <button button mat-raised-button id="btn-raised" (click)="stepper.reset()">Cancelar</button>
+                        </div>
+                        <div class="col-4 text-center">
+                            <button button mat-raised-button id="btn-raised_"
                             (click)="InsertarEmpleado(primeroFormGroup.value, segundoFormGroup.value, terceroFormGroup.value);"
                             type="submit" [disabled]="!terceroFormGroup.valid">
-                            Guardar
-                        </button>
+                                Guardar
+                            </button>
+                        </div>
                     </div>
                 </form>
             </mat-step>

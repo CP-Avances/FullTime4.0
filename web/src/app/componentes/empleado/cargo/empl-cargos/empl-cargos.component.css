@@ -5,7 +5,7 @@
 }
 
 mat-form-field {
-    padding: 10px 5px 0px 0px;
+    padding: auto;
 }
 
 #letras {
@@ -25,4 +25,24 @@ mat-form-field {
 .scrollbar-primary::-webkit-scrollbar {
     width: 12px;
     background-color: #F5F5F5;
+}
+
+.fechas{
+    width: 145px;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .fechas{
+        width: 130px;
+    }
+
+    .sueldo{
+        width: 250px;
+    }
+
+    mat-card-content{
+        margin: auto;
+        padding: 0px;
+    }
 }

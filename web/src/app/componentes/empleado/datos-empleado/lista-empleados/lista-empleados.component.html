@@ -80,21 +80,21 @@
 <div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckDeshabilitado">
-        <div class="row">
-            <div class="col-md">
-                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+        <div class="row w-100">
+            <div class="col-3 col-md-4">
+                <button class="btn btn-primary btn-outline-light"
                     (click)="Deshabilitar(2)">
                     Activar
                 </button>
             </div>
-            <div class="col-md">
-                <button class="btn btn-primary btn-outline-light" style="margin-left: 10px ; padding-left: 20px;"
+            <div class="col-6 col-md-4">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
                     (click)="Deshabilitar(3)">
                     Reincorporar
                 </button>
             </div>
-            <div class="col-md">
-                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+            <div class="col-3 col-md-4">
+                <button class="btn btn-primary btn-outline-light"
                     (click)="ConfirmarDeleteMultiple(2)">
                     Eliminar
                 </button>
