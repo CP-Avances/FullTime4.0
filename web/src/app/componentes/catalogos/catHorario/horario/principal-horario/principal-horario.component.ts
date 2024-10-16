@@ -491,7 +491,6 @@ export class PrincipalHorarioComponent implements OnInit {
   GenerarPDF(action = 'open') {
     const documentDefinition = this.EstructurarPDF();
     console.log('horarios', this.horarios);
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;

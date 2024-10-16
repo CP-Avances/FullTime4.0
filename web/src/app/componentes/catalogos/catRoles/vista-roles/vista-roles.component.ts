@@ -26,6 +26,7 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
 import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-vista-roles',
@@ -55,6 +56,7 @@ export class VistaRolesComponent implements OnInit {
   // CAMPO DE BUSQUEDA DE DATOS
   buscarDescripcion = new FormControl('', Validators.minLength(2));
 
+  get reloj_virtual(): boolean { return this.varificarFunciones.app_movil; }
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantilla.color_Secundary }
   get p_color(): string { return this.plantilla.color_Primary }
@@ -62,6 +64,7 @@ export class VistaRolesComponent implements OnInit {
   get frase(): string { return this.plantilla.marca_Agua }
 
   constructor(
+    private varificarFunciones: MainNavService,
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private permisos: RolPermisosService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES

@@ -151,7 +151,7 @@
             <app-seleccionar-rol-permiso [id_rol]="rol_id"></app-seleccionar-rol-permiso>
         </div>
     </mat-tab>
-    <mat-tab label="movil">
+    <mat-tab label="movil" *ngIf="reloj_virtual">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">phonelink_setup</mat-icon>
             <h6 id="items">Funciones Aplicación Móvil</h6>

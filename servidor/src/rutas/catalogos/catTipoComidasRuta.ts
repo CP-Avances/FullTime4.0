@@ -17,13 +17,14 @@ class TipoComidasRuta {
 
     configuracion(): void {
         this.router.get('/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ListarTipoComidas);
-        this.router.get('/detalle', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ListarTipoComidasDetalles);
+        // METODO PARA LISTAR TIPOS DE COMIDAS Y SU DETALLE      **USADO
+        this.router.get('/listar-detalle', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ListarDetallesComida);
         this.router.get('/:id', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ListarUnTipoComida);
         this.router.get('/buscar/menu/:id', TokenValidation, TIPO_COMIDAS_CONTROLADOR.VerUnMenu);
         this.router.post('/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.CrearTipoComidas);
         this.router.put('/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ActualizarComida);
         this.router.delete('/eliminar/:id', TokenValidation, TIPO_COMIDAS_CONTROLADOR.EliminarRegistros);
-       // this.router.get('/registro/ultimo', TokenValidation, TIPO_COMIDAS_CONTROLADOR.VerUltimoRegistro);
+        // this.router.get('/registro/ultimo', TokenValidation, TIPO_COMIDAS_CONTROLADOR.VerUltimoRegistro);
 
         // Consultar datos de tabla detalle_comida
         this.router.post('/detalle/menu', TokenValidation, TIPO_COMIDAS_CONTROLADOR.CrearDetalleMenu);
