@@ -21,15 +21,18 @@
             </div>
         </div>
     </div>
-    <div class="col-md">
-        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px;">
-            <form method="post">
-                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                    accept="image/png, image/jpeg">
-                <label for="file" class="btn-2">{{textoBoton}}</label>
-            </form>
+    <div class="row text-center">
+        <div class="col-md m-auto">
+            <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px;">
+                <form method="post">
+                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                        accept="image/png, image/jpeg">
+                    <label for="file" class="btn-2">{{textoBoton}}</label>
+                </form>
+            </div>
         </div>
     </div>
+    
 </div>
 
 
