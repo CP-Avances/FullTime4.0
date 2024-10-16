@@ -1158,45 +1158,44 @@ export class PlanificacionMultipleComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-
     // Dividir el objeto plan_general en partes más pequeñas
     const partes = this.dividirPlanGeneral(datos.plan_general);
     const totalPartes = partes.length; // Obtén la cantidad total de partes
 
-    // Enviar cada parte por separado
-    partes.forEach((parte, index) => {
-      const datosParcial = {
-        parte: parte,
-        user_name: this.user_name,
-        ip: this.ip,
-        parteIndex: index, // Puedes enviar el índice de la parte para referencia
-        totalPartes: totalPartes // Agrega el total de partes al objeto de datos
+    this.enviarParte(partes, 0, totalPartes);
 
-      };
+  }
 
-      this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
 
-        if (res.message === 'OK') {
-          this.ver_guardar = false;
+  enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
+    const datosParcial = {
+      parte: partes[parteIndex],
+      user_name: this.user_name,
+      ip: this.ip,
+      parteIndex: parteIndex, // Enviar el índice de la parte actual
+      totalPartes: totalPartes // Enviar el total de partes
+    };
+  
+    // Llamada HTTP para enviar la parte actual
+    this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
+      // Si la respuesta es "OK", continuamos
+      if (res.message === 'OK') {
+        if ((parteIndex + 1) < totalPartes) {
+          // Si no hemos enviado todas las partes, llamamos recursivamente para enviar la siguiente
+          this.enviarParte(partes, parteIndex + 1, totalPartes);
+        } else {
+          // Si hemos enviado todas las partes, mostramos el toast de éxito
+          this.cargar = true;
           this.cargar = true;
           this.toastr.success('Operación exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
-        } else {
-          this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
-            timeOut: 6000,
-          });
-          this.CerrarVentana();
         }
+      } else {
+        // Si hay un error, lo mostramos en consola
+        console.log(res.message);
       }
-        , error => {
-          this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
-            timeOut: 6000,
-          });
-          this.CerrarVentana();
-        });
     });
-
   }
 
   dividirPlanGeneral(plan_general: any[]): any[][] {

@@ -1411,11 +1411,9 @@ export class HorariosMultiplesComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-  
     // Dividir el objeto plan_general en partes más pequeñas
     const partes = this.dividirPlanGeneral(datos.plan_general);
     const totalPartes = partes.length;
-  
     // Enviar la primera parte
     this.enviarParte(partes, 0, totalPartes);
   }
@@ -1449,7 +1447,10 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       } else {
         // Si hay un error, lo mostramos en consola
-        console.log(res.message);
+        this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+          timeOut: 6000,
+        });
+        this.CerrarVentana();
       }
     });
   }
