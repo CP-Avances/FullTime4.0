@@ -18,48 +18,54 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
     constructor() {
-        this.partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
-        this.contador = 0;
-        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            let errores = 0;
-            let ocurrioError = false;
-            let mensajeError = '';
-            let codigoError = 0;
-            // const { user_name, ip, plan_general } = req.body;
-            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
-            console.log("ver parteIndex", parteIndex);
-            console.log("ver totalPartes", totalPartes);
-            if (!this.partesRecibidas) {
-                this.partesRecibidas = [];
-            } // Inicializar si no está definida
-            this.contador++;
-            this.partesRecibidas.push(...parte);
-            //const partesValidas = this.partesRecibidas.filter(p => p !== undefined);
-            if ((parteIndex + 1) === totalPartes) {
-                for (let i = 0; i < this.partesRecibidas.length; i++) {
+        /*
+            public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
+                const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+        
+                let errores: number = 0;
+                let partesRecibidas: any = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
+                let ocurrioError = false;
+                let mensajeError = '';
+                let codigoError = 0;
+        
+                console.log("ver parteIndex", parteIndex)
+                console.log("ver totalPartes", totalPartes)
+                partesRecibidas = parte;
+                let contador = 0;
+                for (let i = 0; i < partesRecibidas.length; i++) {
                     try {
+                        contador = contador + 1 ;
                         // INICIAR TRANSACCION
-                        yield database_1.default.query('BEGIN');
-                        const result = yield database_1.default.query(`
-                        INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                            fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
-                            minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                        `, [
-                            this.partesRecibidas[i].fec_hora_horario, this.partesRecibidas[i].tolerancia, this.partesRecibidas[i].estado_timbre,
-                            this.partesRecibidas[i].id_det_horario, this.partesRecibidas[i].fec_horario, this.partesRecibidas[i].id_empl_cargo,
-                            this.partesRecibidas[i].tipo_entr_salida, this.partesRecibidas[i].id_empleado, this.partesRecibidas[i].id_horario, this.partesRecibidas[i].tipo_dia,
-                            this.partesRecibidas[i].salida_otro_dia, this.partesRecibidas[i].min_antes, this.partesRecibidas[i].min_despues, this.partesRecibidas[i].estado_origen,
-                            this.partesRecibidas[i].min_alimentacion
-                        ]);
+                        await pool.query('BEGIN');
+        
+                        const result = await pool.query(
+                            `
+                                    INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                                        minutos_antes, minutos_despues, estado_origen, minutos_alimentacion)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                                    `
+                            ,
+                            [
+                                partesRecibidas[i].fec_hora_horario, partesRecibidas[i].tolerancia, partesRecibidas[i].estado_timbre,
+                                partesRecibidas[i].id_det_horario, partesRecibidas[i].fec_horario, partesRecibidas[i].id_empl_cargo,
+                                partesRecibidas[i].tipo_entr_salida, partesRecibidas[i].id_empleado, partesRecibidas[i].id_horario, partesRecibidas[i].tipo_dia,
+                                partesRecibidas[i].salida_otro_dia, partesRecibidas[i].min_antes, partesRecibidas[i].min_despues, partesRecibidas[i].estado_origen,
+                                partesRecibidas[i].min_alimentacion
+                            ]
+                        );
+        
                         const [plan] = result.rows;
-                        const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(this.partesRecibidas[i].fec_hora_horario.split(' ')[1]);
-                        const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(this.partesRecibidas[i].fec_hora_horario, 'ddd');
-                        const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(this.partesRecibidas[i].fec_horario, 'ddd');
+        
+                        const fecha_hora_horario1 = await FormatearHora(partesRecibidas[i].fec_hora_horario.split(' ')[1]);
+                        const fecha_hora_horario = await FormatearFecha2(partesRecibidas[i].fec_hora_horario, 'ddd');
+                        const fecha_horario = await FormatearFecha2(partesRecibidas[i].fec_horario, 'ddd');
+        
                         plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
                         plan.fecha_horario = fecha_horario;
+        
                         // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
                             usuario: user_name,
                             accion: 'I',
@@ -68,12 +74,13 @@ class PlanGeneralControlador {
                             ip,
                             observacion: null
                         });
+        
                         // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                    }
-                    catch (error) {
+                        await pool.query('COMMIT');
+        
+                    } catch (error) {
                         // REVERTIR TRANSACCION
-                        yield database_1.default.query('ROLLBACK');
+                        await pool.query('ROLLBACK');
                         ocurrioError = true;
                         mensajeError = error.message;
                         codigoError = 500;
@@ -81,11 +88,77 @@ class PlanGeneralControlador {
                         break;
                     }
                 }
-                return res.status(200).jsonp({ message: 'OK' });
+        
+                if ((parteIndex + 1) === totalPartes) {
+                    if (contador == partesRecibidas.length) {
+                        return res.status(200).jsonp({ message: 'OK' });
+                    }
+                } else {
+                    return res.status(200).jsonp({ message: 'Parte: ' + (parteIndex+1) + 'de '+  totalPartes });
+                }
             }
-            else {
-                return res.status(200).jsonp({ message: 'Parte recibida: ' + (parteIndex + 1) + 'de: ' + totalPartes });
+        */
+        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+            let partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
+            let errores = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            partesRecibidas = parte;
+            let contador = 0;
+            for (let i = 0; i < partesRecibidas.length; i++) {
+                try {
+                    contador += 1;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const result = yield database_1.default.query(`
+                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
+                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                `, [
+                        partesRecibidas[i].fec_hora_horario, partesRecibidas[i].tolerancia, partesRecibidas[i].estado_timbre,
+                        partesRecibidas[i].id_det_horario, partesRecibidas[i].fec_horario, partesRecibidas[i].id_empl_cargo,
+                        partesRecibidas[i].tipo_entr_salida, partesRecibidas[i].id_empleado, partesRecibidas[i].id_horario, partesRecibidas[i].tipo_dia,
+                        partesRecibidas[i].salida_otro_dia, partesRecibidas[i].min_antes, partesRecibidas[i].min_despues, partesRecibidas[i].estado_origen,
+                        partesRecibidas[i].min_alimentacion
+                    ]);
+                    const [plan] = result.rows;
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(partesRecibidas[i].fec_hora_horario.split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(partesRecibidas[i].fec_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(partesRecibidas[i].fec_horario, 'ddd');
+                    plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                    plan.fecha_horario = fecha_horario;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(plan),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    ocurrioError = true;
+                    mensajeError = error.message;
+                    codigoError = 500;
+                    errores++;
+                    break;
+                }
             }
+            if (ocurrioError) {
+                // Si ocurrió un error, devolver el error con el mensaje adecuado
+                return res.status(500).jsonp({ message: 'Error al procesar la parte', error: mensajeError });
+            }
+            // Respuesta final con 'OK' si todo se procesó correctamente
+            return res.status(200).jsonp({ message: 'OK' });
         });
         this.BuscarFechasMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar } = req.body;

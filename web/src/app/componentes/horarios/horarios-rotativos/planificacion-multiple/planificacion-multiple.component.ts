@@ -1152,34 +1152,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
-    /*
-    const datos = {
-      plan_general: this.plan_general,
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-    this.restP.CrearPlanGeneral(datos).subscribe(res => {
-      if (res.message === 'OK') {
-        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-          timeOut: 6000,
-        });
-        this.ver_guardar = false;
-        this.cargar = true;
-      }
-      else {
-        this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
-          timeOut: 6000,
-        });
-        this.CerrarVentana();
-      }
-    }, error => {
-      this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
-        timeOut: 6000,
-      });
-      this.CerrarVentana();
-    })
-*/
-
+  
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
