@@ -50,7 +50,7 @@ export const TokenValidation = (req: Request, res: Response, next: NextFunction)
                     o.fec_desactivacion = new Date(o.fec_desactivacion)
                 return o
             })
-            if (ok_licencias.lenght === 0) return res.status(401).send('La licencia no existe.');
+            if (ok_licencias.length === 0) return res.status(401).send('La licencia no existe.');
 
             const hoy = new Date();
 

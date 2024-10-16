@@ -1,37 +1,37 @@
 .btn {
-    margin-left: 15px;
-    background-color: rgb(80, 87, 97);
-    color: white;
+  margin-left: 15px;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 #funcion {
-    font-size: 15px;
+  font-size: 15px;
 }
 
 table {
-    width: 100%;
-    font-size: 12px;
+  width: 100%;
+  font-size: 12px;
 }
 
 td {
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 #verticalLine {
-    border-right: 1px solid rgb(52, 65, 84);
-    padding-right: 100px;
+  border-right: 1px solid rgb(52, 65, 84);
+  padding-right: 100px;
 }
 
 .centra {
-    text-align: center;
+  text-align: center;
 }
 
 .panel-title {
   display: flex;
   justify-content: center; /* Centrar horizontalmente */
-  align-items: center;    /* Centrar verticalmente */
+  align-items: center; /* Centrar verticalmente */
 }
 
 :host ::ng-deep .mat-expansion-indicator::after {
@@ -40,42 +40,46 @@ td {
 
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
-    .Tabla_titulo span{
-        font-size: small;
-    }
+  .Tabla_titulo span {
+    font-size: small;
+  }
 
-    mat-card-content{
-        padding: 0px;
+  mat-card-content {
+    padding: 0px;
 
-        .container{
-            margin: 0%;
-            width: 100%;
-        }
+    .container {
+      margin: 0%;
+      width: 100%;
     }
-    .modal_body{
-        margin-left: 0px; 
-    }
-    .todos_links{
-        margin-left: 2px;
-    }
+  }
+  .modal_body {
+    margin-left: 0px;
+  }
+  .todos_links {
+    margin-left: 2px;
+  }
 }
 
-.todos_links{
-    margin-left: 5px;
+.todos_links {
+  margin-left: 5px;
 }
-.modal_body{
-    margin-left: 60px; 
+.modal_body {
+  margin-left: 60px;
 }
 .table_horario {
-    max-height: 400px; /* Ajusta según sea necesario */
+  max-height: 400px; /* Ajusta según sea necesario */
 }
 
 /* Contenedor para manejar el scroll horizontal */
 .table-wrapper {
-    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
-    display: block;
+  overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
+  display: block;
 }
 
-.thead{
-    position:sticky;
+.thead {
+  position: sticky;
+}
+
+p {
+  font-size: x-small;
 }

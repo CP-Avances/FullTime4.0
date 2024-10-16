@@ -34,6 +34,8 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/accionesexistentes', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginasExistentes);
         // METODO PARA OBTENER TODAS LAS ACCIONES  **USADO
         this.router.get('/menu/paginas/acciones/todas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarAcciones);
+        // METODO PARA LISTAR FUNCIONES DE ROLES   **USADO
+        this.router.get('/buscar-funciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.BuscarFuncionesRoles);
     }
 }
 const rolPermisosRutas = new RolPermisosRutas();

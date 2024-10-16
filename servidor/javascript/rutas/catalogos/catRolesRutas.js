@@ -19,9 +19,7 @@ class PruebasRutas {
         // METODO PARA REGISTRAR ROL
         this.router.post('/', verificarToken_1.TokenValidation, catRolesControlador_1.default.CrearRol);
         // METODO PARA ACTUALIZAR ROLES DE MANERA MASIVA  **USADO
-        this.router.put('/updateUsers', verificarToken_1.TokenValidation, catRolesControlador_1.default.ActualizarRolUusuario);
-        // METODO PARA LISTAR ROLES  **USADO
-        this.router.get('/listausuariosroles', verificarToken_1.TokenValidation, catRolesControlador_1.default.ListarRolesUsuario);
+        this.router.put('/updateUsers', verificarToken_1.TokenValidation, catRolesControlador_1.default.ActualizarRolUsuario);
         // METODO PARA LISTAR INFORMACION DEL ROL **USADO
         this.router.get('/:id', verificarToken_1.TokenValidation, catRolesControlador_1.default.ObtenerUnRol);
         // METODO PARA LISTAR ROLES EXCEPTO EL QUE SE EDITA  **USADO

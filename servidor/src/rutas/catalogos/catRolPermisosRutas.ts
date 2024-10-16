@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import rolPermisosControlador from '../../controlador/catalogos/catRolPermisosControlador';
+import ROLPERMISOSCONTROLADOR from '../../controlador/catalogos/catRolPermisosControlador';
 import { TokenValidation } from '../../libs/verificarToken';
 
 class RolPermisosRutas {
@@ -10,37 +10,41 @@ class RolPermisosRutas {
     configuracion(): void {
 
         // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
-        this.router.get('/menu/paginas/:tipo', TokenValidation, rolPermisosControlador.ListarMenuRoles);
+        this.router.get('/menu/paginas/:tipo', TokenValidation, ROLPERMISOSCONTROLADOR.ListarMenuRoles);
 
         // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
-        this.router.get('/menu/modulos/:tipo', TokenValidation, rolPermisosControlador.ListarMenuModulosRoles);
+        this.router.get('/menu/modulos/:tipo', TokenValidation, ROLPERMISOSCONTROLADOR.ListarMenuModulosRoles);
 
         // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
-        this.router.post('/menu/paginasmodulos', TokenValidation, rolPermisosControlador.ListarModuloPorNombre);
+        this.router.post('/menu/paginasmodulos', TokenValidation, ROLPERMISOSCONTROLADOR.ListarModuloPorNombre);
 
         // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO
-        this.router.post('/menu/paginas/ide', TokenValidation, rolPermisosControlador.ObtenerIdPaginas);
+        this.router.post('/menu/paginas/ide', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerIdPaginas);
 
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION  **USADO
-        this.router.post('/menu/paginas/ideaccion', TokenValidation, rolPermisosControlador.ObtenerIdPaginasConAcciones);
+        this.router.post('/menu/paginas/ideaccion', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerIdPaginasConAcciones);
 
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
-        this.router.post('/menu/todaspaginasrol', TokenValidation, rolPermisosControlador.ObtenerPaginasRol);
+        this.router.post('/menu/todaspaginasrol', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerPaginasRol);
 
         // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
-        this.router.post('/menu/paginas/insertar', TokenValidation, rolPermisosControlador.AsignarPaginaRol);
+        this.router.post('/menu/paginas/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarPaginaRol);
 
         // METODO PARA ELIMINAR REGISTRO  **USADO
-        this.router.post('/menu/paginas/eliminar', TokenValidation, rolPermisosControlador.EliminarPaginaRol);
+        this.router.post('/menu/paginas/eliminar', TokenValidation, ROLPERMISOSCONTROLADOR.EliminarPaginaRol);
 
         // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA  **USADO
-        this.router.post('/menu/paginas/acciones', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginas);
+        this.router.post('/menu/paginas/acciones', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerAccionesPaginas);
 
         // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA  **USADO
-        this.router.post('/menu/paginas/accionesexistentes', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginasExistentes);
+        this.router.post('/menu/paginas/accionesexistentes', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerAccionesPaginasExistentes);
 
         // METODO PARA OBTENER TODAS LAS ACCIONES  **USADO
-        this.router.get('/menu/paginas/acciones/todas', TokenValidation, rolPermisosControlador.ListarAcciones);
+        this.router.get('/menu/paginas/acciones/todas', TokenValidation, ROLPERMISOSCONTROLADOR.ListarAcciones);
+
+        // METODO PARA LISTAR FUNCIONES DE ROLES   **USADO
+        this.router.get('/buscar-funciones', TokenValidation, ROLPERMISOSCONTROLADOR.BuscarFuncionesRoles);
+
     }
 }
 

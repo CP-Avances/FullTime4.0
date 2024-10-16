@@ -145,23 +145,19 @@ export class ListarParametroComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
-  generarPdf(action = 'open') {
+  GenerarPdf(action = 'open') {
     const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download('Parametros_generales' + '.pdf'); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 
   }
 
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -191,7 +187,7 @@ export class ListarParametroComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: 'PARÁMETROS GENERALES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-        ...this.presentarDataPDFTipoPermisos(),
+        ...this.PresentarDataPDF(),
       ],
       styles: {
         tableMarginCabecera: { margin: [0, 10, 0, 0] },
@@ -204,7 +200,7 @@ export class ListarParametroComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
-  presentarDataPDFTipoPermisos(): Array<any> {
+  PresentarDataPDF(): Array<any> {
     let n: any = []
     this.parametros.forEach((obj: any) => {
       n.push({
@@ -219,7 +215,6 @@ export class ListarParametroComponent implements OnInit {
           ]
         },
       });
-
       if (obj.detalles.length > 0) {
         n.push({
           style: 'tableMargin',
@@ -253,51 +248,93 @@ export class ListarParametroComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************** **
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-  exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.parametros);
+  /** ************************************************************************************************* **
+   ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
+   ** ************************************************************************************************* **/
+
+  ExportToExcel() {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'ParametrosGenerales');
     xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + '.xlsx');
   }
 
-  /** ************************************************************************************************** **
-   ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
-   ** ************************************************************************************************** **/
+  EstructurarDatosExcel() {
+    let datos: any = [];
+    let n: number = 1;
+    this.parametros.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'N°': n++,
+          'PARÁMETRO': obj.descripcion,
+          'DETALLE': det.descripcion,
+          'DESCRIPCIÓN': det.observacion
+        });
+      });
+    });
 
-  exportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.parametros);
+    return datos;
+  }
+
+  /** ************************************************************************************************* **
+   ** **                               METODO PARA EXPORTAR A CSV                                    ** **
+   ** ************************************************************************************************* **/
+
+  ExportToCVS() {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "ParametrosGeneralesCSV" + '.csv');
   }
 
+  EstructurarDatosCSV() {
+    let datos: any = [];
+    let n: number = 1;
+    this.parametros.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'n': n++,
+          'parametro': obj.descripcion,
+          'detalle': det.descripcion,
+          'descripcion': det.observacion
+        });
+      });
+    });
+    return datos;
+  }
+
   /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
+   ** **                           PARA LA EXPORTACION DE ARCHIVOS XML                                ** **
    ** ************************************************************************************************* **/
 
   urlxml: string;
   data: any = [];
-  exportToXML() {
-    let objeto: any;
-    let arregloParametrosGenerales: any = [];
+  ExportToXML() {
+    var objeto: any;
+    var arregloHorarios: any = [];
     this.parametros.forEach((obj: any) => {
+      let detalles: any = [];
+      obj.detalles.forEach((det: any) => {
+        detalles.push({
+          "$": { "id": det.id },
+          "detalle": det.descripcion,
+          "descripcion": det.observacion
+        });
+      });
       objeto = {
-        "tipo_parametro": {
-          "$": { "id": obj.id },
-          "descripcion": obj.descripcion,
+        "parametro": {
+          "$": { "codigo": obj.id },
+          "nombre": obj.descripcion,
+          "detalles": { "detalle": detalles }
         }
-
       }
-      arregloParametrosGenerales.push(objeto)
+      arregloHorarios.push(objeto)
     });
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Parametros' });
-    const xml = xmlBuilder.buildObject(arregloParametrosGenerales);
+
+    const xmlBuilder = new xml2js.Builder({ rootName: 'ParametrosGenerales' });
+    const xml = xmlBuilder.buildObject(arregloHorarios);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -313,10 +350,9 @@ export class ListarParametroComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
 
-
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = 'Parametros.xml';
+    a.download = 'ParametrosGenerales.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }

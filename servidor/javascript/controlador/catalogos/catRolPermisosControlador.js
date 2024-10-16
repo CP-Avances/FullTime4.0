@@ -232,6 +232,44 @@ class RolPermisosControlador {
             }
         });
     }
+    // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
+    BuscarFuncionesRoles(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const CON_ACCIONES = yield database_1.default.query(`
+      SELECT pr.id_rol, p.id AS id_pagina, pr.pagina, a.accion, pr.movil, p.nombre_modulo
+      FROM ero_rol_permisos AS pr
+      JOIN es_acciones_paginas AS a ON a.id = pr.id_accion
+      JOIN es_paginas AS p ON p.nombre = pr.pagina
+      `);
+            console.log('con acciones ', CON_ACCIONES.rowCount);
+            const SIN_ACCIONES = yield database_1.default.query(`
+      SELECT pr.id_rol, p.id AS id_pagina, pr.pagina, pr.id_accion AS accion, pr.movil, p.nombre_modulo
+      FROM ero_rol_permisos AS pr
+      JOIN es_paginas AS p ON p.nombre = pr.pagina AND pr.id_accion IS NULL
+      `);
+            console.log('sin acciones ', SIN_ACCIONES.rowCount);
+            var respuesta = [];
+            if (SIN_ACCIONES.rowCount != 0 && CON_ACCIONES.rowCount != 0) {
+                SIN_ACCIONES.rows.forEach((obj) => {
+                    CON_ACCIONES.rows.push(obj);
+                });
+                respuesta = CON_ACCIONES.rows;
+            }
+            else if (CON_ACCIONES.rowCount != 0) {
+                respuesta = CON_ACCIONES.rows;
+            }
+            else if (SIN_ACCIONES.rowCount != 0) {
+                respuesta = SIN_ACCIONES.rows;
+            }
+            console.log('respuesta ', respuesta.length);
+            if (respuesta.length != 0) {
+                return res.jsonp(respuesta);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
 }
 exports.rolPermisosControlador = new RolPermisosControlador();
 exports.default = exports.rolPermisosControlador;
