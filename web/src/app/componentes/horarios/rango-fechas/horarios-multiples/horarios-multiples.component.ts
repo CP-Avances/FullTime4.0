@@ -990,7 +990,6 @@ export class HorariosMultiplesComponent implements OnInit {
   }
 
   CrearPlanGeneral2(form: any, valor: any, validos: number) {
-    console.log("Ver valor que entra en CrearPlanGeneral2", valor)
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
     valor.forEach(dh => {
@@ -1017,7 +1016,6 @@ export class HorariosMultiplesComponent implements OnInit {
       var origen: string = '';
       var tipo_dia: string = '';
 
-      console.log("ver this.fechasHorario ", this.fechasHorario);
       this.fechasHorario.map((obj: any) => {
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo_dia = default_;
@@ -1081,7 +1079,6 @@ export class HorariosMultiplesComponent implements OnInit {
         }
         else {
           // BUSCAR FERIADOS
-          console.log("ver los feriados por id", this.feriados2[dh.id])
           if (this.feriados2[dh.id]) {
             let feri = this.feriados2[dh.id]
             for (let i = 0; i < feri.length; i++) {
@@ -1094,7 +1091,6 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
 
-        console.log("ver recuperar2 ", this.recuperar2[dh.id])
         // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
         if (this.recuperar2[dh.id]) {
           let recu = this.recuperar2[dh.id]
@@ -1106,7 +1102,6 @@ export class HorariosMultiplesComponent implements OnInit {
             }
           }
         }
-        console.log("ver id del usuario: ", dh.id)
         const miObjeto: { obj: string, dia: string; tipo: string; tipo_dia: string; origen: string } = {
           obj: obj,
           dia: moment.weekdays(day),
@@ -1123,9 +1118,6 @@ export class HorariosMultiplesComponent implements OnInit {
         // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
         else if (tipo_dia === 'DFD') {
           horariosEliminar.push(miObjeto)
-          console.log("entra a  tipo_dia === 'DFD'", tipo_dia);
-
-
           this.lista_descanso.forEach((desc: any) => {
             if (desc.tipo === 'DFD') {
               tipo = 'FD';
@@ -1136,11 +1128,7 @@ export class HorariosMultiplesComponent implements OnInit {
           })
         }
         else if (tipo_dia === 'L' && origen === 'L') {
-          console.log("entra a  tipo_dia === 'L' && origen === 'L'", tipo_dia + " " + origen);
-
           horariosEliminar.push(miObjeto)
-
-
           this.lista_descanso.forEach((desc: any) => {
             if (desc.tipo === 'DL') {
               tipo = 'L';
@@ -1163,10 +1151,7 @@ export class HorariosMultiplesComponent implements OnInit {
       ids
     }).subscribe(
       existe => {
-        console.log("ver horarios existenter segunda vez", existe)
-
         existe.forEach(horario => {
-
           if (!horariosEliminarPorUsuario[horario.id_empleado]) {
             horariosEliminarPorUsuario[horario.id_empleado] = [horario]
           } else {
@@ -1312,7 +1297,6 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
-      console.log("ver plan general: ", this.plan_general)
     }
   }
 
@@ -1322,14 +1306,12 @@ export class HorariosMultiplesComponent implements OnInit {
     this.eliminar_horarios = [];
     this.eliminar = [];
     this.contar_eliminar = 0;
-    console.log("ver lista_descanso", this.lista_descanso);
     this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
         id: obj.id_horario,
       }
       this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
     })
-    console.log(" ver eliminar_horarios", this.eliminar_horarios);
     let total = 0;
     this.usuarios_validos.forEach((obj: any) => {
       this.eliminar_horarios.forEach((eh: any) => {
@@ -1337,7 +1319,6 @@ export class HorariosMultiplesComponent implements OnInit {
       })
     })
 
-    console.log(" ver usuarios_validos", this.usuarios_validos);
 
     let datos = {
       usuarios_validos: this.usuarios_validos,
@@ -1383,6 +1364,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
+  /*
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
     const datos = {
@@ -1416,19 +1398,71 @@ export class HorariosMultiplesComponent implements OnInit {
           })
         } else {
           console.log(res.message);
-          /*
-          this.toastr.error('Ups!!! algo salió mal.', '', {
-            timeOut: 6000,
-          });
-          */
         }
       });
     });
   }
 
+  */
+
+  GuardarInformacion() {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+  
+    // Dividir el objeto plan_general en partes más pequeñas
+    const partes = this.dividirPlanGeneral(datos.plan_general);
+    const totalPartes = partes.length;
+  
+    // Enviar la primera parte
+    this.enviarParte(partes, 0, totalPartes);
+  }
+
+
+  enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
+    const datosParcial = {
+      parte: partes[parteIndex],
+      user_name: this.user_name,
+      ip: this.ip,
+      parteIndex: parteIndex, // Enviar el índice de la parte actual
+      totalPartes: totalPartes // Enviar el total de partes
+    };
+  
+    // Llamada HTTP para enviar la parte actual
+    this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
+      // Si la respuesta es "OK", continuamos
+      if (res.message === 'OK') {
+        if ((parteIndex + 1) < totalPartes) {
+          // Si no hemos enviado todas las partes, llamamos recursivamente para enviar la siguiente
+          this.enviarParte(partes, parteIndex + 1, totalPartes);
+        } else {
+          // Si hemos enviado todas las partes, mostramos el toast de éxito
+          this.cargar = true;
+          this.guardar = false;
+          this.toastr.success(
+            'Operación exitosa.', 
+            'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
+            timeOut: 6000,
+          });
+        }
+      } else {
+        // Si hay un error, lo mostramos en consola
+        console.log(res.message);
+      }
+    });
+  }
+  
+
+
+
+
+
+
   dividirPlanGeneral(plan_general: any[]): any[][] {
     const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
-    const tamañoParte = 90000; // Ajusta el tamaño de cada parte según sea necesario
+    const tamañoParte = 80000; // Ajusta el tamaño de cada parte según sea necesario
     // Verifica si el tamaño total es menor que el tamaño de cada parte
     if (plan_general.length <= tamañoParte) {
       return [plan_general]; // Devuelve el array original como la única parte
