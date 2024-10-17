@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-relojes',
@@ -18,6 +19,7 @@ import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.s
 export class RelojesComponent implements OnInit {
 
   // VARIABLES DE ALMACENAMIENTO
+  zonas_horarias: any = [];
   sucursales: any = [];
   departamento: any = [];
   registrar: boolean = true;
@@ -60,6 +62,8 @@ export class RelojesComponent implements OnInit {
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
   contraseniaF = new FormControl('', [Validators.minLength(1)]);
   idFabricacionF = new FormControl('', [Validators.minLength(4)]);
+  zonasF = new FormControl('', Validators.required);
+  filteredOptions: Observable<any[]>;
 
   constructor(
     private restCatDepartamento: DepartamentosService,
@@ -79,7 +83,7 @@ export class RelojesComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-
+    
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -87,6 +91,34 @@ export class RelojesComponent implements OnInit {
     this.FiltrarSucursales();
     this.ValidarFormulario();
     this.ContarDispositivos();
+    this.LeerZonasHorarias();
+
+  }
+
+  // METODO PARA BUSCAR ZONAS HORARIAS
+  LeerZonasHorarias() {
+    this.zonas_horarias = [];
+    this.rest.ConsultarZonasHorarias().subscribe(response => {
+      this.zonas_horarias = response;
+
+      this.filteredOptions = this.zonasF.valueChanges
+        .pipe(
+          startWith(''),
+          map((value: any) => this._filter(value))
+        );
+    });
+  }
+
+  // METODO DE FILTRACION DE DATOS DE ZONAS HORARIAS -- POR NOMBRE --POR FORMATO -- POR NUMERO
+  private _filter(value: string): any {
+    if (value != null) {
+      const filterValue = value.toLowerCase();
+      return this.zonas_horarias.filter((z: any) =>
+        z.formato_nombre.toLowerCase().includes(filterValue) ||
+        z.formato_gmt.toLowerCase().includes(filterValue) ||
+        z.formato_gmt.replace('GMT', '').includes(filterValue)
+      );
+    }
   }
 
   // METODO PARA CONTAR DIPOSITIVOS
@@ -118,6 +150,7 @@ export class RelojesComponent implements OnInit {
     });
     this.segundoFormulario = this.formulario.group({
       macForm: this.macF,
+      zonaForm: this.zonasF,
       marcaForm: this.marcaF,
       serieForm: this.serieF,
       modeloForm: this.modeloF,
@@ -168,6 +201,9 @@ export class RelojesComponent implements OnInit {
   InsertarReloj(form1: any, form2: any) {
     // VALIDAR DIRECCION MAC
     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
+    const zona = form2.zonaForm;
+    const [nombre, formatogmt] = zona.split(" ("); // DIVIDIMOS EN DOS PARTES
+    const gmt = formatogmt.slice(0, -1); // QUITAMOS EL ULTIMO PARENTESIS
 
     let reloj = {
       // PRIMER FORMULARIO
@@ -188,9 +224,16 @@ export class RelojesComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      formato_gmt_dispositivo: gmt,
+      zona_horaria_dispositivo: nombre,
       user_name: this.user_name,
       user_ip: this.ip,
     };
+    console.log('form2 ', form2.zonaForm)
+    console.log(`Nombre: ${nombre}`);
+    console.log(`GMT: ${gmt}`);
+    console.log('ver form ', reloj)
+
     // VALIDAR DIRECCION MAC
     if (reloj.mac != '') {
       if (direccMac.test(reloj.mac.toString())) {

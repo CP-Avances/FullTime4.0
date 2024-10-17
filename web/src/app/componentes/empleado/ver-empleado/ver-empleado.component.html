@@ -2330,11 +2330,21 @@
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
             <div *ngIf="HabilitarAlimentacion">
                 <mat-card class="mat-elevation-z8">
-                    <div class="d-flex bd-highlight" id="titulo">
-                        <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaAdminComida()" *ngIf="getCrearDatos()">Añadir</button>
+                    <div id="titulo" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>
+                                ADMINISTRAR MÓDULO ALIMENTACIÓN
+                            </span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                                (click)="AbrirVentanaAdminComida()" *ngIf="getCrearDatos()">Añadir 
+                            </button>
+                        </div>
                     </div>
+                    
                     <mat-card-content>
                         <div class="nota" style="margin-left: 10px; padding-top: 20px;">
                             <span>
@@ -2360,10 +2370,19 @@
 
             <div *ngIf="aprobacion">
                 <mat-card class="mat-elevation-z8">
-                    <div class="d-flex bd-highlight" id="titulo">
-                        <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaAutorizar()" *ngIf="getCrearDatos()">Crear</button>
+                    <div id="titulo" class="row w-100 m-auto">
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        </div>
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>
+                                AUTORIZACIÓN DEPARTAMENTOS
+                            </span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                                (click)="AbrirVentanaAutorizar()" *ngIf="getCrearDatos()">Crear
+                            </button>
+                        </div>
                     </div>
                     <mat-card-content>
                         <div class="container" style="padding-top: 15px;">

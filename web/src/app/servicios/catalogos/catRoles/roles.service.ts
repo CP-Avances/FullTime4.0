@@ -17,7 +17,7 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL  **USADO
-  EliminarRoles(id: number, datos:any) {
+  EliminarRoles(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`;
     const httpOtions = {
       body: datos
@@ -47,18 +47,10 @@ export class RolesService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
-  listaUsuariosRoles(){
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rol/listausuariosroles`).pipe(
-      catchError(error => {
-        console.error('Error occurred:', error);
-        return throwError(error);
-      })
-    );
-  }
 
-  actualizarRoles(data: any){
+  // METODO PARA ACTUALIZAR ROLES  DE FORMA MASIVA **USADO
+  ActualizarRoles(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol/updateUsers`, data);
   }
-
 
 }

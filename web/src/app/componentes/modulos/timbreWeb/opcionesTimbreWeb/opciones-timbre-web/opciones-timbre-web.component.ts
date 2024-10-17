@@ -755,4 +755,25 @@ export class OpcionesTimbreWebComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
+  //CONTROL BOTONES
+  getGuardarConfiguracionTimbreWeb(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Guardar Configuración Timbre Web');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerConfiguracionTimbreWeb(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Configuración Timbre Web');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

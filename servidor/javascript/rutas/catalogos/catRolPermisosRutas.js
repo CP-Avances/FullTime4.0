@@ -26,7 +26,7 @@ class RolPermisosRutas {
         this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
         //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL
         this.router.post('/menu/todaspaginasmenurol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasMenuRol);
-        // METODO PARA ASIGNAR FUNCIONES AL ROL
+        // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
         this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
         // METODO PARA ELIMINAR REGISTRO  **USADO
         this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);
@@ -36,6 +36,8 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/accionesexistentes', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginasExistentes);
         // METODO PARA OBTENER TODAS LAS ACCIONES  **USADO
         this.router.get('/menu/paginas/acciones/todas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarAcciones);
+        // METODO PARA LISTAR FUNCIONES DE ROLES   **USADO
+        this.router.get('/buscar-funciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.BuscarFuncionesRoles);
     }
 }
 const rolPermisosRutas = new RolPermisosRutas();

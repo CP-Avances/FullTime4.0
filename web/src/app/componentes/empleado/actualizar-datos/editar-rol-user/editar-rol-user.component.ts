@@ -697,7 +697,7 @@ export class EditarRolUserComponent implements OnInit {
           }
         })
 
-        this.restRol.actualizarRoles(data).subscribe((res: any) => {
+        this.restRol.ActualizarRoles(data).subscribe((res: any) => {
           this.toastr.success(res.message, '', {
             timeOut: 4000,
           });

@@ -99,6 +99,10 @@ class DepartamentoRutas {
         this.router.get('/contrato/:id', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarDatosUltimoContrato);
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);
+        this.router.post('/buscarFechaUsuarios', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoUsuarios);
+
+
+
         // METODO PARA ELIMINAR EL CONTRATO REGISTRADO DE LA TABLA EU_EMPLEADOS_CONTRATOS       **USADO
         this.router.post('/eliminarContrato', [TokenValidation], CONTRATO_EMPLEADO_CONTROLADOR.EliminarContrato);
 

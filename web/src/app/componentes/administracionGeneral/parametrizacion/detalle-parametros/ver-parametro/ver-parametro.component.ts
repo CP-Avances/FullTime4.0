@@ -326,20 +326,21 @@ export class VerParametroComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   // METODO PARA REGISTRAR DETALLES
-  RegistrarValores(detalle: any) {
+  RegistrarValores(detalle: any, observacion: any) {
     this.ingreso = 1;
     this.parametro.ListarDetalleParametros(parseInt(this.idParametro)).subscribe(datos => {
-      this.ActualizarDetalle(datos[0].id_detalle, detalle);
+      this.ActualizarDetalle(datos[0].id_detalle, detalle, observacion);
     }, vacio => {
-      this.CrearDetalle(detalle);
+      this.CrearDetalle(detalle, observacion);
     })
   }
 
   // METODO PARA REGISTRAR NUEVO PARÁMETRO
-  CrearDetalle(detalle: any) {
+  CrearDetalle(detalle: any, observacion: any) {
     let datos = {
       id_tipo: this.idParametro,
       descripcion: detalle,
+      observacion: observacion,
       user_name: this.user_name,
       ip: this.ip,
     };
@@ -353,10 +354,11 @@ export class VerParametroComponent implements OnInit {
   }
 
   // METODO PARA ACTUALIZAR DETALLE DEL PARAMETRO
-  ActualizarDetalle(id_detalle: number, detalle: any) {
+  ActualizarDetalle(id_detalle: number, detalle: any, observacion: any) {
     let datos = {
       id: id_detalle,
       descripcion: detalle,
+      observacion: observacion,
       user_name: this.user_name,
       ip: this.ip,
     };
@@ -391,14 +393,14 @@ export class VerParametroComponent implements OnInit {
   });
 
   // METODO PARA SELECCIONAR EVENTO
-  SelecionarEvento(event: MatRadioChange) {
+  SelecionarEvento(event: MatRadioChange, observacion: any) {
     var seleccion = event.value;
-    this.RegistrarValores(seleccion);
+    this.RegistrarValores(seleccion, observacion);
   }
 
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
-  ActualizarRegistro(detalle: any) {
-    this.ActualizarDetalle(this.datosDetalle[0].id_detalle, detalle);
+  ActualizarRegistro(detalle: any, observacion: any) {
+    this.ActualizarDetalle(this.datosDetalle[0].id_detalle, detalle, observacion);
   }
 
   // METODO PARA LEER EL REGISTRO
@@ -414,23 +416,28 @@ export class VerParametroComponent implements OnInit {
 
   GuardarDatos(seleccion: number) {
     let formato = '';
+    let observacion = '';
     if (seleccion === 1) {
       formato = 'DD/MM/YYYY';
+      observacion = 'Formato americano';
     }
     else if (seleccion === 2) {
       formato = 'MM/DD/YYYY';
+      observacion = 'Formato ingles';
     }
     else if (seleccion === 3) {
       formato = 'YYYY-MM-DD';
+      observacion = 'Formato estándar';
     }
     else if (seleccion === 4) {
       formato = 'hh:mm:ss A';
+      observacion = 'Formato de 12 horas';
     }
     else if (seleccion === 5) {
       formato = 'HH:mm:ss';
+      observacion = 'Formato de 24 horas';
     }
-
-    this.RegistrarValores(formato);
+    this.RegistrarValores(formato, observacion);
   }
 
   /** ******************************************************************************************* **
@@ -469,6 +476,7 @@ export class VerParametroComponent implements OnInit {
     }
     // OPCION UNO (1) SIN CONSIDERAR TOLERANCIA
     else {
+      this.observacion_atraso = 'No se considera minutos de tolerancia.';
       this.tipoF.reset();
       this.ver_con_tolerancia = false;
       this.ver_con_tolerancia_2 = false;
@@ -478,6 +486,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   // METODO PARA SELECCION TIPO ATRASO
+  observacion_atraso: any = '';
   SeleccionarTipo(event: MatRadioChange) {
     var opcion = event.value;
     this.ver_registrar_atraso = false;
@@ -485,31 +494,33 @@ export class VerParametroComponent implements OnInit {
     if (opcion === '2-1') {
       this.ver_sin_tolerancia = true;
       this.ver_con_tolerancia_2 = false;
+      this.observacion_atraso = 'Considerar minutos de tolerancia. Si el usuario llegará más tarde de los minutos de tolerancia configurados, se contabilizará todos los minutos de atraso a partir de su horario de entrada.';
     }
     // OPCION (2-2) CONSIDERANDO MINUTOS DE TOLERANCIA - ATRASO CALCULADO CON TOLERANCIA
     else {
       this.ver_con_tolerancia_2 = true;
       this.ver_sin_tolerancia = false;
+      this.observacion_atraso = 'Considerar minutos de tolerancia. Si el usuario llegará más tarde de los minutos de tolerancia configurados, se contabilizará los minutos de atraso a partir de los minutos de tolerancia.';
     }
   }
 
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   RegistrarAtraso() {
     if (this.tipoF.value) {
-      this.CrearDetalle(this.tipoF.value)
+      this.CrearDetalle(this.tipoF.value, this.observacion_atraso)
     }
     else {
-      this.CrearDetalle(this.toleranciaF.value)
+      this.CrearDetalle(this.toleranciaF.value, this.observacion_atraso)
     }
   }
 
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   ActualizarAtraso() {
     if (this.tipoF.value) {
-      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.tipoF.value)
+      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.tipoF.value, this.observacion_atraso)
     }
     else {
-      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.toleranciaF.value)
+      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.toleranciaF.value, this.observacion_atraso)
     }
   }
 
@@ -527,12 +538,13 @@ export class VerParametroComponent implements OnInit {
         this.ver_con_tolerancia = false;
         this.ver_con_tolerancia_2 = false;
         this.ver_sin_tolerancia = true;
+        this.observacion_atraso = 'No se considera minutos de tolerancia.';
       }
       else if (this.datosDetalle[0].descripcion === '2-1') {
         this.ver_con_tolerancia = true;
         this.ver_sin_tolerancia = true;
         this.ver_con_tolerancia_2 = false;
-
+        this.observacion_atraso = 'Considerar minutos de tolerancia. Si el usuario llegará más tarde de los minutos de tolerancia configurados, se contabilizará todos los minutos de atraso a partir de su horario de entrada.';
         this.toleranciaF.setValue('2');
         this.tipoF.setValue(this.datosDetalle[0].descripcion);
       }
@@ -540,7 +552,7 @@ export class VerParametroComponent implements OnInit {
         this.ver_con_tolerancia = true;
         this.ver_con_tolerancia_2 = true;
         this.ver_sin_tolerancia = false;
-
+        this.observacion_atraso = 'Considerar minutos de tolerancia. Si el usuario llegará más tarde de los minutos de tolerancia configurados, se contabilizará los minutos de atraso a partir de los minutos de tolerancia.';
         this.toleranciaF.setValue('2');
         this.tipoF.setValue(this.datosDetalle[0].descripcion);
       }
@@ -560,9 +572,9 @@ export class VerParametroComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   seleccion: any;
-  SelecionarCarga(event: MatRadioChange) {
+  SelecionarCarga(event: MatRadioChange, observacion: any) {
     this.seleccion = event.value;
-    this.RegistrarValores(this.seleccion);
+    this.RegistrarValores(this.seleccion, observacion);
   }
 
 
@@ -571,9 +583,9 @@ export class VerParametroComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   opcion_kardex: any;
-  SelecionarDescarga(event: MatRadioChange) {
+  SelecionarDescarga(event: MatRadioChange, observacion: any) {
     this.opcion_kardex = event.value;
-    this.RegistrarValores(this.opcion_kardex);
+    this.RegistrarValores(this.opcion_kardex, observacion);
   }
 
   /** ******************************************************************************************* **
@@ -581,9 +593,9 @@ export class VerParametroComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   opcion_laboral: any;
-  SelecionarLaboral(event: MatRadioChange) {
+  SelecionarLaboral(event: MatRadioChange, observacion: any) {
     this.opcion_laboral = event.value;
-    this.RegistrarValores(this.opcion_laboral);
+    this.RegistrarValores(this.opcion_laboral, observacion);
   }
 
 

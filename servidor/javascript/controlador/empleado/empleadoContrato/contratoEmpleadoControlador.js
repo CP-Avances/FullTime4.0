@@ -437,6 +437,29 @@ class ContratoEmpleadoControlador {
             }
         });
     }
+    // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
+    EncontrarFechaContratoUsuarios(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { ids } = req.body;
+                const FECHA = yield database_1.default.query(`
+                SELECT cv.id_contrato, ec.fecha_ingreso, ec.fecha_salida, ec.id_empleado
+                FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec
+                WHERE cv.id_empleado = ANY($1) AND ec.id = cv.id_contrato
+                `, [ids]);
+                const fechaContrato = FECHA.rows;
+                if (FECHA.rowCount != 0) {
+                    return res.jsonp({ fechaContrato });
+                }
+                else {
+                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                }
+            }
+            catch (error) {
+                console.log("ver el error: ", error);
+            }
+        });
+    }
     /** **************************************************************************** **
      ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
      ** **************************************************************************** **/

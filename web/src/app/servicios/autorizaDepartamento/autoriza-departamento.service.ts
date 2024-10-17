@@ -42,10 +42,6 @@ export class AutorizaDepartamentoService {
   }
 
 
-  BuscarEmpleadosAutorizan(id: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/empleadosAutorizan/${id}`);
-  }
-
   // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    **USADO
   BuscarListaEmpleadosAutorizan(id: any) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/listaempleadosAutorizan/${id}`);

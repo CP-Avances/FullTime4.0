@@ -7,7 +7,7 @@
             <div class="container" style="padding-top: 15px;">
                 <br>
                 <div class="row" *ngIf="getConfigurarImagenes()">
-                    <div class="col-6 text-center">
+                    <div class="col-6 text-center" id="verticalLine">
                         <div class="d-flex justify-content-around">
                             <label id="datosF">CABECERA DE CORREO</label>
                         </div>
@@ -25,7 +25,7 @@
                                     </div>
                                 </ng-template>
                                 <br>
-                                <a style="padding-top: 10px;" (click)="EditarLogo('header')" matSuffix
+                                <a (click)="EditarLogo('header')" matSuffix
                                     matTooltipPosition="right" matTooltip="Actualizar imagen de encabezado de correos.">
                                     <mat-icon id="logo">add_a_photo</mat-icon>
                                 </a>
@@ -37,7 +37,7 @@
                         <div class="d-flex justify-content-center">
                             <label id="datosF">PIE DE FIRMA CORREO</label>
                         </div>
-                        <div class="btn-contenedor">
+                        <div>
                             <figure>
                                 <div *ngIf="imagen_default_p; else pieCorreo"
                                     class="d-flex flex-wrap justify-content-center">
@@ -46,11 +46,12 @@
                                 </div>
                                 <ng-template #pieCorreo>
                                     <div class="d-flex flex-wrap justify-content-center">
-                                        <img src="{{pie}}" alt="logo de empresa" srcset="" width="75%" height="75%">
+                                        <img src="{{pie}}" alt="logo de empresa" srcset="" 
+                                        width="75%" height="75%">
                                     </div>
                                 </ng-template>
                                 <br>
-                                <a style="padding-top: 10px;" (click)="EditarLogo('footer')" matSuffix
+                                <a (click)="EditarLogo('footer')" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Actualizar imagen de pie de firma de correos.">
                                     <mat-icon id="logo">add_a_photo</mat-icon>

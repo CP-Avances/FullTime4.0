@@ -100,7 +100,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.totalDispositivos = 4;
+    this.totalDispositivos = 10;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
@@ -352,11 +352,14 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     }
     else if (observacion == 'Ya existe en el sistema' ||
+      observacion == 'IP ya existe en el sistema' ||
+      observacion == 'Código ya existe en el sistema' ||
       observacion == 'Número de serie ya existe en el sistema' ||
       observacion == 'Dirección MAC ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'Sucursal no existe en el sistema' ||
+      observacion == 'Verificar zona horaria' ||
       observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     }
@@ -423,8 +426,7 @@ export class ListarRelojesComponent implements OnInit {
         });
       }
       else {
-        let ingresar = this.totalDispositivos - this.numeroDipositivos;
-        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos.', 'Permitido ingresar solo ' + ingresar + ' dispositivos.', {
+        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos (' + this.listaDispositivosCorrectos.length+ ').', 'Permitido ingresar solo ' + this.totalDispositivos + ' dispositivos.', {
           timeOut: 4000,
         });
       }
@@ -500,7 +502,7 @@ export class ListarRelojesComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
@@ -517,6 +519,7 @@ export class ListarRelojesComponent implements OnInit {
                 { text: 'Mac', style: 'tableHeader' },
                 { text: 'ID Fabricanción', style: 'tableHeader' },
                 { text: 'Fabricante', style: 'tableHeader' },
+                { text: 'Zona Horaria', style: 'tableHeader' },
               ],
               ...this.relojes.map((obj: any) => {
                 return [
@@ -534,6 +537,7 @@ export class ListarRelojesComponent implements OnInit {
                   { text: obj.mac, style: 'itemsTable' },
                   { text: obj.id_fabricacion, style: 'itemsTable' },
                   { text: obj.fabricante, style: 'itemsTable' },
+                  { text: obj.zona_horaria_dispositivo + ' (' + obj.formato_gmt_dispositivo + ')', style: 'itemsTable' }
                 ];
               })
             ]
@@ -614,6 +618,7 @@ export class ListarRelojesComponent implements OnInit {
           "mac": obj.mac,
           "id_fabricacion": obj.id_fabricacion,
           "fabricante": obj.fabricante,
+          "zona_horaria": obj.zona_horaria_dispositivo + ' (' + obj.formato_gmt_dispositivo + ')'
         }
       }
       arregloRelojes.push(objeto)

@@ -242,13 +242,15 @@ export class ListarTipoAccionComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Tipos de Permisos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE TIPOS DE ACCIONES DE PERSONAL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.presentarDataPDFTipoPermisos(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10, alignment: 'center', }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8, alignment: 'center', },
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
       }
     };
   }
@@ -259,15 +261,16 @@ export class ListarTipoAccionComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMarginCabecera',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', '*', '*', '*', '*'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Tipo de acción de personal', style: 'tableHeader' },
-                { text: 'Descripción', style: 'tableHeader' },
-                { text: 'Base Legal', style: 'tableHeader' },
-                { text: 'Tipo', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'TIPO DE ACCIÓN DE PERSONAL', style: 'tableHeader' },
+                { text: 'DESCRIPCIÓN', style: 'tableHeader' },
+                { text: 'BASE LEGAL', style: 'tableHeader' },
+                { text: 'TIPO', style: 'tableHeader' },
               ],
               ...this.tipo_acciones.map((obj: any) => {
                 return [

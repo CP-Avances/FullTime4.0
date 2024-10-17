@@ -15,10 +15,21 @@ export class PlanGeneralService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/`, datos);
   }
 
+  // METODO PARA CREAR PLAN GENERAL   **USADO
+  CrearPlanGeneral2(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/cargar-planificacion`, datos);
+  }
+
   // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
   BuscarFechas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar_fechas`, datos);
   }
+
+  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
+  BuscarFechasMultiples(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar_fechas_multiple`, datos);
+  }
+
 
   // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {

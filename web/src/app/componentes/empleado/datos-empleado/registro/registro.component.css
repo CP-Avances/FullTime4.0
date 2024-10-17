@@ -1,14 +1,14 @@
 mat-form-field {
-    width: 280px;
+    width: 100%;
     padding: 10px 10px 0px 10px;
 }
 
 button {
-    margin: 5px 10px 5px 10px;
+    margin: auto;
 }
 
 .button {
-    margin: 5px 10px 5px 10px;
+    margin: auto;
 }
 
 #letraT {
@@ -24,7 +24,7 @@ button {
 }
 
 .btn {
-    margin-left: 15px;
+    margin-left: 5px;
     background-color: rgb(80, 87, 97);
     color: white;
 }

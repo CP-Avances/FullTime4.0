@@ -202,7 +202,7 @@ class AutorizaDepartamentoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
-            
+
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
@@ -216,7 +216,15 @@ class AutorizaDepartamentoControlador {
         const { id_depa } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT * FROM informacionpersonalautoriza ia WHERE ia.id_depar = 9
+            SELECT e.nombre, e.apellido, e.correo, ad.id AS id_autoriza, ad.id_empleado_cargo, 
+                ec.id_tipo_cargo, tc.cargo, ec.id_departamento AS id_depa_registro, 
+	            (SELECT dep.nombre AS depa_registro FROM ed_departamentos AS dep WHERE ec.id_departamento = dep.id),
+                ad.id_departamento AS id_depar, d.nombre AS nom_depa,
+                ad.estado, ad.autorizar, ad.preautorizar
+            FROM eu_empleados AS e, ed_autoriza_departamento AS ad, ed_departamentos AS d, 
+                eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, contrato_cargo_vigente AS cv
+            WHERE ad.id_empleado = e.id AND d.id = ad.id_departamento AND ec.id = ad.id_empleado_cargo
+                AND tc.id = ec.id_tipo_cargo AND cv.id_cargo = ec.id AND ad.id_departamento = $1
             `
             , [id_depa]);
         if (EMPLEADOS.rowCount != 0) {
@@ -227,20 +235,7 @@ class AutorizaDepartamentoControlador {
         }
     }
 
-    public async ObtenerQuienesAutorizan(req: Request, res: Response): Promise<any> {
-        const { id_depar } = req.params;
-        const EMPLEADOS = await pool.query(
-            `
-            SELECT * FROM informacionpersonalautoriza WHERE id_depar = $1
-            `
-            , [id_depar]);
-        if (EMPLEADOS.rowCount != 0) {
-            return res.jsonp(EMPLEADOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registros no encontrados' });
-        }
-    }
+
 
     public async ObtenerListaAutorizaDepa(req: Request, res: Response): Promise<any> {
         const { id_depar } = req.params;

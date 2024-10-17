@@ -44,6 +44,11 @@ class RelojesRuta {
         // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
         this.router.post('/plantillaExcel/', TokenValidation, RELOJES_CONTROLADOR.CargaPlantillaRelojes);
 
+        /** ***************************************************************************************** **
+         ** **                                  ZONAS HORARIAS                                     ** **
+         ** ***************************************************************************************** **/
+        // METODO PARA BUSCAR ZONAS HORARIAS   **USADO
+        this.router.get('/zonas_horarias/buscar', TokenValidation, RELOJES_CONTROLADOR.BuscarZonasHorarias);
 
     }
 }

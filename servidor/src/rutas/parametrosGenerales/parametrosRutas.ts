@@ -15,14 +15,14 @@ class ParametrosRutas {
 
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', TokenValidation, PARAMETROS_CONTROLADOR.ListarParametros);
+        // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
+        this.router.get('/detalle-parametros/buscar', TokenValidation, PARAMETROS_CONTROLADOR.ListarDetallesParametros);
         // BUSCAR LISTA DE DETALLE DE PARAMETROS      **USADO
         this.router.post('/buscar/detalle-parametros', TokenValidation, PARAMETROS_CONTROLADOR.BuscarDetalles);
         // METODO PARA VER DATOS DE UN PARAMETRO **USADO
         this.router.get('/ver-parametro/:id', TokenValidation, PARAMETROS_CONTROLADOR.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
         this.router.get('/:id', TokenValidation, PARAMETROS_CONTROLADOR.VerDetalleParametro);
-        this.router.get('/opciones-marcacion/:id_empleado', TokenValidation, PARAMETROS_CONTROLADOR.VerDetalleParametroUsuario);
-
         // METODO PARA ELIMINAR DETALLE DE PARAMETRO  **USADO
         this.router.delete('/eliminar-detalle/:id', TokenValidation, PARAMETROS_CONTROLADOR.EliminarDetalleParametro);
         // METODO PARA REGISTRAR DETALLE DE PARAMETRO  **USADO

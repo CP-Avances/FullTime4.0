@@ -469,4 +469,25 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     return usuarios;
   }
 
+  //CONTROL BOTONES
+  getEliminarConfiguracionTimbreMovil(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Configuración Timbre Móvil');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargarReportesConfiguracionTimbreMovil(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Reportes Configuración Timbre Móvil');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

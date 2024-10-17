@@ -25,6 +25,7 @@ export class EditarDetalleParametroComponent implements OnInit {
 
   nota: string = '';
   especificacion: string = '';
+  observacion: string = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -40,26 +41,28 @@ export class EditarDetalleParametroComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
+      'Guardar.';
     this.MostrarDatos();
     if (this.data.parametros.id_tipo === 4) {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.';
       this.especificacion = 'Rango de perímetro en metros.';
+      this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
     }
     else if (this.data.parametros.id_tipo === 33) {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.';
       this.especificacion = 'Ingrese el número máximo de correos permitidos.';
+      this.observacion = 'Número de correos electrónicos que se podrán enviar.';
+    }
+    // PARAMETRO DISPOSITIVOS MOVILES
+    else if (this.data.parametros.id === 6) {
+      this.especificacion = 'Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres en la aplicación móvil.';
+      this.observacion = 'Número de dispositivos móviles en los que el usuario podrá iniciar sesión en la aplicación móvil.';
     }
     else {
-      this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar.';
       this.especificacion = '';
     }
   }
 
-  // MÉTIODO PARA MOSTRAR DETALLE DE PARÁMETRO
+  // METODO PARA MOSTRAR DETALLE DE PARAMETRO
   MostrarDatos() {
     this.formulario.patchValue({
       descripcionForm: this.data.parametros.descripcion
@@ -71,6 +74,7 @@ export class EditarDetalleParametroComponent implements OnInit {
     let datos = {
       id: this.data.parametros.id_detalle,
       descripcion: form.descripcionForm,
+      observacion: this.observacion,
       user_name: this.user_name,
       ip: this.ip,
     };

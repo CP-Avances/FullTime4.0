@@ -68,12 +68,6 @@ export class VerDepartamentoComponent implements OnInit {
     { valor: 5, nombre: '5' }
   ];
 
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-
   info: any = [];
   nombre_sucursal: string = '';
   mostrar: boolean = true;
@@ -208,16 +202,14 @@ export class VerDepartamentoComponent implements OnInit {
   empleados: any = [];
   depa: string;
   AbrirVentanaVerListadoEmpleados(departamento: any) {
-    this.habilitarprogress = true;
     var id_depa = departamento.id_departamento_nivel;
     this.depa = departamento.departamento_nombre_nivel;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
+      //console.log('ver empleados ', datos)
       this.empleados = datos;
-      this.habilitarprogress = false;
       this.mostrar = false;
     }, error => {
       this.mostrar = true;
-      this.habilitarprogress = false;
       this.toastr.error('No se ha encontrado usuarios que autoricen en este departamento.', '', {
         timeOut: 4000,
       });

@@ -56,6 +56,56 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
+    // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
+    public async ListarUnDetalleTodosHorarios(req: Request, res: Response): Promise<any> {
+        const { ids_horario } = req.body;
+        const HORARIO = await pool.query(
+            `
+            SELECT dh.*, cg.minutos_comida
+            FROM eh_detalle_horarios AS dh, eh_cat_horarios AS cg
+            WHERE dh.id_horario = cg.id AND dh.id_horario = ANY($1)
+            ORDER BY orden ASC
+            `
+            , [ids_horario])
+            .then((result: any) => {
+                if (result.rowCount === 0) return [];
+
+                return result.rows.map((o: any) => {
+                    switch (o.tipo_accion) {
+                        case 'E':
+                            o.tipo_accion_show = 'Entrada';
+                            o.tipo_accion = 'E';
+                            break;
+                        case 'I/A':
+                            o.tipo_accion_show = 'Inicio alimentación';
+                            o.tipo_accion = 'I/A';
+                            break;
+                        case 'F/A':
+                            o.tipo_accion_show = 'Fin alimentación';
+                            o.tipo_accion = 'F/A';
+                            break;
+                        case 'S':
+                            o.tipo_accion_show = 'Salida';
+                            o.tipo_accion = 'S';
+                            break;
+                        default:
+                            o.tipo_accion_show = 'Desconocido';
+                            o.tipo_accion = 'D';
+                            break;
+                    }
+                    return o;
+                })
+            });
+
+        if (HORARIO.length > 0) {
+            return res.jsonp(HORARIO)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+
     // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {

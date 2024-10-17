@@ -70,4 +70,11 @@ export class RolPermisosService {
   ObtenerAcciones() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/todas`);
   }
+
+
+  // METODO PARA LISTAR FUNIONES DE ROLES DEL SISTEMA  **USADO
+  BuscarFuncionesRoles() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/buscar-funciones`);
+  }
+
 }

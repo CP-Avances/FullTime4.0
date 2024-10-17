@@ -1,19 +1,26 @@
 <div class="container" style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
     <!-- ******************  TABLA DE DISPOSITIVOS REGISTRADOS POR USUARIO  *********************   -->
     <div class="mat-elevation-z8" style="background: white;">
-        <div class="d-flex bd-highlight" id="titulo">
-            <mat-icon (click)="HabilitarSeleccion()" class="flex-shrink-1 bd-highlight" matSuffix
-                matTooltipPosition="right" matTooltip="Habilitar selección múltiple." id="SelectCheck">
-                library_add_check
-            </mat-icon>
-            <span class="w-100 bd-highlight">
-                LISTA DISPOSITIVOS MÓVILES REGISTRADOS
-            </span>
-            <button *ngIf="multiple && getEliminarDispositivos()" class="btn btn-outline-light btn-sm" matSuffix matTooltipPosition="right"
-                matTooltip="Elimina los dispositivos seleccionados." style="float: right; margin-right: 10px;"
-                (click)="AbrirVentanaEliminar(1)">
-                Eliminar Dispositivo
-            </button>
+
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-2 col-md-3 mb-2 mb-md-0 order-2 order-md-2">  
+                <mat-icon (click)="HabilitarSeleccion()" style="float: left;" matSuffix
+                    matTooltipPosition="right" matTooltip="Habilitar selección múltiple." id="SelectCheck">
+                    library_add_check
+                </mat-icon>
+            </div>
+            <div class="col-12 col-md-6 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    LISTA DISPOSITIVOS MÓVILES REGISTRADOS
+                </span>
+            </div>
+            <div class="col-10 col-md-3 mb-2 mb-md-0 order-3 order-md-2" *ngIf="multiple">
+                <button *ngIf="getEliminarDispositivos()" class="btn btn-outline-light btn-sm btn_eliminar" matSuffix matTooltipPosition="right"
+                    matTooltip="Elimina los dispositivos seleccionados."
+                    (click)="AbrirVentanaEliminar(1)">
+                    Eliminar Dispositivo
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive">

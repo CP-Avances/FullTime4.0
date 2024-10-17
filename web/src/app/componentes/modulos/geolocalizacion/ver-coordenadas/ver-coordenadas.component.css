@@ -3,11 +3,6 @@ p {
     text-align: center;
 }
 
-td {
-    padding-top: 10px;
-    text-align: center;
-}
-
 hr {
     background-color: black;
 }
@@ -56,4 +51,11 @@ mat-icon {
 table {
     width: 100%;
     font-size: 12px;
+}
+
+td {
+    padding-top: 10px;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
 }

@@ -267,6 +267,31 @@ class FeriadosControlador {
                     AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount != 0) {
+                    console.log(FERIADO.rows);
+                    return res.jsonp(FERIADO.rows);
+                }
+                else {
+                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                }
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    FeriadosCiudad2(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_inicio, fecha_final, ids } = req.body;
+                const FERIADO = yield database_1.default.query(`
+                SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre, de.id
+                FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
+                    informacion_general AS de
+                WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
+                    AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = ANY($3)
+                `, [fecha_inicio, fecha_final, ids]);
+                if (FERIADO.rowCount != 0) {
+                    console.log(FERIADO.rows);
                     return res.jsonp(FERIADO.rows);
                 }
                 else {
@@ -292,6 +317,32 @@ class FeriadosControlador {
                     AND f.fecha_recuperacion IS NOT null
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount != 0) {
+                    return res.jsonp(FERIADO.rows);
+                }
+                else {
+                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                }
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+    FeriadosRecuperacionCiudad2(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_inicio, fecha_final, ids } = req.body;
+                const FERIADO = yield database_1.default.query(`
+                    SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre,  de.id 
+                    FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s,
+                        informacion_general AS de
+                    WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
+                        AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id= ANY($3)
+                        AND f.fecha_recuperacion IS NOT null
+                    `, [fecha_inicio, fecha_final, ids]);
+                if (FERIADO.rowCount != 0) {
+                    console.log("ver feriado: ", FERIADO.rows);
                     return res.jsonp(FERIADO.rows);
                 }
                 else {

@@ -58,4 +58,9 @@ export class RelojesService {
   VerificarArchivoExcel(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/relojes/upload/revision/`, formData);
   }
+
+  // METODO PARA LISTAR ZONAS HORARIAS   **USADO
+  ConsultarZonasHorarias() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/relojes/zonas_horarias/buscar`);
+  }
 }

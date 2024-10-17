@@ -758,4 +758,25 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
+
+  //CONTROL BOTONES
+  getGuardarConfiguracionTimbreMovil(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Guardar Configuración Timbre Móvil');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerConfiguracionTimbreMovil(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Configuración Timbre Móvil');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
 }

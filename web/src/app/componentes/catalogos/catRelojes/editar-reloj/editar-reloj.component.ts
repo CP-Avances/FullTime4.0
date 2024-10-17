@@ -11,6 +11,7 @@ import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.s
 import { ListarRelojesComponent } from '../listar-relojes/listar-relojes.component';
 import { VerDipositivoComponent } from '../ver-dipositivo/ver-dipositivo.component';
 import { RelojesComponent } from '../relojes/relojes.component';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-editar-reloj',
@@ -33,6 +34,7 @@ export class EditarRelojComponent implements OnInit {
   sucursales: any = [];
   datosReloj: any = [];
   departamento: any = [];
+  zonas_horarias: any = [];
   activarCampo: boolean = false;
   ver_editar: boolean = true;
 
@@ -58,6 +60,8 @@ export class EditarRelojComponent implements OnInit {
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
   contraseniaF = new FormControl('', [Validators.minLength(1)]);
   idFabricacionF = new FormControl('', [Validators.minLength(4)]);
+  zonasF = new FormControl('', Validators.required);
+  filteredOptions: Observable<any[]>;
 
   constructor(
     private restCatDepartamento: DepartamentosService,
@@ -75,10 +79,30 @@ export class EditarRelojComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     this.FiltrarSucursales();
     this.ValidarFormulario();
-    this.ObtenerDatos();
+    this.LeerZonasHorarias();
+  }
+
+  // METODO PARA BUSCAR ZONAS HORARIAS
+  LeerZonasHorarias() {
+    this.zonas_horarias = [];
+    this.rest.ConsultarZonasHorarias().subscribe(response => {
+      this.zonas_horarias = response;
+      this.ObtenerDatos();
+    });
+  }
+
+  // METODO DE FILTRACION DE DATOS DE ZONAS HORARIAS -- POR NOMBRE --POR FORMATO -- POR NUMERO
+  private _filter(value: string): any {
+    if (value != null) {
+      const filterValue = value.toLowerCase();
+      return this.zonas_horarias.filter((z: any) =>
+        z.formato_nombre.toLowerCase().includes(filterValue) ||
+        z.formato_gmt.toLowerCase().includes(filterValue) ||
+        z.formato_gmt.replace('GMT', '').includes(filterValue)
+      );
+    }
   }
 
   // VALIDACIONES DE FORMULARIO
@@ -96,6 +120,7 @@ export class EditarRelojComponent implements OnInit {
     this.segundoFormulario = this.formulario.group({
       macForm: this.macF,
       marcaForm: this.marcaF,
+      zonaForm: this.zonasF,
       serieForm: this.serieF,
       modeloForm: this.modeloF,
       fabricanteForm: this.fabricanteF,
@@ -120,6 +145,7 @@ export class EditarRelojComponent implements OnInit {
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
       })
+      var zona = this.datosReloj.zona_horaria_dispositivo;
       this.segundoFormulario.patchValue({
         macForm: this.datosReloj.mac,
         marcaForm: this.datosReloj.marca,
@@ -128,7 +154,15 @@ export class EditarRelojComponent implements OnInit {
         fabricanteForm: this.datosReloj.fabricante,
         contraseniaForm: this.datosReloj.contrasenia,
         idFabricacionForm: this.datosReloj.id_fabricacion,
+        zonaForm: this.zonas_horarias.filter((o: any) => { return zona === o.formato_nombre }).map((o: any) => { return o.nombre_general })
       })
+      //console.log('ver zonas ', this.zonas_horarias.filter((o: any) => { return zona === o.formato_nombre }).map((o: any) => { return o.nombre_general }))
+
+      this.filteredOptions = this.zonasF.valueChanges
+        .pipe(
+          startWith(''),
+          map((value: any) => this._filter(value))
+        );
     })
   }
 
@@ -170,6 +204,9 @@ export class EditarRelojComponent implements OnInit {
   InsertarReloj(form1: any, form2: any) {
     // VALIDAR DIRECCION MAC
     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
+    const zona = form2.zonaForm;
+    const [nombre, formatogmt] = zona.split(" ("); // DIVIDIMOS EN DOS PARTES
+    const gmt = formatogmt.slice(0, -1); // QUITAMOS EL ULTIMO PARENTESIS
 
     let datosReloj = {
       // PRIMER FORMULARIO
@@ -191,10 +228,15 @@ export class EditarRelojComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      formato_gmt_dispositivo: gmt,
+      zona_horaria_dispositivo: nombre,
       user_name: this.user_name,
       user_ip: this.ip,
     };
-
+    /*console.log('form2 ', form2.zonaForm)
+    console.log(`Nombre: ${nombre}`);
+    console.log(`GMT: ${gmt}`);
+    console.log('ver form ', datosReloj)*/
     // VERIFICAR DIRECCION MAC
     if (datosReloj.mac != '') {
       if (direccMac.test(datosReloj.mac.toString())) {
@@ -213,6 +255,7 @@ export class EditarRelojComponent implements OnInit {
 
   // METODO PARA GUARDAR EN LA BASE DE DATOS
   GuardarSistema(datosReloj: any) {
+    //console.log('ingresa')
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
       if (response.message === 'actualizado') {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {

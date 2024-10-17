@@ -1,9 +1,19 @@
 <div style="padding-top: 20px;" *ngIf="configurar">
-    <div id="titulo">
-        <span>CONFIGURAR OPCIONES EN MARCACIONES</span>
-        <mat-icon *ngIf="activar_boton" class="float-right" id="cerrar"
-            (click)="LimpiarFormulario()">highlight_off</mat-icon>
+
+    <div id="titulo" class="row w-100 m-auto">
+        <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+            <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+        </div>
+        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+            <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                CONFIGURAR OPCIONES EN MARCACIONES
+            </span>
+        </div>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon *ngIf="activar_boton" class="float-right" id="cerrar" (click)="LimpiarFormulario()">highlight_off</mat-icon>
+        </div>
     </div>
+
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
             <div id="resultados">
@@ -205,16 +215,22 @@
                 </div>
             </div>
             <hr>
-            <div *ngIf="activar_boton" style="padding-bottom: 10px; text-align: center;">
-                <button class="btn btn-sm" (click)="GuardarRegistros(0, '')">
-                    Guardar
-                </button>
-                <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')">
-                    Ver Configuración
-                </button>
-                <button class="btn btn-sm" (click)="MostrarLista()">
-                    Mostrar lista
-                </button>
+            <div class="row w-100" *ngIf="activar_boton" style="padding-bottom: 10px; text-align: center;">
+                <div class="col-6 col-md-4">
+                    <button class="btn btn-sm" (click)="GuardarRegistros(0, '')" *ngIf="getGuardarConfiguracionTimbreWeb()">
+                        Guardar
+                    </button>
+                </div>
+                <div class="col-6 col-md-4">
+                    <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')" *ngIf="getVerConfiguracionTimbreWeb()">
+                        Ver Configuración
+                    </button>
+                </div>
+                <div class="col-12 col-md-4">
+                    <button class="btn btn-sm" (click)="MostrarLista()">
+                        Mostrar lista
+                    </button>
+                </div>
             </div>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
@@ -255,12 +271,12 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
                                         (click)="GuardarRegistros(s, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(s, '')" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(s, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -318,12 +334,12 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
                                         (click)="GuardarRegistros(r, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(r, '')" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(r, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -382,12 +398,12 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
                                         (click)="GuardarRegistros(c, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(c, '')" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(c, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -445,12 +461,12 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
                                         (click)="GuardarRegistros(d, 'ver')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(d, '')" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(d, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -512,12 +528,12 @@
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual" class="fas fa-eye" id="t-ver"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
                                         (click)="VerOpciones([e], 'e')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i id="accion" *ngIf="auto_individual" class="fa fa-hand-pointer-o"
+                                    <i id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()" class="fa fa-hand-pointer-o"
                                         (click)="RegistrarMultiple([e])" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>

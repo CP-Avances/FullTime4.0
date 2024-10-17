@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-between">
-                    <mat-form-field>
+                    <mat-form-field class="m-auto w-100">
                         <mat-label>Seleccionar Continente</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de continentes.">
                             help_outline</mat-icon>
@@ -33,7 +33,7 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field>
+                    <mat-form-field class="m-auto w-100">
                         <mat-label>Seleccionar país</mat-label>
                         <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput
                             [formControl]="nombrePaisF" [matAutocomplete]="auto" required [readonly]="ver_pais">
@@ -48,7 +48,7 @@
                             help_outline
                         </mat-icon>
                     </mat-form-field>
-                    <mat-form-field>
+                    <mat-form-field class="m-auto w-100">
                         <mat-label>Seleccionar provincia</mat-label>
                         <input type="text" placeholder="Seleccionar provincia" aria-label="Number" matInput
                             [formControl]="idProvinciaF" [matAutocomplete]="auto1" required [readonly]="ver_provincia">
@@ -67,7 +67,7 @@
             </div>
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-between">
-                    <mat-form-field>
+                    <mat-form-field class="m-auto w-100">
                         <mat-label>Seleccionar ciudad</mat-label>
                         <input type="text" placeholder="Seleccionar ciudad" aria-label="Number" matInput
                             [formControl]="idCiudad" [matAutocomplete]="auto2" required [readonly]="ver_ciudad">
@@ -82,7 +82,7 @@
                             help_outline
                         </mat-icon>
                     </mat-form-field>
-                    <mat-form-field>
+                    <mat-form-field class="m-auto w-100">
                         <mat-label>Establecimiento</mat-label>
                         <input matInput placeholder="Ej: Sucursal ..." [formControl]="nombre" required
                             [readonly]="sucursal">

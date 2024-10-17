@@ -309,6 +309,33 @@ class FeriadosControlador {
                 , [fecha_inicio, fecha_final, id_empleado]);
 
             if (FERIADO.rowCount != 0) {
+                console.log(FERIADO.rows)
+                return res.jsonp(FERIADO.rows)
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        }
+        catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
+
+    public async FeriadosCiudad2(req: Request, res: Response) {
+        try {
+            const { fecha_inicio, fecha_final, ids } = req.body;
+            const FERIADO = await pool.query(
+                `
+                SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre, de.id
+                FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
+                    informacion_general AS de
+                WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
+                    AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = ANY($3)
+                `
+                , [fecha_inicio, fecha_final, ids]);
+
+            if (FERIADO.rowCount != 0) {
+                console.log(FERIADO.rows)
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -346,6 +373,36 @@ class FeriadosControlador {
             return res.jsonp({ message: 'error' });
         }
     }
+
+
+        // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+        public async FeriadosRecuperacionCiudad2(req: Request, res: Response) {
+            try {
+                const { fecha_inicio, fecha_final, ids } = req.body;
+                const FERIADO = await pool.query(
+                    `
+                    SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre,  de.id 
+                    FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s,
+                        informacion_general AS de
+                    WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
+                        AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id= ANY($3)
+                        AND f.fecha_recuperacion IS NOT null
+                    `
+                    , [fecha_inicio, fecha_final, ids]);
+    
+                if (FERIADO.rowCount != 0) {
+                    console.log("ver feriado: ", FERIADO.rows)
+                    return res.jsonp(FERIADO.rows)
+
+                }
+                else {
+                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                }
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        }
 
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
@@ -884,7 +941,7 @@ class FeriadosControlador {
      ** **                          METODOS DE APLICACION MOVIL                                    ** **
      ** ********************************************************************************************* **/
 
-     // METODO PARA LEER FERIADOS   **USADO
+    // METODO PARA LEER FERIADOS   **USADO
     public async LeerFeriados(req: Request, res: Response): Promise<Response> {
         try {
             const fecha = new Date();

@@ -12,3 +12,9 @@ table {
     width: 100%;
     font-size: 12px;
 }
+
+td {
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+}

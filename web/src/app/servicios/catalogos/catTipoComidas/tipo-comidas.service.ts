@@ -10,6 +10,11 @@ export class TipoComidasService {
     private http: HttpClient
   ) { }
 
+  // METODO PARA LISTAR TIPOS DE COMIDAS CON SU DETALLE     **USADO
+  ConsultarDetallesComida() {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/listar-detalle`);
+  }
+
   // Invocación del METODO post para crear nuevo tipo de comida
   CrearNuevoTipoComida(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas`, datos);

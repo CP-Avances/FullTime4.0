@@ -53,19 +53,19 @@
             </div>
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-around">
-                    <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;">
+                    <section class="d-flex flex-column bd-highlight" style="padding-top: 10px;">
                         <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
                             <div class="bd-highlight">
-                                <div class="row">
-                                    <div class="col-md">
+                                <div class="row w-100 ml-3">
+                                    <div class="col-12">
                                         <mat-radio-button value=1 (click)="QuitarArchivo()">Retirar archivo
                                         </mat-radio-button>
                                     </div>
-                                    <div class="col-md">
+                                    <div class="col-12">
                                         <mat-radio-button value=2 (click)="ActivarArchivo()">Actualizar archivo
                                         </mat-radio-button>
                                     </div>
-                                    <div class="col-md" *ngIf="acciones">
+                                    <div class="col-12" *ngIf="acciones">
                                         <mat-radio-button value=3 (click)="LimpiarAcciones()">Cancelar
                                         </mat-radio-button>
                                     </div>
@@ -76,13 +76,18 @@
 
                     <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;" *ngIf="activar">
                         <div class="bd-highlight">
-                            <form method="post" enctype="multipart/form-data">
-                                <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
-                                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
-                                    matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
-                                    Subir Carnet
-                                </label>
-                            </form>
+                            <div class="row">
+                                <div class="col-12 m-auto">
+                                    <form method="post" enctype="multipart/form-data">
+                                        <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
+                                        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
+                                            matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
+                                            Subir Carnet
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            
                         </div>
                         <div class="bd-highlight" style="text-align: center;">
                             <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado."

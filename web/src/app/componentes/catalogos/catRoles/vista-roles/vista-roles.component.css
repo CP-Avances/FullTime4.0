@@ -1,47 +1,59 @@
 .btn {
-    background-color: rgb(80, 87, 97);
-    color: white;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 p {
-    font-size: x-small;
+  font-size: x-small;
 }
 
 td {
-    padding-top: 10px;
-    text-align: center;
-    vertical-align: middle;
+  padding-top: 10px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 button {
-    margin: 5px 10px 5px 10px;
+  margin: 5px 10px 5px 10px;
 }
 
 #funtion {
-    color: rgb(17, 4, 66);
-    cursor: pointer;
+  color: rgb(17, 4, 66);
+  cursor: pointer;
 }
 
 table {
-    width: 100%;
+  width: 100%;
 }
 
 #items {
-    font-size: 12px;
-    margin-top: 8%;
-    font-style: normal;
-    font-weight: 600;
-    letter-spacing: 1px;
-    word-wrap: break-word;
-    color: black;
-    padding-left: 10px;
+  font-size: 12px;
+  margin-top: 8%;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+  color: black;
+  padding-left: 10px;
 }
 
 mat-tab-group {
-    background: rgb(232, 232, 232);
-    background: radial-gradient(circle, rgba(232, 232, 232, 0.8883928571428571) 0%, rgba(249, 249, 249, 1) 100%);
+  background: rgb(232, 232, 232);
+  background: radial-gradient(
+    circle,
+    rgba(232, 232, 232, 0.8883928571428571) 0%,
+    rgba(249, 249, 249, 1) 100%
+  );
 }
 
-.thead{
-    position:sticky;
+.thead {
+  position: sticky;
+}
+
+#documento {
+    color: rgb(19, 7, 250);
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 15px;
 }

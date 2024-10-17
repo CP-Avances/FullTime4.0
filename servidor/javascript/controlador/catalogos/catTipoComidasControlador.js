@@ -19,12 +19,12 @@ class TipoComidasControlador {
     ListarTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const TIPO_COMIDAS = yield database_1.default.query(`
-            SELECT ctc.id, ctc.nombre, ctc.id_comida, ctc.hora_inicio, 
-                ctc.hora_fin, tc.nombre AS tipo 
-            FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc
-            WHERE ctc.id_comida = tc.id
-            ORDER BY tc.nombre ASC, ctc.id ASC
-            `);
+      SELECT ctc.id, ctc.nombre, ctc.id_comida, ctc.hora_inicio, 
+        ctc.hora_fin, tc.nombre AS tipo 
+      FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc
+      WHERE ctc.id_comida = tc.id
+      ORDER BY tc.nombre ASC, ctc.id ASC
+      `);
             if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
@@ -33,15 +33,17 @@ class TipoComidasControlador {
             }
         });
     }
-    ListarTipoComidasDetalles(req, res) {
+    // METODO PARA LISTAR TIPOS DE COMIDAS CON SU DETALLE      **USADO
+    ListarDetallesComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const TIPO_COMIDAS = yield database_1.default.query(`
-            SELECT ctc.id, ctc.nombre, ctc.id_comida, ctc.hora_inicio, 
-                ctc.hora_fin, tc.nombre AS tipo, dm.nombre AS nombre_plato, dm.valor, dm.observacion 
-            FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc, ma_detalle_comida AS dm 
-            WHERE ctc.id_comida = tc.id AND dm.id_horario_comida = ctc.id 
-            ORDER BY tc.nombre ASC, ctc.id ASC
-            `);
+      SELECT c.nombre AS servicio, hc.id AS id_horario_comida, hc.nombre AS menu, 
+        hc.hora_inicio, hc.hora_fin,
+        dc.id AS id_detalle, dc.nombre AS plato, dc.valor, dc.observacion
+      FROM ma_cat_comidas AS c
+      JOIN ma_horario_comidas AS hc ON hc.id_comida = c.id
+      JOIN ma_detalle_comida AS dc ON dc.id_horario_comida = hc.id
+      `);
             if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }

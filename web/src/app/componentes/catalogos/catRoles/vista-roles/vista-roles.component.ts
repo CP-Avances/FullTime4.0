@@ -25,6 +25,8 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
+import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-vista-roles',
@@ -36,7 +38,7 @@ export class VistaRolesComponent implements OnInit {
 
   ver_roles: boolean = true;
   ver_funciones: boolean = false;
-  
+
   idEmpleado: number; // VARIABLE DE ID DE EMPLEADO QUE INICIA SESIÓN
   roles: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE ROLES
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
@@ -54,6 +56,7 @@ export class VistaRolesComponent implements OnInit {
   // CAMPO DE BUSQUEDA DE DATOS
   buscarDescripcion = new FormControl('', Validators.minLength(2));
 
+  get reloj_virtual(): boolean { return this.varificarFunciones.app_movil; }
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantilla.color_Secundary }
   get p_color(): string { return this.plantilla.color_Primary }
@@ -61,7 +64,9 @@ export class VistaRolesComponent implements OnInit {
   get frase(): string { return this.plantilla.marca_Agua }
 
   constructor(
+    private varificarFunciones: MainNavService,
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private permisos: RolPermisosService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARAIBLE MANEJO DE RUTAS URL
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
@@ -100,6 +105,7 @@ export class VistaRolesComponent implements OnInit {
     this.numero_pagina = 1;
     this.rest.BuscarRoles().subscribe(res => {
       this.roles = res;
+      this.ObtenerFuncionesRoles();
     });
   }
 
@@ -160,13 +166,43 @@ export class VistaRolesComponent implements OnInit {
   }
 
 
+  // METODO PARA BUSCAR FUNCIONES DE LOS ROLES
+  funciones: any = [];
+  data_general: any = [];
+  ObtenerFuncionesRoles() {
+    this.funciones = [];
+    this.data_general = [];
+    this.permisos.BuscarFuncionesRoles().subscribe(res => {
+      this.funciones = res;
+      this.data_general = this.roles;
+      this.data_general.forEach((rol: any) => {
+        rol.funciones = this.funciones.filter((funcion: any) => funcion.id_rol === rol.id);
+      });
+      this.data_general.sort((a: any, b: any) => a.id - b.id);
+      console.log('funciones ', this.data_general);
+    });
+  }
+
+  // METODO PARA SELECCIONAR INFORMACION
+  datos_archivo: any;
+  SeleccionarDatos(id: number) {
+    this.datos_archivo = [];
+    if (id != 0) {
+      this.datos_archivo = this.data_general.filter((item: any) => item.id === id);
+    }
+    else {
+      this.datos_archivo = this.data_general;
+    }
+  }
+
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
-  GenerarPdf(action = 'open') {
-    this.OrdenarDatos(this.roles);
+
+  GenerarPdf(action = 'open', id: number) {
+    this.SeleccionarDatos(id);
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -174,16 +210,17 @@ export class VistaRolesComponent implements OnInit {
       case 'download': pdfMake.createPdf(documentDefinition).download('Roles' + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-    this.ObtenerRoles();
   }
 
   DefinirInformacionPDF() {
-
     return {
-      // ENCABEZADO DE LA PAGINA
+      // ENCABEZADO DE PÁGINA
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE LA PAGINA
+      header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -204,74 +241,151 @@ export class VistaRolesComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Roles del Sistema', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 10] },
-        this.PresentarDataPDFRoles(),
+        { image: this.logoE, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'PERMISOS O FUNCIONALIDADES DEL ROL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        itemsTableInfo: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
       }
     };
   }
 
-  // ESTRUCTURA DEL ARCHIVO PDF
-  PresentarDataPDFRoles() {
-    return {
-      columns: [
-        { width: '*', text: '' },
-        {
-          width: 'auto',
+  // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
+  PresentarDataPDF(): Array<any> {
+    let n: any = []
+    this.datos_archivo.forEach((obj: any) => {
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*'],
+          headerRows: 1,
+          body: [
+            [
+              { text: `ROL: ${obj.nombre}`, style: 'itemsTableInfo', border: [true, true, true, true] },],
+          ]
+        },
+      });
+
+      if (obj.funciones.length > 0) {
+        n.push({
+          style: 'tableMargin',
           table: {
-            widths: [50, 150],
+            widths: ['*'],
+            headerRows: 1,
+            body: [
+              [{ rowSpan: 1, text: 'FUNCIONES DEL SISTEMA ASIGNADAS', style: 'tableHeader', border: [true, true, true, false] }],
+            ]
+          }
+        });
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['*', '*', 'auto', 'auto', 'auto'],
+            headerRows: 1,
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
+                { text: 'PÁGINA', style: 'tableHeader' },
+                { text: 'FUNCIÓN', style: 'tableHeader' },
+                { text: 'MÓDULO', style: 'tableHeader' },
+                { text: 'APLICACIÓN WEB', style: 'tableHeader' },
+                { text: 'APLICACIÓN MÓVIL', style: 'tableHeader' },
               ],
-              ...this.roles.map((obj: any) => {
+              ...obj.funciones.map((detalle: any) => {
                 return [
-                  { text: obj.id, style: 'itemsTable' },
-                  { text: obj.nombre, style: 'itemsTable' },
+                  { text: detalle.pagina, style: 'itemsTableCentrado' },
+                  { text: detalle.accion, style: 'itemsTableCentrado' },
+                  {
+                    text: detalle.nombre_modulo === 'permisos'
+                      ? 'Módulo de Permisos'
+                      : detalle.nombre_modulo === 'vacaciones'
+                        ? 'Módulo de Vacaciones'
+                        : detalle.nombre_modulo === 'horas_extras'
+                          ? 'Módulo de Horas Extras'
+                          : detalle.nombre_modulo === 'alimentacion'
+                            ? 'Módulo de Alimentación'
+                            : detalle.nombre_modulo === 'acciones_personal'
+                              ? 'Módulo de Acciones de Personal'
+                              : detalle.nombre_modulo === 'geolocalizacion'
+                                ? 'Módulo de Geolocalización'
+                                : detalle.nombre_modulo === 'timbre_virtual'
+                                  ? 'Módulo de Timbre Virtual'
+                                  : detalle.nombre_modulo === 'reloj_virtual'
+                                    ? 'Aplicación Móvil'
+                                    : detalle.nombre_modulo === 'aprobar'
+                                      ? 'Aprobaciones Solicitudes'
+                                      : detalle.nombre_modulo, style: 'itemsTableCentrado'
+                  },
+                  { text: detalle.movil == false ? 'Sí' : '', style: 'itemsTableCentrado' },
+                  { text: detalle.movil == true ? 'Sí' : '', style: 'itemsTableCentrado' },
                 ];
               })
-            ],
+            ]
           },
-          // ESTILO DE COLORES FORMATO ZEBRA
           layout: {
-            fillColor: function (i: any) {
-              return (i % 2 === 0) ? '#CCD1D1' : null;
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
-        },
-        { width: '*', text: '' },
-      ]
-    };
+        });
+      }
+    });
+    return n;
   }
+
 
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
   ExportToExcel() {
-    this.OrdenarDatos(this.roles);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.roles.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        NOMBRE_ROL: obj.nombre
-      }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.roles[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
-    }
-    wsr["!cols"] = wscols;
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Roles');
     xlsx.writeFile(wb, "RolesEXCEL" + '.xlsx');
-    this.ObtenerRoles();
+  }
+
+  EstructurarDatosExcel() {
+    let datos: any = [];
+    let n: number = 1;
+    this.data_general.forEach((obj: any) => {
+      obj.funciones.forEach((det: any) => {
+        datos.push({
+          'N°': n++,
+          'ROL': obj.nombre,
+          'PÁGINA': det.pagina,
+          'FUNCIÓN': det.accion,
+          'MÓDULO': det.nombre_modulo === 'permisos'
+            ? 'Módulo de Permisos'
+            : det.nombre_modulo === 'vacaciones'
+              ? 'Módulo de Vacaciones'
+              : det.nombre_modulo === 'horas_extras'
+                ? 'Módulo de Horas Extras'
+                : det.nombre_modulo === 'alimentacion'
+                  ? 'Módulo de Alimentación'
+                  : det.nombre_modulo === 'acciones_personal'
+                    ? 'Módulo de Acciones de Personal'
+                    : det.nombre_modulo === 'geolocalizacion'
+                      ? 'Módulo de Geolocalización'
+                      : det.nombre_modulo === 'timbre_virtual'
+                        ? 'Módulo de Timbre Virtual'
+                        : det.nombre_modulo === 'reloj_virtual'
+                          ? 'Aplicación Móvil'
+                          : det.nombre_modulo === 'aprobar'
+                            ? 'Aprobaciones Solicitudes'
+                            : det.nombre_modulo,
+          'APLICACIÓN WEB': det.movil == false ? 'Sí' : '',
+          'APLICACIÓN MÓVIL': det.movil == true ? 'Sí' : '',
+        });
+      });
+    });
+
+    return datos;
   }
 
   /** ************************************************************************************************* **
@@ -281,23 +395,52 @@ export class VistaRolesComponent implements OnInit {
   urlxml: string;
   data: any = [];
   ExportToXML() {
-    this.OrdenarDatos(this.roles);
     var objeto: any;
     var arregloRoles: any = [];
-    this.roles.forEach((obj: any) => {
+    this.data_general.forEach((obj: any) => {
+      let detalles: any = [];
+      obj.funciones.forEach((det: any) => {
+        detalles.push({
+          "pagina": det.pagina,
+          "funcion": det.accion,
+          "modulo": det.nombre_modulo === 'permisos'
+            ? 'Módulo de Permisos'
+            : det.nombre_modulo === 'vacaciones'
+              ? 'Módulo de Vacaciones'
+              : det.nombre_modulo === 'horas_extras'
+                ? 'Módulo de Horas Extras'
+                : det.nombre_modulo === 'alimentacion'
+                  ? 'Módulo de Alimentación'
+                  : det.nombre_modulo === 'acciones_personal'
+                    ? 'Módulo de Acciones de Personal'
+                    : det.nombre_modulo === 'geolocalizacion'
+                      ? 'Módulo de Geolocalización'
+                      : det.nombre_modulo === 'timbre_virtual'
+                        ? 'Módulo de Timbre Virtual'
+                        : det.nombre_modulo === 'reloj_virtual'
+                          ? 'Aplicación Móvil'
+                          : det.nombre_modulo === 'aprobar'
+                            ? 'Aprobaciones Solicitudes'
+                            : det.nombre_modulo,
+          "aplicacion_web": det.movil == false ? 'Sí' : '',
+          "aplicacion_movil": det.movil == true ? 'Sí' : '',
+        });
+      });
+
       objeto = {
         "rol": {
           "$": { "id": obj.id },
           "nombre": obj.nombre,
+          "funciones": { "detalle": detalles }
         }
       }
       arregloRoles.push(objeto)
     });
+
     const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
     const xml = xmlBuilder.buildObject(arregloRoles);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -313,13 +456,11 @@ export class VistaRolesComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
 
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Roles.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
-    this.ObtenerRoles();
   }
 
   /** ************************************************************************************************** **
@@ -327,52 +468,67 @@ export class VistaRolesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   ExportToCVS() {
-    this.OrdenarDatos(this.roles);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.roles);
-    const csvDataC = xlsx.utils.sheet_to_csv(wsr);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
+    const csvDataH = xlsx.utils.sheet_to_csv(wse);
+    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "RolesCSV" + '.csv');
-    this.ObtenerRoles();
   }
 
-  /** ************************************************************************************************** ** 
-   ** **                                     RESTRICCION DE BOTONES                                   ** **
-   ** ************************************************************************************************** **/
-  getCrearRol() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
+  EstructurarDatosCSV() {
+    let datos: any = [];
+    let n: number = 1;
+    this.data_general.forEach((obj: any) => {
+      obj.funciones.forEach((det: any) => {
+        datos.push({
+          'n': n++,
+          'rol': obj.nombre,
+          'pagina': det.pagina,
+          'funcion': det.accion,
+          'modulo': det.nombre_modulo === 'permisos'
+            ? 'Módulo de Permisos'
+            : det.nombre_modulo === 'vacaciones'
+              ? 'Módulo de Vacaciones'
+              : det.nombre_modulo === 'horas_extras'
+                ? 'Módulo de Horas Extras'
+                : det.nombre_modulo === 'alimentacion'
+                  ? 'Módulo de Alimentación'
+                  : det.nombre_modulo === 'acciones_personal'
+                    ? 'Módulo de Acciones de Personal'
+                    : det.nombre_modulo === 'geolocalizacion'
+                      ? 'Módulo de Geolocalización'
+                      : det.nombre_modulo === 'timbre_virtual'
+                        ? 'Módulo de Timbre Virtual'
+                        : det.nombre_modulo === 'reloj_virtual'
+                          ? 'Aplicación Móvil'
+                          : det.nombre_modulo === 'aprobar'
+                            ? 'Aprobaciones Solicitudes'
+                            : det.nombre_modulo,
+          'aplicacion_web': det.movil == false ? 'Sí' : '',
+          'aplicacion_movil': det.movil == true ? 'Sí' : '',
+        });
+      });
+    });
+    return datos;
+  }
+
+  //CONTROL BOTONES
+  getCrearRol(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Rol');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+      return datos.some(item => item.accion === 'Crear Rol');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
-  getDescargarReportes() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
+  getDescargarReportes(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Roles' && item.id_funcion === 4));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+      return datos.some(item => (item.accion === 'Descargar Reportes Roles' && item.id_funcion === 4));
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

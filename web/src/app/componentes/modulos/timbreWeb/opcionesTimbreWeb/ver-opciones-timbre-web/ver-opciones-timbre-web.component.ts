@@ -465,5 +465,25 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
     return usuarios;
   }
 
+  //CONTROL BOTONES
+  getEliminarConfiguracionTimbreWeb(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Configuración Timbre Web');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargarReportesConfiguracionTimbreWeb(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Reportes Configuración Timbre Web');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
 
 }

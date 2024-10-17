@@ -1,9 +1,14 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR TIPO DE ACCIONES DE PERSONAL
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, '')">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR TIPO DE ACCIONES DE PERSONAL
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, '')">highlight_off</mat-icon>
+    </div>
 </div>
 <mat-card class="example-card mat-elevation-z9">
     <!-- FORMULARIO COMPLETO -->
@@ -15,7 +20,7 @@
                     Guardar.
                 </span>
             </div>
-            <div class="row">
+            <div class="row p-2">
                 <div class="col-sm">
                     <mat-form-field *ngIf="vistaTipo">
                         <mat-label id="letra">Tipo acción personal</mat-label>

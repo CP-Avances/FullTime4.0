@@ -87,6 +87,7 @@ export class AsignarUsuarioComponent implements OnInit {
   // METODO PARA VER PANTALLA PRINCIPAL SUCURSAL USUARIO
   pagina: string = '';
   VerUsuarioAsignado() {
+    //console.log('ingresa')
     this.pagina = 'asignar-usuario';
     this.ventanasu.ver_principal = true;
     this.ventanasu.ver_informacion = false;

@@ -182,13 +182,23 @@
             <hr>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO SUCURSALES
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button>
+            
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO SUCURSALES
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                        (click)="MostrarLista()">
+                        Mostrar lista
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -240,13 +250,23 @@
 
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO RÉGIMEN LABORAL
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button>
+               
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO RÉGIMEN LABORAL
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                        (click)="MostrarLista()">
+                        Mostrar lista
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -301,15 +321,23 @@
             <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
-                <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO CARGOS
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO CARGOS
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
                         (click)="MostrarLista()">
                         Mostrar lista
-                    </button>
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -364,15 +392,23 @@
 
              <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO DEPARTAMENTOS
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO DEPARTAMENTOS
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
                         (click)="MostrarLista()">
                         Mostrar lista
-                    </button>
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -426,15 +462,24 @@
 
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO USUARIOS
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+               
+
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO USUARIOS
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
                         (click)="MostrarLista()">
-                        Mostrar lista
-                    </button>
+                            Mostrar lista
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">

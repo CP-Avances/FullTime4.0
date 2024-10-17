@@ -6,11 +6,11 @@
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <button *ngIf="!btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+            <button *ngIf="!btnCheckHabilitar && getEliminarConfiguracionTimbreWeb()" class="btn btn-outline-light btn-sm"
                 style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()" matTooltip="Eliminar Múltiple">
                 Eliminación Múltiple
             </button>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+            <button *ngIf="btnCheckHabilitar && getEliminarConfiguracionTimbreWeb()" class="btn btn-outline-light btn-sm"
                 style="float: right; margin-right: 10px;" (click)="ConfirmarDeleteMultiple()"
                 matTooltip="Eliminar Múltiple">
                 Eliminar datos
@@ -76,7 +76,7 @@
                         <td class="t_horarios" *ngIf="c.timbre_especial === true">SI</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === false">No</td>
                         <td class="t_horarios">
-                            <i id="t-eliminar" *ngIf="auto_individual" class="far fa-trash-alt t_horarios"
+                            <i id="t-eliminar" *ngIf="auto_individual && getEliminarConfiguracionTimbreWeb()" class="far fa-trash-alt t_horarios"
                                 (click)="ConfirmarDelete(c)" matSuffix matTooltipPosition="right"
                                 matTooltip="Eliminar este registro.">
                                 <p>Eliminar</p>
@@ -91,7 +91,7 @@
             aria-label="Seleccionar pagina">
         </mat-paginator>
 
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem" *ngIf="getDescargarReportesConfiguracionTimbreWeb()">
             <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                 <p>PDF</p>

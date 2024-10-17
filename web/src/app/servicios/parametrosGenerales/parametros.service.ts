@@ -22,6 +22,12 @@ export class ParametrosService {
     return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion`);
   }
 
+  // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
+  BuscarDetallesParametros() {
+    let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.get<any>(`${(urlPrueba as string)}/parametrizacion/detalle-parametros/buscar`);
+  }
+
   // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
     let urlPrueba = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;

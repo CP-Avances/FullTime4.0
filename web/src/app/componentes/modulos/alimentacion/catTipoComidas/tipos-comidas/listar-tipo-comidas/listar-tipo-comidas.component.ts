@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -146,6 +147,23 @@ export class ListarTipoComidasComponent implements OnInit {
         data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.horaFin = this.validar.FormatearHora(data.hora_fin, formato_hora);
       })
+      console.log('tipo comidas ', this.tipoComidas);
+      this.ConsultarDetallesComida();
+    })
+  }
+
+  // METODO PARA LISTAR SERVICIOS DE ALIMENTACION CON SUS DETALLES
+  detalles_comida: any = [];
+  ConsultarDetallesComida() {
+    let informacion: any = [];
+    this.detalles_comida = [];
+    this.rest.ConsultarDetallesComida().subscribe(datos => {
+      informacion = datos;
+      this.detalles_comida = this.tipoComidas;
+      this.detalles_comida.forEach((comida: any) => {
+        comida.detalles = informacion.filter((detalle: any) => detalle.id_horario_comida === comida.id_comida);
+      });
+      console.log('detalles ', this.detalles_comida)
     })
   }
 
@@ -174,7 +192,7 @@ export class ListarTipoComidasComponent implements OnInit {
           }
         }
       });
-      this.BuscarHora();
+    this.BuscarHora();
 
   }
 
@@ -250,13 +268,12 @@ export class ListarTipoComidasComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('ServiciosAlimentacion.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
 
   DefinirInformacionPDF() {
-
     return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -282,99 +299,144 @@ export class ListarTipoComidasComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista Servicios de Alimentación', bold: true, fontSize: 20, alignment: 'center', margin: [0, -5, 0, 10] },
-        this.PresentarDataPDFAlmuerzos(),
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE SERVICIOS DE ALIMENTACIÓN', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableD: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        itemsTableInfo: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
       }
     };
   }
 
-  PresentarDataPDFAlmuerzos() {
-    return {
-      columns: [
-        { width: '*', text: '' },
-        {
-          width: 'auto',
+  // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
+  PresentarDataPDF(): Array<any> {
+    let n: any = []
+    this.detalles_comida.forEach((obj: any) => {
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*'],
+          headerRows: 2,
+          body: [
+            [
+              { text: `SERVICIO: ${obj.tipo}`, style: 'itemsTableInfo', border: [true, true, false, false] },
+              { text: `INICIA: ${obj.horaInicio}`, style: 'itemsTableInfo', border: [false, true, false, false] },
+            ],
+            [
+              { text: `MENÚ: ${obj.nombre}`, style: 'itemsTableInfo', border: [true, false, false, false] },
+              { text: `FINALIZA: ${obj.horaFin}`, style: 'itemsTableInfo', border: [false, false, false, false] },
+            ],
+          ]
+        },
+      });
+
+      if (obj.detalles.length > 0) {
+        n.push({
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['*'],
+            headerRows: 1,
+            body: [
+              [{ rowSpan: 1, text: 'DETALLES', style: 'tableHeader', border: [true, true, true, true] }],
+            ]
+          }
+        });
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['*', '*', '*'],
+            headerRows: 1,
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Servicio', style: 'tableHeader' },
-                { text: 'Menú', style: 'tableHeader' },
-                { text: 'Nombre del plato', style: 'tableHeader' },
-                { text: 'Valor', style: 'tableHeader' },
-                { text: 'Hora Inicia', style: 'tableHeader' },
-                { text: 'Hora Finaliza', style: 'tableHeader' },
-                { text: 'Observaciones', style: 'tableHeader' },
+                { text: 'PLATO', style: 'tableHeader' },
+                { text: 'VALOR', style: 'tableHeader' },
+                { text: 'OBSERVACIÓN', style: 'tableHeader' },
               ],
-              ...this.tipoComidas.map((obj: any) => {
+              ...obj.detalles.map((detalle: any) => {
                 return [
-                  { text: obj.id, style: 'itemsTableD' },
-                  { text: obj.tipo, style: 'itemsTableD' },
-                  { text: obj.nombre, style: 'itemsTableD' },
-                  { text: obj.nombre_plato, style: 'itemsTableD' },
-                  { text: obj.valor, style: 'itemsTableD' },
-                  { text: obj.hora_inicio, style: 'itemsTableD' },
-                  { text: obj.hora_fin, style: 'itemsTableD' },
-                  { text: obj.observacion, style: 'itemsTableD' },
+                  { text: detalle.plato, style: 'itemsTableCentrado' },
+                  { text: '$ ' + detalle.valor, style: 'itemsTableCentrado' },
+                  { text: detalle.observacion, style: 'itemsTableCentrado' },
                 ];
               })
             ]
           },
-          // ESTILO DE COLORES FORMATO ZEBRA
           layout: {
-            fillColor: function (i: any) {
-              return (i % 2 === 0) ? '#CCD1D1' : null;
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
-        },
-        { width: '*', text: '' },
-      ]
-    };
+        });
+      }
+    });
+    return n;
   }
 
   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
-    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        SERVICIO: obj.tipo,
-        MENU: obj.nombre,
-        NOMBRE_PLATO: obj.nombre_plato,
-        VALOR: obj.valor,
-        HORA_INICIA: obj.hora_inicio,
-        HORA_FINALIZA: obj.hora_fin,
-        OBSERVACIONES: obj.observacion
-      }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.tipoComidas[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
-    }
-    wsc["!cols"] = wscols;
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsc, 'SERVICIOS COMIDAS');
-    xlsx.writeFile(wb, "Comidas" + new Date().getTime() + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'ServiciosAlimentacion');
+    xlsx.writeFile(wb, "ServiciosAlimentacionEXCEL" + '.xlsx');
+  }
+
+  EstructurarDatosExcel() {
+    let datos: any = [];
+    let n: number = 1;
+    this.detalles_comida.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'N°': n++,
+          'SERVICO': obj.tipo,
+          'MENÚ': obj.nombre,
+          'INICIA': obj.horaInicio,
+          'FINALIZA': obj.horaFin,
+          'PLATO': det.plato,
+          'VALOR': det.valor,
+          'OBSERVACIÓN': det.observacion,
+        });
+      });
+    });
+
+    return datos;
   }
 
   /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
   ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas);
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "TipoComidasCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "ServiciosAlimentacionCSV" + '.csv');
+  }
+
+  EstructurarDatosCSV() {
+    let datos: any = [];
+    let n: number = 1;
+    this.detalles_comida.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'n': n++,
+          'servicio': obj.tipo,
+          'menu': obj.nombre,
+          'inicia': obj.horaInicio,
+          'finaliza': obj.horaFin,
+          'plato': det.plato,
+          'valor': det.valor,
+          'observacion': det.observacion,
+        });
+      });
+    });
+    return datos;
   }
 
   /** ************************************************************************************************* **
@@ -384,24 +446,54 @@ export class ListarTipoComidasComponent implements OnInit {
   data: any = [];
   ExportToXML() {
     var objeto: any;
-    var arregloComidas: any = [];
-    this.tipoComidas.forEach((obj: any) => {
+    var arregloHorarios: any = [];
+    this.detalles_comida.forEach((obj: any) => {
+      let detalles: any = [];
+      obj.detalles.forEach((det: any) => {
+        detalles.push({
+          "plato": det.plato,
+          "valor": det.valor,
+          "observacion": det.observacion,
+        });
+      });
+
       objeto = {
-        "tipo_comida": {
-          '@id': obj.id,
+        "servicio_alimentacion": {
+          "$": { "id_comida": obj.id_comida },
           "servicio": obj.tipo,
-          "menu": obj.nombre,
-          "hora_inicia": obj.hora_inicio,
-          "hora_finaliza": obj.hora_fin
+          'menu': obj.nombre,
+          'inicia': obj.horaInicio,
+          "finaliza": obj.horaFin,
+          "detalles": { "detalle": detalles }
         }
       }
-      arregloComidas.push(objeto)
+      arregloHorarios.push(objeto)
     });
-    this.rest.CrearXML(arregloComidas).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/tipoComidas/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+
+    const xmlBuilder = new xml2js.Builder({ rootName: 'ServiciosAlimentacion' });
+    const xml = xmlBuilder.buildObject(arregloHorarios);
+
+    if (xml === undefined) {
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'ServicioAlimentacion.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
   }
 
   //CONTROL BOTONES
