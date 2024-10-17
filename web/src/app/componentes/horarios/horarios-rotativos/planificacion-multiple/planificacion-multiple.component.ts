@@ -493,8 +493,8 @@ export class PlanificacionMultipleComponent implements OnInit {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
             codigo: this.datosSeleccionados.usuarios[index].codigo,
-            fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-            fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+            fec_final: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
+            fec_inicio: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
             id_horario: existe[i].id_horario,
           };
           this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -714,8 +714,8 @@ export class PlanificacionMultipleComponent implements OnInit {
             // PREPARAR DATA PARA ELIMINAR HORARIO
             let plan_fecha = {
               codigo: this.datosSeleccionados.usuarios[index].codigo,
-              fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-              fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+              fec_final: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
+              fec_inicio: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
               id_horario: existe.id_horario,
             };
             this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -750,8 +750,8 @@ export class PlanificacionMultipleComponent implements OnInit {
     let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let fecha = dia + '-' + mes
     let fechas = {
-      fechaInicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-      fechaFinal: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+      fechaInicio: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
+      fechaFinal: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
     };
 
     let id_empleado = this.datosSeleccionados.usuarios[index].id;
@@ -767,8 +767,8 @@ export class PlanificacionMultipleComponent implements OnInit {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
             codigo: this.datosSeleccionados.usuarios[index].codigo,
-            fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-            fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+            fec_final: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
+            fec_inicio: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
             id_horario: existe[i].id_horario,
           };
           this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -852,15 +852,26 @@ export class PlanificacionMultipleComponent implements OnInit {
         tipo_dia: 'DFD',
       }]
       lista_feriados = lista_feriados.concat(data);
+
       // PREPARAR DATA PARA ELIMINAR HORARIO
       let plan_fecha = {
         id_empleado: usuario.id,
-        fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
-        fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+        fec_final: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
+        fec_inicio: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
         id_horario: datoHorario.id,
       };
-      this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
-    })
+
+      // Verificar si plan_fecha ya está en eliminar_lista
+      const existe = this.eliminar_lista.some((plan: any) =>
+        plan.id_empleado === plan_fecha.id_empleado &&
+        plan.fec_final === plan_fecha.fec_final &&
+        plan.fec_inicio === plan_fecha.fec_inicio &&
+        plan.id_horario === plan_fecha.id_horario
+      );
+
+      if (!existe) {
+        this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
+      }    })
 
     for (var a = 0; a < usuario.asignado.length; a++) {
       for (var f = 0; f < lista_feriados.length; f++) {
@@ -1118,32 +1129,35 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA GURADAR DATOS EN BASE DE DATOS
   GuardarPlanificacion() {
     let contador = 0;
-    console.log("ver lista a elminar", this.eliminar_lista)
     if (this.eliminar_lista.length === 0) {
       this.RegistrarPlanificacionMultiple();
     }
     else {
       let listaEliminar = this.eliminar_lista
+      console.log("ver lista eliminar ", listaEliminar)
       this.restP.BuscarFechasMultiples({ listaEliminar }).subscribe((res: any) => {
-        res.forEach(item => {
+        console.log("ver res", res)
+
+        
+        //res.forEach(item => {
           let datos = {
-            id_plan: item.id,
+            id_plan: res,
             user_name: this.user_name,
             ip: this.ip,
           }
 
           this.restP.EliminarRegistro(datos).subscribe(datos => {
-            contador = contador + 1;
-            if (contador === this.eliminar_lista.length) {
+            //contador = contador + 1;
+            //if (contador === this.eliminar_lista.length) {
               this.RegistrarPlanificacionMultiple();
-            }
+            //}
           }, error => {
-            contador = contador + 1;
-            if (contador === this.eliminar_lista.length) {
+            //contador = contador + 1;
+            //if (contador === this.eliminar_lista.length) {
               this.RegistrarPlanificacionMultiple();
-            }
+           // }
           })
-        })
+        //})
       }, error => {
         this.RegistrarPlanificacionMultiple();
       })
@@ -1152,7 +1166,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
-  
+
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
@@ -1175,7 +1189,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       parteIndex: parteIndex, // Enviar el índice de la parte actual
       totalPartes: totalPartes // Enviar el total de partes
     };
-  
+
     // Llamada HTTP para enviar la parte actual
     this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
       // Si la respuesta es "OK", continuamos

@@ -251,18 +251,15 @@ class PlanGeneralControlador {
         let resultados: any[] = [];  // Array para almacenar todos los objetos de los resultados
 
         for (const item of listaEliminar) {
-            // Convertir las fechas al formato 'YYYY-MM-DD'
-            const fec_inicio = new Date(item.fec_inicio).toISOString().split('T')[0];  // Convierte a 'YYYY-MM-DD'
-            const fec_final = new Date(item.fec_final).toISOString().split('T')[0];    // Convierte a 'YYYY-MM-DD'
-            console.log("ver fec_inicio", fec_inicio)
-            console.log("ver fec_final", fec_final)
+            console.log("ver fec_inicio e id", item.fec_inicio + ' ' + item.id_empleado)
+            console.log("ver fec_final e id ", item.fec_final + ' ' + item.id_empleado)
 
             const FECHAS = await pool.query(
                 `
                     SELECT id FROM eu_asistencia_general 
                     WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
                 `,
-                [fec_inicio, fec_final, item.id_horario, item.id_empleado]
+                [item.fec_inicio, item.fec_final, item.id_horario, item.id_empleado]
             );
 
             // Concatena los resultados obtenidos en cada iteración

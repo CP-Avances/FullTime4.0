@@ -261,44 +261,47 @@ class EmpleadoHorariosControlador {
         }
     }
 
+
     public async BuscarFechasMultiples(req: Request, res: Response): Promise<any> {
-        try {
-            const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
-            const resultados: any[] = []; // Arreglo para almacenar los resultados
-    
-            for (const obj of usuarios_validos) {
-                for (const eh of eliminar_horarios) {
-                    // Llamar a BuscarFechas y almacenar el resultado en una variable
-                    const filas = await this.BuscarFechas(fec_inicio, fec_final, eh.id, obj.id);
-                    
-                    // Verificar si se encontraron filas y agregarlas al arreglo
-                    if (filas && filas.length > 0) {
-                        resultados.push(...filas); // Agregar las filas al arreglo de resultados
-                    }
+        
+        
+        console.log("ver req.body de BuscarFechasMultiples: ", req.body);
+        const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
+        const resultados: any[] = []; // Arreglo para almacenar los resultados
+
+        // Iterar sobre los usuarios y los horarios
+        for (const obj of usuarios_validos) {
+            for (const eh of eliminar_horarios) {
+                console.log(`Buscando fechas para id_empleado: ${obj.id}, id_horario: ${eh.id}`);
+
+                // Realizar la consulta directamente dentro de este método
+                const FECHAS = await pool.query(
+                    `
+                            SELECT id FROM eu_asistencia_general 
+                            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+                            `,
+                    [fec_inicio, fec_final, eh.id, obj.id]
+                );
+
+                const filas = FECHAS.rows;
+
+                // Verificar si se encontraron filas y agregarlas al arreglo
+                if (filas && filas.length > 0) {
+                    console.log(`Se encontraron ${filas.length} filas para id_empleado: ${obj.id}, id_horario: ${eh.id}`);
+                    resultados.push(...filas); // Usar push para agregar las filas al arreglo de resultados
+                } else {
+                    console.log(`No se encontraron filas para id_empleado: ${obj.id}, id_horario: ${eh.id}`);
                 }
             }
-    
-            // Aquí podrías hacer algo con el arreglo de resultados, por ejemplo, devolverlo en la respuesta
-            return res.json(resultados);
-    
-        } catch (error) {
-            console.error('Error al registrar la planificación horaria:', error);
-            return res.status(500).json({ message: 'Error al registrar la planificación horaria' });
         }
-    }
 
-    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
-    public async BuscarFechas(fec_inicio: string, fec_final: string, id_horario: number, id_empleado: number): Promise<any> {
-        const FECHAS = await pool.query(
-            `
-            SELECT id FROM eu_asistencia_general 
-            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
-            `
-            , [fec_inicio, fec_final, id_horario, id_empleado]);
+        // Devolver los resultados en la respuesta
+        return res.jsonp(resultados);
 
-        return FECHAS.rows;
 
     }
+
+
 
 
 }

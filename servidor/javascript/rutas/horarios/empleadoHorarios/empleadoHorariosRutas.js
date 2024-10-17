@@ -15,6 +15,7 @@ class EmpleadoHorariosRutas {
         // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS  **USADO                     
         this.router.post('/horarios-existentes1/:id_empleado', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarHorariosExistentes);
         this.router.post('/horarios-existentes', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarHorariosExistentes2);
+        this.router.post('/buscar-horarios-multiples', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.BuscarFechasMultiples);
         // METODO PARA OBTENER HORARIO DEL USUARIO POR HORAS EN EL MISMO DIA
         this.router.post('/horario-horas-mismo-dia', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ObtenerHorarioHorasMD);
         // METODO PARA OBTENER HORARIO DEL USUARIO POR HORAS EN DIAS DIFERENTES
@@ -25,7 +26,6 @@ class EmpleadoHorariosRutas {
         this.router.post('/horario-comida-horas-dias-diferentes', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ObtenerComidaHorarioHorasDD);
         // METODO PARA VERIFICAR SI EXISTE PLANIFICACION   **USADO
         this.router.post('/validarFechas', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarFechasHorario);
-        this.router.post('/buscar-horarios-multiples ', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.BuscarFechasMultiples);
     }
 }
 const EMPLEADO_HORARIOS_RUTAS = new EmpleadoHorariosRutas();

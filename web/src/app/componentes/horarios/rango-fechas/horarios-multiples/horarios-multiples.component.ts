@@ -1326,11 +1326,18 @@ export class HorariosMultiplesComponent implements OnInit {
       fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
       fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
     };
+    console.log("ver datos BuscarFechasMultiples: ", datos)
 
     this.rest.BuscarFechasMultiples(datos).subscribe(res => {
-      this.eliminar = res;
-      this.BorrarDescanso();
 
+      console.log("Ver horairos a eliminar: ", res )
+      this.eliminar = res;
+      if (this.eliminar.length != 0) {
+        this.BorrarDescanso();
+      }
+      else {
+        this.GuardarInformacion();
+      }
     }, error => {
       if (this.eliminar.length != 0) {
         this.BorrarDescanso();
@@ -1363,47 +1370,6 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
   }
-
-  /*
-  // METODO PARA REGISTRAR PLANIFICACION
-  GuardarInformacion() {
-    const datos = {
-      plan_general: this.plan_general,
-      user_name: this.user_name,
-      ip: this.ip,
-    };
-
-    // Dividir el objeto plan_general en partes más pequeñas
-    const partes = this.dividirPlanGeneral(datos.plan_general);
-    const totalPartes = partes.length; // Obtén la cantidad total de partes
-
-    // Enviar cada parte por separado
-    partes.forEach((parte, index) => {
-      const datosParcial = {
-        parte: parte,
-        user_name: this.user_name,
-        ip: this.ip,
-        parteIndex: index, // Puedes enviar el índice de la parte para referencia
-        totalPartes: totalPartes // Agrega el total de partes al objeto de datos
-
-      };
-
-      this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
-        if (res.message === 'OK') {
-          this.cargar = true;
-          this.guardar = false;
-          this.toastr.success(
-            'Operación exitosa.', 'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
-            timeOut: 6000,
-          })
-        } else {
-          console.log(res.message);
-        }
-      });
-    });
-  }
-
-  */
 
   GuardarInformacion() {
     const datos = {
