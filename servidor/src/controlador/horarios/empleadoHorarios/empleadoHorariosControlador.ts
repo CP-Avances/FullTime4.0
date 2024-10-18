@@ -242,64 +242,44 @@ class EmpleadoHorariosControlador {
         }
     }
 
-    // VERIFICAR EXISTENCIA DE PLANIFICACION  **USADO
-    public async VerificarFechasHorario2(req: Request, res: Response): Promise<any> {
-        const { fechaInicio, fechaFinal, id_horario } = req.body;
-        const { id_empleado } = req.params;
-        const HORARIO = await pool.query(
-            `
-            SELECT id FROM eu_asistencia_general 
-            WHERE id_empleado = $3 AND id_horario = $4 AND
-                (fecha_horario BETWEEN $1 AND $2) LIMIT 4
-            `
-            , [fechaInicio, fechaFinal, id_empleado, id_horario]);
-        if (HORARIO.rowCount != 0) {
-            return res.jsonp(HORARIO.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registros no encontrados' });
-        }
-    }
 
     public async BuscarFechasMultiples(req: Request, res: Response): Promise<any> {
+        const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
+        
+        // Obtener listas de IDs de empleados y horarios
+        const ids_empleados = usuarios_validos.map((obj: any) => obj.id);
+        const ids_horarios = eliminar_horarios.map((eh: any) => eh.id_horario);
+    
         try {
-            const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
-            const resultados: any[] = []; // Arreglo para almacenar los resultados
+            console.log('Iniciando búsqueda de fechas...'); // Inicio del proceso
     
-            for (const obj of usuarios_validos) {
-                for (const eh of eliminar_horarios) {
-                    // Llamar a BuscarFechas y almacenar el resultado en una variable
-                    const filas = await this.BuscarFechas(fec_inicio, fec_final, eh.id, obj.id);
-                    
-                    // Verificar si se encontraron filas y agregarlas al arreglo
-                    if (filas && filas.length > 0) {
-                        resultados.push(...filas); // Agregar las filas al arreglo de resultados
-                    }
-                }
-            }
+            // Hacer una sola consulta utilizando ANY para buscar múltiples IDs
+            const FECHAS = await pool.query(
+                `
+                SELECT id FROM eu_asistencia_general
+                WHERE (fecha_horario BETWEEN $1 AND $2)
+                AND id_horario = ANY($3::int[])
+                AND id_empleado = ANY($4::int[])
+                `,
+                [fec_inicio, fec_final, ids_horarios, ids_empleados]
+            );
     
-            // Aquí podrías hacer algo con el arreglo de resultados, por ejemplo, devolverlo en la respuesta
-            return res.json(resultados);
+            console.log('Consulta completada, procesando resultados...'); // Consulta finalizada
+    
+            // Obtener las filas y eliminar los IDs duplicados usando Set
+            const resultados = FECHAS.rows.map((row: any) => row.id);
+            //const ids_unicos = Array.from(new Set(resultados)); // Eliminar duplicados
+    
+            console.log(`Total de IDs encontrados: ${resultados.length}`);
+            //console.log(`Total de IDs únicos después de eliminar duplicados: ${ids_unicos.length}`);
+    
+            return res.jsonp(resultados);
     
         } catch (error) {
-            console.error('Error al registrar la planificación horaria:', error);
-            return res.status(500).json({ message: 'Error al registrar la planificación horaria' });
+            console.error('Error en la consulta:', error);
+            return res.status(500).jsonp({ error: 'Error en la consulta de base de datos' });
         }
     }
-
-    // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
-    public async BuscarFechas(fec_inicio: string, fec_final: string, id_horario: number, id_empleado: number): Promise<any> {
-        const FECHAS = await pool.query(
-            `
-            SELECT id FROM eu_asistencia_general 
-            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
-            `
-            , [fec_inicio, fec_final, id_horario, id_empleado]);
-
-        return FECHAS.rows;
-
-    }
-
 
 }
 
