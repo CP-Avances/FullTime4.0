@@ -443,3 +443,7 @@ td {
     border-color: #b2fce9;
 }
 
+
+mat-card-content{
+    padding: 0%;
+}

@@ -356,6 +356,10 @@ mat-progress-spinner {
             width: 100%;
         }
     }
+
+    mat-paginator {
+        font-size:smaller;
+    }
 }
 
 .table_horario {
