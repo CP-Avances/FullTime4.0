@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AUDITORIA_CONTROLADOR } from '../auditoria/auditoriaControlador';
+import { AUDITORIA_CONTROLADOR } from '../reportes/auditoriaControlador';
 import pool from '../../database';
 
 class AutorizacionesControlador {

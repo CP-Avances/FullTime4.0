@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));

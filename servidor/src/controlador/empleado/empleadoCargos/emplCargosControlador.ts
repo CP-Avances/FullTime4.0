@@ -1,7 +1,7 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';

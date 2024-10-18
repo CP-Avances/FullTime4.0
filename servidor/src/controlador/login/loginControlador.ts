@@ -4,7 +4,7 @@ import {
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
 
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 
 import { Request, Response } from 'express';
 import { Licencias } from '../../class/Licencia';
