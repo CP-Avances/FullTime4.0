@@ -487,7 +487,7 @@
                                             </a>
                                             <ng-template #ContratoCargar>
                                                 <a mat-raised-button id="btndocumento" type="submit"
-                                                    (click)="AbrirVentanaEditarContrato(ce)">
+                                                    (click)="AbrirVentanaEditarContrato(ce)" *ngIf="getEditarDatos()">
                                                     Cargar Contrato de Trabajo
                                                 </a>
                                             </ng-template>
@@ -504,7 +504,7 @@
                                         (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Elimina los datos generales de este registro"
-                                        class="far fa-trash-alt">
+                                        class="far fa-trash-alt" *ngIf="getEliminarDatos()">
                                         <p>Eliminar</p>
                                     </i>
                                 </div>
@@ -608,7 +608,7 @@
                                                     autorenew
                                                 </mat-icon></label>
                                         </div>
-                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado">
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado" *ngIf="getEditarDatos()">
                                             <div class="row">
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
@@ -640,7 +640,7 @@
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                         (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                         matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro"
+                                        matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
                                         class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
@@ -748,7 +748,7 @@
                                                 target="_blank">
                                                 <p>{{ce.documento}}</p>
                                             </a>
-                                            <a *ngIf="(ce.documento === null || ce.documento === '') && ce.id != datoActual.id_contrato"
+                                            <a *ngIf="((ce.documento === null || ce.documento === '') && ce.id != datoActual.id_contrato) && getEditarDatos()"
                                                 mat-raised-button id="btndocumento" type="submit"
                                                 (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
                                                 [disabled]="!btnActualizarContrato">
@@ -762,13 +762,13 @@
                                     *ngIf="ce.id != datoActual.id_contrato">
                                     <i type="submit" id="edit" style="margin-right: 6px;"
                                         (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                         (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro"
+                                        matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
                                         class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
@@ -884,7 +884,7 @@
                                                     autorenew
                                                 </mat-icon></label>
                                         </div>
-                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado">
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado" *ngIf="getEditarDatos()">
                                             <div class="row">
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
@@ -912,14 +912,14 @@
                                             <i type="submit" id="edit" style="margin-right: 6px;"
                                                 (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)"
                                                 matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro"
+                                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()"
                                                 class="fas fa-edit">
                                                 <p>Editar</p>
                                             </i>
                                             <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                                 (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                                 matTooltipPosition="right"
-                                                matTooltip="Elimina los datos generales de este registro"
+                                                matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
                                                 class="far fa-trash-alt">
                                                 <p>Eliminar</p>
                                             </i>
