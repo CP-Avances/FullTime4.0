@@ -18,9 +18,9 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 // IMPORTAR COMPONENTES
-import { FraseSeguridadComponent } from '../../administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
+import { FraseSeguridadComponent } from '../../usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { CrearTimbreComponent } from '../acciones-timbres/crear-timbre/crear-timbre.component';
-import { SeguridadComponent } from 'src/app/componentes/administracionGeneral/frase-seguridad/seguridad/seguridad.component';
+import { SeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/seguridad/seguridad.component';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';

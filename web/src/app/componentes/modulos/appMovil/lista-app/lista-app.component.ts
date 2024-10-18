@@ -13,7 +13,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
@@ -443,6 +443,7 @@ export class ListaAppComponent implements OnInit {
   activar_boton_dh: boolean = false;
   activar_seleccion_dh: boolean = true;
   BuscarPorTipo_dh(e: MatRadioChange) {
+    console.log('ver opcion ', e.value)
     this.opcion_dh = e.value;
     this.activar_boton_dh = true;
     this.activar_habilitados = false;
@@ -498,20 +499,26 @@ export class ListaAppComponent implements OnInit {
   GuardarRegistros_DH(valor: any) {
     let tipo: number = 1;
     let usuarios = [];
-    if (this.opcion === 's') {
+    console.log('opcion ', this.opcion_dh)
+    if (this.opcion_dh === 's') {
       usuarios = this.validar.ModelarSucursal_(this.empleados_dh, this.selectionSuc_dh, valor.id);
+      //console.log('usuarios dh.. ', usuarios)
     }
-    else if (this.opcion === 'r') {
+    else if (this.opcion_dh === 'r') {
       usuarios = this.validar.ModelarRegimen_(this.empleados_dh, this.selectionReg_dh, valor.id, valor.id_suc);
+      //console.log('usuarios dh', usuarios)
     }
-    else if (this.opcion === 'c') {
+    else if (this.opcion_dh === 'c') {
       usuarios = this.validar.ModelarCargo_(this.empleados_dh, this.selectionCarg_dh, valor.id, valor.id_suc);
+      //console.log('usuarios dh', usuarios)
     }
-    else if (this.opcion === 'd') {
+    else if (this.opcion_dh === 'd') {
       usuarios = this.validar.ModelarDepartamento_(this.empleados_dh, this.selectionDep_dh, valor.id, valor.id_suc);
+      //console.log('usuarios dh', usuarios)
     }
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados_dh, this.selectionEmp_dh);
+      //console.log('usuarios dh', usuarios)
     }
     this.RegistrarMultiple(usuarios, tipo);
   }
@@ -766,6 +773,7 @@ export class ListaAppComponent implements OnInit {
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
+    console.log('ver opcion ', e.value)
     this.opcion = e.value;
     this.activar_boton = true;
     this.activar_deshabilitados = false;
@@ -1040,18 +1048,23 @@ export class ListaAppComponent implements OnInit {
     let usuarios = [];
     if (this.opcion === 's') {
       usuarios = this.validar.ModelarSucursal_(this.empleados, this.selectionSuc, valor.id);
+      //console.log('usuarios ', usuarios)
     }
     else if (this.opcion === 'r') {
       usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc);
+      //console.log('usuarios ', usuarios)
     }
     else if (this.opcion === 'c') {
       usuarios = this.validar.ModelarCargo_(this.empleados, this.selectionCarg, valor.id, valor.id_suc);
+      //console.log('usuarios ', usuarios)
     }
     else if (this.opcion === 'd') {
       usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc);
+      //console.log('usuarios ', usuarios)
     }
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
+      //console.log('usuarios ', usuarios)
     }
     this.RegistrarMultiple(usuarios, tipo);
   }

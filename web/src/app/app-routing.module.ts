@@ -8,43 +8,44 @@ import { LoginComponent } from './componentes/iniciarSesion/login/login.componen
 import { OlvidarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/olvidar-contrasenia/olvidar-contrasenia.component';
 import { ConfirmarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/confirmar-contrasenia/confirmar-contrasenia.component';
 // PAGINA PRINCIPAL
-import { HomeComponent } from './componentes/home/home.component';
+import { HomeComponent } from './componentes/iniciarSesion/home/home.component';
 // CONFIGURACION --PARAMETRIZACION
-import { VerEmpresaComponent } from './componentes/catalogos/catEmpresa/ver-empresa/ver-empresa.component';
-import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/listar-parametro/listar-parametro.component';
-import { ConfiguracionComponent } from './componentes/administracionGeneral/correo/configuracion/configuracion.component';
-import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
-import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';
-import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component';
-import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
+import { VerEmpresaComponent } from './componentes/configuracion/parametrizacion/empresa/ver-empresa/ver-empresa.component';
+import { ListarParametroComponent } from './componentes/configuracion/parametrizacion/parametros/listar-parametro/listar-parametro.component';
+import { ConfiguracionComponent } from './componentes/configuracion/parametrizacion/correo/configuracion/configuracion.component';
+import { VistaRolesComponent } from './componentes/configuracion/parametrizacion/roles/vista-roles/vista-roles.component';
+import { ListarRegimenComponent } from './componentes/configuracion/parametrizacion/regimen-laboral/listar-regimen/listar-regimen.component';
+import { CatModalidaLaboralComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatTipoCargosComponent } from './componentes/configuracion/parametrizacion/tipo-cargos/listar-tipo-cargo/cat-tipo-cargos.component';
 // CONFIGURACION  --LOCALIZACION
-import { PrincipalProvinciaComponent } from './componentes/catalogos/catProvincia/listar-provincia/principal-provincia.component';
-import { ListarCiudadComponent } from './componentes/catalogos/catCiudad/listar-ciudad/listar-ciudad.component';
-import { ListaSucursalesComponent } from './componentes/catalogos/catSucursal/lista-sucursales/lista-sucursales.component';
-import { PrincipalDepartamentoComponent } from './componentes/catalogos/catDepartamentos/listar-departamento/principal-departamento.component';
+import { PrincipalProvinciaComponent } from './componentes/configuracion/localizacion/provincias/listar-provincia/principal-provincia.component';
+import { ListarCiudadComponent } from './componentes/configuracion/localizacion/ciudades/listar-ciudad/listar-ciudad.component';
+import { ListaSucursalesComponent } from './componentes/configuracion/localizacion/sucursales/lista-sucursales/lista-sucursales.component';
+import { PrincipalDepartamentoComponent } from './componentes/configuracion/localizacion/departamentos/listar-departamento/principal-departamento.component';
 // USUARIOS
-import { ConfigurarCodigoComponent } from './componentes/administracionGeneral/configurar-codigo/configurar-codigo.component';
-import { ListarNivelTitulosComponent } from './componentes/catalogos/catTitulos/nivelTitulos/listar-nivel-titulos/listar-nivel-titulos.component';
-import { ListarTitulosComponent } from './componentes/catalogos/catTitulos/tituloProfesional/listar-titulos/listar-titulos.component';
-import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
-import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
-import { ListaEmpleadosComponent } from './componentes/empleado/datos-empleado/lista-empleados/lista-empleados.component';
-import { VerEmpleadoComponent } from './componentes/empleado/ver-empleado/ver-empleado.component';
-import { RegistroComponent } from './componentes/empleado/datos-empleado/registro/registro.component';
-import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
-import { ActualizacionInformacionComponent } from './componentes/empleado/actualizar-datos/principal-actualizacion/actualizacion-informacion.component';
-import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
-import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
-import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
+import { ConfigurarCodigoComponent } from './componentes/usuarios/configurar-codigo/configurar-codigo.component';
+import { ListarNivelTitulosComponent } from './componentes/usuarios/nivel-titulos/listar-nivel-titulos/listar-nivel-titulos.component';
+import { ListarTitulosComponent } from './componentes/usuarios/titulo-profesional/listar-titulos/listar-titulos.component';
+import { CatDiscapacidadComponent } from './componentes/usuarios/tipo-discapacidad/listar-discapacidad/cat-discapacidad.component';
+import { CatVacunasComponent } from './componentes/usuarios/tipo-vacunas/listar-vacuna/cat-vacunas.component';
+import { ListaEmpleadosComponent } from './componentes/usuarios/empleados/datos-empleado/lista-empleados/lista-empleados.component';
+import { VerEmpleadoComponent } from './componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
+import { RegistroComponent } from './componentes/usuarios/empleados/datos-empleado/registro/registro.component';
+import { CargarPlantillaComponent } from './componentes/usuarios/cargar-plantillas/cargar-plantilla/cargar-plantilla.component';
+import { ActualizacionInformacionComponent } from './componentes/usuarios/actualizar-informacion/principal-actualizacion/actualizacion-informacion.component';
+import { PrincipalSucursalUsuarioComponent } from './componentes/usuarios/administrar-informacion/principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { RecuperarFraseComponent } from './componentes/usuarios/frase-seguridad/recuperar-frase/recuperar-frase.component';
+import { OlvidarFraseComponent } from './componentes/usuarios/frase-seguridad/olvidar-frase/olvidar-frase.component';
 // HORARIOS
-import { ListarFeriadosComponent } from './componentes/catalogos/catFeriados/feriados/listar-feriados/listar-feriados.component';
-import { PrincipalHorarioComponent } from './componentes/catalogos/catHorario/horario/principal-horario/principal-horario.component';
-import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
+import { ListarFeriadosComponent } from './componentes/horarios/catFeriados/feriados/listar-feriados/listar-feriados.component';
+import { PrincipalHorarioComponent } from './componentes/horarios/catHorarios/horario/principal-horario/principal-horario.component';
+import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/planificar-horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 // MODULO  --PERMISOS
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
 import { ListarEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
 import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
+import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 // MODULO  --VACACIONES
 import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
 import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
@@ -74,23 +75,22 @@ import { OpcionesTimbreWebComponent } from './componentes/modulos/timbreWeb/opci
 import { ListaAppComponent } from './componentes/modulos/appMovil/lista-app/lista-app.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 // TIMBRES
-import { ListarRelojesComponent } from './componentes/catalogos/catRelojes/listar-relojes/listar-relojes.component';
-import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/relojes.component';
+import { ListarRelojesComponent } from './componentes/timbres/dispositivos/listar-relojes/listar-relojes.component';
+import { RelojesComponent } from './componentes/timbres/dispositivos/relojes/relojes.component';
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
 import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMovil/configurar-opciones-timbre/configurar-opciones-timbres/configurar-opciones-timbres.component';
-
 // NOTIFICACIONES
-import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
-import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
-import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/lista-archivos.component';
-import { VerBirthdayComponent } from './componentes/administracionGeneral/birthday/ver-birthday/ver-birthday.component';
-import { ComunicadosComponent } from './componentes/administracionGeneral/comunicados/comunicados.component';
+import { ListaNotificacionComponent } from './componentes/notificaciones/configurar-notificaciones/multiple/lista-empleados/listaNotificacion.component';
+import { VerDocumentosComponent } from './componentes/notificaciones/documentos/ver-documentos/ver-documentos.component';
+import { ListaArchivosComponent } from './componentes/notificaciones/documentos/lista-archivos/lista-archivos.component';
+import { VerBirthdayComponent } from './componentes/notificaciones/cumpleanios/ver-birthday/ver-birthday.component';
+import { ComunicadosComponent } from './componentes/notificaciones/comunicados/comunicados.component';
 import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
-import { RealtimeNotificacionComponent } from './componentes/notificaciones/realtime-notificacion/realtime-notificacion.component';
-import { RealtimeAvisosComponent } from './componentes/notificaciones/realtime-avisos/realtime-avisos.component';
+import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
+import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
 // REPORTES  --GENERALES
 import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna-multiple/vacuna-multiple.component';
@@ -143,7 +143,6 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
-import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 
 const routes: Routes = [
 
@@ -241,7 +240,6 @@ const routes: Routes = [
   { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard] },
   { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard] },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard] },
-
 
   // NOTIFICACIONES
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },

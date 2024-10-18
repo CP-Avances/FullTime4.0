@@ -20,10 +20,10 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 // IMPORTACION DE SERVICIOS
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACION
 export interface PlanificacionHE {

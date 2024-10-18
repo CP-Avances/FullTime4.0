@@ -14,14 +14,14 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-lista-horas-extras',

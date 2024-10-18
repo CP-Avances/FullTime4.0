@@ -24,7 +24,7 @@ import { DeleteRegistroDispositivoComponent } from '../delete-registro-dispositi
 // SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';

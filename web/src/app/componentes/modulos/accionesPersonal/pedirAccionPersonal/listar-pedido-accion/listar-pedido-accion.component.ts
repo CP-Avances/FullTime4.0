@@ -16,7 +16,7 @@ moment.locale("es");
 // LLAMADO DE SERVICIOS
 import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
+import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
 import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";

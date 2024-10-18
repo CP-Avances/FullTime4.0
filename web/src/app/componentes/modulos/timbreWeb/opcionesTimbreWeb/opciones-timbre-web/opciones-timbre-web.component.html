@@ -1,16 +1,12 @@
 <div style="padding-top: 20px;" *ngIf="configurar">
-
     <div id="titulo" class="row w-100 m-auto">
-        <div class="col-2 col-md-2 mb-2 mb-md-0"> 
-            <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-        </div>
-        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <div class="col-10 col-md-10 mb-2 mb-md-0 Tabla_titulo">
             <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
                 CONFIGURAR OPCIONES EN MARCACIONES
             </span>
         </div>
-        <div class="col-2 col-md-2 mb-2 mb-md-0">
-            <mat-icon *ngIf="activar_boton" class="float-right" id="cerrar" (click)="LimpiarFormulario()">highlight_off</mat-icon>
+        <div *ngIf="activar_boton" class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario()">highlight_off</mat-icon>
         </div>
     </div>
 
@@ -205,6 +201,18 @@
                 <div class="col-md">
                     <span id="fuente">TIMBRE ESPECIAL</span>
                     <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_especial">
+                        <mat-radio-button class="example-radio-button" [value]="true">
+                            <label id="textoradiobtn">Si</label>
+                        </mat-radio-button>
+                        <mat-radio-button class="example-radio-button" [value]="false">
+                            <label id="textoradiobtn">No</label>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-md">
+                    <span id="fuente">TIMBRE UBICACIÓN DESCONOCIDA</span>
+                    <mat-radio-group class="d-flex flex-wrap justify-content-center"
+                        [formControl]="seleccion_ubicacion">
                         <mat-radio-button class="example-radio-button" [value]="true">
                             <label id="textoradiobtn">Si</label>
                         </mat-radio-button>

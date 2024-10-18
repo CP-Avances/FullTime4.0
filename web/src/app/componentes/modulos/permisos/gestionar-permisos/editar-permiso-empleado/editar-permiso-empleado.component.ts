@@ -15,10 +15,11 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+
+import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 
 // CREACION DE LISTA DE OPCIONES DE SOLICITUD DE PERMISO
 interface opcionesDiasHoras {

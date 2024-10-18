@@ -25,7 +25,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 //PIPES DE FILTROS

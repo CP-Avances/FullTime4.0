@@ -16,13 +16,13 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
 import { EditarCatProcesosComponent } from 'src/app/componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ProcesoService } from 'src/app/servicios/catalogos/catProcesos/proceso.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-principal-proceso',

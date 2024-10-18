@@ -9,7 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from '../../../generales/main-nav/main-nav.service';
 import { MatDialog } from '@angular/material/dialog';
 import { VerImagenComponent } from 'src/app/componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
 

@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
 import { BuscarAsistenciaComponent } from '../buscar-asistencia/buscar-asistencia.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
