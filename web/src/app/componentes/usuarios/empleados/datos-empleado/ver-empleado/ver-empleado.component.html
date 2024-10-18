@@ -403,13 +403,16 @@
             <div class="row" *ngIf="btnActualizarCargo && !editar_contrato">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="w-100 bd-highlight">
-                                <h5>CONTRATO VIGENTE</h5>
+                        <div id="titulo" class="row w-100 m-auto">
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
-                                *ngIf="!editar_contrato">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>
+                                    CONTRATO VIGENTE
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                                <button *ngIf="!editar_contrato" type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
                                     (click)="AbrirVentanaCrearContrato()">
                                     Añadir
                                 </button>
@@ -511,14 +514,18 @@
                 </div>
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="w-100 bd-highlight">
-                                <h5>CARGO VIGENTE</h5>
+                        <div id="titulo" class="row w-100 m-auto">
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
-                                *ngIf="btnActualizarCargo">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaCargo()">{{btnTitulo}}</button>
+                            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>
+                                    CARGO VIGENTE
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                                    (click)="AbrirVentanaCargo()">{{btnTitulo}}
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -2276,20 +2283,20 @@
                                 *ngFor="let e of empleadoProcesos | paginate:tamanio_pagina:numero_pagina"
                                 style="padding-top: 15px;">
                                 <div class="container">
-                                    <div class="row">
-                                        <div class="col-md">
+                                    <div class="row w-100">
+                                        <div class="col-12 col-md-4">
                                             <div class="espacio d-flex justify-content-start">
                                                 <label id="datosF">Proceso:</label>
                                                 <label>{{e.proceso}}</label>
                                             </div>
                                         </div>
-                                        <div class="col-md">
+                                        <div class="col-12 col-md-4">
                                             <div class="espacio d-flex justify-content-start">
                                                 <label id="datosF">Fecha Inicio:</label>
                                                 <label>{{e.fecha_inicio_}}</label>
                                             </div>
                                         </div>
-                                        <div class="col-md">
+                                        <div class="col-12 col-md-4">
                                             <div class="espacio d-flex justify-content-start">
                                                 <label id="datosF">Fecha Final:</label>
                                                 <label>{{e.fecha_final_}}</label>
