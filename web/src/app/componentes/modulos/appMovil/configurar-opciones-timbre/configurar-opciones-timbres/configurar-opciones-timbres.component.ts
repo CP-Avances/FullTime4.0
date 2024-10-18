@@ -57,6 +57,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   seleccion_opcion = new FormControl('');
   seleccion_internet = new FormControl('');
   seleccion_especial = new FormControl('');
+  seleccion_ubicacion = new FormControl('');
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
@@ -165,6 +166,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       { opcion: 'Enviar Foto' },
       { opcion: 'Internet Requerido' },
       { opcion: 'Timbre Especial' },
+      { opcion: 'Timbre Ubicación Desconocida' },
     ];
     this.BuscarInformacionGeneral();
   }
@@ -478,16 +480,20 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_cargo === true) {
+    }
+    else if (this._booleanOptions.bool_cargo === true) {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_reg === true) {
+    }
+    else if (this._booleanOptions.bool_reg === true) {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
     }
@@ -579,6 +585,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.activar_boton = false;
     this.seleccion_internet.reset();
     this.seleccion_especial.reset();
+    this.seleccion_ubicacion.reset();
     this.seleccion_foto.reset();
     this.seleccion.reset();
   }
@@ -637,6 +644,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.Filtrar('', 5);
       this.Filtrar('', 6);
     }
+    this.seleccion_ubicacion.reset();
     this.seleccion_internet.reset();
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
@@ -655,13 +663,14 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       timbre_internet: this.seleccion_internet.value,
       timbre_foto: this.seleccion_foto.value,
       timbre_especial: this.seleccion_especial.value,
+      timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
       ip: this.ip,
     };
     if (
       this.seleccion_especial.value === null &&
       this.seleccion_foto.value === null &&
-      this.seleccion_internet.value === null
+      this.seleccion_internet.value === null && this.seleccion_ubicacion === null
     ) {
       this.toastr.warning('No ha seleccionado ninguna opción para la marcación', '',
         { timeOut: 6000 }
@@ -707,6 +716,9 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     }
     if (this.seleccion_internet.value === null) {
       informacion.timbre_internet = true;
+    }
+    if (this.seleccion_ubicacion.value === null) {
+      informacion.timbre_ubicacion_desconocida = true;
     }
     //console.log('info ', informacion)
     this.restTimbres.IngresarOpcionesMarcacion(informacion).subscribe((i) => {

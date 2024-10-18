@@ -15,7 +15,7 @@ import { ValidacionesService } from "src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
-import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
+import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
 import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
 

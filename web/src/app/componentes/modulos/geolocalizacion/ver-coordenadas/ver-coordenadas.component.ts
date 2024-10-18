@@ -21,7 +21,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { NumericLiteral } from 'typescript';
 

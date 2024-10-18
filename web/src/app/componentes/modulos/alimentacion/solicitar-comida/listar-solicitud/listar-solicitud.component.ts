@@ -20,7 +20,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
 

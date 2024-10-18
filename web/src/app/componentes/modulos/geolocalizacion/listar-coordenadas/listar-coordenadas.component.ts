@@ -18,11 +18,11 @@ import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/em
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { CrearCoordenadasComponent } from '../crear-coordenadas/crear-coordenadas.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-listar-coordenadas',

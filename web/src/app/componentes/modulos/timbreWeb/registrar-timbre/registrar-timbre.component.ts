@@ -296,7 +296,7 @@ export class RegistrarTimbreComponent implements OnInit {
   especial: boolean = false;
   BuscarParametros() {
     let datos: any = [];
-    let detalles = { parametros: '4, 5, 7, 2, 15' };
+    let detalles = { parametros: '4, 7, 2' };
     this.restP.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -305,12 +305,6 @@ export class RegistrarTimbreComponent implements OnInit {
           // id_tipo_parametro PARA RANGO DE UBICACION = 4
           if (p.id_parametro === 4) {
             this.rango = (parseInt(p.descripcion))
-          }
-          // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
-          if (p.id_parametro === 5) {
-            if (p.descripcion === 'Si') {
-              this.desconocida = true;
-            }
           }
           // id_tipo_parametro PARA VERIFICAR USO SSL = 7
           if (p.id_parametro === 7) {
@@ -336,10 +330,12 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     this.foto = false;
     this.especial = false;
+    this.desconocida = false;
     this.restTimbres.BuscarVariasOpcionesMarcacionWeb(buscar).subscribe((a) => {
       //console.log('veificar datos ', a.respuesta);
       this.foto = a.respuesta[0].timbre_foto;
       this.especial = a.respuesta[0].timbre_especial;
+      this.desconocida = a.respuesta[0].timbre_ubicacion_desconocida;
     });
   }
 
@@ -394,6 +390,7 @@ export class RegistrarTimbreComponent implements OnInit {
   fecha_hora: any;
   accionF: string = '';
   AlmacenarDatos(opcion: number) {
+    //console.log('entra1')
     this.boton_abierto = false;
     switch (opcion) {
       case 1:
@@ -445,6 +442,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS DEL TIMBRE
   InsertarTimbre() {
+    //console.log('entra2')
     // VERIFICAR USO DE LA CAMARA
     if (this.foto === true) {
       if (this.existe_camara) {
@@ -493,7 +491,7 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name,
     }
-    //console.log('data timbre ', this.dataTimbre)
+    //console.log('data timbre.... ', this.dataTimbre)
     this.informacion_timbre = this.dataTimbre;
   }
 
@@ -501,7 +499,7 @@ export class RegistrarTimbreComponent implements OnInit {
   RegistrarTimbre(data: any) {
     data.fec_hora_timbre = this.fecha_hora;
     //data.fec_hora_timbre = '11/09/2024 5:09:00 PM'
-    console.log('data timbre ', data)
+    //console.log('data timbre ', data)
     this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
       data.id_empleado = this.id_empl;
       this.ventana.BuscarParametro();
@@ -514,6 +512,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
   GuardarImagen(form: any): void {
+    //console.log('observacion ', form.observacionForm)
     if (this.imagenCamara) {
       this.informacion_timbre.imagen = this.convertida;
     }
@@ -564,6 +563,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any) {
+    //console.log('entra4')
     var longitud_ = '';
     var latitud_ = '';
     if (longitud && latitud) {
@@ -597,6 +597,7 @@ export class RegistrarTimbreComponent implements OnInit {
               this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
                 timeOut: 6000,
               })
+              this.CerrarProcesos();
             }
           }
         })
@@ -607,6 +608,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any) {
+    //console.log('entra3')
     //console.log('coordenadas ', latitud, ' long ', longitud)
     if (this.funciones[0].geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango);
@@ -641,6 +643,7 @@ export class RegistrarTimbreComponent implements OnInit {
           this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
             timeOut: 6000,
           })
+          this.CerrarProcesos();
         }
       }
       else {
@@ -664,6 +667,7 @@ export class RegistrarTimbreComponent implements OnInit {
       this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
+      this.CerrarProcesos();
     }
 
   }

@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { EditarTipoComidasComponent } from '../../tipos-comidas/editar-tipo-comidas/editar-tipo-comidas.component';
 import { EditarDetalleMenuComponent } from '../editar-detalle-menu/editar-detalle-menu.component';
 import { DetalleMenuComponent } from '../detalle-menu/detalle-menu.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/tipo-comidas.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';

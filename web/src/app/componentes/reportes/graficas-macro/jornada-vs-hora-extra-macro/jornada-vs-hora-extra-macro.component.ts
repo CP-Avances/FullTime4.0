@@ -14,7 +14,7 @@ import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent } from 'echarts/components';
 import { PieChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({

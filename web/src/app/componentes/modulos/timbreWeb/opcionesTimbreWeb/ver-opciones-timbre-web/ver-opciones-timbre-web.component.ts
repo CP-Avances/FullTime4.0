@@ -16,7 +16,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 import { OpcionesTimbreWebComponent } from '../opciones-timbre-web/opciones-timbre-web.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 
 @Component({
@@ -116,6 +116,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
             // COMBINAR CON LA INFORMACION DE LA CONFIGURACION
             timbre_especial: res.timbre_especial,
             timbre_foto: res.timbre_foto,
+            timbre_ubicacion_desconocida: res.timbre_ubicacion_desconocida,
             n: numero++
           };
         });
@@ -361,7 +362,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             headerRows: 2,
             body: [
               [
@@ -375,7 +376,8 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
                 { rowSpan: 2, text: 'RÉGIMEN', style: 'cabeceras' },
                 { rowSpan: 2, text: 'DEPARTAMENTO', style: 'cabeceras' },
                 { rowSpan: 2, text: 'CARGO', style: 'cabeceras' },
-                { rowSpan: 1, colSpan: 2, text: 'CONFIGURACIÓN', style: 'tableHeader' },
+                { rowSpan: 1, colSpan: 3, text: 'CONFIGURACIÓN', style: 'tableHeader' },
+                {},
                 {},
               ],
               [
@@ -391,6 +393,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
                 {},
                 { rowSpan: 1, text: 'ENVIAR FOTO', style: 'tableHeader' },
                 { rowSpan: 1, text: 'TIMBRE ESPECIAL', style: 'tableHeader' },
+                { rowSpan: 1, text: 'TIMBRE UBICACIÓN DESCONOCIDA', style: 'tableHeader' },
               ],
               ...this.configuracion.map((obj: any) => {
                 return [
@@ -406,6 +409,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
                   { style: 'itemsTable', text: obj.cargo },
                   { style: 'itemsTableCentrado', text: (obj.timbre_foto === true) ? 'Sí' : 'No' },
                   { style: 'itemsTableCentrado', text: (obj.timbre_especial === true) ? 'Sí' : 'No' },
+                  { style: 'itemsTableCentrado', text: (obj.timbre_ubicacion_desconocida === true) ? 'Sí' : 'No' },
                 ];
               })
             ]
@@ -451,6 +455,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
         'Cargo': usu.cargo,
         'Enviar Foto': usu.timbre_foto == true ? 'SI' : 'NO',
         'Timbre Especial': usu.timbre_especial == true ? 'SI' : 'NO',
+        'Timbre Ubicación Desconocida': usu.timbre_ubicacion_desconocida == true ? 'SI' : 'NO',
       }
       nuevo.push(ele)
     });

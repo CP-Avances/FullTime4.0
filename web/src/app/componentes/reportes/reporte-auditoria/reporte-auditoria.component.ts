@@ -18,7 +18,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { FormControl } from '@angular/forms';
 
 interface Tablas {

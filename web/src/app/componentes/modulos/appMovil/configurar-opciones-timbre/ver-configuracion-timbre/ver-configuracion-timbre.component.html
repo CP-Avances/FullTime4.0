@@ -30,13 +30,14 @@
                         <th class="t_horarios" scope="col" rowspan="2">N°</th>
                         <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                         <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
-                        <th class="t_horarios" scope="col" rowspan="1" colspan="3">CONFIGURACIÓN</th>
+                        <th class="t_horarios" scope="col" rowspan="1" colspan="4">CONFIGURACIÓN</th>
                         <th class="t_horarios" scope="col" rowspan="2">ACCIONES</th>
                     </tr>
                     <tr style="text-align: center">
                         <th class="t_horarios" scope="col" rowspan="1">REQUERIDO INTERNET</th>
                         <th class="t_horarios" scope="col" rowspan="1">ENVIAR FOTO</th>
                         <th class="t_horarios" scope="col" rowspan="1">TIMBRE ESPECIAL</th>
+                        <th class="t_horarios" scope="col" rowspan="1">TIMBRE UBICACIÓN DESCONOCIDA</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +53,7 @@
                                 <input matInput placeholder="Buscar" [formControl]="nombreF">
                             </mat-form-field>
                         </td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -79,6 +81,8 @@
                         <td class="t_horarios" *ngIf="c.timbre_foto === false">No</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === true">SI</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === false">No</td>
+                        <td class="t_horarios" *ngIf="c.timbre_ubicacion_desconocida== true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_ubicacion_desconocida === false">No</td>
                         <td class="t_horarios">
                             <i id="t-eliminar" *ngIf="auto_individual && getEliminarConfiguracionTimbreMovil()" class="far fa-trash-alt t_horarios"
                                 (click)="ConfirmarDelete(c)" matSuffix matTooltipPosition="right"

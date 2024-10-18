@@ -17,7 +17,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 

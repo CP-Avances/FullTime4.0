@@ -21,8 +21,8 @@ import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriado
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { PermisosMultiplesEmpleadosComponent } from '../../multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
-import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
-import { SettingsComponent } from 'src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
+import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
+import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
 
 interface opcionesDiasHoras {
   valor: string;
@@ -33,7 +33,6 @@ interface opcionesDiasHoras {
   selector: 'app-registro-empleado-permiso',
   templateUrl: './registro-empleado-permiso.component.html',
   styleUrls: ['./registro-empleado-permiso.component.css'],
-
 })
 
 export class RegistroEmpleadoPermisoComponent implements OnInit {
