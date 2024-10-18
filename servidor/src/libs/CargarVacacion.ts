@@ -1,5 +1,5 @@
 import pool from '../database'
-import AUDITORIA_CONTROLADOR from '../controlador/auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../controlador/reportes/auditoriaControlador';
 
 export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number, user_name: string, ip: string) {
 

@@ -1,7 +1,7 @@
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';

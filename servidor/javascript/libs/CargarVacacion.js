@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestarPeriodoVacacionAutorizada = void 0;
 const database_1 = __importDefault(require("../database"));
-const auditoriaControlador_1 = __importDefault(require("../controlador/auditoria/auditoriaControlador"));
+const auditoriaControlador_1 = __importDefault(require("../controlador/reportes/auditoriaControlador"));
 const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
     return __awaiter(this, void 0, void 0, function* () {
         let vacacion = yield ConsultarVacacion(id_vacacion);

@@ -7,44 +7,44 @@ import morgan from 'morgan';
 import indexRutas from './rutas/indexRutas';
 
 // EMPRESA
-import PROVINCIA_RUTA from './rutas/catalogos/catProvinciaRutas';
-import CIUDAD_RUTAS from './rutas/ciudades/ciudadesRutas';
-import EMPRESA_RUTAS from './rutas/catalogos/catEmpresaRutas';
-import BIRTHDAY_RUTAS from './rutas/birthday/birthdayRutas';
+import PROVINCIA_RUTA from './rutas/configuracion/localizacion/catProvinciaRutas';
+import CIUDAD_RUTAS from './rutas/configuracion/localizacion/ciudadesRutas';
+import EMPRESA_RUTAS from './rutas/configuracion/parametrizacion/catEmpresaRutas';
+import BIRTHDAY_RUTAS from './rutas/notificaciones/birthdayRutas';
 import DOCUMENTOS_RUTAS from './rutas/documentos/documentosRutas';
-import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
-import ROLES_RUTAS from './rutas/catalogos/catRolesRutas';
-import ROL_PERMISOS_RUTAS from './rutas/catalogos/catRolPermisosRutas';
-import FERIADOS_RUTA from './rutas/catalogos/catFeriadosRuta';
-import CIUDAD_FERIADOS_RUTAS from './rutas/ciudadFeriado/ciudadFeriadoRutas';
-import REGIMEN_RUTA from './rutas/catalogos/catRegimenRuta';
-import SUCURSAL_RUTAS from './rutas/sucursal/sucursalRutas';
-import DEPARTAMENTO_RUTA from './rutas/catalogos/catDepartamentoRutas';
-import AUTORIZA_DEPARTAMENTO_RUTAS from './rutas/autorizaDepartamento/autorizaDepartamentoRutas';
-import RELOJES_RUTA from './rutas/catalogos/catRelojesRuta';
-import MODALIDAD_LABORAL_RUTAS from './rutas/catalogos/catModalidadLaboralRutas';
-import TIPO_CARGOS_RUTAS from './rutas/catalogos/catTiposCargosRutas';
-import NACIONALIDADES_RUTAS from './rutas/nacionalidad/nacionalidadRutas';
-import NIVEL_TITULO_RUTAS from './rutas/nivelTitulo/nivelTituloRutas';
-import TITULO_RUTAS from './rutas/catalogos/catTituloRutas';
-import TIPO_VACUNAS_RUTAS from './rutas/catalogos/catVacunasRutas';
-import DISCAPACIDADES_RUTAS from './rutas/catalogos/catDiscapacidadRutas';
-import HORARIO_RUTA from './rutas/catalogos/catHorarioRutas';
-import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorario/detalleCatHorarioRutas';
-import PLANIFICACION_HORARIA_RUTAS from './rutas/catalogos/catPlanificacionHorariaRutas';
+import PARAMETROS_RUTAS from './rutas/configuracion/parametrizacion/parametrosRutas';
+import ROLES_RUTAS from './rutas/configuracion/parametrizacion/catRolesRutas';
+import ROL_PERMISOS_RUTAS from './rutas/configuracion/parametrizacion/catRolPermisosRutas';
+import FERIADOS_RUTA from './rutas/horarios/catFeriadosRuta';
+import CIUDAD_FERIADOS_RUTAS from './rutas/horarios/ciudadFeriadoRutas';
+import REGIMEN_RUTA from './rutas/configuracion/parametrizacion/catRegimenRuta';
+import SUCURSAL_RUTAS from './rutas/configuracion/localizacion/sucursalRutas';
+import DEPARTAMENTO_RUTA from './rutas/configuracion/localizacion/catDepartamentoRutas';
+import AUTORIZA_DEPARTAMENTO_RUTAS from './rutas/configuracion/localizacion/autorizaDepartamentoRutas';
+import RELOJES_RUTA from './rutas/timbres/catRelojesRuta';
+import MODALIDAD_LABORAL_RUTAS from './rutas/configuracion/parametrizacion/catModalidadLaboralRutas';
+import TIPO_CARGOS_RUTAS from './rutas/configuracion/parametrizacion/catTiposCargosRutas';
+import NACIONALIDADES_RUTAS from './rutas/empleado/empleadoRegistro/nacionalidadRutas';
+import NIVEL_TITULO_RUTAS from './rutas/empleado/nivelTitulo/nivelTituloRutas';
+import TITULO_RUTAS from './rutas/empleado/nivelTitulo/catTituloRutas';
+import TIPO_VACUNAS_RUTAS from './rutas/empleado/empleadoVacuna/catVacunasRutas';
+import DISCAPACIDADES_RUTAS from './rutas/empleado/empleadoDiscapacidad/catDiscapacidadRutas';
+import HORARIO_RUTA from './rutas/horarios/catHorarioRutas';
+import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorarioRutas';
+import PLANIFICACION_HORARIA_RUTAS from './rutas/horarios/catPlanificacionHorariaRutas';
 
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';
-import USUARIO_RUTA from './rutas/usuarios/usuarioRutas';
+import USUARIO_RUTA from './rutas/empleado/usuarios/usuarioRutas';
 import DISCAPACIDAD_RUTAS from './rutas/empleado/empleadoDiscapacidad/discapacidadRutas';
 import VACUNA_RUTAS from './rutas/empleado/empleadoVacuna/vacunasRutas';
 import CONTRATO_EMPLEADO_RUTAS from './rutas/empleado/empleadoContrato/contratoEmpleadoRutas';
 import EMPLEADO_CARGO_RUTAS from './rutas/empleado/empleadoCargos/emplCargosRutas';
-import EMPLEADO_HORARIOS_RUTAS from './rutas/horarios/empleadoHorarios/empleadoHorariosRutas';
-import PLAN_GENERAL_RUTAS from './rutas/planGeneral/planGeneralRutas';
+import EMPLEADO_HORARIOS_RUTAS from './rutas/horarios/empleadoHorariosRutas';
+import PLAN_GENERAL_RUTAS from './rutas/horarios/planGeneralRutas';
 import TIMBRES_RUTAS from './rutas/timbres/timbresRutas';
-import PLANTILLA_RUTAS from './rutas/descargarPlantilla/plantillaRutas';
+import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
@@ -53,26 +53,26 @@ import FUNCIONES_RUTAS from './rutas/funciones/funcionRutas';
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
 import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
 // MODULO PERMISO
-import TIPO_PERMISOS_RUTAS from './rutas/catalogos/catTipoPermisosRutas';
-import PERMISOS_RUTAS from './rutas/permisos/permisosRutas';
+import TIPO_PERMISOS_RUTAS from './rutas/modulos/permisos/catTipoPermisosRutas';
+import PERMISOS_RUTAS from './rutas/modulos/permisos/permisosRutas';
 // MODULO VACACIONES
-import PERIODO_VACACION__RUTAS from './rutas/empleado/empleadoPeriodoVacacion/periodoVacacionRutas';
-import VACACIONES__RUTAS from './rutas/vacaciones/vacacionesRutas';
+import PERIODO_VACACION__RUTAS from './rutas/modulos/vacaciones/periodoVacacionRutas';
+import VACACIONES__RUTAS from './rutas/modulos/vacaciones/vacacionesRutas';
 import KARDEX_VACACION_RUTAS from './rutas/reportes/kardexVacacionesRutas';
 // MODULO HORAS EXTRA
-import HORAS_EXTRAS_RUTAS from './rutas/catalogos/catHorasExtrasRutas';
-import HORA_EXTRA_PEDIDA_RUTAS from './rutas/horaExtra/horaExtraRutas';
-import PLAN_HORAS_EXTRAS_RUTAS from './rutas/planHoraExtra/planHoraExtraRutas';
+import HORAS_EXTRAS_RUTAS from './rutas/modulos/horas-extras/catHorasExtrasRutas';
+import HORA_EXTRA_PEDIDA_RUTAS from './rutas/modulos/horas-extras/horaExtraRutas';
+import PLAN_HORAS_EXTRAS_RUTAS from './rutas/modulos/horas-extras/planHoraExtraRutas';
 // MODULO ALIMENTACION
-import TIPO_COMIDAS_RUTA from './rutas/catalogos/catTipoComidasRuta';
-import PLAN_COMIDAS_RUTAS from './rutas/planComidas/planComidasRutas';
+import TIPO_COMIDAS_RUTA from './rutas/modulos/alimentacion/catTipoComidasRuta';
+import PLAN_COMIDAS_RUTAS from './rutas/modulos/alimentacion/planComidasRutas';
 import ALIMENTACION_RUTAS from './rutas/reportes/alimentacionRutas';
 // MODULO ACCIONES DE PERSONAL
-import PROCESO_RUTA from './rutas/catalogos/catProcesoRutas';
-import EMPLEADO_PROCESO_RUTAS from './rutas/empleado/empleadoProcesos/empleProcesosRutas';
-import ACCION_PERSONAL_RUTAS from './rutas/accionPersonal/accionPersonalRutas';
+import PROCESO_RUTA from './rutas/modulos/acciones-personal/catProcesoRutas';
+import EMPLEADO_PROCESO_RUTAS from './rutas/modulos/acciones-personal/empleProcesosRutas';
+import ACCION_PERSONAL_RUTAS from './rutas/modulos/acciones-personal/accionPersonalRutas';
 // MODULO GEOLOCALIZACION
-import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
+import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
 // MODULO RELOJ VIRTUAL
 import RELOJ_VIRTUAL_RUTAS from './utils/reloj_virtual';
 // REPORTES
@@ -86,7 +86,7 @@ import REPORTES_TIEMPO_LABORADO_RUTAS from './rutas/reportes/reportesTiempoLabor
 import SALIDAS_ANTICIPADAS_RUTAS from './rutas/reportes/salidasAntesRutas';
 import REPORTES_TIMBRES_MRL_RUTAS from './rutas/reportes/reportesTimbresMrlRutas';
 import NOTIFICACION_RUTAS from './rutas/reportes/reportesNotificacionRutas';
-import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
+import AUDITORIA_RUTAS from './rutas/reportes/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import REPORTE_HORA_EXTRA_RUTAS from './rutas/reportes/reporteHoraExtraRutas';
 

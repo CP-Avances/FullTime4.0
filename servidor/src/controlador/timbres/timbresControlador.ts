@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { QueryResult } from 'pg';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 import moment from 'moment-timezone';
