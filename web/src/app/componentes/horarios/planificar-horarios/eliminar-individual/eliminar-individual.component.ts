@@ -219,7 +219,7 @@ export class EliminarIndividualComponent implements OnInit {
   // ELIMINAR DATOS DE BASE DE DATOS
   EliminarDatos(eliminar: any) {
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
-    this.restP.EliminarRegistro(eliminar).subscribe(datos => {
+    this.restP.EliminarRegistroMutiple(eliminar).subscribe(datos => {
       if (datos.message === 'OK') {
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
           timeOut: 6000,

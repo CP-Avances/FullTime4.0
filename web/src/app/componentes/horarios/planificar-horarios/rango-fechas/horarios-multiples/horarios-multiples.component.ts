@@ -714,41 +714,11 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
   validos: number = 0;
-  CrearData(form: any) {
-    this.plan_general = [];
-    this.validos = 0;
-    this.usuarios_validos.map((obj: any) => {
-      this.validos = this.validos + 1;
-      this.RegistrarPlanificacion(form, obj, this.validos);
-    })
-  }
 
   CrearData2(form: any) {
     this.plan_general = [];
     this.validos = this.usuarios_validos.length;
     this.RegistrarPlanificacion2(form, this.usuarios_validos, this.validos);
-  }
-
-
-
-
-  // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
-  RegistrarPlanificacion(form: any, valor: any, validos: number) {
-    // METODO DE BUSQUEDA DE FERIADOS
-    this.feriados = [];
-    let datos = {
-      fecha_inicio: form.fechaInicioForm,
-      fecha_final: form.fechaFinalForm,
-      id_empleado: parseInt(valor.id)
-    }
-    this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
-      this.feriados = data;
-      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-      this.BuscarFeriadosRecuperar(form, valor, validos);
-    }, vacio => {
-      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-      this.BuscarFeriadosRecuperar(form, valor, validos);
-    })
   }
 
   feriados2: { [key: number]: any } = {};
@@ -787,25 +757,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
 
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-  recuperar: any = [];
-  BuscarFeriadosRecuperar(form: any, valor: any, validos: number) {
-    this.recuperar = [];
-    let datos = {
-      fecha_inicio: form.fechaInicioForm,
-      fecha_final: form.fechaFinalForm,
-      id_empleado: parseInt(valor.id)
-    }
-    this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
-
-      this.recuperar = data;
-      // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
-    }, vacio => {
-      // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
-    })
-  }
-
+ 
   recuperar2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   BuscarFeriadosRecuperar2(form: any, valor: any, validos: number) {
@@ -839,156 +791,7 @@ export class HorariosMultiplesComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   plan_general: any = [];
-  CrearPlanGeneral(form: any, dh: any, validos: number) {
-    // CONSULTAR HORARIO
-    const [obj_res] = this.horarios.filter((o: any) => {
-      return o.id === parseInt(form.horarioForm)
-    })
-
-    if (!obj_res) return this.toastr.warning('Horario no válido.');
-    const { default_ } = obj_res;
-
-    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-    this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
-
-    // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
-    while (this.inicioDate <= this.finDate) {
-      this.fechasHorario.push(this.inicioDate);
-      var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
-      this.inicioDate = newDate;
-    }
-
-    var tipo: any = null;
-    var origen: string = '';
-    var tipo_dia: string = '';
-
-    this.fechasHorario.map((obj: any) => {
-      // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-      tipo_dia = default_;
-      origen = default_;
-      tipo = null;
-      var day = moment(obj).day();
-      if (moment.weekdays(day) === 'lunes') {
-        if (form.lunesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'martes') {
-        if (form.martesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'miércoles') {
-        if (form.miercolesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'jueves') {
-        if (form.juevesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'viernes') {
-        if (form.viernesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'sábado') {
-        if (form.sabadoForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'domingo') {
-        if (form.domingoForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-
-      if (default_ === 'FD' || default_ === 'L') {
-        tipo = default_;
-        tipo_dia = default_;
-        origen = 'H' + default_;
-      }
-      else {
-        // BUSCAR FERIADOS
-        if (this.feriados.length != 0) {
-          for (let i = 0; i < this.feriados.length; i++) {
-            if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-              tipo = 'DFD';
-              tipo_dia = 'DFD';
-              break;
-            }
-          }
-        }
-      }
-
-      // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-      if (this.recuperar.length != 0) {
-        for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo = 'REC';
-            tipo_dia = 'REC';
-            break;
-          }
-        }
-      }
-      // METODO PARA CREACION DE DATA DE REGISTRO DE HORARIOS
-      let fechas = {
-        fechaInicio: obj,
-        fechaFinal: obj,
-      };
-      if (tipo_dia === 'N' || tipo_dia === 'REC' || tipo_dia === 'DHA' || origen === 'HFD' || origen === 'HL') {
-        this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, this.detalles);
-      }
-      // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
-      else if (tipo_dia === 'DFD') {
-        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
-          this.EliminarRegistrosH(existe, obj, dh);
-        });
-        this.lista_descanso.forEach((desc: any) => {
-          if (desc.tipo === 'DFD') {
-            tipo = 'FD';
-            tipo_dia = 'FD';
-            origen = 'FD';
-            this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
-          }
-        })
-      }
-      else if (tipo_dia === 'L' && origen === 'L') {
-        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
-          this.EliminarRegistrosH(existe, obj, dh);
-        });
-        this.lista_descanso.forEach((desc: any) => {
-          if (desc.tipo === 'DL') {
-            tipo = 'L';
-            tipo_dia = 'L';
-            origen = 'L';
-            this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
-          }
-        })
-      }
-    });
-    // SE VALIDA QUE EL LIMITE DE REGISTROS SEA EL ADECUADO PARA EL SISTEMA
-    if (validos === this.usuarios_validos.length) {
-      this.ValidarLimites();
-    }
-  }
-
+ 
   CrearPlanGeneral2(form: any, valor: any, validos: number) {
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
@@ -1211,36 +1014,9 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       }
     })
-
     this.ValidarLimites();
-
   }
 
-
-  // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
-  EliminarRegistrosH(existe: any, obj: any, dh: any) {
-    let datos = {
-      id_plan: [],
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-    existe.forEach((h: any) => {
-      if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
-        let plan_fecha = {
-          id_empleado: dh.id,
-          fec_final: obj,
-          fec_inicio: obj,
-          id_horario: h.id_horario,
-        };
-        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-          datos.id_plan = res;
-          // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(datos).subscribe(datos => {
-          })
-        })
-      }
-    })
-  }
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {

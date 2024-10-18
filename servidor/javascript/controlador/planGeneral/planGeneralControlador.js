@@ -200,7 +200,7 @@ class PlanGeneralControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // CONSULTAR DATOSORIGINALES
-                    const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan.id]);
+                    const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan]);
                     const [datosOriginales] = consulta.rows;
                     if (!datosOriginales) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -210,7 +210,7 @@ class PlanGeneralControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip,
-                            observacion: `Error al eliminar el registro con id ${plan.id}. Registro no encontrado.`
+                            observacion: `Error al eliminar el registro con id ${plan}. Registro no encontrado.`
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
@@ -218,7 +218,7 @@ class PlanGeneralControlador {
                     }
                     yield database_1.default.query(`
                     DELETE FROM eu_asistencia_general WHERE id = $1
-                    `, [plan.id]);
+                    `, [plan]);
                     const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
                     const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
                     const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
@@ -262,58 +262,65 @@ class PlanGeneralControlador {
     }
     EliminarRegistrosMultiples(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let errores = 0;
-            let ocurrioError = false;
-            let mensajeError = '';
-            let codigoError = 0;
             const { user_name, ip, id_plan } = req.body;
             // Iniciar transacción
             try {
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
-                const datosOriginales = consulta.rows;
-                if (datosOriginales.length !== id_plan.length) {
-                    const idsEncontrados = datosOriginales.map((d) => d.id);
-                    const idsNoEncontrados = id_plan.filter((id) => !idsEncontrados.includes(id));
-                    // Registrar auditoría de errores
-                    for (const id of idsNoEncontrados) {
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'eu_asistencia_general',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: '',
-                            datosNuevos: '',
-                            ip,
-                            observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
-                        });
-                    }
-                    // Si alguno de los registros no se encontró, hacer ROLLBACK
-                    yield database_1.default.query('ROLLBACK');
-                    return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
-                }
-                // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
-                yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
-                // Formatear las fechas de los datos originales para la auditoría
-                for (const datos of datosOriginales) {
-                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
-                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datos.fecha_hora_horario, 'ddd');
-                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datos.fecha_horario, 'ddd');
-                    datos.fecha_horario = fecha_horario;
-                    datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                }
-                // AUDITORÍA: Registrar todos los registros eliminados
-                for (const datos of datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                /*
+    
+            // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
+            const consulta = await pool.query(
+                `SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`,
+                [id_plan]
+            );
+    
+            const datosOriginales = consulta.rows;
+            if (datosOriginales.length !== id_plan.length) {
+                const idsEncontrados = datosOriginales.map((d: any) => d.id);
+                const idsNoEncontrados = id_plan.filter((id: any) => !idsEncontrados.includes(id));
+                // Registrar auditoría de errores
+                for (const id of idsNoEncontrados) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_asistencia_general',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datos),
+                        datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: null
+                        observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
                     });
                 }
+     
+                // Si alguno de los registros no se encontró, hacer ROLLBACK
+                await pool.query('ROLLBACK');
+                return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
+            }
+    */
+                // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
+                yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
+                // Formatear las fechas de los datos originales para la auditoría
+                /*
+                for (const datos of datosOriginales) {
+                    const fecha_hora_horario1 = await FormatearHora(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                    const fecha_hora_horario = await FormatearFecha2(datos.fecha_hora_horario, 'ddd');
+                    const fecha_horario = await FormatearFecha2(datos.fecha_horario, 'ddd');
+        
+                    datos.fecha_horario = fecha_horario;
+                    datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                }
+                    /*/
+                // AUDITORÍA: Registrar todos los registros eliminados
+                //for (const datos of datosOriginales) {
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: 'Identificadores de planificación horaria: ' + id_plan,
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // }
                 // Finalizar transacción
                 yield database_1.default.query('COMMIT');
                 return res.status(200).jsonp({ message: 'OK' });

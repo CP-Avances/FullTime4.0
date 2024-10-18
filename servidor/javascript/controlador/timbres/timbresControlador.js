@@ -12,8 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.timbresControlador = void 0;
-exports.ValidarZonaHoraria = ValidarZonaHoraria;
+exports.ValidarZonaHoraria = exports.timbresControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const settingsMail_1 = require("../../libs/settingsMail");
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
@@ -1367,3 +1366,4 @@ function ValidarZonaHoraria(fecha_valida, fecha_timbre, fecha_validada, fec_hora
     }
     return hora_diferente;
 }
+exports.ValidarZonaHoraria = ValidarZonaHoraria;
