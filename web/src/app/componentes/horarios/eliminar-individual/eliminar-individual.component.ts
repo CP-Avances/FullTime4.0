@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
-
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 // IMPORTACION DE SERVICIOS
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -45,6 +45,7 @@ export class EliminarIndividualComponent implements OnInit {
   });
 
   constructor(
+    public rest: EmpleadoHorariosService, // SERVICIO DE DATOS DE HORARIOS ASIGNADOS A UN EMPLEADO
     public restP: PlanGeneralService,
     public router: Router,
     public validar: ValidacionesService,
@@ -168,6 +169,7 @@ export class EliminarIndividualComponent implements OnInit {
     for (var i = 0; i <= this.lista_horarios.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('horariosSeleccionados' + i)).checked = true;
     }
+    console.log("ver horarios seleccionados: ", this.horariosSeleccionados)
   }
 
   // QUITAR TODOS LOS DATOS SELECCIONADOS
@@ -186,39 +188,32 @@ export class EliminarIndividualComponent implements OnInit {
     let inicio = moment(form.fechaInicioForm).format('YYYY-MM-DD');
     let final = moment(form.fechaFinalForm).format('YYYY-MM-DD');
 
-    let total = this.horariosSeleccionados.length * this.datosEliminar.usuario.length;
-    let contador = 0;
-
+  
     let datos = {
-      id_plan: [],
-      user_name: this.user_name,
-      ip: this.ip
+      usuarios_validos: this.datosEliminar.usuario,
+      eliminar_horarios: this.horariosSeleccionados,
+      fec_inicio: inicio,
+      fec_final: final,
     };
 
-    this.horariosSeleccionados.forEach((obj: any) => {
-      this.datosEliminar.usuario.forEach((usu: any) => {
-        let plan_fecha = {
-          id_empleado: usu.id,
-          fec_final: final,
-          fec_inicio: inicio,
-          id_horario: obj.id_horario,
-        };
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
-          contador = contador + 1;
-          this.lista_eliminar = this.lista_eliminar.concat(res);
-          if (contador === total) {
-            datos.id_plan = this.lista_eliminar;
-            this.EliminarDatos(datos);
-          }
-        }, error => {
-          contador = contador + 1;
-          if (contador === total) {
-            datos.id_plan = this.lista_eliminar;
-            this.EliminarDatos(datos);
-          }
-        })
-      })
+    this.rest.BuscarFechasMultiples(datos).subscribe(res => {
+      console.log("Ver horairos a eliminar: ", res)
+      this.lista_eliminar = res;
+      let datosEliminar = {
+        id_plan: res,
+        user_name: this.user_name,
+        ip: this.ip
+      };
+      this.EliminarDatos(datosEliminar);
+    }, error => {
+      let datosEliminar = {
+        id_plan: [],
+        user_name: this.user_name,
+        ip: this.ip
+      };
+      this.EliminarDatos(datosEliminar);
     })
+
   }
 
   // ELIMINAR DATOS DE BASE DE DATOS

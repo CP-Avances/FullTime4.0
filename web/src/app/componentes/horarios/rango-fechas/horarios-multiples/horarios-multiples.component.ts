@@ -1308,7 +1308,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.contar_eliminar = 0;
     this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
-        id: obj.id_horario,
+        id_horario: obj.id_horario,
       }
       this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
     })

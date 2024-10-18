@@ -18,86 +18,6 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
     constructor() {
-        /*
-            public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
-                const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
-        
-                let errores: number = 0;
-                let partesRecibidas: any = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
-                let ocurrioError = false;
-                let mensajeError = '';
-                let codigoError = 0;
-        
-                console.log("ver parteIndex", parteIndex)
-                console.log("ver totalPartes", totalPartes)
-                partesRecibidas = parte;
-                let contador = 0;
-                for (let i = 0; i < partesRecibidas.length; i++) {
-                    try {
-                        contador = contador + 1 ;
-                        // INICIAR TRANSACCION
-                        await pool.query('BEGIN');
-        
-                        const result = await pool.query(
-                            `
-                                    INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                                        fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
-                                        minutos_antes, minutos_despues, estado_origen, minutos_alimentacion)
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                                    `
-                            ,
-                            [
-                                partesRecibidas[i].fec_hora_horario, partesRecibidas[i].tolerancia, partesRecibidas[i].estado_timbre,
-                                partesRecibidas[i].id_det_horario, partesRecibidas[i].fec_horario, partesRecibidas[i].id_empl_cargo,
-                                partesRecibidas[i].tipo_entr_salida, partesRecibidas[i].id_empleado, partesRecibidas[i].id_horario, partesRecibidas[i].tipo_dia,
-                                partesRecibidas[i].salida_otro_dia, partesRecibidas[i].min_antes, partesRecibidas[i].min_despues, partesRecibidas[i].estado_origen,
-                                partesRecibidas[i].min_alimentacion
-                            ]
-                        );
-        
-                        const [plan] = result.rows;
-        
-                        const fecha_hora_horario1 = await FormatearHora(partesRecibidas[i].fec_hora_horario.split(' ')[1]);
-                        const fecha_hora_horario = await FormatearFecha2(partesRecibidas[i].fec_hora_horario, 'ddd');
-                        const fecha_horario = await FormatearFecha2(partesRecibidas[i].fec_horario, 'ddd');
-        
-                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                        plan.fecha_horario = fecha_horario;
-        
-                        // AUDITORIA
-                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'eu_asistencia_general',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(plan),
-                            ip,
-                            observacion: null
-                        });
-        
-                        // FINALIZAR TRANSACCION
-                        await pool.query('COMMIT');
-        
-                    } catch (error) {
-                        // REVERTIR TRANSACCION
-                        await pool.query('ROLLBACK');
-                        ocurrioError = true;
-                        mensajeError = error.message;
-                        codigoError = 500;
-                        errores++;
-                        break;
-                    }
-                }
-        
-                if ((parteIndex + 1) === totalPartes) {
-                    if (contador == partesRecibidas.length) {
-                        return res.status(200).jsonp({ message: 'OK' });
-                    }
-                } else {
-                    return res.status(200).jsonp({ message: 'Parte: ' + (parteIndex+1) + 'de '+  totalPartes });
-                }
-            }
-        */
         this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
             let partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
@@ -337,6 +257,72 @@ class PlanGeneralControlador {
                 else {
                     return res.status(200).jsonp({ message: 'OK' });
                 }
+            }
+        });
+    }
+    EliminarRegistrosMultiples(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let errores = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            const { user_name, ip, id_plan } = req.body;
+            // Iniciar transacción
+            try {
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
+                const datosOriginales = consulta.rows;
+                if (datosOriginales.length !== id_plan.length) {
+                    const idsEncontrados = datosOriginales.map((d) => d.id);
+                    const idsNoEncontrados = id_plan.filter((id) => !idsEncontrados.includes(id));
+                    // Registrar auditoría de errores
+                    for (const id of idsNoEncontrados) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
+                        });
+                    }
+                    // Si alguno de los registros no se encontró, hacer ROLLBACK
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
+                }
+                // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
+                yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
+                // Formatear las fechas de los datos originales para la auditoría
+                for (const datos of datosOriginales) {
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datos.fecha_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datos.fecha_horario, 'ddd');
+                    datos.fecha_horario = fecha_horario;
+                    datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                }
+                // AUDITORÍA: Registrar todos los registros eliminados
+                for (const datos of datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(datos),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    });
+                }
+                // Finalizar transacción
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'OK' });
+            }
+            catch (error) {
+                // Revertir la transacción si ocurre un error
+                yield database_1.default.query('ROLLBACK');
+                console.error('Error en la eliminación múltiple:', error);
+                return res.status(500).jsonp({ message: 'Error en el proceso de eliminación', error });
             }
         });
     }
