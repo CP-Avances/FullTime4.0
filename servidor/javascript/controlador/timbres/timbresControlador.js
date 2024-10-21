@@ -261,7 +261,7 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos } = req.body;
                 //console.log('datos del timbre ', req.body)
                 const id_empleado = req.userIdEmpleado;
                 var hora_diferente = false;
@@ -298,6 +298,19 @@ class TimbresControlador {
                     // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
                     hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
                 }
+                // METODO PARA VERIFICAR USO D SEGUNDOS
+                var fecha_servidor_final;
+                var fecha_validada_final;
+                console.log(' hora diferente ', fecha_servidor);
+                console.log(' hora diferente ', fecha_validada);
+                if (capturar_segundos === false) {
+                    fecha_servidor_final = (0, moment_timezone_1.default)(fecha_servidor, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+                    fecha_validada_final = (0, moment_timezone_1.default)(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+                }
+                else {
+                    fecha_servidor_final = fecha_servidor;
+                    fecha_validada_final = fecha_validada;
+                }
                 console.log(' hora diferente ', hora_diferente);
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM eu_empleados WHERE id = $1
@@ -313,10 +326,11 @@ class TimbresControlador {
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-                `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
+                `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor_final, fecha_validada_final, tecl_funcion, accion,
                     observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
                     zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
+                    console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -330,7 +344,17 @@ class TimbresControlador {
                     });
                     //FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                    if (results) {
+                        if (results.rows[0].timbres_web === 0) {
+                            res.status(200).jsonp({ message: 'Registro duplicado.' });
+                        }
+                        else {
+                            res.status(200).jsonp({ message: 'Registro guardado.' });
+                        }
+                    }
+                    else {
+                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                    }
                 }));
             }
             catch (error) {
@@ -370,12 +394,14 @@ class TimbresControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 database_1.default.query(`
-                SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                SELECT * FROM public.timbres_crear ($1, $2,
+                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
                     observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                    //console.log('error ', error)
+                    console.log('error ', error);
+                    console.log('result ', results);
                     // FORMATEAR FECHAS
                     var hora = (0, moment_timezone_1.default)(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
                     var fecha = (0, moment_timezone_1.default)(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
@@ -391,7 +417,17 @@ class TimbresControlador {
                         observacion: null
                     });
                     yield database_1.default.query('COMMIT');
-                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                    if (results) {
+                        if (results.rows[0].timbres_crear === 0) {
+                            res.status(200).jsonp({ message: 'Registro duplicado.' });
+                        }
+                        else {
+                            res.status(200).jsonp({ message: 'Registro guardado.' });
+                        }
+                    }
+                    else {
+                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                    }
                 }));
             }
             catch (error) {

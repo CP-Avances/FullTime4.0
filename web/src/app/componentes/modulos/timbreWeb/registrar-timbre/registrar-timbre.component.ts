@@ -113,7 +113,10 @@ export class RegistrarTimbreComponent implements OnInit {
     const ampm = hours >= 12 ? 'PM' : 'AM';
 
     const formattedMinutes = String(minutes).padStart(2, '0');
-    const formattedSeconds = String(seconds).padStart(2, '0');
+    var formattedSeconds = String(seconds).padStart(2, '0');
+    if (this.capturar_segundos === false) {
+      formattedSeconds = '00';
+    }
 
     if (opcion === 1) {
       if (this.formato === 'hh:mm:ss A') {
@@ -288,11 +291,12 @@ export class RegistrarTimbreComponent implements OnInit {
   // METODO PARA OBTENER RANGO DE PERIMETRO
   rango: number = 0;
   desconocida: boolean = false;
+  capturar_segundos: boolean = false;
   foto: boolean = false;
   especial: boolean = false;
   BuscarParametros() {
     let datos: any = [];
-    let detalles = { parametros: '4, 7, 2' };
+    let detalles = { parametros: '4, 7, 2, 5' };
     this.restP.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -301,6 +305,12 @@ export class RegistrarTimbreComponent implements OnInit {
           // id_tipo_parametro PARA RANGO DE UBICACION = 4
           if (p.id_parametro === 4) {
             this.rango = (parseInt(p.descripcion))
+          }
+          // id_tipo_parametro PARA CONSIDERAR SEGUNDOS O NO = 5
+          if (p.id_parametro === 5) {
+            if (p.descripcion === 'Si') {
+              this.capturar_segundos = true;
+            }
           }
           // id_tipo_parametro PARA VERIFICAR USO SSL = 7
           if (p.id_parametro === 7) {
@@ -473,6 +483,7 @@ export class RegistrarTimbreComponent implements OnInit {
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
     this.dataTimbre = {
+      capturar_segundos: this.capturar_segundos,
       zona_dispositivo: this.timeZone,
       gmt_dispositivo: this.gmt_dispositivo,
       fec_hora_timbre: '',
@@ -499,7 +510,20 @@ export class RegistrarTimbreComponent implements OnInit {
       data.id_empleado = this.id_empl;
       this.ventana.BuscarParametro();
       this.CerrarProcesos();
-      this.toastr.success(res.message)
+      //console.log('res message', res.message)
+      if (res.message === 'Registro guardado.') {
+        this.toastr.success(res.message);
+      }
+      else if (res.message === 'Registro duplicado.') {
+        this.toastr.info(res.message);
+      }
+      else if (res.message === 'Ups!!! algo salio mal.') {
+        this.toastr.warning(res.message);
+      }
+      else {
+        this.toastr.error(res.message);
+      }
+
     }, err => {
       this.toastr.error(err.message)
     })
