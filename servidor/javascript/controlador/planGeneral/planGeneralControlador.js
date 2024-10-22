@@ -18,8 +18,9 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
     constructor() {
-        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.CrearPlanificacion3 = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+            console.log("ver body", req.body);
             let partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
             let errores = 0;
             let ocurrioError = false;
@@ -65,6 +66,12 @@ class PlanGeneralControlador {
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
+                    console.error("Detalles del error:", {
+                        message: error.message,
+                        stack: error.stack, // Para ver dónde ocurre el error
+                        code: error.code, // Código de error (si lo hay)
+                        detail: error.detail // Información adicional de la BD (si la hay)
+                    });
                     yield database_1.default.query('ROLLBACK');
                     ocurrioError = true;
                     mensajeError = error.message;
@@ -79,6 +86,79 @@ class PlanGeneralControlador {
             }
             // Respuesta final con 'OK' si todo se procesó correctamente
             return res.status(200).jsonp({ message: 'OK' });
+        });
+        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { parte, user_name, ip } = req.body;
+            // Validación del input
+            if (!Array.isArray(parte) || parte.length === 0) {
+                return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
+            }
+            const batchSize = 1000; // Ajusta este número según tu caso
+            const totalResults = []; // Para almacenar los resultados de cada lote
+            // Procesar en lotes
+            for (let i = 0; i < parte.length; i += batchSize) {
+                const batch = parte.slice(i, i + batchSize);
+                const valores = [];
+                const placeholders = [];
+                // Recorrer los objetos del batch y construir los placeholders para la consulta
+                for (let j = 0; j < batch.length; j++) {
+                    const p = batch[j];
+                    const index = j * 15; // 15 es el número de campos a insertar
+                    valores.push(p.fec_hora_horario, p.tolerancia, p.estado_timbre, p.id_det_horario, p.fec_horario, p.id_empl_cargo, p.tipo_entr_salida, p.id_empleado, p.id_horario, p.tipo_dia, p.salida_otro_dia, p.min_antes, p.min_despues, p.estado_origen, p.min_alimentacion);
+                    // Crear los placeholders para la consulta
+                    placeholders.push(`($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, 
+                      $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10}, 
+                      $${index + 11}, $${index + 12}, $${index + 13}, $${index + 14}, $${index + 15})`);
+                }
+                // Crear la consulta de inserción masiva para el batch
+                const query = `
+                INSERT INTO eu_asistencia_general (
+                    fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
+                    id_horario, tipo_dia, salida_otro_dia, minutos_antes,
+                    minutos_despues, estado_origen, minutos_alimentacion
+                ) VALUES ${placeholders.join(', ')} RETURNING *
+            `;
+                try {
+                    // INICIAR TRANSACCIÓN
+                    yield database_1.default.query('BEGIN');
+                    const result = yield database_1.default.query(query, valores);
+                    const plans = result.rows;
+                    totalResults.push(...plans); // Guardar resultados del lote
+                    for (const plan of plans) {
+                        const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                        const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan.fecha_hora_horario, 'ddd');
+                        const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan.fecha_horario, 'ddd');
+                        plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                        plan.fecha_horario = fecha_horario;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(plan),
+                            ip,
+                            observacion: null
+                        });
+                    }
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCIÓN
+                    console.error("Detalles del error:", {
+                        message: error.message,
+                        stack: error.stack,
+                        code: error.code,
+                        detail: error.detail
+                    });
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).json({ message: 'Error al procesar la parte', error: error.message });
+                }
+            }
+            // Respuesta final con 'OK' si todo se procesó correctamente
+            return res.status(200).json({ message: 'OK', totalResults });
         });
         this.BuscarFechasMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar } = req.body;
@@ -147,7 +227,12 @@ class PlanGeneralControlador {
                     yield database_1.default.query('COMMIT');
                 }
                 catch (error) {
-                    // REVERTIR TRANSACCION
+                    console.error("Detalles del error:", {
+                        message: error.message,
+                        stack: error.stack, // Para ver dónde ocurre el error
+                        code: error.code, // Código de error (si lo hay)
+                        detail: error.detail // Información adicional de la BD (si la hay)
+                    });
                     yield database_1.default.query('ROLLBACK');
                     ocurrioError = true;
                     mensajeError = error.message;

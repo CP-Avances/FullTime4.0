@@ -1148,13 +1148,9 @@ export class HorariosMultiplesComponent implements OnInit {
   }
 
   GuardarInformacion() {
-    const datos = {
-      plan_general: this.plan_general,
-      user_name: this.user_name,
-      ip: this.ip,
-    };
     // Dividir el objeto plan_general en partes más pequeñas
-    const partes = this.dividirPlanGeneral(datos.plan_general);
+    console.log("ver plan general: ", this.plan_general)
+    const partes = this.dividirPlanGeneral(this.plan_general);
     const totalPartes = partes.length;
     // Enviar la primera parte
     this.enviarParte(partes, 0, totalPartes);
@@ -1415,13 +1411,17 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
+
+    const arrayIds: number[] = this.eliminar.map((obj: any) => obj.id);
+
     let datos = {
-      id_plan: this.eliminar,
+      id_plan: arrayIds,
       user_name: this.user_name,
       ip: this.ip,
     }
+    console.log("ver datos a eliminar: ", datos)
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
-    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
+    this.restP.EliminarRegistroMutiple(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
           timeOut: 6000,
@@ -1442,7 +1442,6 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
   }
-
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
     if (form.horarioForm) {
