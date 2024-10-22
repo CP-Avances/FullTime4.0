@@ -3458,6 +3458,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
   DefinirInfoHistóricoPDF(){
+    const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
     return {
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -3485,6 +3486,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 5, 0, 5] },
         this.PresentarDataPDFContratosCargo(),
       ],
       styles: {

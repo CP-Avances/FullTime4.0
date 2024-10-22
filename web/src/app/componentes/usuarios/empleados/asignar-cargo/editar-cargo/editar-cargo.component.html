@@ -11,14 +11,14 @@
     <!-- FORMULARIO COMPLETO -->
     <form [formGroup]="formulario">
         <mat-card-content>
-            <div class="container" style="padding-top: 2px; text-align: center;">
-                <div class="nota" style="text-align: justify;">
+            <div class="container" style="padding-top: 2px">
+                <div class="nota" style="text-align: justify; ">
                     <span>
                         NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                         Guardar.
                     </span>
                 </div>
-                <div class="row">
+                <div class="row" style="text-align: center;">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
@@ -117,8 +117,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md">
+                <div class="row w-100">
+                    <div class="col-12 col-md-4">
                         <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="jefeF"
                             matTooltip="Indicar si el usuario es Jefe o Coordinador departamento.">
                             <label id="textoradiobtn" style="font-size: 12px;">
@@ -126,7 +126,7 @@
                             </label>
                         </mat-checkbox>
                     </div>
-                    <div class="col-md">
+                    <div class="col-12 col-md-4">
                         <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="administraF"
                             matTooltip="Indicar si el usuario administra al personal del departamento.">
                             <label id="textoradiobtn" style="font-size: 12px;">
@@ -134,7 +134,7 @@
                             </label>
                         </mat-checkbox>
                     </div>
-                    <div class="col-md">
+                    <div class="col-12 col-md-4">
                         <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="personalF"
                             matTooltip="Indicar si el usuario tiene acceso a sus datos.">
                             <label id="textoradiobtn" style="font-size: 12px;">
