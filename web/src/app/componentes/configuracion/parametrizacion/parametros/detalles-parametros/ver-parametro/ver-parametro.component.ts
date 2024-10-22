@@ -209,7 +209,7 @@ export class VerParametroComponent implements OnInit {
         this.opcion_kardex = this.datosDetalle[0].descripcion;
         this.opcion_laboral = this.datosDetalle[0].descripcion;
       }
-      if (this.datosDetalle[0].descripcion === 'hh:mm:ss A') {
+      if (this.datosDetalle[0].descripcion === 'hh:mm:ss a') {
         this.formato12 = '#4194F0';
         this.formato24 = 'rgb(80, 87, 97)';
       }
@@ -424,7 +424,7 @@ export class VerParametroComponent implements OnInit {
       observacion = 'Formato estándar';
     }
     else if (seleccion === 4) {
-      formato = 'hh:mm:ss A';
+      formato = 'hh:mm:ss a';
       observacion = 'Formato de 12 horas';
     }
     else if (seleccion === 5) {

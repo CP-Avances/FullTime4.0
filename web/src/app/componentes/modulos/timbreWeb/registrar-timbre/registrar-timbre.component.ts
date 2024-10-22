@@ -119,7 +119,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
 
     if (opcion === 1) {
-      if (this.formato === 'hh:mm:ss A') {
+      if (this.formato === 'hh:mm:ss a') {
         // CONVERTIR HORAS A FORMATO DE 12 HORAS
         const formattedHours = hours % 12 || 12;
         return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
