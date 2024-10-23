@@ -1,7 +1,6 @@
 import { ToastrService } from 'ngx-toastr';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 import { DateTime } from 'luxon';
 
 @Injectable({
@@ -131,25 +130,7 @@ export class ValidacionesService {
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
 
-  FormatearFecha(fecha: string, formato: string, dia: string): string {
-    let valor: string;
-    if (dia === 'ddd') {
-      valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-        moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-        ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-    }
-    else if (dia === 'no') {
-      valor = moment(fecha, 'YYYY/MM/DD').format(formato);
-    }
-    else {
-      valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-        moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-        ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-    }
-    return valor;
-  }
-
-  FormatearFechaLuxon(fecha: string, formato: string, dia: string, idioma: string): string {
+  FormatearFecha(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
     // CONVERTIR FORMATOS DE FECHA
     if (formato === 'DD/MM/YYYY') {
@@ -183,12 +164,6 @@ export class ValidacionesService {
   }
 
   FormatearHora(hora: string, formato: string) {
-    //console.log('hora ', hora, ' formato ', formato)
-    let valor = moment(hora, 'HH:mm:ss').format(formato);
-    return valor;
-  }
-
-  FormatearHoraLuxon(hora: string, formato: string) {
     //console.log('hora ', hora, ' formato ', formato)
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;

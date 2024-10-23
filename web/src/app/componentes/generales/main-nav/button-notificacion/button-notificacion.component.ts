@@ -3,7 +3,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
@@ -53,8 +53,8 @@ export class ButtonNotificacionComponent implements OnInit {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
-            res.fecha_ = this.validar.FormatearFecha(moment(res.create_at).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado);
-            res.hora_ = this.validar.FormatearHora(moment(res.create_at).format('HH:mm:ss'), this.formato_hora);
+            res.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(res.create_at).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            res.hora_ = this.validar.FormatearHora(DateTime.fromISO(res.create_at).toFormat('HH:mm:ss'), this.formato_hora);
 
             if (res.mensaje.split('para')[0] != undefined && res.mensaje.split('para')[1] != undefined) {
               res.aviso = res.mensaje.split('para')[0];;
@@ -96,30 +96,28 @@ export class ButtonNotificacionComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.LlamarNotificaciones(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.LlamarNotificaciones(fecha, this.formato_hora);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
       });
   }
 
@@ -141,8 +139,8 @@ export class ButtonNotificacionComponent implements OnInit {
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
           this.avisos.forEach((obj: any) => {
-            obj.fecha_ = this.validar.FormatearFecha(moment(obj.create_at).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_abreviado);
-            obj.hora_ = this.validar.FormatearHora(moment(obj.create_at).format('HH:mm:ss'), formato_hora);
+            obj.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(obj.create_at).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            obj.hora_ = this.validar.FormatearHora(DateTime.fromISO(obj.create_at).toFormat('HH:mm:ss'), formato_hora);
             if (obj.visto === false) {
               this.num_noti_false = this.num_noti_false + 1;
               this.estadoNotificacion = false

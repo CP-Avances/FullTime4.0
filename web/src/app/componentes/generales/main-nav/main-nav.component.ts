@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
@@ -97,11 +97,9 @@ export class MainNavComponent implements OnInit {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
     if (licencia !== null) {
       const fec_caducidad = new Date(licencia.split('.')[0])
-      const fecha_hoy = new Date();
       this.fec_caducidad_licencia = fec_caducidad;
-      const fecha1 = moment(fecha_hoy.toJSON().split('T')[0])
-      const fecha2 = moment(fec_caducidad.toJSON().split('T')[0])
-
+      const fecha1 = DateTime.now().toFormat('yyyy-MM-dd');
+      const fecha2 = DateTime.fromJSDate(fec_caducidad).toFormat('yyyy-MM-dd');
       const diferencia = fecha2.diff(fecha1, 'days');
 
       if (diferencia <= 30) {

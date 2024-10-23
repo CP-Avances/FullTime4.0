@@ -1,8 +1,8 @@
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
 import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -184,8 +184,8 @@ export class EditarTipoPermisosComponent implements OnInit {
       this.tipoPermiso.fecha_fin != '' && this.tipoPermiso.fecha_fin != null) {
       this.calendario = true;
       this.rango.patchValue({
-        start: moment(this.tipoPermiso.fecha_inicio, "YYYY/MM/DD").format("YYYY-MM-DD"),
-        end: moment(this.tipoPermiso.fecha_fin, "YYYY/MM/DD").format("YYYY-MM-DD")
+        start: DateTime.fromFormat(this.tipoPermiso.fecha_inicio, 'yyyy-MM-dd').toFormat("YYYY-MM-DD"),
+        end: DateTime.fromFormat(this.tipoPermiso.fecha_fin, 'yyyy-MM-dd').toFormat("YYYY-MM-DD")
       });
     } else {
       this.calendario = false;
@@ -329,8 +329,8 @@ export class EditarTipoPermisosComponent implements OnInit {
       contar_feriados: form2.feriadosForm,
       num_dia_justifica: form2.numDiaJustificaForm,
       gene_justificacion: form2.geneJustificacionForm,
-      fecha_inicio: moment(this.rango.value.start).format('YYYY-MM-DD'),
-      fecha_fin: moment(this.rango.value.end).format('YYYY-MM-DD'),
+      fecha_inicio: DateTime.fromISO(this.rango.value.start).toFormat('yyyy-MM-dd'),
+      fecha_fin: DateTime.fromISO(this.rango.value.end).toFormat('yyyy-MM-dd'),
 
       // FORMULARIO TRES
       correo_crear: form3.correo_crearForm,

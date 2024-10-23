@@ -64,28 +64,27 @@ export class EditarTimbreComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora()
-      },
-      vacio => {
-        this.BuscarHora()
-      });
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
         this.LeerDatosTimbre();
-      },
-      vacio => {
+      }, vacio => {
         this.LeerDatosTimbre();
       });
   }
@@ -96,7 +95,7 @@ export class EditarTimbreComponent implements OnInit {
   LeerDatosTimbre() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado);
+    this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
     this.datosTimbre.hora_ = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
     this.ValidarObservacion();
     this.EditartimbreForm = this.formBuilder.group({

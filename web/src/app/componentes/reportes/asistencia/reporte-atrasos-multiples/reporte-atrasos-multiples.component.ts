@@ -563,12 +563,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               ],
               ...empl.atrasos.map((usu: any) => {
                 // FORMATEAR FECHAS
-                const fechaHorario = this.validar.FormatearFechaLuxon(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-                const fechaTimbre = this.validar.FormatearFechaLuxon(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+                const fechaHorario = this.validar.FormatearFecha(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+                const fechaTimbre = this.validar.FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 console.log('hora formato', this.formato_hora)
-                const horaHorario = this.validar.FormatearHoraLuxon(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+                const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
                 console.log('hora ', horaHorario)
-                const horaTimbre = this.validar.FormatearHoraLuxon(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+                const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
                 var tolerancia = '00:00:00';
                 if (this.tolerancia !== '1') {
                   tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
@@ -728,8 +728,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       suc.empleados.forEach((empl: any) => {
         empl.atrasos.forEach((usu: any) => {
           n++;
-          const horaHorario = this.validar.FormatearHoraLuxon(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
-          const horaTimbre = this.validar.FormatearHoraLuxon(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele: any;
@@ -771,10 +771,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
         empl.atrasos.forEach((usu: any) => {
-          const fechaHorario = this.validar.FormatearFechaLuxon(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-          const fechaTimbre = this.validar.FormatearFechaLuxon(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-          const horaHorario = this.validar.FormatearHoraLuxon(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
-          const horaTimbre = this.validar.FormatearHoraLuxon(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          const fechaHorario = this.validar.FormatearFecha(usu.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fechaTimbre = this.validar.FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);

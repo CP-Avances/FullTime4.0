@@ -4,11 +4,12 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { DateTime } from 'luxon';
+
+import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as moment from 'moment';
-import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from '../../plantilla-reportes.service';
@@ -382,7 +383,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
             {
               border: [false, true, false, true],
               bold: true,
-              text: 'PERIODO DEL: ' + String(moment(this.f_inicio_req, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment(this.f_final_req, "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: 'PERIODO DEL: ' + DateTime.fromFormat(this.f_inicio_req, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(this.f_final_req, 'yyyy/MM/dd').toFormat('dd/MM/yyyy'),
               style: 'itemsTableInfo'
             },
             {

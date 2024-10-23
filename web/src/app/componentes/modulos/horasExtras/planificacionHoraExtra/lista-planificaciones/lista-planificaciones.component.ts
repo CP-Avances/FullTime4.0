@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
 import * as moment from "moment";
@@ -118,7 +119,6 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.fecha = f.format('YYYY-MM-DD');
       this.BuscarParametro();
-      this.BuscarFecha();
     }
   }
 
@@ -148,29 +148,34 @@ export class ListaPlanificacionesComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+  idioma_fechas: string = 'es';
+  correos: number = 0;
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    let datos: any = [];
+    this.correos = 0;
+    let detalles = { parametros: '1, 2, 33' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.ListarPlanificaciones(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.ListarPlanificaciones(fecha, this.formato_hora);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+          // id_tipo_parametro correos = 33
+          else if (p.id_parametro === 33) {
+            this.correos = parseInt(p.descripcion)
+          }
+        })
+        this.ListarPlanificaciones(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.ListarPlanificaciones(this.formato_fecha, this.formato_hora);
       });
   }
 
@@ -183,8 +188,8 @@ export class ListaPlanificacionesComponent implements OnInit {
       console.log('ver data ... ', this.listaPlan)
 
       this.listaPlan.forEach((data: any) => {
-        data.fecha_desde_ = this.validar.FormatearFecha(data.fecha_desde, formato_fecha, this.validar.dia_abreviado);
-        data.fecha_hasta_ = this.validar.FormatearFecha(data.fecha_hasta, formato_fecha, this.validar.dia_abreviado);
+        data.fecha_desde_ = this.validar.FormatearFecha(data.fecha_desde, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fecha_hasta_ = this.validar.FormatearFecha(data.fecha_hasta, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.hora_fin_ = this.validar.FormatearHora(data.hora_fin, formato_hora);
       })
@@ -218,15 +223,15 @@ export class ListaPlanificacionesComponent implements OnInit {
         this.toastr.warning('Planificación no ha sido asignada a ningún colaborador.', 'Registro eliminado.', {
           timeOut: 6000,
         })
-        this.BuscarFecha();
+        this.BuscarParametro();
       });
     });
   }
 
   FormatearDatos(lista: any) {
     lista.forEach((data: any) => {
-      data.fecDesde = this.validar.FormatearFecha(data.fecha_desde, this.formato_fecha, this.validar.dia_abreviado);
-      data.fecHasta = this.validar.FormatearFecha(data.fecha_hasta, this.formato_fecha, this.validar.dia_abreviado);
+      data.fecDesde = this.validar.FormatearFecha(data.fecha_desde, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+      data.fecHasta = this.validar.FormatearFecha(data.fecha_hasta, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, this.formato_hora);
       data.horaFin = this.validar.FormatearHora(data.hora_fin, this.formato_hora);
     })
@@ -299,7 +304,7 @@ export class ListaPlanificacionesComponent implements OnInit {
         this.ver_icono = true;
         this.ver_editar = false;
         this.ver_eliminar = false;
-        this.BuscarFecha();
+        this.BuscarParametro();
       });
     });
   }
@@ -329,8 +334,8 @@ export class ListaPlanificacionesComponent implements OnInit {
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fecha_desde, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(datos.fecha_hasta, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(datos.fecha_desde, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(datos.fecha_hasta, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
@@ -497,7 +502,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     this.botonSeleccion = false;
     this.botonEditar = false;
     this.botonEliminar = false;
-    this.BuscarFecha();
+    this.BuscarParametro();
     this.selectionUno.clear();
   }
 
@@ -550,23 +555,6 @@ export class ListaPlanificacionesComponent implements OnInit {
         });
       }
     })
-  }
-
-  // METODO DE BUSQUEDA DE NUMERO PERMITIDO DE CORREOS
-  correos: number;
-  BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 33
-    let datos: any = [];
-    this.parametro.ListarDetalleParametros(33).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
-        }
-        else {
-          this.correos = 0
-        }
-      });
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIAR
@@ -650,9 +638,9 @@ export class ListaPlanificacionesComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

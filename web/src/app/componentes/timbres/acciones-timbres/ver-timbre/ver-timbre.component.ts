@@ -15,6 +15,7 @@ export class VerTimbreComponent implements OnInit {
   timbre: any = [];
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
+  idioma_fechas: string = 'es';
 
   // LISTA DE ACCIONES DE TIMBRES
   acciones: any = [
@@ -51,32 +52,31 @@ export class VerTimbreComponent implements OnInit {
   fecha_timbre: any;
   hora_timbre: any;
   ObtenerTimbre(formato_fecha: string, formato_hora: string) {
-    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fecha_hora_timbre_validado, formato_fecha, this.validar.dia_completo);
+    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fecha_hora_timbre_validado, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
     this.hora_timbre = this.validar.FormatearHora(this.timbre.fecha_hora_timbre_validado.split(' ')[1], formato_hora);
   }
 
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.ObtenerTimbre(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.ObtenerTimbre(fecha, this.formato_hora);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.ObtenerTimbre(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.ObtenerTimbre(this.formato_fecha, this.formato_hora);
       });
   }
 

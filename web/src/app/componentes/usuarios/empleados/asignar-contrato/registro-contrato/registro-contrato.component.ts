@@ -4,7 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
@@ -265,10 +265,10 @@ export class RegistroContratoComponent implements OnInit {
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
     this.rest.BuscarContratosEmpleado(this.datoEmpleado).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
+      var ingreso = DateTime.fromFormat(datos.fec_ingreso, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = String(moment(this.revisarFecha[i].fecha_salida, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        var fecha_salida = DateTime.fromFormat(this.revisarFecha[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
         if (ingreso < fecha_salida) {
           this.contador = 1;
         }

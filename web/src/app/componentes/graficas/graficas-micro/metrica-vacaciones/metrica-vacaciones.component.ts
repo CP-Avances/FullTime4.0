@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { DateTime } from 'luxon';
+
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
@@ -9,11 +11,12 @@ import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
+
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
+
 @Component({
   selector: 'app-metrica-vacaciones',
   templateUrl: './metrica-vacaciones.component.html',
@@ -48,7 +51,7 @@ export class MetricaVacacionesComponent implements OnInit {
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
-   }
+  }
 
   ngOnInit(): void {
     echarts.use(
@@ -62,7 +65,7 @@ export class MetricaVacacionesComponent implements OnInit {
   llamarGraficaOriginal() {
     let local = sessionStorage.getItem('vacaciones');
     this.chartDom = document.getElementById('charts_vacaciones_macro') as HTMLCanvasElement;
-    this.thisChart = echarts.init(this.chartDom, 'light', {width: 1050, renderer: 'svg',devicePixelRatio: 5 });
+    this.thisChart = echarts.init(this.chartDom, 'light', { width: 1050, renderer: 'svg', devicePixelRatio: 5 });
 
     if (local === null) {
       this.restGraficas.EmpleadoVacaciones().subscribe(res => {
@@ -96,7 +99,7 @@ export class MetricaVacacionesComponent implements OnInit {
     if (f_i < f_f) {
 
       if (f_i.getFullYear() === f_f.getFullYear()) {
-        this.toastr.success('Fechas validas','', {
+        this.toastr.success('Fechas validas', '', {
           timeOut: 6000,
         });
 
@@ -111,18 +114,18 @@ export class MetricaVacacionesComponent implements OnInit {
           this.thisChart.setOption(res);
         });
       } else {
-        this.toastr.error('Años de consulta diferente','Solo puede consultar datos de un año en concreto', {
+        this.toastr.error('Años de consulta diferente', 'Solo puede consultar datos de un año en concreto', {
           timeOut: 6000,
         });
-      }      
+      }
 
     } else if (f_i > f_f) {
-      this.toastr.info('Fecha final es menor a la fecha inicial','', {
+      this.toastr.info('Fecha final es menor a la fecha inicial', '', {
         timeOut: 6000,
       });
       this.fechasConsultaForm.reset();
     } else if (f_i.toLocaleDateString() === f_f.toLocaleDateString()) {
-      this.toastr.info('Fecha inicial es igual a la fecha final','', {
+      this.toastr.info('Fecha inicial es igual a la fecha final', '', {
         timeOut: 6000,
       });
       this.fechasConsultaForm.reset();
@@ -151,9 +154,9 @@ export class MetricaVacacionesComponent implements OnInit {
   }
 
   graficaBase64: any;
-  metodosPDF(accion){ 
-    this.graficaBase64 = this.thisChart.getDataURL({type: 'jpg' , pixelRatio: 5 });
-    this.generarPdf(accion) 
+  metodosPDF(accion) {
+    this.graficaBase64 = this.thisChart.getDataURL({ type: 'jpg', pixelRatio: 5 });
+    this.generarPdf(accion)
   }
 
   generarPdf(action) {
@@ -173,22 +176,20 @@ export class MetricaVacacionesComponent implements OnInit {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
-      pageMargins: [ 30, 60, 30, 40 ],
+      pageMargins: [30, 60, 30, 40],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
-        
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
             { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
-            { text: [
+            {
+              text: [
                 {
                   text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
                   alignment: 'right', opacity: 0.3
@@ -205,7 +206,7 @@ export class MetricaVacacionesComponent implements OnInit {
         { text: 'Desde: ' + this.f_inicio_req + " Hasta: " + this.f_final_req, bold: true, fontSize: 13, alignment: 'center' },
         { image: this.graficaBase64, width: 550, margin: [0, 10, 0, 10] },
         this.ImprimirDatos(),
-        { text: this.texto_grafica, margin: [10, 10, 10, 10], alignment: 'justify'},
+        { text: this.texto_grafica, margin: [10, 10, 10, 10], alignment: 'justify' },
       ],
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -227,46 +228,46 @@ export class MetricaVacacionesComponent implements OnInit {
       };
       datos.push(obj)
     }
-    
+
     let colums: any = [], colums1: any = [], colums2: any = [], colums3: any = [];
     const border = [true, true, true, true]
     for (let i = 0; i < datos.length; i++) { // Ciclo For para crear celdas de la tabla
 
       if (i >= 0 && i <= 2) { // Rango para colocar las celdas de máximo 3 meses
-        colums.push({ text: datos[i].mes, margin: [0,3,0,3], fillColor: this.p_color, border: border });
-        colums.push({ text: datos[i].valor, margin: [0,3,0,3], alignment: 'center', border: border });
+        colums.push({ text: datos[i].mes, margin: [0, 3, 0, 3], fillColor: this.p_color, border: border });
+        colums.push({ text: datos[i].valor, margin: [0, 3, 0, 3], alignment: 'center', border: border });
       };
       if (i >= 3 && i <= 5) { // Rango para colocar las celdas de máximo 3 meses
-        colums1.push({ text: datos[i].mes, margin: [0,3,0,3], fillColor: this.p_color, border: border });
-        colums1.push({ text: datos[i].valor, margin: [0,3,0,3], alignment: 'center', border: border });
+        colums1.push({ text: datos[i].mes, margin: [0, 3, 0, 3], fillColor: this.p_color, border: border });
+        colums1.push({ text: datos[i].valor, margin: [0, 3, 0, 3], alignment: 'center', border: border });
       };
       if (i >= 6 && i <= 8) { // Rango para colocar las celdas de máximo 3 meses
-        colums2.push({ text: datos[i].mes, margin: [0,3,0,3], fillColor: this.p_color, border: border });
-        colums2.push({ text: datos[i].valor, margin: [0,3,0,3], alignment: 'center', border: border });
-      }; 
+        colums2.push({ text: datos[i].mes, margin: [0, 3, 0, 3], fillColor: this.p_color, border: border });
+        colums2.push({ text: datos[i].valor, margin: [0, 3, 0, 3], alignment: 'center', border: border });
+      };
       if (i >= 9 && i <= 11) { // Rango para colocar las celdas de máximo 3 meses
-        colums3.push({ text: datos[i].mes, margin: [0,3,0,3], fillColor: this.p_color, border: border });
-        colums3.push({ text: datos[i].valor, margin: [0,3,0,3], alignment: 'center', border: border });
+        colums3.push({ text: datos[i].mes, margin: [0, 3, 0, 3], fillColor: this.p_color, border: border });
+        colums3.push({ text: datos[i].valor, margin: [0, 3, 0, 3], alignment: 'center', border: border });
       }
     }
 
-    var other : any= [];
+    var other: any = [];
 
     switch (colums.length) {
-      case 2: other = ['auto',40]; break;
-      case 4: other = ['auto',40,'auto',40]; break;
-      case 6: other = ['auto',40,'auto',40,'auto',40]; break;
+      case 2: other = ['auto', 40]; break;
+      case 4: other = ['auto', 40, 'auto', 40]; break;
+      case 6: other = ['auto', 40, 'auto', 40, 'auto', 40]; break;
       default: other = []; break;
     }
 
     let tabla: any = {
-			table: {
+      table: {
         widths: other,
-				body: []
-			}
-		}
+        body: []
+      }
+    }
 
-    const texto_push = {text: '', border: [false, false, false, false] };
+    const texto_push = { text: '', border: [false, false, false, false] };
 
     switch (colums1.length) { // Agrega celdas faltantes en blanco. para q no exista conflicto en la generación del PDF
       case 2: for (let i = 0; i < 4; i++) { colums1.push(texto_push); } break;
@@ -285,21 +286,21 @@ export class MetricaVacacionesComponent implements OnInit {
       case 4: for (let i = 0; i < 2; i++) { colums3.push(texto_push); } break;
       default: break;
     }
-    
+
     if (colums.length > 0) { tabla.table.body.push(colums); }
     if (colums1.length > 0) { tabla.table.body.push(colums1); }
     if (colums2.length > 0) { tabla.table.body.push(colums2); }
-    if (colums3.length > 0) { tabla.table.body.push(colums3); } 
+    if (colums3.length > 0) { tabla.table.body.push(colums3); }
     // console.log(tabla);
 
     const columnas = {
       alignment: 'justify',
-			columns: [
-				{ width: 95, text: '' },
-				tabla,
-				{ width: 95, text: '' }
-			]
-		}
+      columns: [
+        { width: 95, text: '' },
+        tabla,
+        { width: 95, text: '' }
+      ]
+    }
 
     return columnas
   }
@@ -310,7 +311,7 @@ export class MetricaVacacionesComponent implements OnInit {
     this.llamarGraficaOriginal();
   }
 
-  texto_grafica: string = 
-  "Vacaciones"
+  texto_grafica: string =
+    "Vacaciones"
 
 }

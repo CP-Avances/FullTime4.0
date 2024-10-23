@@ -4,6 +4,8 @@ import { FormControl } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
+
 import * as FileSaver from "file-saver";
 import * as moment from "moment";
 import * as xlsx from "xlsx";
@@ -146,7 +148,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  idioma_fechas: string = 'es';
   ArrayAutorizacionTipos: any = []
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
@@ -154,14 +156,10 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-        this.obtenerHorasExtras(this.formato_fecha);
-        this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
-        this.obtenerHorasExtrasObservacion(this.formato_fecha);
+        this.LeerDatos(this.formato_fecha);
       },
       vacio => {
-        this.obtenerHorasExtras(this.formato_fecha);
-        this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
-        this.obtenerHorasExtrasObservacion(this.formato_fecha);
+        this.LeerDatos(this.formato_fecha);
       });
 
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
@@ -169,6 +167,13 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.ArrayAutorizacionTipos = res;
       }
     );
+  }
+
+  // METODO PARA LEER DATOS
+  LeerDatos(fecha: string) {
+    this.obtenerHorasExtras(fecha);
+    this.obtenerHorasExtrasAutorizadas(fecha);
+    this.obtenerHorasExtrasObservacion(fecha);
   }
 
 
@@ -265,8 +270,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         horaT = (moment(tt).format('HH:mm:ss')).split(':');
         this.totalHorasExtras = (moment(tt).format('HH:mm:ss'));
 
-        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
 
       let i = 0;
@@ -407,8 +412,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         horaT = (moment(tt).format('HH:mm:ss')).split(':');
         this.total_horas_observacion = (moment(tt).format('HH:mm:ss'));
 
-        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
 
       });
 
@@ -612,8 +617,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           this.total_horas_autorizadas = (moment(tt).format('HH:mm:ss'));
         }
 
-        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
 
       })
 
@@ -766,9 +771,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

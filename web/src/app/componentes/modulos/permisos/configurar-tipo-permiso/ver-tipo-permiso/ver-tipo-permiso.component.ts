@@ -36,7 +36,7 @@ export class VerTipoPermisoComponent implements OnInit {
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -57,8 +57,8 @@ export class VerTipoPermisoComponent implements OnInit {
       this.datosPermiso = datos;
       console.log('ver datos de permiso', datos)
       this.datosPermiso.forEach((data: any) => {
-        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato, this.validar.dia_abreviado);
-        data.fecha_fin_ = this.validar.FormatearFecha(data.fecha_fin, formato, this.validar.dia_abreviado);
+        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fecha_fin_ = this.validar.FormatearFecha(data.fecha_fin, formato, this.validar.dia_abreviado, this.idioma_fechas);
       })
     })
   }

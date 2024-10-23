@@ -3,7 +3,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -103,7 +103,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -202,35 +202,34 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   }
 
   ContarDiasHabiles(dateFrom: any, dateTo: any): any {
-    var from = moment(dateFrom),
-      to = moment(dateTo),
-      days = 0;
-    console.log('visualizar', from);
-    while (!from.isAfter(to)) {
-      /** SI NO ES SABADO NI DOMINGO */
-      if (from.isoWeekday() !== 6 && from.isoWeekday() !== 7) {
-        days++;;
+    let from = DateTime.fromISO(dateFrom);
+    let to = DateTime.fromISO(dateTo);
+    let days = 0;
+
+    while (from <= to) {
+      // SI NO ES SABADO (6) NI DOMINGO (7)
+      if (from.weekday !== 6 && from.weekday !== 7) {
+        days++;
       }
-      from.add(1, 'days');
+      from = from.plus({ days: 1 });  // SUMAR UN DIA
     }
+
     return days;
   }
 
   ContarDiasLibres(dateFrom: any, dateTo: any) {
-    var from = moment(dateFrom, 'DD/MM/YYY'),
-      to = moment(dateTo, 'DD/MM/YYY'),
-      days = 0,
-      sa = 0;
-    while (!from.isAfter(to)) {
-      /** SI NO ES SABADO NI DOMINGO */
-      if (from.isoWeekday() !== 6 && from.isoWeekday() !== 7) {
-        days++;
+    let from = DateTime.fromFormat(dateFrom, 'dd/MM/yyyy');
+    let to = DateTime.fromFormat(dateTo, 'dd/MM/yyyy'); 
+    let sa = 0;
+
+    while (from <= to) {
+      // SI ES SABADO (6) O DOMINGO (7)
+      if (from.weekday === 6 || from.weekday === 7) {
+        sa++;
       }
-      else {
-        sa++
-      }
-      from.add(1, 'days');
+      from = from.plus({ days: 1 });  // SUMAR UN DIA
     }
+
     return sa;
   }
 
@@ -273,19 +272,20 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   }
 
   ValidarDatosVacacion(form: any) {
-    if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm) && Date.parse(form.fecInicioForm) < Date.parse(form.fechaIngresoForm)) {
-      const ingreso = moment(form.fechaIngresoForm).diff(moment(form.fecFinalForm), 'days');
+    const fechaInicio = DateTime.fromISO(form.fecInicioForm);
+    const fechaFinal = DateTime.fromISO(form.fecFinalForm);   
+    const fechaIngreso = DateTime.fromISO(form.fechaIngresoForm); 
+    if (fechaInicio < fechaFinal && fechaInicio < fechaIngreso) {
+      const ingreso = fechaIngreso.diff(fechaFinal, 'days').days; // DIFERENCIA EN DIAS
       console.log(ingreso);
       if (ingreso <= 1) {
         this.InsertarVacaciones(form);
-      }
-      else {
+      } else {
         this.toastr.info('La fecha de ingreso a laborar no es la adecuada', '', {
           timeOut: 6000,
-        })
+        });
       }
-    }
-    else {
+    } else {
       this.toastr.info('La fecha de ingreso a trabajar y de finalización de vacaciones deben ser mayores a la fecha de salida a vacaciones', '', {
         timeOut: 6000,
       });
@@ -338,8 +338,8 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       cont = cont + 1;
 
       // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
       // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
       if (vacacion.estado === 1) {
@@ -412,8 +412,8 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   EnviarNotificacion(vacaciones: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DIA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACION
-    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let notificacion = {
       id_send_empl: this.idEmpleadoIngresa,

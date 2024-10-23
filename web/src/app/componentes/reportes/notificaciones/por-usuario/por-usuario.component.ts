@@ -1,12 +1,13 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { PageEvent } from '@angular/material/paginator';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
 
 import { NotificacionService } from 'src/app/servicios/reportes/notificaciones/notificacion.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -199,7 +200,7 @@ export class PorUsuarioComponent implements OnInit {
   ImprimirDatos(id_seleccionado, form) {
     var tipo = this.num_tipo;
     var forma = this.selec_forma;
-    console.log('fechas ', moment(form.inicioForm).format('YYYY-MM-DD'), ' ', moment(form.finalForm).format('YYYY-MM-DD'))
+    console.log('fechas ', DateTime.fromISO(form.inicioForm).toFormat('yyyy-MM-dd'), ' ', DateTime.fromISO(form.finalForm).toFormat('yyyy-MM-dd'))
     if (form.inicioForm === '' || form.finalForm === '' || form.inicioForm === null || form.finalForm === null) {
       if (tipo === 1) {
         this.ListarPermisosTodos(id_seleccionado, forma, tipo);
@@ -216,8 +217,8 @@ export class PorUsuarioComponent implements OnInit {
     }
     else {
       if (Date.parse(form.inicioForm) <= Date.parse(form.finalForm)) {
-        var inicio = moment(form.inicioForm).format('YYYY-MM-DD');
-        var final = moment(form.finalForm).format('YYYY-MM-DD');
+        var inicio = DateTime.fromISO(form.inicioForm).toFormat('yyyy-MM-dd');
+        var final = DateTime.fromISO(form.finalForm).toFormat('yyyy-MM-dd');
         if (tipo === 1) {
           this.ListarPermisosFecha(id_seleccionado, forma, inicio, final, tipo);
         }
@@ -370,9 +371,9 @@ var documentDefinition: any;
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -514,9 +515,9 @@ var documentDefinition: any;
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -663,9 +664,9 @@ var documentDefinition: any;
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -806,9 +807,9 @@ var documentDefinition: any;
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

@@ -3,14 +3,16 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+
 // LIBRERÍA PARA GENERAR REPORTES EN FORMATO PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 // LIBRERÍA PARA GENERAR REPORTES EN FORMATO EXCEL
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 
 // IMPORTACION DE SERVICIOS
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
@@ -264,9 +266,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return [
           {
             margin: [10, -2, 10, 0],
@@ -336,8 +338,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
               { text: obj.nombre, style: 'itemsTableD' },
               { text: obj.apellido, style: 'itemsTableD' },
               { text: obj.descripcion, style: 'itemsTableD' },
-              { text: moment(obj.fec_inicio).format('DD/MM/YYYY'), style: 'itemsTableD' },
-              { text: moment(obj.fec_final).format('DD/MM/YYYY'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.hora_inicio, style: 'itemsTableD' },
               { text: obj.hora_final, style: 'itemsTableD' },
               { text: obj.num_hora, style: 'itemsTableD' },
@@ -376,8 +378,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
         CODIGO: obj.codigo,
         EMPLEADO: obj.nombre + ' ' + obj.apellido,
         DESCRIPCION: obj.descripcion,
-        FECHA_INICIO: moment(obj.fec_inicio).format('DD/MM/YYYY'),
-        FECHA_FIN: moment(obj.fec_final).format('DD/MM/YYYY'),
+        FECHA_INICIO: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'),
+        FECHA_FIN: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'),
         HORA_INICIO: obj.hora_inicio,
         HORA_FIN: obj.hora_final,
         HORAS_SOLICITADAS: obj.num_hora,
@@ -391,8 +393,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
     wsa["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
-    var f = moment();
-    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.format('YYYY-MM-DD') + '.xlsx');
+    var f = DateTime.now();
+    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
   }
 
   /* ****************************************************************************************************
@@ -409,9 +411,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return [
           {
             margin: [10, -2, 10, 0],
@@ -484,8 +486,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
               { text: obj.nombre, style: 'itemsTableD' },
               { text: obj.apellido, style: 'itemsTableD' },
               { text: obj.descripcion, style: 'itemsTableD' },
-              { text: moment(obj.fec_inicio).format('DD/MM/YYYY'), style: 'itemsTableD' },
-              { text: moment(obj.fec_final).format('DD/MM/YYYY'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.hora_inicio, style: 'itemsTableD' },
               { text: obj.hora_final, style: 'itemsTableD' },
               { text: obj.tiempo_autorizado, style: 'itemsTableD' },
@@ -519,8 +521,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
         CODIGO: obj.codigo,
         EMPLEADO: obj.nombre + ' ' + obj.apellido,
         DESCRIPCION: obj.descripcion,
-        FECHA_INICIO: moment(obj.fec_inicio).format('DD/MM/YYYY'),
-        FECHA_FIN: moment(obj.fec_final).format('DD/MM/YYYY'),
+        FECHA_INICIO: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'),
+        FECHA_FIN: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'),
         HORA_INICIO: obj.hora_inicio,
         HORA_FIN: obj.hora_final,
         HORAS_SOLICITADAS: obj.tiempo_autorizado,
@@ -535,8 +537,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
     wsa["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsa, 'HorasExtras Autorizadas');
-    var f = moment();
-    xlsx.writeFile(wb, "SolicitudesAutorizadas - " + f.format('YYYY-MM-DD') + '.xlsx');
+    var f = DateTime.now();
+    xlsx.writeFile(wb, "SolicitudesAutorizadas - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
   }
 
   /** *******************************************************************************************
@@ -570,9 +572,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return [
           {
             margin: [10, -2, 10, 0],
@@ -701,8 +703,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
               { text: obj.descripcion, style: 'itemsTableD' },
-              { text: moment(obj.fec_inicio).format('DD/MM/YYYY'), style: 'itemsTableD' },
-              { text: moment(obj.fec_final).format('DD/MM/YYYY'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.hora_inicio, style: 'itemsTableD' },
               { text: obj.hora_fin, style: 'itemsTableD' },
               { text: obj.num_hora, style: 'itemsTableD' },
@@ -767,8 +769,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
       return {
         N_REGISTROS: this.contarRegistros,
         DESCRIPCION: obj.descripcion,
-        FECHA_INICIO: moment(obj.fec_inicio).format('DD/MM/YYYY'),
-        FECHA_FIN: moment(obj.fec_final).format('DD/MM/YYYY'),
+        FECHA_INICIO: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'),
+        FECHA_FIN: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'),
         HORA_INICIO: obj.hora_inicio,
         HORA_FINAL: obj.hora_final,
         HORAS_SOLICITADAS: obj.num_hora,
@@ -783,8 +785,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
-    var f = moment();
-    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.format('YYYY-MM-DD') + '.xlsx');
+    var f = DateTime.now();
+    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toformat('yyyy-MM-dd') + '.xlsx');
   }
 
   /** *******************************************************************************************
@@ -801,9 +803,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return [
           {
             margin: [10, -2, 10, 0],
@@ -936,8 +938,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
               { text: obj.descripcion, style: 'itemsTableD' },
-              { text: moment(obj.fec_inicio).format('DD/MM/YYYY'), style: 'itemsTableD' },
-              { text: moment(obj.fec_final).format('DD/MM/YYYY'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.hora_inicio, style: 'itemsTableD' },
               { text: obj.hora_final, style: 'itemsTableD' },
               { text: obj.estado, style: 'itemsTableD' },
@@ -997,8 +999,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
       return {
         N_REGISTROS: this.contarRegistros,
         DESCRIPCION: obj.descripcion,
-        FECHA_INICIO: moment(obj.fec_inicio).format('DD/MM/YYYY'),
-        FECHA_FIN: moment(obj.fec_final).format('DD/MM/YYYY'),
+        FECHA_INICIO: DateTime.fromISO(obj.fec_inicio).toFormat('dd/MM/yyyy'),
+        FECHA_FIN: DateTime.fromISO(obj.fec_final).toFormat('dd/MM/yyyy'),
         HORA_INICIO: obj.hora_inicio,
         HORA_FIN: obj.hora_final,
         ESTADO: obj.estado,
@@ -1014,8 +1016,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wsa, 'SolicitudHoras Autorizadas');
-    var f = moment();
-    xlsx.writeFile(wb, "SolicitudAutorizadas - " + f.format('YYYY-MM-DD') + '.xlsx');
+    var f = DateTime.now();
+    xlsx.writeFile(wb, "SolicitudAutorizadas - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
   }
 
 }

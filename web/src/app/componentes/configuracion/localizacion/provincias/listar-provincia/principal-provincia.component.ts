@@ -3,9 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -208,9 +208,9 @@ export class PrincipalProvinciaComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -433,7 +433,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
   }
 
-// METODO PARA ELIMINAR DE MANERA MULTIPLE
+  // METODO PARA ELIMINAR DE MANERA MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {

@@ -1,10 +1,9 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DateTime, Duration } from 'luxon';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Md5 } from 'ts-md5/dist/md5';
-import * as moment from 'moment';
-moment.locale('es');
 
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
@@ -69,7 +68,7 @@ export class LoginComponent implements OnInit {
 
   // VALIDACION DE INGRESO DE DATOS DE USUARIO - INTENTOS LIMITADOS
   ValidarUsuario(form: any) {
-    var f = moment();
+    var f = DateTime.now();
     if (form.usuarioF.trim().length === 0) return;
     if (form.passwordF.trim().length === 0) return;
 
@@ -79,7 +78,7 @@ export class LoginComponent implements OnInit {
     var hora = localStorage.getItem('time_wait');
 
     if (hora != undefined) {
-      if (f.format('HH:mm:ss') > hora) {
+      if (f.toFormat('HH:mm:ss') > hora) {
         localStorage.removeItem('time_wait');
         this.intentos = 0;
         local = false;
@@ -117,10 +116,10 @@ export class LoginComponent implements OnInit {
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
       console.log('res login ', datos)
       if (datos.message === 'error') {
-        var f = moment();
-        var espera = '00:01:00';
+        const f = DateTime.now();
+        const espera = Duration.fromISO('PT1M'); // 1 minuto
         if (this.intentos === 20) {
-          var verificar = f.add(moment.duration(espera)).format('HH:mm:ss');
+          const verificar = f.plus(espera).toFormat('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {
             timeOut: 3000,

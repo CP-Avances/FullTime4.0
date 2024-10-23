@@ -3,7 +3,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -92,13 +92,11 @@ export class PlanificacionComidasComponent implements OnInit {
        this.data = this.datos.servicios;
      }*/
 
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.ObtenerServicios();
     this.BuscarParametro();
     this.MostrarDatos();
-    this.BuscarFecha();
-    this.BuscarHora();
   }
 
   /** **************************************************************************************** **
@@ -107,26 +105,35 @@ export class PlanificacionComidasComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+  idioma_fechas: string = 'es';
+  correos: number = 0;
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    this.correos = 0;
+    let datos: any = [];
+    let detalles = { parametros: '1, 2, 33' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+          // id_tipo_parametro correos = 33
+          else if (p.id_parametro === 33) {
+            this.correos = parseInt(p.descripcion)
+          }
+        })
       });
   }
 
   descripcion: string;
-
   // METODO PARA COLOCAR FECHA ACTUAL EN EL FORMULARIO
   MostrarDatos() {
     this.PlanificacionComidasForm.patchValue({
@@ -275,8 +282,8 @@ export class PlanificacionComidasComponent implements OnInit {
         var plan = res.info;
         console.log('ver plan ', plan)
         // INDICAMOS A QUE EMPLEADO SE LE REALIZA UNA PLANIFICACION
-        this.inicioDate = moment(form.fechaInicioForm).format('MM-DD-YYYY');
-        this.finDate = moment(form.fechaFinForm).format('MM-DD-YYYY');
+        this.inicioDate = DateTime.fromISO(form.fechaInicioForm).toFormat('MM-dd-yyyy');
+        this.finDate = DateTime.fromISO(form.fechaFinForm).toFormat('MM-dd-yyyy');
 
         this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
 
@@ -286,7 +293,7 @@ export class PlanificacionComidasComponent implements OnInit {
 
         // LÓGICA PARA OBTENER TODAS LAS FECHAS DEL MES
         while (start <= end) {
-          this.fechasHorario.push(moment(start).format('YYYY-MM-DD'));
+          this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
           var newDate = start.setDate(start.getDate() + 1);
           start = new Date(newDate);
         }
@@ -311,8 +318,8 @@ export class PlanificacionComidasComponent implements OnInit {
         let cuenta_correo = this.data.correo;
 
         // LECTURA DE DATOS DE LA PLANIFICACIÓN
-        let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-        let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo);
+        let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
         let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora);
         let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
@@ -488,8 +495,8 @@ export class PlanificacionComidasComponent implements OnInit {
 
     if (empleados_planificados.length != 0) {
 
-      this.inicioDate = moment(form.fechaInicioForm).format('MM-DD-YYYY');
-      this.finDate = moment(form.fechaFinForm).format('MM-DD-YYYY');
+      this.inicioDate = DateTime.fromISO(form.fechaInicioForm).toFormat('MM-dd-yyyy');
+      this.finDate = DateTime.fromISO(form.fechaFinForm).toFormat('MM-dd-yyyy');
 
       // CREACION DE LA PLANIFICACION PARA VARIOS EMPLEADOS
       this.restPlan.CrearPlanComidas(datosPlanComida).subscribe(res => {
@@ -497,8 +504,8 @@ export class PlanificacionComidasComponent implements OnInit {
           var plan = res.info;
 
           // LECTURA DE DATOS DE LA PLANIFICACION
-          let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-          let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo);
+          let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
           let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora);
           let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
@@ -509,7 +516,7 @@ export class PlanificacionComidasComponent implements OnInit {
           var end = new Date(this.finDate);
           // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIA DEL PERIODO INDICADO
           while (start <= end) {
-            this.fechasHorario.push(moment(start).format('YYYY-MM-DD'));
+            this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
             var newDate = start.setDate(start.getDate() + 1);
             start = new Date(newDate);
           }
@@ -634,23 +641,6 @@ export class PlanificacionComidasComponent implements OnInit {
         this.CerrarRegistroPlanificacion();
       }
     })
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE CORREOS
-  correos: number;
-  BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 33
-    let datos: any = [];
-    this.parametro.ListarDetalleParametros(33).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
-        }
-        else {
-          this.correos = 0
-        }
-      });
   }
 
   // METODO PARA CONTAR CORREOS A ENVIARSE

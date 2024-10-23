@@ -4,9 +4,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
-import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
@@ -89,10 +89,10 @@ export class ListarSolicitudComponent implements OnInit {
   get habilitarComida(): boolean { return this.funciones.alimentacion; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
-  get s_color(): string {return this.plantilla.color_Secundary;}
-  get p_color(): string {return this.plantilla.color_Primary;}
-  get logoE(): string {return this.plantilla.logoBase64;}
-  get frase(): string {return this.plantilla.marca_Agua;}
+  get s_color(): string { return this.plantilla.color_Secundary; }
+  get p_color(): string { return this.plantilla.color_Primary; }
+  get logoE(): string { return this.plantilla.logoBase64; }
+  get frase(): string { return this.plantilla.marca_Agua; }
 
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
@@ -102,7 +102,7 @@ export class ListarSolicitudComponent implements OnInit {
     public restC: PlanComidasService, // SERVICIO DATOS SERVICIO DE COMIDA
     private ventana: MatDialog, // VARIABLE PARA LLAMADO A COMPONENTES
     private funciones: MainNavService,
-  ) { 
+  ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -136,45 +136,44 @@ export class ListarSolicitudComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.LeerDatos(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.LeerDatos(this.formato_fecha, this.formato_hora);
       });
   }
 
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        // LISTA DE DATOS DE SOLICITUDES
-        this.ObtenerSolicitudes(fecha, this.formato_hora);
-        // LISTA DE DATOS DE SOLICITUDES AUTORIZADAS O NEGADAS
-        this.ObtenerSolicitudesAutorizados(fecha, this.formato_hora);
-        // LISTA DE DATOS DE SOLIICTUDES EXPIRADAS
-        this.ObtenerSolicitudesExpiradas(fecha, this.formato_hora);
-      },
-      vacio => {
-        // LISTA DE DATOS DE SOLICITUDES
-        this.ObtenerSolicitudes(fecha, this.formato_hora);
-        // LISTA DE DATOS DE SOLICITUDES AUTORIZADAS O NEGADAS
-        this.ObtenerSolicitudesAutorizados(fecha, this.formato_hora);
-        // LISTA DE DATOS DE SOLIICTUDES EXPIRADAS
-        this.ObtenerSolicitudesExpiradas(fecha, this.formato_hora);
-      });
+  // MOSTRAR DATOS
+  LeerDatos(fecha: string, hora: string) {
+    // LISTA DE DATOS DE SOLICITUDES
+    this.ObtenerSolicitudes(fecha, hora);
+    // LISTA DE DATOS DE SOLICITUDES AUTORIZADAS O NEGADAS
+    this.ObtenerSolicitudesAutorizados(fecha, hora);
+    // LISTA DE DATOS DE SOLIICTUDES EXPIRADAS
+    this.ObtenerSolicitudesExpiradas(fecha, hora);
   }
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
     lista.forEach((data: any) => {
-      data.fec_comida_ = this.validar.FormatearFecha(data.fec_comida, formato_fecha, this.validar.dia_abreviado);
+      data.fec_comida_ = this.validar.FormatearFecha(data.fec_comida, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
       data.hora_fin_ = this.validar.FormatearHora(data.hora_fin, formato_hora);
     })
@@ -199,14 +198,14 @@ export class ListarSolicitudComponent implements OnInit {
 
       // FILTRA LA LISTA DE HORAS EXTRAS AUTORIZADAS PARA DESCARTAR LAS SOLICITUDES DEL MISMO USUARIO Y ALMACENA EN UNA NUEVA LISTA
       this.lista_solicitudes_filtradas = this.solicitudes.filter((o: any) => {
-        if(this.idEmpleado !== o.id_empleado){
+        if (this.idEmpleado !== o.id_empleado) {
           return this.lista_solicitudes_filtradas.push(o);
         }
       });
 
       if (this.lista_solicitudes_filtradas.length != 0) {
         this.lista_solicitados = true;
-      }else{
+      } else {
         this.lista_solicitados = false;
         this.validarMensaje1 = true;
       }
@@ -313,7 +312,7 @@ export class ListarSolicitudComponent implements OnInit {
 
       // FILTRA LA LISTA DE HORAS EXTRAS AUTORIZADAS PARA DESCARTAR LAS SOLICITUDES DEL MISMO USUARIO Y ALMACENA EN UNA NUEVA LISTA
       this.solicitudesAutorizadas_filtradas = this.solicitudesAutorizados.filter((o: any) => {
-        if(this.idEmpleado !== o.id_empleado){
+        if (this.idEmpleado !== o.id_empleado) {
           return this.solicitudesAutorizadas_filtradas.push(o);
         }
       });
@@ -331,7 +330,7 @@ export class ListarSolicitudComponent implements OnInit {
 
       if (this.solicitudesAutorizadas_filtradas.length != 0) {
         this.lista_autorizados = true;
-      }else{
+      } else {
         this.lista_autorizados = false;
         this.validarMensaje2 = true;
       }
@@ -408,16 +407,16 @@ export class ListarSolicitudComponent implements OnInit {
   }
 
   // METODO PARA BUSQUEDA DE DATOS DE SOLICITUDES EXPIRADAS
-  
+
   solicitudesExpiradas: any = []; // VARIABLE PARA ALMACENAR DATOS DE SOLIICTUDES EXPIRADAS
   solicitudesExpiradas_filtradas: any = [];
   ObtenerSolicitudesExpiradas(formato_fecha: string, formato_hora: string) {
     this.restC.ObtenerSolComidaExpirada().subscribe(res => {
       this.solicitudesExpiradas = res;
 
-       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-       this.solicitudesExpiradas_filtradas = this.solicitudesExpiradas.filter((o: any) => {
-        if(this.idEmpleado !== o.id_empleado){
+      //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+      this.solicitudesExpiradas_filtradas = this.solicitudesExpiradas.filter((o: any) => {
+        if (this.idEmpleado !== o.id_empleado) {
           return this.solicitudesExpiradas_filtradas.push(o);
         }
       });
@@ -438,7 +437,7 @@ export class ListarSolicitudComponent implements OnInit {
 
       if (this.solicitudesExpiradas_filtradas.length != 0) {
         this.lista_expirados = true;
-      }else{
+      } else {
         this.lista_expirados = false;
         this.validarMensaje3 = true;
       }
@@ -518,9 +517,9 @@ export class ListarSolicitudComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -595,30 +594,30 @@ export class ListarSolicitudComponent implements OnInit {
 
   // METODO SELECCIONAR QUE LISTA DE PERMISOS MOSTRAR (SOLICITADOS O AUTORIZADOS)
   mostrarDatosSolicitudes(opcion: string) {
-      return (opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
-        opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-        )).map((obj) => {
-        return [
-          { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
-          { text: (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada), style: "itemsTable" },
-          { text: obj.fec_comida_, style: "itemsTable" },
-          { text: obj.hora_inicio_, style: "itemsTable" },
-          { text: obj.hora_fin_, style: "itemsTable" },
-        ];
-      });
+    return (opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
+      opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
+    )).map((obj) => {
+      return [
+        { text: obj.nombre + ' ' + obj.apellido, style: "itemsTable" },
+        { text: (opcion == "Servicios de alimentación solicitados" ? "Solicitado" : obj.aprobada), style: "itemsTable" },
+        { text: obj.fec_comida_, style: "itemsTable" },
+        { text: obj.hora_inicio_, style: "itemsTable" },
+        { text: obj.hora_fin_, style: "itemsTable" },
+      ];
+    });
   }
 
-   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+  ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
+  ** ************************************************************************************************* **/
 
-   exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
-      opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).map((obj: any) => {
+  exportToExcel(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
+      opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
+    )).map((obj: any) => {
       return {
-        Nombre: obj.nombre +' '+ obj.apellido,
-        Estado: (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada),
+        Nombre: obj.nombre + ' ' + obj.apellido,
+        Estado: (opcion == "Servicios de alimentación solicitados" ? "Solicitado" : obj.aprobada),
         Fecha_Comida: obj.fec_comida_,
         Hora_Inicial: obj.hora_inicio_,
         Hora_final: obj.hora_fin_,
@@ -626,9 +625,9 @@ export class ListarSolicitudComponent implements OnInit {
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas[0]:(
-      opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas[0]:this.solicitudesExpiradas_filtradas[0]
-      )); // NOMBRE DE CABECERAS DE COLUMNAS
+    const header = Object.keys(opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas[0] : (
+      opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas[0] : this.solicitudesExpiradas_filtradas[0]
+    )); // NOMBRE DE CABECERAS DE COLUMNAS
     var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
       wscols.push({ wpx: 100 })
@@ -639,17 +638,17 @@ export class ListarSolicitudComponent implements OnInit {
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
-   ** ************************************************************************************************** **/
+  /** ************************************************************************************************** ** 
+  ** **                                     METODO PARA EXPORTAR A CSV                               ** **
+  ** ************************************************************************************************** **/
 
-   exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
-      opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).map((obj: any) => {
+  exportToCVS(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
+      opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
+    )).map((obj: any) => {
       return {
-        Nombre: obj.nombre +' '+ obj.apellido,
-        Estado: (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada),
+        Nombre: obj.nombre + ' ' + obj.apellido,
+        Estado: (opcion == "Servicios de alimentación solicitados" ? "Solicitado" : obj.aprobada),
         Fecha_Comida: obj.fec_comida_,
         Hora_Inicial: obj.hora_inicio_,
         Hora_final: obj.hora_fin_,
@@ -669,17 +668,17 @@ export class ListarSolicitudComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloSolicitudes: any = [];
-    (opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
-      opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).forEach((obj: any) => {
+    (opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
+      opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
+    )).forEach((obj: any) => {
       objeto = {
         "lista_servicios_alimentacion": {
-        '@id': obj.id,
-        "nombre": obj.nombre +' '+ obj.apellido,
-        "estado": (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada),
-        "fecha_comida": obj.fec_comida_,
-        "hora_inicial": obj.hora_inicio_,
-        "hora_final": obj.hora_fin_,
+          '@id': obj.id,
+          "nombre": obj.nombre + ' ' + obj.apellido,
+          "estado": (opcion == "Servicios de alimentación solicitados" ? "Solicitado" : obj.aprobada),
+          "fecha_comida": obj.fec_comida_,
+          "hora_inicial": obj.hora_inicio_,
+          "hora_final": obj.hora_fin_,
         }
       }
       arregloSolicitudes.push(objeto)

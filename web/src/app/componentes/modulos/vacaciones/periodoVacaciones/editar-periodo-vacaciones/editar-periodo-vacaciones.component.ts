@@ -3,11 +3,11 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 
@@ -180,8 +180,8 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       fechaFinForm: ''
     });
     this.dInicio = event.value._i;
-    var fecha = new Date(String(moment(this.dInicio)));
-    var ingreso = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
+    var fecha = this.dInicio.toISOString();
+    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').format('yyyy-MM-dd');
     this.rest.BuscarDatosContrato(this.data.datosPeriodo.id_empl_contrato).subscribe(data => {
       if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
         fecha.setMonth(fecha.getMonth() + parseInt(data[0].meses_periodo));

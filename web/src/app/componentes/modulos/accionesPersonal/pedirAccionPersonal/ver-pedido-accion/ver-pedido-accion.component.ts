@@ -49,7 +49,7 @@ export class VerPedidoAccionComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -82,11 +82,11 @@ export class VerPedidoAccionComponent implements OnInit {
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      this.datosPedido[0].fec_creacion_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_creacion, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_rige_desde_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_desde, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_rige_hasta_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_hasta, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].primera_fecha_reemp_ = this.validar.FormatearFecha(this.datosPedido[0].primera_fecha_reemplazo, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_act_final_concurso_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_acta_final_concurso, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_creacion_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_creacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.datosPedido[0].fec_rige_desde_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.datosPedido[0].fec_rige_hasta_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_hasta, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.datosPedido[0].primera_fecha_reemp_ = this.validar.FormatearFecha(this.datosPedido[0].primera_fecha_reemplazo, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.datosPedido[0].fec_act_final_concurso_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_acta_final_concurso, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       console.log('datos', this.datosPedido);
       this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado).subscribe(data1 => {
         console.log('empleado', data1)
@@ -117,7 +117,7 @@ export class VerPedidoAccionComponent implements OnInit {
             this.restAccion.ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto).subscribe(data7 => {
               this.cargop = data7[0].descripcion;
             });
-          
+
           });
         });
       });

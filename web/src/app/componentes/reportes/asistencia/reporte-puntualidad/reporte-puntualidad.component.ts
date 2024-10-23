@@ -1,14 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import { ToastrService} from 'ngx-toastr';
+import { DateTime } from 'luxon';
+
 import { ITableEmpleados, IReportePuntualidad, model_pdf_puntualidad } from 'src/app/model/reportes.model';
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+
+import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
-import * as xlsx from 'xlsx';
+
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
@@ -20,9 +23,9 @@ import { ReportesService } from '../../../../servicios/reportes/reportes.service
 })
 export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
-  get rangoFechas () { return this.reporteService.rangoFechas; }
+  get rangoFechas() { return this.reporteService.rangoFechas; }
 
-  get opcion () { return this.reporteService.opcion; }
+  get opcion() { return this.reporteService.opcion; }
 
   get bool() { return this.reporteService.criteriosBusqueda; }
 
@@ -32,7 +35,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     mayor: new FormControl('', Validators.required)
   })
 
-  respuesta: any [];
+  respuesta: any[];
   sucursales: any = [];
   departamentos: any = [];
   empleados: any = [];
@@ -98,9 +101,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           })
         })
       })
-      console.log('SUCURSALES',this.sucursales);
-      console.log('DEPARTAMENTOS',this.departamentos);
-      console.log('EMPLEADOS',this.empleados);
+      console.log('SUCURSALES', this.sucursales);
+      console.log('DEPARTAMENTOS', this.departamentos);
+      console.log('EMPLEADOS', this.empleados);
 
     }, err => {
       this.toastr.error(err.error.message)
@@ -115,7 +118,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
   parametrizacion: any = '';
-  onSubmitParametros(){
+  onSubmitParametros() {
     this.parametrizacion = this.ParametrosForm.value;
     // console.log(this.ParametrosForm.value);
     this.toastr.success('Parametros Guardados')
@@ -132,21 +135,21 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
     if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda')
-    if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte','Falta Semaforización')
+    if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte', 'Falta Semaforización')
 
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
         this.ModelarSucursal(action);
-      break;
+        break;
       case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
         this.ModelarDepartamento(action);
-      break;
+        break;
       case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
         this.ModelarEmpleados(action);
-      break;
+        break;
       default:
         this.bool.bool_suc = false; this.bool.bool_dep = false; this.bool.bool_emp = false;
         break;
@@ -158,7 +161,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     let suc = respuesta.filter((o: any) => {
-      var bool =  this.selectionSuc.selected.find((obj1: any) => {
+      var bool = this.selectionSuc.selected.find((obj1: any) => {
         return obj1.id === o.id_suc
       })
       return bool != undefined
@@ -183,8 +186,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos =  obj.departamentos.filter((o: any) => {
-        var bool =  this.selectionDep.selected.find((obj1: any) => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
+        var bool = this.selectionDep.selected.find((obj1: any) => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -215,7 +218,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
-          var bool =  this.selectionEmp.selected.find((obj1: any) => {
+          var bool = this.selectionEmp.selected.find((obj1: any) => {
             return obj1.id === o.id
           })
           return bool != undefined
@@ -295,22 +298,20 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [ 40, 60, 40, 40 ],
+      pageMargins: [40, 60, 40, 40],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
-
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
             { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
-            { text: [
+            {
+              text: [
                 {
                   text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
@@ -326,7 +327,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -40, 0, 10] },
         { text: 'Reporte de Empleados Puntuales', bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 10] },
-        { text: 'Periodo del: ' + this.rangoFechas.fec_inico  + " al " + this.rangoFechas.fec_final , bold: true, fontSize: 13, alignment: 'center' },
+        { text: 'Periodo del: ' + this.rangoFechas.fec_inico + " al " + this.rangoFechas.fec_final, bold: true, fontSize: 13, alignment: 'center' },
         ...this.impresionDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
@@ -342,7 +343,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     };
   }
 
-  impresionDatosPDF(data: any []): Array<any>{
+  impresionDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
     let arr_aux: Array<model_pdf_puntualidad> = [];
@@ -385,16 +386,16 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'N°', style: 'tableHeader'},
-            { text: 'Empleado', style: 'tableHeader'},
-            { text: 'Cédula', style: 'tableHeader'},
-            { text: 'Código', style: 'tableHeader'},
-            { text: 'Ciudad', style: 'tableHeader'},
-            { text: 'Departamento', style: 'tableHeader'},
-            { text: 'Cargo', style: 'tableHeader'},
-            { text: 'Contrato', style: 'tableHeader'},
-            { text: 'Color', style: 'tableHeader'},
-            { text: 'Días Puntuales', style: 'tableHeader'}
+            { text: 'N°', style: 'tableHeader' },
+            { text: 'Empleado', style: 'tableHeader' },
+            { text: 'Cédula', style: 'tableHeader' },
+            { text: 'Código', style: 'tableHeader' },
+            { text: 'Ciudad', style: 'tableHeader' },
+            { text: 'Departamento', style: 'tableHeader' },
+            { text: 'Cargo', style: 'tableHeader' },
+            { text: 'Contrato', style: 'tableHeader' },
+            { text: 'Color', style: 'tableHeader' },
+            { text: 'Días Puntuales', style: 'tableHeader' }
           ],
           ...arr_aux.map((obj: any) => {
             c = c + 1
@@ -406,7 +407,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
               { style: 'itemsTableCentrado', text: obj.ciudad },
               { style: 'itemsTable', text: obj.name_dep },
               { style: 'itemsTable', text: obj.cargo },
-              { style: 'itemsTable', text: obj.contrato},
+              { style: 'itemsTable', text: obj.contrato },
               { style: 'itemsTableCentrado', text: '', fillColor: obj.color },
               { style: 'itemsTableCentrado', text: obj.puntualidad }
             ]
@@ -417,74 +418,77 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     n.push({
       columns: [
-				{ width: 'auto',
+        {
+          width: 'auto',
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Verde:', color: '#06F313'
         },
-				{
+        {
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: 'Mayor o igual a ' + this.parametrizacion.mayor +' días significa que el o los empleados con esta cantidad de días son muy putuales.'
+          text: 'Mayor o igual a ' + this.parametrizacion.mayor + ' días significa que el o los empleados con esta cantidad de días son muy putuales.'
         }
-			]
+      ]
     })
     n.push({
       columns: [
-				{ width: 'auto',
+        {
+          width: 'auto',
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Naranja:', color: '#F38306'
         },
-				{
+        {
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: ' Días entre ' + this.parametrizacion.mayor + ' y ' +  this.parametrizacion.menor +' son empleados que tienen un margen de puntualidad aceptable'
+          text: ' Días entre ' + this.parametrizacion.mayor + ' y ' + this.parametrizacion.menor + ' son empleados que tienen un margen de puntualidad aceptable'
         }
-			]
+      ]
     })
     n.push({
       columns: [
-				{ width: 'auto',
+        {
+          width: 'auto',
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Rojo:', color: '#EC2E05'
         },
-				{
+        {
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
           text: 'Menor o igual a ' + this.parametrizacion.menor + ' días significa que el o los empleados con esta cantidad de días tienen más atrasos laborales que días puntuales.'
         }
-			]
+      ]
     })
 
     n.push({
       columns: [
-				{ width: 250, text: '' },
+        { width: 250, text: '' },
         {
           style: 'tableMarginDep',
           table: {
             widths: [30, 'auto', 'auto'],
             body: [
               [
-                { text: 'Color', style: 'tableHeader'},
-                { text: 'Parámetro', style: 'tableHeader'},
-                { text: 'Cantidad Colaboradores', style: 'tableHeader'}
+                { text: 'Color', style: 'tableHeader' },
+                { text: 'Parámetro', style: 'tableHeader' },
+                { text: 'Cantidad Colaboradores', style: 'tableHeader' }
               ],
               [ // parametro verde
-                { text: '', fillColor: '#06F313'},
-                { text: '>= ' + this.parametrizacion.mayor, style: 'itemsTableCentrado'},
-                { text: cont_color_verde, style: 'itemsTableCentrado'}
+                { text: '', fillColor: '#06F313' },
+                { text: '>= ' + this.parametrizacion.mayor, style: 'itemsTableCentrado' },
+                { text: cont_color_verde, style: 'itemsTableCentrado' }
               ],
               [ // parametro naranja
-                { text: '', fillColor: '#F38306'},
-                { text: 'Entre ' + this.parametrizacion.mayor + ' días y ' + this.parametrizacion.menor + ' días.', style: 'itemsTableCentrado'},
-                { text: cont_color_naranja, style: 'itemsTableCentrado'}
+                { text: '', fillColor: '#F38306' },
+                { text: 'Entre ' + this.parametrizacion.mayor + ' días y ' + this.parametrizacion.menor + ' días.', style: 'itemsTableCentrado' },
+                { text: cont_color_naranja, style: 'itemsTableCentrado' }
               ],
               [ // parametro rojo
-                { text: '', fillColor: '#EC2E05'},
-                { text: '<= ' + this.parametrizacion.menor, style: 'itemsTableCentrado'},
-                { text: cont_color_rojo, style: 'itemsTableCentrado'}
+                { text: '', fillColor: '#EC2E05' },
+                { text: '<= ' + this.parametrizacion.menor, style: 'itemsTableCentrado' },
+                { text: cont_color_rojo, style: 'itemsTableCentrado' }
               ]
             ]
           }
         },
-				{ width: 250, text: '' }
-			]
+        { width: 250, text: '' }
+      ]
     });
 
     return n
@@ -493,7 +497,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-   exportToExcel(): void {
+  exportToExcel(): void {
 
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
@@ -640,8 +644,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       this.Filtrar('', 1)*/
     }
     else if (this.opcion === 'd') {
-     /* this.nombre_dep.reset();
-      this.Filtrar('', 2)*/
+      /* this.nombre_dep.reset();
+       this.Filtrar('', 2)*/
     }
     else if (this.opcion === 'e') {
       /*this.codigo.reset();

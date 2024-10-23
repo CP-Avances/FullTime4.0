@@ -4,15 +4,15 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR MODELOS
-import { ITableEmpleados, IReporteTimbres } from 'src/app/model/reportes.model';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // IMPORTACION DE SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
@@ -130,8 +130,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarHora();
-    this.BuscarHora();
   }
 
   ngOnDestroy() {
@@ -149,22 +147,25 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -342,9 +343,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        var time = f.format('HH:mm:ss');
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -509,7 +510,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
                 {},
               ],
               ...empl.timbres.map((t: any) => {
-                const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+                const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
                 switch (t.accion) {
                   case 'EoS': accionT = 'Entrada o salida'; break;
@@ -609,7 +610,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
-          const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const fecha = this.validar.FormatearFecha(t.fecha_hora_horario.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
           n = n + 1;
           switch (t.accion) {

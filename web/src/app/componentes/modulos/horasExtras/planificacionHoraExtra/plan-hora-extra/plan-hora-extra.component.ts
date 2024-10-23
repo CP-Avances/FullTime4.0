@@ -1,9 +1,9 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';;
-import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon'
 
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -85,12 +85,8 @@ export class PlanHoraExtraComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-  /*  if (this.datos) {
-      this.data = this.datos;
-    }*/
-
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
 
     this.id_user_loggin = parseInt(localStorage.getItem("empleado") as string);
     this.id_cargo_loggin = parseInt(localStorage.getItem("ultimoCargo") as string);
@@ -100,8 +96,6 @@ export class PlanHoraExtraComponent implements OnInit {
     });
 
     this.BuscarParametro();
-    this.BuscarFecha();
-    this.BuscarHora();
   }
 
   /** **************************************************************************************** **
@@ -110,23 +104,34 @@ export class PlanHoraExtraComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+  idioma_fechas: string = 'es';
+  correos: number = 0;
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    let datos: any = [];
+    this.correos = 0;
+    let detalles = { parametros: '1, 2, 33' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+          // id_tipo_parametro correos = 33
+          else if (p.id_parametro === 33) {
+            this.correos = parseInt(p.descripcion)
+          }
+        })
       });
   }
 
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-      });
-  }
 
   // METODO DE VALIDACION DE INGRESO CORRECTO DE FECHAS
   ValidarFechas(form: any) {
@@ -186,8 +191,8 @@ export class PlanHoraExtraComponent implements OnInit {
         let cuenta_correo = this.data.planifica.correo;
 
         // LECTURA DE DATOS DE LA PLANIFICACION
-        let desde = this.validar.FormatearFecha(plan.fecha_desde, this.formato_fecha, this.validar.dia_completo);
-        let hasta = this.validar.FormatearFecha(plan.fecha_hasta, this.formato_fecha, this.validar.dia_completo);
+        let desde = this.validar.FormatearFecha(plan.fecha_desde, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        let hasta = this.validar.FormatearFecha(plan.fecha_hasta, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
         let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora)
         let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
@@ -305,24 +310,20 @@ export class PlanHoraExtraComponent implements OnInit {
 
     // VALIDAR HORAS INGRESDAS
     if (form.horaInicioForm != '' && form.horaFinForm != '') {
+      // CREAR OBJETOS DATETIME A PARTIR DE LAS CADENAS
+      const inicio = DateTime.fromFormat(form.horaInicioForm, 'HH:mm:ss');
+      const fin = DateTime.fromFormat(form.horaFinForm, 'HH:mm:ss');
 
-      //FORMATO DE HORAS
-      var inicio = moment.duration(moment(form.horaInicioForm, 'HH:mm:ss').format('HH:mm:ss'));
-      var fin = moment.duration(moment(form.horaFinForm, 'HH:mm:ss').format('HH:mm:ss'));
-      // RESTAR HORAS
-      var resta = fin.subtract(inicio);
-      var horas = String(resta.hours());
-      var minutos = String(resta.minutes());
+      // CALCULAR LA DIFERENCIA
+      const diferencia = fin.diff(inicio, ['hours', 'minutes']).toObject();
 
-      if (resta.hours() < 10) {
-        horas = '0' + resta.hours();
-      }
-      if (resta.minutes() < 10) {
-        minutos = '0' + resta.minutes();
-      }
+      // FORMATEAR HORAS Y MINUTOS, AÑADIENDO CEROS A LA IZQUIERDA SI ES NECESARIO
+      const horas = String(diferencia.hours || 0).padStart(2, '0');
+      const minutos = String(diferencia.minutes || 0).padStart(2, '0');
+
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
-      var tiempoTotal: string = horas + ':' + minutos;
-      this.formulario.patchValue({ horasForm: tiempoTotal })
+      const tiempoTotal = `${horas}:${minutos}`;
+      this.formulario.patchValue({ horasForm: tiempoTotal });
     }
     else {
       this.toastr.info('Debe ingresar la hora de inicio y la hora de fin de actividades.', 'VERIFICAR', {
@@ -364,7 +365,7 @@ export class PlanHoraExtraComponent implements OnInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: moment(datos.horas_totales, 'HH:mm').format('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -381,23 +382,6 @@ export class PlanHoraExtraComponent implements OnInit {
         });
       }
     })
-  }
-
-  // METODO DE BUSQUEDA DE NUMERO PERMITIDO DE CORREOS
-  correos: number;
-  BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 33
-    let datos: any = [];
-    this.parametro.ListarDetalleParametros(33).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
-        }
-        else {
-          this.correos = 0
-        }
-      });
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIAR
@@ -437,7 +421,7 @@ export class PlanHoraExtraComponent implements OnInit {
     this.componenteb.ver_busqueda = true;
     this.componenteb.ver_planificar = false;
     this.componenteb.LimpiarFormulario();
-   // this.ventana.close();
+    // this.ventana.close();
   }
 
 }

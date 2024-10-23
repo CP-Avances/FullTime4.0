@@ -3,6 +3,7 @@ import { Validators, FormControl } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { environment } from "src/environments/environment";
+import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
 
 import * as FileSaver from "file-saver";
@@ -108,6 +109,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       this.ObtenerEmpresa();
       this.VerDatosAcciones();
       this.ObtenerEmpleados(this.idEmpleado);
+      this.BuscarParametro();
     }
   }
 
@@ -117,23 +119,26 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   formato_fecha: string = "DD/MM/YYYY";
   formato_hora: string = "HH:mm:ss";
-
-  FormatearFecha(fecha: string, formato: string, dia: string) {
-    if (dia === "ddd") {
-      let valor =
-        moment(fecha).format(dia).charAt(0).toUpperCase() +
-        moment(fecha).format(dia).slice(1) +
-        " " +
-        moment(fecha).format(formato);
-      return valor;
-    } else {
-      let valor =
-        moment(fecha).format(dia).charAt(0).toUpperCase() +
-        moment(fecha).format(dia).slice(1) +
-        ", " +
-        moment(fecha).format(formato);
-      return valor;
-    }
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
+      res => {
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+      });
   }
 
   // METODO PARA VER DATOS DE PEDIDOS
@@ -194,7 +199,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-      return data.filter((pedido: any) => this.idUsuariosAcceso.has(pedido.id_empleado));
+    return data.filter((pedido: any) => this.idUsuariosAcceso.has(pedido.id_empleado));
   }
 
 
@@ -204,19 +209,19 @@ export class ListarPedidoAccionComponent implements OnInit {
       data.fecCreacion_ = this.validar.FormatearFecha(
         data.fecha_creacion,
         formato_fecha,
-        this.validar.dia_abreviado
+        this.validar.dia_abreviado, this.idioma_fechas
       );
       data.fecDesde_ = this.validar.FormatearFecha(
         data.fecha_rige_desde,
         formato_fecha,
-        this.validar.dia_abreviado
+        this.validar.dia_abreviado, this.idioma_fechas
       );
       data.fecHasta_ =
         data.fecha_rige_hasta !== null
           ? this.validar.FormatearFecha(
             data.fecha_rige_hasta,
             formato_fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           )
           : "";
       data.fechaActa_ =
@@ -224,7 +229,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           ? this.validar.FormatearFecha(
             data.fecha_acta_final_concurso,
             formato_fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           )
           : "";
       data.fechaReemp_ =
@@ -232,7 +237,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           ? this.validar.FormatearFecha(
             data.primera_fecha_reemplazo,
             formato_fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           )
           : "";
     });
@@ -596,7 +601,8 @@ export class ListarPedidoAccionComponent implements OnInit {
               case "ACUERDO":
                 this.decreto[1] = "X";
                 break;
-              case "RESOLUCIÓN" || "RESOLUCION":
+              case "RESOLUCIÓN":
+              case "RESOLUCION":
                 this.decreto[2] = "X";
                 break;
               default:
@@ -4044,9 +4050,9 @@ export class ListarPedidoAccionComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

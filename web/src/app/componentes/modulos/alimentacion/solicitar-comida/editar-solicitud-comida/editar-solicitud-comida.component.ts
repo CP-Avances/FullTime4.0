@@ -4,8 +4,8 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
+import { DateTime, Duration } from 'luxon';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
 
 // LLAMADO A LOS SERVICIOS
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -17,7 +17,6 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-solicitud-comida',
@@ -104,21 +103,25 @@ export class EditarSolicitudComidaComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -126,7 +129,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
   solInfo: any;
   obtenerInformacionEmpleado() {
-     var estado: boolean;
+    var estado: boolean;
     this.informacion.ObtenerInfoConfiguracion(this.data.solicitud.id_empleado).subscribe(
       res => {
         if (res.estado === 1) {
@@ -153,8 +156,8 @@ export class EditarSolicitudComidaComponent implements OnInit {
   // METODO PARA MOSTRAR LA INFORMACIÓN DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleados = data;
       this.PlanificacionComidasForm.patchValue({
@@ -258,9 +261,9 @@ export class EditarSolicitudComidaComponent implements OnInit {
   // METODO PARA VERIFICAR SI EL EMPLEADO TIENE SOLICITADO UN SERVICIO DE ALIMENTACIÓN
   VerificarSolicitudEmpleado(form: any) {
     // SUMA DE UN MINUTO A LA HORA INICIO DE SERVICIO DE ALIMENTACIÓN
-    var inicio_hora = moment(form.horaInicioForm, 'HH:mm:ss').add(moment.duration("00:01:00")).format('HH:mm:ss');
+    const inicio_hora = DateTime.fromFormat(form.horaInicioForm, 'HH:mm:ss').plus(Duration.fromISO('PT1M')).toFormat('HH:mm:ss');
     // RESTA DE UN MINUTO A LA HORA FINAL DE SERVICIO DE ALIMENTACIÓN
-    var fin_hora = moment(form.horaFinForm, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+    const fin_hora = DateTime.fromFormat(form.horaFinForm, 'HH:mm:ss').minus(Duration.fromISO('PT1M')).toFormat('HH:mm:ss');
     let datosSolicitud = {
       id_empleado: this.data.solicitud.id_empleado,
       hora_inicio: inicio_hora,
@@ -330,7 +333,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
     var correo_usuarios = '';
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -396,7 +399,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
   NotificarPlanificacion(alimentacion: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let desde = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let inicio = this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora);
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);

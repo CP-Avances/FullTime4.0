@@ -1,14 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
+
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { use } from 'echarts';
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 interface Orden {
   valor: number
@@ -398,8 +398,8 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
   }
 
   tiempo() {
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     console.log('fecha Actual', this.FechaActual);
   }
 

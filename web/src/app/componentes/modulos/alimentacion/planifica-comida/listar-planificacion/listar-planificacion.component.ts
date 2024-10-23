@@ -5,10 +5,10 @@ import { environment } from 'src/environments/environment';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from "xlsx";
-import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
@@ -100,10 +100,10 @@ export class ListarPlanificacionComponent implements OnInit {
   get habilitarComida(): boolean { return this.funciones.alimentacion; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
-  get s_color(): string {return this.plantilla.color_Secundary;}
-  get p_color(): string {return this.plantilla.color_Primary;}
-  get logoE(): string {return this.plantilla.logoBase64;}
-  get frase(): string {return this.plantilla.marca_Agua;}
+  get s_color(): string { return this.plantilla.color_Secundary; }
+  get p_color(): string { return this.plantilla.color_Primary; }
+  get logoE(): string { return this.plantilla.logoBase64; }
+  get frase(): string { return this.plantilla.marca_Agua; }
 
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
@@ -136,17 +136,16 @@ export class ListarPlanificacionComponent implements OnInit {
       this.ip = localStorage.getItem('ip');
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.BuscarParametro();
-      this.BuscarFecha();
     }
   }
 
-     // METODO PARA VER LA INFORMACION DEL EMPLEADO
-     ObtenerEmpleados(idemploy: any) {
-      this.empleado = [];
-      this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe((data) => {
-        this.empleado = data;
-      });
-    }
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  ObtenerEmpleados(idemploy: any) {
+    this.empleado = [];
+    this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe((data) => {
+      this.empleado = data;
+    });
+  }
 
   /** **************************************************************************************** **
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
@@ -154,30 +153,34 @@ export class ListarPlanificacionComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+  idioma_fechas: string = 'es';
+  correos: number = 0;
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    this.correos = 0;
+    let datos: any = [];
+    let detalles = { parametros: '1, 2, 33' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        // LISTA DE PLANIFCACIONES DE SERVICIOS DE ALIMENTACIÓN
-        this.ObtenerPlanificaciones(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.ObtenerPlanificaciones(fecha, this.formato_hora);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+          // id_tipo_parametro correos = 33
+          else if (p.id_parametro === 33) {
+            this.correos = parseInt(p.descripcion)
+          }
+        })
+        this.ObtenerPlanificaciones(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.ObtenerPlanificaciones(this.formato_fecha, this.formato_hora);
       });
   }
 
@@ -199,13 +202,13 @@ export class ListarPlanificacionComponent implements OnInit {
 
       if (this.planificaciones.length != 0) {
         this.lista_planificaciones = true;
-      }else{
+      } else {
         this.lista_planificaciones = false;
         this.validarMensaje1 = true;
       }
 
       this.FormatearDatos(this.planificaciones, formato_fecha, formato_hora);
-    },err => {
+    }, err => {
       this.validarMensaje1 = true;
     });
   }
@@ -231,7 +234,7 @@ export class ListarPlanificacionComponent implements OnInit {
     this.botonSeleccion = false;
     this.botonEditar = false;
     this.botonEliminar = false;
-    this.BuscarFecha();
+    this.BuscarParametro();
     this.selectionUno.clear();
   }
 
@@ -270,7 +273,7 @@ export class ListarPlanificacionComponent implements OnInit {
         this.botonEditar = false;
         this.botonEliminar = false;
         this.selectionUno.clear();
-        this.BuscarFecha();
+        this.BuscarParametro();
       });
   }
 
@@ -289,8 +292,8 @@ export class ListarPlanificacionComponent implements OnInit {
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(datos.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(datos.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(datos.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
@@ -332,8 +335,8 @@ export class ListarPlanificacionComponent implements OnInit {
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
     lista.forEach((data: any) => {
-      data.fecInicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-      data.fecFinal = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+      data.fecInicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+      data.fecFinal = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);
       data.horaFin = this.validar.FormatearHora(data.hora_fin, formato_hora);
     })
@@ -368,7 +371,7 @@ export class ListarPlanificacionComponent implements OnInit {
       this.ver_editar = editar;
       this.ver_eliminar = eliminar;
 
-      if(this.planEmpleados.length == 0){
+      if (this.planEmpleados.length == 0) {
         this.lista_empleados = false;
         this.validarMensaje2 = true;
       }
@@ -378,7 +381,7 @@ export class ListarPlanificacionComponent implements OnInit {
         this.toastr.warning('Planificación no ha sido asignada a ningún colaborador.', 'Registro eliminado.', {
           timeOut: 6000,
         })
-        this.BuscarFecha();
+        this.BuscarParametro();
         this.validarMensaje2 = true;
       });
 
@@ -524,8 +527,8 @@ export class ListarPlanificacionComponent implements OnInit {
       console.log('ver eliminar 56666 ', plan)
       var plan = obj.alimentacion
       // LECTURA DE DATOS DE LA PLANIFICACIÓN
-      let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(plan.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      let hasta = this.validar.FormatearFecha(plan.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora);
       let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
@@ -642,7 +645,7 @@ export class ListarPlanificacionComponent implements OnInit {
         this.ver_icono = true;
         this.ver_editar = false;
         this.ver_eliminar = false;
-        this.BuscarFecha();
+        this.BuscarParametro();
       });
     });
   }
@@ -709,23 +712,6 @@ export class ListarPlanificacionComponent implements OnInit {
     })
   }
 
-  // METODO PARA BUSCAR PARÁMETRO DE CORREOS
-  correos: number;
-  BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 33
-    let datos: any = [];
-    this.parametro.ListarDetalleParametros(33).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
-        }
-        else {
-          this.correos = 0
-        }
-      });
-  }
-
   // METODO PARA CONTAR CORREOS A ENVIARSE
   cont_correo: number = 0;
   info_correo: string = '';
@@ -746,9 +732,9 @@ export class ListarPlanificacionComponent implements OnInit {
     })
   }
 
-    /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+ ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
+ ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open") {
@@ -798,9 +784,9 @@ export class ListarPlanificacionComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -886,11 +872,11 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
 
-   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+  ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
+  ** ************************************************************************************************* **/
 
-   exportToExcel() {
+  exportToExcel() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -914,11 +900,11 @@ export class ListarPlanificacionComponent implements OnInit {
     xlsx.writeFile(wb, 'PAlimentacionEXCEL' + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** **
-   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
-   ** ************************************************************************************************** **/
+  /** ************************************************************************************************** **
+  ** **                                     METODO PARA EXPORTAR A CSV                               ** **
+  ** ************************************************************************************************** **/
 
-   exportToCVS() {
+  exportToCVS() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -932,7 +918,7 @@ export class ListarPlanificacionComponent implements OnInit {
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, 'PAlimentacionCSV'  + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, 'PAlimentacionCSV' + new Date().getTime() + '.csv');
   }
 
   /** ************************************************************************************************* **
@@ -947,13 +933,13 @@ export class ListarPlanificacionComponent implements OnInit {
     this.planificaciones.forEach((obj: any) => {
       objeto = {
         "lista_planificaciones": {
-        '@id': obj.id,
-        "servicio": obj.nombre_servicio,
-        "menu": obj.nombre_menu,
-        "fecha_inicio": obj.fecInicio,
-        "fecha_fin": obj.fecFinal,
-        "hora_inicio": obj.horaInicio,
-        "hora_fin": obj.horaFin,
+          '@id': obj.id,
+          "servicio": obj.nombre_servicio,
+          "menu": obj.nombre_menu,
+          "fecha_inicio": obj.fecInicio,
+          "fecha_fin": obj.fecFinal,
+          "hora_inicio": obj.horaInicio,
+          "hora_fin": obj.horaFin,
         }
       }
       arregloPlanificacion.push(objeto)

@@ -2,26 +2,26 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-
 // IMPORTAR SERVICIOS
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 @Component({
   selector: 'app-ver-empleado-permiso',
@@ -88,36 +88,34 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
   ArrayAutorizacionTipos: any = [];
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      }
-    );
-
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.BuscarDatos(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.BuscarDatos(this.formato_fecha, this.formato_hora);
+      });
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
     );
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.BuscarDatos(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.BuscarDatos(fecha, this.formato_hora);
-      });
   }
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE COLABORADORES QUE REVISARON SOLICITUD
@@ -136,18 +134,18 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
       this.InfoPermiso.forEach(p => {
         // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
-        p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo);
-        p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo);
-        p.fec_final_ = this.validar.FormatearFecha(p.fec_final, formato_fecha, this.validar.dia_completo);
+        p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        p.fec_final_ = this.validar.FormatearFecha(p.fec_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
         p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
         p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
 
       })
 
-      if(this.InfoPermiso[0].estado > 1){
+      if (this.InfoPermiso[0].estado > 1) {
         this.esconder = true;
-      }else{
+      } else {
         this.esconder = false;
       }
 
@@ -171,7 +169,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
-      console.log('autorizacion: ',this.autorizacion);
+      console.log('autorizacion: ', this.autorizacion);
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
@@ -199,37 +197,37 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             id_empleado: empleado_id,
             estado: this.estado_auto
           }
-        
-          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+
+          if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
             //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.forEach((item: any) => {
-                if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
+                if ((this.idEmpleado == item.id_empleado) && (autorizaciones.length == item.nivel)) {
                   this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].id_empleado);
-                }else{
+                } else {
                   return this.ocultar = true;
                 }
               })
             });
-          }else{
+          } else {
             this.ocultar = true;
           }
 
-          this.empleado_estado = this.empleado_estado.concat(data);     
+          this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
 
-        }else{
+        } else {
           //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.forEach((item: any) => {
-              if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
+              if ((this.idEmpleado == item.id_empleado) && (autorizaciones.length == item.nivel)) {
                 this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].id_empleado);
-              }else{
+              } else {
                 return this.ocultar = true;
               }
             })
@@ -244,31 +242,31 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       this.ocultar = false;
       this.HabilitarAutorizacion = false;
     });
-  
+
   }
 
   listahorario: any = [];
   mensaje: string = '';
   dia: any;
-  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, id_empleado: any){
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, id_empleado: any) {
     this.mensaje = '';
     var datos = {
-      fecha_inicio: fecha_i, 
-      fecha_final: fehca_f, 
-      id_empleado: '\''+id_empleado+'\''
+      fecha_inicio: fecha_i,
+      fecha_final: fehca_f,
+      id_empleado: '\'' + id_empleado + '\''
     }
 
     this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
       this.listahorario = res;
-      console.log('this.listahorario: ',this.listahorario);
-      if(this.listahorario.data.length == 0){
+      console.log('this.listahorario: ', this.listahorario);
+      if (this.listahorario.data.length == 0) {
         this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
         return this.ocultar = true;
-      }else{
+      } else {
         this.mensaje = '';
         return this.ocultar = false;
       }
-    },error => {
+    }, error => {
       this.mensaje = 'Problemas con validar su planificacion horaria en esas fechas';
       return this.ocultar = true;
     });
@@ -323,31 +321,31 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA VER LA INFORMACIÓN DE LA SOLICITUD 
   ObtenerSolicitud(id: any) {
-    var f = moment();
-    this.fechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.fechaActual = f.toFormat('yyyy-MM-dd');
     this.datoSolicitud = [];
     // BUSQUEDA DE DATOS DE SOLICITUD PARA MOSTRAR EN PDF
     this.restP.BuscarDatosSolicitud(id).subscribe(data => {
       this.datoSolicitud = data;
       // BUSQUEDA DE DATOS DE EMPRESA
       this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-        var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
+        var fecha_inicio = DateTime.fromISO(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
         console.log(fecha_inicio.diff(this.fechaActual, 'days'), ' dias de diferencia');
 
         console.log('fecha inicio -- ' + fecha_inicio + ' fecha actual ' + this.fechaActual +
           ' fecha dato ' + this.datoSolicitud[0].fec_inicio.split('T')[0])
 
-        if(this.InfoPermiso[0].estado > 2){
+        if (this.InfoPermiso[0].estado > 2) {
           this.habilitarActualizar = false;
-        }else{
+        } else {
           if (res[0].cambios === true) {
             if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
             else {
               //var dias = fecha_inicio.diff(this.fechaActual, 'days');
-              var dias = moment(this.fechaActual).diff(fecha_inicio, 'days');
+              var dias = this.fechaActual.diff(fecha_inicio, 'days').days;
               console.log('dias ----- ', dias + ' cambio ' + res[0].dias_cambio);
               if (res[0].dias_cambio >= dias) {
                 this.habilitarActualizar = false;
@@ -356,7 +354,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                 this.habilitarActualizar = true;
               }
             }
-          } 
+          }
         }
 
       });
@@ -374,7 +372,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   // METODO PARA CERRAR VENTANA
-  cerrarVentana(){
+  cerrarVentana() {
     this.router.navigate(['/permisos-solicitados']);
   }
 
@@ -408,19 +406,19 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
     let cont1 = 1;
     //Filtar el array empleado_estado para dividir en otros arrays para firmar
-      this.empleado_estado.filter(item =>{
-        if(cont1 < 4){
-          this.fila1firmas.push(item);
-          return cont1 = cont1 + 1;
-        }else{
-          this.fila2firmas.push(item);
-        }
-      });
+    this.empleado_estado.filter(item => {
+      if (cont1 < 4) {
+        this.fila1firmas.push(item);
+        return cont1 = cont1 + 1;
+      } else {
+        this.fila2firmas.push(item);
+      }
+    });
 
 
-    if(this.fila2firmas.length == 0){
+    if (this.fila2firmas.length == 0) {
       this.fila1firmas.push(firmaEmple);
-    }else{
+    } else {
       this.fila2firmas.push(firmaEmple);
     }
 
@@ -433,9 +431,9 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
-        var f = moment();
-        fecha = f.format('DD/MM/YYYY');
-        hora = f.format('HH:mm:ss');
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -468,9 +466,9 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-    let fec_creacion_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_creacion.split('T')[0], this.formato_fecha, this.validar.dia_completo)
-    let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo)
-    let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo)
+    let fec_creacion_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_creacion.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     return {
       table: {
@@ -529,22 +527,22 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                       table: {
                         widths: ['auto'],
                         body: [
-                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA' },],
                           [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
                         ]
                       }
                     },
-                    { width: '*', text: ''},
+                    { width: '*', text: '' },
                   ]
-                } 
+                }
               })
             ],
           }],
-         
+
           [{
             columns: [
-              ...this.fila2firmas.map(obje => {
+              ...this.fila2firmas.map((obje: any) => {
                 return {
                   columns: [
                     { width: '*', text: '' },
@@ -554,13 +552,13 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                       table: {
                         widths: ['auto'],
                         body: [
-                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA' },],
                           [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
                         ]
                       }
                     },
-                  { width: '*', text: ''},
+                    { width: '*', text: '' },
                   ]
                 }
               })

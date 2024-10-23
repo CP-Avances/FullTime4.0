@@ -1,13 +1,13 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 @Component({
   selector: 'app-cancelar-hora-extra',
@@ -46,7 +46,6 @@ export class CancelarHoraExtraComponent implements OnInit {
 
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   /** **************************************************************************************** **
@@ -55,21 +54,25 @@ export class CancelarHoraExtraComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -144,9 +147,9 @@ export class CancelarHoraExtraComponent implements OnInit {
     var correo_usuarios = '';
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fec_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fec_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     if (horaExtra.estado === 1) {
       var estado_h = 'Pendiente de autorización';
@@ -184,9 +187,9 @@ export class CancelarHoraExtraComponent implements OnInit {
           solicitud: solicitud,
           desde: desde,
           hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora),
-          num_horas: moment(horaExtra.num_hora, 'HH:mm').format('HH:mm'),
+          h_inicio: this.validar.FormatearHora(DateTime.fromISO(horaExtra.fec_inicio).toFormat('HH:mm:ss'), this.formato_hora),
+          h_final: this.validar.FormatearHora(DateTime.fromISO(horaExtra.fec_final).toFormat('HH:mm:ss'), this.formato_hora),
+          num_horas: DateTime.fromFormat(horaExtra.num_hora, 'HH:mm').toFormat('HH:mm'),
           observacion: horaExtra.descripcion,
           estado_h: estado_h,
           proceso: 'eliminado',
@@ -230,11 +233,11 @@ export class CancelarHoraExtraComponent implements OnInit {
   EnviarNotificacion(horaExtra: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fec_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fec_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fec_inicio).toFormat('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fec_final).toFormat('HH:mm:ss'), this.formato_hora);
 
     let notificacion = {
       id_send_empl: this.idEmpleadoIngresa,

@@ -1,25 +1,24 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from "@angular/material/paginator";
-import * as moment from 'moment';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { ThemePalette } from '@angular/material/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
+import { PageEvent } from "@angular/material/paginator";
+import { MatSelect } from '@angular/material/select';
+import { DateTime } from 'luxon';
 
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 // IMPORTAR COMPONENTES
 import { ListarEmpleadoPermisoComponent } from '../../modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
-import { MatSelect } from '@angular/material/select';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 interface Orden {
   valor: number
@@ -140,8 +139,8 @@ export class AutorizacionesComponent implements OnInit {
       }
     }
 
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toformat('yyyy-MM-dd');
     this.obtenerDepartamento();
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
     this.BuscarTipoAutorizacion();
@@ -725,7 +724,7 @@ export class AutorizacionesComponent implements OnInit {
     this.componente.Depata.reset();
     this.componente.Usuario.reset();
     this.componente.Estado.reset();
-    this.componente.BuscarHora(this.formato_fecha);
+    this.componente.BuscarParametro();
   }
 
   ManejarPagina(e: PageEvent) {

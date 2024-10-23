@@ -4,9 +4,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -150,7 +150,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   ngOnDestroy() {
@@ -168,24 +167,28 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-      });
-  }
 
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
@@ -209,7 +212,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     this.cargos = this.validar.ProcesarDatosCargos(informacion);
-    this.regimen =  this.validar.ProcesarDatosRegimen(informacion);
+    this.regimen = this.validar.ProcesarDatosRegimen(informacion);
     this.empleados = this.validar.ProcesarDatosEmpleados(informacion);
     this.sucursales = this.validar.ProcesarDatosSucursales(informacion);
     this.departamentos = this.validar.ProcesarDatosDepartamentos(informacion);
@@ -403,10 +406,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
-
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -577,7 +579,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                 const fecha = this.validar.FormatearFecha(
                   vac.fecha.split('T')[0],
                   this.formato_fecha,
-                  this.validar.dia_abreviado);
+                  this.validar.dia_abreviado, this.idioma_fechas);
 
                 return [
                   {
@@ -658,7 +660,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           const fecha = this.validar.FormatearFecha(
             usu.fecha.split('T')[0],
             this.formato_fecha,
-            this.validar.dia_abreviado);
+            this.validar.dia_abreviado, this.idioma_fechas);
 
           n = n + 1;
           let ele = {

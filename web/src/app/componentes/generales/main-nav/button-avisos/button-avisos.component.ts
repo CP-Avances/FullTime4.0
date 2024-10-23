@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { DateTime } from 'luxon';
 import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
@@ -49,10 +49,10 @@ export class ButtonAvisosComponent implements OnInit {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
-            res.fecha_ = this.validar.FormatearFecha(moment(res.create_at).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado);
-            res.hora_ = this.validar.FormatearHora(moment(res.create_at).format('HH:mm:ss'), this.formato_hora);
-            
-            if(res.tipo != 6){
+            res.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(res.create_at).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            res.hora_ = this.validar.FormatearHora(DateTime.fromISO(res.create_at).toFormat('HH:mm:ss'), this.formato_hora);
+
+            if (res.tipo != 6) {
               if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
                 res.aviso = res.descripcion.split('para')[0];;
                 res.usuario = 'del usuario ' + res.descripcion.split('para')[1].split('desde')[0];
@@ -93,30 +93,28 @@ export class ButtonAvisosComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.LeerAvisos(fecha, this.formato_hora);
-      },
-      vacio => {
-        this.LeerAvisos(fecha, this.formato_hora);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.LeerAvisos(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.LeerAvisos(this.formato_fecha, this.formato_hora);
       });
   }
 
@@ -143,8 +141,8 @@ export class ButtonAvisosComponent implements OnInit {
               this.estadoTimbres = false;
             }
             // FORMATEAR DATOS DE FECHA Y HORA
-            obj.fecha_ = this.validar.FormatearFecha(moment(obj.create_at).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_abreviado);
-            obj.hora_ = this.validar.FormatearHora(moment(obj.create_at).format('HH:mm:ss'), formato_hora);
+            obj.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(obj.create_at).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            obj.hora_ = this.validar.FormatearHora(DateTime.fromISO(obj.create_at).toFormat('HH:mm:ss'), formato_hora);
             // VERIFICAR DESCRIPCIONES DE AVISOS
             if (obj.tipo != 6) {
               if (obj.descripcion.split('para')[0] != undefined && obj.descripcion.split('para')[1] != undefined) {

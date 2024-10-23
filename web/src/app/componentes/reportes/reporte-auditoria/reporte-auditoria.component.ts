@@ -6,8 +6,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
 import { ThemePalette } from '@angular/material/core';
+import { DateTime } from 'luxon';
 
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -61,6 +61,7 @@ export class ReporteAuditoriaComponent implements OnInit {
     // VARIABLES  
     formato_fecha: string = 'DD/MM/YYYY';
     formato_hora: string = 'HH:mm:ss';
+    idioma_fechas: string = 'es';
     verDetalle: boolean = false;
     accionesSeleccionadas = [];
     tablasSolicitadas: any = [];
@@ -107,7 +108,6 @@ export class ReporteAuditoriaComponent implements OnInit {
     ngOnInit(): void {
         this.ContruirTablaDefinitiva(this.tablas);
         this.BuscarParametro();
-        this.BuscarHora();
     }
 
     // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
@@ -116,21 +116,24 @@ export class ReporteAuditoriaComponent implements OnInit {
         this.tamanio_pagina = e.pageSize;
     }
 
-    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+    // METODO PARA BUSCAR DATOS DE PARAMETROS
     BuscarParametro() {
-        // id_tipo_parametro Formato fecha = 1
-        this.parametro.ListarDetalleParametros(1).subscribe(
+        let datos: any = [];
+        let detalles = { parametros: '1, 2' };
+        this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
             res => {
-                this.formato_fecha = res[0].descripcion;
-            });
-    }
-
-    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-    BuscarHora() {
-        // id_tipo_parametro Formato hora = 2
-        this.parametro.ListarDetalleParametros(2).subscribe(
-            res => {
-                this.formato_hora = res[0].descripcion;
+                datos = res;
+                //console.log('datos ', datos)
+                datos.forEach((p: any) => {
+                    // id_tipo_parametro Formato fecha = 1
+                    if (p.id_parametro === 1) {
+                        this.formato_fecha = p.descripcion;
+                    }
+                    // id_tipo_parametro Formato hora = 2
+                    else if (p.id_parametro === 2) {
+                        this.formato_hora = p.descripcion;
+                    }
+                })
             });
     }
 
@@ -536,9 +539,9 @@ export class ReporteAuditoriaComponent implements OnInit {
             watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
             header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
             footer: function (currentPage: any, pageCount: any, fecha: any) {
-                let f = moment();
-                fecha = f.format('YYYY-MM-DD');
-                let time = f.format('HH:mm:ss');
+                let f = DateTime.now();
+                fecha = f.toFormat('yyyy-MM-dd');
+                let time = f.toFormat('HH:mm:ss');
                 return {
                     margin: 10,
                     columns: [
@@ -635,7 +638,7 @@ export class ReporteAuditoriaComponent implements OnInit {
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
-                            { style: 'itemsTable', text: this.validar.FormatearFecha(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado) },
+                            { style: 'itemsTable', text: this.validar.FormatearFecha(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) },
                             { style: 'itemsTable', text: this.validar.FormatearHora(audi.fecha_hora.split(' ')[1], this.formato_hora) },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                             { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },

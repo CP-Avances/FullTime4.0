@@ -1,11 +1,11 @@
-import { PageEvent } from '@angular/material/paginator';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-import * as moment from 'moment';
-import { FormControl, FormGroup } from '@angular/forms';
 
 import { NotificacionService } from 'src/app/servicios/reportes/notificaciones/notificacion.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -16,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
   templateUrl: './administrador-todas.component.html',
   styleUrls: ['./administrador-todas.component.css']
 })
+
 export class AdministradorTodasComponent implements OnInit {
 
   // ITEMS DE PAGINACION DE LA TABLA DE LISTA DE SOLICITUDES PENDIENTES
@@ -178,9 +179,9 @@ export class AdministradorTodasComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -293,9 +294,9 @@ export class AdministradorTodasComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -412,9 +413,9 @@ export class AdministradorTodasComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -529,9 +530,9 @@ export class AdministradorTodasComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

@@ -4,16 +4,16 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { use } from 'echarts';
+
 
 @Component({
   selector: 'app-registrar-vacaciones',
@@ -85,8 +85,8 @@ export class RegistrarVacacionesComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toformat('yyyy-MM-dd');
 
     this.obtenerInformacionEmpleado();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
@@ -98,7 +98,7 @@ export class RegistrarVacacionesComponent implements OnInit {
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -183,42 +183,38 @@ export class RegistrarVacacionesComponent implements OnInit {
       this.VacacionesForm.patchValue({
         diaLibreForm: libre,
         dialaborableForm: habil,
-        totalForm: totalDias,
+        totalForm: String(totalDias),
         diasTForm: 0
       });
     })
   }
 
-  ContarDiasHabiles(dateFrom, dateTo): any {
-    var from = moment(dateFrom),
-      to = moment(dateTo),
-      days = 0;
-    console.log('visualizar', from);
-    while (!from.isAfter(to)) {
-      /** Si no es sabado ni domingo */
-      if (from.isoWeekday() !== 6 && from.isoWeekday() !== 7) {
-        days++;;
+  ContarDiasHabiles(dateFrom: any, dateTo: any) {
+    let from = DateTime.fromISO(dateFrom);
+    let to = DateTime.fromISO(dateTo);
+    let days = 0;
+    while (from <= to) {
+      // SI NO ES SABADO (6) NI DOMINGO (7)
+      if (from.weekday !== 6 && from.weekday !== 7) {
+        days++;
       }
-      from.add(1, 'days');
+      from = from.plus({ days: 1 });  // SUMAR UN DÍA
     }
     return days;
   }
 
-  ContarDiasLibres(dateFrom, dateTo) {
-    var from = moment(dateFrom, 'DD/MM/YYY'),
-      to = moment(dateTo, 'DD/MM/YYY'),
-      days = 0,
-      sa = 0;
-    while (!from.isAfter(to)) {
-      /** Si no es sabado ni domingo */
-      if (from.isoWeekday() !== 6 && from.isoWeekday() !== 7) {
-        days++;
+  ContarDiasLibres(dateFrom: any, dateTo: any) {
+    let from = DateTime.fromFormat(dateFrom, 'dd/MM/yyyy');
+    let to = DateTime.fromFormat(dateTo, 'dd/MM/yyyy');
+    let sa = 0;
+    while (from <= to) {
+      // SI ES SABADO (6) O DOMINGO (7)
+      if (from.weekday === 6 || from.weekday === 7) {
+        sa++;
       }
-      else {
-        sa++
-      }
-      from.add(1, 'days');
+      from = from.plus({ days: 1 });  // SUMAR UN DIA
     }
+
     return sa;
   }
 
@@ -273,8 +269,11 @@ export class RegistrarVacacionesComponent implements OnInit {
   }
 
   ValidarDatosVacacion(form: any) {
-    if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm) && Date.parse(form.fecInicioForm) < Date.parse(form.fechaIngresoForm)) {
-      const ingreso = moment(form.fechaIngresoForm).diff(moment(form.fecFinalForm), 'days');
+    const fechaInicio = DateTime.fromISO(form.fecInicioForm);  // Asumiendo formato ISO
+    const fechaFinal = DateTime.fromISO(form.fecFinalForm);    // Asumiendo formato ISO
+    const fechaIngreso = DateTime.fromISO(form.fechaIngresoForm); // Asumiendo formato ISO
+    if (fechaInicio < fechaFinal && fechaInicio < fechaIngreso) {
+      const ingreso = fechaIngreso.diff(fechaFinal, 'days').days; // Diferencia en días
       console.log(ingreso);
       if (ingreso <= 1) {
         this.InsertarVacaciones(form);
@@ -372,8 +371,8 @@ export class RegistrarVacacionesComponent implements OnInit {
       cont = cont + 1;
 
       // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
       // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
       if (vacacion.estado === 1) {
@@ -437,8 +436,8 @@ export class RegistrarVacacionesComponent implements OnInit {
   EnviarNotificacion(vacaciones: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let notificacion = {
       id_receives_empl: '',
@@ -460,10 +459,9 @@ export class RegistrarVacacionesComponent implements OnInit {
     var allNotificaciones: any = [];
 
     //Ciclo por cada elemento del catalogo
-    vacaciones.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    vacaciones.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
@@ -473,7 +471,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     allNotificaciones.forEach(e => {
       notificacion.id_receives_depa = e.id_dep;
       notificacion.id_receives_empl = e.empleado;
-      console.log("Empleados enviados: ",allNotificaciones);
+      console.log("Empleados enviados: ", allNotificaciones);
       if (e.vaca_noti) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {

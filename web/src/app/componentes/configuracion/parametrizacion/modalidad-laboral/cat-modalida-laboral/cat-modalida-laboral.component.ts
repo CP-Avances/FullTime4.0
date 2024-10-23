@@ -3,13 +3,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { ThemePalette } from '@angular/material/core';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
@@ -113,9 +113,8 @@ export class CatModalidaLaboralComponent implements OnInit {
     })
   }
 
-  formato_fecha: string = 'DD/MM/YYYY';
-
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  formato_fecha: string = 'DD/MM/YYYY';
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
@@ -394,9 +393,9 @@ export class CatModalidaLaboralComponent implements OnInit {
       header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

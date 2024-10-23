@@ -6,8 +6,8 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -164,7 +164,7 @@ export class EditarHorarioComponent implements OnInit {
       dataHorario.min_almuerzo = 0;
     }
     else if (dataHorario.hora_trabajo >= '72:00' || dataHorario.hora_trabajo >= '72:00:00') {
-      dataHorario.hora_trabajo = moment(dataHorario.hora_trabajo, 'HH:mm:ss').format('HH:mm:ss');
+      dataHorario.hora_trabajo = DateTime.fromISO(dataHorario.hora_trabajo, 'HH:mm:ss').toFormat('HH:mm:ss');
     }
 
     // VALIDAR INGRESO DE MINUTOS DE ALIMENTACION

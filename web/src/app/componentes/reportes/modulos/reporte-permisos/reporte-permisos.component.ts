@@ -5,15 +5,15 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-// LIBRERÍA PARA MANEJAR FECHAS
-import * as moment from 'moment';
-moment.locale('es');
+
 // LIBRERÍA PARA GENERAR ARCHIVOS
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
+
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -331,9 +331,9 @@ export class ReportePermisosComponent implements OnInit {
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // METODO de obtención de fecha y hora actual
         var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return [
           {
             table: {
@@ -599,10 +599,10 @@ export class ReportePermisosComponent implements OnInit {
             }
             return [
               { text: obj.num_permiso, style: 'itemsTableD' },
-              { text: moment(obj.fec_creacion).format("DD/MM/YYYY"), style: 'itemsTableD' },
+              { text: DateTime.fromISO(obj.fec_creacion).toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.tipo, style: 'itemsTableD' },
-              { text: String(moment(obj.fec_inicio, "YYYY/MM/DD").format("DD/MM/YYYY")), style: 'itemsTableD' },
-              { text: String(moment(obj.fec_final, "YYYY/MM/DD").format("DD/MM/YYYY")), style: 'itemsTableD' },
+              { text: DateTime.fromFormat(obj.fec_inicio, 'yyyy-MM-dd').toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
+              { text: DateTime.fromFormat(obj.fec_final, 'yyyy-MM-dd').toFormat('dd/MM/yyyy'), style: 'itemsTableD' },
               { text: obj.dia, style: 'itemsTableD' },
               { text: obj.hora_numero, style: 'itemsTableD' },
               { text: trabaja, style: 'itemsTableD' },
@@ -651,9 +651,9 @@ export class ReportePermisosComponent implements OnInit {
       },
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -713,7 +713,7 @@ export class ReportePermisosComponent implements OnInit {
     // ESTRUCTURA DE LA TABLA DE LISTA DE REGISTROS
     if (form.inicioForm != '' && form.inicioForm != null &&
       form.finalForm != '' && form.finalForm != null) {
-      var informacion = 'PERIODO DEL: ' + String(moment(form.inicioForm).format("DD/MM/YYYY")) + ' AL ' + String(moment(form.finalForm).format("DD/MM/YYYY"));
+      var informacion = 'PERIODO DEL: ' + DateTime.fromISO(form.inicioForm).toFormat("dd/MM/yyyy") + ' AL ' + DateTime.fromISO(form.finalForm).toFormat("dd/MM/yyyy");
     }
     else {
       informacion = 'PERMISOS'
@@ -889,10 +889,10 @@ export class ReportePermisosComponent implements OnInit {
       }
       return {
         N_PERMISO: obj.num_permiso,
-        FECHA_CREACION: moment(obj.fec_creacion).format("DD/MM/YYYY"),
+        FECHA_CREACION: DateTime.fromISO(obj.fec_creacion).toFormat('dd/MM/yyyy'),
         NOMBRE_PERMISO: obj.tipo,
-        FECHA_INICIAL: String(moment(obj.fec_inicio, "YYYY/MM/DD").format("DD/MM/YYYY")),
-        FECHA_FINAL: String(moment(obj.fec_final, "YYYY/MM/DD").format("DD/MM/YYYY")),
+        FECHA_INICIAL: DateTime.fromFormat(obj.fec_inicio, 'yyyy-MM-dd').toFormat('dd/MM/yyyy'),
+        FECHA_FINAL: DateTime.fromFormat(obj.fec_final, 'yyyy-MM-dd').toFormat('dd/MM/yyyy'),
         DIAS_PERMISO: obj.dia,
         HORAS_PERMISO: obj.hora_numero,
         HORAS_LABORABLES: trabaja,
@@ -915,11 +915,11 @@ export class ReportePermisosComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wsp, 'Permisos');
     if (form.inicioForm === '' || form.finalForm === '') {
-      var f = moment();
+      var f = DateTime.now();
       xlsx.writeFile(wb, "Permisos - " + f.format('YYYY-MM-DD') + '.xlsx');
     }
     else {
-      xlsx.writeFile(wb, "Permisos - " + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' - ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + '.xlsx');
+      xlsx.writeFile(wb, "Permisos - " + DateTime.fromISO(form.inicioForm, 'yyyy-MM-dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy-MM-dd').toFormat('dd/MM/yyyy') + '.xlsx');
     }
   }
 

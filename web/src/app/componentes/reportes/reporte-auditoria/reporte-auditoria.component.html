@@ -141,7 +141,7 @@
                                 <td class="t_horarios">{{ transformAction(e.action) }}</td>
                                 <td class="t_horarios">
                                     {{validar.FormatearFecha(e.fecha_hora,
-                                    this.formato_fecha,this.validar.dia_abreviado)}}
+                                    this.formato_fecha,this.validar.dia_abreviado, idioma_fechas)}}
                                 </td>
                                 <td class="t_horarios">
                                     {{validar.FormatearHora(e.fecha_hora.split(' ')[1],
