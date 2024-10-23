@@ -90,7 +90,7 @@ let ruta = '';
 export const ObtenerRutaHorasExtraGeneral = async function () {
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'horasExtra';
+    return ruta + separador + 'horasExtras';
 }
 
 export const ObtenerRutaHorasExtra = async function (codigo: any) {
@@ -102,7 +102,7 @@ export const ObtenerRutaHorasExtra = async function (codigo: any) {
         `
         , [codigo]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'horasExtra' + separador + codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].cedula;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO

@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 // IMPORTAR SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-crear-timbre',
@@ -35,6 +36,7 @@ export class CrearTimbreComponent implements OnInit {
   // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
   idEmpleadoLogueado: any;
   nombre: string;
+  capturar_segundos: number = 60;  // 60 = TOMAR SOLO HORAS Y MINUTOS  -  1 TOMAR HORAS, MINUTOS Y SEGUNDOS
 
   // VARIABLES DE ALMACENMAIENTO DE COORDENADAS
   latitud: number;
@@ -66,6 +68,7 @@ export class CrearTimbreComponent implements OnInit {
 
   constructor(
     public ventana: MatDialogRef<CrearTimbreComponent>, // VARIABLE MANEJO DE VENTANAS
+    public restP: ParametrosService,
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
@@ -82,6 +85,26 @@ export class CrearTimbreComponent implements OnInit {
       this.nombre = this.data.name_empleado;
     }
     this.VerDatosEmpleado(this.idEmpleadoLogueado);
+    this.BuscarParametros();
+  }
+
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametros() {
+    let datos: any = [];
+    let detalles = { parametros: '5' };
+    this.capturar_segundos = 60;
+    this.restP.ListarVariosDetallesParametros(detalles).subscribe(
+      res => {
+        datos = res;
+        datos.forEach((p: any) => {
+          // id_tipo_parametro PARA CONSIDERAR O NO SEGUNDOS = 5
+          if (p.id_parametro === 5) {
+            if (p.descripcion === 'Si') {
+              this.capturar_segundos = 1;
+            }
+          }
+        })
+      });
   }
 
   // METODO DE BUSQUEDA DE DATOS DE EMPLEADO
@@ -118,8 +141,12 @@ export class CrearTimbreComponent implements OnInit {
   // METODO DE INGRESO DE TIMBRES
   contador: number = 0;
   InsertarTimbre(form: any) {
+    var hora_timbre = form.horaForm;
+    if (this.capturar_segundos === 60) {
+      hora_timbre = form.horaForm + ':00';
+    }
     let timbre = {
-      fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + form.horaForm + ':00',
+      fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + hora_timbre,
       tecl_funcion: this.TeclaFuncion(form.accionForm),
       observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + ', ' + form.observacionForm,
       id_empleado: '',

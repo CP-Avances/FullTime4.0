@@ -1,6 +1,6 @@
 // SECCION LIBRERIAS
 import { ObtenerRuta, ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';

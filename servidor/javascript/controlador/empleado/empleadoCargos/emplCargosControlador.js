@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CARGO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));

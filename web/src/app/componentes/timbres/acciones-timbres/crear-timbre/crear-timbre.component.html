@@ -26,7 +26,7 @@
             </mat-form-field>
             <mat-form-field style="width: 200px;">
                 <mat-label>Hora timbre</mat-label>
-                <input id="i-cursor" matInput step="1" type="time" [formControl]="HoraF">
+                <input id="i-cursor" matInput [attr.step]="capturar_segundos" type="time" [formControl]="HoraF">
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Acción timbre</mat-label>
@@ -54,19 +54,17 @@
     <div class="d-flex flex-wrap justify-content-evenly" id="contenedorBotones">
         <div class="bd-highlight d-flex align-items-center">
             <form method="post">
-                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
-                    id="file" accept="image/png, image/jpeg">
+                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                    accept="image/png, image/jpeg">
                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
                     Subir justificación
                 </label>
             </form>
         </div>
         <div class="bd-highlight d-flex align-items-center">
-            <input [required]='documento' type="text" id="respaldo"
-                placeholder="Ningún archivo seleccionado" class="form-control"
-                style="width: 200px;" [formControl]="nombreDocumento" readonly>
-            <i *ngIf="HabilitarBtn" class="far fa-trash-alt"
-                style="color:red; margin-left: 5px;" id="i-cursor"
+            <input [required]='documento' type="text" id="respaldo" placeholder="Ningún archivo seleccionado"
+                class="form-control" style="width: 200px;" [formControl]="nombreDocumento" readonly>
+            <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;" id="i-cursor"
                 (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
                 matTooltip="Eliminar archivo seleccionado.">
             </i>

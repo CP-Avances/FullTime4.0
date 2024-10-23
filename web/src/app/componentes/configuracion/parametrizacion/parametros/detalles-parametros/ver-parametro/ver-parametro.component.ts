@@ -51,8 +51,6 @@ export class VerParametroComponent implements OnInit {
   tolerancia_atrasos: boolean = false;
   // PARAMETRO UBICACION
   ubicacion: boolean = false;
-  // PARAMETRO UBICACION DESCONOCIDA
-  ubicacion_desconocida: boolean = false;
   // PARAMTERO DISPOSITIVOS
   dispositivos: boolean = false;
   // PARAMETRO CERTIFICADO SSL
@@ -123,9 +121,9 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '4') {
       this.ubicacion = true;
     }
-    // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
+    // CONSIDERAR SEGUNDOS MARCACIONES
     if (this.idParametro === '5') {
-      this.ubicacion_desconocida = true;
+      this.segundos_timbres = true;
     }
     // DISPOSITIVOS MOVILES
     if (this.idParametro === '6') {
@@ -138,10 +136,6 @@ export class VerParametroComponent implements OnInit {
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '8') {
       this.cumpleanios = true;
-    }
-    // CONSIDERAR SEGUNDOS MARCACIONES
-    if (this.idParametro === '9') {
-      this.segundos_timbres = true;
     }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '10') {
@@ -177,7 +171,7 @@ export class VerParametroComponent implements OnInit {
       this.ver_detalles = true;
     }
     // PARAMETROS CON FORMULARIO
-    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9'
+    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8'
       || this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
       this.ver_formulario = true;
     }
@@ -215,7 +209,7 @@ export class VerParametroComponent implements OnInit {
         this.opcion_kardex = this.datosDetalle[0].descripcion;
         this.opcion_laboral = this.datosDetalle[0].descripcion;
       }
-      if (this.datosDetalle[0].descripcion === 'hh:mm:ss A') {
+      if (this.datosDetalle[0].descripcion === 'hh:mm:ss a') {
         this.formato12 = '#4194F0';
         this.formato24 = 'rgb(80, 87, 97)';
       }
@@ -430,7 +424,7 @@ export class VerParametroComponent implements OnInit {
       observacion = 'Formato estándar';
     }
     else if (seleccion === 4) {
-      formato = 'hh:mm:ss A';
+      formato = 'hh:mm:ss a';
       observacion = 'Formato de 12 horas';
     }
     else if (seleccion === 5) {

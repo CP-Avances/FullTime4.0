@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));

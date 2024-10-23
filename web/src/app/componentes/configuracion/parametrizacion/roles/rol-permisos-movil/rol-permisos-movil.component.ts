@@ -180,6 +180,7 @@ export class RolPermisosMovilComponent implements OnInit {
   VerRoles() {
     this.componenter.ver_funciones = false;
     this.componenter.ver_roles = true;
+    this.componenter.ObtenerRoles();
   }
 
   // METODO PARA MOSTRAR FUNCIONES CON MODULOS DEL SISTEMA

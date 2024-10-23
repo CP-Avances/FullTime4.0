@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -252,8 +252,16 @@ export class HorariosMultiplesComponent implements OnInit {
     this.formulario.patchValue({ horarioForm: 0 });
   }
 
+  fechaInicioFormluxon: any;
+  fechaFinFormluxon: any;
+
   // METODO DE LLAMADO DE FUNCIONES DE VALIDACION
   ValidarSeleccionados(form: any) {
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+
     if (form.horarioForm) {
       this.VerificarDuplicidad(form);
     }
@@ -391,9 +399,10 @@ export class HorariosMultiplesComponent implements OnInit {
       response.fechaContrato.forEach(element => {
         this.cont2 = this.cont2 + 1;
 
-        if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
-          (Date.parse(element.fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
-
+        let timestampfechaInicioForm = Date.parse(this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'));
+        let timestampfechaFinalForm = Date.parse(this.fechaFinFormluxon.toFormat('yyyy-MM-dd'));
+        if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= timestampfechaInicioForm) &&
+          (Date.parse(element.fecha_salida.split('T')[0]) >= timestampfechaFinalForm)) {
           const correcto = correctos
             .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
             .map(item => ({ ...item, observacion: 'OK' })); // Modifica la propiedad
@@ -755,9 +764,7 @@ export class HorariosMultiplesComponent implements OnInit {
       });
   }
 
-
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
- 
   recuperar2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   BuscarFeriadosRecuperar2(form: any, valor: any, validos: number) {
@@ -791,7 +798,6 @@ export class HorariosMultiplesComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   plan_general: any = [];
- 
   CrearPlanGeneral2(form: any, valor: any, validos: number) {
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
@@ -805,69 +811,72 @@ export class HorariosMultiplesComponent implements OnInit {
       console.log("ver default_ ", default_);
 
       this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-      this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-      this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
+      this.inicioDate = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
+      this.finDate = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
 
       // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
       while (this.inicioDate <= this.finDate) {
         this.fechasHorario.push(this.inicioDate);
-        var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
-        this.inicioDate = newDate;
+        let inicioDateLuxon = DateTime.fromISO(this.inicioDate);
+        let newDateLuxon = inicioDateLuxon.plus({ days: 1 });
+        let newDateFormatted = newDateLuxon.toFormat('yyyy-MM-dd');
+        this.inicioDate = newDateFormatted;
       }
-
       var tipo: any = null;
       var origen: string = '';
       var tipo_dia: string = '';
-
       this.fechasHorario.map((obj: any) => {
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo_dia = default_;
         origen = default_;
         tipo = null;
-        var day = moment(obj).day();
-        if (moment.weekdays(day) === 'lunes') {
+
+        var dateLuxon = DateTime.fromISO(obj);
+        var day = dateLuxon.weekday;
+
+        if (day === 1) {
           if (form.lunesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'martes') {
+        if (day === 2) {
           if (form.martesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'miércoles') {
+        if (day === 3) {
           if (form.miercolesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'jueves') {
+        if (day === 4) {
           if (form.juevesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'viernes') {
+        if (day === 5) {
           if (form.viernesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'sábado') {
+        if (day === 6) {
           if (form.sabadoForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'domingo') {
+        if (day === 7) {
           if (form.domingoForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
@@ -885,7 +894,7 @@ export class HorariosMultiplesComponent implements OnInit {
           if (this.feriados2[dh.id]) {
             let feri = this.feriados2[dh.id]
             for (let i = 0; i < feri.length; i++) {
-              if (moment(feri[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+              if (DateTime.fromISO(feri[i].fecha).toFormat('yyyy-MM-dd') === obj) {
                 tipo = 'DFD';
                 tipo_dia = 'DFD';
                 break;
@@ -898,7 +907,7 @@ export class HorariosMultiplesComponent implements OnInit {
         if (this.recuperar2[dh.id]) {
           let recu = this.recuperar2[dh.id]
           for (let j = 0; j < recu.length; j++) {
-            if (moment(recu[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+            if (DateTime.fromISO(recu[j].fecha_recuperacion).toFormat('yyyy-MM-dd') === obj) {
               tipo = 'REC';
               tipo_dia = 'REC';
               break;
@@ -907,7 +916,7 @@ export class HorariosMultiplesComponent implements OnInit {
         }
         const miObjeto: { obj: string, dia: string; tipo: string; tipo_dia: string; origen: string } = {
           obj: obj,
-          dia: moment.weekdays(day),
+          dia: dateLuxon.toFormat('cccc'),
           tipo: tipo,
           tipo_dia: tipo_dia,
           origen: origen
@@ -1020,7 +1029,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
-    
+
     this.guardar = true;
     this.btn_eliminar = false;
     this.cargar = false;
@@ -1065,10 +1074,10 @@ export class HorariosMultiplesComponent implements OnInit {
           min_alimentacion: element.minutos_comida,
         };
         if (element.segundo_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 1 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         if (element.tercer_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 2 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
@@ -1099,14 +1108,14 @@ export class HorariosMultiplesComponent implements OnInit {
     let datos = {
       usuarios_validos: this.usuarios_validos,
       eliminar_horarios: this.eliminar_horarios,
-      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fec_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
     };
     console.log("ver datos BuscarFechasMultiples: ", datos)
 
     this.rest.BuscarFechasMultiples(datos).subscribe(res => {
 
-      console.log("Ver horairos a eliminar: ", res )
+      console.log("Ver horairos a eliminar: ", res)
       this.eliminar = res;
       if (this.eliminar.length != 0) {
         this.BorrarDescanso();
@@ -1165,7 +1174,7 @@ export class HorariosMultiplesComponent implements OnInit {
       parteIndex: parteIndex, // Enviar el índice de la parte actual
       totalPartes: totalPartes // Enviar el total de partes
     };
-  
+
     // Llamada HTTP para enviar la parte actual
     this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
       // Si la respuesta es "OK", continuamos
@@ -1178,7 +1187,7 @@ export class HorariosMultiplesComponent implements OnInit {
           this.cargar = true;
           this.guardar = false;
           this.toastr.success(
-            'Operación exitosa.', 
+            'Operación exitosa.',
             'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
             timeOut: 6000,
           });
@@ -1192,12 +1201,6 @@ export class HorariosMultiplesComponent implements OnInit {
       }
     });
   }
-  
-
-
-
-
-
 
   dividirPlanGeneral(plan_general: any[]): any[][] {
     const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
@@ -1233,8 +1236,8 @@ export class HorariosMultiplesComponent implements OnInit {
 
     let usuarios = {
       codigo: codigos,
-      fec_final: moment(moment(form.fechaFinalForm).format('YYYY-MM-DD')).add(2, 'days'),
-      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+      fec_final: this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
     };
 
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
@@ -1376,8 +1379,8 @@ export class HorariosMultiplesComponent implements OnInit {
       obj.eliminar.forEach((eh: any) => {
         let plan_fecha = {
           id_empleado: obj.id,
-          fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-          fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+          fec_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
+          fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
           id_horario: eh.id,
         };
         this.restP.BuscarFechas(plan_fecha).subscribe(res => {
@@ -1444,6 +1447,11 @@ export class HorariosMultiplesComponent implements OnInit {
   }
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+
     if (form.horarioForm) {
       this.eliminar_horarios = [];
       // OPCION 1 ELIMINAR TODOS LOS REGISTROS
@@ -1469,8 +1477,8 @@ export class HorariosMultiplesComponent implements OnInit {
     let verificar = 0;
     let contador = 0;
     let fechas = {
-      fechaInicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fechaFinal: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      fechaInicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fechaFinal: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
     };
     datos.forEach((d: any) => {
       this.rest.VerificarHorariosExistentes(d.id, fechas).subscribe(existe => {

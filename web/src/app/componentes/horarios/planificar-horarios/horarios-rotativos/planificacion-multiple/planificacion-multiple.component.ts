@@ -6,6 +6,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { default as _rollupMoment, Moment } from 'moment';
 import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
@@ -96,13 +97,19 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>) {
-    const ctrlValue = fecha;
+    const ctrlValue = fecha.toDate();
+    console.log("ctrlValue", ctrlValue)
+    const dateLuxon = DateTime.fromJSDate(ctrlValue);
+    console.log("ver dateLuxon", dateLuxon)
+    let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+    console.log("inicio luxon", inicio)
+    let final = `${dateLuxon.daysInMonth}${dateLuxon.toFormat('/MM/yyyy')}`;
+    console.log("final luxon", final)
 
-    let inicio = moment(ctrlValue).format('01/MM/YYYY');
-    let final = moment(ctrlValue).daysInMonth() + moment(ctrlValue).format('/MM/YYYY');
+    this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+    console.log("fechaInicialF", this.fechaInicialF.value)
 
-    this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
-    this.fechaFinalF.setValue(moment(final, 'DD/MM/YYYY'));
+    this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
 
     datepicker.close();
     this.ver_horario = false;
@@ -118,13 +125,21 @@ export class PlanificacionMultipleComponent implements OnInit {
   mes_asignar: string = '';
   GenerarCalendario() {
     if (this.fechaInicialF.value === null && this.fechaFinalF.value === null) {
-      let inicio = moment().format('01/MM/YYYY');
-      let final = moment().daysInMonth() + moment().format('/MM/YYYY');
-      this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
-      this.fechaFinalF.setValue(moment(final, 'DD/MM/YYYY'));
+      const now = DateTime.now();
+      // Formatear la fecha de inicio como '01/MM/YYYY'
+      let inicio = now.set({ day: 1 }).toFormat('dd/MM/yyyy');
+      // Obtener el número de días en el mes y formatear la fecha final
+      let final = `${now.daysInMonth}${now.toFormat('/MM/yyyy')}`;
+      // Establecer los valores de fecha inicial y final usando Luxon
+      this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy'));
+      this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy'));
+      console.log("fechaInicialF sin seleccionar", this.fechaInicialF.value)
+      console.log("fechaFinalF sin seleccionar", this.fechaFinalF.value)
     }
+    console.log("fechaInicialF", this.fechaInicialF.value)
+    console.log("fechaFinalF", this.fechaFinalF.value)
 
-    this.mes_asignar = ('DE ' + moment(this.fechaInicialF.value).format('MMMM')).toUpperCase();
+    this.mes_asignar = ('DE ' + DateTime.fromISO(this.fechaInicialF.value).toFormat('MMMM')).toUpperCase();
     this.ListarFechas(this.fechaInicialF.value, this.fechaFinalF.value);
     this.ver_horario = true;
     this.mostrar_feriados = true;
@@ -871,7 +886,8 @@ export class PlanificacionMultipleComponent implements OnInit {
 
       if (!existe) {
         this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
-      }    })
+      }
+    })
 
     for (var a = 0; a < usuario.asignado.length; a++) {
       for (var f = 0; f < lista_feriados.length; f++) {
@@ -1138,25 +1154,25 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.restP.BuscarFechasMultiples({ listaEliminar }).subscribe((res: any) => {
         console.log("ver res", res)
 
-        
-        //res.forEach(item => {
-          let datos = {
-            id_plan: res,
-            user_name: this.user_name,
-            ip: this.ip,
-          }
 
-          this.restP.EliminarRegistro(datos).subscribe(datos => {
-            //contador = contador + 1;
-            //if (contador === this.eliminar_lista.length) {
-              this.RegistrarPlanificacionMultiple();
-            //}
-          }, error => {
-            //contador = contador + 1;
-            //if (contador === this.eliminar_lista.length) {
-              this.RegistrarPlanificacionMultiple();
-           // }
-          })
+        //res.forEach(item => {
+        let datos = {
+          id_plan: res,
+          user_name: this.user_name,
+          ip: this.ip,
+        }
+
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
+          //contador = contador + 1;
+          //if (contador === this.eliminar_lista.length) {
+          this.RegistrarPlanificacionMultiple();
+          //}
+        }, error => {
+          //contador = contador + 1;
+          //if (contador === this.eliminar_lista.length) {
+          this.RegistrarPlanificacionMultiple();
+          // }
+        })
         //})
       }, error => {
         this.RegistrarPlanificacionMultiple();

@@ -2,6 +2,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class ValidacionesService {
 
   constructor(
     private toastr: ToastrService,
-    private router: Router,
+    private router:  Router
   ) { }
 
 
@@ -136,9 +137,11 @@ export class ValidacionesService {
       valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
         moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
         ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-    } else if (dia === 'no') {
+    }
+    else if (dia === 'no') {
       valor = moment(fecha, 'YYYY/MM/DD').format(formato);
-    } else {
+    }
+    else {
       valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
         moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
         ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
@@ -146,8 +149,49 @@ export class ValidacionesService {
     return valor;
   }
 
+  FormatearFechaLuxon(fecha: string, formato: string, dia: string, idioma: string): string {
+    let valor: string;
+    // CONVERTIR FORMATOS DE FECHA
+    if (formato === 'DD/MM/YYYY') {
+      formato = 'dd/MM/yyyy';
+    }
+    else if (formato === 'MM/DD/YYYY') {
+      formato = 'MM/dd/yyyy';
+    }
+    else {
+      formato = 'yyyy/MM/dd';
+    }
+    console.log('ingresa fecha ', fecha)
+    // PARSEAR LA FECHA CON LUXON
+    const fechaLuxon = DateTime.fromISO(fecha).setLocale(idioma);
+
+    // MANEJAR EL FORMATO PARA EL DIA
+    if (dia === 'ddd') {
+      const diaAbreviado = fechaLuxon.toFormat('EEE').charAt(0).toUpperCase() +
+        fechaLuxon.toFormat('EEE').slice(1);
+      valor = diaAbreviado + '. ' + fechaLuxon.toFormat(formato);
+    }
+    else if (dia === 'no') {
+      valor = fechaLuxon.toFormat(formato);
+    }
+    else {
+      const diaCompleto = fechaLuxon.toFormat('EEEE').charAt(0).toUpperCase() +
+        fechaLuxon.toFormat('EEEE').slice(1);
+      valor = diaCompleto + '. ' + fechaLuxon.toFormat(formato);
+    }
+    return valor;
+  }
+
   FormatearHora(hora: string, formato: string) {
+    //console.log('hora ', hora, ' formato ', formato)
     let valor = moment(hora, 'HH:mm:ss').format(formato);
+    return valor;
+  }
+
+  FormatearHoraLuxon(hora: string, formato: string) {
+    //console.log('hora ', hora, ' formato ', formato)
+    const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
+    let valor = horaLuxon.toFormat(formato);;
     return valor;
   }
 

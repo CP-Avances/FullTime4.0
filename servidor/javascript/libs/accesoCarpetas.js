@@ -109,7 +109,7 @@ const ObtenerRutaHorasExtraGeneral = function () {
     return __awaiter(this, void 0, void 0, function* () {
         let separador = path_1.default.sep;
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'horasExtra';
+        return ruta + separador + 'horasExtras';
     });
 };
 exports.ObtenerRutaHorasExtraGeneral = ObtenerRutaHorasExtraGeneral;
@@ -121,7 +121,7 @@ const ObtenerRutaHorasExtra = function (codigo) {
         SELECT cedula FROM eu_empleados WHERE codigo = $1
         `, [codigo]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'horasExtra' + separador + codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].cedula;
     });
 };
 exports.ObtenerRutaHorasExtra = ObtenerRutaHorasExtra;

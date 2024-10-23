@@ -1,0 +1,205 @@
+import { Request, Response } from 'express';
+import { FormatearHora } from './../../../libs/settingsMail';
+import { QueryResult } from "pg";
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import pool from '../../../database';
+
+class HorasExtrasControlador {
+  public async ListarHorasExtras(req: Request, res: Response) {
+    const HORAS_EXTRAS = await pool.query(
+      `
+      SELECT * FROM mhe_configurar_hora_extra
+      `
+    );
+    if (HORAS_EXTRAS.rowCount != 0) {
+      return res.jsonp(HORAS_EXTRAS.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+  }
+
+  public async ObtenerUnaHoraExtra(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const HORAS_EXTRAS = await pool.query(
+      `
+      SELECT * FROM mhe_configurar_hora_extra WHERE id = $1
+      `
+      , [id]);
+    if (HORAS_EXTRAS.rowCount != 0) {
+      return res.jsonp(HORAS_EXTRAS.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+  }
+
+  public async CrearHoraExtra(req: Request, res: Response) {
+    try {
+      const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo,
+        incl_almuerzo, tipo_funcion, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO mhe_configurar_hora_extra ( descripcion, tipo_descuento, recargo_porcentaje, hora_inicio, hora_final, 
+          hora_jornada, tipo_dia, codigo, minutos_comida, tipo_funcion ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+        `
+        , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
+
+      const [HORA] = response.rows;
+
+      const horaInicio = await FormatearHora(hora_inicio)
+      const horaFinal = await FormatearHora(hora_final)
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_configurar_hora_extra',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, 
+          hora_jornada: ${hora_jornada}, tipo_dia: ${tipo_dia}, codigo: ${codigo}, minutos_comida: ${incl_almuerzo}, tipo_funcion: ${tipo_funcion}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (HORA) {
+        return res.status(200).jsonp(HORA);
+      } else {
+        return res.status(404).jsonp({ message: "error" });
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+    }
+  }
+
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = horaExtra.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_configurar_hora_extra',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query('DELETE FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
+
+      const horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      const horaFinal = await FormatearHora(datosOriginales.hora_final)
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_configurar_hora_extra',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+
+    }
+  }
+
+  public async ActualizarHoraExtra(req: Request, res: Response): Promise<Response> {
+    try {
+      const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = horaExtra.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_configurar_hora_extra',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE mhe_configurar_hora_extra SET descripcion = $1, tipo_descuento = $2, recargo_porcentaje = $3, hora_inicio = $4, 
+          hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, minutos_comida = $9, tipo_funcion = $10 
+        WHERE id = $11
+        `
+        , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
+      const horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      const horaFinal = await FormatearHora(datosOriginales.hora_final)
+      const horaInicioN = await FormatearHora(hora_inicio)
+      const horaFinalN = await FormatearHora(hora_final)
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_configurar_hora_extra',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
+        datosNuevos: `{codigo: ${codigo}, descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${hora_jornada}, minutos_comida: ${incl_almuerzo}, tipo_dia: ${tipo_dia}, tipo_funcion: ${tipo_funcion}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Hora extra actualizada' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+    }
+  }
+}
+
+export const horaExtraControlador = new HorasExtrasControlador();
+
+export default horaExtraControlador;

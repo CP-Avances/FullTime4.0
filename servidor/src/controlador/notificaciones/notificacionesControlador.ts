@@ -6,7 +6,7 @@ import {
 }
   from '../../libs/settingsMail';
 
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';

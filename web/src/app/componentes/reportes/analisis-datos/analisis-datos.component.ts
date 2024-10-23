@@ -8,12 +8,13 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
   templateUrl: './analisis-datos.component.html',
   styleUrls: ['./analisis-datos.component.css']
 })
+
 export class AnalisisDatosComponent implements OnInit {
 
   //URL HERRAMIENTA DE ANALISIS DE DATOS
+  cargarHerramienta: boolean = false;
   urlHerramienta: string;
   urlSafe: SafeUrl;
-  cargarHerramienta: boolean = false;
 
   constructor(private sanitized: DomSanitizer, private parametro: ParametrosService) { }
 
