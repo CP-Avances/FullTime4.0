@@ -1138,7 +1138,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');;
+        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
