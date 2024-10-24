@@ -9,6 +9,7 @@ import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHora
 // IMPORTACION DE SERVICIOS
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DateTime } from 'luxon';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
@@ -98,11 +99,19 @@ export class EliminarIndividualComponent implements OnInit {
   ver_horarios: boolean = false;
   isChecked: boolean = false;
   horariosSeleccionados: any = [];
+  fechaInicioFormluxon: any;
+  fechaFinFormluxon: any;
+
   BuscarPlanificacion(form: any) {
     this.horariosSeleccionados = [];
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    console.log("ver fecha_inicio", form.fechaInicioForm)
     let busqueda = {
-      fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      fecha_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fecha_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
       id_empleado: ''
     }
     this.datosEliminar.usuario.forEach((obj: any) => {
@@ -185,9 +194,8 @@ export class EliminarIndividualComponent implements OnInit {
   // METODO PARA ELIMINAR PLANIFICACION GENERAL DE HORARIOS
   lista_eliminar: any = [];
   EliminarPlanificacion(form: any) {
-    let inicio = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-    let final = moment(form.fechaFinalForm).format('YYYY-MM-DD');
-
+    let inicio =  this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
+    let final =  this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
   
     let datos = {
       usuarios_validos: this.datosEliminar.usuario,

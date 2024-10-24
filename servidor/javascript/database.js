@@ -12,6 +12,15 @@ const pool = new pg_pool_1.default({
     database: 'prueba_empresa',
     password: 'fu11tim3'
 });
+/*
+const pool = new Pool({
+  user: 'fulltime',
+  host: 'localhost', //'186.4.226.49',
+  port: 5432,
+  database: 'prueba_empresa',
+  password: 'fulltime'
+})
+  */
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {
         console.log("Error durante la conexión", err);
