@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -252,8 +252,16 @@ export class HorariosMultiplesComponent implements OnInit {
     this.formulario.patchValue({ horarioForm: 0 });
   }
 
+  fechaInicioFormluxon: any;
+  fechaFinFormluxon: any;
+
   // METODO DE LLAMADO DE FUNCIONES DE VALIDACION
   ValidarSeleccionados(form: any) {
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+
     if (form.horarioForm) {
       this.VerificarDuplicidad(form);
     }
@@ -391,9 +399,10 @@ export class HorariosMultiplesComponent implements OnInit {
       response.fechaContrato.forEach(element => {
         this.cont2 = this.cont2 + 1;
 
-        if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
-          (Date.parse(element.fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
-
+        let timestampfechaInicioForm = Date.parse(this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'));
+        let timestampfechaFinalForm = Date.parse(this.fechaFinFormluxon.toFormat('yyyy-MM-dd'));
+        if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= timestampfechaInicioForm) &&
+          (Date.parse(element.fecha_salida.split('T')[0]) >= timestampfechaFinalForm)) {
           const correcto = correctos
             .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
             .map(item => ({ ...item, observacion: 'OK' })); // Modifica la propiedad
@@ -714,41 +723,11 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
   validos: number = 0;
-  CrearData(form: any) {
-    this.plan_general = [];
-    this.validos = 0;
-    this.usuarios_validos.map((obj: any) => {
-      this.validos = this.validos + 1;
-      this.RegistrarPlanificacion(form, obj, this.validos);
-    })
-  }
 
   CrearData2(form: any) {
     this.plan_general = [];
     this.validos = this.usuarios_validos.length;
     this.RegistrarPlanificacion2(form, this.usuarios_validos, this.validos);
-  }
-
-
-
-
-  // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
-  RegistrarPlanificacion(form: any, valor: any, validos: number) {
-    // METODO DE BUSQUEDA DE FERIADOS
-    this.feriados = [];
-    let datos = {
-      fecha_inicio: form.fechaInicioForm,
-      fecha_final: form.fechaFinalForm,
-      id_empleado: parseInt(valor.id)
-    }
-    this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
-      this.feriados = data;
-      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-      this.BuscarFeriadosRecuperar(form, valor, validos);
-    }, vacio => {
-      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-      this.BuscarFeriadosRecuperar(form, valor, validos);
-    })
   }
 
   feriados2: { [key: number]: any } = {};
@@ -785,27 +764,7 @@ export class HorariosMultiplesComponent implements OnInit {
       });
   }
 
-
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-  recuperar: any = [];
-  BuscarFeriadosRecuperar(form: any, valor: any, validos: number) {
-    this.recuperar = [];
-    let datos = {
-      fecha_inicio: form.fechaInicioForm,
-      fecha_final: form.fechaFinalForm,
-      id_empleado: parseInt(valor.id)
-    }
-    this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
-
-      this.recuperar = data;
-      // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
-    }, vacio => {
-      // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
-    })
-  }
-
   recuperar2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   BuscarFeriadosRecuperar2(form: any, valor: any, validos: number) {
@@ -839,156 +798,6 @@ export class HorariosMultiplesComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   plan_general: any = [];
-  CrearPlanGeneral(form: any, dh: any, validos: number) {
-    // CONSULTAR HORARIO
-    const [obj_res] = this.horarios.filter((o: any) => {
-      return o.id === parseInt(form.horarioForm)
-    })
-
-    if (!obj_res) return this.toastr.warning('Horario no válido.');
-    const { default_ } = obj_res;
-
-    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-    this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
-
-    // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
-    while (this.inicioDate <= this.finDate) {
-      this.fechasHorario.push(this.inicioDate);
-      var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
-      this.inicioDate = newDate;
-    }
-
-    var tipo: any = null;
-    var origen: string = '';
-    var tipo_dia: string = '';
-
-    this.fechasHorario.map((obj: any) => {
-      // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-      tipo_dia = default_;
-      origen = default_;
-      tipo = null;
-      var day = moment(obj).day();
-      if (moment.weekdays(day) === 'lunes') {
-        if (form.lunesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'martes') {
-        if (form.martesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'miércoles') {
-        if (form.miercolesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'jueves') {
-        if (form.juevesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'viernes') {
-        if (form.viernesForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'sábado') {
-        if (form.sabadoForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-      if (moment.weekdays(day) === 'domingo') {
-        if (form.domingoForm === true) {
-          tipo = 'L';
-          tipo_dia = 'L';
-          origen = 'L';
-        }
-      }
-
-      if (default_ === 'FD' || default_ === 'L') {
-        tipo = default_;
-        tipo_dia = default_;
-        origen = 'H' + default_;
-      }
-      else {
-        // BUSCAR FERIADOS
-        if (this.feriados.length != 0) {
-          for (let i = 0; i < this.feriados.length; i++) {
-            if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-              tipo = 'DFD';
-              tipo_dia = 'DFD';
-              break;
-            }
-          }
-        }
-      }
-
-      // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-      if (this.recuperar.length != 0) {
-        for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo = 'REC';
-            tipo_dia = 'REC';
-            break;
-          }
-        }
-      }
-      // METODO PARA CREACION DE DATA DE REGISTRO DE HORARIOS
-      let fechas = {
-        fechaInicio: obj,
-        fechaFinal: obj,
-      };
-      if (tipo_dia === 'N' || tipo_dia === 'REC' || tipo_dia === 'DHA' || origen === 'HFD' || origen === 'HL') {
-        this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, this.detalles);
-      }
-      // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
-      else if (tipo_dia === 'DFD') {
-        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
-          this.EliminarRegistrosH(existe, obj, dh);
-        });
-        this.lista_descanso.forEach((desc: any) => {
-          if (desc.tipo === 'DFD') {
-            tipo = 'FD';
-            tipo_dia = 'FD';
-            origen = 'FD';
-            this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
-          }
-        })
-      }
-      else if (tipo_dia === 'L' && origen === 'L') {
-        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
-          this.EliminarRegistrosH(existe, obj, dh);
-        });
-        this.lista_descanso.forEach((desc: any) => {
-          if (desc.tipo === 'DL') {
-            tipo = 'L';
-            tipo_dia = 'L';
-            origen = 'L';
-            this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
-          }
-        })
-      }
-    });
-    // SE VALIDA QUE EL LIMITE DE REGISTROS SEA EL ADECUADO PARA EL SISTEMA
-    if (validos === this.usuarios_validos.length) {
-      this.ValidarLimites();
-    }
-  }
-
   CrearPlanGeneral2(form: any, valor: any, validos: number) {
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
@@ -1002,69 +811,72 @@ export class HorariosMultiplesComponent implements OnInit {
       console.log("ver default_ ", default_);
 
       this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-      this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-      this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
+      this.inicioDate = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
+      this.finDate = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
 
       // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
       while (this.inicioDate <= this.finDate) {
         this.fechasHorario.push(this.inicioDate);
-        var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
-        this.inicioDate = newDate;
+        let inicioDateLuxon = DateTime.fromISO(this.inicioDate);
+        let newDateLuxon = inicioDateLuxon.plus({ days: 1 });
+        let newDateFormatted = newDateLuxon.toFormat('yyyy-MM-dd');
+        this.inicioDate = newDateFormatted;
       }
-
       var tipo: any = null;
       var origen: string = '';
       var tipo_dia: string = '';
-
       this.fechasHorario.map((obj: any) => {
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo_dia = default_;
         origen = default_;
         tipo = null;
-        var day = moment(obj).day();
-        if (moment.weekdays(day) === 'lunes') {
+
+        var dateLuxon = DateTime.fromISO(obj);
+        var day = dateLuxon.weekday;
+
+        if (day === 1) {
           if (form.lunesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'martes') {
+        if (day === 2) {
           if (form.martesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'miércoles') {
+        if (day === 3) {
           if (form.miercolesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'jueves') {
+        if (day === 4) {
           if (form.juevesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'viernes') {
+        if (day === 5) {
           if (form.viernesForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'sábado') {
+        if (day === 6) {
           if (form.sabadoForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
             origen = 'L';
           }
         }
-        if (moment.weekdays(day) === 'domingo') {
+        if (day === 7) {
           if (form.domingoForm === true) {
             tipo = 'L';
             tipo_dia = 'L';
@@ -1082,7 +894,7 @@ export class HorariosMultiplesComponent implements OnInit {
           if (this.feriados2[dh.id]) {
             let feri = this.feriados2[dh.id]
             for (let i = 0; i < feri.length; i++) {
-              if (moment(feri[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+              if (DateTime.fromISO(feri[i].fecha).toFormat('yyyy-MM-dd') === obj) {
                 tipo = 'DFD';
                 tipo_dia = 'DFD';
                 break;
@@ -1095,7 +907,7 @@ export class HorariosMultiplesComponent implements OnInit {
         if (this.recuperar2[dh.id]) {
           let recu = this.recuperar2[dh.id]
           for (let j = 0; j < recu.length; j++) {
-            if (moment(recu[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+            if (DateTime.fromISO(recu[j].fecha_recuperacion).toFormat('yyyy-MM-dd') === obj) {
               tipo = 'REC';
               tipo_dia = 'REC';
               break;
@@ -1104,7 +916,7 @@ export class HorariosMultiplesComponent implements OnInit {
         }
         const miObjeto: { obj: string, dia: string; tipo: string; tipo_dia: string; origen: string } = {
           obj: obj,
-          dia: moment.weekdays(day),
+          dia: dateLuxon.toFormat('cccc'),
           tipo: tipo,
           tipo_dia: tipo_dia,
           origen: origen
@@ -1211,40 +1023,13 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       }
     })
-
     this.ValidarLimites();
-
   }
 
-
-  // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
-  EliminarRegistrosH(existe: any, obj: any, dh: any) {
-    let datos = {
-      id_plan: [],
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-    existe.forEach((h: any) => {
-      if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
-        let plan_fecha = {
-          id_empleado: dh.id,
-          fec_final: obj,
-          fec_inicio: obj,
-          id_horario: h.id_horario,
-        };
-        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-          datos.id_plan = res;
-          // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(datos).subscribe(datos => {
-          })
-        })
-      }
-    })
-  }
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
-    
+
     this.guardar = true;
     this.btn_eliminar = false;
     this.cargar = false;
@@ -1289,10 +1074,10 @@ export class HorariosMultiplesComponent implements OnInit {
           min_alimentacion: element.minutos_comida,
         };
         if (element.segundo_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 1 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         if (element.tercer_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 2 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
@@ -1323,14 +1108,14 @@ export class HorariosMultiplesComponent implements OnInit {
     let datos = {
       usuarios_validos: this.usuarios_validos,
       eliminar_horarios: this.eliminar_horarios,
-      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fec_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
     };
     console.log("ver datos BuscarFechasMultiples: ", datos)
 
     this.rest.BuscarFechasMultiples(datos).subscribe(res => {
 
-      console.log("Ver horairos a eliminar: ", res )
+      console.log("Ver horairos a eliminar: ", res)
       this.eliminar = res;
       if (this.eliminar.length != 0) {
         this.BorrarDescanso();
@@ -1372,13 +1157,9 @@ export class HorariosMultiplesComponent implements OnInit {
   }
 
   GuardarInformacion() {
-    const datos = {
-      plan_general: this.plan_general,
-      user_name: this.user_name,
-      ip: this.ip,
-    };
     // Dividir el objeto plan_general en partes más pequeñas
-    const partes = this.dividirPlanGeneral(datos.plan_general);
+    console.log("ver plan general: ", this.plan_general)
+    const partes = this.dividirPlanGeneral(this.plan_general);
     const totalPartes = partes.length;
     // Enviar la primera parte
     this.enviarParte(partes, 0, totalPartes);
@@ -1393,7 +1174,7 @@ export class HorariosMultiplesComponent implements OnInit {
       parteIndex: parteIndex, // Enviar el índice de la parte actual
       totalPartes: totalPartes // Enviar el total de partes
     };
-  
+
     // Llamada HTTP para enviar la parte actual
     this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
       // Si la respuesta es "OK", continuamos
@@ -1406,7 +1187,7 @@ export class HorariosMultiplesComponent implements OnInit {
           this.cargar = true;
           this.guardar = false;
           this.toastr.success(
-            'Operación exitosa.', 
+            'Operación exitosa.',
             'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
             timeOut: 6000,
           });
@@ -1420,12 +1201,6 @@ export class HorariosMultiplesComponent implements OnInit {
       }
     });
   }
-  
-
-
-
-
-
 
   dividirPlanGeneral(plan_general: any[]): any[][] {
     const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
@@ -1461,8 +1236,8 @@ export class HorariosMultiplesComponent implements OnInit {
 
     let usuarios = {
       codigo: codigos,
-      fec_final: moment(moment(form.fechaFinalForm).format('YYYY-MM-DD')).add(2, 'days'),
-      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+      fec_final: this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
     };
 
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
@@ -1604,8 +1379,8 @@ export class HorariosMultiplesComponent implements OnInit {
       obj.eliminar.forEach((eh: any) => {
         let plan_fecha = {
           id_empleado: obj.id,
-          fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-          fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+          fec_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
+          fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
           id_horario: eh.id,
         };
         this.restP.BuscarFechas(plan_fecha).subscribe(res => {
@@ -1639,13 +1414,17 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
+
+    const arrayIds: number[] = this.eliminar.map((obj: any) => obj.id);
+
     let datos = {
-      id_plan: this.eliminar,
+      id_plan: arrayIds,
       user_name: this.user_name,
       ip: this.ip,
     }
+    console.log("ver datos a eliminar: ", datos)
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
-    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
+    this.restP.EliminarRegistroMutiple(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
           timeOut: 6000,
@@ -1666,9 +1445,13 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
   }
-
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+
     if (form.horarioForm) {
       this.eliminar_horarios = [];
       // OPCION 1 ELIMINAR TODOS LOS REGISTROS
@@ -1694,8 +1477,8 @@ export class HorariosMultiplesComponent implements OnInit {
     let verificar = 0;
     let contador = 0;
     let fechas = {
-      fechaInicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fechaFinal: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      fechaInicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fechaFinal: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
     };
     datos.forEach((d: any) => {
       this.rest.VerificarHorariosExistentes(d.id, fechas).subscribe(existe => {

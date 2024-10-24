@@ -37,6 +37,11 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/eliminar`, data);
   }
 
+  // METODO PARA ELIMINAR REGISTROS - MULTIPLES   **USADO
+  EliminarRegistroMutiple(data: any,) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/eliminar-multiples`, data);
+  }
+
   // METODO PARA BUSCAR HORARIO DEL USUARIO EN FECHAS ESPECIFICAS
   BuscarHorarioFechas(datos: any) {
     return this.http.post(`${environment.url}/planificacion_general/horario-general-fechas`, datos);

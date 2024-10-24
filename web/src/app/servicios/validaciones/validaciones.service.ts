@@ -11,7 +11,7 @@ export class ValidacionesService {
 
   constructor(
     private toastr: ToastrService,
-    private router: Router,
+    private router:  Router
   ) { }
 
 
