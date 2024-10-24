@@ -17,6 +17,3 @@ mat-form-field {
     align-items: flex-start;
 }
 
-.mat-mdc-radio-button~.mat-mdc-radio-button {
-    margin-left: 20px;
-}

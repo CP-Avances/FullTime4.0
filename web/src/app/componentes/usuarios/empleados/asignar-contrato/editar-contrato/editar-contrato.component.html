@@ -59,25 +59,28 @@
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-start">
-                        <label
-                            style="padding-top: 15px; padding-bottom: 5px; position: relative; left:40px; font-size: 14px;">
-                            Controlar asistencia *
-                        </label>
-                    </div>
-                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:45px;">
-                        <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
-                            [value]="controlAsistenciaF.value" required>
-                            <div class="d-flex justify-content-around">
-                                <mat-radio-button [value]="true">
-                                    <label id="textoradiobtn">Si</label>
-                                </mat-radio-button>
-                                <mat-radio-button [value]="false">
-                                    <label id="textoradiobtn">No</label>
-                                </mat-radio-button>
-                            </div>
-                        </mat-radio-group>
+                        <mat-form-field *ngIf="habilitarSeleccion">
+                            <mat-label>Modalidad Laboral</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
+                                help_outline
+                            </mat-icon>
+                            <mat-select [formControl]="tipoF">
+                                <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
+                                    (click)="IngresarOtro(ContratoForm.value)">
+                                    {{tc.descripcion}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="habilitarContrato">
+                            <mat-label>Tipo Contrato</mat-label>
+                            <input matInput placeholder="Ej: Indefinido" [formControl]="contratoF">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Regresar a la lista de contratos existentes" (click)="VerTiposContratos()">
+                                help_outline
+                            </mat-icon>
+                            <mat-error *ngIf="contratoF.invalid">Ingresar un tipo de contrato válido</mat-error>
+                        </mat-form-field>
                     </div>
                 </div>
                 <div class="col-md">
@@ -110,55 +113,54 @@
                                 </mat-form-field>
                             </div>
                         </div>
-
-                        <mat-form-field *ngIf="habilitarSeleccion">
-                            <mat-label>Modalidad Laboral</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
-                                help_outline
-                            </mat-icon>
-                            <mat-select [formControl]="tipoF">
-                                <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
-                                    (click)="IngresarOtro(ContratoForm.value)">
-                                    {{tc.descripcion}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <mat-form-field *ngIf="habilitarContrato">
-                            <mat-label>Tipo Contrato</mat-label>
-                            <input matInput placeholder="Ej: Indefinido" [formControl]="contratoF">
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Regresar a la lista de contratos existentes" (click)="VerTiposContratos()">
-                                help_outline
-                            </mat-icon>
-                            <mat-error *ngIf="contratoF.invalid">Ingresar un tipo de contrato válido</mat-error>
-                        </mat-form-field>
-
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <label
-                                style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
-                                Controlar vacaciones *
-                            </label>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
-                            <mat-radio-group aria-label="Select an option" [formControl]="controlVacacionesF"
-                                [value]="controlVacacionesF.value" required>
-                                <div class="d-flex justify-content-around">
-                                    <mat-radio-button matSuffix matTooltipPosition="right"
-                                        matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                        [value]="true">
-                                        <label id="textoradiobtn">Si</label>
-                                    </mat-radio-button>
-                                    <mat-radio-button matSuffix matTooltipPosition="right"
-                                        matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                        [value]="false">
-                                        <label id="textoradiobtn">No</label>
-                                    </mat-radio-button>
-                                </div>
-                            </mat-radio-group>
-                        </div>
                     </div>
                 </div>
+
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <label
+                            style="padding-top: 10px; padding-bottom: 5px; position: relative; left:20px; font-size: 14px;">
+                            Controlar asistencia *
+                        </label>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:25px;">
+                        <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
+                            [value]="controlAsistenciaF.value" required>
+                            <div class="d-flex justify-content-around">
+                                <mat-radio-button [value]="true">
+                                    <label id="textoradiobtn">Si</label>
+                                </mat-radio-button>
+                                <mat-radio-button [value]="false">
+                                    <label id="textoradiobtn">No</label>
+                                </mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <label
+                            style="padding-top: 10px; padding-bottom: 5px; position: relative; left:20px; font-size: 14px;">
+                            Controlar vacaciones *
+                        </label>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:25px;">
+                        <mat-radio-group aria-label="Select an option" [formControl]="controlVacacionesF"
+                            [value]="controlVacacionesF.value" required>
+                            <div class="d-flex justify-content-around">
+                                <mat-radio-button matSuffix matTooltipPosition="right"
+                                    matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                    [value]="true">
+                                    <label id="textoradiobtn">Si</label>
+                                </mat-radio-button>
+                                <mat-radio-button matSuffix matTooltipPosition="right"
+                                    matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                    [value]="false">
+                                    <label id="textoradiobtn">No</label>
+                                </mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+
                 <div class="col-md">
 
                     <div class="d-flex flex-wrap justify-content-start" *ngIf="isChecked">
