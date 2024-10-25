@@ -1,23 +1,29 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        ASIGNAR PROCESOS
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroProceso()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR DEPARTAMENTO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroProceso()">highlight_off</mat-icon>
+    </div>
 </div>
 <div>
     <!-- FORMULARIO COMPLETO -->
     <form [formGroup]="EmpleProcesoForm">
         <mat-card-content>
-            <div class="container" style="text-align: center;">
+            <div style="text-align: center;">
                 <div class="nota" style="text-align: justify;">
                     <span>
                         NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                         Guardar.
                     </span>
                 </div>
-                <div class="row">
-                    <div class="col-sm">
+                <div class="row w-100 m-auto">
+                    <div class="col-sm m-auto p-0">
                         <mat-form-field>
                             <mat-label>Empleado</mat-label>
                             <input id="nomEmple" matInput placeholder="Empleado" [formControl]="nombreEmpleado"
@@ -39,7 +45,7 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-sm">
+                    <div class="col-sm m-auto p-0">
                         <mat-form-field>
                             <mat-label>Fecha de Inicio</mat-label>
                             <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"

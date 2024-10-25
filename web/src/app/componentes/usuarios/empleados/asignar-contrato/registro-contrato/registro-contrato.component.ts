@@ -1,6 +1,5 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -11,6 +10,8 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 
+import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+
 @Component({
   selector: 'app-registro-contrato',
   templateUrl: './registro-contrato.component.html',
@@ -18,6 +19,9 @@ import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.s
 })
 
 export class RegistroContratoComponent implements OnInit {
+
+  @Input() datoEmpleado: any;
+  @Input() pagina: any;
 
   isChecked: boolean = false;
   habilitarSeleccion: boolean = true;
@@ -65,15 +69,14 @@ export class RegistroContratoComponent implements OnInit {
     private restR: RegimenService,
     private toastr: ToastrService,
     public restCargo: EmplCargosService,
-    public ventana: MatDialogRef<RegistroContratoComponent>,
+    public ventana: VerEmpleadoComponent,
     public pais: ProvinciaService,
-    @Inject(MAT_DIALOG_DATA) public datoEmpleado: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    console.log('dato ', this.datoEmpleado);
     this.ObtenerPaises();
     this.ObtenerEmpleados();
     this.ObtenerTipoContratos();
@@ -249,7 +252,7 @@ export class RegistroContratoComponent implements OnInit {
           this.CargarContrato(response.id, form);
         }
       }
-      this.CerrarVentana();
+      this.CerrarVentana(2);
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', '', {
         timeOut: 6000,
@@ -265,10 +268,11 @@ export class RegistroContratoComponent implements OnInit {
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
     this.rest.BuscarContratosEmpleado(this.datoEmpleado).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = DateTime.fromFormat(datos.fec_ingreso, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      var ingreso = DateTime.fromISO(datos.fec_ingreso.toISOString()).toFormat('yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = DateTime.fromFormat(this.revisarFecha[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+        var fecha_salida = DateTime.fromISO(this.revisarFecha[i].fecha_salida).toFormat('yyyy-MM-dd');
+        //console.log('ver fechas ', ingreso , ' sal ', fecha_salida)
         if (ingreso < fecha_salida) {
           this.contador = 1;
         }
@@ -391,9 +395,16 @@ export class RegistroContratoComponent implements OnInit {
   }
 
   // CERRAR VENTANA DE REGISTRO DE CONTRATO
-  CerrarVentana() {
+  CerrarVentana(opcion: any) {
     this.LimpiarCampos();
-    this.ventana.close();
+    this.ventana.ver_contrato_cargo = true;
+    if (this.pagina === 'ver-empleado') {
+      this.ventana.crear_contrato = false;
+      if (opcion === 2) {
+        this.ventana.VerDatosActuales(this.ventana.formato_fecha);
+        this.ventana.ObtenerContratosEmpleado(this.ventana.formato_fecha);
+      }
+    }
   }
 
 

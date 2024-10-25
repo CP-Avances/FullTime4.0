@@ -974,10 +974,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   pagina_contrato: any = '';
   contrato_editar: any = [];
   AbrirVentanaEditarContrato(dataContrato: any) {
+    this.ver_contrato_cargo = false;
     this.editar_contrato = true;
     this.contrato_editar = dataContrato;
     this.pagina_contrato = 'ver-empleado';
-    this.btnActualizarCargo = true;
   }
 
   // METODO PARA ELIMINAR CONTRATOS
@@ -998,6 +998,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             timeOut: 4500,
           });
           this.VerDatosActuales(this.formato_fecha);
+          this.ObtenerContratosEmpleado(this.formato_fecha);
         }
       }, error: (err: any) => {
         this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
@@ -1037,15 +1038,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // VENTANA PARA INGRESAR CONTRATO DEL EMPLEADO
+  crear_contrato: boolean = false;
+  enviar_contrato: any;
+  ver_contrato_cargo: boolean = true;
   AbrirVentanaCrearContrato(): void {
-    this.ventana.open(RegistroContratoComponent, { width: '900px', data: this.idEmpleado }).
-      afterClosed().subscribe(item => {
-        this.contratoEmpleado = [];
-        this.cargoEmpleado = [];
-        this.VerDatosActuales(this.formato_fecha);
-        this.ObtenerContratosEmpleado(this.formato_fecha);
-      });
-    this.btnActualizarCargo = true;
+    this.ver_contrato_cargo = false;
+    this.crear_contrato = true;
+    this.pagina_contrato = 'ver-empleado';
+    this.enviar_contrato = this.idEmpleado;
   }
 
   /** ** ***************************************************************************************** **
@@ -1111,27 +1111,26 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // MOSTRAR VENTANA EDICION DE CARGO
-  btnActualizarCargo: boolean = true;
-  VerCargoEdicion(value: boolean) {
-    this.btnActualizarCargo = value;
-    this.editar_contrato = false;
-  }
-
-  // BUSQUEDA DE ID DE CARGO SELECCIONADO
+  btnActualizarCargo: boolean = false;
   idSelectCargo: number;
-  ObtenerIdCargoSeleccionado(idCargoEmpleado: number) {
+  VerCargoEdicion(idCargoEmpleado: number) {
+    this.ver_contrato_cargo = false;
+    this.btnActualizarCargo = true;
     this.idSelectCargo = idCargoEmpleado;
   }
 
   // VENTANA PARA INGRESAR CARGO DEL EMPLEADO
+  enviar_cargo: any = [];
+  crear_cargo: boolean = false;
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
-      this.ventana.open(EmplCargosComponent,
-        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato, idRol: this.datoActual.id_rol } }).
-        afterClosed().subscribe(item => {
-          this.VerDatosActuales(this.formato_fecha);
-        });
-      this.editar_contrato = false;
+      this.ver_contrato_cargo = false;
+      this.crear_cargo = true;
+      this.enviar_cargo = {
+        idEmpleado: this.idEmpleado,
+        idContrato: this.datoActual.id_contrato,
+        idRol: this.datoActual.id_rol
+      };
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Contrato.', '', {
@@ -3462,7 +3461,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  DefinirInfoHistoricoPDF(){
+  DefinirInfoHistoricoPDF() {
     const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
     return {
       pageOrientation: 'portrait',
@@ -3491,7 +3490,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
-        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 5, 0, 5] },
+        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDFContratosCargo(),
       ],
       styles: {
@@ -3509,7 +3508,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         // Salto en blanco o espacio antes de la primera parte
         {
           text: '', // Objeto vacío para crear espacio en blanco
-          margin: [0, 10, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
+          margin: [0, 5, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
         },
         // Primera parte con la información del régimen laboral de forma dinámica
         {
@@ -3592,7 +3591,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         // Tabla principal con los datos de los empleados o cargos
         {
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
             body: [
               [
                 { text: 'Sucursal', style: 'tableHeader', fontSize: 9 },

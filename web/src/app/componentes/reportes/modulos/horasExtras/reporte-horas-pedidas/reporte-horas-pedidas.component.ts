@@ -6,12 +6,12 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-// LIBRERÍA PARA GENERAR REPORTES EN FORMATO PDF
+// LIBRERIA PARA GENERAR REPORTES EN FORMATO PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-// LIBRERÍA PARA GENERAR REPORTES EN FORMATO EXCEL
+// LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL
 import * as xlsx from 'xlsx';
 
 // IMPORTACION DE SERVICIOS

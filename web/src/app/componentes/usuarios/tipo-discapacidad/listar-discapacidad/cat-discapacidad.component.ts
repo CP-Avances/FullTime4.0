@@ -406,14 +406,16 @@ export class CatDiscapacidadComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Tipo Discapacidades', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE DISCAPACIDADES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDFDiscapacidades(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10, alignment: 'center' },
-        itemsTableD: { fontSize: 10 }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8, alignment: 'center' },
+        itemsTableD: { fontSize: 8 },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -424,12 +426,13 @@ export class CatDiscapacidadComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto'],
+            widths: ['*', '*'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'NOMBRE', style: 'tableHeader' },
 
               ],
               ...this.discapacidades.map((obj: any) => {

@@ -251,7 +251,7 @@ export class VistaRolesComponent implements OnInit {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
         itemsTableInfo: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMargin: { margin: [0, 5, 0, 0] },
         tableMarginCabecera: { margin: [0, 10, 0, 0] },
       }
     };
