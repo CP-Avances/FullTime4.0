@@ -220,6 +220,7 @@ class EmpleadoHorariosControlador {
     public async VerificarFechasHorario(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id_horario, ids } = req.body; // 'ids' es un array de id_empleado
 
+        console.log("ver req.body: ", req.body );
         // Consulta para verificar planificaciones duplicadas
         const HORARIOS = await pool.query(
             `
@@ -241,14 +242,14 @@ class EmpleadoHorariosControlador {
 
     public async BuscarFechasMultiples(req: Request, res: Response): Promise<any> {
         const { usuarios_validos, eliminar_horarios, fec_inicio, fec_final } = req.body;
-        
+
         // Obtener listas de IDs de empleados y horarios
         const ids_empleados = usuarios_validos.map((obj: any) => obj.id);
         const ids_horarios = eliminar_horarios.map((eh: any) => eh.id_horario);
-    
+
         try {
             console.log('Iniciando búsqueda de fechas...'); // Inicio del proceso
-    
+
             // Hacer una sola consulta utilizando ANY para buscar múltiples IDs
             const FECHAS = await pool.query(
                 `
@@ -259,18 +260,18 @@ class EmpleadoHorariosControlador {
                 `,
                 [fec_inicio, fec_final, ids_horarios, ids_empleados]
             );
-    
+
             console.log('Consulta completada, procesando resultados...'); // Consulta finalizada
-    
+
             // Obtener las filas y eliminar los IDs duplicados usando Set
             const resultados = FECHAS.rows.map((row: any) => row.id);
             //const ids_unicos = Array.from(new Set(resultados)); // Eliminar duplicados
-    
+
             console.log(`Total de IDs encontrados: ${resultados.length}`);
             //console.log(`Total de IDs únicos después de eliminar duplicados: ${ids_unicos.length}`);
-    
+
             return res.jsonp(resultados);
-    
+
         } catch (error) {
             console.error('Error en la consulta:', error);
             return res.status(500).jsonp({ error: 'Error en la consulta de base de datos' });

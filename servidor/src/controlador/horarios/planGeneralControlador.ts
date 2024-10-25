@@ -338,6 +338,7 @@ class PlanGeneralControlador {
         errores = 0;
 
         const { user_name, ip, id_plan } = req.body;
+        console.log("ver req body eliminar: ", req.body)
 
         for (const plan of id_plan) {
 
