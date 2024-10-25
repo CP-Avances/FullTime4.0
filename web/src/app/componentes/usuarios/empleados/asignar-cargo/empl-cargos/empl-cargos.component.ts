@@ -1,9 +1,8 @@
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import moment from 'moment';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
@@ -14,6 +13,8 @@ import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
+import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+
 @Component({
   selector: 'app-empl-cargos',
   templateUrl: './empl-cargos.component.html',
@@ -21,6 +22,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 })
 
 export class EmplCargosComponent implements OnInit {
+
+  @Input() datoEmpleado: any;
 
   habilitarCargo: boolean = false;
   idEmpleado: string;
@@ -78,22 +81,21 @@ export class EmplCargosComponent implements OnInit {
     private usuario: UsuarioService,
     private toastr: ToastrService,
     public router: Router,
-    public ventana: MatDialogRef<EmplCargosComponent>,
+    public ventana: VerEmpleadoComponent,
     public validar: ValidacionesService,
     public tipocargo: CatTipoCargosService,
-    @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
   ) {
-    this.idEmpleado = datoEmpleado.idEmpleado;
   }
 
   ngOnInit(): void {
+    //console.log('datos ', this.datoEmpleado)
+    this.idEmpleado = this.datoEmpleado.idEmpleado;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
-
     this.BuscarDatosContrato()
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
@@ -186,23 +188,20 @@ export class EmplCargosComponent implements OnInit {
 
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
+    //console.log('fechas ', form.fecInicioForm, ' ----  ', form.fecFinalForm)
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = moment(form.fecInicioForm).format('YYYY-MM-DD');
-    let registro_fin = moment(form.fecFinalForm).format('YYYY-MM-DD');
-    let contrato_inicio = moment(this.contrato_actual.fecha_ingreso).format('YYYY-MM-DD');
-    let contrato_fin = moment(this.contrato_actual.fecha_salida).format('YYYY-MM-DD');
-    /*console.log('inicio ', registro_inicio)
-    console.log('inicio format ', Date.parse(registro_inicio))
-    console.log('fin ', registro_fin)
-    console.log('fin format ', Date.parse(registro_fin))
-    console.log('inicio ', contrato_inicio)
-    console.log('inicio format ', Date.parse(contrato_inicio))
-    console.log('fin ', contrato_fin)
-    console.log('fin format ', Date.parse(contrato_fin))*/
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
+    let contrato_inicio = DateTime.fromISO(this.contrato_actual.fecha_ingreso).toFormat('yyyy-MM-dd');
+    let contrato_fin = DateTime.fromISO(this.contrato_actual.fecha_salida).toFormat('yyyy-MM-dd');
+    //console.log('inicio ', registro_inicio)
+    //console.log('fin ', registro_fin)
+    //console.log('inicio ', contrato_inicio)
+    //console.log('fin ', contrato_fin)
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
-    if ((Date.parse(contrato_inicio) <= Date.parse(registro_inicio)) &&
-      (Date.parse(contrato_fin) >= Date.parse(registro_fin))) {
-      if (Date.parse(registro_inicio) < Date.parse(registro_fin)) {
+    if ((contrato_inicio <= registro_inicio) &&
+      (contrato_fin >= registro_fin)) {
+      if (registro_inicio < registro_fin) {
         this.RegistrarCargo(form);
       }
       else {
@@ -283,7 +282,7 @@ export class EmplCargosComponent implements OnInit {
       });
       this.VerificarAsignaciones(form);
       this.CambiarEstado();
-      this.CerrarVentana();
+      this.CerrarVentana(2);
     });
   }
 
@@ -332,9 +331,13 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO PARA CERRAR VENTANA DE REGISTRO
-  CerrarVentana() {
+  CerrarVentana(opcion: any) {
     this.LimpiarCampos();
-    this.ventana.close();
+    this.ventana.ver_contrato_cargo = true;
+    this.ventana.crear_cargo = false;
+    if (opcion === 2) {
+      this.ventana.VerDatosActuales(this.ventana.formato_fecha);
+    }
   }
 
   // METODO PARA VALIDAR INGRESO DE HORAS
@@ -403,7 +406,7 @@ export class EmplCargosComponent implements OnInit {
           principal_true = a.id;
         }
       })
-      
+
       console.log('ver datos ', principal_false, ' true ', principal_true)
       if (principal_false != 0) {
         this.EliminarAsignacion(principal_true);

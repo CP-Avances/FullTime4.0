@@ -1,36 +1,35 @@
-<div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
-        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+<mat-card class="mat-elevation-z8">
+    <div id="titulo" class="row w-100 m-auto">
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+        </div>
+        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+            <span>
+                REGISTRAR CONTRATO {{empleados.nombre_}}
+            </span>
+        </div>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)" matSuffix matTooltipPosition="right"
+                matTooltip="Salir">
+                highlight_off
+            </mat-icon>
+        </div>
     </div>
-    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
-        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-            REGISTRAR CONTRATO {{empleados.nombre_}}
-        </span>
-    </div>
-    <div class="col-2 col-md-2 mb-2 mb-md-0">
-        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()" matSuffix matTooltipPosition="right"
-        matTooltip="Salir">
-            highlight_off
-        </mat-icon>
-    </div>
-</div>
-
-<div>
-    <!-- FORMULARIO COMPLETO -->
-    <mat-card-content>
-        <div class="container" style="text-align: center">
-            <div class="nota" style="text-align: justify;">
-                <span>
-                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                    Guardar.
-                </span>
-            </div>
-            <span class="nota">Desea subir un archivo (opcional) </span>
-            <mat-slide-toggle [(ngModel)]="isChecked"></mat-slide-toggle>
-            <form [formGroup]="formulario">
-                <div class="row mt-0 mb-0">
-                    <div class="col-12 col-md-6 mt-0 mb-0">
-                        <mat-form-field>
+    <div>
+        <!-- FORMULARIO COMPLETO -->
+        <mat-card-content>
+            <div class="container" style="text-align: center">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
+                </div>
+                <span class="nota">Desea subir un archivo (opcional)</span>
+                <mat-slide-toggle [(ngModel)]="isChecked"></mat-slide-toggle>
+                <form [formGroup]="formulario">
+                    <div class="row mt-0 mb-0">
+                        <div class="col-12 col-md-6 mt-0 mb-0">
+                            <mat-form-field>
                                 <mat-label>Seleccionar país</mat-label>
                                 <input type="text" placeholder="Ingresar nombre" aria-label="Number" matInput
                                     [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
@@ -44,10 +43,10 @@
                                     matTooltip="Seleccionar uno de los paises de la lista.">
                                     help_outline
                                 </mat-icon>
-                        </mat-form-field>
-                    </div> 
-                    <div class="col-12 col-md-6 mt-0 mb-0">
-                        <mat-form-field>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-md-6 mt-0 mb-0">
+                            <mat-form-field>
                                 <mat-label>Régimen Laboral</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccionar Régimen Laboral con el cual va a prestar sus servicios el empleado.">
@@ -58,12 +57,12 @@
                                         {{regimen.descripcion}}
                                     </mat-option>
                                 </mat-select>
-                        </mat-form-field>
-                    </div> 
-                </div> 
-                <div class="row mt-0 mb-0">
-                    <div class="col-12 col-md-6">
-                        <mat-form-field *ngIf="habilitarSeleccion">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row mt-0 mb-0">
+                        <div class="col-12 col-md-6">
+                            <mat-form-field *ngIf="habilitarSeleccion">
                                 <mat-label>Modalidad Laboral</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
@@ -75,10 +74,10 @@
                                         {{tc.descripcion}}
                                     </mat-option>
                                 </mat-select>
-                        </mat-form-field>
-                    </div> 
-                    <div class="col-12 col-md-6">
-                        <mat-form-field *ngIf="habilitarContrato">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <mat-form-field *ngIf="habilitarContrato">
                                 <mat-label>Tipo Contrato</mat-label>
                                 <input matInput placeholder="Ej: Indefinido" [formControl]="contratoF">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -87,13 +86,13 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-error *ngIf="contratoF.invalid">Ingresar un tipo de contrato válido</mat-error>
-                        </mat-form-field>
-                    </div>     
-                </div>
+                            </mat-form-field>
+                        </div>
+                    </div>
 
-                <div class="row mt-0 mb-0">
-                    <div class="col-12 col-md-6 mt-0 mb-0">
-                        <mat-form-field id="fecha">
+                    <div class="row mt-0 mb-0">
+                        <div class="col-12 col-md-6 mt-0 mb-0">
+                            <mat-form-field id="fecha">
                                 <mat-label>Fecha de ingreso</mat-label>
                                 <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                     [formControl]="fechaIngresoF" required>
@@ -101,10 +100,10 @@
                                     matTooltip="Ingresar la fecha de ingreso del empleado a la empresa. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker></mat-datepicker>
-                        </mat-form-field>
-                    </div>   
-                    <div class="col-12 col-md-6 mt-0 mb-0">
-                        <mat-form-field id="fecha">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-md-6 mt-0 mb-0">
+                            <mat-form-field id="fecha">
                                 <mat-label>Fecha de salida</mat-label>
                                 <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
                                     [formControl]="fechaSalidaF" required>
@@ -113,84 +112,86 @@
                                     matTooltip="Ingresar la fecha estimada de salida del empleado, en caso de conocerla. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker2></mat-datepicker>
-                        </mat-form-field>
+                            </mat-form-field>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row mt-0 mb-0">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <label
-                                style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
-                                Controlar asistencia *
-                            </label>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
-                            <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
-                                [value]="controlAsistenciaF.value" required>
-                                <div class="d-flex justify-content-around">
-                                    <mat-radio-button value="true">
-                                        <label id="textoradiobtn">Si</label>
-                                    </mat-radio-button>
-                                    <mat-radio-button value="false">
-                                        <label id="textoradiobtn">No</label>
-                                    </mat-radio-button>
-                                </div>
-                            </mat-radio-group>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <label
-                                style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
-                                Controlar vacaciones *
-                            </label>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
-                            <mat-radio-group aria-label="Select an option" [formControl]="controlVacacionesF"
-                                [value]="controlVacacionesF.value" required>
-                                <div class="d-flex justify-content-around">
-                                    <mat-radio-button matSuffix matTooltipPosition="right"
-                                        matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                        value="true">
-                                        <label id="textoradiobtn">Si</label>
-                                    </mat-radio-button>
-                                    <mat-radio-button matSuffix matTooltipPosition="right"
-                                        matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                        value="false">
-                                        <label id="textoradiobtn">No</label>
-                                    </mat-radio-button>
-                                </div>
-                            </mat-radio-group>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-around" *ngIf="isChecked">
-                            <div class="separar">
-                                <form method="post" enctype="multipart/form-data">
-                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
-                                        id="file">
-                                    <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Subir el repectivo documento contrato del empleado">
-                                        Subir Contrato
-                                    </label>
-                                </form>
+                    <div class="row mt-0 mb-0">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <label
+                                    style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
+                                    Controlar asistencia *
+                                </label>
                             </div>
-                            <div class="separar">
-                                <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado"
-                                    class="form-control" style="width: 200px;" [formControl]="documentoF">
-                                <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
-                                    id="i-cursor" (click)="QuitarArchivo()" matSuffix matTooltipPosition="right"
-                                    matTooltip="Eliminar archivo seleccionado.">
-                                </i>
+                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
+                                <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
+                                    [value]="controlAsistenciaF.value" required>
+                                    <div class="d-flex justify-content-around">
+                                        <mat-radio-button value="true">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button value="false">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <label
+                                    style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
+                                    Controlar vacaciones *
+                                </label>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
+                                <mat-radio-group aria-label="Select an option" [formControl]="controlVacacionesF"
+                                    [value]="controlVacacionesF.value" required>
+                                    <div class="d-flex justify-content-around">
+                                        <mat-radio-button matSuffix matTooltipPosition="right"
+                                            matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                            value="true">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button matSuffix matTooltipPosition="right"
+                                            matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                            value="false">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-around" *ngIf="isChecked">
+                                <div class="separar">
+                                    <form method="post" enctype="multipart/form-data">
+                                        <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                                            id="file">
+                                        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Subir el repectivo documento contrato del empleado">
+                                            Subir Contrato
+                                        </label>
+                                    </form>
+                                </div>
+                                <div class="separar">
+                                    <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado"
+                                        class="form-control" style="width: 200px;" [formControl]="documentoF">
+                                    <i *ngIf="HabilitarBtn" class="far fa-trash-alt"
+                                        style="color:red; margin-left: 5px;" id="i-cursor" (click)="QuitarArchivo()"
+                                        matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar archivo seleccionado.">
+                                    </i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+        </mat-card-content>
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 1%;">
+            <mat-card-actions style="text-align: center">
+                <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
+                    (click)="ValidarDatosContrato(formulario.value)" value="Guardar">Guardar</button>
+            </mat-card-actions>
         </div>
-    </mat-card-content>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 1%;">
-        <mat-card-actions style="text-align: center">
-            <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
-                (click)="ValidarDatosContrato(formulario.value)" value="Guardar">Guardar</button>
-        </mat-card-actions>
     </div>
-</div>
+</mat-card>

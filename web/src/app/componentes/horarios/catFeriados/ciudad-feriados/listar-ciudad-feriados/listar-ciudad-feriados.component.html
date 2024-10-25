@@ -2,17 +2,27 @@
 <div *ngIf="ver_lista">
     <div class="container" *ngFor="let f of datosFeriado" style="padding-top: 15px;">
         <mat-card class="example-card mat-elevation-z8">
-            <div id="titulo">
-                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-6 col-md-3 mb-2 mb-md-0 order-2 order-md-2">  
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
                     (click)="CerrarPantalla()">
-                    Listar feriados
-                </button>
-                <span>{{f.descripcion.toUpperCase()}}</span>
-                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                    (click)="AbrirVentanaEditarFeriado(f)" *ngIf="">
-                    Editar
-                </button>
+                        Listar feriados
+                    </button>
+                </div>
+                <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        {{f.descripcion.toUpperCase()}}
+                    </span>
+                </div>
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    (click)="AbrirVentanaEditarFeriado(f)">
+                        Editar
+                    </button>
+                </div>
             </div>
+
             <mat-card-content>
                 <div class="container" style="padding-top: 15px;">
                     <div class="row ml-2">
@@ -32,24 +42,34 @@
                 </div>
                 <hr>
                 <div class="container w-100" style="padding-bottom: 15px;">
-                    <div class="d-flex bd-highlight" id="titulo">
-                        <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+
+                    <div id="titulo" class="row w-100 m-auto">
+                        <div class="col-3 col-md-1 mb-2 mb-md-0 order-2 order-md-2">  
+                            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
                             matTooltipPosition="right" matTooltip="Elimar múltiples registros." id="SelectCheck">
-                            library_add_check
-                        </mat-icon>
-                        <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                                library_add_check
+                            </mat-icon>
+                        </div>
+                        <div class="col-3 col-md-2 mb-2 mb-md-0 order-2 order-md-2"> 
+                            <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
                             style="float: left; margin-left: 10px;" (click)="ConfirmarProceso(selection.selected, 2)">
-                            Eliminar
-                        </button>
-                        <span class="w-100 bd-highlight">
-                            FERIADO APLICA
-                        </span>
-                        <mat-icon style="float: right; margin-right: 12px; color: white;"
+                                Eliminar
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>
+                                FERIADO APLICA
+                            </span>
+                        </div>
+                        <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                            <mat-icon style="float: right; margin-right: 12px; color: white;"
                             (click)="ListarCiudadesFeriados(idFeriado)" matSuffix matTooltipPosition="right"
                             matTooltip="Actualizar registros." id="i-cursor">
-                            autorenew
-                        </mat-icon>
+                                autorenew
+                            </mat-icon>
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="mat-elevation-z8 table table-hover table-sm">
                             <thead class="thead-light">

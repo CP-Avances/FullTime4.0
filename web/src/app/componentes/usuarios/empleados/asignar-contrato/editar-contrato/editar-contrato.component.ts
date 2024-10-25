@@ -3,13 +3,14 @@ import { Component, OnInit, Input } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-contrato',
@@ -69,6 +70,7 @@ export class EditarContratoComponent implements OnInit {
 
   constructor(
     public componentev: VerEmpleadoComponent,
+    public validar: ValidacionesService,
     public pais: ProvinciaService,
     private rest: EmpleadoService,
     private toastr: ToastrService,
@@ -252,8 +254,9 @@ export class EditarContratoComponent implements OnInit {
     console.log('datos fin ', moment(datos.fec_salida).format('YYYY-MM-DD'))
     console.log('contrato inicio ', moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD'))
     console.log('contrato fin ', moment(this.contrato.fecha_salida).format('YYYY-MM-DD'))*/
-    if (moment(datos.fec_ingreso).format('YYYY-MM-DD') === moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD') &&
-      moment(datos.fec_salida).format('YYYY-MM-DD') === moment(this.contrato.fecha_salida).format('YYYY-MM-DD')) {
+
+    if (DateTime.fromISO(datos.fec_ingreso).hasSame(DateTime.fromISO(this.contrato.fecha_ingreso), 'day') &&
+      DateTime.fromISO(datos.fec_salida).hasSame(DateTime.fromISO(this.contrato.fecha_salida), 'day')) {
       this.VerificarInformacion(datos, form);
     }
     else {
@@ -296,10 +299,10 @@ export class EditarContratoComponent implements OnInit {
     }
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
+      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = String(moment(this.revisarFecha[i].fecha_salida, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd');
         if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
@@ -476,6 +479,7 @@ export class EditarContratoComponent implements OnInit {
 
   // CERRAR VENTA DE REGISTRO
   Cancelar(opcion: any) {
+    this.componentev.ver_contrato_cargo = true;
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_contrato = false;
       if (opcion === 2) {

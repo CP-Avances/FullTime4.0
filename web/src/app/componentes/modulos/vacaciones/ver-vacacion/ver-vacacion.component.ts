@@ -2,9 +2,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { DateTime } from 'luxon';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
@@ -70,7 +71,7 @@ export class VerVacacionComponent implements OnInit {
     this.id_vacacion = this.router.url.split('/')[2];
   }
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.BuscarParametro();
   }
 
@@ -86,11 +87,11 @@ export class VerVacacionComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
-    var f = moment();
-    this.fechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.fechaActual = f.toFormat('yyyy-MM-dd');
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
@@ -124,14 +125,14 @@ export class VerVacacionComponent implements OnInit {
       this.ObtenerAutorizacion(this.vacacion[0].id);
       this.vacacion.forEach(v => {
         // TRATAMIENTO DE FECHAS Y HORAS 
-        v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
-        v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
-        v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
+        v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       })
 
-      if(this.vacacion[0].estado > 1){
+      if (this.vacacion[0].estado > 1) {
         this.estado = true;
-      }else{
+      } else {
         this.estado = false;
       }
 
@@ -177,19 +178,19 @@ export class VerVacacionComponent implements OnInit {
             estado: this.estado_auto
           }
 
-          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+          if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
             //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.filter(item => {
-                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                if ((this.idEmpleado == item.id_contrato) && (autorizaciones.length == item.nivel)) {
                   return this.ocultar = false;
-                }else{
+                } else {
                   return this.ocultar = true;
                 }
               })
             });
-          }else{
+          } else {
             this.ocultar = true;
           }
 
@@ -199,14 +200,14 @@ export class VerVacacionComponent implements OnInit {
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
-        }else{
+        } else {
           //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
-              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+              if ((this.idEmpleado == item.id_contrato) && (autorizaciones.length == item.nivel)) {
                 return this.ocultar = false;
-              } 
+              }
             })
           });
         }
@@ -272,12 +273,12 @@ export class VerVacacionComponent implements OnInit {
       this.datoSolicitud = data;
       // BUSQUEDA DE DATOS DE EMPRESA
       this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-        var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
+        var fecha_inicio = DateTime.fromISO(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
         console.log(fecha_inicio.diff(this.fechaActual, 'days'), ' dias de diferencia ' + res[0].dias_cambio);
-        if(this.vacacion[0].estado > 2){
+        if (this.vacacion[0].estado > 2) {
           this.habilitarActualizar = false;
-        }else{
+        } else {
           if (res[0].cambios === true) {
             if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
@@ -345,19 +346,19 @@ export class VerVacacionComponent implements OnInit {
 
     let cont1 = 1;
     //Filtar el array empleado_estado para dividir en otros arrays para firmar
-      this.empleado_estado.filter(item =>{
-        if(cont1 < 4){
-          this.fila1firmas.push(item);
-          return cont1 = cont1 + 1;
-        }else{
-          this.fila2firmas.push(item);
-        }
-      });
+    this.empleado_estado.filter(item => {
+      if (cont1 < 4) {
+        this.fila1firmas.push(item);
+        return cont1 = cont1 + 1;
+      } else {
+        this.fila2firmas.push(item);
+      }
+    });
 
 
-    if(this.fila2firmas.length == 0){
+    if (this.fila2firmas.length == 0) {
       this.fila1firmas.push(firmaEmple);
-    }else{
+    } else {
       this.fila2firmas.push(firmaEmple);
     }
 
@@ -369,9 +370,9 @@ export class VerVacacionComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -403,10 +404,10 @@ export class VerVacacionComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-    let fecha = this.validar.FormatearFecha(this.fechaActual, this.formato_fecha, this.validar.dia_completo);
-    let fec_ingreso_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_ingreso.split('T')[0], this.formato_fecha, this.validar.dia_completo);
-    let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo);
-    let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo);
+    let fecha = this.validar.FormatearFecha(this.fechaActual, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let fec_ingreso_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_ingreso.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     return {
       table: {
@@ -525,15 +526,15 @@ export class VerVacacionComponent implements OnInit {
                       table: {
                         widths: ['auto'],
                         body: [
-                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA' },],
                           [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
                         ]
                       }
                     },
-                    { width: '*', text: ''},
+                    { width: '*', text: '' },
                   ]
-                } 
+                }
               })
             ],
           }],
@@ -549,13 +550,13 @@ export class VerVacacionComponent implements OnInit {
                       table: {
                         widths: ['auto'],
                         body: [
-                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA' },],
                           [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
                         ]
                       }
                     },
-                  { width: '*', text: ''},
+                    { width: '*', text: '' },
                   ]
                 }
               })

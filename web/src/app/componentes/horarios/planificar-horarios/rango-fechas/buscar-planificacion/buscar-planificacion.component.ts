@@ -4,8 +4,7 @@ import { FormControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Component, Input } from '@angular/core';
-import { default as _rollupMoment, Moment } from 'moment';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
@@ -74,20 +73,26 @@ export class BuscarPlanificacionComponent {
 
   fecHorario: boolean = true;
   // METODO PARA MOSTRAR FECHA SELECCIONADA
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
-    const ctrlValue = fecha;
+  FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
+    console.log()
+    const ctrlValue = fecha.toDate();
+
+    const dateLuxon = DateTime.fromJSDate(ctrlValue);
+    console.log("ver opciones: ", opcion)
+
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
-        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
+        this.ValidarFechas(dateLuxon, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = moment(ctrlValue).format('01/MM/YYYY');
-        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+        let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+        console.log("ver inicio opcion 1: ", inicio)
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
+      this.ValidarFechas(this.fechaInicialF.value, dateLuxon, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }
@@ -95,17 +100,30 @@ export class BuscarPlanificacionComponent {
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = moment(fec_inicio).format('01/MM/YYYY');
-    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    let inicio = DateTime.fromJSDate(fec_inicio).set({ day: 1 }).toFormat('dd/MM/yyyy');
+    console.log("ver fecha_fin: ", fec_fin)
+    console.log("ver formulario: ", formulario)
+    console.log("ver opcion: ", opcion)
+    
+    const lastDayOfMonth = fec_fin.endOf('month').day;
+    const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
+
+    let final = formattedDate;
+    console.log("ver inicio: ", inicio)
+    console.log("ver final: ", final)
+
+    let feci =  DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let fecf =  DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+
     // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
+
+    console.log("ver Date.parse(feci) ", Date.parse(feci))
     if (Date.parse(feci) <= Date.parse(fecf)) {
       if (opcion === 1) {
-        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+        formulario.setValue( DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       else {
-        formulario.setValue(moment(final, 'DD/MM/YYYY'));
+        formulario.setValue( DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
       }
     }
     else {
@@ -113,6 +131,7 @@ export class BuscarPlanificacionComponent {
         timeOut: 6000,
       });
     }
+    console.log("ver fecha final: ", this.fechaFinalF.value)
   }
 
   // METODO PARA VER PLANIFICACION
@@ -136,8 +155,10 @@ export class BuscarPlanificacionComponent {
       this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1, id_empleado);
     }
     else {
-      let inicio = moment().format('YYYY/MM/01');
-      let final = moment().format('YYYY/MM/') + moment().daysInMonth();
+      const ahora = DateTime.now();
+
+      let inicio = ahora.toFormat('yyyy/MM/01');
+      let final = `${ahora.toFormat('yyyy/MM/')}${ahora.daysInMonth}`;
       this.ObtenerHorariosEmpleado(inicio, final, 2, id_empleado);
     }
   }
@@ -152,8 +173,8 @@ export class BuscarPlanificacionComponent {
     this.columnAccion = true;
     this.horariosEmpleado = [];
     if (opcion === 1) {
-      this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
-      this.mes_fin = fec_final.format("YYYY-MM-DD");
+      this.mes_inicio = DateTime.fromJSDate(fec_inicio).toFormat('yyyy-MM-dd');
+      this.mes_fin = DateTime.fromJSDate(fec_final).toFormat('yyyy-MM-dd');
     }
     else {
       this.mes_inicio = fec_inicio;
@@ -487,10 +508,12 @@ export class BuscarPlanificacionComponent {
   datos_editar: any = [];
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
     let fecha = anio + '-' + mes + '-' + dia;
-    let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
-    let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
+    console.log("fecha en AbrirEditarHorario", fecha);
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy/MM/dd');
+    let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid();
     // VERIFICAR QUE EL DIA SEA VALIDO
     if (verificar === true) {
+      console.log("entra a valido")
       this.horariosEmpleado[index].color = 'ok';
       this.horariosEmpleado[index].seleccionado = dia;
       this.datos_editar = {

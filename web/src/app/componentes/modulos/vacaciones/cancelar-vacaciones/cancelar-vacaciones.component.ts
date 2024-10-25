@@ -51,7 +51,7 @@ export class CancelarVacacionesComponent implements OnInit {
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -128,8 +128,8 @@ export class CancelarVacacionesComponent implements OnInit {
       cont = cont + 1;
 
       // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
       // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
       if (vacacion.estado === 1) {
@@ -195,8 +195,8 @@ export class CancelarVacacionesComponent implements OnInit {
   EnviarNotificacion(vacaciones: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let notificacion = {
       id_send_empl: this.idEmpleadoIngresa,
@@ -217,10 +217,9 @@ export class CancelarVacacionesComponent implements OnInit {
     var allNotificaciones: any = [];
 
     //Ciclo por cada elemento del catalogo
-    vacaciones.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    vacaciones.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
@@ -230,7 +229,7 @@ export class CancelarVacacionesComponent implements OnInit {
     allNotificaciones.forEach(e => {
       notificacion.id_receives_depa = e.id_dep;
       notificacion.id_receives_empl = e.empleado;
-      console.log("Empleados enviados: ",allNotificaciones);
+      console.log("Empleados enviados: ", allNotificaciones);
       if (e.vaca_noti) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {

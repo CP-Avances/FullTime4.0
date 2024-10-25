@@ -5,11 +5,12 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
+import { DateTime } from 'luxon';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
+
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 import { BarChart } from 'echarts/charts';
@@ -185,12 +186,9 @@ export class RetrasosMacroComponent implements OnInit {
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
-
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -249,7 +247,7 @@ export class RetrasosMacroComponent implements OnInit {
       }
     }
 
-    var other : any= [];
+    var other: any = [];
 
     switch (colums.length) {
       case 2: other = ['auto', 40]; break;

@@ -176,9 +176,10 @@
             <div class="container" style="padding-bottom: 20px;" *ngIf="ver_formulario">
                 <div class="nota" id="espacio" style="text-align: justify;">
 
-                    <!-- CONTENIDO PERMITIR TIMBRE UBICACION DESCONOCIDA (5) -->
-                    <span *ngIf="ubicacion_desconocida">
-                        NOTA: Permitir al usuario timbrar en una ubicación diferente a las configuradas en el sistema.
+                    <!-- CONTENIDO USAR SEGUNDOS EN LOS TIMBRES (5) -->
+                    <span *ngIf="segundos_timbres">
+                        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
+                        cálculos referentes a la asistencia.
                     </span>
 
                     <!-- CONTENIDO INDICAR USO DE CERTIFICADOS SSL (7) -->
@@ -189,12 +190,6 @@
                     <!-- CONTENIDO INDICAR ENVIO DE MENSAJES DE CUMPLEAÑOS (8) -->
                     <span *ngIf="cumpleanios">
                         NOTA: Enviar mensajes de felicitaciones de cumpleaños de los colaboradores.
-                    </span>
-
-                    <!-- CONTENIDO USAR SEGUNDOS EN LOS TIMBRES (9) -->
-                    <span *ngIf="segundos_timbres">
-                        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
-                        cálculos referentes a la asistencia.
                     </span>
 
                     <!-- CONTENIDO USAR CONECTIVIDAD INTERNET (13) -->
@@ -208,7 +203,7 @@
                     </span>
 
                     <!-- CONTENIDO CAPTURAR FOTO EN APP WEB (15) -->
-                    <span *ngIf="ubicacion_desconocida">
+                    <span *ngIf="foto_web">
                         NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación web.
                     </span>
                 </div>

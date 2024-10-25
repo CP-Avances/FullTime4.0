@@ -1,6 +1,15 @@
-<div id="titulo">
-    <span>MODIFICAR DATOS DEL USUARIO</span>
-    <mat-icon class="float-right" id="cerrar" (click)="Cancelar()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            MODIFICAR DATOS DEL USUARIO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="Cancelar()">highlight_off</mat-icon>
+    </div>
 </div>
 <div>
     <mat-horizontal-stepper [linear]="isLinear" #stepper>
@@ -177,7 +186,7 @@
                                 </mat-select>
                             </mat-form-field>
                             <mat-form-field>
-                                <input type="text" placeholder="Nacionalidad" aria-label="Number" matInput
+                                <input type="text" placeholder="Nacionalidad*" aria-label="Number" matInput
                                     [formControl]="NacionalidadControl" [matAutocomplete]="auto" required>
                                 <mat-autocomplete #auto="matAutocomplete">
                                     <mat-option *ngFor="let option of filteredOptions | async" [value]="option.nombre">
@@ -200,7 +209,8 @@
             <form [formGroup]="terceroFormGroup">
                 <ng-template matStepLabel>
                     <mat-icon id="seccion_emple" matSuffix matTooltipPosition="right"
-                        matTooltip="Sección 3: Datos de Usuario">insert_emoticon
+                        matTooltip="Sección 3: Datos de Usuario">
+                        insert_emoticon
                     </mat-icon>
                 </ng-template>
                 <div class="subtitulo">

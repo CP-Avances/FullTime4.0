@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
+
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-reporte-kardex',
@@ -24,6 +26,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
   ]
 })
+
 export class ReporteKardexComponent implements OnInit {
 
   empleados: any = [];
@@ -292,7 +295,7 @@ export class ReporteKardexComponent implements OnInit {
             {
               border: [true, true, false, true],
               bold: true,
-              text: 'PERIODO DEL: ' + String(moment(this.f_inicio_reqK, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment(this.f_final_reqK, "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: 'PERIODO DEL: ' + DateTime.fromFormat(this.f_inicio_reqK, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(this.f_final_reqK, 'yyyy/MM/dd').toFormat('dd/MM/yyyy'),
               style: 'itemsTableInfo'
             },
             {
@@ -326,7 +329,7 @@ export class ReporteKardexComponent implements OnInit {
           [
             {
               border: [true, false, false, true],
-              text: 'F.INGRESO: ' + String(moment(e.fec_ingreso.split('T')[0], "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: 'F.INGRESO: ' + DateTime.fromFormat(e.fec_ingreso.split('T')[0], 'yyyy/MM/dd').toFormat('dd/MM/yyyy'),
               style: 'itemsTableInfo',
             },
             {
@@ -342,7 +345,7 @@ export class ReporteKardexComponent implements OnInit {
           [
             {
               border: [true, true, false, true],
-              text: 'F.CARGA: ' + String(moment(e.fec_carga.split('T')[0], "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: 'F.CARGA: ' + DateTime.fromFormat(e.fec_carga.split('T')[0], 'yyyy/MM/dd').toFormat('dd/MM/yyyy'),
               style: 'itemsTableInfo',
             },
             {

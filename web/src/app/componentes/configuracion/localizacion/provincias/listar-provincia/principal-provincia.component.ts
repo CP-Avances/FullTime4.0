@@ -3,9 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -208,9 +208,9 @@ export class PrincipalProvinciaComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -229,25 +229,21 @@ export class PrincipalProvinciaComponent implements OnInit {
         };
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        {
-          text: "Lista de Provincias",
-          bold: true,
-          fontSize: 20,
-          alignment: "center",
-          margin: [0, -30, 0, 10],
-        },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE PROVINCIAS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.presentarDataPDFProvincias(),
       ],
       styles: {
         tableHeader: {
-          fontSize: 12,
+          fontSize: 9,
           bold: true,
           alignment: "center",
           fillColor: this.p_color,
         },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: "center" },
+        itemsTable: { fontSize: 8 },
+        itemsTableC: { fontSize: 8, alignment: "center" },
+        tableMargin: { margin: [0, 5, 0, 0] },
       },
     };
   }
@@ -258,12 +254,13 @@ export class PrincipalProvinciaComponent implements OnInit {
         { width: "*", text: "" },
         {
           width: "auto",
+          style: 'tableMargin',
           table: {
             widths: ["auto", "auto"],
             body: [
               [
-                { text: "País", style: "tableHeader" },
-                { text: "Provincias", style: "tableHeader" },
+                { text: "PAÍS", style: "tableHeader" },
+                { text: "PROVINCIAS", style: "tableHeader" },
               ],
               ...this.provincias.map((obj: any) => {
                 return [
@@ -493,7 +490,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
   }
 
-// METODO PARA ELIMINAR DE MANERA MULTIPLE
+  // METODO PARA ELIMINAR DE MANERA MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {

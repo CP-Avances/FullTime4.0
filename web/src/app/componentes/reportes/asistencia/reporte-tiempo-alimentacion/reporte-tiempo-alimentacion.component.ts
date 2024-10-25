@@ -4,9 +4,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -125,7 +125,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -144,22 +143,25 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -336,9 +338,9 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        let f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        let time = f.format('HH:mm:ss');
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -367,9 +369,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       styles: {
         derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 1, 0, 1], },
-        itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         itemsTableCentradoFT: { fontSize: 8, alignment: 'center', fillColor: '#EE4444' },
@@ -377,15 +377,12 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         itemsTableCentradoColores: { fontSize: 9, alignment: 'center' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color },
-        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginColores: { margin: [0, 15, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
         tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
         tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
-        quote: { margin: [5, -2, 0, -2], italics: true },
-        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
@@ -570,7 +567,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                 { text: 'M. EXCESO', style: 'tableHeader' },
               ],
               ...empl.alimentacion.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const fecha = this.validar.FormatearFecha(usu.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 const inicioAlimentacion = usu.inicioAlimentacion.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
                   : 'FT';
@@ -722,7 +719,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((info: any) => {
       info.empleados.forEach((usu: any) => {
         usu.alimentacion.forEach((a: any) => {
-          const fecha = this.validar.FormatearFecha(a.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          const fecha = this.validar.FormatearFecha(a.inicioAlimentacion.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           const inicioAlimentacion = a.inicioAlimentacion.fecha_hora_timbre != null
             ? this.validar.FormatearHora(a.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';

@@ -5,17 +5,14 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { DateTime } from 'luxon';
 
-// LIBRERÍA FORMATO DE FECHAS
-import * as moment from 'moment';
-moment.locale('es');
-
-// LIBRERÍA PARA GENERAR ARCHIVOS PDF
+// LIBRERIA PARA GENERAR ARCHIVOS PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-// LIBRERÍA PARA GENERAR ARCHIVOS EXCEL
+// LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
 // IMPORTACION DE SERVICIOS
@@ -113,8 +110,8 @@ export class AlimentosInvitadosComponent implements OnInit {
         fec_inicio: form.inicioForm,
         fec_final: form.finalForm
       }
-      this.inicio = moment(form.inicioForm).format('YYYY-MM-DD');
-      this.fin = moment(form.finalForm).format('YYYY-MM-DD');
+      this.inicio = DateTime.fromISO(form.inicioForm).toFormat('yyyy-MM-dd');
+      this.fin = DateTime.fromISO(form.finalForm).toFormat('yyyy-MM-dd');
       this.invitados = [];
       // BUSQUEDA DE DATOS DE SERVICIOS DE INVITADOS
       this.restA.ObtenerDetallesInvitados(fechas).subscribe(plan => {
@@ -129,7 +126,7 @@ export class AlimentosInvitadosComponent implements OnInit {
           this.generarPdf('open');
           this.LimpiarFechas();
         });
-       // return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        // return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
     }
     else {
@@ -191,9 +188,9 @@ export class AlimentosInvitadosComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -396,9 +393,9 @@ export class AlimentosInvitadosComponent implements OnInit {
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -453,7 +450,7 @@ export class AlimentosInvitadosComponent implements OnInit {
     }));
     if (this.invitados.length != 0) {
       const header = Object.keys(this.invitados[0]); // COLUMNS NAME
-      var wscols : any = [];
+      var wscols: any = [];
       for (var i = 0; i < header.length; i++) {  // COLUMNS LENGTH ADDED
         wscols.push({ wpx: 110 })
       }
@@ -464,7 +461,7 @@ export class AlimentosInvitadosComponent implements OnInit {
     if (this.invitados.length != 0) {
       xlsx.utils.book_append_sheet(wb, wsp, 'Alimentos Invitados');
     }
-    xlsx.writeFile(wb, "Alimentacion - " + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' - ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + '.xlsx');
+    xlsx.writeFile(wb, "Alimentacion - " + DateTime.fromFormat(form.inicioForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy") + ' - ' + DateTime.fromFormat(form.finalForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy") + '.xlsx');
   }
 
 }

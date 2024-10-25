@@ -7,7 +7,6 @@ import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.s
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-autoriza-solicitud',
@@ -56,29 +55,28 @@ export class AutorizaSolicitudComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        this.MostrarDatos(fecha);
-      },
-      vacio => {
-        this.MostrarDatos(fecha);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.MostrarDatos(this.formato_fecha);
+      }, vacio => {
+        this.MostrarDatos(this.formato_fecha)
       });
   }
 
@@ -89,7 +87,7 @@ export class AutorizaSolicitudComponent implements OnInit {
     else {
       this.individual = true;
       var info = this.data.datosMultiple;
-      info.fecha_comida_ = this.validar.FormatearFecha(info.fec_comida, formato_fecha, this.validar.dia_completo);
+      info.fecha_comida_ = this.validar.FormatearFecha(info.fec_comida, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       info.hora_inicio_ = this.validar.FormatearHora(info.hora_inicio, this.formato_hora);
       info.hora_fin_ = this.validar.FormatearHora(info.hora_fin, this.formato_hora);
 
@@ -260,7 +258,7 @@ export class AutorizaSolicitudComponent implements OnInit {
     var correo_usuarios = '';
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -326,7 +324,7 @@ export class AutorizaSolicitudComponent implements OnInit {
   NotificarEvento(alimentacion: any, estado_a: string) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let desde = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let inicio = this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora);
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
@@ -347,10 +345,9 @@ export class AutorizaSolicitudComponent implements OnInit {
     //Listado para eliminar el usuario duplicado
     var allNotificaciones: any = [];
     //Ciclo por cada elemento del catalogo
-    alimentacion.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }

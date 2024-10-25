@@ -2,16 +2,15 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { use } from 'echarts';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 @Component({
   selector: 'app-tiempo-autorizado',
@@ -52,7 +51,7 @@ export class TiempoAutorizadoComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  public autorizacion: any []
+  public autorizacion: any[]
   public lectura: any;
   public estado_auto: any;
   public empleado_estado: any = [];
@@ -80,7 +79,6 @@ export class TiempoAutorizadoComponent implements OnInit {
     this.obtenerInformacionEmpleado();
     this.MostrarProceso();
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   /** **************************************************************************************** **
@@ -91,15 +89,26 @@ export class TiempoAutorizadoComponent implements OnInit {
   formato_hora: string = 'HH:mm:ss';
   autorizaDirecto: boolean = false;
   InfoListaAutoriza: any = [];
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      }
-    );
-
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+      });
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
@@ -110,25 +119,25 @@ export class TiempoAutorizadoComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nombre == 'GERENCIA' && x.estado == true){
+          if (x.nombre == 'GERENCIA' && x.estado == true) {
             this.gerencia = true;
             this.autorizaDirecto = false;
             this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
+            if (x.autorizar == true) {
               this.ocultarAu = false;
               this.ocultarPre = true;
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.ocultarAu = true;
               this.ocultarPre = false;
             }
           }
-          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+          else if ((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)) {
             this.autorizaDirecto = true;
             this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
+            if (x.autorizar == true) {
               this.ocultarAu = false;
               this.ocultarPre = true;
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.ocultarAu = true;
               this.ocultarPre = false;
             }
@@ -136,14 +145,6 @@ export class TiempoAutorizadoComponent implements OnInit {
         });
       }
     );
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-      });
   }
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
@@ -287,21 +288,21 @@ export class TiempoAutorizadoComponent implements OnInit {
   /** ******************************************************************************************* **
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
    ** ******************************************************************************************* **/
-   listadoDepaAutoriza: any = [];
-   id_departamento: any;
+  listadoDepaAutoriza: any = [];
+  id_departamento: any;
   // METODO PARA ENVIAR NOTIFICACIONES DE CORREO
   ConfiguracionCorreo(horaExtra: any, estado_h: string, estado_c: string, valor: any, estado_n: string) {
     console.log('ver horas extras ....   ', horaExtra)
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     this.id_departamento = this.solInfo.id_dep;
     this.lectura = 1;
     this.restA.getUnaAutorizacionByHoraExtraRest(this.data.horaExtra.id).subscribe(res1 => {
       this.autorizacion = res1;
-      console.log('this.autorizacion: ',this.autorizacion);
+      console.log('this.autorizacion: ', this.autorizacion);
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
@@ -327,51 +328,51 @@ export class TiempoAutorizadoComponent implements OnInit {
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
-            if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
                 this.listadoDepaAutoriza = res;
                 this.listadoDepaAutoriza.filter(item => {
-                  if((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)){
+                  if ((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)) {
                     return this.listaEnvioCorreo.push(item);
-                  }else if((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))){
+                  } else if ((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))) {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-                console.log('this.listaEnvioCorreo1: ',this.listaEnvioCorreo);
+                console.log('this.listaEnvioCorreo1: ', this.listaEnvioCorreo);
                 this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
               });
-            }else if(this.estado_auto > 2){
+            } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
                 this.listadoDepaAutoriza = res;
                 this.listadoDepaAutoriza.filter(item => {
-                  if((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)){
+                  if ((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)) {
                     this.autorizaDirecto = false;
                     return this.listaEnvioCorreo.push(item);
-                  }else{
+                  } else {
                     this.autorizaDirecto = true;
                   }
                 })
 
                 //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
-                if(this.autorizaDirecto === true){
+                if (this.autorizaDirecto === true) {
                   this.listaEnvioCorreo = this.listadoDepaAutoriza;
                 }
 
-                console.log('this.listaEnvioCorreo2: ',this.listaEnvioCorreo);
+                console.log('this.listaEnvioCorreo2: ', this.listaEnvioCorreo);
                 this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
               });
             }
           }
 
-        }else if(autorizaciones.length == 1){
+        } else if (autorizaciones.length == 1) {
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
-              if(item.nivel < 3 ){
+              if (item.nivel < 3) {
                 return this.listaEnvioCorreo.push(item);
               }
             })
-            console.log('this.listaEnvioCorreo3: ',this.listaEnvioCorreo);
+            console.log('this.listaEnvioCorreo3: ', this.listaEnvioCorreo);
             this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
           });
         }
@@ -380,12 +381,12 @@ export class TiempoAutorizadoComponent implements OnInit {
 
   }
 
-  EnviarCorreo(horaExtra: any, listaEnvioCorreo: any, estado_h: string, estado_c: string, solicitud: any, desde: any, hasta: any, valor: any, estado_n: any){
+  EnviarCorreo(horaExtra: any, listaEnvioCorreo: any, estado_h: string, estado_c: string, solicitud: any, desde: any, hasta: any, valor: any, estado_n: any) {
     var cont = 0;
     var correo_usuarios = '';
     horaExtra.EmpleadosSendNotiEmail = listaEnvioCorreo;
     horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('nueva lista hora extra: ',horaExtra.EmpleadosSendNotiEmail);
+    console.log('nueva lista hora extra: ', horaExtra.EmpleadosSendNotiEmail);
 
     // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     horaExtra.EmpleadosSendNotiEmail.forEach(e => {
@@ -413,8 +414,8 @@ export class TiempoAutorizadoComponent implements OnInit {
           hasta: hasta,
           h_inicio: this.validar.FormatearHora(horaExtra.fec_inicio, this.formato_hora),
           h_final: this.validar.FormatearHora(horaExtra.fec_final, this.formato_hora),
-          num_horas: moment(horaExtra.num_hora, 'HH:mm').format('HH:mm') +
-            '<br> <b>Num. horas ' + estado_n + ':</b> ' + moment(valor, 'HH:mm').format('HH:mm') + ' <br>',
+          num_horas: DateTime.fromFormat(horaExtra.num_hora, 'HH:mm').toFormat('HH:mm') +
+            '<br> <b>Num. horas ' + estado_n + ':</b> ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm') + ' <br>',
           observacion: horaExtra.descripcion,
           estado_h: estado_h,
           proceso: estado_h.toLowerCase(),
@@ -459,8 +460,8 @@ export class TiempoAutorizadoComponent implements OnInit {
   EnviarNotificacion(horaExtra: any, estado_h: string, valor: any, estado_n: string) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let h_inicio = this.validar.FormatearHora(horaExtra.fec_inicio, this.formato_hora)
     let h_final = this.validar.FormatearHora(horaExtra.fec_final, this.formato_hora);
@@ -473,7 +474,7 @@ export class TiempoAutorizadoComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final +
-        ' estado ' + estado_n + ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
+        ' estado ' + estado_n + ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm'),
       tipo: 12,  // APROBACIONES DE SOLICITUD DE HORAS EXTRAS
       user_name: this.user_name,
       ip: this.ip
@@ -483,10 +484,9 @@ export class TiempoAutorizadoComponent implements OnInit {
     var allNotificaciones: any = [];
 
     //Ciclo por cada elemento del catalogo
-    horaExtra.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
@@ -537,9 +537,9 @@ export class TiempoAutorizadoComponent implements OnInit {
     }
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let datosHoraExtraCreada = {
       tipo_solicitud: 'Solicitud de Justificación de Hora Extra por',
@@ -548,7 +548,7 @@ export class TiempoAutorizadoComponent implements OnInit {
       hasta: hasta,
       h_inicio: this.validar.FormatearHora(horaExtra.fec_inicio, this.formato_hora),
       h_final: this.validar.FormatearHora(horaExtra.fec_final, this.formato_hora),
-      num_horas: moment(horaExtra.num_hora, 'HH:mm').format('HH:mm'),
+      num_horas: DateTime.fromFormat(horaExtra.num_hora, 'HH:mm').toFormat('HH:mm'),
       observacion: horaExtra.descripcion,
       estado_h: estado_h + '<br><br> <b>Mensaje:</b> ' + mensaje,
       proceso: 'pedido justificar',
@@ -587,8 +587,8 @@ export class TiempoAutorizadoComponent implements OnInit {
   NotificarJustificacion(horaExtra: any, valor: string) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let h_inicio = this.validar.FormatearHora(horaExtra.fec_inicio, this.formato_hora)
     let h_final = this.validar.FormatearHora(horaExtra.fec_final, this.formato_hora);
@@ -598,10 +598,10 @@ export class TiempoAutorizadoComponent implements OnInit {
       id_empl_recive: parseInt(this.solInfo.empleado),
       mensaje: 'Solicita justificar la solicitud de horas extras de ' +
         this.solInfo.fullname + ' desde ' +
-        desde + ' ' + moment(horaExtra.fec_inicio).format('DD/MM/YYYY') + ' hasta ' +
-        hasta + ' ' + moment(horaExtra.fec_final).format('DD/MM/YYYY') +
+        desde + ' ' + DateTime.fromISO(horaExtra.fec_inicio).toFormat('DD/MM/YYYY') + ' hasta ' +
+        hasta + ' ' + DateTime.fromISO(horaExtra.fec_final).toFormat('DD/MM/YYYY') +
         ' horario de ' + h_inicio + ' a ' + h_final +
-        ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
+        ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm'),
       tipo: 11,  // JUSTIFICACION DE SOLICITUD DE HORAS EXTRAS
       user_name: this.user_name,
       ip: this.ip,

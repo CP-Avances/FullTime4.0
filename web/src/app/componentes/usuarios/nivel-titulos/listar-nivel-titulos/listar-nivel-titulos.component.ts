@@ -4,11 +4,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
@@ -370,9 +370,9 @@ export class ListarNivelTitulosComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -390,14 +390,16 @@ export class ListarNivelTitulosComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista Niveles de Títulos Profesionales', bold: true, fontSize: 20, alignment: 'center', margin: [0, -5, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE NIVELES DE TITULOS PROFESIONALES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTableD: { fontSize: 10, alignment: 'center' },
-        itemsTable: { fontSize: 10 }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTableD: { fontSize: 8, alignment: 'center' },
+        itemsTable: { fontSize: 8 },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -408,12 +410,13 @@ export class ListarNivelTitulosComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto'],
+            widths: ['*', '*'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nivel', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'NIVEL', style: 'tableHeader' },
               ],
               ...this.nivelTitulos.map((obj: any) => {
                 return [

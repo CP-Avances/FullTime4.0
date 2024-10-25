@@ -1,27 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-// Librería para formato de fechas
-import * as moment from 'moment';
-moment.locale('es');
-// Librería para generar archivos PDF
+import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator';
+import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
+
+// LIBRERIA PARA GENERAR ARCHIVOS PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-// Librería para generar archivos EXCEL
+
+// LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
 import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-detalle-planificados',
@@ -160,9 +160,9 @@ export class DetallePlanificadosComponent implements OnInit {
         fec_inicio: form.inicioForm,
         fec_final: form.finalForm
       }
-      this.inicio = moment(form.inicioForm).format('YYYY-MM-DD');
-      this.fin = moment(form.finalForm).format('YYYY-MM-DD');
-      console.log('fechas', moment(this.inicio).format('YYYY-MM-DD'), this.fin)
+      this.inicio = DateTime.fromISO(form.inicioForm).toFormat('yyyy-MM-dd');
+      this.fin = DateTime.fromISO(form.finalForm).toFormat('yyyy-MM-dd');
+      console.log('fechas', DateTime.fromISO(this.inicio).toFormat('yyyy-MM-dd'), this.fin)
       // Limpiar array de datos
       this.planificados = [];
       this.solicitados = [];
@@ -353,16 +353,9 @@ export class DetallePlanificadosComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        // Formato de hora actual
-        if (h.getMinutes() < 10) {
-          var time = h.getHours() + ':0' + h.getMinutes();
-        }
-        else {
-          var time = h.getHours() + ':' + h.getMinutes();
-        }
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss')
         return {
           margin: 10,
           columns: [
@@ -585,16 +578,9 @@ export class DetallePlanificadosComponent implements OnInit {
 
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        // Formato de hora actual
-        if (h.getMinutes() < 10) {
-          var time = h.getHours() + ':0' + h.getMinutes();
-        }
-        else {
-          var time = h.getHours() + ':' + h.getMinutes();
-        }
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss')
         return {
           margin: 10,
           columns: [
@@ -716,7 +702,7 @@ export class DetallePlanificadosComponent implements OnInit {
     if (this.extras.length != 0) {
       xlsx.utils.book_append_sheet(wb, wse, 'Alimentos Extras');
     }
-    xlsx.writeFile(wb, "Alimentacion - " + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' - ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + '.xlsx');
+    xlsx.writeFile(wb, "Alimentacion - " + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').format('dd/MM/yyyy') + '.xlsx');
   }
 
 }

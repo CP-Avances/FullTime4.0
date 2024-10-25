@@ -1,7 +1,7 @@
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
@@ -16,6 +16,7 @@ interface Estados {
   templateUrl: './estado-hora-extra.component.html',
   styleUrls: ['./estado-hora-extra.component.css']
 })
+
 export class EstadoHoraExtraComponent implements OnInit {
 
   // VARIABLES PARA AUDITORIA
@@ -56,8 +57,8 @@ export class EstadoHoraExtraComponent implements OnInit {
   }
 
   tiempo () {
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     console.log('fecha Actual', this.FechaActual);
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
   }

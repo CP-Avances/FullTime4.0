@@ -20,6 +20,8 @@ class DepartamentoRutas {
         this.router.post('/buscar_fechas_multiple', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFechasMultiples);
         // METODO PARA ELIMINAR REGISTROS  **USADO
         this.router.post('/eliminar', TokenValidation, PLAN_GENERAL_CONTROLADOR.EliminarRegistros);
+          // METODO PARA ELIMINAR REGISTROS MULTIPLES  **USADO
+          this.router.post('/eliminar-multiples', TokenValidation, PLAN_GENERAL_CONTROLADOR.EliminarRegistrosMultiples);
         // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
         this.router.post('/horario-general-fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarHorarioFechas);
         // METODO PARA LISTAR PLANIFICACION DE USUARIOS  **USADO

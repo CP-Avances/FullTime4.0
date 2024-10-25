@@ -3,12 +3,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
 
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { DateTime } from 'luxon';
 
 interface Estado {
   id: number,
@@ -44,7 +44,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
 
   public InfoListaAutoriza: any = [];
   public ArrayAutorizacionTipos: any = [];
-  public autorizacion: any []
+  public autorizacion: any[]
   public gerencia: boolean = false;
   public autorizaDirecto: boolean = false;
   public lectura: any;
@@ -83,34 +83,34 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nombre == 'GERENCIA' && x.estado == true){
+          if (x.nombre == 'GERENCIA' && x.estado == true) {
             this.gerencia = true;
             this.autorizaDirecto = false;
             this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
+            if (x.autorizar == true) {
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
                 { id: 4, nombre: 'Negado' }
               ];
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.estados = [
                 { id: 2, nombre: 'Pre-autorizado' },
-                { id: 4, nombre: 'Negado'}
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }
-          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+          else if ((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)) {
             this.autorizaDirecto = true;
             this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
+            if (x.autorizar == true) {
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
                 { id: 4, nombre: 'Negado' }
               ];
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.estados = [
                 { id: 2, nombre: 'Pre-autorizado' },
-                { id: 4, nombre: 'Negado'}
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }
@@ -124,8 +124,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   }
 
   ObtenerTiempo() {
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
   }
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
@@ -217,9 +217,12 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   // METODO PARA ENVIO DE NOTIFICACIONES DE VACACIONES
   ConfiguracionCorreoEmpleados(vacacion: any, estado_v: string, estado_c: string) {
     console.log('entro ha configuracion correo..')
-    // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = moment.weekdays(moment(vacacion.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_inicio).day()).slice(1);
-    let hasta = moment.weekdays(moment(vacacion.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_final).day()).slice(1);
+    // OBTENER EL DIA DE LA SEMANA EN FORMATO LARGO Y CAPITALIZAR LA PRIMERA LETRA
+    let desde = DateTime.fromISO(vacacion.fec_inicio).setLocale('es').weekdayLong;
+    let hasta = DateTime.fromISO(vacacion.fec_final).setLocale('es').weekdayLong;
+    // CAPITALIZAR LA PRIMERA LETRA
+    desde = desde.charAt(0).toUpperCase() + desde.slice(1);
+    hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
     this.listaEnvioCorreo = [];
     this.id_departamento = this.solInfo.id_dep;
     this.lectura = 1;
@@ -250,51 +253,51 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
-            if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
                 this.listadoDepaAutoriza = res;
                 this.listadoDepaAutoriza.filter(item => {
-                  if((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)){
+                  if ((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)) {
                     return this.listaEnvioCorreo.push(item);
-                  }else if((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))){
+                  } else if ((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))) {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-                console.log('listaEnvioCorreo 1: ',this.listaEnvioCorreo );
+                console.log('listaEnvioCorreo 1: ', this.listaEnvioCorreo);
                 this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
               });
-            }else if(this.estado_auto > 2){
+            } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
                 this.listadoDepaAutoriza = res;
                 this.listadoDepaAutoriza.filter(item => {
-                  if((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)){
+                  if ((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)) {
                     this.autorizaDirecto = false;
                     return this.listaEnvioCorreo.push(item);
-                  }else{
+                  } else {
                     this.autorizaDirecto = true;
                   }
                 })
 
                 //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
-                if(this.autorizaDirecto === true){
+                if (this.autorizaDirecto === true) {
                   this.listaEnvioCorreo = this.listadoDepaAutoriza;
                 }
 
-                console.log('listaEnvioCorreo 2: ',this.listaEnvioCorreo );
+                console.log('listaEnvioCorreo 2: ', this.listaEnvioCorreo);
                 this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
               });
             }
           }
-        }else if(autorizaciones.length == 1){
+        } else if (autorizaciones.length == 1) {
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
-              if(item.nivel < 3 ){
+              if (item.nivel < 3) {
                 return this.listaEnvioCorreo.push(item);
               }
             })
 
-            console.log('listaEnvioCorreo 3: ',this.listaEnvioCorreo );
+            console.log('listaEnvioCorreo 3: ', this.listaEnvioCorreo);
             this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
           });
         }
@@ -305,12 +308,12 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
 
   }
 
-  EnviarCorreo(listaEnvioCorreo: any, vacacion: any, estado_v: string, estado_c: string, desde: any, hasta: any){
+  EnviarCorreo(listaEnvioCorreo: any, vacacion: any, estado_v: string, estado_c: string, desde: any, hasta: any) {
     var cont = 0;
     var correo_usuarios = '';
     vacacion.EmpleadosSendNotiEmail = listaEnvioCorreo;
     vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('nueva lista: ',vacacion.EmpleadosSendNotiEmail);
+    console.log('nueva lista: ', vacacion.EmpleadosSendNotiEmail);
 
     vacacion.EmpleadosSendNotiEmail.forEach(e => {
       // LECTURA DE DATOS LEIDOS
@@ -335,8 +338,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
           idContrato: vacacion.id_contrato,
           estado_v: estado_v,
           proceso: estado_v.toLowerCase(),
-          desde: desde + ' ' + moment(vacacion.fec_inicio).format('DD/MM/YYYY'),
-          hasta: hasta + ' ' + moment(vacacion.fec_final).format('DD/MM/YYYY'),
+          desde: desde + ' ' + DateTime.fromISO(vacacion.fec_inicio).toFormat('dd/MM/yyyy'),
+          hasta: hasta + ' ' + DateTime.fromISO(vacacion.fec_final).toFormat('dd/MM/yyyy'),
           id_dep: e.id_dep, // VERIFICAR
           id_suc: e.id_suc, // VERIFICAR
           correo: correo_usuarios,
@@ -374,9 +377,12 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacion(vacaciones: any, estado_v: string) {
     vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);
-    let desde = moment.weekdays(moment(vacaciones.fecha_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
-    let hasta = moment.weekdays(moment(vacaciones.fecha_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
-
+    // OBTENER EL DIA DE LA SEMANA EN FORMATO LARGO Y CAPITALIZAR LA PRIMERA LETRA
+    let desde = DateTime.fromISO(vacaciones.fec_inicio).setLocale('es').weekdayLong;
+    let hasta = DateTime.fromISO(vacaciones.fec_final).setLocale('es').weekdayLong;
+    // CAPITALIZAR LA PRIMERA LETRA
+    desde = desde.charAt(0).toUpperCase() + desde.slice(1);
+    hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
     let notificacion = {
       id_receives_empl: '',
       id_receives_depa: '',
@@ -388,8 +394,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       tipo: 2,
       mensaje: 'Ha ' + estado_v.toLowerCase() + ' la solicitud de vacaciones para ' +
         this.solInfo.fullname + ' desde ' +
-        desde + ' ' + moment(vacaciones.fec_inicio).format('DD/MM/YYYY') + ' hasta ' +
-        hasta + ' ' + moment(vacaciones.fec_final).format('DD/MM/YYYY'),
+        desde + ' ' + DateTime.fromISO(vacaciones.fec_inicio).toFormat('dd/MM/yyyy') + ' hasta ' +
+        hasta + ' ' + DateTime.fromISO(vacaciones.fec_final).toFormat('dd/MM/yyyy'),
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -398,10 +404,9 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     var allNotificaciones: any = [];
 
     //Ciclo por cada elemento del catalogo
-    vacaciones.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    vacaciones.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }

@@ -5,11 +5,11 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
@@ -387,9 +387,9 @@ export class ListarTitulosComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -407,14 +407,16 @@ export class ListarTitulosComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Títulos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE TITULOS PROFESIONALES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableD: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8 },
+        itemsTableD: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -425,19 +427,20 @@ export class ListarTitulosComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Nivel', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'NIVEL', style: 'tableHeader' },
+                { text: 'NOMBRE', style: 'tableHeader' },
               ],
               ...this.verTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
+                  { text: obj.nivel, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.nivel, style: 'itemsTableD' }
                 ];
               })
             ]
@@ -463,8 +466,8 @@ export class ListarTitulosComponent implements OnInit {
     const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
+        NIVEL: obj.nivel,
         TITULO: obj.nombre,
-        NIVEL: obj.nivel
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
@@ -493,8 +496,8 @@ export class ListarTitulosComponent implements OnInit {
       objeto = {
         "titulos": {
           "$": { "id": obj.id },
-          "nombre": obj.nombre,
           "nivel": obj.nivel,
+          "nombre": obj.nombre,
         }
       }
       arregloTitulos.push(objeto)

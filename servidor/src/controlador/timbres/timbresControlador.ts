@@ -259,7 +259,7 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo } = req.body;
+                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos } = req.body;
             //console.log('datos del timbre ', req.body)
             const id_empleado = req.userIdEmpleado;
             var hora_diferente: boolean = false;
@@ -301,6 +301,20 @@ class TimbresControlador {
                 hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
             }
 
+            // METODO PARA VERIFICAR USO D SEGUNDOS
+            var fecha_servidor_final: any;
+            var fecha_validada_final: any;
+            console.log(' hora diferente ', fecha_servidor)
+            console.log(' hora diferente ', fecha_validada)
+            if (capturar_segundos === false) {
+                fecha_servidor_final = moment(fecha_servidor, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+                fecha_validada_final = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+            }
+            else {
+                fecha_servidor_final = fecha_servidor;
+                fecha_validada_final = fecha_validada;
+            }
+
             console.log(' hora diferente ', hora_diferente)
 
             let code = await pool.query(
@@ -324,12 +338,13 @@ class TimbresControlador {
                     to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 `
-                , [codigo, id_reloj, fec_hora_timbre, fecha_servidor, fecha_validada, tecl_funcion, accion,
+                , [codigo, id_reloj, fec_hora_timbre, fecha_servidor_final, fecha_validada_final, tecl_funcion, accion,
                     observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
                     zona_dispositivo, gmt_dispositivo, hora_diferente],
 
                 async (error, results) => {
                     console.log('error ', error)
+                    console.log('result ', results.rows[0].timbres_web)
                     const fechaHora = await FormatearHora(hora_timbre);
                     const fechaTimbre = await FormatearFecha(fecha_timbre, 'ddd');
 
@@ -345,10 +360,19 @@ class TimbresControlador {
 
                     //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
-                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                    if (results) {
+                        if (results.rows[0].timbres_web === 0) {
+                            res.status(200).jsonp({ message: 'Registro duplicado.' });
+                        }
+                        else {
+                            res.status(200).jsonp({ message: 'Registro guardado.' });
+                        }
+                    }
+                    else {
+                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                    }
                 }
             )
-
         } catch (error) {
             console.log('error 500 ', error)
             // REVERTIR TRANSACCION
@@ -375,7 +399,6 @@ class TimbresControlador {
             let servidor: any;
 
             //console.log('req... ', hora_fecha_timbre)
-
             if (tipo === 'administrar') {
                 servidor = hora_fecha_timbre;
             }
@@ -397,7 +420,8 @@ class TimbresControlador {
 
             pool.query(
                 `
-                SELECT * FROM public.timbres_crear ($1, $2, $3, 
+                SELECT * FROM public.timbres_crear ($1, $2,
+                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
                 `
@@ -405,7 +429,8 @@ class TimbresControlador {
                     observacion, 'APP_WEB', documento, true, servidor]
 
                 , async (error, results) => {
-                    //console.log('error ', error)
+                    console.log('error ', error)
+                    console.log('result ', results)
                     // FORMATEAR FECHAS
                     var hora = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
                     var fecha = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
@@ -423,7 +448,17 @@ class TimbresControlador {
                     });
 
                     await pool.query('COMMIT');
-                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                    if (results) {
+                        if (results.rows[0].timbres_crear === 0) {
+                            res.status(200).jsonp({ message: 'Registro duplicado.' });
+                        }
+                        else {
+                            res.status(200).jsonp({ message: 'Registro guardado.' });
+                        }
+                    }
+                    else {
+                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                    }
                 }
             )
         } catch (error) {

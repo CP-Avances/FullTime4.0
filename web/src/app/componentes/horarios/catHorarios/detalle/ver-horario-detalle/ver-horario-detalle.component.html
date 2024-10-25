@@ -1,17 +1,26 @@
 <div class="container" *ngFor="let h of datosHorario" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-6 col-md-3 mb-2 mb-md-0 order-2 order-md-2">  
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
                 (click)="VerHorarios()">
-                Listar horarios
-            </button>
-            <span>{{h.nombre.toUpperCase()}}</span>
-            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    Listar horarios
+                </button>
+            </div>
+            <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    {{h.nombre.toUpperCase()}}
+                </span>
+            </div>
+            <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="AbrirVentanaEditar(h)"
                 *ngIf="(h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA') && getEditarHorario()">
-                Editar
-            </button>
+                    Editar
+                </button>
+            </div>
         </div>
+
         <mat-card-content>
             <div class="container" style="padding-top: 15px;">
                 <div class="row opciones">
@@ -65,22 +74,39 @@
             <hr>
             <div class="container" style="padding-bottom: 25px; text-align: center;">
                 <div class="mat-elevation-z8" style="background: white;">
-                    <div id="titulo">
-                        <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
+
+                    <div id="titulo" class="row w-100 m-auto">
+                        <div class="col-4 col-md-1 mb-2 mb-md-0 order-2 order-md-2">  
+                            <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
                             (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
                             matTooltip="Elimar múltiples registros." id="SelectCheck">
-                            library_add_check
-                        </mat-icon>
-                        <span class="w-100 bd-highlight">DETALLES DE HORARIO</span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="ConfirmarDelete('', 2)" *ngIf="btnCheckHabilitar">
-                            Eliminar
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(h)"
-                            *ngIf="(h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA' && !btnCheckHabilitar) && getCrearDetalleHorario()">
+                                library_add_check
+                            </mat-icon>
+                        </div>
+                        <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                            <span>
+                                DETALLES DE HORARIO
+                            </span>
+                        </div>
+                        <div *ngIf="btnCheckHabilitar" class="col-6 col-md-4 mb-2 mb-md-0 order-3 order-md-2">
+                            <button class="btn btn-outline-light btn-sm" style="float: right;"
+                            (click)="ConfirmarDelete('', 2)" >
+                                Eliminar
+                            </button>
+                        </div>
+                        <div *ngIf="(h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA' && !btnCheckHabilitar) && getCrearDetalleHorario()"
+                             class="col-8 col-md-4 mb-2 mb-md-0 order-3 order-md-2">
+                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaDetalles(h)">
                             Registrar detalle
-                        </button>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="titulo">
+                        
+                       
+                        
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">

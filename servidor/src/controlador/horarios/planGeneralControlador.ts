@@ -63,7 +63,12 @@ class PlanGeneralControlador {
                 await pool.query('COMMIT');
 
             } catch (error) {
-                // REVERTIR TRANSACCION
+                console.error("Detalles del error:", {
+                    message: error.message,
+                    stack: error.stack,      // Para ver dónde ocurre el error
+                    code: error.code,        // Código de error (si lo hay)
+                    detail: error.detail     // Información adicional de la BD (si la hay)
+                }); 
                 await pool.query('ROLLBACK');
                 ocurrioError = true;
                 mensajeError = error.message;
@@ -84,8 +89,12 @@ class PlanGeneralControlador {
         }
     }
 
-    public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
+
+    public CrearPlanificacion3 = async (req: Request, res: Response): Promise<any> => {
         const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
+
+        console.log("ver body", req.body)
+
 
         let partesRecibidas: any = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
         let errores: number = 0;
@@ -143,6 +152,12 @@ class PlanGeneralControlador {
 
             } catch (error) {
                 // REVERTIR TRANSACCION
+                console.error("Detalles del error:", {
+                    message: error.message,
+                    stack: error.stack,      // Para ver dónde ocurre el error
+                    code: error.code,        // Código de error (si lo hay)
+                    detail: error.detail     // Información adicional de la BD (si la hay)
+                }); 
                 await pool.query('ROLLBACK');
                 ocurrioError = true;
                 mensajeError = error.message;
@@ -161,6 +176,111 @@ class PlanGeneralControlador {
         return res.status(200).jsonp({ message: 'OK' });
     };
 
+    public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
+        const { parte, user_name, ip } = req.body;
+    
+        // Validación del input
+        if (!Array.isArray(parte) || parte.length === 0) {
+            return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
+        }
+    
+        const batchSize = 1000; // Ajusta este número según tu caso
+        const totalResults = []; // Para almacenar los resultados de cada lote
+    
+        // Procesar en lotes
+        for (let i = 0; i < parte.length; i += batchSize) {
+            const batch = parte.slice(i, i + batchSize);
+            const valores = [];
+            const placeholders = [];
+    
+            // Recorrer los objetos del batch y construir los placeholders para la consulta
+            for (let j = 0; j < batch.length; j++) {
+                const p = batch[j];
+                const index = j * 15; // 15 es el número de campos a insertar
+                valores.push(
+                    p.fec_hora_horario,
+                    p.tolerancia,
+                    p.estado_timbre,
+                    p.id_det_horario,
+                    p.fec_horario,
+                    p.id_empl_cargo,
+                    p.tipo_entr_salida,
+                    p.id_empleado,
+                    p.id_horario,
+                    p.tipo_dia,
+                    p.salida_otro_dia,
+                    p.min_antes,
+                    p.min_despues,
+                    p.estado_origen,
+                    p.min_alimentacion
+                );
+                // Crear los placeholders para la consulta
+                placeholders.push(
+                    `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, 
+                      $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10}, 
+                      $${index + 11}, $${index + 12}, $${index + 13}, $${index + 14}, $${index + 15})`
+                );
+            }
+    
+            // Crear la consulta de inserción masiva para el batch
+            const query = `
+                INSERT INTO eu_asistencia_general (
+                    fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
+                    id_horario, tipo_dia, salida_otro_dia, minutos_antes,
+                    minutos_despues, estado_origen, minutos_alimentacion
+                ) VALUES ${placeholders.join(', ')} RETURNING *
+            `;
+    
+            try {
+                // INICIAR TRANSACCIÓN
+                await pool.query('BEGIN');
+    
+                const result = await pool.query(query, valores);
+                const plans = result.rows;
+                totalResults.push(...plans); // Guardar resultados del lote
+    
+                for (const plan of plans) {
+                    const fecha_hora_horario1 = await FormatearHora(plan.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                    const fecha_hora_horario = await FormatearFecha2(plan.fecha_hora_horario, 'ddd');
+                    const fecha_horario = await FormatearFecha2(plan.fecha_horario, 'ddd');
+    
+                    plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                    plan.fecha_horario = fecha_horario;
+    
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(plan),
+                        ip,
+                        observacion: null
+                    });
+                }
+    
+                // FINALIZAR TRANSACCIÓN
+                await pool.query('COMMIT');
+    
+            } catch (error) {
+                // REVERTIR TRANSACCIÓN
+                console.error("Detalles del error:", {
+                    message: error.message,
+                    stack: error.stack,
+                    code: error.code,
+                    detail: error.detail
+                });
+                await pool.query('ROLLBACK');
+    
+                return res.status(500).json({ message: 'Error al procesar la parte', error: error.message });
+            }
+        }
+    
+        // Respuesta final con 'OK' si todo se procesó correctamente
+        return res.status(200).json({ message: 'OK', totalResults });
+    };
+    
 
     public BuscarFechasMultiples = async (req: Request, res: Response): Promise<any> => {
         const { listaEliminar } = req.body;
@@ -218,6 +338,7 @@ class PlanGeneralControlador {
         errores = 0;
 
         const { user_name, ip, id_plan } = req.body;
+        console.log("ver req body eliminar: ", req.body)
 
         for (const plan of id_plan) {
 
@@ -226,7 +347,7 @@ class PlanGeneralControlador {
                 await pool.query('BEGIN');
 
                 // CONSULTAR DATOSORIGINALES
-                const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan.id]);
+                const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan]);
                 const [datosOriginales] = consulta.rows;
 
                 if (!datosOriginales) {
@@ -237,7 +358,7 @@ class PlanGeneralControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar el registro con id ${plan.id}. Registro no encontrado.`
+                        observacion: `Error al eliminar el registro con id ${plan}. Registro no encontrado.`
                     });
 
                     // FINALIZAR TRANSACCION
@@ -249,7 +370,7 @@ class PlanGeneralControlador {
                     `
                     DELETE FROM eu_asistencia_general WHERE id = $1
                     `,
-                    [plan.id]);
+                    [plan]);
 
                 const fecha_hora_horario1 = await FormatearHora(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
                 const fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd');
@@ -298,51 +419,46 @@ class PlanGeneralControlador {
 
 
     public async EliminarRegistrosMultiples(req: Request, res: Response): Promise<Response> {
-        let errores = 0;
-        let ocurrioError = false;
-        let mensajeError = '';
-        let codigoError = 0;
-    
         const { user_name, ip, id_plan } = req.body;
-    
         // Iniciar transacción
         try {
             await pool.query('BEGIN');
-    
-            // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
-            const consulta = await pool.query(
-                `SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`,
-                [id_plan]
-            );
-    
-            const datosOriginales = consulta.rows;
-    
-            if (datosOriginales.length !== id_plan.length) {
-                const idsEncontrados = datosOriginales.map((d: any) => d.id);
-                const idsNoEncontrados = id_plan.filter((id: any) => !idsEncontrados.includes(id));
-    
-                // Registrar auditoría de errores
-                for (const id of idsNoEncontrados) {
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'eu_asistencia_general',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
-                    });
-                }
-    
-                // Si alguno de los registros no se encontró, hacer ROLLBACK
-                await pool.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
+            /*
+
+        // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
+        const consulta = await pool.query(
+            `SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`,
+            [id_plan]
+        );
+
+        const datosOriginales = consulta.rows;
+        if (datosOriginales.length !== id_plan.length) {
+            const idsEncontrados = datosOriginales.map((d: any) => d.id);
+            const idsNoEncontrados = id_plan.filter((id: any) => !idsEncontrados.includes(id));
+            // Registrar auditoría de errores
+            for (const id of idsNoEncontrados) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
+                });
             }
-    
+ 
+            // Si alguno de los registros no se encontró, hacer ROLLBACK
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
+        }
+*/
             // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
             await pool.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
-    
+
+
             // Formatear las fechas de los datos originales para la auditoría
+            /*
             for (const datos of datosOriginales) {
                 const fecha_hora_horario1 = await FormatearHora(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
                 const fecha_hora_horario = await FormatearFecha2(datos.fecha_hora_horario, 'ddd');
@@ -351,24 +467,26 @@ class PlanGeneralControlador {
                 datos.fecha_horario = fecha_horario;
                 datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
             }
-    
+                /*/
+
             // AUDITORÍA: Registrar todos los registros eliminados
-            for (const datos of datosOriginales) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'eu_asistencia_general',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datos),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-            }
-    
+            //for (const datos of datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_asistencia_general',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: 'Identificadores de planificación horaria: ' + id_plan,
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+            // }
+
+
             // Finalizar transacción
             await pool.query('COMMIT');
             return res.status(200).jsonp({ message: 'OK' });
-    
+
         } catch (error) {
             // Revertir la transacción si ocurre un error
             await pool.query('ROLLBACK');
@@ -376,7 +494,7 @@ class PlanGeneralControlador {
             return res.status(500).jsonp({ message: 'Error en el proceso de eliminación', error });
         }
     }
-    
+
 
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
     public async BuscarHorarioFechas(req: Request, res: Response) {

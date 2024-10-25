@@ -8,11 +8,10 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
-import { default as _rollupMoment, Moment } from 'moment';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
@@ -179,8 +178,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    var a = moment();
-    this.FechaActual = a.format('YYYY-MM-DD');
+    var a = DateTime.now();
+    this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
       .pipe(
         switchMap(({ id }) => this.idEmpleado = id)
@@ -415,33 +414,30 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha);
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha);
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.VerEmpleado(this.formato_fecha);
+      }, vacio => {
+        this.VerEmpleado(this.formato_fecha);
       });
   }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-        // LLAMADO A PRESENTACION DE DATOS
-        this.VerEmpleado(fecha);
-      },
-      vacio => {
-        this.VerEmpleado(fecha);
-      });
-  }
-
 
   /** **************************************************************************************** **
    ** **                       METODOS GENERALES DEL SISTEMA                                ** **
@@ -498,7 +494,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.empleadoUno = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
-      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
@@ -832,7 +828,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restVacuna.ObtenerVacunaEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.datosVacuna = data;
       this.datosVacuna.forEach((data: any) => {
-        data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_completo);
+        data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       })
     });
   }
@@ -904,8 +900,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
       this.contratoEmpleado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
   }
@@ -917,7 +913,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarContratosEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.contratoBuscado = res;
       this.contratoBuscado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
   }
@@ -952,14 +948,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
       this.contratoSeleccionado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
     this.restCargo.BuscarCargoIDContrato(form.fechaContratoForm).subscribe(datos => {
       this.listaCargos = datos;
       this.listaCargos.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
 
       // MOSTRAR INFORMACION DEL CARGO
@@ -994,10 +990,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   pagina_contrato: any = '';
   contrato_editar: any = [];
   AbrirVentanaEditarContrato(dataContrato: any) {
+    this.ver_contrato_cargo = false;
     this.editar_contrato = true;
     this.contrato_editar = dataContrato;
     this.pagina_contrato = 'ver-empleado';
-    this.btnActualizarCargo = true;
   }
 
   // METODO PARA ELIMINAR CONTRATOS
@@ -1018,6 +1014,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             timeOut: 4500,
           });
           this.VerDatosActuales(this.formato_fecha);
+          this.ObtenerContratosEmpleado(this.formato_fecha);
         }
       }, error: (err: any) => {
         this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
@@ -1057,15 +1054,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // VENTANA PARA INGRESAR CONTRATO DEL EMPLEADO
+  crear_contrato: boolean = false;
+  enviar_contrato: any;
+  ver_contrato_cargo: boolean = true;
   AbrirVentanaCrearContrato(): void {
-    this.ventana.open(RegistroContratoComponent, { width: '900px', data: this.idEmpleado }).
-      afterClosed().subscribe(item => {
-        this.contratoEmpleado = [];
-        this.cargoEmpleado = [];
-        this.VerDatosActuales(this.formato_fecha);
-        this.ObtenerContratosEmpleado(this.formato_fecha);
-      });
-    this.btnActualizarCargo = true;
+    this.ver_contrato_cargo = false;
+    this.crear_contrato = true;
+    this.pagina_contrato = 'ver-empleado';
+    this.enviar_contrato = this.idEmpleado;
   }
 
   /** ** ***************************************************************************************** **
@@ -1079,8 +1075,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.cargoEmpleado = [];
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
   }
@@ -1124,34 +1120,33 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.cargoSeleccionado = [];
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
   }
 
   // MOSTRAR VENTANA EDICION DE CARGO
-  btnActualizarCargo: boolean = true;
-  VerCargoEdicion(value: boolean) {
-    this.btnActualizarCargo = value;
-    this.editar_contrato = false;
-  }
-
-  // BUSQUEDA DE ID DE CARGO SELECCIONADO
+  btnActualizarCargo: boolean = false;
   idSelectCargo: number;
-  ObtenerIdCargoSeleccionado(idCargoEmpleado: number) {
+  VerCargoEdicion(idCargoEmpleado: number) {
+    this.ver_contrato_cargo = false;
+    this.btnActualizarCargo = true;
     this.idSelectCargo = idCargoEmpleado;
   }
 
   // VENTANA PARA INGRESAR CARGO DEL EMPLEADO
+  enviar_cargo: any = [];
+  crear_cargo: boolean = false;
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
-      this.ventana.open(EmplCargosComponent,
-        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato, idRol: this.datoActual.id_rol } }).
-        afterClosed().subscribe(item => {
-          this.VerDatosActuales(this.formato_fecha);
-        });
-      this.editar_contrato = false;
+      this.ver_contrato_cargo = false;
+      this.crear_cargo = true;
+      this.enviar_cargo = {
+        idEmpleado: this.idEmpleado,
+        idContrato: this.datoActual.id_contrato,
+        idRol: this.datoActual.id_rol
+      };
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Contrato.', '', {
@@ -1311,8 +1306,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.cargoSeleccionado = [];
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     });
   }
@@ -1359,15 +1354,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   fecHorario: boolean = true;
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
-    const ctrlValue = fecha;
+  FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
+    const ctrlValue = fecha.toISOString();
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = moment(ctrlValue).format('01/MM/YYYY');
-        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
     }
@@ -1379,21 +1374,28 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
-    // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = moment(fec_inicio).format('01/MM/YYYY');
-    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
-    if (Date.parse(feci) <= Date.parse(fecf)) {
+    // PARSEAR LAS FECHAS DE ENTRADA
+    const fechaInicio = DateTime.fromISO(fec_inicio);
+    const fechaFin = DateTime.fromISO(fec_fin);
+
+    // OBTENER EL PRIMER DIA DEL MES
+    const inicio = fechaInicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
+
+    // OBTENER EL ÚLTIMO DIA DEL MES
+    const final = fechaFin.endOf('month').toFormat('dd/MM/yyyy');
+
+    // PARSEAR LAS FECHAS PARA LA COMPARACION
+    const feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy');
+    const fecf = DateTime.fromFormat(final, 'dd/MM/yyyy');
+
+    // VERIFICAR SI LAS FECHAS ESTAN INGRESADAS CORRECTAMENTE
+    if (feci <= fecf) {
       if (opcion === 1) {
-        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+        formulario.setValue(feci.toISODate());
+      } else {
+        formulario.setValue(fecf.toISODate());
       }
-      else {
-        formulario.setValue(moment(final, 'DD/MM/YYYY'));
-      }
-    }
-    else {
+    } else {
       this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
         timeOut: 6000,
       });
@@ -1413,8 +1415,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1);
     }
     else {
-      let inicio = moment().format('YYYY/MM/01');
-      let final = moment().format('YYYY/MM/') + moment().daysInMonth();
+      const now = DateTime.now();  // ALMACENAR LA FECHA ACTUAL UNA SOLA VEZ
+      const inicio = now.toFormat('yyyy/MM/01');  // PRIMER DIA DEL MES
+      const final = now.toFormat('yyyy/MM/') + now.daysInMonth();  // ULTIMO DIA DEL MES
       this.ObtenerHorariosEmpleado(inicio, final, 2);
     }
   }
@@ -1719,9 +1722,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   datos_editar: any = [];
   expansion: boolean = true;
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, index: any): void {
-    let fecha = anio + '-' + mes + '-' + dia;
-    let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
-    let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
+    let fecha = `${anio}-${mes}-${dia}`;
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
+    let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
     // VERIFICAR QUE EL DIA SEA VALIDO (30-31)
     if (verificar === true) {
       this.horariosEmpleado[index].color = 'ok';
@@ -1773,9 +1776,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.permisosTotales = datos;
       this.permisosTotales.forEach((p: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
-        p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, formato_fecha, this.validar.dia_completo);
-        p.fec_inicio_ = this.validar.FormatearFecha(p.fecha_inicio, formato_fecha, this.validar.dia_completo);
-        p.fec_final_ = this.validar.FormatearFecha(p.fecha_final, formato_fecha, this.validar.dia_completo);
+        p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        p.fec_inicio_ = this.validar.FormatearFecha(p.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        p.fec_final_ = this.validar.FormatearFecha(p.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
         p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
         p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
@@ -1857,9 +1860,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restPermiso.ObtenerInformeUnPermiso(id).subscribe(datos => {
       this.unPermiso = datos[0];
       // TRATAMIENTO DE FECHAS Y HORAS
-      this.unPermiso.fec_creacion_ = this.validar.FormatearFecha(this.unPermiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-      this.unPermiso.fec_inicio_ = this.validar.FormatearFecha(this.unPermiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      this.unPermiso.fec_final_ = this.validar.FormatearFecha(this.unPermiso.fec_final, this.formato_fecha, this.validar.dia_completo);
+      this.unPermiso.fec_creacion_ = this.validar.FormatearFecha(this.unPermiso.fec_creacion, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.unPermiso.fec_inicio_ = this.validar.FormatearFecha(this.unPermiso.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+      this.unPermiso.fec_final_ = this.validar.FormatearFecha(this.unPermiso.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
       this.unPermiso.hora_ingreso_ = this.validar.FormatearHora(this.unPermiso.hora_ingreso, this.formato_hora);
       this.unPermiso.hora_salida_ = this.validar.FormatearHora(this.unPermiso.hora_salida, this.formato_hora);
@@ -1975,9 +1978,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
-        var f = moment();
-        fecha = f.format('DD/MM/YYYY');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -2102,9 +2105,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
-        var f = moment();
-        fecha = f.format('DD/MM/YYYY');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -2251,8 +2254,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
       this.peridoVacaciones.forEach((v: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
-        v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
-        v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
+        v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       })
     })
   }
@@ -2311,9 +2314,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.vacaciones = res;
         this.vacaciones.forEach((v: any) => {
           // TRATAMIENTO DE FECHAS Y HORAS
-          v.fecha_ingreso_ = this.validar.FormatearFecha(v.fecha_ingreso, formato_fecha, this.validar.dia_completo);
-          v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
-          v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
+          v.fecha_ingreso_ = this.validar.FormatearFecha(v.fecha_ingreso, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         })
       });
     });
@@ -2403,13 +2406,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           h.estado = 'Negado';
         }
 
-        h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
-        h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), formato_hora);
+        h.fecha_inicio_ = this.validar.FormatearFecha(DateTime.fromISO(h.fec_inicio).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        h.hora_inicio_ = this.validar.FormatearHora(DateTime.fromISO(h.fec_inicio).toFormat('HH:mm:ss'), formato_hora);
 
-        h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fec_final).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);;
-        h.hora_fin_ = this.validar.FormatearHora(moment(h.fec_final).format('HH:mm:ss'), formato_hora);
+        h.fecha_fin_ = this.validar.FormatearFecha(DateTime.fromISO(h.fec_final).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);;
+        h.hora_fin_ = this.validar.FormatearHora(DateTime.fromISO(h.fec_final).toFormat('HH:mm:ss'), formato_hora);
 
-        h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo);
+        h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       })
 
     });
@@ -2448,10 +2451,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           h.estado = 'Negado';
         }
 
-        h.fecha_inicio_ = this.validar.FormatearFecha(h.fecha_desde, formato_fecha, this.validar.dia_completo);
+        h.fecha_inicio_ = this.validar.FormatearFecha(h.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         h.hora_inicio_ = this.validar.FormatearHora(h.hora_inicio, formato_hora);
 
-        h.fecha_fin_ = this.validar.FormatearFecha(h.fecha_hasta, formato_fecha, this.validar.dia_completo);;
+        h.fecha_fin_ = this.validar.FormatearFecha(h.fecha_hasta, formato_fecha, this.validar.dia_completo, this.idioma_fechas);;
         h.hora_fin_ = this.validar.FormatearHora(h.hora_fin, formato_hora);
       })
 
@@ -2529,8 +2532,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fecha_desde, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(datos.fecha_hasta, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(datos.fecha_desde, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(datos.fecha_hasta, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
@@ -2576,7 +2579,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: moment(datos.horas_totales, 'HH:mm').format('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -2635,14 +2638,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   FormatearFechas(datos: any, formato_fecha: string, formato_hora: string) {
     datos.forEach((c: any) => {
       // TRATAMIENTO DE FECHAS Y HORAS
-      c.fecha_ = this.validar.FormatearFecha(c.fecha, formato_fecha, this.validar.dia_completo);
+      c.fecha_ = this.validar.FormatearFecha(c.fecha, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
       if (c.fec_comida != undefined) {
-        c.fec_comida_ = this.validar.FormatearFecha(c.fec_comida, formato_fecha, this.validar.dia_completo);
+        c.fec_comida_ = this.validar.FormatearFecha(c.fec_comida, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       }
       else {
-        c.fec_inicio_ = this.validar.FormatearFecha(c.fec_inicio, formato_fecha, this.validar.dia_completo);
-        c.fec_final_ = this.validar.FormatearFecha(c.fec_final, formato_fecha, this.validar.dia_completo);
+        c.fec_inicio_ = this.validar.FormatearFecha(c.fec_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        c.fec_final_ = this.validar.FormatearFecha(c.fec_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
       }
 
       c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, formato_hora);
@@ -2736,8 +2739,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(datos.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(datos.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    let hasta = this.validar.FormatearFecha(datos.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
 
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
@@ -2851,8 +2854,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
       this.empleadoProcesos = datos;
       this.empleadoProcesos.forEach((data: any) => {
-        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fecha_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
+        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        data.fecha_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
     })
   }
@@ -3086,9 +3089,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -3107,109 +3110,109 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         {
-         table: {
-          widths: ['35%', '65%'],
-          body:[
-            [
-            {
-              stack:[
+          table: {
+            widths: ['35%', '65%'],
+            body: [
+              [
                 {
-                  text: (this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido).toUpperCase(),
-                  bold: true, 
-                  fontSize: 11,
-                  alignment: 'center',
-                  margin: [0, 15, 0, 18]
-                },
-                { 
-                  image: this.imagenEmpleado, 
-                  width: 120, 
-                  alignment: 'center',
-                  margin: [10, -10, 0, 5] 
-                }, 
-              ]
-            },
-            {
-             stack: [
-                {
-                  table: {
-                    widths: ['*'],
-                    body:[
-                      [
-                        {
-                          text: '',
-                          margin: [0, 5, 0, 5],
-                        }
-                      ],
-                      [
-                        { 
-                          text: 'INFORMACIÓN PERSONAL',
-                          fillColor: '#0099ff', 
-                          color: 'white',            // Texto en color blanco
-                          alignment: 'center',
-                          bold: true,                // Negrita
-                          margin: [0, 2, 0, 2],    // Ajusta el margen como necesites
-                          fontSize: 12,  
-                        },
-                      ]
-                    ]
-                  },
-                  layout: 'noBorders', // Esto elimina los bordes de la tabla
-                  alignment: 'left', // Alinea la tabla a la izquierda
+                  stack: [
+                    {
+                      text: (this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido).toUpperCase(),
+                      bold: true,
+                      fontSize: 11,
+                      alignment: 'center',
+                      margin: [0, 15, 0, 18]
+                    },
+                    {
+                      image: this.imagenEmpleado,
+                      width: 120,
+                      alignment: 'center',
+                      margin: [10, -10, 0, 5]
+                    },
+                  ]
                 },
                 {
-                  table: {
-                    widths: ['50%', '50%'],
-                    body:[
-                      [
-                        { 
-                          text: [
-                            'CI: '+ this.empleadoUno[0].cedula+ '\n',
-                            'Nacionalidad: ' + nacionalidad + '\n',
-                            'Fecha Nacimiento: '+ '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
-                            'Estado civil: ' + estadoCivil+ '\n',
-                            'Género: ' + genero+ '\n'
+                  stack: [
+                    {
+                      table: {
+                        widths: ['*'],
+                        body: [
+                          [
+                            {
+                              text: '',
+                              margin: [0, 5, 0, 5],
+                            }
                           ],
-                          style: 'item' 
-                        },
-                        { 
-                          text: [
-                            'Código: ' + this.empleadoUno[0].codigo+ '\n',
-                            'Teléfono: ' + this.empleadoUno[0].telefono+'\n',
-                            'Estado: ' + estado+ '\n',
-                            'Domicilio: ' + this.empleadoUno[0].domicilio+ '\n',
-                          ],
-                          style: 'item' 
-                        },  
-                      ]
-                    ]
-                  },
-                  layout: 'noBorders', // Esto elimina los bordes de la tabla
-                  alignment: 'left', // Alinea la tabla a la izquierda
-                },
-                {
-                  text:'Correo: ' + this.empleadoUno[0].correo, style: 'item' 
+                          [
+                            {
+                              text: 'INFORMACIÓN PERSONAL',
+                              fillColor: '#0099ff',
+                              color: 'white',            // Texto en color blanco
+                              alignment: 'center',
+                              bold: true,                // Negrita
+                              margin: [0, 2, 0, 2],    // Ajusta el margen como necesites
+                              fontSize: 12,
+                            },
+                          ]
+                        ]
+                      },
+                      layout: 'noBorders', // Esto elimina los bordes de la tabla
+                      alignment: 'left', // Alinea la tabla a la izquierda
+                    },
+                    {
+                      table: {
+                        widths: ['50%', '50%'],
+                        body: [
+                          [
+                            {
+                              text: [
+                                'CI: ' + this.empleadoUno[0].cedula + '\n',
+                                'Nacionalidad: ' + nacionalidad + '\n',
+                                'Fecha Nacimiento: ' + '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                                'Estado civil: ' + estadoCivil + '\n',
+                                'Género: ' + genero + '\n'
+                              ],
+                              style: 'item'
+                            },
+                            {
+                              text: [
+                                'Código: ' + this.empleadoUno[0].codigo + '\n',
+                                'Teléfono: ' + this.empleadoUno[0].telefono + '\n',
+                                'Estado: ' + estado + '\n',
+                                'Domicilio: ' + this.empleadoUno[0].domicilio + '\n',
+                              ],
+                              style: 'item'
+                            },
+                          ]
+                        ]
+                      },
+                      layout: 'noBorders', // Esto elimina los bordes de la tabla
+                      alignment: 'left', // Alinea la tabla a la izquierda
+                    },
+                    {
+                      text: 'Correo: ' + this.empleadoUno[0].correo, style: 'item'
+                    }
+                  ]
                 }
-              ]
-            }
 
+              ]
             ]
-          ]
-         } ,
-         layout: 'noBorders', // Esto elimina los bordes de la tabla
+          },
+          layout: 'noBorders', // Esto elimina los bordes de la tabla
         },
         {
           table: {
             widths: ['100%'],
-            body:[
+            body: [
               [
-                { 
+                {
                   text: 'TÍTULOS',
-                  margin: [0,2, 0, 2],
-                  fillColor: '#0099ff', 
+                  margin: [0, 2, 0, 2],
+                  fillColor: '#0099ff',
                   color: 'white',            // Texto en color blanco
                   alignment: 'center',
-                  bold: true,    
-                  fontSize: 12,  
+                  bold: true,
+                  fontSize: 12,
                 },
               ],
               [
@@ -3220,29 +3223,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           layout: 'noBorders',
           alignment: 'left',
           margin: [0, 10, 0, 10]
-        },  
-        { 
+        },
+        {
           table: {
             widths: ['50%', '50%'],
-            body:[
+            body: [
               [
-                { 
+                {
                   text: 'CONTRATO',
-                  margin: [0,2, 0, 2],
-                  fillColor: '#0099ff', 
+                  margin: [0, 2, 0, 2],
+                  fillColor: '#0099ff',
                   color: 'white',            // Texto en color blanco
                   alignment: 'center',
-                  bold: true,    
-                  fontSize: 12,  
+                  bold: true,
+                  fontSize: 12,
                 },
                 {
                   text: 'CARGO',
                   margin: [0, 2, 0, 2],
-                  fillColor: '#0099ff', 
+                  fillColor: '#0099ff',
                   color: 'white',            // Texto en color blanco
                   alignment: 'center',
                   bold: true,                // Negrita  // Ajusta el margen como necesites
-                  fontSize: 12,   
+                  fontSize: 12,
                 }
               ],
               [
@@ -3264,19 +3267,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           },
           alignment: 'left', // Alinea la tabla a la izquierda
         },
-        { 
+        {
           table: {
             widths: ['100%'],
-            body:[
+            body: [
               [
-                { 
+                {
                   text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''),
-                  margin: [0,2, 0, 2],
-                  fillColor: (this.discapacidadUser.length > 0 ? '#0099ff' : 'white'), 
+                  margin: [0, 2, 0, 2],
+                  fillColor: (this.discapacidadUser.length > 0 ? '#0099ff' : 'white'),
                   color: 'white',            // Texto en color blanco
                   alignment: 'center',
-                  bold: true,    
-                  fontSize: 12,  
+                  bold: true,
+                  fontSize: 12,
                 },
               ],
               [
@@ -3288,19 +3291,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           alignment: 'left',
           margin: [0, 0, 0, 10]
         },
-        { 
+        {
           table: {
             widths: ['100%'],
-            body:[
+            body: [
               [
-                { 
+                {
                   text: (this.datosVacuna.length > 0 ? 'VACUNAS' : ''),
-                  margin: [0,2, 0, 2],
-                  fillColor: (this.datosVacuna.length > 0 ? '#0099ff' : 'white'), 
+                  margin: [0, 2, 0, 2],
+                  fillColor: (this.datosVacuna.length > 0 ? '#0099ff' : 'white'),
                   color: 'white',            // Texto en color blanco
                   alignment: 'center',
-                  bold: true,    
-                  fontSize: 12,  
+                  bold: true,
+                  fontSize: 12,
                 },
               ],
               [
@@ -3338,15 +3341,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             ...this.tituloEmpleado.map((obj: any) => {
               return [
                 {
-                  text:[
-                    { text: 'NOMBRE: '+obj.nombre+' ' },
-                    { text: 'NIVEL: '+ obj.nivel}
+                  text: [
+                    { text: 'NOMBRE: ' + obj.nombre + ' ' },
+                    { text: 'NIVEL: ' + obj.nivel }
                   ],
                 }
               ];
             })
           ]
-        }, 
+        },
         layout: 'noBorders',
         alignment: 'left',
       };
@@ -3354,7 +3357,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   }
 
-  PresentarDataPDFvacunasEmpleado(){
+  PresentarDataPDFvacunasEmpleado() {
     if (this.datosVacuna.length > 0) {
       return {
         table: {
@@ -3363,17 +3366,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             ...this.datosVacuna.map((obj: any) => {
               return [
                 {
-                  text:[
-                    { text: 'Vacuna: '+obj.nombre+' ' },
-                    { text: 'descripcion: '+ obj.Descripción+' '},
-                    { text: 'fecha: '+obj.fecha_+' '},
-                    { text: 'carnet: '+obj.carnet}
+                  text: [
+                    { text: 'Vacuna: ' + obj.nombre + ' ' },
+                    { text: 'descripcion: ' + obj.Descripción + ' ' },
+                    { text: 'fecha: ' + obj.fecha_ + ' ' },
+                    { text: 'carnet: ' + obj.carnet }
                   ],
                 }
               ];
             })
           ]
-        }, 
+        },
         layout: 'noBorders',
         alignment: 'left',
         margin: [0, 0, 0, 5]
@@ -3384,27 +3387,27 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   PresentarDataPDFcontratoEmpleado() {
     if (this.contratoEmpleado.length > 0) {
       return {
-      table: {
-        widths: ['auto'],
-        body: [
-          ...this.contratoEmpleado.map(contrato => {
-            return [
-              {
-                stack:[
-                  { text: 'Régimen: '+contrato.descripcion,},
-                  { text: 'Desde: '+contrato.fec_ingreso_,},
-                  { text: 'Hasta: '+ (contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_),},
-                  { text: 'Modalidad laboral: '+contrato.nombre_contrato,},
-                  { text: 'Control asistencias: '+ (contrato.controlar_asistencia ? 'Si' : 'No'),},
-                  { text: 'Control vacaciones: '+ (contrato.controlar_vacacion ? 'Si' : 'No'),},
-                ]
-              }
-            ];
-          }),
-        ],
-      },
-      layout: 'noBorders',
-      alignment: 'left',
+        table: {
+          widths: ['auto'],
+          body: [
+            ...this.contratoEmpleado.map(contrato => {
+              return [
+                {
+                  stack: [
+                    { text: 'Régimen: ' + contrato.descripcion, },
+                    { text: 'Desde: ' + contrato.fec_ingreso_, },
+                    { text: 'Hasta: ' + (contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_), },
+                    { text: 'Modalidad laboral: ' + contrato.nombre_contrato, },
+                    { text: 'Control asistencias: ' + (contrato.controlar_asistencia ? 'Si' : 'No'), },
+                    { text: 'Control vacaciones: ' + (contrato.controlar_vacacion ? 'Si' : 'No'), },
+                  ]
+                }
+              ];
+            }),
+          ],
+        },
+        layout: 'noBorders',
+        alignment: 'left',
       };
     }
   }
@@ -3418,14 +3421,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             ...this.cargoEmpleado.map(cargo => {
               return [
                 {
-                  stack:[
-                  { text: 'Sucursal: '+cargo.sucursal,  },
-                  { text: 'Departamento: '+cargo.departamento,  },
-                  { text: 'Cargo: '+cargo.nombre_cargo,   },
-                  { text: 'Desde: '+cargo.fec_inicio_,  },
-                  { text: 'Hasta: '+cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,  },
-                  { text: 'Horas de trabajo: '+cargo.hora_trabaja,  },
-                  { text: 'Sueldo: '+cargo.sueldo,  }]
+                  stack: [
+                    { text: 'Sucursal: ' + cargo.sucursal, },
+                    { text: 'Departamento: ' + cargo.departamento, },
+                    { text: 'Cargo: ' + cargo.nombre_cargo, },
+                    { text: 'Desde: ' + cargo.fec_inicio_, },
+                    { text: 'Hasta: ' + cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_, },
+                    { text: 'Horas de trabajo: ' + cargo.hora_trabaja, },
+                    { text: 'Sueldo: ' + cargo.sueldo, }]
                 }
               ]
             })
@@ -3435,7 +3438,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         alignment: 'left',
       };
     }
-    
+
   }
 
   PresentarDataPDFdiscapacidadEmpleado() {
@@ -3448,13 +3451,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               return [
                 {
                   text: [
-                    { text: 'Carnet conadis: '+ obj.carnet_conadis +' ', alignment: 'left'},
-                    { text: 'tipo: '+ obj.nom_tipo+' ',alignment: 'center' },
-                    { text: 'porcentaje:  '+obj.porcentaje+' %'+' ', alignment: 'right' },
+                    { text: 'Carnet conadis: ' + obj.carnet_conadis + ' ', alignment: 'left' },
+                    { text: 'tipo: ' + obj.nom_tipo + ' ', alignment: 'center' },
+                    { text: 'porcentaje:  ' + obj.porcentaje + ' %' + ' ', alignment: 'right' },
                   ],
                 }
               ];
-            }) 
+            })
           ]
         },
         layout: 'noBorders',
@@ -3465,7 +3468,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   GenerarPdf_Historico(action = 'open') {
-    const documentDefinition = this.DefinirInfoHistóricoPDF();
+    const documentDefinition = this.DefinirInfoHistoricoPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -3473,16 +3476,18 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
-  DefinirInfoHistóricoPDF(){
+
+  DefinirInfoHistoricoPDF() {
+    const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
     return {
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -3501,6 +3506,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDFContratosCargo(),
       ],
       styles: {
@@ -3512,13 +3518,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
 
-  PresentarDataPDFContratosCargo(){
+  PresentarDataPDFContratosCargo() {
     return this.listaContratosEmple.map(contrato => {
       return [
         // Salto en blanco o espacio antes de la primera parte
         {
           text: '', // Objeto vacío para crear espacio en blanco
-          margin: [0, 10, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
+          margin: [0, 5, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
         },
         // Primera parte con la información del régimen laboral de forma dinámica
         {
@@ -3526,27 +3532,27 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             widths: ['*', '*', '*'], // Ajusta el número de columnas según tus necesidades
             body: [
               [
-                { 
-                  text: `Régimen laboral: ${contrato.regimen}`, 
-                  style: 'headerText', 
+                {
+                  text: `Régimen laboral: ${contrato.regimen}`,
+                  style: 'headerText',
                   margin: [7, 5, 7, 5],
                   fontSize: 9,
                   fillColor: '#adcbff', // Cambia a azul
                   color: 'black'
                 },
-                { 
-                  text: `Fecha desde: ${moment(contrato.fecha_ingreso).format('DD/MM/YYYY')}`, 
+                {
+                  text: `Fecha desde: ${DateTime.fromISO(contrato.fecha_ingreso).toFormat('dd/MM/yyyy')}`,
                   alignment: 'center',
-                  style: 'headerText', 
+                  style: 'headerText',
                   margin: [7, 5, 7, 5],
                   fontSize: 9,
                   fillColor: '#adcbff',
                   color: 'black'
                 },
-                { 
-                  text: `Controlar vacaciones: ${contrato.controlar_vacacion ? 'Si' : 'No'}`, 
+                {
+                  text: `Controlar vacaciones: ${contrato.controlar_vacacion ? 'Si' : 'No'}`,
                   alignment: 'right',
-                  style: 'headerText', 
+                  style: 'headerText',
                   margin: [7, 5, 7, 5],
                   fontSize: 9,
                   fillColor: '#adcbff',
@@ -3554,27 +3560,27 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                 }
               ],
               [
-                { 
-                  text: `Modalidad laboral: ${contrato.descripcion}`, 
-                  style: 'headerText', 
-                  margin: [7, 0, 7,5],
-                  fontSize: 9,
-                  fillColor: '#adcbff',
-                  color: 'black'
-                },
-                { 
-                  text: `Fecha hasta: ${moment(contrato.fecha_salida).format('DD/MM/YYYY')}`, 
-                  alignment: 'center', 
-                  style: 'headerText', 
+                {
+                  text: `Modalidad laboral: ${contrato.descripcion}`,
+                  style: 'headerText',
                   margin: [7, 0, 7, 5],
                   fontSize: 9,
                   fillColor: '#adcbff',
                   color: 'black'
                 },
-                { 
-                  text: `Controlar asistencia: ${contrato.controlar_asistencia ? 'Si' : 'No'}`, 
-                  alignment: 'right', 
-                  style: 'headerText', 
+                {
+                  text: `Fecha hasta: ${DateTime.fromISO(contrato.fecha_salida).toFormat('dd/MM/yyyy')}`,
+                  alignment: 'center',
+                  style: 'headerText',
+                  margin: [7, 0, 7, 5],
+                  fontSize: 9,
+                  fillColor: '#adcbff',
+                  color: 'black'
+                },
+                {
+                  text: `Controlar asistencia: ${contrato.controlar_asistencia ? 'Si' : 'No'}`,
+                  alignment: 'right',
+                  style: 'headerText',
                   margin: [7, 0, 7, 5],
                   fontSize: 9,
                   fillColor: '#adcbff',
@@ -3583,7 +3589,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               ]
             ]
           },
-          layout:  {
+          layout: {
             hLineWidth: function (i, node) {
               return (i === 0 || i === node.table.body.length) ? 1 : 0; // Bordes horizontales solo en el contorno
             },
@@ -3597,11 +3603,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               return '#6e6e6e'; // Color del borde vertical
             },
           }
-        },      
+        },
         // Tabla principal con los datos de los empleados o cargos
         {
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
             body: [
               [
                 { text: 'Sucursal', style: 'tableHeader', fontSize: 9 },
@@ -3619,8 +3625,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                   { text: obj.sucursal, style: 'itemsTable', fontSize: 9 },
                   { text: obj.nombre, style: 'itemsTable', fontSize: 9 },
                   { text: obj.cargo, style: 'itemsTable', fontSize: 9 },
-                  { text: moment(obj.fecha_inicio).format('DD/MM/YYYY'), style: 'itemsTable', fontSize: 9 },
-                  { text: moment(obj.fecha_final).format('DD/MM/YYYY'), style: 'itemsTable', fontSize: 9 },
+                  { text: DateTime.fromISO(obj.fecha_inicio).toFormat('dd/MM/yyyy'), style: 'itemsTable', fontSize: 9 },
+                  { text: DateTime.fromISO(obj.fecha_final).toFormat('dd/MM/yyyy'), style: 'itemsTable', fontSize: 9 },
                   { text: obj.hora_trabaja, style: 'itemsTable', fontSize: 9 },
                   { text: obj.sueldo, style: 'itemsTable', fontSize: 9 },
                   { text: obj.cargo.jefe ? 'Si' : 'No', style: 'itemsTable', fontSize: 9 },
@@ -3633,10 +3639,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             fillColor: function (i: any) {
               return (i % 2 === 0) ? '#e5f6fd' : null;
             },
-            hLineWidth: function(i: number, node: any) {
+            hLineWidth: function (i: number, node: any) {
               return (i === 0 || i === node.table.body.length) ? 1 : 0.5;
             },
-            vLineWidth: function(i: number, node: any) {
+            vLineWidth: function (i: number, node: any) {
               return (i === 0 || i === node.table.widths.length) ? 1 : 0.5;
             },
             hLineColor: function (i, node) {

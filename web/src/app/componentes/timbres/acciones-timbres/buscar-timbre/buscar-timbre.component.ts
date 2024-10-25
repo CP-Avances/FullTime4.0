@@ -66,7 +66,6 @@ export class BuscarTimbreComponent implements OnInit {
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.BuscarParametro();
-    this.BuscarHora();
     this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
   }
 
@@ -76,21 +75,25 @@ export class BuscarTimbreComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -151,7 +154,7 @@ export class BuscarTimbreComponent implements OnInit {
           })
         }
         this.timbres.forEach((data: any) => {
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado);
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           if (data.tecla_funcion === '0') {
             data.tecla_funcion_ = 'Entrada';

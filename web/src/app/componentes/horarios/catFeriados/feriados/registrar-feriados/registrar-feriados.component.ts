@@ -6,7 +6,7 @@ import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
@@ -108,7 +108,7 @@ export class RegistrarFeriadosComponent implements OnInit {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
           this.contador = 1;
         }
       })
@@ -131,8 +131,8 @@ export class RegistrarFeriadosComponent implements OnInit {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (moment(feriado.fecha).format('YYYY-MM-DD') === moment(obj.fecha_recuperacion).format('YYYY-MM-DD') ||
-          moment(feriado.fec_recuperacion).format('YYYY-MM-DD') === moment(obj.fecha).format('YYYY-MM-DD')
+        if (DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd') === DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') ||
+          DateTime.fromISO(feriado.fec_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(obj.fecha).toFormat('yyyy-MM-dd')
         ) {
           this.contador = 1;
         }

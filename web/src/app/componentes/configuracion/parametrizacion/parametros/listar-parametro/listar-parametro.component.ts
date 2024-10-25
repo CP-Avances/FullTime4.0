@@ -3,9 +3,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -165,9 +165,9 @@ export class ListarParametroComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -192,7 +192,7 @@ export class ListarParametroComponent implements OnInit {
       styles: {
         tableMarginCabecera: { margin: [0, 10, 0, 0] },
         itemsTableInfo: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
-        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMargin: { margin: [0, 5, 0, 0] },
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
       }

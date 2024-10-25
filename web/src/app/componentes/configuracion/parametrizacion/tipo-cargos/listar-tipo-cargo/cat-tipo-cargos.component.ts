@@ -6,10 +6,10 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
@@ -109,9 +109,8 @@ export class CatTipoCargosComponent {
     })
   }
 
-  formato_fecha: string = 'DD/MM/YYYY';
-
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  formato_fecha: string = 'DD/MM/YYYY';
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
@@ -478,9 +477,9 @@ export class CatTipoCargosComponent {
       header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -497,14 +496,16 @@ export class CatTipoCargosComponent {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Tipo Cargos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA TIPO DE CARGOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10, alignment: 'center' },
-        itemsTableD: { fontSize: 10 }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8, alignment: 'center' },
+        itemsTableD: { fontSize: 8 },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -515,12 +516,13 @@ export class CatTipoCargosComponent {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto'],
             body: [
               [
-                { text: 'Item', style: 'tableHeader' },
-                { text: 'Cargos', style: 'tableHeader' },
+                { text: 'ITEM', style: 'tableHeader' },
+                { text: 'CARGOS', style: 'tableHeader' },
               ],
               ...this.listaTipoCargos.map((obj: any) => {
                 return [

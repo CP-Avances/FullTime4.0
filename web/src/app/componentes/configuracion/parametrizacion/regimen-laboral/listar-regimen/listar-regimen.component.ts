@@ -4,11 +4,11 @@ import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
+import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
 
 import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
-import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
@@ -227,9 +227,9 @@ export class ListarRegimenComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -248,24 +248,20 @@ export class ListarRegimenComponent implements OnInit {
         };
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        {
-          text: "Regímenes Laborales",
-          bold: true,
-          fontSize: 20,
-          alignment: "center",
-          margin: [0, -20, 0, 10],
-        },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'RÉGIMEN LABORAL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDF(),
       ],
       styles: {
         tableHeader: {
-          fontSize: 10,
+          fontSize: 9,
           bold: true,
           alignment: "center",
           fillColor: this.p_color,
         },
         itemsTable: { fontSize: 8, alignment: "center" },
+        tableMargin: { margin: [0, 5, 0, 0] },
       },
     };
   }
@@ -276,6 +272,7 @@ export class ListarRegimenComponent implements OnInit {
         { width: "*", text: "" },
         {
           width: "auto",
+          style: 'tableMargin',
           table: {
             widths: [
               "auto",
@@ -292,17 +289,17 @@ export class ListarRegimenComponent implements OnInit {
             ],
             body: [
               [
-                { text: "Código", style: "tableHeader" },
-                { text: "Descripción", style: "tableHeader" },
-                { text: "País", style: "tableHeader" },
-                { text: "Meses Periodo", style: "tableHeader" },
-                { text: "Días por mes", style: "tableHeader" },
-                { text: "Vacaciones por año", style: "tableHeader" },
-                { text: "Días libres", style: "tableHeader" },
-                { text: "Días calendario", style: "tableHeader" },
-                { text: "Días máximos acumulables", style: "tableHeader" },
-                { text: "Años para antiguedad", style: "tableHeader" },
-                { text: "Días de incremento", style: "tableHeader" },
+                { text: "CÓDIGO", style: "tableHeader" },
+                { text: "DESCRIPCIÓN", style: "tableHeader" },
+                { text: "PAÍS", style: "tableHeader" },
+                { text: "MESES PERIODO", style: "tableHeader" },
+                { text: "DÍAS POR MES", style: "tableHeader" },
+                { text: "VACACIONES POR AÑO", style: "tableHeader" },
+                { text: "DÍAS LIBRES", style: "tableHeader" },
+                { text: "DÍAS CALENDARIO", style: "tableHeader" },
+                { text: "DÍAS MÁXIMOS ACUMULABLES", style: "tableHeader" },
+                { text: "AÑOS PARA ANTIGUEDAD", style: "tableHeader" },
+                { text: "DÍAS DE INCREMENTO", style: "tableHeader" },
               ],
               ...this.regimen.map((obj: any) => {
                 return [

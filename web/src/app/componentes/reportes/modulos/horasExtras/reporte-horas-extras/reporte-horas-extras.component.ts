@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
+
+import { PlantillaReportesService } from '../../../plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as moment from 'moment';
-import { MatDialog } from '@angular/material/dialog';
+
 import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
-import { PlantillaReportesService } from '../../../plantilla-reportes.service';
 
 @Component({
   selector: 'app-reporte-horas-extras',
@@ -224,7 +227,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
             {
               border: [true, true, false, true],
               bold: true,
-              text: 'PERIODO DEL: ' + String(moment('2020/12/01', "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment('2020/12/31', "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: 'PERIODO DEL: ' + DateTime.fromFormat('2020/12/01', 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat('2020/12/31', 'yyyy/MM/dd').toFormat('dd/MM/yyyy'),
               style: 'itemsTableInfo'
             },
             {

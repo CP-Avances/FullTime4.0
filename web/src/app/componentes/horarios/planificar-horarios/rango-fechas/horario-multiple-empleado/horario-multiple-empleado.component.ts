@@ -5,7 +5,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -425,7 +425,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.PlanificarRotativos(datos);
     }
     else if (tipo === 't') {
-      this.CargarTimbres(datos);
+      this.CargarTimbres(datos, this.timbre.value);
     }
     else if (tipo === 'c') {
       this.CargarPlantilla(datos);
@@ -521,12 +521,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc)
+      console.log("ver usuarios", usuarios)
     }
     else if (this.opcion === 'r') {
       usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc)
     }
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
+      console.log("ver usuarios: ", usuarios)
     }
     this.SeleccionarProceso(tipo, usuarios);
   }
@@ -711,12 +713,24 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.activar_cargar = false;
   }
 
-  // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
-  CargarTimbres(data: any) {
-    if (data.length > 0) {
+  fechaInicioFormluxon: any;
+  fechaFinFormluxon: any;
 
-      var inicio = moment(this.fechaInicioF.value).format('YYYY-MM-DD');
-      var fin = moment(this.fechaFinalF.value).format('YYYY-MM-DD');
+  // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
+  CargarTimbres(data: any, timbre: any) {
+
+    let fechaInicioForm = timbre.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    console.log("fechaInicioFormluxon: ", this.fechaInicioFormluxon)
+
+    let fechaFinalForm = timbre.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    console.log("ver data: ", data);
+    if (data.length > 0) {
+      var inicio = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
+      var fin = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
+
+      console.log(" ver inicio: ", inicio)
 
       // VERIFICAR FECHAS INGRESADAS
       if (Date.parse(inicio) <= Date.parse(fin)) {
@@ -732,10 +746,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
           }
         })
 
+        console.log("ver fin en metodo:", this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'))
+        console.log("ver inicio metodo ",this.fechaInicioFormluxon.toFormat('yyyy-MM-dd') )
+
+
         let usuarios = {
           codigo: codigos,
-          fec_final: moment(moment(this.fechaFinalF.value).format('YYYY-MM-DD')).add(2, 'days'),
-          fec_inicio: moment(this.fechaInicioF.value).format('YYYY-MM-DD'),
+          fec_final: this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+          fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
         };
 
         this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {

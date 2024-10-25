@@ -4,7 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 
@@ -104,7 +104,7 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarSinRecuperacion(feriado: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
           this.contador = 1;
         }
       })
@@ -128,8 +128,8 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
-          moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (obj.fecha.split('T')[0] === DateTime.fromISO(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
+          DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
           this.contador = 1;
         }
       })

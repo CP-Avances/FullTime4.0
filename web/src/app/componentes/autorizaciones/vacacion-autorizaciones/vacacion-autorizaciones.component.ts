@@ -1,14 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import * as moment from 'moment';
+import { Component, OnInit, Inject } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 interface Orden {
   valor: number
@@ -87,8 +87,8 @@ export class VacacionAutorizacionesComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.obtenerDepartamento();
     this.BuscarTipoAutorizacion();
 

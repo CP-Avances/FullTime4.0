@@ -428,7 +428,7 @@ export class AsignarUsuarioComponent implements OnInit {
     }
     this.ventana.open(VisualizarAsignacionesComponent, {
       data: datos,
-      width: '700px',
+      width: '800px',
       height: 'auto',
     }).afterClosed().subscribe(async () => {
       await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);

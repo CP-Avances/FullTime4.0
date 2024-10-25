@@ -199,6 +199,7 @@ class EmpleadoHorariosControlador {
     VerificarFechasHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal, id_horario, ids } = req.body; // 'ids' es un array de id_empleado
+            console.log("ver req.body: ", req.body);
             // Consulta para verificar planificaciones duplicadas
             const HORARIOS = yield database_1.default.query(`
         SELECT DISTINCT id_empleado FROM eu_asistencia_general 

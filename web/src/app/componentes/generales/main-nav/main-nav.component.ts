@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable, asapScheduler } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
@@ -249,14 +249,13 @@ export class MainNavComponent implements OnInit {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
     console.log(licencia);
     if (licencia !== null) {
-      const fec_caducidad = new Date(licencia.split('.')[0])
-      const fecha_hoy = new Date();
+      const fec_caducidad = new Date(licencia.split('.')[0]);
       this.fec_caducidad_licencia = fec_caducidad;
-      const fecha1 = moment(fecha_hoy.toJSON().split('T')[0])
-      const fecha2 = moment(fec_caducidad.toJSON().split('T')[0])
-
-      const diferencia = fecha2.diff(fecha1, 'days');
-
+      // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
+      const fecha1 = DateTime.now();
+      const fecha2 = DateTime.fromJSDate(fec_caducidad);
+      // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS
+      const diferencia = fecha2.diff(fecha1, 'days').days;
       if (diferencia <= 30) {
         this.showMessageLicencia = true;
         const text = (diferencia === 1) ? 'dia' : 'dias';

@@ -1,9 +1,15 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR AUTORIZAR DEPARTAMENTO
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            MODIFICAR AUTORIZAR DEPARTAMENTO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
 </div>
 <!-- FORMULARIO COMPLETO -->
 <form [formGroup]="formulario">
@@ -55,25 +61,32 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="d-flex flex-wrap justify-content-start">
-                        <mat-radio-group aria-labelledby="example-radio-group-label" [formControl]="autorizarF"
+                <div class="col-md-12">
+                    <div class="d-flex flex-wrap justify-content-start w-100">
+                        <label class="d-flex justify-content-between"
+                            style="position: relative; left:15px; font-size: 14px; padding-top: 5px;">
+                            <span>Opciones de aprobación*</span>
+                        </label>
+                        <mat-radio-group class="w-100" aria-labelledby="example-radio-group-label" [formControl]="autorizarF"
                             required>
-                            <label class="d-flex justify-content-between"
-                                style="position: relative; left:15px; font-size: 14px; padding-top: 5px;">
-                                <span>Opciones de aprobación*</span>
-                            </label>
-                            <div style="margin-left: 30px;">
-                                <mat-radio-button ngDefaultControl [checked]="selec1" value="preautorizar">
-                                    <label id="textoradiobtn">Pre-autorizar</label>
-                                </mat-radio-button>
-                                <mat-radio-button ngDefaultControl [checked]="selec2" value="autorizar">
-                                    <label id="textoradiobtn">Autorizar</label>
-                                </mat-radio-button>
-                                <mat-radio-button ngDefaultControl [checked]="selec3" value="noautorizar">
-                                    <label id="textoradiobtn">Ninguna</label>
-                                </mat-radio-button>
-                            </div>
+                            <div class="row w-100 ml-3">
+                                <div class="col-12 col-md-4 p-0">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec1" value="preautorizar">
+                                        <label id="textoradiobtn">Pre-autorizar</label>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="col-12 col-md-4 p-0">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec2" value="autorizar">
+                                        <label id="textoradiobtn">Autorizar</label>
+                                    </mat-radio-button>
+                                </div> 
+                                <div class="col-12 col-md-4 p-0">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec3" value="noautorizar">
+                                        <label id="textoradiobtn">Ninguna</label>
+                                    </mat-radio-button>
+                                </div>  
+                                    
+                            </div> 
                         </mat-radio-group>
                     </div>
                 </div>

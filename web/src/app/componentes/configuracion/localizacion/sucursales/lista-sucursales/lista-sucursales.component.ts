@@ -4,11 +4,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -254,9 +254,9 @@ export class ListaSucursalesComponent implements OnInit {
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -273,14 +273,16 @@ export class ListaSucursalesComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Establecimientos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE SUCURSALES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.presentarDataPDFSucursales(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8 },
+        itemsTableC: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -291,13 +293,14 @@ export class ListaSucursalesComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Establecimiento', style: 'tableHeader' },
-                { text: 'Ciudad', style: 'tableHeader' }
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'SUCURSAL/ ESTABLECIMIENTO', style: 'tableHeader' },
+                { text: 'CIUDAD', style: 'tableHeader' }
               ],
               ...this.sucursales.map((obj: any) => {
                 return [
@@ -328,18 +331,18 @@ export class ListaSucursalesComponent implements OnInit {
     this.sucursales.forEach((item: any) => {
       var data: any = {
         id: '',
+        ciudad: '',
         nombre: '',
-        descripcion: ''
       }
 
       data.id = item.id;
+      data.ciudad = item.descripcion;
       data.nombre = item.nombre;
-      data.descripcion = item.descripcion;
 
       listExcelSucursales.push(data);
     })
 
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(listExcelSucursales);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Establecimientos');
     xlsx.writeFile(wb, "Establecimientos" + '.xlsx');
@@ -350,23 +353,22 @@ export class ListaSucursalesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
-
     var listExcelSucursales: any = [];
     this.sucursales.forEach((item: any) => {
       var data: any = {
         id: '',
+        ciudad: '',
         nombre: '',
-        descripcion: ''
       }
 
       data.id = item.id;
+      data.ciudad = item.descripcion;
       data.nombre = item.nombre;
-      data.descripcion = item.descripcion;
 
       listExcelSucursales.push(data);
     })
 
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(listExcelSucursales);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "EstablecimientosCSV" + '.csv');
@@ -385,8 +387,8 @@ export class ListaSucursalesComponent implements OnInit {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },
-          "establecimiento": obj.nombre,
           "ciudad": obj.descripcion,
+          "establecimiento": obj.nombre,
         }
       }
       arregloSucursales.push(objeto)

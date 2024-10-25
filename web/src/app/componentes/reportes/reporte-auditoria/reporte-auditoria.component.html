@@ -140,11 +140,11 @@
                                 <td class="t_horarios">{{ e.table_name }}</td>
                                 <td class="t_horarios">{{ transformAction(e.action) }}</td>
                                 <td class="t_horarios">
-                                    {{validar.FormatearFecha(e.fecha_hora,
-                                    this.formato_fecha,this.validar.dia_abreviado)}}
+                                    {{validar.FormatearFechaAuditoria(e.fecha_hora,
+                                    this.formato_fecha,this.validar.dia_abreviado, idioma_fechas)}}
                                 </td>
                                 <td class="t_horarios">
-                                    {{validar.FormatearHora(e.fecha_hora.split(' ')[1],
+                                    {{validar.FormatearHoraAuditoria(e.fecha_hora.split(' ')[1],
                                     this.formato_hora)}}
                                 </td>
                                 <td class="t_horarios">{{ e.original_data }}</td>

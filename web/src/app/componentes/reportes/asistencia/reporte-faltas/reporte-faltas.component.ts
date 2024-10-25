@@ -4,9 +4,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -125,7 +125,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -142,22 +141,25 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -337,9 +339,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        let f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        let time = f.format('HH:mm:ss');
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -394,7 +396,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let general: any = [];
     let n: any = [];
     let c = 0;
-    console.log("ver la data del pdf",data)
+    console.log("ver la data del pdf", data)
     data.forEach((selec: any) => {
       let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length })
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
@@ -522,7 +524,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 { text: 'FECHA', style: 'tableHeader' },
               ],
               ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 totalFaltasEmpleado++;
                 c = c + 1;
                 return [
@@ -615,7 +617,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       suc.empleados.forEach((empl: any) => {
         empl.faltas.forEach((obj3: any) => {
           n++;
-          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           let ele = {
             'N°': n,
             'Cédula': empl.cedula,
@@ -645,7 +647,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
         empl.faltas.forEach((usu: any) => {
-          const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           n = n + 1;
           let ele = {
             n: n,

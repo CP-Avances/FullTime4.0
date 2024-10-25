@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
@@ -53,7 +53,7 @@ export class HomeComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     this.VerEmpleado(this.formato_fecha)
@@ -70,8 +70,8 @@ export class HomeComponent implements OnInit {
 
   // METODO PARA FORMATEAR FECHAS
   FormatearFechas(formato_fecha: string) {
-    var f = moment();
-    this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
+    var f = DateTime.now();
+    this.fecha = this.validar.FormatearFecha(f.toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);
   }
 
   // METODO PARA VER LA INFORMACION DEL USUARIO 
@@ -83,7 +83,7 @@ export class HomeComponent implements OnInit {
     this.datosEmpleado = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.datosEmpleado = data[0];
-      this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {

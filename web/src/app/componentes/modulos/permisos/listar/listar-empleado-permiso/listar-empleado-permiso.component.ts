@@ -4,6 +4,8 @@ import { Component, OnInit } from "@angular/core";
 import { SelectionModel } from "@angular/cdk/collections";
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
+import { DateTime } from 'luxon';
+
 import * as FileSaver from "file-saver";
 import * as moment from "moment";
 import * as xlsx from "xlsx";
@@ -11,20 +13,21 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-
 // IMPORTACION DE SERVICIOS
+import { AutorizaDepartamentoService } from "src/app/servicios/autorizaDepartamento/autoriza-departamento.service";
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
 import { PermisosService } from "src/app/servicios/permisos/permisos.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
-import { AutorizaDepartamentoService } from "src/app/servicios/autorizaDepartamento/autoriza-departamento.service";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 import { ToastrService } from 'ngx-toastr';
-import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
+
 import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
+import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
+
 import { EditarPermisoEmpleadoComponent } from '../../gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 
 export interface PermisosElemento {
@@ -159,40 +162,35 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   formato_fecha: string = "DD/MM/YYYY";
   formato_hora: string = "HH:mm:ss";
-
   ArrayAutorizacionTipos: any = []
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
-      (res) => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha);
-      },
-      (vacio) => {
-        this.BuscarHora(this.formato_fecha);
-      }
-    );
-
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
+      res => {
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.obtenerPermisos(this.formato_fecha, this.formato_hora);
+        this.ObtenerPermisosAutorizados(this.formato_fecha, this.formato_hora);
+      }, vacio => {
+        this.obtenerPermisos(this.formato_fecha, this.formato_hora);
+        this.ObtenerPermisosAutorizados(this.formato_fecha, this.formato_hora);
+      });
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
-      }
-    );
-
-  }
-
-  BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      (res) => {
-        this.formato_hora = res[0].descripcion;
-        this.obtenerPermisos(fecha, this.formato_hora);
-        this.ObtenerPermisosAutorizados(fecha, this.formato_hora);
-      },
-      (vacio) => {
-        this.obtenerPermisos(fecha, this.formato_hora);
-        this.ObtenerPermisosAutorizados(fecha, this.formato_hora);
       }
     );
   }
@@ -218,17 +216,17 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           p.fec_creacion_ = this.validar.FormatearFecha(
             p.fec_creacion,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
           p.fec_inicio_ = this.validar.FormatearFecha(
             p.fec_inicio,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
           p.fec_final_ = this.validar.FormatearFecha(
             p.fec_final,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
 
           if (p.estado === 1) {
@@ -469,17 +467,17 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           p.fec_creacion_ = this.validar.FormatearFecha(
             p.fec_creacion,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
           p.fec_inicio_ = this.validar.FormatearFecha(
             p.fec_inicio,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
           p.fec_final_ = this.validar.FormatearFecha(
             p.fec_final,
             fecha,
-            this.validar.dia_abreviado
+            this.validar.dia_abreviado, this.idioma_fechas
           );
 
           if (p.estado === 3) {
@@ -576,9 +574,9 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var f = moment();
-        fecha = f.format("YYYY-MM-DD");
-        hora = f.format("HH:mm:ss");
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [

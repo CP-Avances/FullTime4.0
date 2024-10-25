@@ -41,11 +41,11 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-    // VARIABLES PROGRESS SPINNER
-    habilitarprogress: boolean = false;
-    mode: ProgressSpinnerMode = 'indeterminate';
-    color: ThemePalette = 'primary';
-    value = 10;
+  // VARIABLES PROGRESS SPINNER
+  habilitarprogress: boolean = false;
+  mode: ProgressSpinnerMode = 'indeterminate';
+  color: ThemePalette = 'primary';
+  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -75,7 +75,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
-
+  idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
@@ -102,9 +102,9 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     this.rest.ConsultarUnFeriado(idFeriado).subscribe(data => {
       this.datosFeriado = data;
       this.datosFeriado.forEach((data: any) => {
-        data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
+        data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         if (data.fecha_recuperacion != null) {
-          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado);
+          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         }
       })
     })

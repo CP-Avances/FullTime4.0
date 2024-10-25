@@ -6,8 +6,8 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ThemePalette } from '@angular/material/core';
+import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -109,7 +109,7 @@ export class RegistroHorarioComponent implements OnInit {
       dataHorario.min_almuerzo = 0;
     }
     else if (dataHorario.hora_trabajo >= '72:00' || dataHorario.hora_trabajo >= '72:00:00') {
-      dataHorario.hora_trabajo = moment(dataHorario.hora_trabajo, 'HH:mm:ss').format('HH:mm:ss');
+      dataHorario.hora_trabajo = DateTime.fromISO(dataHorario.hora_trabajo, 'HH:mm:ss').toFormat('HH:mm:ss');
     }
 
     // VERIFICAR INGRESO DE MINUTOS DE ALIMENTACION

@@ -11,9 +11,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import * as moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-moment.locale('es');
 
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';

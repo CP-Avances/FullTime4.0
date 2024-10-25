@@ -14,6 +14,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MrlService } from 'src/app/servicios/reportes/mrl/mrl.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-timbre-mrl',
@@ -109,6 +110,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     private restEmpre: EmpresaService,
     private validar: ValidacionesService,
     private toastr: ToastrService,
+    public parametro: ParametrosService,
     public restUsuario: UsuarioService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -118,6 +120,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
+    this.BuscarParametro();
     this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
@@ -128,6 +131,28 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     this.regimen = [];
     this.timbres = [];
     this.cargos = [];
+  }
+
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
+      res => {
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+      });
   }
 
   /** ****************************************************************************************** **
@@ -293,7 +318,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
           n = n + 1;
-          const servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           const servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           switch (t.accion) {
             case 'EoS': accionT = '1'; break;

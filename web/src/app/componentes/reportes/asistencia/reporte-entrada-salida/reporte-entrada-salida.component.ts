@@ -3,24 +3,23 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import * as moment from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
+
+import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xlsx from 'xlsx';
 
-
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { EntradasSalidas } from 'src/app/model/timbres.model';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { EntradasSalidas } from 'src/app/model/timbres.model';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-entrada-salida',
@@ -155,8 +154,8 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           fechaFinal: form.finalForm
         }
         this.fechasPeriodo = []; // Array que contiene todas las fechas del mes indicado
-        this.inicioDate = moment(form.inicioForm).format('MM-DD-YYYY');
-        this.finDate = moment(form.finalForm).format('MM-DD-YYYY');
+        this.inicioDate = DateTime.fromISO(form.inicioForm).toFormat('MM-dd-yyyy');
+        this.finDate = DateTime.fromISO(form.finalForm).toFormat('MM-dd-yyyy');
 
         // Inicializar datos de fecha
         var start = new Date(this.inicioDate);
@@ -164,7 +163,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
         // Lógica para obtener el nombre de cada uno de los día del periodo indicado
         while (start <= end) {
-          this.fechasPeriodo.push(moment(start).format('dddd DD/MM/YYYY'));
+          this.fechasPeriodo.push(DateTime.fromISO(start).toFormat('dddd dd/MM/yyyy'));
           var newDate = start.setDate(start.getDate() + 1);
           start = new Date(newDate);
         }
@@ -307,16 +306,16 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
     }, error => {
       // BUSQUEDA de la lista de las planificaciones del empleado
-     /* this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
-        this.empleadoPlan = dataP;
-        console.log('plan', this.empleadoPlan);
-        // Llamado a ver archivos
-        this.VerArchivos(codigo, archivo, form, fechasTotales);
-
-      }, error => {
-        // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
-        this.VerArchivos(codigo, archivo, form, fechasTotales);
-      })*/
+      /* this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
+         this.empleadoPlan = dataP;
+         console.log('plan', this.empleadoPlan);
+         // Llamado a ver archivos
+         this.VerArchivos(codigo, archivo, form, fechasTotales);
+ 
+       }, error => {
+         // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
+         this.VerArchivos(codigo, archivo, form, fechasTotales);
+       })*/
     })
   }
 
@@ -381,16 +380,9 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
       // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        // Formato de hora actual
-        if (h.getMinutes() < 10) {
-          var time = h.getHours() + ':0' + h.getMinutes();
-        }
-        else {
-          var time = h.getHours() + ':' + h.getMinutes();
-        }
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return [
           {
             table: {
@@ -469,8 +461,8 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         regimen = obj.regimen;
       }
     })
-    var diaI = moment(form.inicioForm).day();
-    var diaF = moment(form.finalForm).day();
+    var diaI = DateTime.fromISO(form.inicioForm).weekday;
+    var diaF = DateTime.fromISO(form.finalForm).weekday;
     return {
       table: {
         widths: ['*'],
@@ -480,7 +472,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             columns: [
               { text: [{ text: 'CIUDAD: ' + ciudad, style: 'itemsTableI' }] },
               { text: [{ text: '', style: 'itemsTableI' }] },
-              { text: [{ text: 'PERIODO DEL: ' + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")), style: 'itemsTableP' }] },
+              { text: [{ text: 'PERIODO DEL: ' + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy'), style: 'itemsTableP' }] },
             ]
           }],
           [{
@@ -504,8 +496,15 @@ export class ReporteEntradaSalidaComponent implements OnInit {
               { text: [{ text: 'N° REGISTROS: ' + fechasTotales.length, style: 'itemsTableI' }] },
             ]
           }],
-          [{ text: 'LISTA DE ENTRADAS - SALIDAS PERIODO DEL ' + moment.weekdays(diaI).toUpperCase() + ' ' + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + moment.weekdays(diaF).toUpperCase() + ' ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")), style: 'tableHeader' },],
-        ]
+          [{
+            text: 'LISTA DE ENTRADAS - SALIDAS PERIODO DEL ' +
+              DateTime.fromObject({ weekday: diaI }).toFormat('cccc').toUpperCase() + ' ' +
+              DateTime.fromFormat(form.inicioForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy") +
+              ' AL ' +
+              DateTime.fromObject({ weekday: diaF }).toFormat('cccc').toUpperCase() + ' ' +
+              DateTime.fromFormat(form.finalForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy"),
+            style: 'tableHeader'
+          },],]
       },
       layout: {
         hLineColor: function (i, node) {
@@ -526,7 +525,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     // Buscar dias en la lista de planificacion del empleado
     if (this.empleadoPlan.length != 0) {
       for (var k = 0; k <= this.empleadoPlan.length - 1; k++) {
-        fechaPlan = moment(this.empleadoPlan[k].fecha_dia).format('DD/MM/YYYY');
+        fechaPlan = DateTime.fromISO(this.empleadoPlan[k].fecha_dia).toFormat('dd/MM/yyyy');
         if (dayFecha === fechaPlan) {
           if (this.empleadoPlan[k].tipo_dia === 1) {
             estado = 'Libre';
@@ -666,7 +665,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
             // BUSQUEDA de los datos
             this.totalEntradasSalidas.forEach((element: any) => {
-              fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
+              fecha_timbre = DateTime.fromISO(element.fecha_hora_timbre).toFormat('dd/MM/yyyy');
               // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
 
               //console.log('ver fecha2 map ', fecha_timbre, element.accion);
@@ -676,32 +675,32 @@ export class ReporteEntradaSalidaComponent implements OnInit {
                 console.log('entrada ', fecha_timbre, element.accion);
                 entrada = 'REGISTRADO'
                 horarioE = element.hora;
-                timbreE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+                timbreE = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'S') {
                 console.log('salida ', fecha_timbre, element.accion);
                 salida = 'REGISTRADO'
                 horarioS = element.hora;
-                timbreS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+                timbreS = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'I/A') {
                 console.log('inicio comida ', fecha_timbre, element.accion);
                 almuerzoS = 'REGISTRADO'
                 horarioAS = element.hora;
-                timbreAlmuerzoS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+                timbreAlmuerzoS = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'F/A') {
                 console.log('fin comida ', fecha_timbre, element.accion);
                 almuerzoE = 'REGISTRADO'
                 horarioAE = element.hora;
-                timbreAlmuerzoE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+                timbreAlmuerzoE = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
               }
               // NO EXISTE TIMBRE
               else {
                 if (this.feriadosTotales.length != 0) {
                   // Buscar días en la lista de feriados
                   for (var i = 0; i <= this.feriadosTotales.length - 1; i++) {
-                    fechaFeriado = moment(this.feriadosTotales[i].fecha).format('DD/MM/YYYY');
+                    fechaFeriado = DateTime.fromISO(this.feriadosTotales[i].fecha).toFormat('dd/MM/yyyy');
                     if (dayFecha === fechaFeriado) {
                       sinTimbre = 'Feriado';
                       break;
@@ -820,16 +819,9 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        // Formato de hora actual
-        if (h.getMinutes() < 10) {
-          var time = h.getHours() + ':0' + h.getMinutes();
-        }
-        else {
-          var time = h.getHours() + ':' + h.getMinutes();
-        }
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -895,7 +887,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           [{ text: 'INFORMACIÓN GENERAL EMPLEADO', style: 'tableHeader' },],
           [{
             columns: [
-              { text: [{ text: 'PERIODO DEL: ' + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")), style: 'itemsTableP' }] },
+              { text: [{ text: 'PERIODO DEL: ' + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').format('dd/MM/yyyy'), style: 'itemsTableP' }] },
             ]
           }],
           [{
@@ -978,34 +970,34 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
       // BUSQUEDA de los datos
       this.totalEntradasSalidas.forEach((element: any) => {
-        fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
+        fecha_timbre = DateTime.fromISO(element.fecha_hora_timbre).toFormat('dd/MM/yyyy');
         // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
         if (dayFecha === fecha_timbre && element.accion === 'E') {
           entrada = 'REGISTRADO'
           horarioE = element.hora;
-          timbreE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+          timbreE = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'S') {
           salida = 'REGISTRADO'
           horarioS = element.hora;
-          timbreS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+          timbreS = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'I/A') {
           almuerzoS = 'REGISTRADO'
           horarioAS = element.hora;
-          timbreAlmuerzoS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+          timbreAlmuerzoS = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'F/A') {
           almuerzoE = 'REGISTRADO'
           horarioAE = element.hora;
-          timbreAlmuerzoE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
+          timbreAlmuerzoE = DateTime.fromISO(element.fecha_hora_timbre).toFormat('HH:mm:ss')
         }
         // NO EXISTE TIMBRE
         else {
           if (this.feriadosTotales.length != 0) {
             // Buscar días en la lista de feriados
             for (var i = 0; i <= this.feriadosTotales.length - 1; i++) {
-              fechaFeriado = moment(this.feriadosTotales[i].fecha).format('DD/MM/YYYY');
+              fechaFeriado = DateTime.fromISO(this.feriadosTotales[i].fecha).toFormat('dd/MM/yyyy');
               if (dayFecha === fechaFeriado) {
                 sinTimbre = 'Feriado';
                 break;
@@ -1092,7 +1084,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wst, 'Timbres');
-    xlsx.writeFile(wb, "Timbres Entradas-Salidas - " + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' - ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + '.xlsx');
+    xlsx.writeFile(wb, "Timbres Entradas-Salidas - " + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + '.xlsx');
   }
 
 }

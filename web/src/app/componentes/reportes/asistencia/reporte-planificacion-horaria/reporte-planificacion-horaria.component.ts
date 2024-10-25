@@ -6,10 +6,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
-import { default as _rollupMoment, Moment } from 'moment';
+import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -158,7 +157,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -176,22 +174,25 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-      });
-  }
-
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 2
-    this.parametro.ListarDetalleParametros(2).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
       });
   }
 
@@ -333,13 +334,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   mes_fin: any = '';
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, id_empleado: any) {
     this.horariosEmpleado = [];
-    this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
-    this.mes_fin = fec_final.format("YYYY-MM-DD");
+    this.mes_inicio = DateTime.fromISO(fec_inicio).toFormat('yyyy-MM-dd');
+    this.mes_fin = DateTime.fromISO(fec_final).toFormat('yyyy-MM-dd');
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
       id_empleado: id_empleado
     }
+    //console.log('fechas ', busqueda)
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe((datos: any) => {
       if (datos.message === 'OK') {
         const horarios = datos.data;
@@ -530,9 +532,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        let f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        let time = f.format('HH:mm:ss');
+        let f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        let time = f.toFormat('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -566,9 +568,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginHorarios: { margin: [10, 10, 10, 0] },
         tableMarginCabecera: { margin: [0, 10, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
-        quote: { margin: [5, -2, 0, -2], italics: true },
-        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
@@ -1130,15 +1129,17 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   fecHorario: boolean = true;
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
-    const ctrlValue = fecha;
+  FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
+    const ctrlValue = fecha.toISOString();
+    //console.log('value ', ctrlValue)
+    //console.log('opcion ', opcion)
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = moment(ctrlValue).format('01/MM/YYYY');
-        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
     }
@@ -1150,22 +1151,32 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
-    // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = moment(fec_inicio).format('01/MM/YYYY');
-    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
-    if (Date.parse(feci) <= Date.parse(fecf)) {
+    //console.log('inicio ', fec_inicio);
+    //console.log('final ', fec_fin);
+
+    // PARSEAR LAS FECHAS DE ENTRADA
+    const fechaInicio = DateTime.fromISO(fec_inicio);
+    const fechaFin = DateTime.fromISO(fec_fin);
+
+    // OBTENER EL PRIMER DIA DEL MES
+    const inicio = fechaInicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
+
+    // OBTENER EL ÚLTIMO DIA DEL MES
+    const final = fechaFin.endOf('month').toFormat('dd/MM/yyyy');
+
+    // PARSEAR LAS FECHAS PARA LA COMPARACION
+    const feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy');
+    const fecf = DateTime.fromFormat(final, 'dd/MM/yyyy');
+
+    // VERIFICAR SI LAS FECHAS ESTAN INGRESADAS CORRECTAMENTE
+    if (feci <= fecf) {
       if (opcion === 1) {
-        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+        formulario.setValue(feci.toISODate());
+      } else {
+        formulario.setValue(fecf.toISODate());
       }
-      else {
-        formulario.setValue(moment(final, 'DD/MM/YYYY'));
-      }
-    }
-    else {
-      this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
+    } else {
+      this.toastr.warning('La fecha no se registró. Ups!!!, la fecha no es correcta.', 'VERIFICAR', {
         timeOut: 6000,
       });
     }

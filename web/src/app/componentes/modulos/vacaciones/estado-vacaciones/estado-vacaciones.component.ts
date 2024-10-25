@@ -1,11 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { use } from 'echarts';
 
 interface Estados {
   valor: number;
@@ -51,20 +50,20 @@ export class EstadoVacacionesComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
+    var f = DateTime.now();
+    this.FechaActual = f.toformat('yyyy-MM-dd');
     this.llenarForm();
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  llenarForm(){
+  llenarForm() {
     this.VacacionForm.patchValue({
       estadoForm: this.data.vacacion.estado
     });
   }
 
   resVacacion: any = [];
-  EditarEstadoVacacion(form){
+  EditarEstadoVacacion(form) {
     let datosVacacion = {
       estado: form.estadoForm,
       id_vacacion: this.data.vacacion.id,
