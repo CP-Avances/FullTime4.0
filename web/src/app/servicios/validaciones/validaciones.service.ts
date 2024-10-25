@@ -11,7 +11,7 @@ export class ValidacionesService {
 
   constructor(
     private toastr: ToastrService,
-    private router:  Router
+    private router: Router
   ) { }
 
 
@@ -168,6 +168,31 @@ export class ValidacionesService {
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
+  }
+
+  DarFormatoFecha(fechaString: any, formatoSalida: any) {
+    let formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
+    let fecha: DateTime;
+    // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT
+    if (typeof fechaString === 'object' && fechaString._isAMomentObject) {
+      // SI ES UN OBJETO MOMENT, CONVIÉRTELO A ISO STRING
+      fechaString = fechaString.toISOString();
+    }
+    // SI LA FECHA ES VALIDA EN FORMATO ISO 8601
+    fecha = DateTime.fromISO(fechaString);
+    if (fecha.isValid) {
+      return fecha.toFormat(formatoSalida);
+    }
+    // SI NO ES ISO, INTENTA CON LOS FORMATOS CONOCIDOS
+    for (let formato of formatos) {
+      fecha = DateTime.fromFormat(fechaString, formato);
+      if (fecha.isValid) {
+        return fecha.toFormat(formatoSalida);
+      }
+    }
+    // SI NO ES VALIDA EN NINGUNO DE LOS FORMATOS, DEVUELVE UN ERROR
+    console.error('Formato de fecha no válido:', fechaString);
+    return null;
   }
 
   /** ******************************************************************** **

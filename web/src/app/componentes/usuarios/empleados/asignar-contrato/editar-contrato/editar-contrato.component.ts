@@ -10,6 +10,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-contrato',
@@ -69,6 +70,7 @@ export class EditarContratoComponent implements OnInit {
 
   constructor(
     public componentev: VerEmpleadoComponent,
+    public validar: ValidacionesService,
     public pais: ProvinciaService,
     private rest: EmpleadoService,
     private toastr: ToastrService,
@@ -297,10 +299,10 @@ export class EditarContratoComponent implements OnInit {
     }
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = DateTime.fromFormat(datos.fec_ingreso, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = DateTime.fromFormat(this.revisarFecha[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd');
         if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
@@ -477,6 +479,7 @@ export class EditarContratoComponent implements OnInit {
 
   // CERRAR VENTA DE REGISTRO
   Cancelar(opcion: any) {
+    this.componentev.ver_contrato_cargo = true;
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_contrato = false;
       if (opcion === 2) {

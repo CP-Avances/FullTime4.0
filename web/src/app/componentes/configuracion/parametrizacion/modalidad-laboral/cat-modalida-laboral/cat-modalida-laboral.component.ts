@@ -412,14 +412,16 @@ export class CatModalidaLaboralComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Modalidad Laboral', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'MODALIDAD LABORAL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10, alignment: 'center' },
-        itemsTableD: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8, alignment: 'center' },
+        itemsTableD: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -430,12 +432,13 @@ export class CatModalidaLaboralComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto'],
             body: [
               [
-                { text: 'Item', style: 'tableHeader' },
-                { text: 'Modalidad laboral', style: 'tableHeader' },
+                { text: 'ITEM', style: 'tableHeader' },
+                { text: 'MODALIDAD LABORAL', style: 'tableHeader' },
               ],
               ...this.listaModalida_Laboral.map((obj: any) => {
                 return [

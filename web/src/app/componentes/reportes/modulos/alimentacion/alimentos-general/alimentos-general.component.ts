@@ -7,12 +7,12 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-// LIBRERÍA PARA GENERAR ARCHIVOS PDF
+// LIBRERIA PARA GENERAR ARCHIVOS PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-// LIBRERÍA PARA GENERAR ARCHIVOS EXCEL
+// LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
 // LLAMADA DE SERVICIOS GENERALES

@@ -2,7 +2,6 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import moment from 'moment';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
@@ -234,22 +233,19 @@ export class EditarCargoComponent implements OnInit {
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = moment(form.fecInicioForm).format('YYYY-MM-DD');
-    let registro_fin = moment(form.fecFinalForm).format('YYYY-MM-DD');
-    let contrato_inicio = moment(this.contrato_actual.fecha_ingreso).format('YYYY-MM-DD');
-    let contrato_fin = moment(this.contrato_actual.fecha_salida).format('YYYY-MM-DD');
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
+    let contrato_inicio = this.validar.DarFormatoFecha(this.contrato_actual.fecha_ingreso, 'yyyy-MM-dd');
+    let contrato_fin = this.validar.DarFormatoFecha(this.contrato_actual.fecha_salida, 'yyyy-MM-dd');
     /*console.log('inicio ', registro_inicio)
-    console.log('inicio format ', Date.parse(registro_inicio))
     console.log('fin ', registro_fin)
-    console.log('fin format ', Date.parse(registro_fin))
     console.log('inicio ', contrato_inicio)
-    console.log('inicio format ', Date.parse(contrato_inicio))
     console.log('fin ', contrato_fin)
-    console.log('fin format ', Date.parse(contrato_fin))*/
+    */
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
-    if ((Date.parse(contrato_inicio) <= Date.parse(registro_inicio)) &&
-      (Date.parse(contrato_fin) >= Date.parse(registro_fin))) {
-      if (Date.parse(registro_inicio) < Date.parse(registro_fin)) {
+    if ((contrato_inicio <= registro_inicio) &&
+      (contrato_fin >= registro_fin)) {
+      if (registro_inicio < registro_fin) {
         this.ActualizarEmpleadoCargo(form);
       }
       else {
@@ -407,7 +403,8 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA FINALIZAR PROCESO
   Cancelar() {
-    this.verEmpleado.VerCargoEdicion(true);
+    this.verEmpleado.btnActualizarCargo = false;
+    this.verEmpleado.ver_contrato_cargo = true;
   }
 
   // METODO PARA VALIDAR INGRESO DE HORAS
@@ -484,7 +481,7 @@ export class EditarCargoComponent implements OnInit {
         this.principal_true = a.id;
       }
     })
-    
+
     console.log('ver datos ', this.principal_false, ' true ', this.principal_true)
     if (this.principal_false != 0) {
       this.EliminarAsignacion(this.principal_true);

@@ -457,14 +457,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Departamentos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE DEPARTAMENTOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.presentarDataPDFDepartamentos(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8 },
+        itemsTableC: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -475,15 +477,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Establecimiento', style: 'tableHeader' },
-                { text: 'Departamento', style: 'tableHeader' },
-                { text: 'Nivel', style: 'tableHeader' },
-                { text: 'Departamento Superior', style: 'tableHeader' }
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'SUCURSAL/ ESTABLECIMIENTO', style: 'tableHeader' },
+                { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                { text: 'NIVEL', style: 'tableHeader' },
+                { text: 'DEPARTAMENTO SUPERIOR', style: 'tableHeader' }
               ],
               ...this.departamentos.map((obj: any) => {
                 return [
@@ -536,7 +539,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
-    var objeto;
+    var objeto: any;
     var arregloDepartamentos: any = [];
     this.departamentos.forEach((obj: any) => {
       objeto = {
