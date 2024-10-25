@@ -213,13 +213,19 @@
             <div class="row">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="w-100 bd-highlight">
-                                <h5>TÍTULO PROFESIONAL</h5>
+                    
+                        <div id="titulo" class="row w-100 m-auto">
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistarTituloEmpleado()">Añadir</button>
+                            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>
+                                    TÍTULO PROFESIONAL
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                                     (click)="AbrirVentanaRegistarTituloEmpleado()">Añadir
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -262,13 +268,18 @@
                 </div>
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8" style="padding-bottom: 5px;">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <div class="w-100 bd-highlight">
-                                <h5>DISCAPACIDAD</h5>
+                        <div id="titulo" class="row w-100 m-auto">
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="MostrarDis()">{{btnDisc}}</button>
+                            <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>
+                                    DISCAPACIDAD
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                                    (click)="MostrarDis()">{{btnDisc}}
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -325,7 +336,7 @@
                                 </span>
                             </div>
                             <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
                                     (click)="MostrarVentanaVacuna()">Añadir
                                 </button>
                             </div>
@@ -1620,17 +1631,23 @@
             </app-editar-permiso-empleado>
 
             <mat-card class="mat-elevation-z8" *ngIf="solicitudes_permiso">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="w-100 bd-highlight">
-                        <h5>SOLICITUDES DE PERMISO</h5>
+                
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPermiso()">
-                            {{btnTitulo}}
-                        </button>
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            SOLICITUDES DE PERMISO
+                        </span>
+                    </div>
+                    <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                        (click)="AbrirVentanaPermiso()">
+                        {{btnTitulo}}
+                    </button>
                     </div>
                 </div>
+
                 <div class="d-flex justify-content-center" style="padding-top: 10px; padding-bottom: 10px;">
                     <mat-form-field style="width: 200px; font-size: 12px;">
                         <mat-icon id="i-cursor" matPrefix matSuffix matTooltipPosition="right"
@@ -1769,15 +1786,22 @@
         <!--  *********************  PANTALLA DE VISTA DE PERIODO DE VACACIONES  *************************  -->
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="w-100 bd-highlight">
-                        <h5>PERIODO DE VACACIONES</h5>
+                
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPerVacaciones()">Añadir</button>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            PERIODO DE VACACIONES
+                        </span>
+                    </div>
+                    <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            (click)="AbrirVentanaPerVacaciones()">Añadir
+                        </button>
                     </div>
                 </div>
+
                 <mat-card-content>
                     <div *ngFor="let p of peridoVacaciones" style="padding-top: 15px;">
                         <div class="container">
@@ -1842,15 +1866,23 @@
         <!--  *********************  PANTALLA DE SOLICITUDES DE VACACIONES  *************************  -->
         <div class="container" style="padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="w-100 bd-highlight">
-                        <h5>SOLICITUDES VACACIONES</h5>
+        
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaVacaciones()">{{btnTitulo}}</button>
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            SOLICITUDES VACACIONES
+                        </span>
+                    </div>
+                    <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            (click)="AbrirVentanaVacaciones()">{{btnTitulo}}
+                        </button>
                     </div>
                 </div>
+
+
                 <mat-card-content>
                     <div *ngFor="let v of vacaciones" style="padding-top: 15px;">
                         <div class="container">
@@ -1925,15 +1957,22 @@
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_horas">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="w-100 bd-highlight">
-                        <h5>SOLICITUDES DE HORAS EXTRAS</h5>
+
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="MostrarPlanH()">Mostrar planificaciones</button>
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            SOLICITUDES DE HORAS EXTRAS
+                        </span>
+                    </div>
+                    <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            (click)="MostrarPlanH()">Mostrar planificaciones
+                        </button>
                     </div>
                 </div>
+
                 <div *ngFor="let h of hora_extra | paginate:tamanio_pagina:numero_pagina" style="padding-top: 15px;">
                     <div class="container">
                         <div class="row">
@@ -2009,19 +2048,25 @@
         </div>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="plan_horas">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="flex-shrink-1 bd-highlight" style="margin-left: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="MostrarSolicitaH()">Mostrar solicitudes</button>
+                
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-3 mb-2 mb-md-0 order-2 order-md-2">  
+                        <button type="submit" class="btn btn-outline-light btn-sm" 
+                            (click)="MostrarSolicitaH()">Mostrar solicitudes
+                        </button>
                     </div>
-                    <div class="w-100 bd-highlight">
-                        <h5>PLANIFICACIÓN DE HORAS EXTRAS</h5>
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            PLANIFICACIÓN DE HORAS EXTRAS
+                        </span>
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="PlanificarHoras()">Planificar</button>
+                    <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            (click)="PlanificarHoras()">Planificar
+                        </button>
                     </div>
                 </div>
+
                 <div *ngFor="let h of hora_extra_plan | paginate:tamanio_pagina:numero_pagina"
                     style="padding-top: 15px;">
                     <div class="container">
@@ -2092,15 +2137,21 @@
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_comida">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="w-100 bd-highlight">
-                        <h5>SERVICIOS DE ALIMENTACIÓN</h5>
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            SERVICIOS DE ALIMENTACIÓN
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="MostrarPlanComida()">Mostrar planificaciones</button>
+                            (click)="MostrarPlanComida()">Mostrar planificaciones
+                        </button>
                     </div>
                 </div>
+    
                 <div *ngFor="let pc of solicitaComida | paginate:tamanio_pagina:numero_pagina"
                     style="padding-top: 15px;">
                     <div class="container">
@@ -2177,19 +2228,24 @@
         </div>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="plan_comida">
             <mat-card class="mat-elevation-z8">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <div class="flex-shrink-1 bd-highlight" style="margin-left: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="MostrarSolicitaComida()">Mostrar solicitudes</button>
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-9 col-md-3 mb-2 mb-md-0 order-2 order-md-2">  
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px; float: left;"
+                            (click)="MostrarSolicitaComida()">Mostrar solicitudes
+                        </button>
                     </div>
-                    <div class="w-100 bd-highlight">
-                        <h5>PLANIFICACIÓN SERVICIOS DE ALIMENTACIÓN</h5>
+                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            PLANIFICACIÓN SERVICIOS DE ALIMENTACIÓN
+                        </span>
                     </div>
-                    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPlanificacion()">{{btnTitulo}}</button>
+                    <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px; float: right;"
+                        (click)="AbrirVentanaPlanificacion()">{{btnTitulo}}
+                    </button>
                     </div>
                 </div>
+
                 <div *ngFor="let pc of planComidas | paginate:tamanio_pagina:numero_pagina" style="padding-top: 15px;">
                     <div class="container">
                         <div class="row">
@@ -2276,12 +2332,20 @@
             <div class="row">
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <span class="w-100 bd-highlight">PROCESOS</span>
-                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        <div id="titulo" class="row w-100 m-auto">
+                            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                            </div>
+                            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>
+                                    PROCESOS
+                                </span>
+                            </div>
+                            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                                 (click)="AbrirVentanaProcesos()">
-                                Añadir
-                            </button>
+                                    Añadir
+                                </button>
+                            </div>
                         </div>
                         <mat-card-content>
                             <div class="container"

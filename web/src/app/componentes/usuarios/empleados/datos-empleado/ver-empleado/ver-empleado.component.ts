@@ -3486,7 +3486,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
-        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 5, 0, 5] },
+        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDFContratosCargo(),
       ],
       styles: {
@@ -3504,7 +3504,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         // Salto en blanco o espacio antes de la primera parte
         {
           text: '', // Objeto vacío para crear espacio en blanco
-          margin: [0, 10, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
+          margin: [0, 5, 0, 10] // Ajusta el margen según tus necesidades [left, top, right, bottom]
         },
         // Primera parte con la información del régimen laboral de forma dinámica
         {
@@ -3587,7 +3587,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         // Tabla principal con los datos de los empleados o cargos
         {
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
             body: [
               [
                 { text: 'Sucursal', style: 'tableHeader', fontSize: 9 },
