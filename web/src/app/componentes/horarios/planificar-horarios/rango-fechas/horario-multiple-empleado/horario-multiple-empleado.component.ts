@@ -521,12 +521,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc)
+      console.log("ver usuarios", usuarios)
     }
     else if (this.opcion === 'r') {
       usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc)
     }
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
+      console.log("ver usuarios: ", usuarios )
     }
     this.SeleccionarProceso(tipo, usuarios);
   }
@@ -713,6 +715,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
   CargarTimbres(data: any) {
+    
     if (data.length > 0) {
 
       var inicio = moment(this.fechaInicioF.value).format('YYYY-MM-DD');
