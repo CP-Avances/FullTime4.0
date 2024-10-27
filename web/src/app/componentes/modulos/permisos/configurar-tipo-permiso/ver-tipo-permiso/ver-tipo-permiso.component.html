@@ -1,16 +1,24 @@
 <div class="container" *ngFor="let p of datosPermiso" style="padding-top: 15px;">
         <mat-card class="example-card mat-elevation-z8">
-                <div id="titulo">
-                        <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                <div id="titulo" class="row w-100 m-auto align-items-center">
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+                                <button class="btn btn-outline-light btn-sm" style="float: left;"
                                 (click)="VerListaPermisos()">
-                                Listar tipo permisos
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                                        Listar tipo permisos
+                                </button>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>TIPO DE PERMISO <br> {{p.descripcion.toUpperCase()}}</span>
+                        </div>
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                                <button class="btn btn-outline-light btn-sm" style="float: right;"
                                 (click)="VerFormularioEditar(p.id)">
-                                Editar
-                        </button>
-                        <span>TIPO DE PERMISO <br> {{p.descripcion.toUpperCase()}}</span>
-                </div>
+                                        Editar
+                                </button>
+                        </div>
+                
+                    </div>
+
                 <mat-card-content>
                         <div class="container" style="padding-top: 15px;">
                                 <div class="row">
@@ -103,7 +111,7 @@
                                                         <b>En la solicitud se incluira:</b> Feriados como días libres
                                                 </label>
                                         </div>
-                                        <div class="col-md" id="verticalLine">
+                                        <div class="col-md custom-disabled-checkbox" id="verticalLine">
                                                 <label class="col-sm col-form-label">
                                                         <b>Notificaciones de solicitudes de permisos:</b>
                                                 </label>

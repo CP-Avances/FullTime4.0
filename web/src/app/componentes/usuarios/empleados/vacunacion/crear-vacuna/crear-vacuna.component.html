@@ -58,23 +58,27 @@
                 </div>
             </div>
             <div class="col-md">
-                <div class="d-flex flex-wrap justify-content-around">
-                    <div class="separar">
-                        <form method="post" enctype="multipart/form-data">
-                            <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
-                            <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
-                                matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
-                                Subir Carnet
-                            </label>
-                        </form>
+                <div class="row m-auto text-center">
+                    <div class="col-12 m-auto">
+                        <div class="separar">
+                            <form method="post" enctype="multipart/form-data">
+                                <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
+                                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
+                                    Subir Carnet
+                                </label>
+                            </form>
+                        </div>
                     </div>
-                    <div class="separar">
-                        <input type="text" readonly id="letras" placeholder="Ningún archivo seleccionado."
-                            class="form-control" style="width: 200px;" [formControl]="certificadoF">
-                        <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
-                            id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
-                            matTooltip="Eliminar archivo seleccionado.">
-                        </i>
+                    <div class="col-11 m-auto">
+                        <div class="separar">
+                            <input type="text" readonly id="letras" placeholder="Ningún archivo seleccionado."
+                                class="form-control" style="width: 200px;" [formControl]="certificadoF">
+                            <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
+                                id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
+                                matTooltip="Eliminar archivo seleccionado.">
+                            </i>
+                        </div>
                     </div>
                 </div>
             </div>
