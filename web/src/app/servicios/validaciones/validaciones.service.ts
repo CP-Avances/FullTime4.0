@@ -175,7 +175,7 @@ export class ValidacionesService {
     let fecha: DateTime;
     // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT
     if (typeof fechaString === 'object' && fechaString._isAMomentObject) {
-      // SI ES UN OBJETO MOMENT, CONVIÉRTELO A ISO STRING
+      // SI ES UN OBJETO MOMENT, CONVIERTELO A ISO STRING
       fechaString = fechaString.toISOString();
     }
     // SI LA FECHA ES VALIDA EN FORMATO ISO 8601
