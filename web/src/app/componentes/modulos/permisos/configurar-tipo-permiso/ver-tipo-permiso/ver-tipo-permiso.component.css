@@ -24,12 +24,14 @@ label {
     border-left: 1px solid rgb(52, 65, 84);
 }
 
-::ng-deep.mat-mdc-checkbox-checked.mat-accent.mat-checkbox-disabled .mat-mdc-checkbox-background,
-.mat-mdc-checkbox-indeterminate.mat-mdc-accent .mat-mdc-checkbox-background {
-    background-color: rgb(73, 123, 230) !important;
-    color: rgb(20, 19, 20);
+#color_fuente {
+    label{
+        color: rgb(8, 8, 8);
+    }
+    
 }
 
-#color_fuente {
-    color: rgb(8, 8, 8);
+::ng-deep .mdc-checkbox__background {
+    background-color: #207ab6 !important; /* Cambia a tu color preferido */
+    border-color: #e0e0e0 !important; /* Cambia a tu color preferido */
 }
