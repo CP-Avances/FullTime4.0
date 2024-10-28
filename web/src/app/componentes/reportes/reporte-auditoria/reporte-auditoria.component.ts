@@ -315,88 +315,6 @@ export class ReporteAuditoriaComponent implements OnInit {
         });
     }
 
-    //BUSCAR REGISTROS AUDITORIA
-    ModelarTablasAuditoria(accion: any) {
-        this.data_pdf = [];
-        var tablas = '';
-        var acciones = '';
-        tablas = this.tablasSolicitadas.map((x: any) => x.nombre).join(',');
-        acciones = this.accionesSeleccionadas.map((x: any) => x).join(',');
-
-        const buscarTabla = {
-            tabla: tablas,
-            desde: this.rangoFechas.fec_inico,
-            hasta: this.rangoFechas.fec_final,
-            action: acciones,
-        };
-
-        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-            (response: HttpResponse<Blob>) => {
-                if (response.body !== null) {
-                    this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
-                        this.data_pdf = data_pdf;
-                        switch (accion) {
-                            case 'ver': this.VerDatos(); break;
-                            default: this.GenerarPDF(data_pdf, accion); break;
-                        }
-                    }).catch(error => {
-                        //console.error('Error al convertir Blob a array de objetos:', error);
-                    });
-
-                } else {
-                    //console.error('El cuerpo de la respuesta está vacío.');
-                }
-            },
-            error => {
-                if (error.status === 404) {
-                    //console.error('No existen registros con las tablas y acciones seleccionadas');
-                } else {
-                    //console.error('Error en la consulta:', error);
-                }
-            }
-        )
-    }
-
-    // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
-    async ModelarTablasAuditoriaPorTablas(accion: any) {
-        this.data_pdf = [];
-        this.datosbusqueda = [];
-        var acciones = '';
-        acciones = this.accionesSeleccionadas.map(x => x).join(',');
-        const consultas: Promise<any>[] = [];
-        for (let i = 0; i < this.tablasSolicitadas.length; i++) {
-            const tabla = this.tablasSolicitadas[i];
-            const buscarTabla = {
-                tabla: tabla.tabla,
-                desde: this.rangoFechas.fec_inico,
-                hasta: this.rangoFechas.fec_final,
-                action: acciones,
-            };
-            const consulta = this.restAuditoria.ConsultarAuditoriaPorTabla(buscarTabla).toPromise();
-            consultas.push(consulta);
-        }
-        try {
-            // ESPERAR A QUE TODAS LAS CONSULTAS SE COMPLETEN
-            const resultados = await Promise.allSettled(consultas);
-            // FILTRAR Y EXTRAER SOLO LOS RESULTADOS EXITOSOS
-            this.datosbusqueda = resultados
-                .filter(result => result.status === 'fulfilled')
-                .map(result => (result as PromiseFulfilledResult<any>).value);
-            //console.log("a ver si carga datos pdf", this.datosbusqueda);
-            this.data_pdf = this.datosbusqueda.flat();
-            //console.log("datos oficiales", this.data_pdf);
-            switch (accion) {
-                case 'ver':
-                    this.VerDatos();
-                    break;
-                default:
-                    this.GenerarPDF(this.data_pdf, accion);
-                    break;
-            }
-        } catch (error) {
-            //console.error("Error al consultar auditorías por tabla:", error);
-        }
-    }
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
@@ -446,8 +364,16 @@ export class ReporteAuditoriaComponent implements OnInit {
                 .map(result => (result as PromiseFulfilledResult<any>).value);
             // RESULTADOS AHORA CONTIENE TODOS LOS ARRAYS DE DATOS OBTENIDOS
             this.data_pdf = this.datosbusqueda.flat(); // APLANAR EL ARRAY DE ARRAYS
-            //console.log("quiero ver los datos", this.data_pdf);
+            this.data_pdf.forEach(d => {
+                d.action = this.transformAction(d.action);
+                d.fecha_hora_format = this.validar.FormatearFechaAuditoria(d.fecha_hora,
+                this.formato_fecha,this.validar.dia_abreviado, this.idioma_fechas);
+                d.solo_hora = this.validar.FormatearHoraAuditoria(d.fecha_hora.split(' ')[1],
+                this.formato_hora);
+            })
+            console.log("quiero ver los datos", this.data_pdf);
             this.datosPdF = this.data_pdf;
+            
             // REALIZAR LA ACCIÓN CORRESPONDIENTE
             switch (accion) {
                 case 'ver':
@@ -675,6 +601,7 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA LEER ACCIONES
     transformAction(action: string): string {
+        console.log("ver transformAction")
         switch (action) {
             case 'U':
                 return 'Actualizar';

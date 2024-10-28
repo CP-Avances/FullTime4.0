@@ -16,7 +16,8 @@ export class DetalleCatHorariosService {
     return this.http.get<any>(`${environment.url}/detalleHorario/${id}`);
   }
 
-  ConsultarUnDetalleHorario2(datos: any) {
+  // METODO PARA BUSCAR DETALLES DE LOS HORARIOS EN EL ARREGLO COMO PARAMETRO   **USADO
+  ConsultarUnDetalleHorarioMultiple(datos: any) {
     return this.http.post<any>(`${environment.url}/detalleHorario/todos_horario`, datos);
   }
 

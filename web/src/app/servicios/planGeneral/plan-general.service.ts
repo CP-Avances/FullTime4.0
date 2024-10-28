@@ -16,8 +16,8 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
   }
 
-  // METODO PARA CREAR PLAN GENERAL   **USADO
-  CrearPlanGeneral2(datos: any) {
+  // METODO PARA CREAR PLAN GENERAL POR LOTES  **USADO
+  CrearPlanGeneralPorLotes(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/cargar-planificacion`, datos);
   }
 
@@ -61,8 +61,7 @@ export class PlanGeneralService {
   BuscarHorariosUsuario(datos: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista`, datos);
   }
-
-
+  
   // METODO PARA CONSULTAR ASISTENCIA    **USADO
   ConsultarAsistencia(data: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/buscar-asistencia`, data);
@@ -72,9 +71,4 @@ export class PlanGeneralService {
   ActualizarAsistenciaManual(data: any) {
     return this.http.post<any>(`${environment.url}/planificacion_general/actualizar-asistencia/manual`, data);
   }
-
-  BuscarFecha(datos: any) {
-    return this.http.post(`${environment.url}/planificacion_general/buscar_fecha/plan`, datos);
-  }
-
 }

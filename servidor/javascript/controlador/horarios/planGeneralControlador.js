@@ -87,7 +87,7 @@ class PlanGeneralControlador {
             // Respuesta final con 'OK' si todo se procesó correctamente
             return res.status(200).jsonp({ message: 'OK' });
         });
-        this.CrearPlanificacion2 = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.CrearPlanificacionPorLotes = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { parte, user_name, ip } = req.body;
             // Validación del input
             if (!Array.isArray(parte) || parte.length === 0) {

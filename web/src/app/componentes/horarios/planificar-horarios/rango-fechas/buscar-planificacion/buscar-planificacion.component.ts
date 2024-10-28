@@ -104,7 +104,7 @@ export class BuscarPlanificacionComponent {
     console.log("ver fecha_fin: ", fec_fin)
     console.log("ver formulario: ", formulario)
     console.log("ver opcion: ", opcion)
-    
+
     const lastDayOfMonth = fec_fin.endOf('month').day;
     const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
 
@@ -112,18 +112,18 @@ export class BuscarPlanificacionComponent {
     console.log("ver inicio: ", inicio)
     console.log("ver final: ", final)
 
-    let feci =  DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
-    let fecf =  DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let fecf = DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
 
     // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
 
     console.log("ver Date.parse(feci) ", Date.parse(feci))
     if (Date.parse(feci) <= Date.parse(fecf)) {
       if (opcion === 1) {
-        formulario.setValue( DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+        formulario.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       else {
-        formulario.setValue( DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+        formulario.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
       }
     }
     else {
@@ -509,8 +509,11 @@ export class BuscarPlanificacionComponent {
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
     let fecha = anio + '-' + mes + '-' + dia;
     console.log("fecha en AbrirEditarHorario", fecha);
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy/MM/dd');
-    let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid();
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
+    console.log("Ver fecha_", fecha_)
+    let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
+    console.log("Ver verificar", verificar)
+
     // VERIFICAR QUE EL DIA SEA VALIDO
     if (verificar === true) {
       console.log("entra a valido")

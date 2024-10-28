@@ -12,7 +12,7 @@ class DepartamentoRutas {
     configuracion(): void {
         // METODO PARA REGISTRAR PLAN GENERAL  **USADO
         this.router.post('/', TokenValidation, PLAN_GENERAL_CONTROLADOR.CrearPlanificacion);
-        this.router.post('/cargar-planificacion', TokenValidation, PLAN_GENERAL_CONTROLADOR.CrearPlanificacion2);
+        this.router.post('/cargar-planificacion', TokenValidation, PLAN_GENERAL_CONTROLADOR.CrearPlanificacionPorLotes);
 
         // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL  **USADO
         this.router.post('/buscar_fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFechas);

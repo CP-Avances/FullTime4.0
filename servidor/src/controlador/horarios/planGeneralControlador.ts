@@ -176,7 +176,7 @@ class PlanGeneralControlador {
         return res.status(200).jsonp({ message: 'OK' });
     };
 
-    public CrearPlanificacion2 = async (req: Request, res: Response): Promise<any> => {
+    public CrearPlanificacionPorLotes = async (req: Request, res: Response): Promise<any> => {
         const { parte, user_name, ip } = req.body;
     
         // Validación del input
