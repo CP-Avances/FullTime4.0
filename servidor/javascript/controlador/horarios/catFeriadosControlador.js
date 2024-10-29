@@ -279,7 +279,7 @@ class FeriadosControlador {
             }
         });
     }
-    FeriadosCiudad2(req, res) {
+    FeriadosCiudadMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, ids } = req.body;
@@ -329,7 +329,7 @@ class FeriadosControlador {
         });
     }
     // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
-    FeriadosRecuperacionCiudad2(req, res) {
+    FeriadosRecuperacionCiudadMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, ids } = req.body;

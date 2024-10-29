@@ -4,8 +4,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import moment, { Moment } from 'moment';
 import * as XLSX from 'xlsx';
+import { DateTime } from 'luxon';
+
 
 //IMPORTAR SERVICIOS
 import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
@@ -90,29 +91,48 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
    ** **************************************************************************************** **/
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>) {
-    const ctrlValue = fecha;
-    let inicio = moment(ctrlValue).format('01/MM/YYYY');
-    let final = moment(ctrlValue).daysInMonth() + moment(ctrlValue).format('/MM/YYYY');
-    this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
-    this.fechaFinalF.setValue(moment(final, 'DD/MM/YYYY'));
+  FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>) {
+    const ctrlValue = fecha.toDate();
+    console.log("ctrlValue", ctrlValue)
+    const dateLuxon = DateTime.fromJSDate(ctrlValue)
+    console.log("ver dateLuxon", dateLuxon)
+
+    let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+    console.log("inicio luxon", inicio)
+    let final = `${dateLuxon.daysInMonth}${dateLuxon.toFormat('/MM/yyyy')}`;
+    console.log("final luxon", final)
+    this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+    console.log("fechaInicialF", this.fechaInicialF.value)
+    this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
     datepicker.close();
   }
 
   // GENERAR DIAS DEL MES
   GenerarDiasMes() {
     this.dias_mes = [];
-    let dia_inicio = moment(this.dia_inicio, 'YYYYY-MM-DD');
-    let dia_fin = moment(this.dia_fin, 'YYYYY-MM-DD');
-    this.mes = dia_inicio.format('MMMM').toUpperCase();
-    while (dia_inicio <= dia_fin) {
+    let dia_inicio = DateTime.fromISO(this.dia_inicio).toFormat('dd/MM/yyyy');
+    console.log("ver this.dia_inicio", dia_inicio)
+
+    let dia_fin = DateTime.fromISO(this.dia_fin).toFormat('dd/MM/yyyy');
+    console.log("ver this.dia_fin", dia_fin)
+
+    let fechaLuxonInicio = DateTime.fromFormat(dia_inicio, 'dd/MM/yyyy').setLocale('es');
+    let fechaLuxonFin = DateTime.fromFormat(dia_fin, 'dd/MM/yyyy').setLocale('es');
+
+    this.mes = fechaLuxonInicio.setLocale('es').toFormat('MMMM').toUpperCase();
+    console.log("ver mes: ", this.mes);
+
+    while (fechaLuxonInicio <= fechaLuxonFin) {
+
       let dia = {
-        fecha: dia_inicio.format('YYYY-MM-DD'),
-        fecha_formato: dia_inicio.format('dddd, DD/MM/YYYY').toUpperCase()
+        fecha: fechaLuxonInicio.toFormat('yyyy-MM-dd'),
+        fecha_formato: fechaLuxonInicio.toFormat('EEEE, dd/MM/yyyy').toUpperCase()
       }
       this.dias_mes.push(dia);
-      dia_inicio = dia_inicio.add(1, 'days');
+      fechaLuxonInicio = fechaLuxonInicio.plus({ days: 1 });
     }
+    console.log("ver dias_mes", this.dias_mes)
+
   }
 
 
@@ -201,24 +221,24 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     if (data.planificacionHoraria.length > 0) {
       data.planificacionHoraria.forEach((planificacion: any) => {
-          this.dias_mes.forEach((dia: any) => {
-              // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
-              if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
-                  // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
-                  planificacion.dias[dia.fecha] = {
-                      horarios: [],
-                      observacion: ''
-                  };
+        this.dias_mes.forEach((dia: any) => {
+          // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
+          if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
+            // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
+            planificacion.dias[dia.fecha] = {
+              horarios: [],
+              observacion: ''
+            };
 
-                  // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
-                 if (planificacion.feriados) {
-                   if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
-                       planificacion.dias[dia.fecha].observacion = 'FD';
-                       planificacion.dias[dia.fecha].observacion3 = 'DEFAULT-FERIADO';
-                   }
-                 }
+            // COMPROBAR SI EL DIA ES FERIADO Y AÑADIR LA OBSERVACION
+            if (planificacion.feriados) {
+              if (planificacion.feriados.some((feriado: any) => feriado.fecha === dia.fecha)) {
+                planificacion.dias[dia.fecha].observacion = 'FD';
+                planificacion.dias[dia.fecha].observacion3 = 'DEFAULT-FERIADO';
               }
-          });
+            }
+          }
+        });
 
         // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
         planificacion.dias = Object.keys(planificacion.dias)
@@ -306,22 +326,22 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
 
   // METODO PARA GENERAR EXCEL
-  GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
+  GenerarExcel(fechaInicial: DateTime, fechaFinal: DateTime, usuarios: any[]) {
 
+    console.log("ver fechaInicial: ", fechaInicial)
     if (fechaInicial === null || fechaFinal === null) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
         timeOut: 6000,
       });
       return;
     }
+    const fechaInicialD = new Date(fechaInicial);
+    const fechaInicio = DateTime.fromJSDate(fechaInicialD);
 
-    const fechaInicio = fechaInicial.toDate();
-    const fechaFin = fechaFinal.toDate();
-
-
+    const fechaFinalD = new Date(fechaFinal);
+    const fechaFin = DateTime.fromJSDate(fechaFinalD);
     // CREAR UN ARRAY PARA LAS FILAS DEL ARCHIVO EXCEL
     const filas: any[] = [];
-
     // CREAR LA FILA DE ENCABEZADOS
     const encabezados = ['CEDULA', 'EMPLEADO'];
     for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {

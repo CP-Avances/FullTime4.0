@@ -1,9 +1,9 @@
 // IMPORTAR LIBRERIAS
-import * as moment from 'moment';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
+import { DateTime } from 'luxon';
 
 // IMPORTACION DE SERVICIOS
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
@@ -165,8 +165,16 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     })
   }
 
+  fechaInicioFormluxon: any;
+  fechaFinFormluxon: any;
+
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS
   VerificarIngresoFechas(form: any) {
+    let fechaInicioForm = form.fechaInicioForm.toDate();
+    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    let fechaFinalForm = form.fechaFinalForm.toDate();
+    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+
     if (form.fechaInicioForm === '' || form.fechaInicioForm === null || form.fechaInicioForm === undefined ||
       form.fechaFinalForm === '' || form.fechaFinalForm === null || form.fechaFinalForm === undefined) {
       this.toastr.warning('Por favor ingrese fechas de inicio y fin de actividades.', '', {
@@ -188,9 +196,12 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     }
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
+      const fechaInicioForm = form.fechaInicioForm.format('YYYY-MM-DD');
+      const fechaFinalForm = form.fechaFinalForm.format('YYYY-MM-DD')
+
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS (CONTRATO)
-      if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
-        (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
+      if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(DateTime.fromISO(fechaInicioForm).toFormat('yyyy-MM-dd'))) &&
+        (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(DateTime.fromISO(fechaFinalForm).toFormat('yyyy-MM-dd')))) {
         // VERIFICAR FECHAS INGRESADAS
         if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
@@ -523,8 +534,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     var codigos = '\'' + this.data_horario.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final: moment(moment(form.fechaFinalForm).format('YYYY-MM-DD')).add(2, 'days'),
-      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+      fec_final: this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {
@@ -566,12 +577,16 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.plan_general = [];
 
     this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
-    this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
+    this.inicioDate = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
+    this.finDate = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
     while (this.inicioDate <= this.finDate) {
       this.fechasHorario.push(this.inicioDate);
-      var newDate = moment(this.inicioDate).add(1, 'd').format('YYYY-MM-DD')
+      let inicioDateLuxon = DateTime.fromISO(this.inicioDate);
+      let newDateLuxon = inicioDateLuxon.plus({ days: 1 });
+      let newDateFormatted = newDateLuxon.toFormat('yyyy-MM-dd');
+
+      var newDate = newDateFormatted;
       this.inicioDate = newDate;
     }
     // VARIABLES TIPO DE DIA (HORARIO)
@@ -583,50 +598,52 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       tipo_dia = default_;
       origen = default_;
       tipo = null;
-      var day = moment(obj).day();
-      if (moment.weekdays(day) === 'lunes') {
+      var dateLuxon = DateTime.fromISO(obj);
+      var day = dateLuxon.weekday;
+
+      if (day === 1) {
         if (form.lunesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'martes') {
+      if (day === 2) {
         if (form.martesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'miércoles') {
+      if (day === 3) {
         if (form.miercolesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'jueves') {
+      if (day === 4) {
         if (form.juevesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'viernes') {
+      if (day === 5) {
         if (form.viernesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'sábado') {
+      if (day === 6) {
         if (form.sabadoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
           origen = 'L';
         }
       }
-      if (moment.weekdays(day) === 'domingo') {
+      if (day === 7) {
         if (form.domingoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
@@ -643,7 +660,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         // LEER FERIADOS DEL SISTEMA
         if (this.feriados.length != 0) {
           for (let i = 0; i < this.feriados.length; i++) {
-            if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+            if (DateTime.fromISO(this.feriados[i].fecha).toFormat('yyyy-MM-dd') === obj) {
               tipo = 'DFD';
               tipo_dia = 'DFD';
               break;
@@ -654,7 +671,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (DateTime.fromISO(this.recuperar[j].fecha_recuperacion).toFormat('yyyy-MM-dd') === obj) {
             tipo = 'REC';
             tipo_dia = 'REC';
             break;
@@ -741,10 +758,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           min_alimentacion: element.minutos_comida,
         };
         if (element.segundo_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 1 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         if (element.tercer_dia === true) {
-          plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          plan.fec_hora_horario = DateTime.fromISO(obj).plus({ days: 2 }).toFormat('yyyy-MM-dd') + element.hora;
         }
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);

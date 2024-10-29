@@ -157,8 +157,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     this.dia_inicio = DateTime.fromJSDate(fecha_inicio).toFormat('yyyy-MM-dd')
     this.dia_fin = DateTime.fromJSDate(fecha_final).toFormat('yyyy-MM-dd')
-
-
+    
     // Convertimos las fechas de inicio y fin a DateTime de Luxon
     let dia_inicio = DateTime.fromJSDate(fecha_inicio).setLocale('es').startOf('day');
     let dia_fin = DateTime.fromJSDate(fecha_final).setLocale('es').startOf('day');
@@ -945,7 +944,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       ids
     }
 
-    await this.feriado.ListarFeriadosCiudad2(datos).subscribe(data => {
+    await this.feriado.ListarFeriadosCiudadMultiplesEmpleados(datos).subscribe(data => {
       data.forEach(feriado => {
         if (!feriados2[feriado.id]) {
           feriados2[feriado.id] = [feriado]
@@ -1004,7 +1003,7 @@ CrearDataHorario(lista: any, validar: boolean) {
     lista.forEach((li: any) => {
       ids_horario = li.asignado.map((asig: any) => asig.id_horario);
     })
-    this.restD.ConsultarUnDetalleHorario2({ ids_horario }).subscribe(det1 => {
+    this.restD.ConsultarUnDetalleHorarioMultiple({ ids_horario }).subscribe(det1 => {
       det1.forEach(horario => {
         if (!horarios2[horario.id_horario]) {
           horarios2[horario.id_horario] = [horario]
@@ -1231,7 +1230,7 @@ enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
   };
 
   // Llamada HTTP para enviar la parte actual
-  this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
+  this.restP.CrearPlanGeneralPorLotes(datosParcial).subscribe(res => {
     // Si la respuesta es "OK", continuamos
     if (res.message === 'OK') {
       if ((parteIndex + 1) < totalPartes) {

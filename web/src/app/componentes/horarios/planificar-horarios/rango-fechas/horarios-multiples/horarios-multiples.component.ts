@@ -542,7 +542,7 @@ export class HorariosMultiplesComponent implements OnInit {
               this.usuarios = this.usuarios.concat(horas_correctas);
               this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               // CREACION DE LA DATA DE PLANIFICACION GENERAL
-              this.CrearData2(form);
+              this.CrearData(form);
             }
           }
         }
@@ -555,7 +555,7 @@ export class HorariosMultiplesComponent implements OnInit {
             this.usuarios = this.usuarios.concat(horas_correctas);
             this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             // CREACION DE LA DATA DE PLANIFICACION GENERAL
-            this.CrearData2(form);
+            this.CrearData(form);
           }
         }
 
@@ -589,7 +589,7 @@ export class HorariosMultiplesComponent implements OnInit {
               this.usuarios = this.usuarios.concat(horas_correctas);
               this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               // CREACION DE LA DATA DE PLANIFICACION GENERAL
-              this.CrearData2(form);
+              this.CrearData(form);
             }
           }
         }
@@ -602,7 +602,7 @@ export class HorariosMultiplesComponent implements OnInit {
             this.usuarios = this.usuarios.concat(horas_correctas);
             this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             // CREACION DE LA DATA DE PLANIFICACION GENERAL
-            this.CrearData2(form);
+            this.CrearData(form);
           }
         }
       })
@@ -724,16 +724,16 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
   validos: number = 0;
 
-  CrearData2(form: any) {
+  CrearData(form: any) {
     this.plan_general = [];
     this.validos = this.usuarios_validos.length;
-    this.RegistrarPlanificacion2(form, this.usuarios_validos, this.validos);
+    this.RegistrarPlanificacion(form, this.usuarios_validos, this.validos);
   }
 
   feriados2: { [key: number]: any } = {};
 
   // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
-  RegistrarPlanificacion2(form: any, valor: any, validos: number) {
+  RegistrarPlanificacion(form: any, valor: any, validos: number) {
     // METODO DE BUSQUEDA DE FERIADOS
     const ids = valor.map((dh: any) => dh.id);
     let datos = {
@@ -742,7 +742,7 @@ export class HorariosMultiplesComponent implements OnInit {
       ids
     }
 
-    this.feriado.ListarFeriadosCiudad2(datos).subscribe(data => {
+    this.feriado.ListarFeriadosCiudadMultiplesEmpleados(datos).subscribe(data => {
       console.log("Ver feriados2-----------------------------------: ", data);
 
       data.forEach(feriado => {
@@ -754,27 +754,27 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       })
       console.log("Ver feriados2 armado -----------------------------------: ", this.feriados2);
-      this.BuscarFeriadosRecuperar2(form, valor, validos);
+      this.BuscarFeriadosRecuperar(form, valor, validos);
     },
       vacio => {
         console.log("Ver feriados2: ", "vacio");
 
         // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-        this.BuscarFeriadosRecuperar2(form, valor, validos);
+        this.BuscarFeriadosRecuperar(form, valor, validos);
       });
   }
 
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   recuperar2: { [key: number]: any } = {};
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-  BuscarFeriadosRecuperar2(form: any, valor: any, validos: number) {
+  BuscarFeriadosRecuperar(form: any, valor: any, validos: number) {
     const ids = valor.map((dh: any) => dh.id);
     let datos = {
       fecha_inicio: form.fechaInicioForm,
       fecha_final: form.fechaFinalForm,
       ids
     }
-    this.feriado.ListarFeriadosRecuperarCiudad2(datos).subscribe(data => {
+    this.feriado.ListarFeriadosRecuperarCiudadMultiplesEmpleados(datos).subscribe(data => {
       console.log("Ver recuperar2: ", data);
       data.forEach(feriadorec => {
         if (!this.recuperar2[feriadorec.id]) {
@@ -784,11 +784,11 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       })
       // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral2(form, valor, validos);
+      this.CrearPlanGeneral(form, valor, validos);
     }, vacio => {
       console.log("Ver recuperar2: ", "vacio");
       // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral2(form, valor, validos);
+      this.CrearPlanGeneral(form, valor, validos);
     })
   }
 
@@ -798,7 +798,7 @@ export class HorariosMultiplesComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   plan_general: any = [];
-  CrearPlanGeneral2(form: any, valor: any, validos: number) {
+  CrearPlanGeneral(form: any, valor: any, validos: number) {
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
     valor.forEach(dh => {
@@ -1176,7 +1176,7 @@ export class HorariosMultiplesComponent implements OnInit {
     };
 
     // Llamada HTTP para enviar la parte actual
-    this.restP.CrearPlanGeneral2(datosParcial).subscribe(res => {
+    this.restP.CrearPlanGeneralPorLotes(datosParcial).subscribe(res => {
       // Si la respuesta es "OK", continuamos
       if (res.message === 'OK') {
         if ((parteIndex + 1) < totalPartes) {

@@ -138,14 +138,12 @@
                                 <td class="t_horarios">{{ e.user_name }}</td>
                                 <td class="t_horarios">{{ e.ip_address }}</td>
                                 <td class="t_horarios">{{ e.table_name }}</td>
-                                <td class="t_horarios">{{ transformAction(e.action) }}</td>
+                                <td class="t_horarios">{{ e.action }}</td>
                                 <td class="t_horarios">
-                                    {{validar.FormatearFechaAuditoria(e.fecha_hora,
-                                    this.formato_fecha,this.validar.dia_abreviado, idioma_fechas)}}
+                                    {{e.fecha_hora_format}}
                                 </td>
                                 <td class="t_horarios">
-                                    {{validar.FormatearHoraAuditoria(e.fecha_hora.split(' ')[1],
-                                    this.formato_hora)}}
+                                    {{e.solo_hora}}
                                 </td>
                                 <td class="t_horarios">{{ e.original_data }}</td>
                                 <td class="t_horarios">{{ e.new_data }}</td>

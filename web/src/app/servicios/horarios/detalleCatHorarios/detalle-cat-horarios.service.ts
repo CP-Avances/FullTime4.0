@@ -15,7 +15,8 @@ export class DetalleCatHorariosService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/${id}`);
   }
 
-  ConsultarUnDetalleHorario2(datos: any) {
+  // METODO PARA BUSCAR DETALLES DE LOS HORARIOS EN EL ARREGLO COMO PARAMETRO   **USADO
+  ConsultarUnDetalleHorarioMultiple(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/todos_horario`, datos);
   }
 

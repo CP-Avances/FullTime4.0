@@ -321,7 +321,7 @@ class FeriadosControlador {
         }
     }
 
-    public async FeriadosCiudad2(req: Request, res: Response) {
+    public async FeriadosCiudadMultiplesEmpleados(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, ids } = req.body;
             const FERIADO = await pool.query(
@@ -376,7 +376,7 @@ class FeriadosControlador {
 
 
         // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
-        public async FeriadosRecuperacionCiudad2(req: Request, res: Response) {
+        public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
             try {
                 const { fecha_inicio, fecha_final, ids } = req.body;
                 const FERIADO = await pool.query(
