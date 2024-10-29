@@ -6,7 +6,6 @@ import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
-import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
@@ -14,6 +13,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 
 import { ListarFeriadosComponent } from '../listar-feriados/listar-feriados.component';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-feriados',
@@ -63,6 +63,7 @@ export class RegistrarFeriadosComponent implements OnInit {
     private restF: CiudadFeriadosService,
     private toastr: ToastrService,
     public componentel: ListarFeriadosComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -108,8 +109,13 @@ export class RegistrarFeriadosComponent implements OnInit {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
-          this.contador = 1;
+        //console.log(' ----  ', obj.fecha_recuperacion);
+        if (obj.fecha_recuperacion) {
+          //console.log('fecha 1 ', this.validar.DarFormatoFecha(obj.fecha_recuperacion, 'yyyy-MM-dd'), ' ----  ', obj.fecha_recuperacion);
+          //console.log('fecha 2 ', this.validar.DarFormatoFecha(feriado.fecha, 'yyyy-MM-dd'), '  -------  ', feriado.fecha);
+          if (this.validar.DarFormatoFecha(obj.fecha_recuperacion, 'yyyy-MM-dd') === this.validar.DarFormatoFecha(feriado.fecha, 'yyyy-MM-dd')) {
+            this.contador = 1;
+          }
         }
       })
       if (this.contador === 0) {
@@ -131,10 +137,15 @@ export class RegistrarFeriadosComponent implements OnInit {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd') === DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') ||
-          DateTime.fromISO(feriado.fec_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(obj.fecha).toFormat('yyyy-MM-dd')
-        ) {
-          this.contador = 1;
+        if (obj.fecha_recuperacion) {
+          if (this.validar.DarFormatoFecha(feriado.fecha, 'yyyy-MM-dd') === this.validar.DarFormatoFecha(obj.fecha_recuperacion, 'yyyy-MM-dd')) {
+            this.contador = 1;
+          }
+        }
+        if (feriado.fec_recuperacion) {
+          if (this.validar.DarFormatoFecha(feriado.fec_recuperacion, 'yyyy-MM-dd') === this.validar.DarFormatoFecha(obj.fecha, 'yyyy-MM-dd')) {
+            this.contador = 1;
+          }
         }
       })
       if (this.contador === 0) {

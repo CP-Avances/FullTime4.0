@@ -206,7 +206,8 @@
                 <mat-form-field>
                     <mat-label>Seleccionar el rol</mat-label>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de roles.">
-                        help_outline</mat-icon>
+                        help_outline
+                    </mat-icon>
                     <mat-select [formControl]="nombreRolF" required>
                         <mat-option *ngFor="let rol of listaRoles" [value]="rol.id">
                             {{rol.nombre}}
@@ -225,7 +226,7 @@
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -233,9 +234,9 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -283,7 +284,7 @@
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -291,13 +292,13 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -345,7 +346,7 @@
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -353,8 +354,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>
@@ -406,7 +407,7 @@
             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -414,13 +415,13 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>
                 </div>
-        
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
@@ -468,21 +469,21 @@
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
-                        RESULTADO USUARIOS
+                            RESULTADO USUARIOS
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">

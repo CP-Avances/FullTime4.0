@@ -697,6 +697,7 @@ export class EditarDepaUserComponent implements OnInit {
             timeOut: 4000,
           });
           this.LimpiarFormularioDep();
+          this.BuscarInformacionGeneralDepa();
           this.formularioDep.reset();
         }, (error: any) => {
           this.toastr.error(error, '', {

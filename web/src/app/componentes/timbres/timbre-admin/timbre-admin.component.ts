@@ -112,7 +112,7 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ObtenerInformacionGeneral(1).subscribe(data => {
-      console.log('data', data);
+      //console.log('data', data);
       this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       console.log(this.datosEmpleado);
     });
@@ -139,14 +139,16 @@ export class TimbreAdminComponent implements OnInit {
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach((data: any) => {
         //console.log('ver timbre ', data.fecha_hora_timbre_validado)
-        let fecha: any = data.fecha_hora_timbre_validado;
-        data.fecha = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        var fecha = data.fecha_hora_timbre_validado;
+        let fecha_formato: any = this.validar.DarFormatoFecha(fecha.split(' ')[0], 'yyyy-MM-dd');
+        //console.log('ver fecha ', fecha, ' formato ', fecha_formato)
+        data.fecha = this.validar.FormatearFecha(fecha_formato, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.hora = this.validar.FormatearHora(fecha.split(' ')[1], this.formato_hora);
         this.LeerAcciones(data);
         this.LeerBiometrico(data);
       })
     }, err => {
-      this.toastr.info(err.error.message)
+      this.toastr.info(err.error.message);
     })
   }
 

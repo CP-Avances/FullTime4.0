@@ -14,7 +14,7 @@
     </div>
     <form [formGroup]="formulario">
         <div class="row">
-            <div class="col-md">
+            <div class="col-12 col-md-4">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
                         <mat-label>Descripción</mat-label>
@@ -42,11 +42,11 @@
                             matTooltip="Ingresar minutos de alimentación que dispondrá el usuario.">
                             help_outline
                         </mat-icon>
-                    </mat-form-field>
+                    </mat-form-field> 
                 </div>
             </div>
-            <div class="col-md">
-                <div class="d-flex flex-wrap justify-content-around">
+            <div class="col-12 col-md-5">
+                <div>
                     <mat-form-field>
                         <mat-label>Horas totales</mat-label>
                         <input matInput placeholder="Ej: 8:15 " [formControl]="horaTrabajo" required
@@ -59,59 +59,64 @@
                             {{ObtenerMensajeErrorHoraTrabajo()}}
                         </mat-error>
                     </mat-form-field>
+                </div>            
+                <div class="row">
+                    <div class="col-12 col-md-4">
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <label
+                                style="padding-top: 10px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
+                                Tipo horario:
+                            </label>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
+                            <mat-radio-group aria-label="Select an option" [formControl]="tipoH">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button [disabled]="establecido" value="N" matSuffix matTooltipPosition="right"
+                                        matTooltip="Indicar tiempo mínimo de servicios en horas.">
+                                        <label id="textoradiobtn" style="color: black;">Laborable</label>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button [disabled]="establecido" value="L" matSuffix matTooltipPosition="right"
+                                        matTooltip="Indicar tiempo mínimo de servicios en meses.">
+                                        <label id="textoradiobtn" style="color: black;">Libre</label>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button [disabled]="establecido" value="FD" matSuffix matTooltipPosition="right"
+                                        matTooltip="Indicar tiempo mínimo de servicios en horas.">
+                                        <label id="textoradiobtn" style="color: black;">Feriado</label>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8">
+                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:20px;">
+                            <mat-checkbox id="check" [formControl]="tipoF" matSuffix matTooltipPosition="right"
+                                matTooltip="Marcar si el horario es Nocturno.">
+                                <label id="textoradiobtn">Horario nocturno</label>
+                            </mat-checkbox>
+                            <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
+                                <label id="textoradiobtn">Control de archivos</label>
+                            </mat-checkbox>
+                        </div>
+                        
+                    </div>
                 </div>
-                <div class="d-flex flex-wrap justify-content-start">
-                    <label
-                        style="padding-top: 15px; padding-bottom: 5px; position: relative; left:40px; font-size: 14px;">
-                        Tipo horario:
-                    </label>
-                </div>
-                <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:48px;">
-                    <mat-radio-group aria-label="Select an option" [formControl]="tipoH">
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <mat-radio-button [disabled]="establecido" value="N" matSuffix matTooltipPosition="right"
-                                matTooltip="Indicar tiempo mínimo de servicios en horas.">
-                                <label id="textoradiobtn" style="color: black;">Laborable</label>
-                            </mat-radio-button>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <mat-radio-button [disabled]="establecido" value="L" matSuffix matTooltipPosition="right"
-                                matTooltip="Indicar tiempo mínimo de servicios en meses.">
-                                <label id="textoradiobtn" style="color: black;">Libre</label>
-                            </mat-radio-button>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-start">
-                            <mat-radio-button [disabled]="establecido" value="FD" matSuffix matTooltipPosition="right"
-                                matTooltip="Indicar tiempo mínimo de servicios en horas.">
-                                <label id="textoradiobtn" style="color: black;">Feriado</label>
-                            </mat-radio-button>
-                        </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <section class="d-flex flex-column bd-highlight" *ngIf="isChecked">
+                    <mat-radio-group aria-label="Select an option" [formControl]="seleccion" class="contenedor">
+                        <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
+                            Retirar archivo
+                        </mat-radio-button>
+                        <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
+                            Actualizar archivo
+                        </mat-radio-button>
                     </mat-radio-group>
-                </div>
-            </div>
-            <div class="col-md">
+                </section>
                 <div class="d-flex flex-wrap justify-content-start">
-                    <mat-checkbox id="check" [formControl]="tipoF" matSuffix matTooltipPosition="right"
-                        matTooltip="Marcar si el horario es Nocturno.">
-                        <label id="textoradiobtn">Horario nocturno</label>
-                    </mat-checkbox>
-                    <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
-                        <label id="textoradiobtn">Control de archivos</label>
-                    </mat-checkbox>
-                </div>
-            </div>
-            <div class="col-md">
-                <div class="d-flex flex-wrap justify-content-start">
-                    <section class="d-flex flex-column bd-highlight" *ngIf="isChecked">
-                        <mat-radio-group aria-label="Select an option" [formControl]="seleccion" class="contenedor">
-                            <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
-                                Retirar archivo
-                            </mat-radio-button>
-                            <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
-                                Actualizar archivo
-                            </mat-radio-button>
-                        </mat-radio-group>
-                    </section>
                     <section class="d-flex flex-column bd-highlight" *ngIf="activar">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
@@ -136,6 +141,7 @@
                 </div>
             </div>
         </div>
+        
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
         <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"

@@ -202,6 +202,7 @@ export class RelojesComponent implements OnInit {
     // VALIDAR DIRECCION MAC
     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
     const zona = form2.zonaForm;
+    console.log('zona ', zona)
     const [nombre, formatogmt] = zona.split(" ("); // DIVIDIMOS EN DOS PARTES
     const gmt = formatogmt.slice(0, -1); // QUITAMOS EL ULTIMO PARENTESIS
 
