@@ -33,7 +33,7 @@
                     </div>
                     <div class="container">
                         <div class="row p-0 m-0">
-                            <div class="col-12 col-md-4 m-auto">
+                            <div class="col-12 col-md-4">
                                 <mat-form-field>
                                     <mat-label>Tipo de permiso</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -47,7 +47,9 @@
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
+
                                 <br *ngIf="!HabilitarOtro">
+
                                 <mat-form-field *ngIf="!HabilitarOtro">
                                     <mat-label>Descripción</mat-label>
                                     <input matInput placeholder="Ej: Calamidad" (keypress)="IngresarSoloLetras($event)"

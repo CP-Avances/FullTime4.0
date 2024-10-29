@@ -24,8 +24,9 @@ mat-radio-group {
 }
 
 mat-form-field {
-    width: 275px;
-    padding: 10px 10px 0px 10px;
+    width: 95%;
+    margin: auto;
+    padding: auto;
 }
 
 .btn {

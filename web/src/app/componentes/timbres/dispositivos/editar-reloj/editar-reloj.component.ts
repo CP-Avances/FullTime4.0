@@ -147,6 +147,7 @@ export class EditarRelojComponent implements OnInit {
         idDepartamentoForm: this.datosReloj.id_departamento,
       })
       var zona = this.datosReloj.zona_horaria_dispositivo;
+      var verificar_zona = this.zonas_horarias.filter((o: any) => { return zona === o.formato_nombre }).map((o: any) => { return o.nombre_general });
       this.segundoFormulario.patchValue({
         macForm: this.datosReloj.mac,
         marcaForm: this.datosReloj.marca,
@@ -155,10 +156,10 @@ export class EditarRelojComponent implements OnInit {
         fabricanteForm: this.datosReloj.fabricante,
         contraseniaForm: this.datosReloj.contrasenia,
         idFabricacionForm: this.datosReloj.id_fabricacion,
-        zonaForm: this.zonas_horarias.filter((o: any) => { return zona === o.formato_nombre }).map((o: any) => { return o.nombre_general })
+        zonaForm: verificar_zona[0],
       })
       //console.log('ver zonas ', this.zonas_horarias.filter((o: any) => { return zona === o.formato_nombre }).map((o: any) => { return o.nombre_general }))
-
+      //console.log('verificar ', verificar_zona[0])
       this.filteredOptions = this.zonasF.valueChanges
         .pipe(
           startWith(''),
@@ -206,6 +207,7 @@ export class EditarRelojComponent implements OnInit {
     // VALIDAR DIRECCION MAC
     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
     const zona = form2.zonaForm;
+    console.log('zona ', zona)
     const [nombre, formatogmt] = zona.split(" ("); // DIVIDIMOS EN DOS PARTES
     const gmt = formatogmt.slice(0, -1); // QUITAMOS EL ULTIMO PARENTESIS
 

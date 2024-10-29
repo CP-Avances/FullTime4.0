@@ -4,9 +4,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { DateTime } from 'luxon';
 
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-feriados',
@@ -45,6 +45,7 @@ export class EditarFeriadosComponent implements OnInit {
     private rest: FeriadosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarFeriadosComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
@@ -104,8 +105,10 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarSinRecuperacion(feriado: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
-          this.contador = 1;
+        if (obj.fecha_recuperacion) {
+          if (this.validar.DarFormatoFecha(obj.fecha_recuperacion, 'yyyy-MM-dd') === this.validar.DarFormatoFecha(feriado.fecha, 'yyyy-MM-dd')) {
+            this.contador = 1;
+          }
         }
       })
       if (this.contador === 0) {
@@ -128,9 +131,15 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (obj.fecha.split('T')[0] === DateTime.fromISO(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
-          DateTime.fromISO(obj.fecha_recuperacion).toFormat('yyyy-MM-dd') === DateTime.fromISO(feriado.fecha).toFormat('yyyy-MM-dd')) {
-          this.contador = 1;
+        if (feriado.fec_recuperacion) {
+          if (obj.fecha.split('T')[0] === this.validar.DarFormatoFecha(feriado.fec_recuperacion, 'YYYY-MM-DD')) {
+            this.contador = 1;
+          }
+        }
+        if (obj.fecha_recuperacion) {
+          if (this.validar.DarFormatoFecha(obj.fecha_recuperacion, 'yyyy-MM-dd') === this.validar.DarFormatoFecha(feriado.fecha, ('yyyy-MM-dd'))) {
+            this.contador = 1;
+          }
         }
       })
       if (this.contador === 0) {
