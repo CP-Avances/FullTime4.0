@@ -5,7 +5,8 @@
 }
 
 mat-form-field {
-    width: 250px;
+    width: 100%;
+    margin: auto;
     padding: 10px 10px 0px 10px;
 }
 
