@@ -1160,7 +1160,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
     // OBTENER EL PRIMER DIA DEL MES
     const inicio = fechaInicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
-
     // OBTENER EL ÚLTIMO DIA DEL MES
     const final = fechaFin.endOf('month').toFormat('dd/MM/yyyy');
 

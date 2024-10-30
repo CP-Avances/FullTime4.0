@@ -308,6 +308,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, id_empleado } = req.body;
+                console.log("ver req body, feriado recuperar: ", req.body);
                 const FERIADO = yield database_1.default.query(`
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
                 FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 

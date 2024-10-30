@@ -553,8 +553,8 @@ export class ReporteAuditoriaComponent implements OnInit {
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
-                            { style: 'itemsTable', text: this.validar.FormatearFechaAuditoria(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) },
-                            { style: 'itemsTable', text: this.validar.FormatearHoraAuditoria(audi.fecha_hora.split(' ')[1], this.formato_hora) },
+                            { style: 'itemsTable', text: audi.fecha_hora_format },
+                            { style: 'itemsTable', text: audi.solo_hora },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                             { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                         ]

@@ -486,7 +486,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   VerificarExistencias(dia: any, id_empleado: string, data: any, index: any) {
 
     let verificar = 0;
-
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');
     let fecha = dia + '-' + mes
 
