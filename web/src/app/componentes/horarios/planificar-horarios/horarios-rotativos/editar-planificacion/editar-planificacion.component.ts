@@ -5,8 +5,6 @@ import { ToastrService } from 'ngx-toastr';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import moment from 'moment';
-import { default as _rollupMoment } from 'moment';
 import { DateTime } from 'luxon';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -98,8 +96,8 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     this.feriados = [];
     let datos = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
@@ -115,8 +113,8 @@ export class EditarPlanificacionComponent implements OnInit {
   BuscarFeriadosRecuperar(fecha: any) {
     this.recuperar = [];
     let datos = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
@@ -206,9 +204,11 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_libres = [];
     let total = this.datos_horarios.datosPlan.split(',').length;
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+    console.log("ListarHorariosSeleccionados fecha", fecha);
+
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd');
     console.log("ver fecha_", fecha_)
-    this.dia_fecha = DateTime.fromFormat(fecha_, 'yyyy-MM-dd')
+    this.dia_fecha = DateTime.fromFormat(fecha_, 'yyyy-MM-dd').setLocale('es')
       .toFormat('MMMM, EEE. dd, yyyy')
       .toUpperCase();
 
@@ -261,8 +261,8 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_feriados = [];
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let busqueda = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
@@ -296,14 +296,18 @@ export class EditarPlanificacionComponent implements OnInit {
   antes: any = [];
   BuscarPlanificacionAntes() {
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    var restar = moment(formato, 'YYYY-MM-DD').subtract(1, 'days');
-    var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    var restar = DateTime.fromFormat(formato, "yyyy-MM-d")
+      .minus({ days: 1 })
+      .toFormat("yyyy-MM-dd");
+    console.log("ver restar: ", restar)
+    var fecha = restar;
     let busqueda = {
       fecha_inicio: fecha,
       fecha_final: fecha,
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
+      console.log("ver datos: ", datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -329,8 +333,10 @@ export class EditarPlanificacionComponent implements OnInit {
   despues: any = [];
   BuscarPlanificacionDespues() {
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    var restar = moment(formato, 'YYYY-MM-DD').add(1, 'days');
-    var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    var restar = DateTime.fromFormat(formato, "yyyy-MM-d")
+      .plus({ days: 1 })
+      .toFormat("yyyy-MM-dd");
+    var fecha = restar;
 
     let busqueda = {
       fecha_inicio: fecha,
@@ -338,6 +344,7 @@ export class EditarPlanificacionComponent implements OnInit {
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
+      console.log("ver datos BuscarPlanificacionDespues: ", datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -563,7 +570,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
         // VERIFICAR SI EXISTEN HORARIOS CON SALIDAS AL DIA SIGUIENTE (UN DIA ANTES)
         for (var t = 0; t < this.antes.length; t++) {
-          if (moment(this.antes[i].horarios.salida, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.entrada, 'HH:mm:ss').format('HH:mm:ss')) {
+          if (DateTime.fromISO(this.antes[i].horarios.salida).toFormat('HH:mm:ss') <= DateTime.fromISO(data.horarios.detalles.entrada).toFormat('HH:mm:ss')) {
             verificador = 3;
             break;
           }
@@ -579,7 +586,7 @@ export class EditarPlanificacionComponent implements OnInit {
           if (data.horarios.detalles.segundo_dia === true) {
             // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
             for (var t = 0; t < this.despues.length; t++) {
-              if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
+              if (DateTime.fromISO(this.despues[i].horarios.entrada).toFormat('HH:mm:ss') <= DateTime.fromISO(data.horarios.detalles.salida).toFormat('HH:mm:ss')) {
                 verificador = 4;
                 break;
               }
@@ -777,12 +784,14 @@ export class EditarPlanificacionComponent implements OnInit {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
-        fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-        fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        fec_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
         id_horario: horario.horarios.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-        datos.id_plan = res;
+        const ids = res.map(item => item.id);
+        datos.id_plan = ids;
+
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(datos).subscribe(datos => {
           cont = cont + 1;
@@ -834,7 +843,8 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA GUARDAR DATOS DE HORARIOS
   GuardarHorario(lista: any) {
     this.plan_general = [];
-    let fecha = moment(this.dia_fecha, 'MMMM, ddd DD, YYYY').format('YYYY-MM-DD');
+    let fecha = DateTime.fromFormat(this.dia_fecha, "MMMM, EEE. dd, yyyy", { locale: 'es' }).toFormat("yyyy-MM-dd");
+    console.log("ver fecha en GuardarHorario", fecha );
     let cont1 = 0;
     // CONTAR HORARIOS ASIGNADOS
     lista.forEach((h: any) => {
@@ -920,10 +930,14 @@ export class EditarPlanificacionComponent implements OnInit {
                   min_alimentacion: deta.minutos_comida,
                 };
                 if (deta.segundo_dia === true) {
-                  plan.fec_hora_horario = moment(fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
+                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-MM-dd')
+                  .plus({ days: 1 })
+                  .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
                 }
                 if (deta.tercer_dia === true) {
-                  plan.fec_hora_horario = moment(fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
+                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-MM-dd')
+                  .plus({ days: 2 })
+                  .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
                 }
                 // ALMACENAMIENTO DE PLANIFICACION GENERAL
                 this.plan_general = this.plan_general.concat(plan);
@@ -1016,8 +1030,12 @@ export class EditarPlanificacionComponent implements OnInit {
     var codigos = '\'' + this.datos_horarios.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final: moment(moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD')).add(2, 'days'),
-      fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      fec_final: DateTime.fromFormat(fecha, 'yyyy-MM-d')
+      .plus({ days: 2 })
+      .toFormat('yyyy-MM-dd'),
+    
+      fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d')
+      .toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {
@@ -1060,8 +1078,8 @@ export class EditarPlanificacionComponent implements OnInit {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
-        fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-        fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        fec_final:  DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
         id_horario: horario.horarios.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
