@@ -5,8 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { default as _rollupMoment, Moment } from 'moment';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -188,21 +187,24 @@ export class RegistroPlanHorarioComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
+  FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
     this.ControlarBotones(true, false);
-    const ctrlValue = fecha;
+    const ctrlValue = fecha.toDate();
+
+    const dateLuxon = DateTime.fromJSDate(ctrlValue);
+
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = moment(ctrlValue).format('01/MM/YYYY');
-        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+        let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
+      this.ValidarFechas(this.fechaInicialF.value, dateLuxon, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }
@@ -210,10 +212,19 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = moment(fec_inicio).format('01/MM/YYYY');
-    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    console.log("ver fec_inicio", fec_inicio)
+    console.log("ver fec_fin", fec_fin)
+    console.log("ver formulario", formulario)
+
+    let inicio = DateTime.fromJSDate(fec_inicio).set({ day: 1 }).toFormat('dd/MM/yyyy');
+    const lastDayOfMonth = fec_fin.endOf('month').day;
+    const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
+    let final = formattedDate;
+    let feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let fecf = DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    console.log("ver feci", feci)
+    console.log("ver fecf", fecf)
+
     // VERIFICAR SI LAS FECHAS ESTAN INGRESADAS DE FORMA CORRECTA
     if (Date.parse(feci) <= Date.parse(fecf)) {
       let datosBusqueda = {
@@ -226,10 +237,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
           (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(fecf))) {
           // REGISTRO DE LA FECHA EN EL FORMULARIO
           if (opcion === 1) {
-            formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+            formulario.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
           }
           else {
-            formulario.setValue(moment(final, 'DD/MM/YYYY'));
+            formulario.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
           }
         }
         else {
@@ -257,8 +268,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value);
     }
     else {
-      let inicio = moment().format('YYYY/MM/01');
-      let final = moment().format('YYYY/MM/') + moment().daysInMonth();
+      const now = DateTime.now();
+      // Formatear la fecha de inicio como '01/MM/YYYY'
+      let inicio = now.set({ day: 1 }).toFormat('dd/MM/yyyy');
+      let final = `${now.daysInMonth}${now.toFormat('/MM/yyyy')}`;
       this.BuscarFeriados(inicio, final);
     }
   }
@@ -271,37 +284,45 @@ export class RegistroPlanHorarioComponent implements OnInit {
   ListarFechas(fecha_inicio: any, fecha_final: any) {
     this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
 
-    this.dia_inicio = moment(fecha_inicio, 'YYYY-MM-DD').format('YYYY-MM-DD');
-    this.dia_fin = moment(fecha_final, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    this.dia_inicio = DateTime.fromJSDate(fecha_inicio).toFormat('yyyy-MM-dd')
+    this.dia_fin = DateTime.fromJSDate(fecha_final).toFormat('yyyy-MM-dd')
+
+    // Convertimos las fechas de inicio y fin a DateTime de Luxon
+    let dia_inicio = DateTime.fromJSDate(fecha_inicio).setLocale('es').startOf('day');
+    let dia_fin = DateTime.fromJSDate(fecha_final).setLocale('es').startOf('day');
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
-    while (this.dia_inicio <= this.dia_fin) {
+    while (dia_inicio <= dia_fin) {
       let fechas = {
-        fecha: this.dia_inicio,
-        dia: (moment(this.dia_inicio).format('dddd')).toUpperCase(),
-        num_dia: moment(this.dia_inicio, 'YYYY/MM/DD').isoWeekday(),
-        formato: (moment(this.dia_inicio).format('MMMM, ddd DD, YYYY')).toUpperCase(),
-        mes: moment(this.dia_inicio).format('MMMM').toUpperCase(),
-        anio: moment(this.dia_inicio).format('YYYY'),
+        fecha: dia_inicio.toFormat('yyyy-MM-dd'),
+        dia: dia_inicio.toFormat('EEEE').toUpperCase(), // Nombre del día completo
+        num_dia: dia_inicio.weekday, // Día de la semana (1-7, donde 1 es lunes)
+        formato: dia_inicio.toFormat('MMMM, EEE. dd, yyyy').toUpperCase(), // Formato largo de la fecha
+        formato_: dia_inicio.toFormat('MMM. EEE. dd, yyyy').toUpperCase(), // Formato corto de la fecha
+        mes: dia_inicio.toFormat('MMMM').toUpperCase(), // Mes en texto completo
+        anio: dia_inicio.toFormat('yyyy'), // Año
         horarios: [],
         registrados: [],
         tipo_dia: '-',
+        tipo_dia_origen: '-',
         estado: false,
         observacion: '',
         horarios_existentes: '',
         supera_jornada: '',
         horas_superadas: '',
-        tipo_dia_origen: '-', // TRATAMIENTO LIBRES Y FERIADOS
       }
       this.fechas_mes.push(fechas);
-      var newDate = moment(this.dia_inicio).add(1, 'd').format('YYYY-MM-DD')
-      this.dia_inicio = newDate;
+      dia_inicio = dia_inicio.plus({ days: 1 });
     }
+    console.log(" fechas_mes : ", this.fechas_mes)
+    console.log(" feriados : ", this.feriados)
+
     // TRATAMIENTO DE FERIADOS
     this.fechas_mes.forEach((obj: any) => {
       // BUSCAR FERIADOS
       if (this.feriados.length != 0) {
         for (let i = 0; i < this.feriados.length; i++) {
-          if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
+          console.log("ver fecha en el if formateada: ", DateTime.fromISO(this.feriados[i].fecha).toFormat('yyyy-MM-dd'))
+          if (DateTime.fromISO(this.feriados[i].fecha).toFormat('yyyy-MM-dd') === obj.fecha) {
             obj.tipo_dia = 'FD';
             obj.estado = true;
             obj.observacion = 'FERIADO*';
@@ -325,7 +346,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
       // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
+          if (DateTime.fromISO(this.recuperar[j].fecha_recuperacion).toFormat('yyyy-MM-dd') === obj.fecha
+            === obj.fecha) {
             obj.tipo_dia = 'N';
             obj.observacion = 'RECUPERACIÓN*';
             break;
@@ -953,12 +975,12 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
         if (ele.codigo === datos_o[i].codigo) {
 
-          if ((moment(datos_o[i].fecha_hora_horario).format('YYYY-MM-DD') === moment(ele.fecha_hora_horario).format('YYYY-MM-DD')) &&
-            datos_o[i].tipo_accion === 'E' && ele.tipo_accion === 'S' && datos_o[i].tipo_dia === 'N') {
+          if ((DateTime.fromISO(datos_o[i].fecha_hora_horario).toFormat('yyyy-MM-dd') == DateTime.fromISO(ele.fecha_hora_horario).toFormat('yyyy-MM-dd'))
+            && datos_o[i].tipo_accion === 'E' && ele.tipo_accion === 'S' && datos_o[i].tipo_dia === 'N') {
 
-            if (moment(datos_o[i].fecha_hora_horario).format('HH:mm:ss') <= moment(ele.fecha_hora_horario).format('HH:mm:ss')) {
+            if (DateTime.fromISO(datos_o[i].fecha_hora_horario).toFormat('HH:mm:ss') <= DateTime.fromISO(ele.fecha_hora_horario).toFormat('HH:mm:ss')) {
               this.data_horarios.forEach((li: any) => {
-                if (li.fecha === moment(ele.fecha_hora_horario).format('YYYY-MM-DD')) {
+                if (li.fecha === DateTime.fromISO(ele.fec_hora_horario).toFormat('yyyy-MM-dd')) {
                   li.horas_validas = 'RANGOS DE TIEMPO SIMILARES'
                 }
               })
@@ -1149,10 +1171,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
                 min_alimentacion: deta.minutos_comida,
               };
               if (deta.segundo_dia === true) {
-                plan.fec_hora_horario = moment(valor.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
+                plan.fec_hora_horario = DateTime.fromISO(valor.fecha).plus({ days: 1 }).toFormat('yyyy-MM-dd') + deta.hora;
               }
               if (deta.tercer_dia === true) {
-                plan.fec_hora_horario = moment(valor.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
+                plan.fec_hora_horario = DateTime.fromISO(valor.fecha).plus({ days: 2 }).toFormat('yyyy-MM-dd') + deta.hora;
               }
               // ALMACENAMIENTO DE PLANIFICACION GENERAL
               this.plan_general = this.plan_general.concat(plan);
@@ -1212,8 +1234,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
     var codigos = '\'' + this.datoEmpleado.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final: moment(moment(this.fechaFinalF.value).format('YYYY-MM-DD')).add(2, 'days'),
-      fec_inicio: moment(this.fechaInicialF.value).format('YYYY-MM-DD'),
+      fec_final: DateTime.fromJSDate(this.fechaFinalF.value).plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: DateTime.fromJSDate(this.fechaInicialF.value).toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {

@@ -1411,10 +1411,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   mes_inicio: any = '';
   mes_fin: any = '';
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number) {
+    console.log("ver fec_inicio: ",fec_inicio )
+    console.log(" ver fec_final: ", fec_final)
+
     this.horariosEmpleado = [];
     if (opcion === 1) {
-      this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
-      this.mes_fin = fec_final.format("YYYY-MM-DD");
+      this.mes_inicio = DateTime.fromISO(fec_inicio).toFormat("yyyy-MM-dd")
+      this.mes_fin = DateTime.fromISO(fec_final).toFormat("yyyy-MM-dd")
     }
     else {
       this.mes_inicio = fec_inicio;

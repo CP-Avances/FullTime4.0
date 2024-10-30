@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { default as _rollupMoment } from 'moment';
+import { DateTime } from 'luxon';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -97,8 +98,8 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     this.feriados = [];
     let datos = {
-      fecha_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-      fecha_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
@@ -114,8 +115,8 @@ export class EditarPlanificacionComponent implements OnInit {
   BuscarFeriadosRecuperar(fecha: any) {
     this.recuperar = [];
     let datos = {
-      fecha_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-      fecha_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
@@ -205,8 +206,12 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_libres = [];
     let total = this.datos_horarios.datosPlan.split(',').length;
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
-    this.dia_fecha = (moment(fecha_, 'YYYY/MM/DD').format('MMMM, ddd DD, YYYY')).toUpperCase();
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+    console.log("ver fecha_", fecha_)
+    this.dia_fecha = DateTime.fromFormat(fecha_, 'yyyy-MM-dd')
+      .toFormat('MMMM, EEE. dd, yyyy')
+      .toUpperCase();
+
     for (var i = 0; i < total; i++) {
       // HORARIOS LIBRE Y FERIADO PROPIOS DEL SISTEMA
       if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L' ||
@@ -256,8 +261,8 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_feriados = [];
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let busqueda = {
-      fecha_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-      fecha_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'),
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {

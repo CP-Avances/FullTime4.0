@@ -377,7 +377,6 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     if (!datoHorario) return this.toastr.warning('No ha seleccionado un horario.');
 
-    // let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');
     let fecha = dia + '-' + mes;
 
@@ -487,7 +486,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   VerificarExistencias(dia: any, id_empleado: string, data: any, index: any) {
 
     let verificar = 0;
-    //let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');
     let fecha = dia + '-' + mes
 
@@ -1082,12 +1080,10 @@ CrearDataHorario(lista: any, validar: boolean) {
                 min_alimentacion: element.minutos_comida,
               };
               if (element.segundo_dia === true) {
-                //plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
                 plan.fec_hora_horario = DateTime.fromISO(asig.fecha).plus({ days: 1 }).toFormat('yyyy-MM-dd') + element.hora;
 
               }
               if (element.tercer_dia === true) {
-                //plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
                 plan.fec_hora_horario = DateTime.fromISO(asig.fecha).plus({ days: 2 }).toFormat('yyyy-MM-dd') + element.hora;
 
               }

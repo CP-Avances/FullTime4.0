@@ -351,6 +351,7 @@ class FeriadosControlador {
     public async FeriadosRecuperacionCiudad(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
+            console.log("ver req body, feriado recuperar: ", req.body)
             const FERIADO = await pool.query(
                 `
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
