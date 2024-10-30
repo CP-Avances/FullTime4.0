@@ -1,5 +1,3 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';;
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -12,7 +10,6 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 import { ListaEmplePlanHoraEComponent } from '../empleados-planificar/lista-emple-plan-hora-e.component';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 interface Estado {
   id: number,
@@ -23,12 +20,6 @@ interface Estado {
   selector: 'app-plan-hora-extra',
   templateUrl: './plan-hora-extra.component.html',
   styleUrls: ['./plan-hora-extra.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class PlanHoraExtraComponent implements OnInit {

@@ -1,5 +1,3 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
@@ -9,15 +7,16 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -26,12 +25,6 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
   selector: 'app-lista-emple-plan-hora-e',
   templateUrl: './lista-emple-plan-hora-e.component.html',
   styleUrls: ['./lista-emple-plan-hora-e.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class ListaEmplePlanHoraEComponent implements OnInit {

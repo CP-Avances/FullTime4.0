@@ -1,6 +1,4 @@
 // LLAMADO A LAS LIBRERIAS
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
@@ -20,13 +18,8 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
   selector: 'app-editar-plan-comidas',
   templateUrl: './editar-plan-comidas.component.html',
   styleUrls: ['./editar-plan-comidas.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
+
 export class EditarPlanComidasComponent implements OnInit {
 
   // VALIDACIONES DE CAMPOS DE FORMULARIO

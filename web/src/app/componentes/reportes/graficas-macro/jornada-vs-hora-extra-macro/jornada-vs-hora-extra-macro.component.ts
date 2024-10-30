@@ -23,12 +23,7 @@ import { PieChart } from 'echarts/charts';
   selector: 'app-jornada-vs-hora-extra-macro',
   templateUrl: './jornada-vs-hora-extra-macro.component.html',
   styleUrls: ['./jornada-vs-hora-extra-macro.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
+
 })
 export class JornadaVsHoraExtraMacroComponent implements OnInit {
 

@@ -715,7 +715,7 @@ export class AutorizacionesComponent implements OnInit {
     this.nuevaAutorizacionesForm.reset();
   }
 
-  formato_fecha: string = "DD/MM/YYYY";
+  formato_fecha: string = "dd/MM/yyyy";
   CerrarVentanaRegistroNoti() {
     this.limpiarCampos();
     this.componente.multiple = false;

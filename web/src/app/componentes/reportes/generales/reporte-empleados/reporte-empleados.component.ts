@@ -25,12 +25,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   selector: 'app-reporte-empleados',
   templateUrl: './reporte-empleados.component.html',
   styleUrls: ['./reporte-empleados.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
+
 })
 
 export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
