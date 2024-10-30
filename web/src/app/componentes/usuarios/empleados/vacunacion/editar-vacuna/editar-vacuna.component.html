@@ -24,7 +24,7 @@
             </span>
         </div>
         <div class="row">
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
                         <mat-label>Descripción</mat-label>
@@ -57,8 +57,9 @@
                     </mat-form-field>
                 </div>
             </div>
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div class="d-flex flex-wrap justify-content-around">
+
                     <section class="d-flex flex-column bd-highlight" style="padding-top: 10px;">
                         <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
                             <div class="bd-highlight">
@@ -80,27 +81,27 @@
                         </mat-radio-group>
                     </section>
 
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <div class="separar">
-                                <form method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-12" style="text-align: center;">
+                                <form method="post" enctype="multipart/form-data" class="m-auto">
                                     <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
                                     <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
                                         matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
                                         Subir Carnet
                                     </label>
                                 </form>
-                            </div>
-                            <div class="separar">
-                                <input type="text" readonly id="letras" placeholder="Ningún archivo seleccionado."
-                                    class="form-control" style="width: 200px;" [formControl]="certificadoF">
-                                <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
-                                    id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
-                                    matTooltip="Eliminar archivo seleccionado.">
-                                </i>
-                            </div>
                         </div>
-                    </div>
+                        <div class="col-12 mt-2 mb-2">
+                                <div style="width: min-content;" class="m-auto">
+                                    <input type="text" readonly id="letras" placeholder="Ningún archivo seleccionado."
+                                    class="form-control" style="width: 200px;" [formControl]="certificadoF">
+                                    <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
+                                        id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar archivo seleccionado.">
+                                    </i>
+                                </div>
+                        </div>
+                    </div> 
                 </div>
             </div>
         </div>
