@@ -3,10 +3,8 @@ import { firstValueFrom, forkJoin, map, Observable } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Validators, FormControl } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
@@ -92,12 +90,6 @@ export class ListaEmpleadosComponent implements OnInit {
   lista_activos: boolean = false;
   tabla_activos: boolean = true;
   lista_inactivos: boolean = true;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -543,7 +535,6 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
@@ -576,9 +567,6 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 
@@ -591,7 +579,6 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.rest.VerificarArchivoExcel_Manual(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
@@ -623,10 +610,7 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
       this.datosManuales = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

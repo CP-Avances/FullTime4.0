@@ -4,8 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-eliminar-realtime',
@@ -18,12 +16,6 @@ export class EliminarRealtimeComponent implements OnInit {
   ids: any = [];
   contenidoSolicitudes: boolean = false;
   contenidoAvisos: boolean = false;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -78,14 +70,12 @@ export class EliminarRealtimeComponent implements OnInit {
       this.restAvisos.EliminarAvisos(datosAvisos).subscribe(res => {
         console.log(res);
         if (res.message === 'OK') {
-          this.progreso = false;
           this.toastr.error('Registros eliminados correctamente.', '', {
             timeOut: 6000,
           })
           this.ventana.close(true);
         }
         else {
-          this.progreso = false;
           this.toastr.info('Ups algo ha salido mal.', 'Notificaciones no seleccionadas.', {
             timeOut: 6000,
           })
@@ -95,18 +85,15 @@ export class EliminarRealtimeComponent implements OnInit {
 
       // ELIMINACION DE NOTIFICACIONES DE PERMISOS, HORAS EXTRAS Y VACACIONES
     } else if (this.Notificaciones.opcion === 2) {
-      this.progreso = true;
       this.realtime.EliminarNotificaciones(datos).subscribe(res => {
         console.log(res);
         if (res.message === 'OK') {
-          this.progreso = false;
           this.toastr.error('Registros eliminados correctamente.', '', {
             timeOut: 6000,
           })
           this.ventana.close(true);
         }
         else {
-          this.progreso = false;
           this.toastr.info('Ups algo ha salido mal.', 'Notificaciones no seleccionadas.', {
             timeOut: 6000,
           })

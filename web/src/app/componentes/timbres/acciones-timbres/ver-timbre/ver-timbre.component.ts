@@ -13,7 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 export class VerTimbreComponent implements OnInit {
 
   timbre: any = [];
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
 
@@ -52,8 +52,10 @@ export class VerTimbreComponent implements OnInit {
   fecha_timbre: any;
   hora_timbre: any;
   ObtenerTimbre(formato_fecha: string, formato_hora: string) {
-    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fecha_hora_timbre_validado, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-    this.hora_timbre = this.validar.FormatearHora(this.timbre.fecha_hora_timbre_validado.split(' ')[1], formato_hora);
+    var fecha = this.timbre.fecha_hora_timbre_validado;
+    let fecha_formato: any = this.validar.DarFormatoFecha(fecha.split(' ')[0], 'yyyy-MM-dd');
+    this.fecha_timbre = this.validar.FormatearFecha(fecha_formato, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+    this.hora_timbre = this.validar.FormatearHora(fecha.split(' ')[1], formato_hora);
   }
 
   // METODO PARA BUSCAR DATOS DE PARAMETROS

@@ -1,14 +1,13 @@
 // IMPORTACION DE LIBRERIAS
-import { FormControl } from '@angular/forms';
 import { Component, OnInit } from "@angular/core";
 import { SelectionModel } from "@angular/cdk/collections";
+import { FormControl } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
-import * as moment from "moment";
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -408,8 +407,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         id_depa: obj.id_depa,
         nombre_depa: obj.depa_nombre,
         estado: obj.estado,
-        fecha_inicio: moment(obj.fec_inicio).format('YYYY-MM-DD'),
-        fecha_final: moment(obj.fec_final).format('YYYY-MM-DD'),
+        fecha_inicio: this.validar.DarFormatoFecha(obj.fec_inicio, 'yyyy-MM-dd'),
+        fecha_final: this.validar.DarFormatoFecha(obj.fec_final, 'yyyy-MM-dd'),
         codigo: obj.codigo,
         observacion: '',
         aprobar: '',
@@ -420,7 +419,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   lis: any = [];
   // AUTORIZACIÓN DE PERMISOS
-  AbrirAutorizaciones(datos_permiso, forma: string) {
+  AbrirAutorizaciones(datos_permiso: any, forma: string) {
     if (datos_permiso.length != 0) {
       this.multiple = true;
       this.lista_permisos = false;

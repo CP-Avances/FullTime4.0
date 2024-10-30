@@ -1,13 +1,12 @@
+import { DateTime, Duration } from 'luxon';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
-import * as moment from "moment";
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -146,7 +145,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   ArrayAutorizacionTipos: any = []
@@ -197,9 +196,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   sumaHorasfiltro: any = [];
   horasSumadas: any;
   SumatoriaHoras(inicio, fin) {
-    var t1 = new Date();
-    var tt = new Date();
-    var hora1 = '00:00:00', horaT = '00:00:00'.split(":");
+    var tt = tt = DateTime.fromObject({ hour: 0, minute: 0, second: 0 });;
+    var horaT = tt.toFormat('HH:mm:ss');
     this.restHE.ListaAllHoraExtra().subscribe(res => {
       this.sumaHoras = res;
 
@@ -210,22 +208,38 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         }
       })
 
+      /* for (var i = inicio; i < fin; i++) {
+         if (i < this.sumaHorasfiltro.length) {
+           hora1 = (this.sumaHorasfiltro[i].num_hora).split(":");
+           t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
+           tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
+ 
+           // AQUÍ HAGO LA SUMA
+           tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
+           horaT = (moment(tt).format('HH:mm:ss')).split(':');
+           this.horasSumadas = (moment(tt).format('HH:mm:ss'));
+         }
+         else {
+           break;
+         }
+       }*/
+
       for (var i = inicio; i < fin; i++) {
         if (i < this.sumaHorasfiltro.length) {
-          hora1 = (this.sumaHorasfiltro[i].num_hora).split(":");
-          t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-          tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
-
-          // AQUÍ HAGO LA SUMA
-          tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
-          horaT = (moment(tt).format('HH:mm:ss')).split(':');
-          this.horasSumadas = (moment(tt).format('HH:mm:ss'));
+          // DIVIDE LA HORA EN HORAS, MINUTOS Y SEGUNDOS
+          const [hour, minute, second] = this.sumaHorasfiltro[i].num_hora.split(":").map(Number);
+          // CREA UN DURATION CON LAS PARTES DE LA HORA
+          const t1 = Duration.fromObject({ hours: hour, minutes: minute, seconds: second });
+          // SUMA EL DURATION A TT
+          tt = tt.plus(t1);
+          // ACTUALIZA HORAT Y HORASSUMADAS EN EL FORMATO HH:mm:ss
+          horaT = tt.toFormat('HH:mm:ss');
+          this.horasSumadas = horaT;
         }
         else {
           break;
         }
       }
-
     }, err => {
       return this.validar.RedireccionarHomeAdmin(err.error)
     });
@@ -239,9 +253,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   obtenerHorasExtras(formato_fecha: string) {
     this.HorasExtraLista = [];
     this.lista_HorasExtras = [];
-    var t1 = new Date();
-    var tt = new Date();
-    var hora1 = '00:00:00', horaT = '00:00:00'.split(":");
+    var tt = DateTime.fromObject({ hour: 0, minute: 0, second: 0 });;
+    var horaT = tt.toFormat('HH:mm:ss');
     this.restHE.ListaAllHoraExtra().subscribe(res => {
       this.horas_extras = res;
 
@@ -261,25 +274,24 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           data.estado = 'Pre-autorizado';
         }
 
-        hora1 = (data.num_hora).split(":");
-        t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-        tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
+        const [hour, minute, second] = (data.num_hora).split(":").map(Number);
+        const t1 = Duration.fromObject({ hours: hour, minutes: minute, seconds: second });
 
-        // AQUÍ HAGO LA SUMA
-        tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
-        horaT = (moment(tt).format('HH:mm:ss')).split(':');
-        this.totalHorasExtras = (moment(tt).format('HH:mm:ss'));
+        // HAGO LA SUMA
+        tt = tt.plus(t1);
+        horaT = tt.toFormat('HH:mm:ss');
+        this.totalHorasExtras = horaT;
 
         data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
 
       let i = 0;
-      this.lista_pedidosFiltradas.filter(item => {
+      this.lista_pedidosFiltradas.filter((item: any) => {
         this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
           (usuaDep) => {
             i = i + 1;
-            this.ArrayAutorizacionTipos.filter(x => {
+            this.ArrayAutorizacionTipos.filter((x: any) => {
               if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
                 this.gerencia = true;
                 if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
@@ -375,9 +387,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     this.solicitudes_observacion = [];
     this.listaHorasExtrasObservaFiltradas = [];
     this.lista_HorasExtrasObservacion = [];
-    var t1 = new Date();
-    var tt = new Date();
-    var hora1 = '00:00:00', horaT = '00:00:00'.split(":");
+    var tt = DateTime.fromObject({ hour: 0, minute: 0, second: 0 });
+    var horaT = tt.toFormat('HH:mm:ss');
     this.restHE.ListaAllHoraExtraObservacion().subscribe(res => {
       this.solicitudes_observacion = res;
 
@@ -403,14 +414,11 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           data.estado = 'Negado';
         }
 
-        hora1 = (data.num_hora).split(":");
-        t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-        tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
-
-        // AQUÍ HAGO LA SUMA
-        tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
-        horaT = (moment(tt).format('HH:mm:ss')).split(':');
-        this.total_horas_observacion = (moment(tt).format('HH:mm:ss'));
+        const [hour, minute, second] = (data.num_hora).split(":").map(Number);
+        const t1 = Duration.fromObject({ hours: hour, minutes: minute, seconds: second });
+        tt = tt.plus(t1);
+        horaT = tt.toFormat('HH:mm:ss');
+        this.total_horas_observacion = horaT;
 
         data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
@@ -492,9 +500,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   horasSumadas_observacion: any;
   susmaHoras_observacionFiltada: any = [];
   SumatoriaHorasObservacion(inicio, fin) {
-    var t1 = new Date();
-    var tt = new Date();
-    var hora1 = '00:00:00', horaT = '00:00:00'.split(":");
+    var tt = DateTime.fromObject({ hour: 0, minute: 0, second: 0 });
+    var horaT = tt.toFormat('HH:mm:ss');
     this.restHE.ListaAllHoraExtraObservacion().subscribe(res => {
       this.sumaHoras_observacion = res;
 
@@ -508,14 +515,11 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       for (var i = inicio; i < fin; i++) {
         if (i < this.susmaHoras_observacionFiltada.length) {
-          hora1 = (this.susmaHoras_observacionFiltada[i].num_hora).split(":");
-          t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-          tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
-
-          // AQUÍ HAGO LA SUMA
-          tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
-          horaT = (moment(tt).format('HH:mm:ss')).split(':');
-          this.horasSumadas_observacion = (moment(tt).format('HH:mm:ss'));
+          const [hour, minute, second] = (this.susmaHoras_observacionFiltada[i].num_hora).split(":").map(Number);
+          const t1 = Duration.fromObject({ hours: hour, minutes: minute, seconds: second });
+          tt = tt.plus(t1);
+          horaT = tt.toFormat('HH:mm:ss');
+          this.horasSumadas_observacion = horaT;
         }
         else {
           break;
@@ -569,9 +573,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   total_horas_autorizadas: any;
   listaHorasExtrasAutorizadasFiltradas: any = [];
   obtenerHorasExtrasAutorizadas(formato_fecha: string) {
-    var t1 = new Date();
-    var tt = new Date();
-    var hora1 = '00:00:00', horaT = '00:00:00'.split(":");
+    let tt = DateTime.fromObject({ hour: 0, minute: 0, second: 0 });
+    let horaT = tt.toFormat('HH:mm:ss');
     this.restHE.ListaAllHoraExtraAutorizada().subscribe(res => {
       this.pedido_hora_autoriza = res;
 
@@ -607,14 +610,11 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         }
 
         if (data.estado === 'Autorizado') {
-          hora1 = (data.tiempo_autorizado).split(":");
-          t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-          tt.setHours(parseInt(horaT[0]), parseInt(horaT[1]), parseInt(horaT[2]));
-
-          // AQUÍ HAGO LA SUMA
-          tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
-          horaT = (moment(tt).format('HH:mm:ss')).split(':');
-          this.total_horas_autorizadas = (moment(tt).format('HH:mm:ss'));
+          const [hour, minute, second] = (data.tiempo_autorizado).split(":").map(Number);
+          const t1 = Duration.fromObject({ hours: hour, minutes: minute, seconds: second });
+          tt = tt.plus(t1);
+          horaT = tt.toFormat('HH:mm:ss');
+          this.total_horas_autorizadas = horaT;
         }
 
         data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);

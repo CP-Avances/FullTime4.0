@@ -249,12 +249,6 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EL REGISTRO ENTRA O NO A VERIFICACION DE DUPLICIDAD
   VerificarDatos(datos: any, form: any) {
-    /*console.log('datos contrato ', datos, ' contrato ', this.contrato)
-    console.log('datos inicio ', moment(datos.fec_ingreso).format('YYYY-MM-DD'))
-    console.log('datos fin ', moment(datos.fec_salida).format('YYYY-MM-DD'))
-    console.log('contrato inicio ', moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD'))
-    console.log('contrato fin ', moment(this.contrato.fecha_salida).format('YYYY-MM-DD'))*/
-
     if (DateTime.fromISO(datos.fec_ingreso).hasSame(DateTime.fromISO(this.contrato.fecha_ingreso), 'day') &&
       DateTime.fromISO(datos.fec_salida).hasSame(DateTime.fromISO(this.contrato.fecha_salida), 'day')) {
       this.VerificarInformacion(datos, form);
