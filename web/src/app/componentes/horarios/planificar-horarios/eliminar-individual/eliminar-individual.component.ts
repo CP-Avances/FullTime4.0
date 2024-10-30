@@ -1,15 +1,15 @@
 // IMPORTAR LIBRERIAS
-import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import moment from 'moment';
-import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
+
 // IMPORTACION DE SERVICIOS
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { DateTime } from 'luxon';
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';

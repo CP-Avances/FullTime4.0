@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-5">
-                <div>
+                <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
                         <mat-label>Horas totales</mat-label>
                         <input matInput placeholder="Ej: 8:15 " [formControl]="horaTrabajo" required
@@ -92,31 +92,39 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-8">
-                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:20px;">
-                            <mat-checkbox id="check" [formControl]="tipoF" matSuffix matTooltipPosition="right"
+                        <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
+                            <div class="d-flex flex-wrap justify-content-start w-100">
+                                <mat-checkbox id="check" [formControl]="tipoF" matSuffix matTooltipPosition="right"
                                 matTooltip="Marcar si el horario es Nocturno.">
-                                <label id="textoradiobtn">Horario nocturno</label>
-                            </mat-checkbox>
-                            <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
-                                <label id="textoradiobtn">Control de archivos</label>
-                            </mat-checkbox>
+                                    <label id="textoradiobtn">Horario nocturno</label>
+                                </mat-checkbox>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start w-100">
+                                <mat-checkbox id="check" (change)="VerificarArchivo($event)">
+                                    <label id="textoradiobtn">Control de archivos</label>
+                                </mat-checkbox>
+                            </div>
                         </div>
                         
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-3">
-                <section class="d-flex flex-column bd-highlight" *ngIf="isChecked">
-                    <mat-radio-group aria-label="Select an option" [formControl]="seleccion" class="contenedor">
-                        <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
-                            Retirar archivo
-                        </mat-radio-button>
-                        <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
-                            Actualizar archivo
-                        </mat-radio-button>
+                <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;" *ngIf="isChecked">
+                    <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
+                        <div class="d-flex flex-wrap justify-content-start w-100">
+                            <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
+                                Retirar archivo
+                            </mat-radio-button>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start w-100">
+                            <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
+                                Actualizar archivo
+                            </mat-radio-button>
+                        </div>
                     </mat-radio-group>
-                </section>
-                <div class="d-flex flex-wrap justify-content-start">
+                </div>
+                <div class="d-flex flex-wrap justify-content-center">
                     <section class="d-flex flex-column bd-highlight" *ngIf="activar">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
@@ -131,7 +139,6 @@
                         <div class="separar">
                             <input type="text" id="respaldo" placeholder="Ningún archivo seleccionado"
                                 class="form-control" style="width: 200px;" [formControl]="documentoF">
-
                             <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
                                 id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
                                 matTooltip="Eliminar archivo seleccionado.">

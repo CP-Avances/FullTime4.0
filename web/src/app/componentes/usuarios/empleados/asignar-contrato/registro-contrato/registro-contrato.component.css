@@ -6,11 +6,6 @@
     padding: 5px 5px 0px 5px
 }
 
-mat-form-field {
-    width: 250px;
-    padding: 5px 5px 0px 5px;
-}
-
 #respaldo {
     font-size: 13px;
     display: inline-block;
@@ -102,39 +97,4 @@ mat-radio-group {
     background-color: #F5F5F5;
 }
 
-@media (max-width: 530px) {
-    
-    mat-card-content{
-        padding: 0px;
-    }
 
-    mat-form-field {
-        width: 250px;
-        padding: 0px 0px 0px 0px;
-    }
-
-    mat-radio-group {
-        width: 210px;
-        padding: 0px 0px 0px 0px;
-        margin-bottom: 0px;
-    }
-
-
-    form{
-        margin: 0%;
-        padding: 0%;
-    }
-
-    .fechas{
-        margin: 0px;
-        padding: 0%;
-    }
-
-    #fechas{
-        width: 50px !important;
-    }
-
-    .separar {
-        padding: 0px 0px 0px 0px
-    }
-}

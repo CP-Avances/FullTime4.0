@@ -412,15 +412,15 @@ export class VerParametroComponent implements OnInit {
     let formato = '';
     let observacion = '';
     if (seleccion === 1) {
-      formato = 'DD/MM/YYYY';
+      formato = 'dd/MM/yyyy';
       observacion = 'Formato americano';
     }
     else if (seleccion === 2) {
-      formato = 'MM/DD/YYYY';
+      formato = 'MM/dd/yyyy';
       observacion = 'Formato ingles';
     }
     else if (seleccion === 3) {
-      formato = 'YYYY-MM-DD';
+      formato = 'yyyy-MM-dd';
       observacion = 'Formato estándar';
     }
     else if (seleccion === 4) {

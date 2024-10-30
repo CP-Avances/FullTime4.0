@@ -1,12 +1,10 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -31,12 +29,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   @Input() seleccionados: any;
   @Input() pagina: any;
-
-  // VARIABLES PROGRESS SPINNER
-  //progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS
   horarios: any = [];

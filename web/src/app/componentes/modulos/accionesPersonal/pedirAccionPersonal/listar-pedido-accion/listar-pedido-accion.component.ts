@@ -9,23 +9,21 @@ import { PageEvent } from "@angular/material/paginator";
 import * as FileSaver from "file-saver";
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as moment from "moment";
 import * as xlsx from "xlsx";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-moment.locale("es");
+
 
 // LLAMADO DE SERVICIOS
-import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
+import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
 import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
+import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
+import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
+import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
-import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
@@ -81,7 +79,6 @@ export class ListarPedidoAccionComponent implements OnInit {
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public parametro: ParametrosService,
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
-    private restUsuario: UsuarioService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     private validar: ValidacionesService,
     private funciones: MainNavService,
@@ -201,7 +198,6 @@ export class ListarPedidoAccionComponent implements OnInit {
   FiltrarEmpleadosAsignados(data: any) {
     return data.filter((pedido: any) => this.idUsuariosAcceso.has(pedido.id_empleado));
   }
-
 
   // METODO PARA FORMATEAR DATOS DE FECHA
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
@@ -706,9 +702,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                           style: "itemsTable",
                         },
                         {
-                          text: moment(this.datosPedido[0].fec_creacion).format(
-                            "DD MMMM YYYY"
-                          ),
+                          text: this.validar.DarFormatoFecha(this.datosPedido[0].fec_creacion, "dd MMMM yyyy"),
                           style: "itemsTable_c",
                         },
                       ],
@@ -1092,9 +1086,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: moment(this.datosPedido[0].fec_rige_desde).format(
-                        "dddd DD MMMM YYYY"
-                      ),
+                      text: this.validar.DarFormatoFecha(this.datosPedido[0].fec_rige_desde, "cccc dd MMMM yyyy"),
                       style: "itemsTable_c",
                       alignment: 'center',
                     },
@@ -2589,9 +2581,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                         body: [
                           [
                             {
-                              text: moment(this.datosPedido[0].fec_act_final_concurso).format(
-                                "DD MMMM YYYY"
-                              ),
+                              text: this.validar.DarFormatoFecha(this.datosPedido[0].fec_act_final_concurso, "dd MMMM yyyy"),
                               color: "black",
                               style: "itemsTable",
                             },
@@ -2841,9 +2831,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                         body: [
                           [
                             {
-                              text: moment(
-                                this.datosPedido[0].fec_creacion
-                              ).format("DD MMMM YYYY"),
+                              text: this.validar.DarFormatoFecha(this.datosPedido[0].fec_creacion, 'dd MMMM yyyy'),
                               style: "itemsTable",
                             },
                           ],
@@ -3167,9 +3155,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: moment(
-                        this.datosPedido[0].primera_fecha_reemp
-                      ).format("DD MMMM YYYY"),
+                      text: this.validar.DarFormatoFecha(this.datosPedido[0].primera_fecha_reemp, "dd MMMM yyyy"),
                       color: "black",
                       style: "itemsTable"
                     },
@@ -3782,13 +3768,11 @@ export class ListarPedidoAccionComponent implements OnInit {
 
 
     // VARIABLES AUXILIARES PARA LOS DATOS
-    let fecha1 = moment(this.datosPedido[0].fec_creacion).format(
-      "DD MMMM YYYY");
-    let fecha2 = moment(this.datosPedido[0].fec_rige_desde).format(
-      "dddd DD MMMM YYYY");
-    let fecha3 = moment(this.datosPedido[0].fec_act_final_concurso).format("DD MMMM YYYY");
-    let fecha4 = moment(this.datosPedido[0].fec_creacion).format("DD MMMM YYYY");
-    let fecha5 = moment(this.datosPedido[0].primera_fecha_reemp).format("DD MMMM YYYY");
+    let fecha1 = this.validar.DarFormatoFecha(this.datosPedido[0].fec_creacion, 'dd MMMM yyyy');
+    let fecha2 = this.validar.DarFormatoFecha(this.datosPedido[0].fec_rige_desde, 'cccc dd MMMM yyyy');
+    let fecha3 = this.validar.DarFormatoFecha(this.datosPedido[0].fec_act_final_concurso, 'dd MMMM yyyy');
+    let fecha4 = this.validar.DarFormatoFecha(this.datosPedido[0].fec_creacion, 'dd MMMM yyyy');
+    let fecha5 = this.validar.DarFormatoFecha(this.datosPedido[0].primera_fecha_reemp, 'dd MMMM yyyy');
     let nombreEmpleado = this.empleado_1[0].nombre.toUpperCase();
     let apellidoEmpleado = this.empleado_1[0].apellido.toUpperCase();
 
@@ -4212,7 +4196,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   ExportToCVS() {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.listaPedidos.map((obj) => {
+      this.listaPedidos.map((obj: any) => {
         return {
           Codigo: obj.id,
           Cedula: obj.cedula,

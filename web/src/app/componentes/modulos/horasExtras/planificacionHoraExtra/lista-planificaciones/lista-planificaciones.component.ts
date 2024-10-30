@@ -8,7 +8,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
-import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
@@ -115,9 +114,9 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
 
-      var f = moment();
+      var f = DateTime.now();
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
-      this.fecha = f.format('YYYY-MM-DD');
+      this.fecha = f.toFormat('yyyy-MM-dd');
       this.BuscarParametro();
     }
   }
@@ -146,7 +145,7 @@ export class ListaPlanificacionesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   correos: number = 0;
@@ -412,11 +411,13 @@ export class ListaPlanificacionesComponent implements OnInit {
       // LECTURA DE NOMBRES DE USUARIOS
       usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
 
-      // LECTURA DE DATOS DE LA PLANIFICACIÓN
-      let desde = moment.weekdays(moment(obj.fecha_desde).day()).charAt(0).toUpperCase() + moment.weekdays(moment(obj.fecha_desde).day()).slice(1);
-      let hasta = moment.weekdays(moment(obj.fecha_hasta).day()).charAt(0).toUpperCase() + moment.weekdays(moment(obj.fecha_hasta).day()).slice(1);
-      let h_inicio = moment(obj.hora_inicio, 'HH:mm').format('HH:mm');
-      let h_fin = moment(obj.hora_fin, 'HH:mm').format('HH:mm');
+      // LECTURA DE DATOS DE LA PLANIFICACION
+      const desde_ = DateTime.fromISO(obj.fecha_desde).setLocale('es').toFormat('cccc');
+      const hasta_ = DateTime.fromISO(obj.fecha_hasta).setLocale('es').toFormat('cccc');
+      let desde = desde_.charAt(0).toUpperCase() + desde_.slice(1);
+      let hasta = hasta_.charAt(0).toUpperCase() + hasta_.slice(1);;
+      let h_inicio = this.validar.FormatearHora(obj.hora_inicio, 'HH:mm');
+      let h_fin = this.validar.FormatearHora(obj.hora_fin, 'HH:mm');
 
 
       this.restPlan.EliminarPlanEmpleado(obj.id_plan, obj.id_empleado, data).subscribe(res => {
@@ -538,7 +539,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: moment(datos.horas_totales, 'HH:mm').format('HH:mm'),
+      horas: this.validar.FormatearHora(datos.horas_totales, 'HH:mm'),
       fin: h_fin,
     }
 

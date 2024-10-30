@@ -132,20 +132,9 @@ export class ValidacionesService {
 
   FormatearFecha(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    // CONVERTIR FORMATOS DE FECHA
-    if (formato === 'DD/MM/YYYY') {
-      formato = 'dd/MM/yyyy';
-    }
-    else if (formato === 'MM/DD/YYYY') {
-      formato = 'MM/dd/yyyy';
-    }
-    else {
-      formato = 'yyyy/MM/dd';
-    }
     console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaLuxon = DateTime.fromISO(fecha).setLocale(idioma);
-
     // MANEJAR EL FORMATO PARA EL DIA
     if (dia === 'ddd') {
       const diaAbreviado = fechaLuxon.toFormat('EEE').charAt(0).toUpperCase() +
@@ -197,16 +186,6 @@ export class ValidacionesService {
 
   FormatearFechaAuditoria(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    // CONVERTIR FORMATOS DE FECHA
-    if (formato === 'DD/MM/YYYY') {
-      formato = 'dd/MM/yyyy';
-    }
-    else if (formato === 'MM/DD/YYYY') {
-      formato = 'MM/dd/yyyy';
-    }
-    else {
-      formato = 'yyyy/MM/dd';
-    }
     console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaISO = fecha.replace(' ', 'T').replace(/-\d{2}$/, '');

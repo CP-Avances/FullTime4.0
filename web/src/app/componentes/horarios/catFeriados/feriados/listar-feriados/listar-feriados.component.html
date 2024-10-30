@@ -27,7 +27,7 @@
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row m-auto">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"

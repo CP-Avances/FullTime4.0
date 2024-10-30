@@ -1,10 +1,8 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Component, ViewChild } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
@@ -52,17 +50,10 @@ export class CatTipoCargosComponent {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-
-  listaTipoCargos: any;
   tiposCargosCorrectos: number = 0;
-
-  empleado: any = [];
+  listaTipoCargos: any;
   idEmpleado: number;
+  empleado: any = [];
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -111,7 +102,7 @@ export class CatTipoCargosComponent {
   }
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
@@ -274,7 +265,6 @@ export class CatTipoCargosComponent {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
@@ -314,9 +304,6 @@ export class CatTipoCargosComponent {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

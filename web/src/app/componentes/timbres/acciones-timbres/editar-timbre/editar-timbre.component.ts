@@ -62,7 +62,7 @@ export class EditarTimbreComponent implements OnInit {
   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
   ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -95,8 +95,10 @@ export class EditarTimbreComponent implements OnInit {
   LeerDatosTimbre() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-    this.datosTimbre.hora_ = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+    var fecha = this.datosTimbre.fecha_hora_timbre_validado;
+    let fecha_formato: any = this.validar.DarFormatoFecha(fecha.split(' ')[0], 'yyyy-MM-dd');
+    this.datosTimbre.fecha_ = this.validar.FormatearFecha(fecha_formato, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+    this.datosTimbre.hora_ = this.validar.FormatearHora(fecha.split(' ')[1], this.formato_hora);
     this.ValidarObservacion();
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: [this.datosTimbre.accion, Validators.required],

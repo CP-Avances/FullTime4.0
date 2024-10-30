@@ -14,8 +14,6 @@ mat-form-field {
 }
 
 #check {
-    width: 210px;
-    margin-right: 80px;
     margin-bottom: 5px;
 }
 
@@ -37,10 +35,6 @@ mat-form-field {
     margin: 1rem auto;
     max-width: 200px;
     align-items: flex-start;
-}
-
-.radio-button {
-    margin: 0px 0px 10px;
 }
 
 #respaldo {

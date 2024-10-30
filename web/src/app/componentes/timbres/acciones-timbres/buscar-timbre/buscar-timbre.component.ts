@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import moment from 'moment';
 
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -73,7 +72,7 @@ export class BuscarTimbreComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -140,7 +139,7 @@ export class BuscarTimbreComponent implements OnInit {
       var datos: any = {
         codigo: form.codigoForm,
         cedula: form.cedulaForm,
-        fecha: moment(form.fechaForm).format('YYYY-MM-DD')
+        fecha: this.validar.DarFormatoFecha(form.fechaForm, 'yyyy-MM-dd')
       }
       this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(async timbres => {
         if (timbres.timbres.length > 0) {
@@ -154,8 +153,10 @@ export class BuscarTimbreComponent implements OnInit {
           })
         }
         this.timbres.forEach((data: any) => {
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_validado, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-          data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+          var fecha = data.fecha_hora_timbre_validado;
+          let fecha_formato: any = this.validar.DarFormatoFecha(fecha.split(' ')[0], 'yyyy-MM-dd');
+          data.fecha = this.validar.FormatearFecha(fecha_formato, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          data.hora = this.validar.FormatearHora(fecha.split(' ')[1], this.formato_hora);
           if (data.tecla_funcion === '0') {
             data.tecla_funcion_ = 'Entrada';
           }

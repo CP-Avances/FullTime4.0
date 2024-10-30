@@ -1,11 +1,8 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { HttpResponse } from '@angular/common/http';
-import { ThemePalette } from '@angular/material/core';
 import { DateTime } from 'luxon';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -52,14 +49,8 @@ export class ReporteAuditoriaComponent implements OnInit {
     tabla_ = new FormControl('');
     modulo_ = new FormControl('');
 
-    // VARIABLES PROGRESS SPINNER
-    habilitarprogress: boolean = false;
-    mode: ProgressSpinnerMode = 'indeterminate';
-    color: ThemePalette = 'primary';
-    value = 10;
-
     // VARIABLES  
-    formato_fecha: string = 'DD/MM/YYYY';
+    formato_fecha: string = 'dd/MM/yyyy';
     formato_hora: string = 'HH:mm:ss';
     idioma_fechas: string = 'es';
     verDetalle: boolean = false;
@@ -318,7 +309,6 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
-        this.habilitarprogress = true;
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
         // ARRAY PARA ALMACENAR TODAS LAS PROMESAS DE CONSULTA
@@ -384,7 +374,6 @@ export class ReporteAuditoriaComponent implements OnInit {
                     break;
             }
         } finally {
-            this.habilitarprogress = false;
         }
     }
 
