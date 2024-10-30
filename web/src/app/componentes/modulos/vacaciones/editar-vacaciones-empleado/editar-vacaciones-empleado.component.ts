@@ -1,5 +1,3 @@
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -18,12 +16,6 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'app-editar-vacaciones-empleado',
   templateUrl: './editar-vacaciones-empleado.component.html',
   styleUrls: ['./editar-vacaciones-empleado.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class EditarVacacionesEmpleadoComponent implements OnInit {
