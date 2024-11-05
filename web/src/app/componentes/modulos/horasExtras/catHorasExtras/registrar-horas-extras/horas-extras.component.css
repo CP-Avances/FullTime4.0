@@ -15,7 +15,8 @@ mat-slider {
 
 mat-form-field {
   width: 300px;
-  padding: 10px 5px 0px 10px;
+  margin: auto;
+  padding: auto;
 }
 
 mat-radio-group {

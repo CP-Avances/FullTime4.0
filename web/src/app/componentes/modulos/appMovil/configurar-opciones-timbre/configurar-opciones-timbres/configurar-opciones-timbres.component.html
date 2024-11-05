@@ -1,12 +1,14 @@
 <div style="padding-top: 20px;" *ngIf="configurar">
     <div id="titulo" class="row w-100 m-auto">
-        <div class="col-10 col-md-10 mb-2 mb-md-0 Tabla_titulo">
-            <span>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+        </div>
+        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+            <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
                 CONFIGURAR OPCIONES EN MARCACIONES
             </span>
         </div>
-        <div *ngIf="activar_boton" class="col-2 col-md-2 mb-2 mb-md-0">
-            <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario()">highlight_off</mat-icon>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon *ngIf="activar_boton" class="float-right" id="cerrar" (click)="LimpiarFormulario()">highlight_off</mat-icon>
         </div>
     </div>
     <mat-card class="example-card mat-elevation-z9">
@@ -233,18 +235,18 @@
                 </div>
             </div>
             <hr>
-            <div class="row w-100" *ngIf="activar_boton" style="padding-bottom: 10px; text-align: center;">
-                <div class="col-5 col-md-4">
+            <div class="row w-100" *ngIf="activar_boton" style="padding-bottom: 10px;">
+                <div class="col-3 col-md-4">
                     <button class="btn btn-sm" (click)="GuardarRegistros(0, '')">
                         Guardar
                     </button>
                 </div>
-                <div class="col-7 col-md-4">
+                <div class="col-5 col-md-4">
                     <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')">
                         Ver Configuración
                     </button>
                 </div>
-                <div class="col-12 col-md-4 mt-2 mt-md-0">
+                <div class="col-4 col-md-4">
                     <button class="btn btn-sm" (click)="MostrarLista()">
                         Mostrar lista
                     </button>
