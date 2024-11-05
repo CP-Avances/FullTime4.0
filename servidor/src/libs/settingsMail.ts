@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import pool from '../database';
-
+import { DateTime } from 'luxon';
 import moment from 'moment';
 moment.locale('es');
 
@@ -137,25 +137,45 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
     moment(fecha).format(dia).slice(1) +
     ', ' + moment(fecha).format(formato.fecha);
 
-    console.log(' fecha.. ', moment(fecha).format(formato.fecha))
+  console.log(' fecha.. ', moment(fecha).format(formato.fecha))
   return valor;
 }
 
 export const FormatearFecha2 = async function (fecha: string, dia: string) {
-  let formato = await BuscarFecha();
 
-  let diaFormateado = moment(fecha).format(dia);
-  // Limpia el día formateado de puntos no deseados
-  diaFormateado = diaFormateado.replace('.', '');
-  // Asegúrate de que la primera letra esté en mayúscula
-  diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  console.log("ver fecha: ", fecha)
+  const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+  const formato = await BuscarFecha();
+  if (dia == "ddd" || dia == "dddd") {
+    if (!regex.test(fecha)) {
+      const date = new Date(fecha);
+      // Obtener las partes de la fecha y formatearlas con dos dígitos
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      // Devolver la fecha formateada
+      fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+    console.log("fecha ver", fecha)
+    const fechaObj = DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
+    // Formatear el día
+    let diaFormateado = fechaObj.toFormat("EEE", { locale: 'es' });
+    // Limpia el día formateado de puntos no deseados
+    diaFormateado = diaFormateado.replace('.', '');
+    // Asegúrate de que la primera letra esté en mayúscula
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    // Formatear la fecha
+    const fechaFormateada = fechaObj.toFormat(formato.fecha);
+    let valor = `${diaFormateado}, ${fechaFormateada}`;
+    return valor;
 
-  let fechaFormateada = moment(fecha).format(formato.fecha);
+  }
 
-  let valor = `${diaFormateado}, ${fechaFormateada}`;
-
-  return valor;
 }
+
 
 export const FormatearFechaBase = async function (fecha: any, dia: string) {
   let formato = await BuscarFecha();
@@ -198,14 +218,12 @@ function transformDate(date: any): string {
   return fechaISO1;
 }
 
-
-
-
 export const FormatearHora = async function (hora: string) {
-  let formato = await BuscarHora();
-  let valor = moment(hora, 'HH:mm:ss').format(formato.hora);
+  console.log("ver hora: ", hora ) 
+  const formato = await BuscarHora(); // Obtenemos el formato deseado desde la función
+  const valor = DateTime.fromFormat(hora, 'HH:mm:ss').toFormat(formato.hora);
   return valor;
-}
+};
 
 // METODO PARA BUSCAR PARAMETRO FECHA (1)
 export const BuscarFecha = async function () {

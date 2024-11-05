@@ -9,6 +9,17 @@ const pool = new Pool({
   password: 'fu11tim3'
 })
 
+
+/*
+const pool = new Pool({
+  user: 'fulltime',
+  host: 'localhost',
+  port: 5432,
+  database: 'prueba_empresa',
+  password: 'fulltime'
+})
+*/
+
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.log("Error durante la conexión", err)

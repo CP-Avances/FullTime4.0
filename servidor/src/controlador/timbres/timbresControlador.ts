@@ -3,7 +3,7 @@ import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { QueryResult } from 'pg';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 import moment from 'moment-timezone';
-//import * as moment_ from 'moment-timezone';
+import { DateTime } from 'luxon';
 import pool from '../../database';
 
 class TimbresControlador {
@@ -1350,23 +1350,18 @@ class TimbresControlador {
             const hoy: Date = new Date();
             const timbre: any = req.body;
             await pool.query('BEGIN');
-
-            // Verificar el contenido de req.body
-            console.log('Contenido de req.body:', timbre);
-
-            timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-            const fechaHoraEnZonaHorariaDispositivo = moment(timbre.fecha_hora_timbre_servidor)
-                .tz(timbre.zona_horaria_dispositivo)
-                .format('YYYY-MM-DD HH:mm:ss');
-
-            const zonaHorariaServidor = moment.tz.guess();
+            const pad = (num: number) => num.toString().padStart(2, '0');
+            timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+            const fechaHoraEnZonaHorariaDispositivo = DateTime.fromJSDate(hoy)
+            .setZone(timbre.zona_horaria_dispositivo)
+            .toFormat('yyyy-MM-dd HH:mm:ss');
+            const zonaHorariaServidor = DateTime.local().zoneName;
             const timbreRV: Date = new Date(fechaHoraEnZonaHorariaDispositivo || '');
             const timbreDispositivo: Date = new Date(timbre.fecha_hora_timbre || '');
-
-
             const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
             const restaTimbresMinutos = timbreRV.getMinutes() - timbreDispositivo.getMinutes();
             const restaTimbresDias = timbreRV.getDate() - timbreDispositivo.getDate();
+
             if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
                 timbre.hora_timbre_diferente = true;
             } else {
@@ -1422,8 +1417,9 @@ class TimbresControlador {
             await pool.query('BEGIN');
             console.log("ver req.body", req.body)
 
-            timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-            const zonaHorariaServidor = moment.tz.guess();
+            const pad = (num: number) => num.toString().padStart(2, '0');
+            timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+            const zonaHorariaServidor = DateTime.local().zoneName;
             timbre.hora_timbre_diferente = false;
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
@@ -1437,12 +1433,16 @@ class TimbresControlador {
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+
+            const fechaHoraSubida = await FormatearHora(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
+            const fechaTimbreSubida = await FormatearFecha2(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
                 usuario: timbre.user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: '', id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, id_empleado: ${timbre.id_empleado}, imagen: ${timbre.imagen} }`,
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
                 ip: timbre.ip,
                 observacion: null
             });
@@ -1467,7 +1467,7 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body
             console.log(req.body);
             await pool.query('BEGIN');
-            const zonaHorariaServidor = moment.tz.guess();
+            const zonaHorariaServidor = DateTime.local().zoneName;
 
 
             const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id',
@@ -1475,7 +1475,7 @@ class TimbresControlador {
                 .then(result => {
                     return result.rows;
                 });
-            const fechaHora = await FormatearHora(fec_hora_timbre.toLocaleString().split('T')[1]);
+            const fechaHora = await FormatearHora(fec_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(fec_hora_timbre.toLocaleString(), 'ddd');
 
 
