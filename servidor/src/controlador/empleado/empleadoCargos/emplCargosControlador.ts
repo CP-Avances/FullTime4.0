@@ -2,11 +2,11 @@ import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
+import { DateTime } from 'luxon';
 
 import excel from 'xlsx';
 
@@ -536,17 +536,17 @@ class EmpleadoCargosControlador {
               data.observacion = 'La cédula ingresada no es válida';
             } else {
               // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-              if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
+              if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
 
                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
 
                   // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                   if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                     data.observacion = 'El sueldo es incorrecto';
                   }
                   else {
-                    if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                    if (DateTime.fromFormat(HORA_TRABAJA, 'HH:mm:ss').isValid) {
                       if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                         data.observacion = 'Columna jefe formato incorrecto';
                       }
@@ -630,11 +630,12 @@ class EmpleadoCargosControlador {
               else {
                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                 if (data.fecha_desde != 'No registrado') {
-                  if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
+                  if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid
+                  ) {
 
                     // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                     if (data.fecha_hasta != 'No registrado') {
-                      if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                      if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
 
                         if (data.sueldo != 'No registrado') {
                           // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
@@ -643,7 +644,7 @@ class EmpleadoCargosControlador {
                           } else {
                             // VERFICAR FORMATO DE HORAS
                             if (data.hora_trabaja != 'No registrado') {
-                              if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                              if (DateTime.fromFormat(HORA_TRABAJA, 'HH:mm:ss').isValid) {
                                 if (data.admini_depa != 'No registrado') {
                                   if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                                     data.observacion = 'Columna jefe formato incorrecto';
@@ -745,7 +746,7 @@ class EmpleadoCargosControlador {
                         , [valor.cargo.toUpperCase()])
                       if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
-                        if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                        if (DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
                           valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
                         }
                         else {

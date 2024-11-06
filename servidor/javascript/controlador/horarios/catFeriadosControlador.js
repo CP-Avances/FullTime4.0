@@ -117,9 +117,8 @@ class FeriadosControlador {
                     const [feriado] = response.rows;
                     const fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
                     feriado.fecha = fecha_formato;
-                    let fec_recuperacion_formato = '';
                     if (fec_recuperacion) {
-                        fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                        let fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
                         feriado.fecha_recuperacion = fec_recuperacion_formato;
                     }
                     // AUDITORIA
@@ -206,10 +205,9 @@ class FeriadosControlador {
                     const [datosNuevos] = actualizacion.rows;
                     const fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
                     datosNuevos.fecha = fecha_formato;
-                    let fec_recuperacion_formato = '';
                     if (fec_recuperacion) {
-                        fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
-                        datosNuevos.fecha_recuperacion = fec_recuperacion_formato;
+                        let fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                        datosNuevos.fecha_recuperacion = fec_recuperacion_formato || '';
                     }
                     const fecha_formatoO = yield (0, settingsMail_1.FormatearFecha2)(feriado.fecha, 'ddd');
                     feriado.fecha = fecha_formatoO;

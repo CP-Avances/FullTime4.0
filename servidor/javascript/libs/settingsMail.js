@@ -146,23 +146,34 @@ const FormatearFecha2 = function (fecha, dia) {
         console.log("ver fecha: ", fecha);
         const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
         const formato = yield (0, exports.BuscarFecha)();
-        if (dia == "ddd" || dia == "dddd") {
-            if (!regex.test(fecha)) {
-                const date = new Date(fecha);
-                // Obtener las partes de la fecha y formatearlas con dos dígitos
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                // Devolver la fecha formateada
-                fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-            }
-            console.log("fecha ver", fecha);
-            const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
-            // Formatear el día
+        if (!regex.test(fecha)) {
+            const date = new Date(fecha);
+            // Obtener las partes de la fecha y formatearlas con dos dígitos
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            // Devolver la fecha formateada
+            fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        console.log("fecha ver", fecha);
+        const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
+        // Formatear el día
+        if (dia == "ddd") {
             let diaFormateado = fechaObj.toFormat("EEE", { locale: 'es' });
+            // Limpia el día formateado de puntos no deseados
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+            // Formatear la fecha
+            const fechaFormateada = fechaObj.toFormat(formato.fecha);
+            let valor = `${diaFormateado}, ${fechaFormateada}`;
+            return valor;
+        }
+        else if (dia == "dddd") {
+            let diaFormateado = fechaObj.toFormat("EEEE", { locale: 'es' });
             // Limpia el día formateado de puntos no deseados
             diaFormateado = diaFormateado.replace('.', '');
             // Asegúrate de que la primera letra esté en mayúscula

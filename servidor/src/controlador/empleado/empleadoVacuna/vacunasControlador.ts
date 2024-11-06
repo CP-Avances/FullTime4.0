@@ -2,7 +2,8 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
-import moment from 'moment';
+import { DateTime } from 'luxon';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
@@ -109,6 +110,8 @@ class VacunasControlador {
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
 
                 const [vacuna] = response.rows;
+                const fechaF = await FormatearFecha2(DateTime.fromJSDate(vacuna.fecha).toFormat("yyyy-MM-dd HH:mm:ss"), 'ddd');
+                vacuna.fecha = fechaF
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -147,10 +150,10 @@ class VacunasControlador {
     public async GuardarDocumento(req: Request, res: Response): Promise<Response> {
         try {
             // FECHA DEL SISTEMA
-            var fecha = moment();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            const fecha = DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
 
             const { user_name, ip } = req.body;
             let id = req.params.id;
@@ -199,6 +202,11 @@ class VacunasControlador {
                 `
                 , [id, documento]);
 
+            const fechaO = await FormatearFecha2(
+                datosOriginales.fecha, 'ddd');
+            const fechaN = await FormatearFecha2(datosNuevos.rows[0].fecha, 'ddd');
+            datosOriginales.fecha = fechaO;
+            datosNuevos.rows[0].fecha = fechaN
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
@@ -287,6 +295,12 @@ class VacunasControlador {
                     `
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
 
+
+                const fechaO = await FormatearFecha2(
+                    datosOriginales.fecha, 'ddd');
+                const fechaN = await FormatearFecha2(datosNuevos.rows[0].fecha, 'ddd');
+                datosOriginales.fecha = fechaO;
+                datosNuevos.rows[0].fecha = fechaN
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
@@ -443,6 +457,9 @@ class VacunasControlador {
                 , [id]);
 
             const [vacuna] = response.rows;
+            const fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+            datosOriginales.fecha = fechaO;
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
