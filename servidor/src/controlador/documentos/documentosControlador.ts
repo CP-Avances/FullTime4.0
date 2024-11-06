@@ -1,12 +1,11 @@
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import { DateTime } from 'luxon';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
-import moment from 'moment';
-export var carpeta: any;
 
 class DocumentosControlador {
 
@@ -165,10 +164,10 @@ class DocumentosControlador {
             const { user_name, ip } = req.body;
 
             // FECHA DEL SISTEMA
-            var fecha = moment();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            var fecha = DateTime.now();
+            var anio = fecha.toFormat('yyyy');
+            var mes = fecha.toFormat('MM');
+            var dia = fecha.toFormat('dd');
 
             let documento = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 

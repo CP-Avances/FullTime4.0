@@ -1,11 +1,11 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerRutaLeerPlantillas, ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
 import { ComprimirImagen, ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { DateTime } from 'luxon';
 import path from 'path';
 import pool from '../../../database';
 import fs from 'fs';
-import { DateTime } from 'luxon';
 
 const sharp = require('sharp');
 

@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPRESA_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
-const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const luxon_1 = require("luxon");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const fs_1 = __importDefault(require("fs"));
-const luxon_1 = require("luxon");
 const sharp = require('sharp');
 class EmpresaControlador {
     // BUSCAR DATOS DE EMPRESA PARA RECUPERAR CUENTA

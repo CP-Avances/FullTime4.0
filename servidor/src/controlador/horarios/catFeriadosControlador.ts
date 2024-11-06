@@ -1,14 +1,14 @@
 
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha, FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 
 
 class FeriadosControlador {
@@ -564,7 +564,7 @@ class FeriadosControlador {
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
                     // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                    if (moment(item.fecha, 'YYYY-MM-DD', true).isValid()) {
+                    if (DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                         // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                         const VERIFICAR_FECHA = await pool.query(
                             `SELECT * FROM ef_cat_feriados 
@@ -591,7 +591,7 @@ class FeriadosControlador {
                                         item.observacion = '1';
                                     }
                                 } else {
-                                    if (moment(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                    if (DateTime.fromFormat(item.fec_recuperacion, 'yyyy-MM-dd').isValid) {
                                         fec_recuperacion_correcta = true;
                                         const VERIFICAR_FECHA_RECUPE = await pool.query(
                                             `

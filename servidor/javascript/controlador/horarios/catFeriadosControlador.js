@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const settingsMail_1 = require("../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
-const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../libs/settingsMail");
 class FeriadosControlador {
     // CONSULTA DE LISTA DE FERIADOS ORDENADOS POR SU DESCRIPCION   **USADO
     ListarFeriados(req, res) {
@@ -494,7 +494,7 @@ class FeriadosControlador {
                     //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                     if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
                         // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                        if ((0, moment_1.default)(item.fecha, 'YYYY-MM-DD', true).isValid()) {
+                        if (luxon_1.DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                             // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                             const VERIFICAR_FECHA = yield database_1.default.query(`SELECT * FROM ef_cat_feriados 
                             WHERE fecha = $1 OR fecha_recuperacion = $1
@@ -516,7 +516,7 @@ class FeriadosControlador {
                                         }
                                     }
                                     else {
-                                        if ((0, moment_1.default)(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                        if (luxon_1.DateTime.fromFormat(item.fec_recuperacion, 'yyyy-MM-dd').isValid) {
                                             fec_recuperacion_correcta = true;
                                             const VERIFICAR_FECHA_RECUPE = yield database_1.default.query(`
                                             SELECT * FROM ef_cat_feriados     
