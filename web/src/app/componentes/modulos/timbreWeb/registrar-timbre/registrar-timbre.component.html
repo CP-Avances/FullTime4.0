@@ -9,7 +9,7 @@
         </mat-icon>
     </div>
 
-    <div *ngIf="!ver_informacion">
+    <div *ngIf="!ver_informacion" class="m-auto">
         <div class="container d-flex flex-wrap justify-content-center" style="padding-top: 8px;">
             <span>{{f | date: 'fullDate' : undefined : 'es-EC'}}</span>
         </div>
@@ -78,7 +78,7 @@
     </div>
     <!--  ******************  INFORMACION DEL TIMBRE  ********************  -->
     <div class="row" *ngIf="ver_informacion">
-        <div class="col-md" style="text-align: left;">
+        <div class="col-md m-auto p-0" style="align-content: center;">
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-calendar"></i>
                     {{this.fecha_hora}}

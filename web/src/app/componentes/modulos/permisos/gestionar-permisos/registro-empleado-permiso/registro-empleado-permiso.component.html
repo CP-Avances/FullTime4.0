@@ -1,8 +1,13 @@
-<div id="titulo">
-    <span>
-        SOLICITUD DE PERMISO N° {{num}}
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            SOLICITUD DE PERMISO N° {{num}}
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
 </div>
 <mat-card class="example-card mat-elevation-z8">
     <!-- FORMULARIO COMPLETO -->
@@ -173,7 +178,7 @@
                                     Archivo de permiso es requerido *
                                 </label>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start">
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <section class="d-flex flex-column bd-highlight">
                                     <div class="bd-highlight">
                                         <form method="post">

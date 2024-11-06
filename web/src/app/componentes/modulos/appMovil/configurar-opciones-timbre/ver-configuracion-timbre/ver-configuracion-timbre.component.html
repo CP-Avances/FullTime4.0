@@ -1,21 +1,31 @@
 <div class="container" style="padding-top: 15px">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">
-            <span>OPCIONES DE MARCACIÓN APLICACIÓN MÓVIL</span>
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-2 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <button *ngIf="!btnCheckHabilitar" class="btn btn-outline-light btn-sm"
-                style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()" matTooltip="Eliminar Múltiple">
-                Eliminación Múltiple
-            </button>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
-                style="float: right; margin-right: 10px;" (click)="ConfirmarDeleteMultiple()"
-                matTooltip="Eliminar Múltiple">
-                Eliminar datos
-            </button>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    OPCIONES DE MARCACIÓN APLICACIÓN MÓVIL
+                </span>
+            </div>
+            <div class="col-10 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+                <button *ngIf="!btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                    style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()" matTooltip="Eliminar Múltiple">
+                    Eliminación Múltiple
+                </button>
+                <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                    style="float: right; margin-right: 10px;" (click)="ConfirmarDeleteMultiple()"
+                    matTooltip="Eliminar Múltiple">
+                    Eliminar datos
+                </button>
+            </div>
         </div>
+
         <div class="table-responsive">
             <table class="table table-hover table-sm" id="detalle">
                 <thead class="thead-light">
