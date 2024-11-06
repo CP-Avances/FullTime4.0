@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
-import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.service';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
@@ -16,10 +16,10 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/editar-departamento/editar-departamento.component';

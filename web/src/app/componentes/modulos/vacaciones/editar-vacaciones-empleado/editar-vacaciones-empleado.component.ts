@@ -1,16 +1,16 @@
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 import { ListarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-vacaciones-empleado',

@@ -6,13 +6,12 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
-// SECCION DE SERVICIOS
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ListarParametroComponent } from '../../listar-parametro/listar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
+
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-ver-parametro',

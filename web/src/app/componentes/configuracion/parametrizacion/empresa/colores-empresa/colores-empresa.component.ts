@@ -1,10 +1,8 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { Location } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
@@ -13,8 +11,8 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-colores-empresa',
@@ -24,6 +22,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 
 export class ColoresEmpresaComponent implements OnInit {
 
+  verFrase: boolean = false;
   ingresarOtro = false;
 
   // DATOS DE FORMULARIO DE REGISTRO DE MARCA DE AGUA
@@ -40,14 +39,6 @@ export class ColoresEmpresaComponent implements OnInit {
   p_color: any;
   s_color: any;
   frase: any;
-
-  verFrase: boolean = false;
-
-  // VARIABLES PROGRESS SPINNER
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-  habilitarprogress: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -155,7 +146,6 @@ export class ColoresEmpresaComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR FRASE MARCA DE AGUA EN BASE DE DATOS
   ActualizarFrase() {
-    this.habilitarprogress = true;
     let datos = {
       marca_agua: this.frase,
       id: this.data.datos.id,
@@ -168,7 +158,6 @@ export class ColoresEmpresaComponent implements OnInit {
       });
       this.ObtenerColores();
       this.ventana.close({ actualizar: true });
-      this.habilitarprogress = false;
     })
   }
 

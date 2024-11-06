@@ -6,7 +6,7 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Md5 } from 'ts-md5';
 
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 @Component({
   selector: 'app-cambiar-contrasena',

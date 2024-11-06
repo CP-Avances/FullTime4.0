@@ -3,8 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { DiscapacidadService } from 'src/app/servicios/discapacidad/discapacidad.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DiscapacidadService } from 'src/app/servicios/usuarios/empleado/discapacidad/discapacidad.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-discapacidad',

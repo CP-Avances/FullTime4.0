@@ -144,7 +144,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let reloj of relojes | filtrosNombres: nombreF.value  | filtroSucursalR: sucursalF.value | filtroIp: ipF.value | filtroDepartamentoR: departamentoF.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let reloj of relojes | filtrosNombres: nombreF.value  | sucNombre: sucursalF.value | filtroIp: ipF.value | departamento: departamentoF.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionDispositivos.toggle(reloj) : null"

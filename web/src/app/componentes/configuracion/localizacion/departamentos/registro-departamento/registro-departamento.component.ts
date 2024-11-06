@@ -1,13 +1,11 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { Router } from '@angular/router';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
 @Component({
   selector: 'app-registro-departamento',
@@ -31,13 +29,6 @@ export class RegistroDepartamentoComponent implements OnInit {
     idSucursalForm: this.idSucursal,
     nombreForm: this.nombre,
   });
-
-  // VARIABLES PROGRESS SPINNER
-
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -114,9 +105,7 @@ export class RegistroDepartamentoComponent implements OnInit {
 
   // ALMACENAR DATOS EN BASE DE DATOS
   RegistrarDepartamento(departamento: any) {
-    this.habilitarprogress = true;
     this.rest.RegistrarDepartamento(departamento).subscribe(response => {
-      this.habilitarprogress = false;
       if (response.message === 'error') {
         this.toastr.error('Los datos ingresados tienen un error', '', {
           timeOut: 6000,

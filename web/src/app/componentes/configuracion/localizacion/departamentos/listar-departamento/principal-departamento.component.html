@@ -137,7 +137,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let departamento of departamentos | filtroDepartamento: departamentoF.value | departamentoPadre: departamentoPadreF.value | filtroSucursalR: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let departamento of departamentos | filtrosNombres: departamentoF.value | departamentoPadre: departamentoPadreF.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionDepartamentos.toggle(departamento) : null"

@@ -23,12 +23,12 @@ import { ConfirmarCrearCarpetaComponent } from '../../confirmar-crearCarpeta/con
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';

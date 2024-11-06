@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service'
+import { AccionPersonalService } from 'src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
+
 import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-accion.component';
 
 @Component({

@@ -7,9 +7,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
 
 import { EditarDetalleCatHorarioComponent } from 'src/app/componentes/horarios/catHorarios/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
 import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/planificar-horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';

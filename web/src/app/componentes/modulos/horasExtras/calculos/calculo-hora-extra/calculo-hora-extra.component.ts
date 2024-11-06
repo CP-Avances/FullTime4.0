@@ -2,8 +2,8 @@ import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
 
 interface tipoDia {
   value: number;

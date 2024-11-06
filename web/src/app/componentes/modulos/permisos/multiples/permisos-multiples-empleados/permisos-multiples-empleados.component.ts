@@ -1,18 +1,16 @@
+import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
-// IMPORTAR PLANTILLA DE MODELO DE DATOS
-import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
-import { ITableEmpleados } from 'src/app/model/reportes.model';
-
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 

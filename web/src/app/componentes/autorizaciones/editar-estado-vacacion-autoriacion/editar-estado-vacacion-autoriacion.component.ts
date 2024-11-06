@@ -1,14 +1,14 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ToastrService } from 'ngx-toastr';
-
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { DateTime } from 'luxon';
+
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 
 interface Estado {
   id: number,

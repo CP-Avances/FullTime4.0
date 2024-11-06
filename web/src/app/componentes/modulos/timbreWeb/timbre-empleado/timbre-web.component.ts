@@ -5,10 +5,10 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MainNavService } from '../../../generales/main-nav/main-nav.service';
 import { MatDialog } from '@angular/material/dialog';
 

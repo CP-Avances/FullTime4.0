@@ -20,10 +20,10 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { RelojesComponent } from 'src/app/componentes/timbres/dispositivos/relojes/relojes.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-listar-relojes',

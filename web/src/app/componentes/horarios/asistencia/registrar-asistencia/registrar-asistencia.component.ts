@@ -7,10 +7,10 @@ import { DateTime } from 'luxon';
 import { BuscarAsistenciaComponent } from '../buscar-asistencia/buscar-asistencia.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 @Component({
   selector: 'app-registrar-asistencia',

@@ -1,12 +1,10 @@
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 
 interface Nivel {
   valor: number;
@@ -44,12 +42,6 @@ export class VerListadoNivelComponent implements OnInit {
     depaPadreForm: this.depaPadre,
     idSucursalForm: this.idSucursal,
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   tipoAutorizacion: string;
 

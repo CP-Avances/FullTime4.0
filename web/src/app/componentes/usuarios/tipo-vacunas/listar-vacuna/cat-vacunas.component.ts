@@ -16,8 +16,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { ITableVacuna } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-vacunas.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vacunas.service';
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
 
 import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';

@@ -9,11 +9,11 @@ import { Router } from '@angular/router';
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';

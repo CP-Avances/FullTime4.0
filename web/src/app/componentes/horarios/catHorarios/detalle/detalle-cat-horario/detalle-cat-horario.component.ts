@@ -1,14 +1,12 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -52,14 +50,7 @@ export class DetalleCatHorarioComponent implements OnInit {
 
   options = OPTIONS_HORARIOS;
   espera: boolean = false;
-
   acciones: boolean = false;
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  value = 10;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -384,12 +375,10 @@ export class DetalleCatHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR DETALLES DE HORARIO
   GuardarRegistro(datos: any) {
-    this.habilitarprogress = true;
     this.rest.IngresarDetalleHorarios(datos).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       })
-      this.habilitarprogress = false;
       this.LimpiarCampos();
       if (this.data.actualizar === true) {
         this.LimpiarCampos();

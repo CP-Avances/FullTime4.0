@@ -16,11 +16,11 @@ import * as xml2js from 'xml2js';
 import { RegistroProvinciaComponent } from '../registro-provincia/registro-provincia.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ProvinciaService } from '../../../../../servicios/catalogos/catProvincias/provincia.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ProvinciaService } from '../../../../../servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableProvincias } from 'src/app/model/reportes.model';

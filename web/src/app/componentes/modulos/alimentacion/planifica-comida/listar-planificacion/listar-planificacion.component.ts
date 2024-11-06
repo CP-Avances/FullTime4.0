@@ -19,15 +19,14 @@ import { EditarPlanComidasComponent } from '../editar-plan-comidas/editar-plan-c
 
 // LLAMADO A SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { use } from 'echarts';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACIÓN
 export interface SolicitudElemento {

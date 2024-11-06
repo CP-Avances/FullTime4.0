@@ -7,8 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { TiempoAutorizadoComponent } from '../../tiempo-autorizado/tiempo-autorizado.component';
 import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';

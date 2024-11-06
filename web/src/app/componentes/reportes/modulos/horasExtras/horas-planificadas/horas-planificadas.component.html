@@ -125,7 +125,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let d of departamentos | emplNombre: filtroNombreDep | paginate:tamanio_pagina_dep:numero_pagina_dep">
+                        *ngFor="let d of departamentos | filtrosNombres: filtroNombreDep | paginate:tamanio_pagina_dep:numero_pagina_dep">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDep.toggle(d) : null" [checked]="selectionDep.isSelected(d)"
@@ -179,7 +179,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | filtrosNombres: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"

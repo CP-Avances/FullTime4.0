@@ -10,12 +10,12 @@ import { PageEvent } from '@angular/material/paginator';
 // IMPORTAR MODELOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 export interface EmpleadoElemento {
   comunicado_mail: boolean;

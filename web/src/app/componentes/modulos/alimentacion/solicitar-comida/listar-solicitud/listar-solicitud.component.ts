@@ -13,17 +13,17 @@ import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LLAMADO A COMPONENTES
+import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
 import { AutorizaSolicitudComponent } from '../../autoriza-solicitud/autoriza-solicitud.component';
 
 // LLAMADO A SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
-import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE AUTORIZACION
 export interface SolicitudElemento {

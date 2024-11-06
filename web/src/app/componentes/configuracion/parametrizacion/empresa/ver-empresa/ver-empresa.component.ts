@@ -17,10 +17,10 @@ import { TipoSeguridadComponent } from '../tipo-seguridad/tipo-seguridad.compone
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { LogosComponent } from 'src/app/componentes/configuracion/parametrizacion/empresa/logos/logos.component';
 
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { ITableSucursales } from 'src/app/model/reportes.model';

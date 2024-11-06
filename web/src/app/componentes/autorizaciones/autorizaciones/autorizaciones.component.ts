@@ -1,35 +1,24 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
+import { ToastrService } from 'ngx-toastr';;
 import { PageEvent } from "@angular/material/paginator";
 import { MatSelect } from '@angular/material/select';
 import { DateTime } from 'luxon';
 
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permisos/permisos.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 // IMPORTAR COMPONENTES
 import { ListarEmpleadoPermisoComponent } from '../../modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
 
-interface Orden {
-  valor: number
-}
-
 interface Estado {
-  id: number,
-  nombre: string
-}
-
-interface Documento {
   id: number,
   nombre: string
 }
@@ -86,11 +75,6 @@ export class AutorizacionesComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
-
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   constructor(
     public restAutorizaciones: AutorizacionService,
@@ -260,7 +244,6 @@ export class AutorizacionesComponent implements OnInit {
   listaCorreosEnviar: any = [];
   num: number = 0;
   obtenerAutorizacion(){
-    this.habilitarprogress = true;
     this.cont_correo = 0;
     this.info_correo = '';
     this.listaCorreosEnviar = [];
@@ -312,7 +295,6 @@ export class AutorizacionesComponent implements OnInit {
 
 
                         if(this.ListaPermisos.length == this.cont){
-                          this.habilitarprogress = false;
                           if(this.listafiltrada.length == 0){
                             this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
                             this.ocultar = true;
@@ -340,7 +322,6 @@ export class AutorizacionesComponent implements OnInit {
 
                       });
                     }else{
-                      this.habilitarprogress = false;
                       this.ocultar = true;
                     }
 
@@ -360,7 +341,6 @@ export class AutorizacionesComponent implements OnInit {
                           });
 
                           if(this.ListaPermisos.length == this.cont){
-                            this.habilitarprogress = false;
                             if(this.listafiltrada.length == 0){
                               this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
                               this.ocultar = true;
@@ -391,7 +371,6 @@ export class AutorizacionesComponent implements OnInit {
                   }
                 });
               },error => {
-                this.habilitarprogress = false;
                 o.observacion = 'La solicitud tiene problemas con el registro de autorización';
                 o.aprobar = 'SI';
                 this.listafiltrada.push(o);
@@ -402,13 +381,11 @@ export class AutorizacionesComponent implements OnInit {
 
           return
         }else{
-          this.habilitarprogress = false;
           this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
           this.ocultar = true;
           return
         }
       }else{
-        this.habilitarprogress = false;
         this.mensaje = 'No ha seleccionado solicitudes del departamento de '+this.departamentoChange.depa_autoriza;
         this.ocultar = true;
         return

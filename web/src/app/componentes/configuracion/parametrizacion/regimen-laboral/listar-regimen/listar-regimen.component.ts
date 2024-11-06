@@ -19,8 +19,8 @@ import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.service";
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';

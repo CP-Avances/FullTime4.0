@@ -77,7 +77,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let h of horas_extras_plan | emplCedula: cedula.value | nombreApellido: nombre.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let h of horas_extras_plan | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"

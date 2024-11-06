@@ -34,7 +34,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let s of sucursales | filtroDescripcion: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{s.descripcion}}</td>
                             <td>{{s.nombre}}</td>
                             <td class="justify-content-center">

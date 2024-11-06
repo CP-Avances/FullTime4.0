@@ -12,10 +12,10 @@ import { DateTime } from 'luxon';
 import { MenuNode } from 'src/app/model/menu.model';
 
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MainNavService } from './main-nav.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 

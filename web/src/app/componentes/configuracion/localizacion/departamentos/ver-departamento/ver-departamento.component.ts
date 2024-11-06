@@ -1,14 +1,12 @@
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 
 import { RegistrarNivelDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
 import { PrincipalDepartamentoComponent } from '../listar-departamento/principal-departamento.component';

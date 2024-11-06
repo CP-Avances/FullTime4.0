@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service'
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service'
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-configurar-codigo',

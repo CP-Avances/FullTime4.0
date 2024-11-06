@@ -1,11 +1,9 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-tipo-seguridad',
@@ -22,12 +20,6 @@ export class TipoSeguridadComponent implements OnInit {
   public formulario = new FormGroup({
     tipoForm: this.tipoF
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -66,7 +58,6 @@ export class TipoSeguridadComponent implements OnInit {
 
   // METODO PARA CAPTURAR DATOS DE SEGURIDAD
   InsertarEmpresa(form: any) {
-    this.habilitarprogress = true;
     let datosEmpresa = {
       seg_contrasena: false,
       seg_ninguna: false,
@@ -91,13 +82,11 @@ export class TipoSeguridadComponent implements OnInit {
 
   // METODO PARA GUARDAR DATOS DE SEGURIDAD
   GuardarDatos(datos: any) {
-    this.habilitarprogress = true;
     this.rest.ActualizarSeguridad(datos).subscribe(response => {
       this.LimpiarCampos();
       this.toastr.success('Operación exitosa.', 'Datos de seguridad registrados.', {
         timeOut: 6000,
       })
-      this.habilitarprogress = false
     });
   }
 

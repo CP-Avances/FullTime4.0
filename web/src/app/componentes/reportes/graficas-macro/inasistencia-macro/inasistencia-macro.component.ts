@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 
 import { ToastrService } from 'ngx-toastr';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';

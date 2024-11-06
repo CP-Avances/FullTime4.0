@@ -1,14 +1,12 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -50,16 +48,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     horaForm: this.horaF,
   });
 
-  // VARIABLES PROGRESS SPINNER
-
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-
   options = OPTIONS_HORARIOS;
   espera: boolean = false;
-
   acciones: boolean = false;
 
   // VARIABLES PARA AUDITORIA
@@ -384,9 +374,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR REGISTRO
   GuardarRegistro(datos: any) {
-    this.habilitarprogress = true;
     this.rest.ActualizarRegistro(datos).subscribe(response => {
-      this.habilitarprogress = false;
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       })

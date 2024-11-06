@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service'
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service'
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/editar-departamento/editar-departamento.component';

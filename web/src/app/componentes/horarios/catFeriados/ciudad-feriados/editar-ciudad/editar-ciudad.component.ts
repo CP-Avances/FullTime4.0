@@ -1,13 +1,11 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service'
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service'
 
 @Component({
   selector: 'app-editar-ciudad',
@@ -47,12 +45,6 @@ export class EditarCiudadComponent implements OnInit {
     idProvinciaForm: this.idProvinciaF,
     nombrePaisForm: this.nombrePaisF,
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  value = 10;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -225,7 +217,6 @@ export class EditarCiudadComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR REGISTRO
   InsertarFeriadoCiudad(form: any) {
-    this.habilitarprogress === true;
     var idFeriado = this.data.idferiado;
     var nombreCiudad = form.nombreCiudadForm;
     var ciudad = {
@@ -238,7 +229,6 @@ export class EditarCiudadComponent implements OnInit {
     this.ciudadFeriados = [];
     // VALIDAR EXISTENCIA DE REGISTRO
     this.restF.BuscarIdCiudad(ciudad).subscribe(datos => {
-      this.habilitarprogress === false;
       this.ciudadFeriados = datos;
       this.toastr.info('Se le recuerda que esta Ciudad ya fue asignada a este Feriado.', '', {
         timeOut: 6000,
@@ -246,13 +236,11 @@ export class EditarCiudadComponent implements OnInit {
     }, error => {
       // METODO PARA ACTUALIZAR DATOS
       this.restF.ActualizarDatos(ciudad).subscribe(response => {
-        this.habilitarprogress === false;
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }, error => {
-        this.habilitarprogress === false;
         this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });

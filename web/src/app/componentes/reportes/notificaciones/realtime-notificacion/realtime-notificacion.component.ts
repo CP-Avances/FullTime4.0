@@ -4,8 +4,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
 

@@ -23,7 +23,7 @@ import { registerLocaleData } from '@angular/common';
 import localEsEC from '@angular/common/locales/es-EC';
 registerLocaleData(localEsEC);
 // SEGURIDAD
-import { AuthGuard } from "./servicios/guards/auth.guard";
+import { AuthGuard } from './servicios/generales/guards/auth.guard';
 // RUTA
 import { environment } from 'src/environments/environment';
 // NOTIFICACIONES EN TIEMPO REAL

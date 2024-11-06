@@ -42,7 +42,7 @@
                                 </mat-form-field>
                         </tr>
                         <tr
-                            *ngFor="let tp of coordenadas | filtroNombre: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let tp of coordenadas | filtroDescripcion: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
                             <td style="padding-top: 10px;text-align: center;">{{tp.descripcion}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{tp.latitud}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{tp.longitud}}</td>

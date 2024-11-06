@@ -5,10 +5,10 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { DateTime } from 'luxon';
 
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
 

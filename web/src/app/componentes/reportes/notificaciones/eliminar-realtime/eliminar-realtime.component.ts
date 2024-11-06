@@ -2,8 +2,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 @Component({
   selector: 'app-eliminar-realtime',

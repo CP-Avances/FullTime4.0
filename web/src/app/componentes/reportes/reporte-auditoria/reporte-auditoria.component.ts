@@ -10,11 +10,11 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from '../../../servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
+import { ValidacionesService } from '../../../servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { AuditoriaService } from 'src/app/servicios/reportes/auditoria/auditoria.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { FormControl } from '@angular/forms';
 

@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { DateTime } from 'luxon';
 import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({
@@ -48,9 +47,10 @@ export class ButtonAvisosComponent implements OnInit {
         if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
+            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
-            res.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(res.create_at).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            res.hora_ = this.validar.FormatearHora(DateTime.fromISO(res.create_at).toFormat('HH:mm:ss'), this.formato_hora);
+            res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
 
             if (res.tipo != 6) {
               if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
@@ -140,9 +140,10 @@ export class ButtonAvisosComponent implements OnInit {
               this.num_timbre_false = this.num_timbre_false + 1;
               this.estadoTimbres = false;
             }
+            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd');
             // FORMATEAR DATOS DE FECHA Y HORA
-            obj.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(obj.create_at).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            obj.hora_ = this.validar.FormatearHora(DateTime.fromISO(obj.create_at).toFormat('HH:mm:ss'), formato_hora);
+            obj.fecha_ = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            obj.hora_ = this.validar.FormatearHora(obj.create_at.split(' ')[1], formato_hora);
             // VERIFICAR DESCRIPCIONES DE AVISOS
             if (obj.tipo != 6) {
               if (obj.descripcion.split('para')[0] != undefined && obj.descripcion.split('para')[1] != undefined) {

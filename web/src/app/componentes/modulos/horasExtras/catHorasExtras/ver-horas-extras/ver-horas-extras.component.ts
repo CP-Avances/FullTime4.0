@@ -2,11 +2,10 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
-import { EditarHorasExtrasComponent } from 'src/app/componentes/modulos/horasExtras/catHorasExtras/editar-horas-extras/editar-horas-extras.component';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
 
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service'
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { ListaHorasExtrasComponent } from '../lista-horas-extras/lista-horas-extras.component';
 
 @Component({

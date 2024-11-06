@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 
 import { ToastrService } from 'ngx-toastr';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 
 import * as echarts from 'echarts/core';

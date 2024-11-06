@@ -1,19 +1,17 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
 
 // IMPORTAR SERVICIOS
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 
 import { ListarFeriadosComponent } from '../listar-feriados/listar-feriados.component';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-feriados',
@@ -46,12 +44,6 @@ export class RegistrarFeriadosComponent implements OnInit {
     nombrePaisForm: this.nombrePaisF,
     tipoForm: this.tipoF,
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -173,9 +165,7 @@ export class RegistrarFeriadosComponent implements OnInit {
   CrearFeriado(datos: any) {
     // VALIDAR SI SE HA SELECCIONADO CIUDADES
     if (this.ciudadesSeleccionadas.length != 0) {
-      this.habilitarprogress = true;
       this.rest.CrearNuevoFeriado(datos).subscribe(response => {
-        this.habilitarprogress = false;
         if (response.message === 'error') {
           this.toastr.error('Verificar que los datos sean los correctos.', 'Upss!!! algo salio mal.', {
             timeOut: 6000,
@@ -387,7 +377,6 @@ export class RegistrarFeriadosComponent implements OnInit {
     this.ingresar = 0;
     this.contadorc = 0;
     this.nota = '';
-    this.habilitarprogress = true;
     // METODO PARA OMITIR DUPLICADOS
     this.OmitirDuplicados();
     // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
@@ -424,7 +413,6 @@ export class RegistrarFeriadosComponent implements OnInit {
   // MOSTRAR MENSAJE DE REGISTRO
   VerMensaje(id: any) {
     if (this.contadorc === this.ciudadesSeleccionadas.length) {
-      this.habilitarprogress = false;
       this.toastr.success('Feriado registrado exitosamente.',
         'Se ha asignado ' + this.ingresar + ' ciudades a este feriado.', {
         timeOut: 1000,

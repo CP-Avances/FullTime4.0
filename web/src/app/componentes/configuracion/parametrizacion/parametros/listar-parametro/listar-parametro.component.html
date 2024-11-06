@@ -39,7 +39,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let tp of parametros | filtroNombre: descripcionF.value| paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let tp of parametros | filtroDescripcion: descripcionF.value| paginate:tamanio_pagina:numero_pagina">
                             <th style="padding-top: 10px; text-align: center;" scope="row">{{tp.id}}</th>
                             <td style="padding-top: 10px; text-align: center;">{{tp.descripcion}}</td>
                             <td style="padding-top: 10px; text-align: center;" class="justify-content-center">

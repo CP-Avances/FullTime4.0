@@ -5,9 +5,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-crear-timbre',

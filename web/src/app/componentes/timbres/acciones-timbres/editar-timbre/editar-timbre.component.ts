@@ -3,9 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-editar-timbre',

@@ -6,11 +6,11 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 

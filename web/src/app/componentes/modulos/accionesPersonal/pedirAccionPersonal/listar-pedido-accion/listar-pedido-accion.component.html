@@ -65,7 +65,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let a of listaPedidos  | emplNombre: nombre.value | emplApellido: apellido.value  | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let a of listaPedidos  | filtrosNombres: nombre.value | nombreCompleto: apellido.value  | paginate:tamanio_pagina:numero_pagina">
                             <td>{{a.apellido}}</td>
                             <td>{{a.nombre}}</td>
                             <td>{{a.fecCreacion_}}</td>

@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { BirthdayService } from 'src/app/servicios/birthday/birthday.service';
+import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
 
 @Component({
   selector: 'app-editar-birthday',

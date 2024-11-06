@@ -13,10 +13,10 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
+import { CatModalidadLaboralService } from 'src/app/servicios/configuracion/parametrizacion/catModalidadLaboral/cat-modalidad-laboral.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableModalidad } from 'src/app/model/reportes.model';

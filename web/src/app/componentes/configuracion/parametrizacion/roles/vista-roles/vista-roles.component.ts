@@ -21,12 +21,12 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
-import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
+import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({

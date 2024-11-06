@@ -6,8 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Md5 } from 'ts-md5/dist/md5';
 
 import { LoginService } from '../../../servicios/login/login.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-login',
@@ -114,11 +114,11 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      console.log('res login ', datos)
+      //console.log('res login ', datos)
       if (datos.message === 'error') {
         const f = DateTime.now();
         const espera = Duration.fromISO('PT1M'); // 1 minuto
-        if (this.intentos === 20) {
+        if (this.intentos === 2) {
           const verificar = f.plus(espera).toFormat('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {

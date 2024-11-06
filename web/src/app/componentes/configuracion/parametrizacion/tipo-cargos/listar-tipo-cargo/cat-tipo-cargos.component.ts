@@ -17,9 +17,9 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { ITableTipoCargo } from 'src/app/model/reportes.model';
 
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { CatTipoCargosService } from 'src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';

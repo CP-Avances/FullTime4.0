@@ -15,11 +15,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 // IMPORTACION DE SERVICIOS

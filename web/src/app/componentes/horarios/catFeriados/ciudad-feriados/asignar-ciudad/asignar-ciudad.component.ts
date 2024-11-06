@@ -1,14 +1,12 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
 
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 
 import { ListarCiudadFeriadosComponent } from '../listar-ciudad-feriados/listar-ciudad-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
@@ -57,12 +55,6 @@ export class AsignarCiudadComponent implements OnInit {
     nombrePaisForm: this.nombrePaisF,
     tipoForm: this.tipoF,
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -250,7 +242,6 @@ export class AsignarCiudadComponent implements OnInit {
     this.OmitirDuplicados();
     // VALIDAR SI SE HA SELECCIONADO CIUDADES
     if (this.ciudadesSeleccionadas.length != 0) {
-      this.habilitarprogress = true;
       // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
       this.ciudadesSeleccionadas.map((obj: any) => {
         var buscarCiudad = {
@@ -264,11 +255,9 @@ export class AsignarCiudadComponent implements OnInit {
         this.restF.BuscarIdCiudad(buscarCiudad).subscribe(datos => {
           this.contador = this.contador + 1;
           this.ciudadFeriados = datos;
-          this.habilitarprogress = false;
           this.nota = 'Algunas de las ciudades ya fueron asignadas a este Feriado.';
           this.VerMensaje();
         }, error => {
-          this.habilitarprogress = false;
           this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
             this.contador = this.contador + 1;
             this.ingresar = this.ingresar + 1;

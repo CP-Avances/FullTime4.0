@@ -14,16 +14,16 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 // LLAMADO DE SERVICIOS
-import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
-import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
-import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
-import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
-import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";;
+import { EmpleadoProcesosService } from "src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service";
+import { AccionPersonalService } from "src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
+import { AsignacionesService } from "src/app/servicios/usuarios/asignaciones/asignaciones.service";
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmplCargosService } from "src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service";
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
-import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: "app-listar-pedido-accion",

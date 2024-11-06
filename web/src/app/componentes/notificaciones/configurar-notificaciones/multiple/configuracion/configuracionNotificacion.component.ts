@@ -3,7 +3,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({

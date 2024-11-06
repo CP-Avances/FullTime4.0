@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -54,24 +54,19 @@ export class EmpleadoHorariosService {
     return this.http.post<any>(`${environment.url}/empleadoHorario/horario-comida-horas-dias-diferentes`, datos);
   }
 
+
+
+
+
+
+
+
+  
+
+
   //Horarios Empleado
   ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {
     return this.http.post(`${environment.url}/empleadoHorario/fechas_horario/${codigo}`, data)
-  }
-
-  // Verificar datos de la plantilla de horario fijo
-  VerificarDatos_EmpleadoHorario(formData: any, id: number) {
-    console.log('entra')
-    return this.http.post<any>(`${environment.url}/empleadoHorario/revisarData/${id}`, formData)
-  }
-  VerificarPlantilla_EmpleadoHorario(formData: any) {
-    return this.http.post<any>(`${environment.url}/empleadoHorario/verificarPlantilla/upload`, formData)
-  }
-  CreaPlanificacion(formData: any, id: number, codigo: string | number) {
-    return this.http.post<any>(`${environment.url}/empleadoHorario/plan_general/upload/${id}/${codigo}`, formData)
-  }
-  SubirArchivoExcel(formData: any, id: number, codigo: string | number) {
-    return this.http.post<any>(`${environment.url}/empleadoHorario/upload/${id}/${codigo}`, formData)
   }
 
   BuscarHorarioFechas(codigo: any, datos: any) {

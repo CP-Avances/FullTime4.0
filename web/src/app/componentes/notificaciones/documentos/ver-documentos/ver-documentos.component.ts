@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 
-import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
+import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/documentos.service';
 
 @Component({
   selector: 'app-ver-documentos',

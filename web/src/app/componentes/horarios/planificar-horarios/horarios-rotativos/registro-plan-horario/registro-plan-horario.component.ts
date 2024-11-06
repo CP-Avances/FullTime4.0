@@ -7,13 +7,13 @@ import { DateTime } from 'luxon';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
@@ -77,7 +77,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
-
+  idioma_fecha: string = 'es';
   BuscarHora() {
     // id_tipo_parametro Formato hora = 2
     this.parametro.ListarDetalleParametros(2).subscribe(
@@ -181,22 +181,19 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
     this.ControlarBotones(true, false);
-    const ctrlValue = fecha.toDate();
-
-    const dateLuxon = DateTime.fromJSDate(ctrlValue);
-
+    const ctrlValue = fecha;
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, dateLuxon, this.fechaFinalF, opcion);
+      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }
@@ -257,31 +254,35 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.ControlarBotones(true, false);
 
     if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
-      this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value);
+      console.log('fecha 1 ', this.fechaInicialF.value)
+      console.log('fecha 2 ', this.fechaFinalF.value)
+      let inicio = DateTime.fromJSDate(new Date(this.fechaInicialF.value)).toFormat('yyyy-MM-dd');
+      let final = DateTime.fromJSDate(new Date(this.fechaFinalF.value)).toFormat('yyyy-MM-dd');
+      console.log('fecha 1 ', inicio)
+      console.log('fecha 2 ', final)
+      this.BuscarFeriados(inicio, final);
     }
     else {
       const now = DateTime.now();
       // Formatear la fecha de inicio como '01/MM/YYYY'
-      let inicio = now.set({ day: 1 }).toFormat('dd/MM/yyyy');
-      let final = `${now.daysInMonth}${now.toFormat('/MM/yyyy')}`;
+      let inicio = now.set({ day: 1 }).toFormat('yyyy-MM-dd');
+      let final = now.endOf('month').toFormat('yyyy-MM-dd');
+      console.log('fecha 1 ', inicio)
+      console.log('fecha 2 ', final)
       this.BuscarFeriados(inicio, final);
     }
   }
 
   // METODO PARA OBTENER FECHAS, MES, DIA, AÑO
   fechas_mes: any = [];
-  dia_inicio: any;
-  dia_fin: any;
   hora_feriado: boolean = false;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
+    //console.log('dia i... ', fecha_inicio, ' dia f... ', fecha_final)
     this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-
-    this.dia_inicio = DateTime.fromJSDate(fecha_inicio).toFormat('yyyy-MM-dd')
-    this.dia_fin = DateTime.fromJSDate(fecha_final).toFormat('yyyy-MM-dd')
-
     // Convertimos las fechas de inicio y fin a DateTime de Luxon
-    let dia_inicio = DateTime.fromJSDate(fecha_inicio).setLocale('es').startOf('day');
-    let dia_fin = DateTime.fromJSDate(fecha_final).setLocale('es').startOf('day');
+    let dia_inicio = DateTime.fromISO(fecha_inicio).setLocale(this.idioma_fecha);
+    let dia_fin = DateTime.fromISO(fecha_final).setLocale(this.idioma_fecha);
+    //console.log('dia i ', dia_inicio, ' dia f ', dia_fin)
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
     while (dia_inicio <= dia_fin) {
       let fechas = {

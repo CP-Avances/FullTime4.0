@@ -4,7 +4,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatRadioChange } from '@angular/material/radio';
 
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-criterios-busqueda',

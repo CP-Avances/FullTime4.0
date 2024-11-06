@@ -328,7 +328,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let r of regimenDep | sucNombre: filtroNombreSucDep | emplNombre: filtroNombreRegDep | paginate:tamanio_pagina_regDep:numero_pagina_regDep">
+                                *ngFor="let r of regimenDep | sucNombre: filtroNombreSucDep | filtrosNombres: filtroNombreRegDep | paginate:tamanio_pagina_regDep:numero_pagina_regDep">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_Dep" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionRegDep.toggle(r) : null"
@@ -391,7 +391,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let c of cargosDep | sucNombre: filtroNombreSucDep | emplNombre: filtroNombreCargDep | paginate:tamanio_pagina_carDep:numero_pagina_carDep">
+                                *ngFor="let c of cargosDep | sucNombre: filtroNombreSucDep | filtrosNombres: filtroNombreCargDep | paginate:tamanio_pagina_carDep:numero_pagina_carDep">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_Dep" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionCargDep.toggle(c) : null"
@@ -522,7 +522,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | emplCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | nombreCompleto: filtroNombreEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
+                                *ngFor="let e of empleadosDep | sucNombre: filtroNombreSucDep | filtroCodigo: filtroCodigoDep | emplCedula: filtroCedulaDep | nombreCompleto: filtroNombreEmpDep | paginate:tamanio_pagina_empDep :numero_pagina_empDep">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_Dep" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmpDep.toggle(e) : null"

@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { delay } from 'rxjs';
-import { SpinnerService } from 'src/app/servicios/intercepto/spinner.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { SpinnerService } from 'src/app/servicios/generales/intercepto/spinner.service';
+import { ThemePalette } from '@angular/material/core';
+import { Component } from '@angular/core';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-spinner',
@@ -26,6 +26,5 @@ export class SpinnerComponent {
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
-
 
 }

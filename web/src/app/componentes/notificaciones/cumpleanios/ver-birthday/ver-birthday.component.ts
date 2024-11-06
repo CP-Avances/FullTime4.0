@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { RegistrarBirthdayComponent } from '../../../notificaciones/cumpleanios/registrar-birthday/registrar-birthday.component';
 import { EditarBirthdayComponent } from '../../../notificaciones/cumpleanios/editar-birthday/editar-birthday.component';
 
-import { BirthdayService } from 'src/app/servicios/birthday/birthday.service';
+import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
 
 @Component({
   selector: 'app-ver-birthday',

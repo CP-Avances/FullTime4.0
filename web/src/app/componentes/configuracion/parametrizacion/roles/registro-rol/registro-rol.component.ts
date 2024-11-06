@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
   selector: 'app-registro-rol',

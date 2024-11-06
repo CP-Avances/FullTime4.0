@@ -15,10 +15,10 @@ import * as xlsx from 'xlsx';
 
 // IMPORTACION DE SERVICIOS
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-alimentos-invitados',

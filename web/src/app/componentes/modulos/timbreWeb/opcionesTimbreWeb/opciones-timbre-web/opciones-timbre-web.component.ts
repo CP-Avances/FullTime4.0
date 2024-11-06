@@ -11,11 +11,11 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda, } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 @Component({
   selector: 'app-opciones-timbre-web',

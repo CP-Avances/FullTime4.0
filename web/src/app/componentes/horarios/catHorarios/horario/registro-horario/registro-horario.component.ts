@@ -1,17 +1,15 @@
 // IMPORTAR LIBRERIAS
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ThemePalette } from '@angular/material/core';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
 
 @Component({
   selector: 'app-registro-horario',
@@ -45,13 +43,6 @@ export class RegistroHorarioComponent implements OnInit {
     tipoHForm: this.tipoH,
   });
 
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
-
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -75,7 +66,6 @@ export class RegistroHorarioComponent implements OnInit {
   // METODO PARA TOMAR LOS DATOS DE HORARIO
   idHorario: any;
   InsertarHorario(form: any) {
-    this.habilitarprogress = true;
     let dataHorario = {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
@@ -131,8 +121,6 @@ export class RegistroHorarioComponent implements OnInit {
       this.toastr.warning('Código de horario ya existe.', 'Verificar datos.', {
         timeOut: 6000,
       });
-      this.habilitarprogress = false;
-
     }, error => {
       this.VerificarArchivo(horario, form);
     });
@@ -148,7 +136,6 @@ export class RegistroHorarioComponent implements OnInit {
         this.toastr.warning('Cargar documento como respaldo de creación de horario.', '', {
           timeOut: 6000,
         });
-        this.habilitarprogress = false;
       }
     }
     else {
@@ -170,7 +157,6 @@ export class RegistroHorarioComponent implements OnInit {
         this.ventana.close(response.id);
       },
       error: (error) => {
-        this.habilitarprogress = false;
         this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
@@ -204,7 +190,6 @@ export class RegistroHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO   
   SubirRespaldo(id: number, codigo: any) {
-    this.habilitarprogress = true;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -212,7 +197,6 @@ export class RegistroHorarioComponent implements OnInit {
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
     this.rest.SubirArchivo(formData, id, null, codigo).subscribe(res => {
-      this.habilitarprogress = false;
       this.archivoForm.reset();
       this.nameFile = '';
     });
@@ -270,7 +254,6 @@ export class RegistroHorarioComponent implements OnInit {
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarCampos() {
     this.formulario.reset();
-    this.habilitarprogress = false;
   }
 
   // METODO PARA CERRAR VENTANA

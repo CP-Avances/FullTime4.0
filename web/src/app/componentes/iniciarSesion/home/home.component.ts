@@ -1,12 +1,11 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { DateTime } from 'luxon';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from '../../generales/main-nav/main-nav.service';
 
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
@@ -29,8 +28,6 @@ import * as echarts_jorn from 'echarts/core';
 
 export class HomeComponent implements OnInit {
 
-  fecha: string;
-
   // BUSQUEDA DE FUNCIONES ACTIVAS
   get geolocalizacion(): boolean { return this.funciones.geolocalizacion; }
   get alimentacion(): boolean { return this.funciones.alimentacion; }
@@ -41,18 +38,18 @@ export class HomeComponent implements OnInit {
   get accion(): boolean { return this.funciones.accionesPersonal; }
   get movil(): boolean { return this.funciones.app_movil; }
 
-  datosEmpleado: any;
+  datosEmpleado: any = [];
   idEmpleado: any = 0;
 
   constructor(
     private funciones: MainNavService,
+    private graficar: GraficasService,
     private router: Router,
     private route: ActivatedRoute,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
     public restEmpleado: EmpleadoService,
 
-    private graficar: GraficasService,
   ) { }
 
   ngOnInit(): void {
@@ -69,22 +66,14 @@ export class HomeComponent implements OnInit {
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
-    this.VerEmpleado(this.formato_fecha)
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-        this.FormatearFechas(this.formato_fecha);
-      },
-      vacio => {
-        this.FormatearFechas(this.formato_fecha)
+        this.VerEmpleado(this.formato_fecha);
+      }, vacio => {
+        this.VerEmpleado(this.formato_fecha);
       });
-  }
-
-  // METODO PARA FORMATEAR FECHAS
-  FormatearFechas(formato_fecha: string) {
-    var f = DateTime.now();
-    this.fecha = this.validar.FormatearFecha(f.toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);
   }
 
   // METODO PARA VER LA INFORMACION DEL USUARIO 
@@ -141,8 +130,8 @@ export class HomeComponent implements OnInit {
   MenuRapido(num: number) {
     switch (num) {
       case 0: // Info Usuario
-        this.router.navigate(['/verEmpleado/'+this.idEmpleado], { relativeTo: this.route, skipLocationChange: false });
-        break; 
+        this.router.navigate(['/verEmpleado/' + this.idEmpleado], { relativeTo: this.route, skipLocationChange: false });
+        break;
       case 1: // REPORTES
         this.router.navigate(['/timbres-personal'], { relativeTo: this.route, skipLocationChange: false });
         break;

@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 
-import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { CatModalidadLaboralService } from 'src/app/servicios/configuracion/parametrizacion/catModalidadLaboral/cat-modalidad-laboral.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-modalidad',

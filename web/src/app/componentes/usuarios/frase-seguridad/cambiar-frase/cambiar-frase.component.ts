@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
 // IMPORTACION DE SERVICIOS
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Router } from '@angular/router';
 import { use } from 'echarts';

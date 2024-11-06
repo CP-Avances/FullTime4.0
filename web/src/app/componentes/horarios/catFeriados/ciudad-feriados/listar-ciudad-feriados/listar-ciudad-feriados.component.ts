@@ -1,16 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
 import { EditarCiudadComponent } from '../editar-ciudad/editar-ciudad.component';
 import { EditarFeriadosComponent } from '../../feriados/editar-feriados/editar-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
@@ -40,12 +38,6 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -144,7 +136,6 @@ export class ListarCiudadFeriadosComponent implements OnInit {
       this.Eliminar(datos.idciudad_asignada);
     }
     else {
-      this.habilitarprogress = true;
       const data = {
         user_name: this.user_name,
         ip: this.ip,
@@ -157,7 +148,6 @@ export class ListarCiudadFeriadosComponent implements OnInit {
             this.toastr.error('Registro eliminado.', '', {
               timeOut: 6000,
             });
-            this.habilitarprogress = false;
             this.ListarCiudadesFeriados(this.idFeriado);
             this.HabilitarSeleccion();
           }

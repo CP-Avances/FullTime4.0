@@ -127,7 +127,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let f of feriados | filtroNombre: descripcionF.value | filtroFecha: fechaF.value | paginate:tamanio_pagina:numero_pagina ">
+                            *ngFor="let f of feriados | filtroDescripcion: descripcionF.value | filtroFecha: fechaF.value | paginate:tamanio_pagina:numero_pagina ">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionFeriados.toggle(f) : null"

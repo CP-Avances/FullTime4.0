@@ -2,10 +2,10 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AccionPersonalService } from 'src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
+
 import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-accion.component';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-crear-tipoaccion',
