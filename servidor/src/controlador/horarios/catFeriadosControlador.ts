@@ -135,9 +135,8 @@ class FeriadosControlador {
 
                 feriado.fecha = fecha_formato;
 
-                let fec_recuperacion_formato = '';
                 if (fec_recuperacion) {
-                    fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    let fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
                     feriado.fecha_recuperacion = fec_recuperacion_formato;
                 }
 
@@ -241,10 +240,9 @@ class FeriadosControlador {
                 const fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
                 datosNuevos.fecha = fecha_formato;
 
-                let fec_recuperacion_formato = '';
                 if (fec_recuperacion) {
-                    fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
-                    datosNuevos.fecha_recuperacion = fec_recuperacion_formato;
+                    let fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    datosNuevos.fecha_recuperacion = fec_recuperacion_formato || '';
                 }
                 const fecha_formatoO = await FormatearFecha2(feriado.fecha, 'ddd');
                 feriado.fecha = fecha_formatoO;
@@ -376,12 +374,12 @@ class FeriadosControlador {
     }
 
 
-        // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
-        public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
-            try {
-                const { fecha_inicio, fecha_final, ids } = req.body;
-                const FERIADO = await pool.query(
-                    `
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+    public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
+        try {
+            const { fecha_inicio, fecha_final, ids } = req.body;
+            const FERIADO = await pool.query(
+                `
                     SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre,  de.id 
                     FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s,
                         informacion_general AS de
@@ -389,21 +387,21 @@ class FeriadosControlador {
                         AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id= ANY($3)
                         AND f.fecha_recuperacion IS NOT null
                     `
-                    , [fecha_inicio, fecha_final, ids]);
-    
-                if (FERIADO.rowCount != 0) {
-                    console.log("ver feriado: ", FERIADO.rows)
-                    return res.jsonp(FERIADO.rows)
+                , [fecha_inicio, fecha_final, ids]);
 
-                }
-                else {
-                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
-                }
+            if (FERIADO.rowCount != 0) {
+                console.log("ver feriado: ", FERIADO.rows)
+                return res.jsonp(FERIADO.rows)
+
             }
-            catch (error) {
-                return res.jsonp({ message: 'error' });
+            else {
+                res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         }
+        catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
 
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO

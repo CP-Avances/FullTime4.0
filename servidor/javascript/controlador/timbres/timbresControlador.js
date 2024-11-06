@@ -17,7 +17,7 @@ exports.ValidarZonaHoraria = ValidarZonaHoraria;
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const settingsMail_1 = require("../../libs/settingsMail");
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
-//import * as moment_ from 'moment-timezone';
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
@@ -1182,13 +1182,12 @@ class TimbresControlador {
                 const hoy = new Date();
                 const timbre = req.body;
                 yield database_1.default.query('BEGIN');
-                // Verificar el contenido de req.body
-                console.log('Contenido de req.body:', timbre);
-                timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-                const fechaHoraEnZonaHorariaDispositivo = (0, moment_timezone_1.default)(timbre.fecha_hora_timbre_servidor)
-                    .tz(timbre.zona_horaria_dispositivo)
-                    .format('YYYY-MM-DD HH:mm:ss');
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const pad = (num) => num.toString().padStart(2, '0');
+                timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+                const fechaHoraEnZonaHorariaDispositivo = luxon_1.DateTime.fromJSDate(hoy)
+                    .setZone(timbre.zona_horaria_dispositivo)
+                    .toFormat('yyyy-MM-dd HH:mm:ss');
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 const timbreRV = new Date(fechaHoraEnZonaHorariaDispositivo || '');
                 const timbreDispositivo = new Date(timbre.fecha_hora_timbre || '');
                 const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
@@ -1244,8 +1243,9 @@ class TimbresControlador {
                 const timbre = req.body;
                 yield database_1.default.query('BEGIN');
                 console.log("ver req.body", req.body);
-                timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const pad = (num) => num.toString().padStart(2, '0');
+                timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 timbre.hora_timbre_diferente = false;
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
@@ -1256,12 +1256,14 @@ class TimbresControlador {
                     timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.fecha_hora_timbre, zonaHorariaServidor]);
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+                const fechaHoraSubida = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
+                const fechaTimbreSubida = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: '', id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, id_empleado: ${timbre.id_empleado}, imagen: ${timbre.imagen} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
                     ip: timbre.ip,
                     observacion: null
                 });
@@ -1286,12 +1288,12 @@ class TimbresControlador {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body;
                 console.log(req.body);
                 yield database_1.default.query('BEGIN');
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
                     .then(result => {
                     return result.rows;
                 });
-                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split('T')[1]);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',

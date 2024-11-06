@@ -2,10 +2,11 @@ import { ObtenerRutaLeerPlantillas, ObtenerRutaLogos } from '../../../libs/acces
 import { ComprimirImagen, ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import moment from 'moment';
 import path from 'path';
 import pool from '../../../database';
 import fs from 'fs';
+import { DateTime } from 'luxon';
+
 const sharp = require('sharp');
 
 class EmpresaControlador {
@@ -53,11 +54,10 @@ class EmpresaControlador {
         sharp.cache(false);
 
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
         // IMAGEN ORIGINAL
         const separador = path.sep;
         let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
@@ -398,12 +398,11 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
-
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         // IMAGEN ORIGINAL
         const separador = path.sep;
@@ -518,10 +517,10 @@ class EmpresaControlador {
         sharp.cache(false);
 
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         // IMAGEN ORIGINAL
         const separador = path.sep;
