@@ -1,5 +1,5 @@
+import { DateTime } from 'luxon';
 import pool from '../database';
-import moment from 'moment';
 
 export const BuscarTimbresByFecha = async function (fec_inicio: string, fec_final: string) {
 
@@ -86,11 +86,11 @@ export const HoraExtra_ModelarDatos = async function (fec_desde: Date, fec_hasta
 }
 
 function DiasIterados(inicio: string, final: string, tiempo_autorizado: number, id_empl_cargo: number, codigo: number) {
-    var fec_aux = new Date(inicio)
-    var fecha1 = moment(inicio.split("T")[0]);
-    var fecha2 = moment(final.split("T")[0]);
+    const fec_aux = new Date(inicio);
+    const fecha1 = DateTime.fromISO(inicio.split("T")[0]);
+    const fecha2 = DateTime.fromISO(final.split("T")[0]);
 
-    var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+    const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
     let respuesta = [];
     for (let i = 0; i < diasHorario; i++) {
         let horario_res = {
@@ -352,11 +352,11 @@ export const Empleado_Vacaciones_ModelarDatos = async function (id_empleado: str
     // console.log('Lista de vacaciones ===', vacaciones);
     let aux_array: any = [];
     vacaciones.forEach((obj: any) => {
-        var fec_aux = new Date(obj.fec_inicio)
-        var fecha1 = moment(obj.fec_inicio.split(" ")[0]);
-        var fecha2 = moment(obj.fec_final.split(" ")[0]);
+        const fec_aux = new Date(obj.fec_inicio);
+        const fecha1 = DateTime.fromISO(obj.fec_inicio.split(" ")[0]);
+        const fecha2 = DateTime.fromISO(obj.fec_final.split(" ")[0]);
 
-        var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+        const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
         for (let i = 0; i < diasHorario; i++) {
             let horario_res = {
                 fecha: fec_aux.toJSON().split('T')[0],
@@ -380,11 +380,12 @@ export const Empleado_Permisos_ModelarDatos = async function (id_empleado: strin
     // console.log('Lista de permisos ===', permisos);
     let aux_array: any = [];
     permisos.forEach((obj: any) => {
-        var fec_aux = new Date(obj.fec_inicio)
-        var fecha1 = moment(obj.fec_inicio.split(" ")[0]);
-        var fecha2 = moment(obj.fec_final.split(" ")[0]);
+        const fec_aux = new Date(obj.fec_inicio);
+        const fecha1 = DateTime.fromISO(obj.fec_inicio.split(" ")[0]);
+        const fecha2 = DateTime.fromISO(obj.fec_final.split(" ")[0]);
 
-        var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+        const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
+
         for (let i = 0; i < diasHorario; i++) {
             let horario_res = {
                 fecha: fec_aux.toJSON().split('T')[0],
@@ -433,11 +434,11 @@ export const ModelarFechas = function (desde: string, hasta: string, horario: an
  * @returns Un Array de objetos.
  */
 function DiasConEstado(horario: any, rango: any) {
-    var fec_aux = new Date(rango.inicio)
-    var fecha1 = moment(rango.inicio);
-    var fecha2 = moment(rango.final);
+    const fec_aux = new Date(rango.inicio);
+    const fecha1 = DateTime.fromISO(rango.inicio.split(" ")[0]);
+    const fecha2 = DateTime.fromISO(rango.final.split(" ")[0]);
 
-    var diasHorario = fecha2.diff(fecha1, 'days');
+    const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
     let respuesta = [];
     for (let i = 0; i <= diasHorario; i++) {
         let horario_res = fechaIterada(fec_aux, horario);

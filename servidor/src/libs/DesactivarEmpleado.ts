@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import pool from '../database';
 
 const HORA_EJECUTA = 23
@@ -8,9 +8,9 @@ export const DesactivarFinContratoEmpleado = function () {
 
     setInterval(async () => {
         // OBTENER HORA Y FECHA
-        var f = moment();
-        let hora: number = parseInt(moment(f).format('HH'));
-        let fecha: string = moment(f).format('YYYY-MM-DD');
+        var f = DateTime.now();
+        let hora: number = parseInt(f.toFormat('HH'));
+        let fecha: string = f.toFormat('yyyy-MM-dd');
 
         if (hora === HORA_EJECUTA) {
 

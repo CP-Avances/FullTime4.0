@@ -19,8 +19,8 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
-const moment_1 = __importDefault(require("moment"));
 const fs_1 = __importDefault(require("fs"));
+const luxon_1 = require("luxon");
 class PlanificacionHorariaControlador {
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     VerificarDatosPlanificacionHoraria(req, res) {
@@ -47,11 +47,11 @@ class PlanificacionHorariaControlador {
                 let fechaInicial;
                 let fechaFinal;
                 try {
-                    let fechaEntrada = moment_1.default.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
+                    let fechaEntrada = luxon_1.DateTime.fromFormat(fechaFormateada, 'dd/MM/yyyy', { zone: 'utc' });
                     // RESTAR 1 DIA A LA FECHA DE ENTRADA
-                    fechaInicial = moment_1.default.utc(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
+                    fechaInicial = fechaEntrada.minus({ days: 1 }).toFormat('yyyy-MM-dd');
                     // SUMAR 1 MES A LA FECHA DE ENTRADA
-                    fechaFinal = moment_1.default.utc(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
+                    fechaFinal = fechaEntrada.plus({ months: 1 }).toFormat('yyyy-MM-dd');
                 }
                 catch (error) {
                     res.json({ error: 'Fecha no valida' });
@@ -135,8 +135,8 @@ class PlanificacionHorariaControlador {
                     };
                     data.dias = yield VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
                 }
-                const fechaInicioMes = moment_1.default.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
-                const fechaFinalMes = moment_1.default.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
+                const fechaInicioMes = luxon_1.DateTime.fromISO(fechaInicial, { zone: 'utc' }).plus({ days: 1 }).toFormat('yyyy-MM-dd');
+                const fechaFinalMes = luxon_1.DateTime.fromISO(fechaFinal, { zone: 'utc' }).minus({ days: 1 }).toFormat('yyyy-MM-dd');
                 res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
                 EliminarPlantilla(ruta);
             }
@@ -500,15 +500,15 @@ function VerificarSuperposicionHorarios(datos) {
                             horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
                             horario.inicioAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'I/A');
                             horario.finAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'F/A');
-                            let fechaEntrada = moment_1.default.utc(`${horario.dia} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                            let fechaEntrada = luxon_1.DateTime.fromFormat(`${horario.dia} ${horario.entrada.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                             horario.entrada.fecha = fechaEntrada;
                             horario.entrada.fec_hora_horario = `${horario.dia} ${horario.entrada.hora}`;
-                            let fechaSalida = moment_1.default.utc(`${horario.dia} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                            let fechaSalida = luxon_1.DateTime.fromFormat(`${horario.dia} ${horario.salida.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                             if (horario.salida.segundo_dia) {
-                                fechaSalida = moment_1.default.utc(fechaSalida).add(1, 'days').toDate();
+                                fechaSalida = luxon_1.DateTime.fromJSDate(fechaSalida).plus({ days: 1 }).toJSDate();
                             }
                             else if (horario.salida.tercer_dia) {
-                                fechaSalida = moment_1.default.utc(fechaSalida).add(2, 'days').toDate();
+                                fechaSalida = luxon_1.DateTime.fromJSDate(fechaSalida).plus({ days: 2 }).toJSDate();
                             }
                             horario.salida.fecha = fechaSalida;
                             horario.salida.fec_hora_horario = `${horario.dia} ${horario.salida.hora}`;
@@ -532,16 +532,16 @@ function VerificarSuperposicionHorarios(datos) {
                     const detalles = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
                     horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
                     horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
-                    let fecha = moment_1.default.utc(horario.fecha).format('YYYY-MM-DD');
+                    let fecha = luxon_1.DateTime.fromISO(horario.fecha, { zone: 'utc' }).toFormat('yyyy-MM-dd');
                     horario.dia = fecha;
-                    let fechaEntrada = moment_1.default.utc(`${fecha} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    let fechaEntrada = luxon_1.DateTime.fromFormat(`${fecha} ${horario.entrada.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                     horario.entrada.fecha = fechaEntrada;
-                    let fechaSalida = moment_1.default.utc(`${fecha} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    let fechaSalida = luxon_1.DateTime.fromFormat(`${fecha} ${horario.salida.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                     if (horario.salida.segundo_dia) {
-                        fechaSalida = moment_1.default.utc(fechaSalida).add(1, 'days').toDate();
+                        fechaSalida = luxon_1.DateTime.fromJSDate(fechaSalida).plus({ days: 1 }).toJSDate();
                     }
                     else if (horario.salida.tercer_dia) {
-                        fechaSalida = moment_1.default.utc(fechaSalida).add(2, 'days').toDate();
+                        fechaSalida = luxon_1.DateTime.fromJSDate(fechaSalida).plus({ days: 2 }).toJSDate();
                     }
                     horario.salida.fecha = fechaSalida;
                     horario.codigo = horario.codigo_dia;
@@ -861,11 +861,11 @@ function ConvertirMinutosAHoras(minutos) {
 }
 function ObtenerFechasMes(fechaInicial, fechaFinal) {
     let fechas = [];
-    let fechaInicio = moment_1.default.utc(fechaInicial);
-    let fechaFin = moment_1.default.utc(fechaFinal);
+    let fechaInicio = luxon_1.DateTime.fromISO(fechaInicial, { zone: 'utc' });
+    let fechaFin = luxon_1.DateTime.fromISO(fechaFinal, { zone: 'utc' });
     while (fechaInicio <= fechaFin) {
-        fechas.push(fechaInicio.format('YYYY-MM-DD'));
-        fechaInicio = fechaInicio.add(1, 'days');
+        fechas.push(fechaInicio.toFormat('yyyy-MM-dd'));
+        fechaInicio = fechaInicio.plus({ days: 1 });
     }
     return fechas;
 }
