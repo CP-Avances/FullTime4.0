@@ -311,8 +311,8 @@ export class PermisosMultiplesComponent implements OnInit {
       // CAPTURAR FECHA INGRESADA
       this.dSalida = event.value;
       var leer_fecha = event.value._i;
-      var fecha = leer_fecha.toISOString();
-      var salida = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      //var fecha = leer_fecha.toISOString();
+      var salida = this.dSalida.toFormat('yyyy-MM-dd');
 
       // VALIDAR SI EXISTE RESTRICCION DE FECHAS
       if (this.datosPermiso.fecha_restrinccion === true) {
@@ -345,6 +345,8 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO DE TRATAMIENTO DE CONFIGURACIONES DE FECHAS DE TIPO DE PERMISOS
   ValidarRestricionesFechas(inicio: any, form: any) {
+    console.log("DateTime.fromISO(inicio).toFormat('yyyy')", DateTime.fromISO(inicio).toFormat('yyyy'))
+
     if (DateTime.fromISO(inicio).toFormat('yyyy') < DateTime.fromISO(this.FechaActual).toFormat('yyyy')) {
       this.ValidarAñosAnteriores(inicio, form);
     }
@@ -355,6 +357,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR FECHAS DE AÑOS PASADOS
   ValidarAñosAnteriores(inicio: any, form: any) {
+
     const mesInicial = DateTime.now().startOf('year');
     var dias = this.datosPermiso.crear_dias_anteriores;
     if (dias > 0) {
@@ -373,8 +376,15 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
   ValidarDiasPrevios(inicio: any, form: any) {
+
+
     var dias = this.datosPermiso.dias_anticipar_permiso;
-    const restar = DateTime.fromFormat(inicio, 'yyyy/MM/dd').minus({ days: dias }).toFormat('yyyy/MM/dd');
+    console.log("ver dias: ", dias)
+    const restar = DateTime.fromFormat(inicio, 'yyyy-MM-dd').minus({ days: dias }).toFormat('yyyy-MM-dd');
+
+    console.log("ver restar: ", restar )
+    console.log("ver FechaActual: ", this.FechaActual )
+
     if (dias > 0) {
       if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
         this.ImprimirFecha(form);
@@ -421,9 +431,13 @@ export class PermisosMultiplesComponent implements OnInit {
       }
       else {
         // CAPTURAR FECHA INGRESADA
-        var fecha = event.value._i.toISOString();
-        var inicio = DateTime.fromFormat(form.fechaInicioForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-        var fin = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+        //var fecha = event.value._i.toISOString();
+        console.log("ver form.fechaInicioForm", form.fechaInicioForm)
+
+        var inicio = form.fechaInicioForm.toFormat('yyyy-MM-dd');
+        console.log("ver inicio", inicio)
+
+        var fin = this.dIngreso.toFormat('yyyy-MM-dd');
 
         // VERIFICAR QUE LA FECHA INGRESADA SEA CORRECTA
         if (Date.parse(inicio) <= Date.parse(fin)) {
@@ -467,8 +481,13 @@ export class PermisosMultiplesComponent implements OnInit {
   // METODO PARA VERIFICAR INGRESO DE DIAS DE ACUERDO A LA CONFIGURACION DEL PERMISO
   ValidarConfiguracionDias() {
     if (this.configuracion_permiso === 'Dias') {
-      const resta = this.dIngreso.diff(this.dSalida, 'days');
+      const restaDias = this.dIngreso.diff(this.dSalida, 'days');
+      const resta = restaDias.values.days
+
+      console.log("ver resta de dias ", resta )
       this.diasF.setValue(resta + 1);
+      console.log("ver  this.diasF", this.diasF)
+
       if ((resta + 1) > this.Tdias) {
         this.toastr.warning(
           `Sin embargo los dias máximos de permiso son ${this.Tdias}.`,
@@ -720,9 +739,9 @@ export class PermisosMultiplesComponent implements OnInit {
     this.verificar_ = false;
 
     // FECHAS TOMADAS DEL FORMULARIO
-    var fecha_inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    var fecha_inicio_ = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    var fecha_final = DateTime.fromFormat(form.fechaFinalForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+    var fecha_inicio = this.dSalida.toFormat('yyyy-MM-dd');
+    var fecha_inicio_ = this.dSalida.toFormat('yyyy-MM-dd');
+    var fecha_final = form.fechaFinalForm.toFormat('yyyy-MM-dd');
 
     this.fechasHorario = '';
     this.totalFechas = [];
