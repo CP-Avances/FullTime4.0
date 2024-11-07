@@ -160,7 +160,7 @@ class DatosGeneralesControlador {
                 console.log('***************', id_empleado);
                 const response = yield database_1.default.query(`
                 SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
-                    da.cedula, da.correo, da.codigo, da.estado, da.id_sucursal, 
+                    da.cedula, da.correo, da.codigo, da.estado, da.id_suc, 
                     da.id_contrato, 
                     da.name_dep AS ndepartamento,
                     da.name_suc AS nsucursal
