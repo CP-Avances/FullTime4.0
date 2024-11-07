@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HORARIO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const luxon_1 = require("luxon");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const moment_1 = __importDefault(require("moment"));
 class HorarioControlador {
     // REGISTRAR HORARIO    **USADO
     CrearHorario(req, res) {
@@ -29,9 +29,9 @@ class HorarioControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-      INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-        nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
-      `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
+        INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+          nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+        `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
                 const [horario] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -85,10 +85,10 @@ class HorarioControlador {
                 let { archivo, codigo } = req.params;
                 const { user_name, ip } = req.body;
                 // FECHA DEL SISTEMA
-                var fecha = (0, moment_1.default)();
-                var anio = fecha.format('YYYY');
-                var mes = fecha.format('MM');
-                var dia = fecha.format('DD');
+                var fecha = luxon_1.DateTime.now();
+                var anio = fecha.toFormat('yyyy');
+                var mes = fecha.toFormat('MM');
+                var dia = fecha.toFormat('dd');
                 // LEER DATOS DE IMAGEN
                 let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
                 let separador = path_1.default.sep;
@@ -907,7 +907,7 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
             else {
                 //VALIDAR QUE LA SUMA DE HORAS DE ENTRADA Y SALIDA SEA IGUAL A HORAS_TOTALES
                 const getDetalle = (accion) => detalles.find((detalle) => detalle.TIPO_ACCION === accion);
-                const getHora = (detalle) => (0, moment_1.default)(detalle.HORA, 'HH:mm');
+                const getHora = (detalle) => luxon_1.DateTime.fromFormat(detalle.HORA, 'HH:mm');
                 const entrada = getDetalle('Entrada');
                 const salida = getDetalle('Salida');
                 let horaEntrada = getHora(entrada);
@@ -919,7 +919,7 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
                     const finAlimentacion = getDetalle('Fin alimentación');
                     const horaInicioAlimentacion = getHora(inicioAlimentacion);
                     const horaFinAlimentacion = getHora(finAlimentacion);
-                    diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
+                    diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes').as('minutes');
                     minutosAlimentacion = Number(horario.MINUTOS_ALIMENTACION.toString());
                     if (diferenciaAlimentacion < minutosAlimentacion) {
                         codigosDetalles.push({ codigo: codigoHorario, observacion: 'Minutos de alimentación no corresponden a los asignados' });
@@ -927,9 +927,9 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
                     }
                 }
                 else if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si') {
-                    horaSalida.add(1, 'days');
+                    horaSalida.plus({ days: 1 });
                 }
-                const diferencia = horaSalida.diff(horaEntrada, 'minutes');
+                const diferencia = horaSalida.diff(horaEntrada, 'minutes').as('minutes');
                 const direnciaTotal = tieneAlimentacion ? diferencia - minutosAlimentacion : diferencia;
                 const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
                 if (direnciaTotal !== horasTotalesEnMinutos) {

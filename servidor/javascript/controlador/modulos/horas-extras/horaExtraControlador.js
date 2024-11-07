@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraPedidasControlador = void 0;
+const luxon_1 = require("luxon");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const moment_1 = __importDefault(require("moment"));
 class HorasExtrasPedidasControlador {
     // verificar uso de estado
     ListarHorasExtrasPedidas(req, res) {
@@ -264,10 +264,10 @@ class HorasExtrasPedidasControlador {
                 }
                 const carpetaHorasExtra = yield (0, accesoCarpetas_1.ObtenerRutaHorasExtraGeneral)();
                 const separador = path_1.default.sep;
-                const fecha = (0, moment_1.default)();
-                const anio = fecha.format('YYYY');
-                const mes = fecha.format('MM');
-                const dia = fecha.format('DD');
+                const fecha = luxon_1.DateTime.now();
+                const anio = fecha.toFormat('yyyy');
+                const mes = fecha.toFormat('MM');
+                const dia = fecha.toFormat('dd');
                 const documentoTemporal = `${carpetaHorasExtra}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
                 if (nombreArchivo) {
                     try {

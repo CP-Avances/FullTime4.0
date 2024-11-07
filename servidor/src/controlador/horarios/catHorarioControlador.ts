@@ -1,12 +1,12 @@
 import { ObtenerIndicePlantilla, ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
 import excel from 'xlsx';
-import moment from 'moment';
 
 class HorarioControlador {
 
@@ -19,13 +19,12 @@ class HorarioControlador {
 
       const response: QueryResult = await pool.query(
         `
-      INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-        nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
-      `
+        INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+          nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+        `
         , [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
 
       const [horario] = response.rows;
-
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -34,7 +33,6 @@ class HorarioControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(horario),
-
         ip,
         observacion: null
       })
@@ -84,10 +82,10 @@ class HorarioControlador {
       const { user_name, ip } = req.body;
 
       // FECHA DEL SISTEMA
-      var fecha = moment();
-      var anio = fecha.format('YYYY');
-      var mes = fecha.format('MM');
-      var dia = fecha.format('DD');
+      var fecha = DateTime.now();
+      var anio = fecha.toFormat('yyyy');
+      var mes = fecha.toFormat('MM');
+      var dia = fecha.toFormat('dd');
       // LEER DATOS DE IMAGEN
       let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
       let separador = path.sep;
@@ -1030,7 +1028,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         //VALIDAR QUE LA SUMA DE HORAS DE ENTRADA Y SALIDA SEA IGUAL A HORAS_TOTALES
 
         const getDetalle = (accion: string) => detalles.find((detalle: any) => detalle.TIPO_ACCION === accion);
-        const getHora = (detalle: any) => moment(detalle.HORA, 'HH:mm');
+        const getHora = (detalle: any) => DateTime.fromFormat(detalle.HORA, 'HH:mm');
 
         const entrada = getDetalle('Entrada');
         const salida = getDetalle('Salida');
@@ -1045,7 +1043,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
           const horaInicioAlimentacion = getHora(inicioAlimentacion);
           const horaFinAlimentacion = getHora(finAlimentacion);
 
-          diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
+          diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes').as('minutes');
           minutosAlimentacion = Number(horario.MINUTOS_ALIMENTACION.toString());
 
           if (diferenciaAlimentacion < minutosAlimentacion) {
@@ -1053,10 +1051,10 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
             return codigosDetalles;
           }
         } else if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si') {
-          horaSalida.add(1, 'days');
+          horaSalida.plus({ days: 1 });
         }
 
-        const diferencia = horaSalida.diff(horaEntrada, 'minutes');
+        const diferencia = horaSalida.diff(horaEntrada, 'minutes').as('minutes');
         const direnciaTotal = tieneAlimentacion ? diferencia - minutosAlimentacion : diferencia;
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
 
@@ -1111,13 +1109,13 @@ function ValidarHorasTotales(horario: Horario): Horario {
 function EliminarPlantilla(ruta: string) {
   // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
   fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      }
-      else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
-    });
+    if (err) {
+    }
+    else {
+      // ELIMINAR DEL SERVIDOR
+      fs.unlinkSync(ruta);
+    }
+  });
 }
 
 interface Horario {

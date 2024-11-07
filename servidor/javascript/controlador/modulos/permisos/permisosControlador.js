@@ -16,11 +16,10 @@ exports.PERMISOS_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../../libs/settingsMail");
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const luxon_1 = require("luxon");
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
-const moment_1 = __importDefault(require("moment"));
-moment_1.default.locale('es');
 class PermisosControlador {
     // METODO PARA BUSCAR NUEMRO DE PERMISO
     ObtenerNumPermiso(req, res) {
@@ -168,10 +167,10 @@ class PermisosControlador {
             }
             const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
             const separador = path_1.default.sep;
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
             console.log("ver subir documento", data.subir_documento);
             if (nombreArchivo) {
@@ -217,10 +216,10 @@ class PermisosControlador {
             const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
             const separador = path_1.default.sep;
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dias = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dias = fecha.toFormat('dd');
             const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dias}_${nombreArchivo}`;
             try {
                 const id = req.params.id;
@@ -695,10 +694,10 @@ class PermisosControlador {
             const { permisos } = req.body;
             // copnvertir permisos que esta en json a array
             const permisosArray = JSON.parse(permisos);
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             let errorPermisos = false;
             const separador = path_1.default.sep;
             const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
@@ -1826,10 +1825,10 @@ function RegistrarDocumentoPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { id, codigo, nombreArchivo, user_name, ip, eliminar } = datos;
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CONSULTAR DATOSORIGINALES
