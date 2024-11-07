@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const luxon_1 = require("luxon");
 const catHorarioControlador_1 = __importDefault(require("../../controlador/horarios/catHorarioControlador"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const moment_1 = __importDefault(require("moment"));
 // MANEJO DE PLANTILLAS DE DATOS
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
@@ -27,10 +27,10 @@ const storage_horario = multer_1.default.diskStorage({
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        var fecha = (0, moment_1.default)();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        var fecha = luxon_1.DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
         let { id, codigo } = req.params;
         cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname);
     }
