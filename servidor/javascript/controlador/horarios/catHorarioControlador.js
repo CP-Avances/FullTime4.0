@@ -539,6 +539,7 @@ class HorarioControlador {
                         }
                         catch (error) {
                             // REVERTIR TRANSACCION
+                            console.log("ver error al insertar solo el horario: ", error);
                             yield database_1.default.query('ROLLBACK');
                             horariosCargados = false;
                         }
@@ -593,8 +594,10 @@ class HorarioControlador {
                             }
                             // CAMBIAR TOLERANCIA
                             TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
+                            console.log("ver codigosHorariosCargados: ", codigosHorariosCargados);
                             // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
                             const ID_HORARIO = (_a = (codigosHorariosCargados.find((codigo) => codigo.codigoHorario === CODIGO_HORARIO))) === null || _a === void 0 ? void 0 : _a.idHorario;
+                            console.log("verID_HORARIO ", ID_HORARIO);
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             // INSERTAR EN LA BASE DE DATOS
@@ -623,6 +626,7 @@ class HorarioControlador {
                         }
                         catch (error) {
                             // REVERTIR TRANSACCION
+                            console.log("ver error: ", error);
                             yield database_1.default.query('ROLLBACK');
                             detallesCargados = false;
                         }
@@ -636,6 +640,7 @@ class HorarioControlador {
                 }
             }
             catch (error) {
+                console.log("ver error horarios: ", error);
                 return res.status(500).jsonp({ message: 'error' });
             }
         });

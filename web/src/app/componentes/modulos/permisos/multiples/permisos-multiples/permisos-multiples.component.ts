@@ -146,7 +146,7 @@ export class PermisosMultiplesComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     var f = DateTime.now();
-    this.FechaActual = f.toformat('yyyy-MM-dd');
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.ObtenerTiposPermiso();
     this.BuscarParametro();
   }

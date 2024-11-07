@@ -226,7 +226,8 @@ const FormatearHora = function (hora) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("ver hora: ", hora);
         const formato = yield (0, exports.BuscarHora)(); // Obtenemos el formato deseado desde la función
-        const valor = luxon_1.DateTime.fromFormat(hora, 'HH:mm:ss').toFormat(formato.hora);
+        const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
+        const valor = luxon_1.DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
         return valor;
     });
 };

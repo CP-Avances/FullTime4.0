@@ -605,6 +605,7 @@ class HorarioControlador {
 
           } catch (error) {
             // REVERTIR TRANSACCION
+            console.log("ver error al insertar solo el horario: ", error )
             await pool.query('ROLLBACK');
             horariosCargados = false;
           }
@@ -666,8 +667,10 @@ class HorarioControlador {
             // CAMBIAR TOLERANCIA
             TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
 
+            console.log("ver codigosHorariosCargados: ", codigosHorariosCargados)
             // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
             const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
+            console.log("verID_HORARIO ", ID_HORARIO );
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -702,6 +705,7 @@ class HorarioControlador {
 
           } catch (error) {
             // REVERTIR TRANSACCION
+            console.log("ver error: ", error)
             await pool.query('ROLLBACK');
             detallesCargados = false;
           }
@@ -715,6 +719,7 @@ class HorarioControlador {
       }
 
     } catch (error) {
+      console.log("ver error horarios: ",  error)
       return res.status(500).jsonp({ message: 'error' });
     }
   }

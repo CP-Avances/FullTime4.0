@@ -229,7 +229,8 @@ function transformDate(date: any): string {
 export const FormatearHora = async function (hora: string) {
   console.log("ver hora: ", hora)
   const formato = await BuscarHora(); // Obtenemos el formato deseado desde la función
-  const valor = DateTime.fromFormat(hora, 'HH:mm:ss').toFormat(formato.hora);
+  const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
+  const valor = DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
   return valor;
 };
 
