@@ -64,14 +64,7 @@ export class VerParametroComponent implements OnInit {
   kardex: boolean = false;
   // PARAMETRO FORMATO LABORAL - CALENDARIO
   laboral_calendario: boolean = false;
-  // PARAMETRO FORMATO CONECTIVIDAD A INTERNET
-  conectividad_internet: boolean = false;
-  // PARAMETRO TOMAR FOTO MOVIL
-  foto_movil: boolean = false;
-  // PARAMETRO TOMAR FOTO WEB
-  foto_web: boolean = false;
-  // PARAMETRO LIMITE CORREO
-  limite_correo: boolean = false;
+
   // PARAMETRO HERRAMIENTA DE ANALISIS DE DATOS
   analisis: boolean = false;
 
@@ -148,35 +141,18 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '12') {
       this.laboral_calendario = true;
     }
-    // FORMATO CONECTIVIDAD INTERNET
-    if (this.idParametro === '13') {
-      this.conectividad_internet = true;
-    }
-    // FORMATO FOTO MOVIL
-    if (this.idParametro === '14') {
-      this.foto_movil = true;
-    }
-    // FORMATO FOTO WEB
-    if (this.idParametro === '15') {
-      this.foto_web = true;
-    }
     // PARAMETRO DE HERRAMIENTA DE ANALISIS DE DATOS
     if (this.idParametro === '16') {
       this.analisis = true;
     }
     // PARAMETROS PARA INGRESAR DETALLE
-    if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16' || this.idParametro === '33') {
+    if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16') {
       this.ver_editar = true;
       this.ver_detalles = true;
     }
     // PARAMETROS CON FORMULARIO
-    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8'
-      || this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
+    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8') {
       this.ver_formulario = true;
-    }
-    // LIMITE CORREO
-    if (this.idParametro === '33') {
-      this.limite_correo = true;
     }
 
   }

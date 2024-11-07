@@ -535,10 +535,10 @@ class EmpleadoCargosControlador {
             if (data.cedula.toString().length != 10) {
               data.observacion = 'La cédula ingresada no es válida';
             } else {
-              // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+              // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
               if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
 
-                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                 if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
 
                   // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
@@ -628,12 +628,12 @@ class EmpleadoCargosControlador {
                 data.observacion = 'La cédula ingresada no es válida';
               }
               else {
-                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                 if (data.fecha_desde != 'No registrado') {
                   if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid
                   ) {
 
-                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                     if (data.fecha_hasta != 'No registrado') {
                       if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
 

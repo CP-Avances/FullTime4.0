@@ -493,7 +493,7 @@ class FeriadosControlador {
                 listFeriados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                     if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                         if (luxon_1.DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                             // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                             const VERIFICAR_FECHA = yield database_1.default.query(`SELECT * FROM ef_cat_feriados 

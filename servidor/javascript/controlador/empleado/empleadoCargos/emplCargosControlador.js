@@ -470,9 +470,9 @@ class EmpleadoCargosControlador {
                                 data.observacion = 'La cédula ingresada no es válida';
                             }
                             else {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                 if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                     if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                         // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                                         if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
@@ -563,10 +563,10 @@ class EmpleadoCargosControlador {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                     if (data.fecha_desde != 'No registrado') {
                                         if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
-                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                             if (data.fecha_hasta != 'No registrado') {
                                                 if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                                     if (data.sueldo != 'No registrado') {

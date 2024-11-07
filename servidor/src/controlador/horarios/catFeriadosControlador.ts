@@ -563,7 +563,7 @@ class FeriadosControlador {
             listFeriados.forEach(async (item: any) => {
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                     if (DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                         // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                         const VERIFICAR_FECHA = await pool.query(

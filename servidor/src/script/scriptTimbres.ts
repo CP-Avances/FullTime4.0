@@ -28,10 +28,9 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
 
         switch (ele.tipo_accion) {
             case 'E':
-                //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                //var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:01:00")).toFormat("HH:mm:ss");
                 var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:00:00")).toFormat("HH:mm:ss");
-                //console.log('ver fecha ', moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+                //console.log('ver fecha ', DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd'))
                 var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
                 fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 //console.log('ver formato ', fecha)
@@ -40,8 +39,8 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
                 tecla_funcion = '0';
                 break;
             case 'S':
-                //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
-                //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                //var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:10:00")).toFormat("HH:mm:ss");
+                //var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:00:00")).toFormat("HH:mm:ss");
                 var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").minus(Duration.fromISOTime("00:02:00")).toFormat("HH:mm:ss");
                 var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
                 fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
@@ -60,11 +59,10 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
                 break;
             case 'F/A':
                 var comida = DateTime.fromFormat(formatearMinutos(ele.minutos_alimentacion), 'HH:mm:ss').toFormat('HH:mm:ss');
-                //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+                //var min = DateTime.fromFormat(comida, "HH:mm:ss").minus(Duration.fromISOTime("00:02:00")).toFormat("HH:mm:ss");
                 var min = DateTime.fromFormat(comida, "HH:mm:ss").plus(Duration.fromISOTime("00:00:00")).toFormat("HH:mm:ss");
                 var hora_ = DateTime.fromFormat(auxiliar, "HH:mm:ss").plus(Duration.fromISOTime(min)).toFormat("HH:mm:ss");
-                console.log('hora ', hora_, ' auxiliar ', auxiliar)
+                //console.log('hora ', hora_, ' auxiliar ', auxiliar)
                 var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
                 fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 accion = 'F/A';

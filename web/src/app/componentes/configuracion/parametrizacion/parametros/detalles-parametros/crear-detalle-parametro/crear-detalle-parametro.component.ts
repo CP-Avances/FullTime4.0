@@ -49,11 +49,6 @@ export class CrearDetalleParametroComponent implements OnInit {
       this.especificacion = 'Rango de perímetro en metros.';
       this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
     }
-    // PARAMETRO LIMITE CORREO
-    else if (this.data.parametros.id === 33) {
-      this.especificacion = 'Ingrese el número máximo de correos permitidos.';
-      this.observacion = 'Número de correos electrónicos que se podrán enviar.';
-    }
     // PARAMETRO DISPOSITIVOS MOVILES
     else if (this.data.parametros.id === 6) {
       this.especificacion = 'Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres en la aplicación móvil.';

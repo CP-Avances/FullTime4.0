@@ -91,12 +91,10 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
-  correos: number = 0;
   // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
     let datos: any = [];
-    let detalles = { parametros: '1, 2, 33' };
-    this.correos = 0;
+    let detalles = { parametros: '1, 2' };
     this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -109,10 +107,6 @@ export class EditarPlanHoraExtraComponent implements OnInit {
           // id_tipo_parametro Formato hora = 2
           else if (p.id_parametro === 2) {
             this.formato_hora = p.descripcion;
-          }
-          // id_tipo_parametro correos = 33
-          else if (p.id_parametro === 33) {
-            this.correos = parseInt(p.descripcion)
           }
         })
       });
@@ -151,15 +145,8 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   // METODO PARA VALIDAR NUMERO DE CORREOS
   ValidarProceso(form: any) {
     if (this.data.planifica.length != undefined) {
-      this.ContarCorreos(this.data.planifica);
-      if (this.cont_correo <= this.correos) {
-        this.ValidarFechas(form);
-      }
-      else {
-        this.toastr.warning('Trata de enviar correo de un total de ' + this.cont_correo + ' colaboradores, sin embargo solo tiene permitido enviar un total de ' + this.correos + ' correos.', 'ACCIÓN NO PERMITIDA.', {
-          timeOut: 6000,
-        });
-      }
+      this.LeerCorreos(this.data.planifica);
+      this.ValidarFechas(form);
     }
     else {
       this.ValidarFechas(form);
@@ -395,13 +382,10 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIAR
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
-      this.cont_correo = this.cont_correo + 1
       if (this.info_correo === '') {
         this.info_correo = obj.correo;
       }
