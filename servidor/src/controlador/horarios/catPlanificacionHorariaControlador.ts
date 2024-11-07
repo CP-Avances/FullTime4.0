@@ -5,8 +5,8 @@ import AUDITORIA_CONTROLADOR from "../reportes/auditoriaControlador";
 import path from 'path';
 import excel from 'xlsx';
 import pool from '../../database';
-import moment from "moment";
 import fs from 'fs';
+import { DateTime } from "luxon";
 
 class PlanificacionHorariaControlador {
 
@@ -38,13 +38,13 @@ class PlanificacionHorariaControlador {
 
 
             try {
-                let fechaEntrada = moment.utc(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
+                let fechaEntrada = DateTime.fromFormat(fechaFormateada, 'dd/MM/yyyy', { zone: 'utc' });
 
                 // RESTAR 1 DIA A LA FECHA DE ENTRADA
-                fechaInicial = moment.utc(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
+                fechaInicial = fechaEntrada.minus({ days: 1 }).toFormat('yyyy-MM-dd');
 
                 // SUMAR 1 MES A LA FECHA DE ENTRADA
-                fechaFinal = moment.utc(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
+                fechaFinal = fechaEntrada.plus({ months: 1 }).toFormat('yyyy-MM-dd');
 
             } catch (error) {
                 res.json({ error: 'Fecha no valida' });
@@ -144,8 +144,8 @@ class PlanificacionHorariaControlador {
                 data.dias = await VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
             }
 
-            const fechaInicioMes = moment.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
-            const fechaFinalMes = moment.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
+            const fechaInicioMes = DateTime.fromISO(fechaInicial, { zone: 'utc' }).plus({ days: 1 }).toFormat('yyyy-MM-dd');
+            const fechaFinalMes = DateTime.fromISO(fechaFinal, { zone: 'utc' }).minus({ days: 1 }).toFormat('yyyy-MM-dd');
 
             res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
             EliminarPlantilla(ruta);
@@ -561,15 +561,15 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                         horario.finAlimentacion = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'F/A');
 
 
-                        let fechaEntrada = moment.utc(`${horario.dia} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                        let fechaEntrada = DateTime.fromFormat(`${horario.dia} ${horario.entrada.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                         horario.entrada.fecha = fechaEntrada;
                         horario.entrada.fec_hora_horario = `${horario.dia} ${horario.entrada.hora}`;
 
-                        let fechaSalida = moment.utc(`${horario.dia} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                        let fechaSalida = DateTime.fromFormat(`${horario.dia} ${horario.salida.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                         if (horario.salida.segundo_dia) {
-                            fechaSalida = moment.utc(fechaSalida).add(1, 'days').toDate();
+                            fechaSalida = DateTime.fromJSDate(fechaSalida).plus({ days: 1 }).toJSDate();
                         } else if (horario.salida.tercer_dia) {
-                            fechaSalida = moment.utc(fechaSalida).add(2, 'days').toDate();
+                            fechaSalida = DateTime.fromJSDate(fechaSalida).plus({ days: 2 }).toJSDate();
                         }
                         horario.salida.fecha = fechaSalida;
                         horario.salida.fec_hora_horario = `${horario.dia} ${horario.salida.hora}`;
@@ -601,17 +601,17 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                 horario.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
                 horario.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
 
-                let fecha = moment.utc(horario.fecha).format('YYYY-MM-DD');
+                let fecha = DateTime.fromISO(horario.fecha, { zone: 'utc' }).toFormat('yyyy-MM-dd');
                 horario.dia = fecha;
 
-                let fechaEntrada = moment.utc(`${fecha} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                let fechaEntrada = DateTime.fromFormat(`${fecha} ${horario.entrada.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                 horario.entrada.fecha = fechaEntrada;
 
-                let fechaSalida = moment.utc(`${fecha} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                let fechaSalida = DateTime.fromFormat(`${fecha} ${horario.salida.hora}`, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' }).toJSDate();
                 if (horario.salida.segundo_dia) {
-                    fechaSalida = moment.utc(fechaSalida).add(1, 'days').toDate();
+                    fechaSalida = DateTime.fromJSDate(fechaSalida).plus({ days: 1 }).toJSDate();
                 } else if (horario.salida.tercer_dia) {
-                    fechaSalida = moment.utc(fechaSalida).add(2, 'days').toDate();
+                    fechaSalida = DateTime.fromJSDate(fechaSalida).plus({ days: 2 }).toJSDate();
                 }
                 horario.salida.fecha = fechaSalida;
 
@@ -1007,12 +1007,12 @@ function ConvertirMinutosAHoras(minutos: number): string {
 
 function ObtenerFechasMes(fechaInicial: string, fechaFinal: string) {
     let fechas: string[] = [];
-    let fechaInicio = moment.utc(fechaInicial);
-    let fechaFin = moment.utc(fechaFinal);
+    let fechaInicio = DateTime.fromISO(fechaInicial, { zone: 'utc' });
+    let fechaFin = DateTime.fromISO(fechaFinal, { zone: 'utc' });
 
     while (fechaInicio <= fechaFin) {
-        fechas.push(fechaInicio.format('YYYY-MM-DD'));
-        fechaInicio = fechaInicio.add(1, 'days');
+        fechas.push(fechaInicio.toFormat('yyyy-MM-dd'));
+        fechaInicio = fechaInicio.plus({ days: 1 });
     }
 
     return fechas;

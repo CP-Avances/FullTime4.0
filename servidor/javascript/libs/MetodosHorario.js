@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HorariosParaInasistencias = void 0;
-const moment_1 = __importDefault(require("moment"));
 /**
  * METODO para devolver la fecha y el estado de cada uno de los dias de ese horario
  * @param fechaIterada Fecha asignada por el ciclo for
@@ -55,8 +51,8 @@ exports.HorariosParaInasistencias = HorariosParaInasistencias;
 function DiasConEstado(horario, rango) {
     var fec_aux = new Date(rango.inicio);
     // console.log('FECHA_FERIADOS', FECHA_FERIADOS);
-    var fecha1 = (0, moment_1.default)(rango.inicio.toJSON().split("T")[0]);
-    var fecha2 = (0, moment_1.default)(rango.final.toJSON().split("T")[0]);
+    var fecha1 = moment(rango.inicio.toJSON().split("T")[0]);
+    var fecha2 = moment(rango.final.toJSON().split("T")[0]);
     var diasHorario = fecha2.diff(fecha1, 'days');
     let respuesta = [];
     for (let i = 0; i <= diasHorario; i++) {

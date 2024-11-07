@@ -1,13 +1,11 @@
+import HorasExtrasPedidasControlador from '../../../controlador/modulos/horas-extras/horaExtraControlador';
 import { ObtenerRutaHorasExtraGeneral } from '../../../libs/accesoCarpetas';
 import { ModuloHoraExtraValidation } from '../../../libs/Modulos/verificarHoraExtra';
 import { TokenValidation } from '../../../libs/verificarToken';
+import { DateTime } from 'luxon';
 import { Router } from 'express';
-import HorasExtrasPedidasControlador from '../../../controlador/modulos/horas-extras/horaExtraControlador';
-
-import moment from 'moment';
 import multer from 'multer';
 
-moment.locale('es');
 const storage2 = multer.diskStorage({
     
     destination: async function (req, file, cb) {
@@ -17,10 +15,10 @@ const storage2 = multer.diskStorage({
     filename: async function (req, file, cb) {
 
         // FECHA DEL SISTEMA
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dia = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
         console.log('documento', documento);

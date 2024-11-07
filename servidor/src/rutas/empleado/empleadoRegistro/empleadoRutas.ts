@@ -4,8 +4,6 @@ import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
-import moment from 'moment';
-moment.locale('es');
 
 
 /** ************************************************************************************** **

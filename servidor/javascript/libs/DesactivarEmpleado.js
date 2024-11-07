@@ -13,16 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DesactivarFinContratoEmpleado = void 0;
-const moment_1 = __importDefault(require("moment"));
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../database"));
 const HORA_EJECUTA = 23;
 // METODO PARA CAMBIAR EL ESTADO DE ACCESO DE USUARIOS SEGUN FECHA DE FINALIZACION DE CONTRATO
 const DesactivarFinContratoEmpleado = function () {
     setInterval(() => __awaiter(this, void 0, void 0, function* () {
         // OBTENER HORA Y FECHA
-        var f = (0, moment_1.default)();
-        let hora = parseInt((0, moment_1.default)(f).format('HH'));
-        let fecha = (0, moment_1.default)(f).format('YYYY-MM-DD');
+        var f = luxon_1.DateTime.now();
+        let hora = parseInt(f.toFormat('HH'));
+        let fecha = f.toFormat('yyyy-MM-dd');
         if (hora === HORA_EJECUTA) {
             let EMPLEADOS = yield database_1.default.query(`
                 SELECT DISTINCT cv.id_empleado 

@@ -15,11 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vacunasControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoVacuna/vacunasControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
+const luxon_1 = require("luxon");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const database_1 = __importDefault(require("../../../database"));
-const moment_1 = __importDefault(require("moment"));
-moment_1.default.locale('es');
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,10 +30,10 @@ const storage = multer_1.default.diskStorage({
     filename: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            var fecha = luxon_1.DateTime.now();
+            var anio = fecha.toFormat('yyyy');
+            var mes = fecha.toFormat('MM');
+            var dia = fecha.toFormat('dd');
             // DATOS DOCUMENTO
             let id = req.params.id_empleado;
             const usuario = yield database_1.default.query(`

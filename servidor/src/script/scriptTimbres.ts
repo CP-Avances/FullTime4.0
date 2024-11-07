@@ -1,6 +1,5 @@
+import { DateTime, Duration } from 'luxon';
 import pool from '../database';
-import moment from 'moment';
-const FECHA_FERIADOS: any = [];
 
 export const generarTimbres = async function (codigo: string, inicio: string, fin: string) {
 
@@ -31,10 +30,10 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
             case 'E':
                 //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
-                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:00:00")).toFormat("HH:mm:ss");
                 //console.log('ver fecha ', moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
-                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+                fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 //console.log('ver formato ', fecha)
                 accion = 'E';
                 observacion = 'Entrada';
@@ -43,31 +42,31 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
             case 'S':
                 //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
                 //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
-                var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:02:00")).format("HH:mm:ss");
-                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").minus(Duration.fromISOTime("00:02:00")).toFormat("HH:mm:ss");
+                var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+                fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 observacion = 'Salida';
                 tecla_funcion = '1';
                 break;
             case 'I/A':
                 auxiliar = '';
-                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:20:00")).format("HH:mm:ss");
-                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                var hora_ = DateTime.fromFormat(ele.hora, "HH:mm:ss").plus(Duration.fromISOTime("00:20:00")).toFormat("HH:mm:ss");
+                var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+                fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 accion = 'I/A';
                 observacion = 'Inicio alimentacion';
                 tecla_funcion = '2';
                 auxiliar = hora_;
                 break;
             case 'F/A':
-                var comida = moment(formatearMinutos(ele.minutos_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
+                var comida = DateTime.fromFormat(formatearMinutos(ele.minutos_alimentacion), 'HH:mm:ss').toFormat('HH:mm:ss');
                 //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                var min = moment(comida, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss")
-                var hora_ = moment(auxiliar, "HH:mm:ss").add(moment.duration(min)).format("HH:mm:ss");
+                var min = DateTime.fromFormat(comida, "HH:mm:ss").plus(Duration.fromISOTime("00:00:00")).toFormat("HH:mm:ss");
+                var hora_ = DateTime.fromFormat(auxiliar, "HH:mm:ss").plus(Duration.fromISOTime(min)).toFormat("HH:mm:ss");
                 console.log('hora ', hora_, ' auxiliar ', auxiliar)
-                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                var formato = DateTime.fromFormat(ele.fecha, 'yyyy-MM-dd').toFormat('yyyy-MM-dd');
+                fecha = DateTime.fromFormat(`${formato} ${hora_}`, 'yyyy-MM-dd HH:mm:ss').toFormat('yyyy-MM-dd HH:mm:ss');
                 accion = 'F/A';
                 observacion = 'Fin alimentacion';
                 tecla_funcion = '3';
@@ -113,57 +112,6 @@ function formatearMinutos(minutos: any) {
     var second: any = seconds % 60;
     second = (second < 10) ? '0' + second : second;
     return hour + ':' + minute + ':' + second;
-}
-
-/**
- * Metodo que devuelve el arreglo de las fechas con su estado.
- * @param horario Ultimo horario del empleado con los estados de los dias libres y normales
- * @param rango Fecha de inicio y final, puede ser rango semanal o mensual
- */
-function DiasByEstado(horario: any) {
-    var fecha1 = moment(horario.fec_inicio.toJSON().split("T")[0]);
-    var fecha2 = moment(horario.fec_final.toJSON().split("T")[0]);
-
-    var diasHorario = fecha2.diff(fecha1, 'days');
-
-    var fec_aux = new Date(horario.fec_inicio)
-    let respuesta = [];
-    for (let i = 0; i <= diasHorario; i++) {
-        let horario_res = fechaIterada(fec_aux, horario);
-        respuesta.push(horario_res)
-        fec_aux.setDate(fec_aux.getDate() + 1)
-    }
-    return respuesta.filter(ele => { return ele.estado === false })
-}
-
-/**
- * METODO para devolver la fecha y el estado de cada uno de los dias de ese horario
- * @param fechaIterada Fecha asignada por el ciclo for 
- * @param horario es el ultimo horario del empleado.
- */
-function fechaIterada(fechaIterada: Date, horario: any) {
-    let est;
-    if (fechaIterada.getDay() === 0) {
-        est = horario.domingo
-    } else if (fechaIterada.getDay() === 1) {
-        est = horario.lunes
-    } else if (fechaIterada.getDay() === 2) {
-        est = horario.martes
-    } else if (fechaIterada.getDay() === 3) {
-        est = horario.miercoles
-    } else if (fechaIterada.getDay() === 4) {
-        est = horario.jueves
-    } else if (fechaIterada.getDay() === 5) {
-        est = horario.viernes
-    } else if (fechaIterada.getDay() === 6) {
-        est = horario.sabado
-    }
-
-    return {
-        fecha: fechaIterada.toJSON().split('T')[0],
-        estado: est,
-        id_horario: horario.id_horarios
-    }
 }
 
 export const EliminarTimbres = async function (id_empleado: number) {

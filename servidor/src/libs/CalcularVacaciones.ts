@@ -1,5 +1,5 @@
 import { VacacionesDiasCalendario, InfoLabora, IAcumulado } from '../class/periVacacion';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import pool from '../database';
 
 
@@ -531,9 +531,9 @@ function DetallePeriodoMetodo(I_Periodo: Date) {
     let valor;
     if (f < aux_f) {
         // console.log('Periodo Actual');
-        var fecha1 = moment(I_Periodo.toJSON().split("T")[0]);
-        var fecha2 = moment(f.toJSON().split("T")[0]);
-        diasLaborados = fecha2.diff(fecha1, 'days');
+        const fecha1 = DateTime.fromISO(I_Periodo.toJSON().split("T")[0]);
+        const fecha2 = DateTime.fromISO(f.toJSON().split("T")[0]);        
+        const diasLaborados = fecha2.diff(fecha1, 'days').as('days');
         valor = (diasLaborados * 15) / 365
     } else {
         // console.log('Periodo Anterior');

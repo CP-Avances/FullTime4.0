@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModelarFechas = exports.SegundosToHHMM = exports.Empleado_Permisos_ModelarDatos = exports.Empleado_Vacaciones_ModelarDatos = exports.Empleado_HoraExtra_ModelarDatos = exports.BuscarTimbresEntradas = exports.SumarValoresArray = exports.HHMMtoSegundos = exports.HoraExtra_ModelarDatos = exports.BuscarHorasExtras = exports.BuscarPermisosJustificados = exports.BuscarTimbresByCodigo_Fecha = exports.BuscarTimbresByFecha = void 0;
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../database"));
-const moment_1 = __importDefault(require("moment"));
 const BuscarTimbresByFecha = function (fec_inicio, fec_final) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
@@ -97,10 +97,10 @@ const HoraExtra_ModelarDatos = function (fec_desde, fec_hasta) {
 };
 exports.HoraExtra_ModelarDatos = HoraExtra_ModelarDatos;
 function DiasIterados(inicio, final, tiempo_autorizado, id_empl_cargo, codigo) {
-    var fec_aux = new Date(inicio);
-    var fecha1 = (0, moment_1.default)(inicio.split("T")[0]);
-    var fecha2 = (0, moment_1.default)(final.split("T")[0]);
-    var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+    const fec_aux = new Date(inicio);
+    const fecha1 = luxon_1.DateTime.fromISO(inicio.split("T")[0]);
+    const fecha2 = luxon_1.DateTime.fromISO(final.split("T")[0]);
+    const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
     let respuesta = [];
     for (let i = 0; i < diasHorario; i++) {
         let horario_res = {
@@ -357,10 +357,10 @@ const Empleado_Vacaciones_ModelarDatos = function (id_empleado, fec_desde, fec_h
         // console.log('Lista de vacaciones ===', vacaciones);
         let aux_array = [];
         vacaciones.forEach((obj) => {
-            var fec_aux = new Date(obj.fec_inicio);
-            var fecha1 = (0, moment_1.default)(obj.fec_inicio.split(" ")[0]);
-            var fecha2 = (0, moment_1.default)(obj.fec_final.split(" ")[0]);
-            var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+            const fec_aux = new Date(obj.fec_inicio);
+            const fecha1 = luxon_1.DateTime.fromISO(obj.fec_inicio.split(" ")[0]);
+            const fecha2 = luxon_1.DateTime.fromISO(obj.fec_final.split(" ")[0]);
+            const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
             for (let i = 0; i < diasHorario; i++) {
                 let horario_res = {
                     fecha: fec_aux.toJSON().split('T')[0],
@@ -384,10 +384,10 @@ const Empleado_Permisos_ModelarDatos = function (id_empleado, fec_desde, fec_has
         // console.log('Lista de permisos ===', permisos);
         let aux_array = [];
         permisos.forEach((obj) => {
-            var fec_aux = new Date(obj.fec_inicio);
-            var fecha1 = (0, moment_1.default)(obj.fec_inicio.split(" ")[0]);
-            var fecha2 = (0, moment_1.default)(obj.fec_final.split(" ")[0]);
-            var diasHorario = fecha2.diff(fecha1, 'days') + 1;
+            const fec_aux = new Date(obj.fec_inicio);
+            const fecha1 = luxon_1.DateTime.fromISO(obj.fec_inicio.split(" ")[0]);
+            const fecha2 = luxon_1.DateTime.fromISO(obj.fec_final.split(" ")[0]);
+            const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
             for (let i = 0; i < diasHorario; i++) {
                 let horario_res = {
                     fecha: fec_aux.toJSON().split('T')[0],
@@ -433,10 +433,10 @@ exports.ModelarFechas = ModelarFechas;
  * @returns Un Array de objetos.
  */
 function DiasConEstado(horario, rango) {
-    var fec_aux = new Date(rango.inicio);
-    var fecha1 = (0, moment_1.default)(rango.inicio);
-    var fecha2 = (0, moment_1.default)(rango.final);
-    var diasHorario = fecha2.diff(fecha1, 'days');
+    const fec_aux = new Date(rango.inicio);
+    const fecha1 = luxon_1.DateTime.fromISO(rango.inicio.split(" ")[0]);
+    const fecha2 = luxon_1.DateTime.fromISO(rango.final.split(" ")[0]);
+    const diasHorario = fecha2.diff(fecha1, 'days').as('days') + 1;
     let respuesta = [];
     for (let i = 0; i <= diasHorario; i++) {
         let horario_res = fechaIterada(fec_aux, horario);

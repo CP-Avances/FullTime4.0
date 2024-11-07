@@ -4,21 +4,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const birthdayControlador_1 = __importDefault(require("../../controlador/notificaciones/birthdayControlador"));
-const verificarToken_1 = require("../../libs/verificarToken");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const verificarToken_1 = require("../../libs/verificarToken");
+const luxon_1 = require("luxon");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const moment_1 = __importDefault(require("moment"));
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         cb(null, (0, accesoCarpetas_1.ObtenerRutaBirthday)());
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        var fecha = (0, moment_1.default)();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        var fecha = luxon_1.DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
         let documento = anio + '_' + mes + '_' + dia + '_' + file.originalname;
         cb(null, documento);
     }

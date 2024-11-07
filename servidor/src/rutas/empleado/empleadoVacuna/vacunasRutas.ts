@@ -1,11 +1,10 @@
 import VACUNA_CONTROLADOR from '../../../controlador/empleado/empleadoVacuna/vacunasControlador';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
+import { DateTime } from 'luxon';
 import { Router } from 'express';
 import multer from 'multer';
 import pool from '../../../database';
-import moment from 'moment';
-moment.locale('es');
 
 const storage = multer.diskStorage({
 
@@ -17,10 +16,10 @@ const storage = multer.diskStorage({
     filename: async function (req, file, cb) {
 
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        var fecha = DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
 
         // DATOS DOCUMENTO
         let id = req.params.id_empleado;

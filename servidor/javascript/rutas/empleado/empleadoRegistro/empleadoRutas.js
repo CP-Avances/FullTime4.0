@@ -9,8 +9,6 @@ const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const moment_1 = __importDefault(require("moment"));
-moment_1.default.locale('es');
 /** ************************************************************************************** **
  ** **                   METODO PARA OBTENER CARPETA DE PLANTILLAS                         **
  ** ************************************************************************************** **/
