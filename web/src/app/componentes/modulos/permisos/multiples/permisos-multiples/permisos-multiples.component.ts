@@ -382,8 +382,8 @@ export class PermisosMultiplesComponent implements OnInit {
     console.log("ver dias: ", dias)
     const restar = DateTime.fromFormat(inicio, 'yyyy-MM-dd').minus({ days: dias }).toFormat('yyyy-MM-dd');
 
-    console.log("ver restar: ", restar )
-    console.log("ver FechaActual: ", this.FechaActual )
+    console.log("ver restar: ", restar)
+    console.log("ver FechaActual: ", this.FechaActual)
 
     if (dias > 0) {
       if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
@@ -408,7 +408,7 @@ export class PermisosMultiplesComponent implements OnInit {
       // SI CASO ESPECIAL SELECCIONADO
       if (form.especialForm === true) {
         // SUMAR UN DIA A LA FECHA
-        var fecha = DateTime.fromFormat(form.fechaInicioForm, 'yyyy-MM-dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
+        var fecha = form.fechaInicioForm.plus({ days: 1 }).toFormat('yyyy-MM-dd');
         this.fechaFinalF.setValue(fecha);
       } else {
         // MENTENER FECHA IGUAL
@@ -484,7 +484,7 @@ export class PermisosMultiplesComponent implements OnInit {
       const restaDias = this.dIngreso.diff(this.dSalida, 'days');
       const resta = restaDias.values.days
 
-      console.log("ver resta de dias ", resta )
+      console.log("ver resta de dias ", resta)
       this.diasF.setValue(resta + 1);
       console.log("ver  this.diasF", this.diasF)
 
@@ -513,16 +513,21 @@ export class PermisosMultiplesComponent implements OnInit {
     this.horasF.setValue('');
     // VALIDAR HORAS INGRESDAS
     if (form.horaSalidaForm != '' && form.horasIngresoForm != '') {
+
+      console.log("form.horaSalidaForm: ", form.horaSalidaForm)
+
       //FORMATO DE HORAS
-      var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm:ss').toFormat('HH:mm:ss'));
-      var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm:ss').toFormat('HH:mm:ss'));
+      var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm').toFormat('HH:mm:ss'));
+      var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm').toFormat('HH:mm:ss'));
+
+      console.log("ver inicio: ",  inicio);
       var resta: any;
 
       // FECHAS EN UN MISMO DIA
       if (form.especialForm === false) {
         if (inicio < fin) {
           // RESTAR HORAS
-          resta = fin.subtract(inicio);
+          resta = fin.minus(inicio)
           this.CalcularTiempo(resta);
         }
         else {
@@ -538,33 +543,33 @@ export class PermisosMultiplesComponent implements OnInit {
         var inicio_dia = Duration.fromISOTime('00:00:00');
 
         // SI LAS HORA DESDE ES MAYOR A LA HORA HASTA
-        if (inicio.hours() > fin.hours()) {
+        if (inicio.values.hours > fin.values.hours) {
 
           // SI LA HORA DESDE ESTA DENTRO DEL RAGO ESTABLECIDO MOSTRAR HORAS
-          if (inicio.hours() >= 17 && inicio.hours() <= Duration.fromISOTime('23:59:00').hours()) {
+          if (inicio.values.hours >= 17 && inicio.values.hours <= Duration.fromISOTime('23:59:00').values.hours) {
             // RESTAR HORAS
-            var entrada = media_noche.subtract(inicio);
-            var salida = fin.subtract(inicio_dia);
-            resta = entrada.add(salida);
+            var entrada = media_noche.minus(inicio);
+            var salida = fin.minus(inicio_dia);
+            resta = entrada.plus(salida);
             this.CalcularTiempo(resta);
           }
           // SI LA HORA DESDE NO ESTA DENTRO DEL RANGO SUMAR LAS HORAS DE LOS DOS DIAS
           else {
-            var entrada = media_noche.subtract(inicio);
-            resta = entrada.add(fin);
+            var entrada = media_noche.minus(inicio);
+            resta = entrada.plus(fin);
             this.CalcularTiempo(resta);
           }
         }
-        else if (inicio.hours() < fin.hours()) {
-          var entrada = media_noche.subtract(inicio);
-          resta = entrada.add(fin);
+        else if (inicio.values.hours < fin.values.hours) {
+          var entrada = media_noche.minus(inicio);
+          resta = entrada.plus(fin);
           this.CalcularTiempo(resta);
         }
         else {
           // RESTAR HORAS
-          var entrada = media_noche.subtract(inicio);
-          var salida = fin.subtract(inicio_dia);
-          resta = entrada.add(salida);
+          var entrada = media_noche.minus(inicio);
+          var salida = fin.minus(inicio_dia);
+          resta = entrada.plus(salida);
           this.CalcularTiempo(resta);
         }
       }
@@ -581,18 +586,20 @@ export class PermisosMultiplesComponent implements OnInit {
   tiempoTotal: string;
   CalcularTiempo(resta: any) {
     // COLOCAR FORMATO DE HORAS EN FORMULARIO
-    var horas = String(resta.hours());
-    var minutos = String(resta.minutes());
+    console.log("CalcularTiempo resta:", resta)
+    var horas = resta.values.hours;
+    var minutos = resta.values.minutes;
 
-    if (resta.days() === 0) {
-      if (resta.hours() < 10) {
-        horas = '0' + resta.hours();
+    if (!resta.values.days) {
+      if (resta.hours < 10) {
+        horas = '0' + resta.values.hours;
       }
-      if (resta.minutes() < 10) {
-        minutos = '0' + resta.minutes();
+      if (resta.values.minutes < 10) {
+        minutos = '0' + resta.values.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       this.tiempoTotal = horas + ':' + minutos;
+      console.log("ver this.tiempoTotal", this.tiempoTotal)
 
       // VALIDAR NUMERO DE HORAS SOLICITADAS
       this.ValidarConfiguracionHoras(this.tiempoTotal);
