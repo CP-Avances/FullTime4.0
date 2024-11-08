@@ -10,8 +10,8 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { environment } from 'src/environments/environment';

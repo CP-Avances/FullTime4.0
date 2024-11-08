@@ -9,8 +9,8 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import * as echarts from 'echarts/core';

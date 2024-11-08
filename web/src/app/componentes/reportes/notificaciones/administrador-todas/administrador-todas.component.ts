@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { NotificacionService } from 'src/app/servicios/reportes/notificaciones/notificacion.service';

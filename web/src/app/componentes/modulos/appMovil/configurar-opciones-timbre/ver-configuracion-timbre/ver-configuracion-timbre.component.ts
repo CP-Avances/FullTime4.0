@@ -7,8 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
