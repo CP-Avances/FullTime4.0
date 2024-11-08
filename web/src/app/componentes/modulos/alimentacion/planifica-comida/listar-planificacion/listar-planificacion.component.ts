@@ -8,13 +8,9 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from "xlsx";
-<<<<<<< HEAD
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
-=======
-declare const pdfMake: any;
-declare const pdfFonts: any;
->>>>>>> cfb6903196be935ded637443895c79116d402312
+const pdfMake = require('src/assets/build/pdfmake.js');
+const pdfFonts = require('src/assets/build/vfs_fonts.js');
+
 import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
