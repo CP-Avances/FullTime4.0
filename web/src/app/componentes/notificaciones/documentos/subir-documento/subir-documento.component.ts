@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
+import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/documentos.service';
 
 @Component({
   selector: 'app-subir-documento',

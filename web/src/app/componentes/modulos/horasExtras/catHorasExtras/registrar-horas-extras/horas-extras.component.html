@@ -1,8 +1,15 @@
 <div class="container" style="padding-top: 20px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>CONFIGURAR HORA EXTRA</span>
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, '')">highlight_off</mat-icon>
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+            <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    CONFIGURAR HORA EXTRA
+                </span>
+            </div>
+            <div class="col-2 col-md-2 mb-2 mb-md-0">
+                <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, '')">highlight_off</mat-icon>
+            </div>
         </div>
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
             <mat-step [stepControl]="primeroFormGroup">
@@ -23,9 +30,9 @@
                     </span>
                 </div>
                 <form [formGroup]="primeroFormGroup">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                    <div class="row W-100">
+                        <div class="col-md m-auto">
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label id="horaExtra">Descripción</mat-label>
                                     <input matInput placeholder="Ej: " formControlName="descripcionForm" required>
@@ -62,8 +69,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                        <div class="col-md m-auto">
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Tipo de jornada</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -104,26 +111,26 @@
                 </div>
             </mat-step>
             <mat-step [stepControl]="segundoFormGroup">
-                <form [formGroup]="segundoFormGroup">
-                    <ng-template matStepLabel>
-                        <mat-icon id="seccion_horaE" matSuffix matTooltipPosition="right"
-                            matTooltip="Sección 2: Configuraciones Generales">
-                            timer
-                        </mat-icon>
-                    </ng-template>
-                    <div class="subtitulo">
-                        <span>Configuraciones Generales</span>
-                    </div>
-                    <br>
-                    <div class="nota" id="espacio">
-                        <span>
-                            Por favor llenar todos los campos obligatorios (*) del formulario y dar click en
-                            Guardar.
-                        </span>
-                    </div>
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                <ng-template matStepLabel>
+                    <mat-icon id="seccion_horaE" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 2: Configuraciones Generales">
+                        timer
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Configuraciones Generales</span>
+                </div>
+                <br>
+                <div class="nota" id="espacio">
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en
+                        Guardar.
+                    </span>
+                </div>
+                <form [formGroup]="segundoFormGroup" class="p-0 text-center">
+                    <div class="row w-100 m-auto">
+                        <div class="col-md m-auto p-0">
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Función del reloj</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -150,28 +157,30 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <mat-form-field>
-                                <mat-label id="codigoP">Código programacion</mat-label>
-                                <mat-select formControlName="codigoForm" required>
-                                    <mat-option *ngFor="let t of tipoFuncionAlg" [value]="t.value">
-                                        {{t.viewValue}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-radio-group aria-label="Select an option" formControlName="inclAlmuerzoForm" required>
-                                <label id="letras" class="d-flex justify-content-start">
-                                    Incluye alimentacion*
-                                </label>
-                                <div class="d-flex justify-content-start">
-                                    <mat-radio-button [value]="true">
-                                        <label id="textoradiobtn">Si</label>
-                                    </mat-radio-button>
-                                    <mat-radio-button [value]="false">
-                                        <label id="textoradiobtn">No</label>
-                                    </mat-radio-button>
-                                </div>
-                            </mat-radio-group>
+                        <div class="col-md m-auto p-0">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label id="codigoP">Código programacion</mat-label>
+                                    <mat-select formControlName="codigoForm" required>
+                                        <mat-option *ngFor="let t of tipoFuncionAlg" [value]="t.value">
+                                            {{t.viewValue}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-radio-group aria-label="Select an option" formControlName="inclAlmuerzoForm" required>
+                                    <label id="letras" class="d-flex justify-content-start">
+                                        Incluye alimentacion*
+                                    </label>
+                                    <div class="d-flex justify-content-start">
+                                        <mat-radio-button [value]="true">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button [value]="false">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div> 
                         </div>
                     </div>
                 </form>
@@ -192,8 +201,4 @@
             </mat-step>
         </mat-horizontal-stepper>
     </mat-card>
-</div>
-<div class="pantalla-progress" *ngIf="habilitarprogress">
-    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-    </mat-progress-spinner>
 </div>

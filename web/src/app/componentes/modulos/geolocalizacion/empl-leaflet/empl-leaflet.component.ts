@@ -3,7 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import * as L from 'leaflet';
 import { ToastrService } from 'ngx-toastr';
 
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-empl-leaflet',

@@ -5,12 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MainNavService } from '../../../generales/main-nav/main-nav.service';
 import { MatDialog } from '@angular/material/dialog';
+
 import { VerImagenComponent } from 'src/app/componentes/timbres/acciones-timbres/ver-imagen/ver-imagen.component';
 
 @Component({
@@ -75,7 +76,7 @@ export class TimbreWebComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -128,7 +129,8 @@ export class TimbreWebComponent implements OnInit {
       this.info = res.info;
       this.timbres.forEach((data: any) => {
         let fecha: any = data.fecha_hora_timbre_validado;
-        data.fecha = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        let fecha_formato: any = this.validar.DarFormatoFecha(fecha.split(' ')[0], 'yyyy-MM-dd');
+        data.fecha = this.validar.FormatearFecha(fecha_formato, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.hora = this.validar.FormatearHora(fecha.split(' ')[1], formato_hora);
         this.LeerAcciones(data);
         this.LeerBiometrico(data);

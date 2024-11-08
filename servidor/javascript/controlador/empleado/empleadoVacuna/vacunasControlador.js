@@ -15,7 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACUNAS_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const moment_1 = __importDefault(require("moment"));
+const luxon_1 = require("luxon");
+const settingsMail_1 = require("../../../libs/settingsMail");
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -106,6 +107,8 @@ class VacunasControlador {
                     VALUES ($1, $2, $3, $4, $5) RETURNING *
                     `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
                     const [vacuna] = response.rows;
+                    const fechaF = yield (0, settingsMail_1.FormatearFecha2)(luxon_1.DateTime.fromJSDate(vacuna.fecha).toFormat("yyyy-MM-dd HH:mm:ss"), 'ddd');
+                    vacuna.fecha = fechaF;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_vacunas',
@@ -142,10 +145,10 @@ class VacunasControlador {
             var _a;
             try {
                 // FECHA DEL SISTEMA
-                var fecha = (0, moment_1.default)();
-                var anio = fecha.format('YYYY');
-                var mes = fecha.format('MM');
-                var dia = fecha.format('DD');
+                const fecha = luxon_1.DateTime.now();
+                const anio = fecha.toFormat('yyyy');
+                const mes = fecha.toFormat('MM');
+                const dia = fecha.toFormat('dd');
                 const { user_name, ip } = req.body;
                 let id = req.params.id;
                 let id_empleado = req.params.id_empleado;
@@ -178,6 +181,10 @@ class VacunasControlador {
                 const datosNuevos = yield database_1.default.query(`
                 UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
                 `, [id, documento]);
+                const fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(datosNuevos.rows[0].fecha, 'ddd');
+                datosOriginales.fecha = fechaO;
+                datosNuevos.rows[0].fecha = fechaN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
@@ -253,6 +260,10 @@ class VacunasControlador {
                     UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
                     WHERE id = $5 RETURNING *
                     `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
+                    const fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                    const fechaN = yield (0, settingsMail_1.FormatearFecha2)(datosNuevos.rows[0].fecha, 'ddd');
+                    datosOriginales.fecha = fechaO;
+                    datosNuevos.rows[0].fecha = fechaN;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_vacunas',
@@ -390,6 +401,8 @@ class VacunasControlador {
                 DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
                 `, [id]);
                 const [vacuna] = response.rows;
+                const fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                datosOriginales.fecha = fechaO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',

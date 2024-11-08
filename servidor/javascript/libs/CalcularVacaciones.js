@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportePeriVacaciones = exports.vacacionesByIdUser = void 0;
-const moment_1 = __importDefault(require("moment"));
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../database"));
 function DescuentoDiasHorMin(hora_trabaja, num_dia_vacaciones) {
     var dProporcional = parseFloat(num_dia_vacaciones) * (30 / 22);
@@ -488,9 +488,9 @@ function DetallePeriodoMetodo(I_Periodo) {
     let valor;
     if (f < aux_f) {
         // console.log('Periodo Actual');
-        var fecha1 = (0, moment_1.default)(I_Periodo.toJSON().split("T")[0]);
-        var fecha2 = (0, moment_1.default)(f.toJSON().split("T")[0]);
-        diasLaborados = fecha2.diff(fecha1, 'days');
+        const fecha1 = luxon_1.DateTime.fromISO(I_Periodo.toJSON().split("T")[0]);
+        const fecha2 = luxon_1.DateTime.fromISO(f.toJSON().split("T")[0]);
+        const diasLaborados = fecha2.diff(fecha1, 'days').as('days');
         valor = (diasLaborados * 15) / 365;
     }
     else {

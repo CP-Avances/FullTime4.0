@@ -1,10 +1,8 @@
-import { Router } from 'express';
 import DEPARTAMENTO_CONTROLADOR from '../../../controlador/configuracion/localizacion/catDepartamentoControlador';
-import { TokenValidation } from '../../../libs/verificarToken';
-
-import multer from 'multer';
-import moment from 'moment';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
 
 const storage = multer.diskStorage({
 
@@ -13,10 +11,10 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
+        //var fecha = DateTime.now();
+        //var anio = fecha.toFormat('yyyy');
+        //var mes = fecha.toFormat('MM');
+        //var dia = fecha.toFormat('dd');
         let documento = file.originalname;
 
         cb(null, documento);

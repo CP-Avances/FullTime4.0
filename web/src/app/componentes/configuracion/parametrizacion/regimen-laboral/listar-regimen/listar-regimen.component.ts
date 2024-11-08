@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
 import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -19,8 +19,8 @@ import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.service";
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';

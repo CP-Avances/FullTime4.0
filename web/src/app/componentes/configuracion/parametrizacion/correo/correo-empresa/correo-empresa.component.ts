@@ -2,13 +2,11 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
 // SECCION DE SERVICIOS
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-correo-empresa',
@@ -33,12 +31,6 @@ export class CorreoEmpresaComponent implements OnInit {
 
   btnDisableGuardar: boolean = false;
   dis_correo: boolean = false;
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -73,7 +65,6 @@ export class CorreoEmpresaComponent implements OnInit {
 
   // METODO PARA GUARDAR DATOS DE CORREO
   GuardarConfiguracion(form: any) {
-    this.habilitarprogress = true;
     let data = {
       correo: form.email || this.data.correo,
       password_correo: form.passwordF || this.data.password_correo,
@@ -83,7 +74,6 @@ export class CorreoEmpresaComponent implements OnInit {
       ip: this.ip
     }
     this.restE.EditarCredenciales(this.data.id, data).subscribe(res => {
-      this.habilitarprogress = false;
       this.toastr.success(res.message)
       this.ventana.close({ actualizar: true })
     })

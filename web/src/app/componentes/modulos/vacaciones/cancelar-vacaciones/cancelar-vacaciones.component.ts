@@ -2,11 +2,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 @Component({
   selector: 'app-cancelar-vacaciones',
@@ -50,7 +50,7 @@ export class CancelarVacacionesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {

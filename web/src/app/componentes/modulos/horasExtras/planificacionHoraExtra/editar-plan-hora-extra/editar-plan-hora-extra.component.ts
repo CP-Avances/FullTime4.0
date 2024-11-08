@@ -1,30 +1,22 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
+import { Validators, FormGroup, FormControl } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-planificaciones.component';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-plan-hora-extra',
   templateUrl: './editar-plan-hora-extra.component.html',
   styleUrls: ['./editar-plan-hora-extra.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class EditarPlanHoraExtraComponent implements OnInit {
@@ -96,15 +88,13 @@ export class EditarPlanHoraExtraComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
-  correos: number = 0;
   // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
     let datos: any = [];
-    let detalles = { parametros: '1, 2, 33' };
-    this.correos = 0;
+    let detalles = { parametros: '1, 2' };
     this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -117,10 +107,6 @@ export class EditarPlanHoraExtraComponent implements OnInit {
           // id_tipo_parametro Formato hora = 2
           else if (p.id_parametro === 2) {
             this.formato_hora = p.descripcion;
-          }
-          // id_tipo_parametro correos = 33
-          else if (p.id_parametro === 33) {
-            this.correos = parseInt(p.descripcion)
           }
         })
       });
@@ -159,15 +145,8 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   // METODO PARA VALIDAR NUMERO DE CORREOS
   ValidarProceso(form: any) {
     if (this.data.planifica.length != undefined) {
-      this.ContarCorreos(this.data.planifica);
-      if (this.cont_correo <= this.correos) {
-        this.ValidarFechas(form);
-      }
-      else {
-        this.toastr.warning('Trata de enviar correo de un total de ' + this.cont_correo + ' colaboradores, sin embargo solo tiene permitido enviar un total de ' + this.correos + ' correos.', 'ACCIÓN NO PERMITIDA.', {
-          timeOut: 6000,
-        });
-      }
+      this.LeerCorreos(this.data.planifica);
+      this.ValidarFechas(form);
     }
     else {
       this.ValidarFechas(form);
@@ -403,13 +382,10 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIAR
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
-      this.cont_correo = this.cont_correo + 1
       if (this.info_correo === '') {
         this.info_correo = obj.correo;
       }

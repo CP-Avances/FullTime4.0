@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidarZonaHoraria = exports.timbresControlador = void 0;
+exports.timbresControlador = void 0;
+exports.ValidarZonaHoraria = ValidarZonaHoraria;
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const settingsMail_1 = require("../../libs/settingsMail");
-const moment_timezone_1 = __importDefault(require("moment-timezone"));
-//import * as moment_ from 'moment-timezone';
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
@@ -261,7 +261,7 @@ class TimbresControlador {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos } = req.body;
-                //console.log('datos del timbre ', req.body)
+                console.log('datos del timbre ', req.body);
                 const id_empleado = req.userIdEmpleado;
                 var hora_diferente = false;
                 var fecha_validada;
@@ -273,38 +273,41 @@ class TimbresControlador {
                 // FORMATEAR COMO GMT
                 const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
                 // OBTENER LA FECHA Y HORA ACTUAL DEL SERVIDOR DEL APLICATIVO
-                var now = (0, moment_timezone_1.default)();
+                var now = luxon_1.DateTime.now();
                 const now_ = new Date();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
-                fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
+                var fecha_servidor = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
+                fecha_validada = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
                 // FORMATEAR FECHA Y HORA DEL TIMBRE INGRESADO
-                var hora_timbre = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-                var fecha_timbre = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                var fecha_timbre = luxon_1.DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('yyyy-MM-dd');
+                var hora_timbre = luxon_1.DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('HH:mm:ss');
+                console.log('hora ', hora_timbre);
                 // VERIFICAR ZONA HORARIA
                 if (zona_dispositivo != zona_servidor) {
                     const convertToTimeZone = (date, timeZone) => {
-                        return (0, moment_timezone_1.default)(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+                        return luxon_1.DateTime.fromJSDate(date).setZone(timeZone).toFormat('yyyy-MM-dd HH:mm:ss');
                     };
                     var fecha_ = convertToTimeZone(now_, zona_dispositivo);
-                    fecha_validada = (0, moment_timezone_1.default)(fecha_).format('DD/MM/YYYY, h:mm:ss a');
-                    var verificar_fecha = (0, moment_timezone_1.default)(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                    fecha_validada = luxon_1.DateTime.fromFormat(fecha_, 'yyyy-MM-dd HH:mm:ss', { zone: zona_dispositivo }).toFormat('dd/MM/yyyy, hh:mm:ss a');
+                    var verificar_fecha = luxon_1.DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd');
                     hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
                 }
                 else {
                     // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                    var verificar_fecha = (0, moment_timezone_1.default)(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                    var verificar_fecha = luxon_1.DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd');
                     // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
                     hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
                 }
-                // METODO PARA VERIFICAR USO D SEGUNDOS
+                // METODO PARA VERIFICAR USO DE SEGUNDOS
                 var fecha_servidor_final;
                 var fecha_validada_final;
                 console.log(' hora diferente ', fecha_servidor);
                 console.log(' hora diferente ', fecha_validada);
                 if (capturar_segundos === false) {
-                    fecha_servidor_final = (0, moment_timezone_1.default)(fecha_servidor, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
-                    fecha_validada_final = (0, moment_timezone_1.default)(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+                    fecha_servidor_final = luxon_1.DateTime.fromFormat(fecha_servidor, 'dd/MM/yyyy, hh:mm:ss a')
+                        .set({ second: 0 }).toFormat('dd/MM/yyyy, hh:mm:ss a');
+                    fecha_validada_final = luxon_1.DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a')
+                        .set({ second: 0 }).toFormat('dd/MM/yyyy, hh:mm:ss a');
                 }
                 else {
                     fecha_servidor_final = fecha_servidor;
@@ -370,12 +373,13 @@ class TimbresControlador {
             try {
                 // ESTE USUARIO NO TIMBRA CON UBICACION
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body;
-                //console.log('req ', req.body)
-                var hora_fecha_timbre = (0, moment_timezone_1.default)(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY, h:mm:ss a');
+                console.log('req ', req.body);
+                const fecha_ = luxon_1.DateTime.fromISO(fec_hora_timbre);
+                var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
-                var now = (0, moment_timezone_1.default)();
+                var now = luxon_1.DateTime.now();
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+                var fecha_hora = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
                 let servidor;
                 //console.log('req... ', hora_fecha_timbre)
                 if (tipo === 'administrar') {
@@ -400,10 +404,10 @@ class TimbresControlador {
                 `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
                     observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
-                    console.log('result ', results);
+                    //console.log('result ', results)
                     // FORMATEAR FECHAS
-                    var hora = (0, moment_timezone_1.default)(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
-                    var fecha = (0, moment_timezone_1.default)(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
+                    var fecha = fecha_.toFormat('yyyy-MM-dd');
+                    var hora = fecha_.toFormat('HH:mm:ss');
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1181,13 +1185,12 @@ class TimbresControlador {
                 const hoy = new Date();
                 const timbre = req.body;
                 yield database_1.default.query('BEGIN');
-                // Verificar el contenido de req.body
-                console.log('Contenido de req.body:', timbre);
-                timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-                const fechaHoraEnZonaHorariaDispositivo = (0, moment_timezone_1.default)(timbre.fecha_hora_timbre_servidor)
-                    .tz(timbre.zona_horaria_dispositivo)
-                    .format('YYYY-MM-DD HH:mm:ss');
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const pad = (num) => num.toString().padStart(2, '0');
+                timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+                const fechaHoraEnZonaHorariaDispositivo = luxon_1.DateTime.fromJSDate(hoy)
+                    .setZone(timbre.zona_horaria_dispositivo)
+                    .toFormat('yyyy-MM-dd HH:mm:ss');
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 const timbreRV = new Date(fechaHoraEnZonaHorariaDispositivo || '');
                 const timbreDispositivo = new Date(timbre.fecha_hora_timbre || '');
                 const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
@@ -1243,8 +1246,9 @@ class TimbresControlador {
                 const timbre = req.body;
                 yield database_1.default.query('BEGIN');
                 console.log("ver req.body", req.body);
-                timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const pad = (num) => num.toString().padStart(2, '0');
+                timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 timbre.hora_timbre_diferente = false;
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
@@ -1255,12 +1259,14 @@ class TimbresControlador {
                     timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.imagen, timbre.fecha_hora_timbre, zonaHorariaServidor]);
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+                const fechaHoraSubida = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
+                const fechaTimbreSubida = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: '', id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, id_empleado: ${timbre.id_empleado}, imagen: ${timbre.imagen} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
                     ip: timbre.ip,
                     observacion: null
                 });
@@ -1285,12 +1291,12 @@ class TimbresControlador {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body;
                 console.log(req.body);
                 yield database_1.default.query('BEGIN');
-                const zonaHorariaServidor = moment_timezone_1.default.tz.guess();
+                const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
                     .then(result => {
                     return result.rows;
                 });
-                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split('T')[1]);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
@@ -1371,7 +1377,9 @@ class TimbresControlador {
 }
 exports.timbresControlador = new TimbresControlador;
 exports.default = exports.timbresControlador;
+// FUNCION PARA VALIDAR ZONA HORARIA DEL DISPOSITIVO Y DEL SERVIDOR
 function ValidarZonaHoraria(fecha_valida, fecha_timbre, fecha_validada, fec_hora_timbre) {
+    //console.log('ver datos ', fec_hora_timbre, ' fecha_validad ', fecha_validada)
     var hora_diferente;
     // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
     if (fecha_valida != fecha_timbre) {
@@ -1379,18 +1387,18 @@ function ValidarZonaHoraria(fecha_valida, fecha_timbre, fecha_validada, fec_hora
     }
     else {
         // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
-        var hora_valida = (0, moment_timezone_1.default)(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
-        var hora_timbre_ = (0, moment_timezone_1.default)(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
-        var resta_hora_valida = (0, moment_timezone_1.default)(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
+        var hora_valida = luxon_1.DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a');
+        var hora_timbre_ = luxon_1.DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a');
+        var resta_hora_valida = hora_valida.minus({ minutes: 1 });
         //console.log(' hora_valida ', hora_valida)
         //console.log('resta ', resta_hora_valida)
         //console.log('hora_timbre.... ', hora_timbre_)
-        if (hora_timbre_.isAfter(hora_valida)) {
+        if (hora_timbre_ > (hora_valida)) {
             //console.log('ingresa true, hora mayor');
             hora_diferente = true;
         }
         else {
-            if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
+            if (hora_timbre_ >= (resta_hora_valida)) {
                 //console.log('ingresa false');
                 hora_diferente = false;
             }
@@ -1402,4 +1410,3 @@ function ValidarZonaHoraria(fecha_valida, fecha_timbre, fecha_validada, fec_hora
     }
     return hora_diferente;
 }
-exports.ValidarZonaHoraria = ValidarZonaHoraria;

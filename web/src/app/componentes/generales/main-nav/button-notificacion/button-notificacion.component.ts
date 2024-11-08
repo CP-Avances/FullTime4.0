@@ -3,12 +3,11 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
-import { DateTime } from 'luxon';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
 
@@ -52,9 +51,10 @@ export class ButtonNotificacionComponent implements OnInit {
         if (parseInt(data.id_receives_empl) === this.idEmpleadoIngresa) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
+            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
-            res.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(res.create_at).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            res.hora_ = this.validar.FormatearHora(DateTime.fromISO(res.create_at).toFormat('HH:mm:ss'), this.formato_hora);
+            res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
 
             if (res.mensaje.split('para')[0] != undefined && res.mensaje.split('para')[1] != undefined) {
               res.aviso = res.mensaje.split('para')[0];;
@@ -94,7 +94,7 @@ export class ButtonNotificacionComponent implements OnInit {
   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
   ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -139,8 +139,9 @@ export class ButtonNotificacionComponent implements OnInit {
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
           this.avisos.forEach((obj: any) => {
-            obj.fecha_ = this.validar.FormatearFecha(DateTime.fromISO(obj.create_at).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            obj.hora_ = this.validar.FormatearHora(DateTime.fromISO(obj.create_at).toFormat('HH:mm:ss'), formato_hora);
+            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd');
+            obj.fecha_ = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            obj.hora_ = this.validar.FormatearHora(obj.create_at.split(' ')[1], formato_hora);
             if (obj.visto === false) {
               this.num_noti_false = this.num_noti_false + 1;
               this.estadoNotificacion = false

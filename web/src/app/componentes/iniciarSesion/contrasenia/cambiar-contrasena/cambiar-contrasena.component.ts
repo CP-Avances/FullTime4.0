@@ -5,7 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 @Component({
   selector: 'app-cambiar-contrasena',

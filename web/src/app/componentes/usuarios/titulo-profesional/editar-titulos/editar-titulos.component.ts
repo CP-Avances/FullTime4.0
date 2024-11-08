@@ -3,9 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
-import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.service';
+import { NivelTitulosService } from 'src/app/servicios/usuarios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-titulos',

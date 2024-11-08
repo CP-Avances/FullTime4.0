@@ -76,7 +76,7 @@
                         <td></td>
                     </tr>
                     <tr
-                        *ngFor="let d of dispositivosRegistrados | emplCodigo: codigo.value | emplNombre: nombre.value | emplCedula: cedula.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let d of dispositivosRegistrados | filtroCodigo: codigo.value | filtroCodigo: nombre.value | emplCedula: cedula.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="habilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(d) : null" [checked]="selectionEmp.isSelected(d)"

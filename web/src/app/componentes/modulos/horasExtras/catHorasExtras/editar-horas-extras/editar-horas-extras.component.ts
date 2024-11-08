@@ -2,10 +2,9 @@ import { FormControl, Validators, FormGroup, FormBuilder } from '@angular/forms'
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ListaHorasExtrasComponent } from '../lista-horas-extras/lista-horas-extras.component';
+
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
 
 interface TipoDescuentos {
   value: number;
@@ -72,18 +71,9 @@ export class EditarHorasExtrasComponent implements OnInit {
   ];
 
   datosHoraExtra: any = [];
-
   isLinear = true;
   primeroFormGroup: FormGroup;
   segundoFormGroup: FormGroup;
-
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-  habilitarprogress: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;

@@ -8,17 +8,17 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 @Component({
   selector: 'app-salidas-antes',
@@ -140,7 +140,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
    ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS

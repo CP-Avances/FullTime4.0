@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/tipo-comidas.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
 
 @Component({
   selector: 'app-tipo-comidas',

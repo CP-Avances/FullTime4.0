@@ -5,9 +5,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-crear-timbre',
@@ -154,7 +154,6 @@ export class CrearTimbreComponent implements OnInit {
       longitud: this.longitud,
       latitud: this.latitud,
       accion: form.accionForm,
-      tipo: 'administrar',
       documento: this.documentoBase64,
       user_name: this.user_name,
       ip: this.ip,
@@ -167,7 +166,7 @@ export class CrearTimbreComponent implements OnInit {
       this.contador = 0;
       this.data.map((obj: any) => {
         timbre.id_empleado = obj.id;
-        // METODO DE INSERCIoN DE TIMBRES
+        // METODO DE INSERCION DE TIMBRES
         this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
           this.contador = this.contador + 1;
           if (this.contador === this.data.length) {

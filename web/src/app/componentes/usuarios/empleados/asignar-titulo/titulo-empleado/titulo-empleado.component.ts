@@ -3,9 +3,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.service';
 
 @Component({
   selector: 'app-titulo-empleado',

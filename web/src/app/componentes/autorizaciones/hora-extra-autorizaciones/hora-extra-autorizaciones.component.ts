@@ -4,11 +4,11 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 interface Orden {
   valor: number

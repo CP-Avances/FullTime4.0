@@ -37,7 +37,7 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row m-auto" *ngIf="getPlantilla()">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                        <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                             <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -156,7 +156,7 @@
                         <td></td>
                     </tr>
                     <tr
-                        *ngFor="let e of desactivados | emplCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value |  paginate:tamanio_paginaDes:numero_paginaDes">
+                        *ngFor="let e of desactivados | filtroCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value |  paginate:tamanio_paginaDes:numero_paginaDes">
                         <td>
                             <mat-checkbox *ngIf="btnCheckDeshabilitado" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDos.toggle(e) : null" [checked]="selectionDos.isSelected(e)"
@@ -296,7 +296,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleado | filtroCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"

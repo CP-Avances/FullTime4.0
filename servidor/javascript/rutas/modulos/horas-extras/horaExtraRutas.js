@@ -12,14 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const horaExtraControlador_1 = __importDefault(require("../../../controlador/modulos/horas-extras/horaExtraControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarHoraExtra_1 = require("../../../libs/Modulos/verificarHoraExtra");
 const verificarToken_1 = require("../../../libs/verificarToken");
+const luxon_1 = require("luxon");
 const express_1 = require("express");
-const horaExtraControlador_1 = __importDefault(require("../../../controlador/modulos/horas-extras/horaExtraControlador"));
-const moment_1 = __importDefault(require("moment"));
 const multer_1 = __importDefault(require("multer"));
-moment_1.default.locale('es');
 const storage2 = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -30,10 +29,10 @@ const storage2 = multer_1.default.diskStorage({
     filename: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             // FECHA DEL SISTEMA
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
             console.log('documento', documento);
             cb(null, documento);

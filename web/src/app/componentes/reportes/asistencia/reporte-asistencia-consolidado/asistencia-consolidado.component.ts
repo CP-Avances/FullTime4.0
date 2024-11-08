@@ -8,13 +8,13 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from '../../plantilla-reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 // IMPORTAR COMPONENTES

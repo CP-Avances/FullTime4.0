@@ -8,12 +8,12 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { ConfigurarOpcionesTimbresComponent } from '../configurar-opciones-timbres/configurar-opciones-timbres.component';

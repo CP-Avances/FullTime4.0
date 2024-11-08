@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
+import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
 
 import { ListarRelojesComponent } from '../../../timbres/dispositivos/listar-relojes/listar-relojes.component';
 

@@ -9,21 +9,18 @@ import { Observable, asapScheduler } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { DateTime } from 'luxon';
+import { MenuNode } from 'src/app/model/menu.model';
 
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MainNavService } from './main-nav.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
-
-import { MenuNode } from 'src/app/model/menu.model';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
-import { textChangeRangeIsUnchanged } from 'typescript';
+import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 
 @Component({
   selector: 'app-main-nav',
@@ -52,12 +49,6 @@ export class MainNavComponent implements OnInit {
 
   // VERIFICAR LICENCIA
   fec_caducidad_licencia: Date;
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
 
   //COMPONENTES DEL MENU
   menuGeneralUsuarios: any = [];//Menu General
@@ -212,6 +203,7 @@ export class MainNavComponent implements OnInit {
     public restF: FuncionesService,
     public inicio: LoginService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public location: Location,
     public restEmpresa: EmpresaService,
     public restUsuario: UsuarioService,
@@ -249,17 +241,22 @@ export class MainNavComponent implements OnInit {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
     console.log(licencia);
     if (licencia !== null) {
-      const fec_caducidad = new Date(licencia.split('.')[0]);
+      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd');
       this.fec_caducidad_licencia = fec_caducidad;
       // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
-      const fecha1 = DateTime.now();
-      const fecha2 = DateTime.fromJSDate(fec_caducidad);
+      const fecha = DateTime.now();
+      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd');
+      const fechaInicio = DateTime.fromISO(fechaActual);
+      const fechaFin = DateTime.fromISO(fec_caducidad);
       // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS
-      const diferencia = fecha2.diff(fecha1, 'days').days;
+      const diferencia = fechaFin.diff(fechaInicio, 'days').days;
+      //console.log('diferencia ', diferencia)
       if (diferencia <= 30) {
         this.showMessageLicencia = true;
         const text = (diferencia === 1) ? 'dia' : 'dias';
-        this.toaster.warning(`SU LICENCIA EXPIRA EN ${diferencia + ' ' + text}`)
+        this.toaster.warning(`${diferencia + ' ' + text}`, 'SU LICENCIA EXPIRA EN', {
+          timeOut: 3000,
+        });
       }
     }
   }

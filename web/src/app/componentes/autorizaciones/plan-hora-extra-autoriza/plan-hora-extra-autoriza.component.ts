@@ -3,10 +3,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { use } from 'echarts';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
 
 interface Orden {
   valor: number

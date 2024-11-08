@@ -1,30 +1,24 @@
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-reporte-kardex',
   templateUrl: './reporte-kardex.component.html',
   styleUrls: ['./reporte-kardex.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
+
 })
 
 export class ReporteKardexComponent implements OnInit {

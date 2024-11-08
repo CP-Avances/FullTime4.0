@@ -1,17 +1,15 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/tipo-comidas.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
 
@@ -19,12 +17,6 @@ import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
   selector: 'app-planificacion-comidas',
   templateUrl: './planificacion-comidas.component.html',
   styleUrls: ['./planificacion-comidas.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class PlanificacionComidasComponent implements OnInit {
@@ -103,15 +95,13 @@ export class PlanificacionComidasComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
-  correos: number = 0;
   // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    this.correos = 0;
     let datos: any = [];
-    let detalles = { parametros: '1, 2, 33' };
+    let detalles = { parametros: '1, 2' };
     this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -124,10 +114,6 @@ export class PlanificacionComidasComponent implements OnInit {
           // id_tipo_parametro Formato hora = 2
           else if (p.id_parametro === 2) {
             this.formato_hora = p.descripcion;
-          }
-          // id_tipo_parametro correos = 33
-          else if (p.id_parametro === 33) {
-            this.correos = parseInt(p.descripcion)
           }
         })
       });
@@ -215,15 +201,8 @@ export class PlanificacionComidasComponent implements OnInit {
 
       // METODO PARA VALIDAR REGISTRO INDIVIDUAL O MULTIPLE
       if (this.data.length != undefined) {
-        this.ContarCorreos(this.data);
-        if (this.cont_correo <= this.correos) {
-          this.VerificarDuplicidadMultiple(form, datosPlanComida);
-        }
-        else {
-          this.toastr.warning('Trata de enviar correo de un total de ' + this.cont_correo + ' colaboradores, sin embargo solo tiene permitido enviar un total de ' + this.correos + ' correos.', 'ACCIÓN NO PERMITIDA.', {
-            timeOut: 6000,
-          });
-        }
+        this.LeerCorreos(this.data);
+        this.VerificarDuplicidadMultiple(form, datosPlanComida);
       }
       else {
         this.VerificarDuplicidadIndividual(form, datosPlanComida);
@@ -644,13 +623,10 @@ export class PlanificacionComidasComponent implements OnInit {
   }
 
   // METODO PARA CONTAR CORREOS A ENVIARSE
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
-      this.cont_correo = this.cont_correo + 1;
       if (this.info_correo === '') {
         this.info_correo = obj.correo;
       }

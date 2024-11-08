@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import { QueryResult } from 'pg';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
-import moment from 'moment-timezone';
-//import * as moment_ from 'moment-timezone';
+import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import pool from '../../database';
 
 class TimbresControlador {
@@ -260,7 +259,7 @@ class TimbresControlador {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos } = req.body;
-            //console.log('datos del timbre ', req.body)
+            console.log('datos del timbre ', req.body)
             const id_empleado = req.userIdEmpleado;
             var hora_diferente: boolean = false;
             var fecha_validada: any;
@@ -274,41 +273,43 @@ class TimbresControlador {
             const gmt_servidor = `GMT${gmt_horas >= 0 ? '+' : ''}${gmt_horas.toString().padStart(2, '0')}`;
 
             // OBTENER LA FECHA Y HORA ACTUAL DEL SERVIDOR DEL APLICATIVO
-            var now = moment();
+            var now = DateTime.now();
             const now_ = new Date();
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-            var fecha_servidor = now.format('DD/MM/YYYY, h:mm:ss a');
-            fecha_validada = now.format('DD/MM/YYYY, h:mm:ss a');
+            var fecha_servidor = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
+            fecha_validada = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
 
             // FORMATEAR FECHA Y HORA DEL TIMBRE INGRESADO
-            var hora_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('HH:mm:ss');
-            var fecha_timbre = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
-
+            var fecha_timbre = DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('yyyy-MM-dd');
+            var hora_timbre = DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('HH:mm:ss');
+            console.log('hora ', hora_timbre)
             // VERIFICAR ZONA HORARIA
             if (zona_dispositivo != zona_servidor) {
                 const convertToTimeZone = (date: Date, timeZone: string): string => {
-                    return moment(date).tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+                    return DateTime.fromJSDate(date).setZone(timeZone).toFormat('yyyy-MM-dd HH:mm:ss');
                 };
                 var fecha_: any = convertToTimeZone(now_, zona_dispositivo)
-                fecha_validada = moment(fecha_).format('DD/MM/YYYY, h:mm:ss a');
-                var verificar_fecha = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                fecha_validada = DateTime.fromFormat(fecha_, 'yyyy-MM-dd HH:mm:ss', { zone: zona_dispositivo }).toFormat('dd/MM/yyyy, hh:mm:ss a');
+                var verificar_fecha = DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd');
                 hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
             }
             else {
                 // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var verificar_fecha = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').format('YYYY-MM-DD');
+                var verificar_fecha = DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd');
                 // VERIFICAR HORAS DEL TIMBRE Y DEL SERVIDOR
                 hora_diferente = ValidarZonaHoraria(verificar_fecha, fecha_timbre, fecha_validada, fec_hora_timbre);
             }
 
-            // METODO PARA VERIFICAR USO D SEGUNDOS
+            // METODO PARA VERIFICAR USO DE SEGUNDOS
             var fecha_servidor_final: any;
             var fecha_validada_final: any;
             console.log(' hora diferente ', fecha_servidor)
             console.log(' hora diferente ', fecha_validada)
             if (capturar_segundos === false) {
-                fecha_servidor_final = moment(fecha_servidor, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
-                fecha_validada_final = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a').seconds(0).format('DD/MM/YYYY, hh:mm:ss a');
+                fecha_servidor_final = DateTime.fromFormat(fecha_servidor, 'dd/MM/yyyy, hh:mm:ss a')
+                    .set({ second: 0 }).toFormat('dd/MM/yyyy, hh:mm:ss a');
+                fecha_validada_final = DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a')
+                    .set({ second: 0 }).toFormat('dd/MM/yyyy, hh:mm:ss a');
             }
             else {
                 fecha_servidor_final = fecha_servidor;
@@ -388,14 +389,15 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion,
                 id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body
 
-            //console.log('req ', req.body)
-            var hora_fecha_timbre = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY, h:mm:ss a');
+            console.log('req ', req.body)
+            const fecha_ = DateTime.fromISO(fec_hora_timbre);
+            var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
 
             // OBTENER LA FECHA Y HORA ACTUAL
-            var now = moment();
+            var now = DateTime.now();
 
             // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+            var fecha_hora = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
             let servidor: any;
 
             //console.log('req... ', hora_fecha_timbre)
@@ -430,10 +432,11 @@ class TimbresControlador {
 
                 , async (error, results) => {
                     console.log('error ', error)
-                    console.log('result ', results)
+                    //console.log('result ', results)
                     // FORMATEAR FECHAS
-                    var hora = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('HH:mm:ss');
-                    var fecha = moment(fec_hora_timbre, 'YYYY/MM/DD HH:mm:ss').format('YYYY-MM-DD');
+                    var fecha = fecha_.toFormat('yyyy-MM-dd');
+                    var hora = fecha_.toFormat('HH:mm:ss');
+                    
                     const fechaHora = await FormatearHora(hora);
                     const fechaTimbre = await FormatearFecha(fecha, 'ddd');
 
@@ -1350,23 +1353,18 @@ class TimbresControlador {
             const hoy: Date = new Date();
             const timbre: any = req.body;
             await pool.query('BEGIN');
-
-            // Verificar el contenido de req.body
-            console.log('Contenido de req.body:', timbre);
-
-            timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-            const fechaHoraEnZonaHorariaDispositivo = moment(timbre.fecha_hora_timbre_servidor)
-                .tz(timbre.zona_horaria_dispositivo)
-                .format('YYYY-MM-DD HH:mm:ss');
-
-            const zonaHorariaServidor = moment.tz.guess();
+            const pad = (num: number) => num.toString().padStart(2, '0');
+            timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+            const fechaHoraEnZonaHorariaDispositivo = DateTime.fromJSDate(hoy)
+                .setZone(timbre.zona_horaria_dispositivo)
+                .toFormat('yyyy-MM-dd HH:mm:ss');
+            const zonaHorariaServidor = DateTime.local().zoneName;
             const timbreRV: Date = new Date(fechaHoraEnZonaHorariaDispositivo || '');
             const timbreDispositivo: Date = new Date(timbre.fecha_hora_timbre || '');
-
-
             const restaTimbresHoras = timbreRV.getHours() - timbreDispositivo.getHours();
             const restaTimbresMinutos = timbreRV.getMinutes() - timbreDispositivo.getMinutes();
             const restaTimbresDias = timbreRV.getDate() - timbreDispositivo.getDate();
+
             if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
                 timbre.hora_timbre_diferente = true;
             } else {
@@ -1422,8 +1420,9 @@ class TimbresControlador {
             await pool.query('BEGIN');
             console.log("ver req.body", req.body)
 
-            timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-            const zonaHorariaServidor = moment.tz.guess();
+            const pad = (num: number) => num.toString().padStart(2, '0');
+            timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
+            const zonaHorariaServidor = DateTime.local().zoneName;
             timbre.hora_timbre_diferente = false;
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
@@ -1437,12 +1436,16 @@ class TimbresControlador {
 
             const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
+
+            const fechaHoraSubida = await FormatearHora(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
+            const fechaTimbreSubida = await FormatearFecha2(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
                 usuario: timbre.user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: '', id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, id_empleado: ${timbre.id_empleado}, imagen: ${timbre.imagen} }`,
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
                 ip: timbre.ip,
                 observacion: null
             });
@@ -1467,7 +1470,7 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body
             console.log(req.body);
             await pool.query('BEGIN');
-            const zonaHorariaServidor = moment.tz.guess();
+            const zonaHorariaServidor = DateTime.local().zoneName;
 
 
             const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id',
@@ -1475,7 +1478,7 @@ class TimbresControlador {
                 .then(result => {
                     return result.rows;
                 });
-            const fechaHora = await FormatearHora(fec_hora_timbre.toLocaleString().split('T')[1]);
+            const fechaHora = await FormatearHora(fec_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(fec_hora_timbre.toLocaleString(), 'ddd');
 
 
@@ -1560,14 +1563,15 @@ class TimbresControlador {
         }
     };
 
-
 }
 
 export const timbresControlador = new TimbresControlador;
 
 export default timbresControlador;
 
+// FUNCION PARA VALIDAR ZONA HORARIA DEL DISPOSITIVO Y DEL SERVIDOR
 export function ValidarZonaHoraria(fecha_valida: any, fecha_timbre: any, fecha_validada: any, fec_hora_timbre: any) {
+    //console.log('ver datos ', fec_hora_timbre, ' fecha_validad ', fecha_validada)
     var hora_diferente: boolean;
     // VERIFICAR FECHAS DEBE SER LA MISMA DEL SERVIDOR
     if (fecha_valida != fecha_timbre) {
@@ -1575,18 +1579,18 @@ export function ValidarZonaHoraria(fecha_valida: any, fecha_timbre: any, fecha_v
     }
     else {
         // VALDAR HORAS NO DEBE SER MENOR NI MAYOR A LA HORA DEL SERVIDOR -- 1 MINUTO DE ESPERA
-        var hora_valida = moment(fecha_validada, 'DD/MM/YYYY, hh:mm:ss a');
-        var hora_timbre_ = moment(fec_hora_timbre, 'DD/MM/YYYY, hh:mm:ss a');
-        var resta_hora_valida = moment(hora_valida, 'HH:mm:ss').subtract(1, 'minutes');
+        var hora_valida = DateTime.fromFormat(fecha_validada, 'dd/MM/yyyy, hh:mm:ss a');
+        var hora_timbre_ = DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a');
+        var resta_hora_valida = hora_valida.minus({ minutes: 1 });
         //console.log(' hora_valida ', hora_valida)
         //console.log('resta ', resta_hora_valida)
         //console.log('hora_timbre.... ', hora_timbre_)
-        if (hora_timbre_.isAfter(hora_valida)) {
+        if (hora_timbre_ > (hora_valida)) {
             //console.log('ingresa true, hora mayor');
             hora_diferente = true;
         }
         else {
-            if (hora_timbre_.isSameOrAfter(resta_hora_valida)) {
+            if (hora_timbre_ >= (resta_hora_valida)) {
                 //console.log('ingresa false');
                 hora_diferente = false;
             }

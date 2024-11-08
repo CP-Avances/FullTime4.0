@@ -5,8 +5,8 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 // SECCION SERVICIOS
-import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoUbicacionService } from 'src/app/servicios/modulos/empleadoUbicacion/empleado-ubicacion.service';
 
 import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 

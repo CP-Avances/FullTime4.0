@@ -1,15 +1,14 @@
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { DateTime } from 'luxon';
 
 import { ToastrService } from 'ngx-toastr';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import * as echarts from 'echarts/core';
@@ -21,12 +20,7 @@ import { CanvasRenderer } from 'echarts/renderers';
   selector: 'app-inasistencia-macro',
   templateUrl: './inasistencia-macro.component.html',
   styleUrls: ['./inasistencia-macro.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
+
 })
 export class InasistenciaMacroComponent implements OnInit {
 

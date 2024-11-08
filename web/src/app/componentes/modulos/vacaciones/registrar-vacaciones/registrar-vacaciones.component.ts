@@ -1,30 +1,21 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 @Component({
   selector: 'app-registrar-vacaciones',
   templateUrl: './registrar-vacaciones.component.html',
   styleUrls: ['./registrar-vacaciones.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class RegistrarVacacionesComponent implements OnInit {
@@ -97,7 +88,7 @@ export class RegistrarVacacionesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {

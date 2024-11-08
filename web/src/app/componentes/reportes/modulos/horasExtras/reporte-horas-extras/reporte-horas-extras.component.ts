@@ -6,11 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import { PlantillaReportesService } from '../../../plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';

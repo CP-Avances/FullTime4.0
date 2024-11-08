@@ -1,25 +1,23 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
-import { CatDiscapacidadService } from 'src/app/servicios/catalogos/catDiscapacidad/cat-discapacidad.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { CatDiscapacidadService } from 'src/app/servicios/usuarios/catDiscapacidad/cat-discapacidad.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ITableDiscapacidad } from 'src/app/model/reportes.model';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
 import { EditarDiscapacidadComponent } from '../editar-discapacidad/editar-discapacidad.component';
@@ -61,12 +59,6 @@ export class CatDiscapacidadComponent implements OnInit {
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   discapacidadesEliminar: any = [];
   discapacidades: any;
@@ -243,8 +235,6 @@ export class CatDiscapacidadComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.progreso = true;
-
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_discapacidad = res.data;
@@ -285,9 +275,6 @@ export class CatDiscapacidadComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

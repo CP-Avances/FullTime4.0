@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 // SEGURIDAD
-import { AuthGuard } from "./servicios/guards/auth.guard";
+import { AuthGuard } from './servicios/generales/guards/auth.guard';
 // ACCESO A RUTAS DE INICIO DE SESION
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
 import { OlvidarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/olvidar-contrasenia/olvidar-contrasenia.component';

@@ -1,10 +1,10 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { ProcesoService } from 'src/app/servicios/catalogos/catProcesos/proceso.service';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 // AYUDA PARA CREAR LOS NIVELES
 interface Nivel {

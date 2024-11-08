@@ -10,17 +10,17 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 @Component({
   selector: 'app-reporte-planificacion-horaria',
@@ -172,7 +172,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
    ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -1130,7 +1130,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   fecHorario: boolean = true;
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
-    const ctrlValue = fecha.toISOString();
+    const ctrlValue = fecha;
     //console.log('value ', ctrlValue)
     //console.log('opcion ', opcion)
     if (opcion === 1) {
@@ -1160,7 +1160,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
     // OBTENER EL PRIMER DIA DEL MES
     const inicio = fechaInicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
-
     // OBTENER EL ÚLTIMO DIA DEL MES
     const final = fechaFin.endOf('month').toFormat('dd/MM/yyyy');
 

@@ -1,14 +1,14 @@
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { map, Observable, startWith } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
-import { map, Observable, startWith } from 'rxjs';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
+import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
 
 @Component({
   selector: 'app-relojes',

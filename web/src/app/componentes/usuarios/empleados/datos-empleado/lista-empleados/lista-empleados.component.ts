@@ -3,10 +3,8 @@ import { firstValueFrom, forkJoin, map, Observable } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Validators, FormControl } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
@@ -14,7 +12,7 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -24,12 +22,12 @@ import { ConfirmarCrearCarpetaComponent } from '../../confirmar-crearCarpeta/con
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
@@ -91,12 +89,6 @@ export class ListaEmpleadosComponent implements OnInit {
   lista_activos: boolean = false;
   tabla_activos: boolean = true;
   lista_inactivos: boolean = true;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -542,7 +534,6 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
@@ -575,9 +566,6 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 
@@ -590,7 +578,6 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.rest.VerificarArchivoExcel_Manual(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
@@ -622,10 +609,7 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
       this.datosManuales = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

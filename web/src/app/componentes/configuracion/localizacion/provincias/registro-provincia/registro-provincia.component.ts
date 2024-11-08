@@ -5,8 +5,8 @@ import { ToastrService } from "ngx-toastr";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 
-import { ProvinciaService } from "src/app/servicios/catalogos/catProvincias/provincia.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
+import { ProvinciaService } from "src/app/servicios/configuracion/localizacion/catProvincias/provincia.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 
 @Component({
   selector: "app-registro-provincia",

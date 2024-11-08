@@ -75,7 +75,7 @@
             </thead>
             <tbody>
                 <tr
-                    *ngFor="let t of timbres_noti | avisoEmpl: nom_empleado.value | avisoDesc: descripcion.value | avisoFech: fecha.value | paginate:tamanio_pagina:numero_pagina">
+                    *ngFor="let t of timbres_noti | avisoEmpl: nom_empleado.value | filtroDescripcion: descripcion.value | filtroFecha: fecha.value | paginate:tamanio_pagina:numero_pagina">
                     <td>
                         <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                             (change)="$event ? selectionUno.toggle(t) : null" [checked]="selectionUno.isSelected(t)"

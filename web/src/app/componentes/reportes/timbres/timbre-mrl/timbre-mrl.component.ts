@@ -8,13 +8,13 @@ import { ToastrService } from 'ngx-toastr';
 import { ITableEmpleados, TimbreMrl } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MrlService } from 'src/app/servicios/reportes/mrl/mrl.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-timbre-mrl',

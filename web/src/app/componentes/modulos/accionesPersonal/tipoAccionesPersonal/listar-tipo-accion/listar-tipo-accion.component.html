@@ -48,7 +48,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let ta of tipo_acciones | nombre:nombreF.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let ta of tipo_acciones | filtrosNombres:nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td id="centrar">{{ta.nombre}}</td>
                             <td id="centrar" class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"

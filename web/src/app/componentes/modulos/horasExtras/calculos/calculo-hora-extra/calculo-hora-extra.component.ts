@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
 
 interface tipoDia {
   value: number;
@@ -16,12 +14,6 @@ interface tipoDia {
   selector: 'app-calculo-hora-extra',
   templateUrl: './calculo-hora-extra.component.html',
   styleUrls: ['./calculo-hora-extra.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
 })
 export class CalculoHoraExtraComponent implements OnInit {
 

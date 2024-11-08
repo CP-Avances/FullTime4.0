@@ -166,7 +166,7 @@
                             <td></td>
                         </tr>
                         <tr
-                            *ngFor="let u of usuarios | sucRolEmpleado: rol.value | nombreCompleto: nombre.value | sucDepEmpleado: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
+                            *ngFor="let u of usuarios | roles: rol.value | nombreCompleto: nombre.value | departamento: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
                             <td>
                                 <mat-checkbox (click)="$event.stopPropagation()"
                                     (change)="$event ? usuariosSeleccionados.toggle(u) : null"

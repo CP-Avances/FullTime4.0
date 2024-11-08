@@ -83,7 +83,7 @@
                                 </td>
                             </tr>
                             <tr
-                                *ngFor="let regimenL of regimen | filtroRegion: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
+                                *ngFor="let regimenL of regimen | filtroDescripcion: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionRegimen.toggle(regimenL) : null"

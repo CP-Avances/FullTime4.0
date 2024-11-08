@@ -1,23 +1,23 @@
 // IMPORTACION LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
+import { DateTime, Duration } from 'luxon';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-import { DateTime, Duration } from 'luxon';
 
 // IMPORTACION DE SERVICIOS
 import { LoginService } from 'src/app/servicios/login/login.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permisos/permisos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { TipoPermisosService } from 'src/app/servicios/modulos/modulo-permisos/catTipoPermisos/tipo-permisos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 
@@ -160,7 +160,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS

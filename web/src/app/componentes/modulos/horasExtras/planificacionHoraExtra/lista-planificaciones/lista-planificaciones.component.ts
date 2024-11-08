@@ -7,19 +7,18 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
-import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 // IMPORTACION DE SERVICIOS
@@ -114,9 +113,9 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
 
-      var f = moment();
+      var f = DateTime.now();
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
-      this.fecha = f.format('YYYY-MM-DD');
+      this.fecha = f.toFormat('yyyy-MM-dd');
       this.BuscarParametro();
     }
   }
@@ -145,15 +144,13 @@ export class ListaPlanificacionesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
-  correos: number = 0;
   // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
     let datos: any = [];
-    this.correos = 0;
-    let detalles = { parametros: '1, 2, 33' };
+    let detalles = { parametros: '1, 2' };
     this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -166,10 +163,6 @@ export class ListaPlanificacionesComponent implements OnInit {
           // id_tipo_parametro Formato hora = 2
           else if (p.id_parametro === 2) {
             this.formato_hora = p.descripcion;
-          }
-          // id_tipo_parametro correos = 33
-          else if (p.id_parametro === 33) {
-            this.correos = parseInt(p.descripcion)
           }
         })
         this.ListarPlanificaciones(this.formato_fecha, this.formato_hora);
@@ -361,17 +354,8 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.ConfirmarDeletePlan(EmpleadosSeleccionados[0]);
 
     } else if (EmpleadosSeleccionados.length > 1) {
-      this.ContarCorreos(EmpleadosSeleccionados);
-
-      if (this.cont_correo <= this.correos) {
-        this.ConfirmarDeletePlanMultiple(EmpleadosSeleccionados)
-      }
-      else {
-        this.toastr.warning('Trata de enviar correo de un total de ' + this.cont_correo + ' colaboradores, sin embargo solo tiene permitido enviar un total de ' + this.correos + ' correos.', 'ACCIÓN NO PERMITIDA.', {
-          timeOut: 6000,
-        });
-      }
-
+      this.LeerCorreos(EmpleadosSeleccionados);
+      this.ConfirmarDeletePlanMultiple(EmpleadosSeleccionados)
     }
     else {
       this.toastr.info('No ha seleccionado ningún registro.', 'Seleccionar registros.', {
@@ -411,11 +395,13 @@ export class ListaPlanificacionesComponent implements OnInit {
       // LECTURA DE NOMBRES DE USUARIOS
       usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
 
-      // LECTURA DE DATOS DE LA PLANIFICACIÓN
-      let desde = moment.weekdays(moment(obj.fecha_desde).day()).charAt(0).toUpperCase() + moment.weekdays(moment(obj.fecha_desde).day()).slice(1);
-      let hasta = moment.weekdays(moment(obj.fecha_hasta).day()).charAt(0).toUpperCase() + moment.weekdays(moment(obj.fecha_hasta).day()).slice(1);
-      let h_inicio = moment(obj.hora_inicio, 'HH:mm').format('HH:mm');
-      let h_fin = moment(obj.hora_fin, 'HH:mm').format('HH:mm');
+      // LECTURA DE DATOS DE LA PLANIFICACION
+      const desde_ = DateTime.fromISO(obj.fecha_desde).setLocale('es').toFormat('cccc');
+      const hasta_ = DateTime.fromISO(obj.fecha_hasta).setLocale('es').toFormat('cccc');
+      let desde = desde_.charAt(0).toUpperCase() + desde_.slice(1);
+      let hasta = hasta_.charAt(0).toUpperCase() + hasta_.slice(1);;
+      let h_inicio = this.validar.FormatearHora(obj.hora_inicio, 'HH:mm');
+      let h_fin = this.validar.FormatearHora(obj.hora_fin, 'HH:mm');
 
 
       this.restPlan.EliminarPlanEmpleado(obj.id_plan, obj.id_empleado, data).subscribe(res => {
@@ -537,7 +523,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: moment(datos.horas_totales, 'HH:mm').format('HH:mm'),
+      horas: this.validar.FormatearHora(datos.horas_totales, 'HH:mm'),
       fin: h_fin,
     }
 
@@ -557,13 +543,10 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIAR
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
-      this.cont_correo = this.cont_correo + 1
       if (this.info_correo === '') {
         this.info_correo = obj.correo;
       }

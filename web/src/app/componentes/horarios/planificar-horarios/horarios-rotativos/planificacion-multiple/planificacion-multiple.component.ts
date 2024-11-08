@@ -11,12 +11,12 @@ import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planific
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 @Component({
   selector: 'app-planificacion-multiple',
@@ -95,13 +95,11 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>) {
-    const ctrlValue = fecha.toDate();
+    const ctrlValue = fecha;
     console.log("ctrlValue", ctrlValue)
-    const dateLuxon = DateTime.fromJSDate(ctrlValue);
-    console.log("ver dateLuxon", dateLuxon)
-    let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+    let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
     console.log("inicio luxon", inicio)
-    let final = `${dateLuxon.daysInMonth}${dateLuxon.toFormat('/MM/yyyy')}`;
+    let final = `${ctrlValue.daysInMonth}${ctrlValue.toFormat('/MM/yyyy')}`;
     console.log("final luxon", final)
 
     this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
@@ -377,7 +375,6 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     if (!datoHorario) return this.toastr.warning('No ha seleccionado un horario.');
 
-    // let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');
     let fecha = dia + '-' + mes;
 
@@ -487,7 +484,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   VerificarExistencias(dia: any, id_empleado: string, data: any, index: any) {
 
     let verificar = 0;
-    //let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');
     let fecha = dia + '-' + mes
 
@@ -1082,12 +1078,10 @@ CrearDataHorario(lista: any, validar: boolean) {
                 min_alimentacion: element.minutos_comida,
               };
               if (element.segundo_dia === true) {
-                //plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
                 plan.fec_hora_horario = DateTime.fromISO(asig.fecha).plus({ days: 1 }).toFormat('yyyy-MM-dd') + element.hora;
 
               }
               if (element.tercer_dia === true) {
-                //plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
                 plan.fec_hora_horario = DateTime.fromISO(asig.fecha).plus({ days: 2 }).toFormat('yyyy-MM-dd') + element.hora;
 
               }

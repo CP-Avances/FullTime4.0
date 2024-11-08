@@ -1042,12 +1042,11 @@ class UsuarioControlador {
     getEmpleadosActivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.default.query('SELECT e.cedula, e.codigo, ' +
-                    '( e.apellido || \' \' || e.nombre) as fullname, e.nombre, e.apellido, e.correo, e.id, e.telefono, u.id_rol, u.usuario, i.name_rol ' +
-                    'FROM informacion_general AS e, eu_usuarios AS u, informacion_general AS i  WHERE e.id = u.id_empleado AND i.codigo = e.codigo AND e.estado = 1 ORDER BY fullname');
-                const usuarios = response.rows;
-                console.log(usuarios);
-                return res.jsonp(usuarios);
+                const response = yield database_1.default.query('SELECT e.cedula, e.codigo,  e.nombre, e.apellido, ' +
+                    '( e.apellido || \' \' || e.nombre) as fullname, e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol ' +
+                    'FROM informacion_general AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+                const empleados = response.rows;
+                return res.status(200).jsonp(empleados);
             }
             catch (error) {
                 console.log(error);

@@ -2,7 +2,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-confirmar-desactivados',

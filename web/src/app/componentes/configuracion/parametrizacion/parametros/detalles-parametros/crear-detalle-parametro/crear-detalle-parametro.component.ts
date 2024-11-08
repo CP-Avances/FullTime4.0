@@ -4,8 +4,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-// SECCION SERVICIOS
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+
 
 @Component({
   selector: 'app-crear-detalle-parametro',
@@ -48,11 +48,6 @@ export class CrearDetalleParametroComponent implements OnInit {
     if (this.data.parametros.id === 4) {
       this.especificacion = 'Rango de perímetro en metros.';
       this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
-    }
-    // PARAMETRO LIMITE CORREO
-    else if (this.data.parametros.id === 33) {
-      this.especificacion = 'Ingrese el número máximo de correos permitidos.';
-      this.observacion = 'Número de correos electrónicos que se podrán enviar.';
     }
     // PARAMETRO DISPOSITIVOS MOVILES
     else if (this.data.parametros.id === 6) {

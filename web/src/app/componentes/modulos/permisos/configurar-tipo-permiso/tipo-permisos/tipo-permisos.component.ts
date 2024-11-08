@@ -4,8 +4,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { TipoPermisosService } from 'src/app/servicios/modulos/modulo-permisos/catTipoPermisos/tipo-permisos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { VistaElementosComponent } from '../listarTipoPermisos/vista-elementos.component';
 

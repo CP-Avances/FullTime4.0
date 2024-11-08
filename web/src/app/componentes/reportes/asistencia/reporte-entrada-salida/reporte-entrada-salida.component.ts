@@ -7,19 +7,19 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { EntradasSalidas } from 'src/app/model/timbres.model';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-entrada-salida',

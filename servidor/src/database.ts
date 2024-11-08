@@ -3,10 +3,10 @@ import Pool from 'pg-pool';
 
 const pool = new Pool({
   user: 'postgres',
-  host: '192.168.0.148', //'186.4.226.49',
+  host: '192.168.0.148',
   port: 5432,
   database: 'fulltime_pruebas1',
-  password: 'fulltime'
+  password: 'fu11tim3'
 })
 
 pool.query('SELECT NOW()', (err, res) => {

@@ -10,12 +10,12 @@ import { PageEvent } from '@angular/material/paginator';
 // IMPORTAR MODELOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 export interface EmpleadoElemento {
   comunicado_mail: boolean;
@@ -156,7 +156,6 @@ export class ComunicadosComponent implements OnInit {
 
     this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarInformacionGeneralComunicados();
-    this.BuscarParametro();
   }
 
   // METODO PARA CERARR PROCESOS
@@ -533,38 +532,25 @@ export class ComunicadosComponent implements OnInit {
   cont: number = 0;
   EnviarNotificaciones(data: any, form: any) {
     if (data.length > 0) {
-      this.ContarCorreos(data);
-      if (this.cont_correo <= this.correos) {
-        this.cont = 0;
-        data.forEach((obj: any) => {
-
-          this.cont = this.cont + 1;
-
-          if (obj.comunicado_noti === true) {
-            console.log('NotificarPlanificacion: ', this.idEmpleadoLogueado,'_',obj.id);
-            this.NotificarPlanificacion(this.idEmpleadoLogueado, obj.id, form);
+      this.LeerCorreos(data);
+      this.cont = 0;
+      data.forEach((obj: any) => {
+        this.cont = this.cont + 1;
+        if (obj.comunicado_noti === true) {
+          this.NotificarPlanificacion(this.idEmpleadoLogueado, obj.id, form);
+        }
+        if (this.cont === data.length) {
+          if (this.info_correo === '') {
+            this.toastr.success('Mensaje enviado exitosamente.', '', {
+              timeOut: 6000,
+            });
           }
-          if (this.cont === data.length) {
-            if (this.info_correo === '') {
-              this.toastr.success('Mensaje enviado exitosamente.', '', {
-                timeOut: 6000,
-              });
-            }
-            else {
-              this.EnviarCorreo(this.info_correo, form);
-            }
-            this.LimpiarFormulario();
-            this.BuscarParametro();
+          else {
+            this.EnviarCorreo(this.info_correo, form);
           }
-        })
-      }
-      else {
-        this.toastr.warning('Trata de enviar un total de ' + this.cont_correo +
-          ' correos, sin embargo solo tiene permitido enviar un total de ' + this.correos +
-          ' correos.', 'ACCIÓN NO PERMITIDA.', {
-          timeOut: 6000,
-        });
-      }
+          this.LimpiarFormulario();
+        }
+      })
     }
     else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
@@ -574,14 +560,11 @@ export class ComunicadosComponent implements OnInit {
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIARSE
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
       if (obj.comunicado_mail === true) {
-        this.cont_correo = this.cont_correo + 1
         if (this.info_correo === '') {
           this.info_correo = obj.correo;
         }
@@ -719,23 +702,6 @@ export class ComunicadosComponent implements OnInit {
       this.Filtrar('', 5)
       this.Filtrar('', 6)
     }
-  }
-
-  // METODO PARA LEER NUMERO DE CORREOS PERMITIDOS
-  correos: number = 0;
-  BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREO = 33
-    let datos: any = [];
-    this.restP.ListarDetalleParametros(33).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
-        }
-        else {
-          this.correos = 0
-        }
-      });
   }
 
   // METODO USADO PARA ENVIAR COMUNICADO POR CORREO

@@ -1,14 +1,14 @@
 
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha, FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 
 
 class FeriadosControlador {
@@ -135,9 +135,8 @@ class FeriadosControlador {
 
                 feriado.fecha = fecha_formato;
 
-                let fec_recuperacion_formato = '';
                 if (fec_recuperacion) {
-                    fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    let fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
                     feriado.fecha_recuperacion = fec_recuperacion_formato;
                 }
 
@@ -241,10 +240,9 @@ class FeriadosControlador {
                 const fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
                 datosNuevos.fecha = fecha_formato;
 
-                let fec_recuperacion_formato = '';
                 if (fec_recuperacion) {
-                    fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
-                    datosNuevos.fecha_recuperacion = fec_recuperacion_formato;
+                    let fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    datosNuevos.fecha_recuperacion = fec_recuperacion_formato || '';
                 }
                 const fecha_formatoO = await FormatearFecha2(feriado.fecha, 'ddd');
                 feriado.fecha = fecha_formatoO;
@@ -351,6 +349,7 @@ class FeriadosControlador {
     public async FeriadosRecuperacionCiudad(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, id_empleado } = req.body;
+            console.log("ver req body, feriado recuperar: ", req.body)
             const FERIADO = await pool.query(
                 `
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
@@ -375,12 +374,12 @@ class FeriadosControlador {
     }
 
 
-        // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
-        public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
-            try {
-                const { fecha_inicio, fecha_final, ids } = req.body;
-                const FERIADO = await pool.query(
-                    `
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+    public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
+        try {
+            const { fecha_inicio, fecha_final, ids } = req.body;
+            const FERIADO = await pool.query(
+                `
                     SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre,  de.id 
                     FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s,
                         informacion_general AS de
@@ -388,21 +387,21 @@ class FeriadosControlador {
                         AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id= ANY($3)
                         AND f.fecha_recuperacion IS NOT null
                     `
-                    , [fecha_inicio, fecha_final, ids]);
-    
-                if (FERIADO.rowCount != 0) {
-                    console.log("ver feriado: ", FERIADO.rows)
-                    return res.jsonp(FERIADO.rows)
+                , [fecha_inicio, fecha_final, ids]);
 
-                }
-                else {
-                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
-                }
+            if (FERIADO.rowCount != 0) {
+                console.log("ver feriado: ", FERIADO.rows)
+                return res.jsonp(FERIADO.rows)
+
             }
-            catch (error) {
-                return res.jsonp({ message: 'error' });
+            else {
+                res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         }
+        catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
 
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
@@ -564,8 +563,8 @@ class FeriadosControlador {
             listFeriados.forEach(async (item: any) => {
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                    if (moment(item.fecha, 'YYYY-MM-DD', true).isValid()) {
+                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                    if (DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                         // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                         const VERIFICAR_FECHA = await pool.query(
                             `SELECT * FROM ef_cat_feriados 
@@ -592,7 +591,7 @@ class FeriadosControlador {
                                         item.observacion = '1';
                                     }
                                 } else {
-                                    if (moment(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                    if (DateTime.fromFormat(item.fec_recuperacion, 'yyyy-MM-dd').isValid) {
                                         fec_recuperacion_correcta = true;
                                         const VERIFICAR_FECHA_RECUPE = await pool.query(
                                             `

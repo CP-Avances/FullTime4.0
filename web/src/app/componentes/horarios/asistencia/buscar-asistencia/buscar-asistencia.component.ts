@@ -2,12 +2,11 @@ import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import moment from 'moment';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-buscar-asistencia',
@@ -65,7 +64,7 @@ export class BuscarAsistenciaComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -119,16 +118,14 @@ export class BuscarAsistenciaComponent implements OnInit {
         if (data.respuesta.length > 0) {
           this.existenAsistencias = true;
         }
-        this.asistencia = this. rolEmpleado === 1 ? data.respuesta : await this.FiltrarEmpleadosAsignados(data.respuesta);
+        this.asistencia = this.rolEmpleado === 1 ? data.respuesta : await this.FiltrarEmpleadosAsignados(data.respuesta);
         if (this.asistencia.length === 0 && this.existenAsistencias) {
           return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {
             timeOut: 6000,
           });
         }
         this.asistencia.forEach((obj: any) => {
-          //console.log('ver fecha ', moment(obj.fecha_hora_horario).format('YYYY-MM-DD'))
-          //console.log('ver hora ', moment(obj.fecha_hora_horario).format('HH:mm:ss'))
-          obj.fecha_general_ = this.validar.FormatearFecha(moment(obj.fecha_horario).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          obj.fecha_general_ = this.validar.FormatearFecha(obj.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           obj.fecha_horario_ = this.validar.FormatearFecha(obj.fecha_horarios, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           obj.hora_horario_ = this.validar.FormatearHora(obj.hora_horario, this.formato_hora);
           if (obj.fecha_timbre) {

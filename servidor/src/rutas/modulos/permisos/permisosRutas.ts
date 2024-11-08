@@ -1,12 +1,11 @@
 import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral } from '../../../libs/accesoCarpetas';
 import { ModuloPermisosValidation } from '../../../libs/Modulos/verificarPermisos';
-import PERMISOS_CONTROLADOR from '../../../controlador/modulos/permisos/permisosControlador';
 import { TokenValidation } from '../../../libs/verificarToken'
+import { DateTime } from 'luxon';
 import { Router } from 'express';
+import PERMISOS_CONTROLADOR from '../../../controlador/modulos/permisos/permisosControlador';
 import multer from 'multer';
 import pool from '../../../database';
-import moment from 'moment';
-moment.locale('es');
 
 const storage = multer.diskStorage({
 
@@ -18,10 +17,10 @@ const storage = multer.diskStorage({
     filename: async function (req, file, cb) {
 
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        var fecha = DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
 
         // DATOS DOCUMENTO
         let { id, codigo } = req.params;
@@ -49,10 +48,10 @@ const storage2 = multer.diskStorage({
     filename: async function (req, file, cb) {
 
         // FECHA DEL SISTEMA
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dia = fecha.format('DD');
+        var fecha = DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
 
         const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
         console.log('documento', documento);

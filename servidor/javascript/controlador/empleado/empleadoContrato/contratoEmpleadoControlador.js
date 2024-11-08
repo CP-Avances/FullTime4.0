@@ -16,11 +16,11 @@ const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../../libs/settingsMail");
-const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const luxon_1 = require("luxon");
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS    **USADO
     CrearContrato(req, res) {
@@ -101,10 +101,10 @@ class ContratoEmpleadoControlador {
             var _a;
             try {
                 // FECHA DEL SISTEMA
-                var fecha = (0, moment_1.default)();
-                var anio = fecha.format('YYYY');
-                var mes = fecha.format('MM');
-                var dia = fecha.format('DD');
+                const fecha = luxon_1.DateTime.now();
+                const anio = fecha.toFormat('yyyy');
+                const mes = fecha.toFormat('MM');
+                const dia = fecha.toFormat('dd');
                 const { user_name, ip } = req.body;
                 let id = req.params.id;
                 // INICIAR TRANSACCION
@@ -598,10 +598,10 @@ class ContratoEmpleadoControlador {
                                 data.observacion = 'La cédula ingresada no es válida';
                             }
                             else {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                                if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                                    if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { }
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) { }
                                     else {
                                         data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
                                     }
@@ -671,12 +671,12 @@ class ContratoEmpleadoControlador {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                     if (data.fecha_desde != 'No registrado') {
-                                        if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                        if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                             if (data.fecha_hasta != 'No registrado') {
-                                                if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                                                if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                                     if (data.control_vaca != 'No registrado') {
                                                         if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
                                                             data.observacion = 'Control de vacaciones es incorrecto';
@@ -751,7 +751,7 @@ class ContratoEmpleadoControlador {
                                                         SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                                                         `, [valor.modalida_la.toUpperCase()]);
                                                         if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
-                                                            if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                            if (luxon_1.DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= luxon_1.DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
                                                                 valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                                             }
                                                         }

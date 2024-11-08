@@ -3,21 +3,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
 const catDepartamentoControlador_1 = __importDefault(require("../../../controlador/configuracion/localizacion/catDepartamentoControlador"));
-const verificarToken_1 = require("../../../libs/verificarToken");
-const multer_1 = __importDefault(require("multer"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const verificarToken_1 = require("../../../libs/verificarToken");
+const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
+        //var fecha = DateTime.now();
+        //var anio = fecha.toFormat('yyyy');
+        //var mes = fecha.toFormat('MM');
+        //var dia = fecha.toFormat('dd');
         let documento = file.originalname;
         cb(null, documento);
     }

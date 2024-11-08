@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { CatTipoCargosService } from 'src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-cargo',

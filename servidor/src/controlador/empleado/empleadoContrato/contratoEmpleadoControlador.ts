@@ -4,11 +4,11 @@ import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
 import { Request, Response, query } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
-import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { DateTime } from 'luxon';
 
 class ContratoEmpleadoControlador {
 
@@ -101,10 +101,10 @@ class ContratoEmpleadoControlador {
     public async GuardarDocumentoContrato(req: Request, res: Response): Promise<Response> {
         try {
             // FECHA DEL SISTEMA
-            var fecha = moment();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            const fecha = DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
 
             const { user_name, ip } = req.body;
 
@@ -460,7 +460,7 @@ class ContratoEmpleadoControlador {
     }
 
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-    
+
     public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
@@ -478,10 +478,10 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    
-      // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
+
+    // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
     public async EncontrarFechaContratoUsuarios(req: Request, res: Response): Promise<any> {
-        try{
+        try {
             const { ids } = req.body;
             const FECHA = await pool.query(
                 `
@@ -490,21 +490,21 @@ class ContratoEmpleadoControlador {
                 WHERE cv.id_empleado = ANY($1) AND ec.id = cv.id_contrato
                 `
                 , [ids]);
-    
-                const fechaContrato = FECHA.rows;
+
+            const fechaContrato = FECHA.rows;
             if (FECHA.rowCount != 0) {
-                return res.jsonp({fechaContrato})
+                return res.jsonp({ fechaContrato })
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
-        }catch(error){
+        } catch (error) {
 
             console.log("ver el error: ", error)
         }
-      
+
     }
-        
+
 
 
     /** **************************************************************************** ** 
@@ -657,10 +657,10 @@ class ContratoEmpleadoControlador {
                         if (data.cedula.toString().length != 10) {
                             data.observacion = 'La cédula ingresada no es válida';
                         } else {
-                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                            if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                                if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { } else {
+                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                            if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) { } else {
                                     data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
                                 }
                             } else {
@@ -723,12 +723,14 @@ class ContratoEmpleadoControlador {
                             if (data.cedula.toString().length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
                             } else {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                 if (data.fecha_desde != 'No registrado') {
-                                    if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                    if (
+                                        DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid
+                                    ) {
+                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                         if (data.fecha_hasta != 'No registrado') {
-                                            if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                                            if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                                 if (data.control_vaca != 'No registrado') {
                                                     if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
                                                         data.observacion = 'Control de vacaciones es incorrecto'
@@ -816,7 +818,7 @@ class ContratoEmpleadoControlador {
                                                         `
                                                         , [valor.modalida_la.toUpperCase()])
                                                     if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
-                                                        if (moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                        if (DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
                                                             valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
                                                         }
                                                     }

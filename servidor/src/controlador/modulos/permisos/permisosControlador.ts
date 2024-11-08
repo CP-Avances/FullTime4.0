@@ -9,14 +9,12 @@ import {
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import fs from 'fs';
 import pool from '../../../database';
 import path from 'path';
-import moment from 'moment';
-moment.locale('es');
 
 class PermisosControlador {
-
 
     // METODO PARA BUSCAR NUEMRO DE PERMISO
     public async ObtenerNumPermiso(req: Request, res: Response): Promise<any> {
@@ -170,10 +168,10 @@ class PermisosControlador {
         }
         const carpetaPermisos = await ObtenerRutaPermisosGeneral();
         const separador = path.sep;
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dia = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
 
@@ -223,10 +221,10 @@ class PermisosControlador {
         const nombreArchivo = req.file?.originalname;
         const carpetaPermisos = await ObtenerRutaPermisosGeneral();
         const separador = path.sep;
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dias = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dias = fecha.toFormat('dd');
         const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dias}_${nombreArchivo}`;
 
 
@@ -775,10 +773,10 @@ class PermisosControlador {
         const permisosArray = JSON.parse(permisos);
 
 
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dia = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         let errorPermisos: boolean = false;
 
@@ -2025,10 +2023,10 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
 
         const { id, codigo, nombreArchivo, user_name, ip, eliminar } = datos;
 
-        const fecha = moment();
-        const anio = fecha.format('YYYY');
-        const mes = fecha.format('MM');
-        const dia = fecha.format('DD');
+        const fecha = DateTime.now();
+        const anio = fecha.toFormat('yyyy');
+        const mes = fecha.toFormat('MM');
+        const dia = fecha.toFormat('dd');
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');

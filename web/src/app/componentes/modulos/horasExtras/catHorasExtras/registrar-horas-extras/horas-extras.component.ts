@@ -1,11 +1,9 @@
 import { FormControl, Validators, FormGroup, FormBuilder } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
 
 import { ListaHorasExtrasComponent } from '../lista-horas-extras/lista-horas-extras.component';
 
@@ -74,14 +72,6 @@ export class HorasExtrasComponent implements OnInit {
   isLinear = true;
   primeroFormGroup: FormGroup;
   segundoFormGroup: FormGroup;
-
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-  habilitarprogress: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;

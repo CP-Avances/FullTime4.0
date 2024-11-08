@@ -3,32 +3,24 @@ import { Router } from '@angular/router';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-hora-extra-real',
   templateUrl: './hora-extra-real.component.html',
   styleUrls: ['./hora-extra-real.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
 })
+
 export class HoraExtraRealComponent implements OnInit {
 
   empleado: any = [];

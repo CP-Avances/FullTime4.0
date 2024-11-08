@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
+exports.DOCUMENTOS_CONTROLADOR = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const luxon_1 = require("luxon");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
-const moment_1 = __importDefault(require("moment"));
 class DocumentosControlador {
     // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR    **USADO
     Carpetas(req, res) {
@@ -173,10 +173,10 @@ class DocumentosControlador {
             try {
                 const { user_name, ip } = req.body;
                 // FECHA DEL SISTEMA
-                var fecha = (0, moment_1.default)();
-                var anio = fecha.format('YYYY');
-                var mes = fecha.format('MM');
-                var dia = fecha.format('DD');
+                var fecha = luxon_1.DateTime.now();
+                var anio = fecha.toFormat('yyyy');
+                var mes = fecha.toFormat('MM');
+                var dia = fecha.toFormat('dd');
                 let documento = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');

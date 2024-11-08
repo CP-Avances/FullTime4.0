@@ -3,8 +3,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
 
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { ToastrService } from 'ngx-toastr';
 
 interface Estados {

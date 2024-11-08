@@ -8,13 +8,13 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-listar-parametro',

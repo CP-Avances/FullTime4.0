@@ -4,16 +4,15 @@ import { ToastrService } from 'ngx-toastr';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-recuperar-frase',
   templateUrl: './recuperar-frase.component.html',
   styleUrls: ['./recuperar-frase.component.css']
 })
-
 export class RecuperarFraseComponent implements OnInit {
 
   token: string;

@@ -1,7 +1,5 @@
 // SECCION DE LIBRERIAS
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Component, OnInit } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr'
@@ -10,22 +8,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // SECCION DE SERVICIOS
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
-
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class RegistroComponent implements OnInit {

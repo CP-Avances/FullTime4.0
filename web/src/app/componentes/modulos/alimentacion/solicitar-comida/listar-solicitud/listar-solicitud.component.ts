@@ -7,22 +7,22 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LLAMADO A COMPONENTES
+import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
 import { AutorizaSolicitudComponent } from '../../autoriza-solicitud/autoriza-solicitud.component';
 
 // LLAMADO A SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
-import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE AUTORIZACION
 export interface SolicitudElemento {
@@ -133,7 +133,7 @@ export class ListarSolicitudComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS

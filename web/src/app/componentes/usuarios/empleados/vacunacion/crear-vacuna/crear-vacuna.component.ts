@@ -5,7 +5,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
-import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
+import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 
 import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacuna.component';
 

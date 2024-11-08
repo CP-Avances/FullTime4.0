@@ -1,15 +1,14 @@
 // IMPORTAR LIBRERIAS
-import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import moment from 'moment';
-import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+
 // IMPORTACION DE SERVICIOS
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { DateTime } from 'luxon';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
@@ -104,14 +103,12 @@ export class EliminarIndividualComponent implements OnInit {
 
   BuscarPlanificacion(form: any) {
     this.horariosSeleccionados = [];
-    let fechaInicioForm = form.fechaInicioForm.toDate();
-    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
-    let fechaFinalForm = form.fechaFinalForm.toDate();
-    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    this.fechaInicioFormluxon = this.validar.DarFormatoFecha(form.fechaInicioForm, 'yyyy-MM-dd');
+    this.fechaFinFormluxon = this.validar.DarFormatoFecha(form.fechaFinalForm, 'yyyy-MM-dd');
     console.log("ver fecha_inicio", form.fechaInicioForm)
     let busqueda = {
-      fecha_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
-      fecha_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
+      fecha_inicio: this.fechaInicioFormluxon,
+      fecha_final: this.fechaFinFormluxon,
       id_empleado: ''
     }
     this.datosEliminar.usuario.forEach((obj: any) => {
@@ -193,9 +190,9 @@ export class EliminarIndividualComponent implements OnInit {
 
   // METODO PARA ELIMINAR PLANIFICACION GENERAL DE HORARIOS
   lista_eliminar: any = [];
-  EliminarPlanificacion(form: any) {
-    let inicio =  this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
-    let final =  this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
+  EliminarPlanificacion() {
+    let inicio =  this.fechaInicioFormluxon;
+    let final =  this.fechaFinFormluxon;
   
     let datos = {
       usuarios_validos: this.datosEliminar.usuario,
@@ -248,12 +245,12 @@ export class EliminarIndividualComponent implements OnInit {
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
-  ConfirmarEliminar(form: any) {
+  ConfirmarEliminar() {
     if (this.horariosSeleccionados.length != 0) {
       this.ventana_.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
-            this.EliminarPlanificacion(form);
+            this.EliminarPlanificacion();
           }
         });
     }

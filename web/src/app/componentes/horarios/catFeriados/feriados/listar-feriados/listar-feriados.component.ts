@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -20,10 +20,10 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableFeriados } from 'src/app/model/reportes.model';
@@ -115,7 +115,7 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {

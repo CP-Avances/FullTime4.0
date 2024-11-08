@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPRESA_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
-const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const moment_1 = __importDefault(require("moment"));
+const luxon_1 = require("luxon");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const fs_1 = __importDefault(require("fs"));
@@ -65,10 +65,10 @@ class EmpresaControlador {
             var _a, _b;
             sharp.cache(false);
             // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             // IMAGEN ORIGINAL
             const separador = path_1.default.sep;
             let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
@@ -357,11 +357,10 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             sharp.cache(false);
-            // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             // IMAGEN ORIGINAL
             const separador = path_1.default.sep;
             let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
@@ -459,10 +458,10 @@ class EmpresaControlador {
             var _a, _b;
             sharp.cache(false);
             // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            const fecha = luxon_1.DateTime.now();
+            const anio = fecha.toFormat('yyyy');
+            const mes = fecha.toFormat('MM');
+            const dia = fecha.toFormat('dd');
             // IMAGEN ORIGINAL
             const separador = path_1.default.sep;
             let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);

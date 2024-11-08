@@ -5,12 +5,12 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { DateTime } from 'luxon';
 
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-contrato',
@@ -249,12 +249,6 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EL REGISTRO ENTRA O NO A VERIFICACION DE DUPLICIDAD
   VerificarDatos(datos: any, form: any) {
-    /*console.log('datos contrato ', datos, ' contrato ', this.contrato)
-    console.log('datos inicio ', moment(datos.fec_ingreso).format('YYYY-MM-DD'))
-    console.log('datos fin ', moment(datos.fec_salida).format('YYYY-MM-DD'))
-    console.log('contrato inicio ', moment(this.contrato.fecha_ingreso).format('YYYY-MM-DD'))
-    console.log('contrato fin ', moment(this.contrato.fecha_salida).format('YYYY-MM-DD'))*/
-
     if (DateTime.fromISO(datos.fec_ingreso).hasSame(DateTime.fromISO(this.contrato.fecha_ingreso), 'day') &&
       DateTime.fromISO(datos.fec_salida).hasSame(DateTime.fromISO(this.contrato.fecha_salida), 'day')) {
       this.VerificarInformacion(datos, form);

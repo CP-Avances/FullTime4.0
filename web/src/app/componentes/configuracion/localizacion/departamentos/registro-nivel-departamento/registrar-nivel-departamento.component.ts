@@ -1,12 +1,10 @@
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
 interface Nivel {
   valor: number;
@@ -47,12 +45,6 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     { valor: 4, nombre: '4' },
     { valor: 5, nombre: '5' }
   ];
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -147,7 +139,6 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
       // VERIFICAR QUE EL NIVEL DE APROBACION CORRESPONDA EN EL REGISTRO
       if ((this.listaDepaNiveles.length + 1) === departamento.nivel) {
         this.rest.RegistrarNivelDepartamento(departamento).subscribe(response => {
-          this.habilitarprogress = false;
           if (response.message === 'error') {
             this.toastr.error('Existe un error en los datos.', '', {
               timeOut: 3000,

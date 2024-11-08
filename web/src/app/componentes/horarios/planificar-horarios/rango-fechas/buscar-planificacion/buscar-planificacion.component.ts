@@ -7,12 +7,12 @@ import { Component, Input } from '@angular/core';
 import { DateTime } from 'luxon';
 
 // IMPORTAR SERVICIOS
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
@@ -75,24 +75,20 @@ export class BuscarPlanificacionComponent {
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
     console.log()
-    const ctrlValue = fecha.toDate();
-
-    const dateLuxon = DateTime.fromJSDate(ctrlValue);
-    console.log("ver opciones: ", opcion)
-
+    const ctrlValue = fecha;
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
-        this.ValidarFechas(dateLuxon, this.fechaFinalF.value, this.fechaInicialF, opcion);
+        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         console.log("ver inicio opcion 1: ", inicio)
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, dateLuxon, this.fechaFinalF, opcion);
+      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }

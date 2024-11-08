@@ -1,26 +1,24 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Component, ViewChild } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ITableTipoCargo } from 'src/app/model/reportes.model';
 
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { CatTipoCargosService } from 'src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
@@ -51,17 +49,10 @@ export class CatTipoCargosComponent {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-
-  listaTipoCargos: any;
   tiposCargosCorrectos: number = 0;
-
-  empleado: any = [];
+  listaTipoCargos: any;
   idEmpleado: number;
+  empleado: any = [];
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -110,7 +101,7 @@ export class CatTipoCargosComponent {
   }
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 1
     this.parametro.ListarDetalleParametros(1).subscribe(
@@ -273,7 +264,6 @@ export class CatTipoCargosComponent {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
@@ -313,9 +303,6 @@ export class CatTipoCargosComponent {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

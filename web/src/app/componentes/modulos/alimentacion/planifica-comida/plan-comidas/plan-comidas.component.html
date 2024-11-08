@@ -295,7 +295,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let r of regimen | sucNombre: filtroNombreSuc | emplNombre: filtroNombreReg | paginate:tamanio_pagina_reg:numero_pagina_reg">
+                                *ngFor="let r of regimen | sucNombre: filtroNombreSuc | filtrosNombres: filtroNombreReg | paginate:tamanio_pagina_reg:numero_pagina_reg">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionReg.toggle(r) : null"
@@ -366,7 +366,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let c of cargos | sucNombre: filtroNombreSuc | emplNombre: filtroNombreCarg | paginate:tamanio_pagina_car:numero_pagina_car">
+                                *ngFor="let c of cargos | sucNombre: filtroNombreSuc | filtrosNombres: filtroNombreCarg | paginate:tamanio_pagina_car:numero_pagina_car">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionCarg.toggle(c) : null"
@@ -509,7 +509,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmp.toggle(e) : null"

@@ -2,7 +2,7 @@ import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
@@ -68,10 +68,10 @@ class BirthdayControlador {
     public async CrearImagenCumpleanios(req: Request, res: Response): Promise<Response> {
         try {
             // FECHA DEL SISTEMA
-            var fecha = moment();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            var fecha = DateTime.now();
+            var anio = fecha.toFormat('yyyy');
+            var mes = fecha.toFormat('MM');
+            var dia = fecha.toFormat('dd');
 
             let imagen = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
             let id = req.params.id_empresa;

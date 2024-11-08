@@ -4,7 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 @Component({
   selector: 'app-visualizar-asignaciones',

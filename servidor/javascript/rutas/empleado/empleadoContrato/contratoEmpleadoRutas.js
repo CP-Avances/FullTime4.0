@@ -16,14 +16,10 @@ const contratoEmpleadoControlador_1 = __importDefault(require("../../../controla
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
+const luxon_1 = require("luxon");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const database_1 = __importDefault(require("../../../database"));
-const moment_1 = __importDefault(require("moment"));
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './contratos',
-});
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,17 +27,17 @@ const storage = multer_1.default.diskStorage({
             const usuario = yield database_1.default.query(`
             SELECT e.id FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
-            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(usuario.rows[0].id);
+            var ruta = yield (0, accesoCarpetas_2.ObtenerRutaContrato)(usuario.rows[0].id);
             cb(null, ruta);
         });
     },
     filename: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
+            var fecha = luxon_1.DateTime.now();
+            var anio = fecha.toFormat('yyyy');
+            var mes = fecha.toFormat('MM');
+            var dia = fecha.toFormat('dd');
             // DATOS DOCUMENTO
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
@@ -55,7 +51,7 @@ const storage = multer_1.default.diskStorage({
 const upload = (0, multer_1.default)({ storage: storage });
 const storage_plantilla = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)());
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
     },
     filename: function (req, file, cb) {
         let documento = file.originalname;

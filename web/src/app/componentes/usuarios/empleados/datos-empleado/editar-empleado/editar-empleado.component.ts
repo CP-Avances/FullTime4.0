@@ -6,10 +6,10 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({

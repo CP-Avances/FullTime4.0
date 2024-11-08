@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ReporteHoraExtra } from '../../../class/HorasExtras';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
@@ -9,13 +10,10 @@ import {
   ObtenerRutaHorasExtraIdEmpleado, ObtenerRutaHorasExtraGeneral, ObtenerRutaHorasExtra,
   ObtenerRutaLogos
 } from '../../../libs/accesoCarpetas';
-
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import moment from 'moment';
-
 
 class HorasExtrasPedidasControlador {
 
@@ -288,13 +286,12 @@ class HorasExtrasPedidasControlador {
 
       const carpetaHorasExtra = await ObtenerRutaHorasExtraGeneral();
       const separador = path.sep;
-      const fecha = moment();
-      const anio = fecha.format('YYYY');
-      const mes = fecha.format('MM');
-      const dia = fecha.format('DD');
+      const fecha = DateTime.now();
+      const anio = fecha.toFormat('yyyy');
+      const mes = fecha.toFormat('MM');
+      const dia = fecha.toFormat('dd');
 
       const documentoTemporal = `${carpetaHorasExtra}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
-
 
       if (nombreArchivo) {
         try {

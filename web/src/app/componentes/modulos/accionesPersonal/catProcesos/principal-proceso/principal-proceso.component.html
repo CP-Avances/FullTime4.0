@@ -54,7 +54,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let proceso of procesos | nombre:buscarNombre.value | padre:buscarPadre.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let proceso of procesos | filtrosNombres:buscarNombre.value | padre:buscarPadre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>{{proceso.nombre}}</td>
                         <td>{{proceso.nivel}}</td>
                         <td>{{proceso.proc_padre}}</td>

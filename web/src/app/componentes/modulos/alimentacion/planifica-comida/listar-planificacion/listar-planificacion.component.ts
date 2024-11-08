@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -18,15 +18,14 @@ import { EditarPlanComidasComponent } from '../editar-plan-comidas/editar-plan-c
 
 // LLAMADO A SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { use } from 'echarts';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACIÓN
 export interface SolicitudElemento {
@@ -150,15 +149,13 @@ export class ListarPlanificacionComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
-  correos: number = 0;
   // METODO PARA BUSCAR DATOS DE PARAMETROS
   BuscarParametro() {
-    this.correos = 0;
     let datos: any = [];
-    let detalles = { parametros: '1, 2, 33' };
+    let detalles = { parametros: '1, 2' };
     this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
       res => {
         datos = res;
@@ -171,10 +168,6 @@ export class ListarPlanificacionComponent implements OnInit {
           // id_tipo_parametro Formato hora = 2
           else if (p.id_parametro === 2) {
             this.formato_hora = p.descripcion;
-          }
-          // id_tipo_parametro correos = 33
-          else if (p.id_parametro === 33) {
-            this.correos = parseInt(p.descripcion)
           }
         })
         this.ObtenerPlanificaciones(this.formato_fecha, this.formato_hora);
@@ -491,16 +484,8 @@ export class ListarPlanificacionComponent implements OnInit {
       this.ConfirmarDeletePlanComidas(EmpleadosSeleccionados[0].alimentacion);
     } else if (EmpleadosSeleccionados.length > 1) {
 
-      this.ContarCorreos(EmpleadosSeleccionados);
-      if (this.cont_correo <= this.correos) {
-        this.ConfirmarDeletePlanComidasMultiple(EmpleadosSeleccionados)
-      }
-      else {
-        this.toastr.warning('Trata de enviar correo de un total de ' + this.cont_correo + ' colaboradores, sin embargo solo tiene permitido enviar un total de ' + this.correos + ' correos.', 'ACCIÓN NO PERMITIDA.', {
-          timeOut: 6000,
-        });
-      }
-
+      this.LeerCorreos(EmpleadosSeleccionados);
+      this.ConfirmarDeletePlanComidasMultiple(EmpleadosSeleccionados)
     }
     else {
       this.toastr.info('No ha seleccionado ningún registro.', 'Seleccionar registros.', {
@@ -712,15 +697,12 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   // METODO PARA CONTAR CORREOS A ENVIARSE
-  cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
+  LeerCorreos(data: any) {
     console.log('ver data correo.... ', data)
-    this.cont_correo = 0;
     this.info_correo = '';
     data.forEach((obj: any) => {
       console.log('ver obj correo.... ', obj.alimentacion.correo)
-      this.cont_correo = this.cont_correo + 1;
       if (this.info_correo === '') {
         this.info_correo = obj.alimentacion.correo;
       }

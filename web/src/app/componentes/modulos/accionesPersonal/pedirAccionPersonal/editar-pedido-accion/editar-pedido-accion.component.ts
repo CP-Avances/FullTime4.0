@@ -1,21 +1,18 @@
-// IMPORTACION DE LIBRERIAS
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter, } from "@angular/material-moment-adapter";
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, } from "@angular/material/core";
 import { FormControl, Validators, FormGroup } from "@angular/forms";
 import { Component, OnInit, Input } from "@angular/core";
 import { startWith, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
+import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
-import * as moment from "moment";
 
 // IMPORTACION DE SERVICIOS
-import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
-import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
-import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
+import { AccionPersonalService } from "src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ProcesoService } from "src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service";
+import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
 
 import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedido-accion.component";
 
@@ -23,16 +20,6 @@ import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedi
   selector: "app-editar-pedido-accion",
   templateUrl: "./editar-pedido-accion.component.html",
   styleUrls: ["./editar-pedido-accion.component.css"],
-  providers: [
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE],
-    },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: "es" },
-  ],
 })
 export class EditarPedidoAccionComponent implements OnInit {
 
@@ -167,8 +154,8 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     this.CargarInformacion();
     // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
-    var f = moment();
-    this.FechaActual = f.format("YYYY-MM-DD");
+    var f = DateTime.now();
+    this.FechaActual = f.toFormat("yyyy-MM-dd");
     this.firstFormGroup.patchValue({
       fechaForm: this.FechaActual,
     });
@@ -190,7 +177,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.empleados.filter((info) =>
+      return this.empleados.filter((info: any) =>
         info.empleado.toUpperCase().includes(filterValue)
       );
     }
@@ -200,7 +187,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   private _filtrarCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.ciudades.filter((info) =>
+      return this.ciudades.filter((info: any) =>
         info.descripcion.toUpperCase().includes(filterValue)
       );
     }
@@ -485,12 +472,9 @@ export class EditarPedidoAccionComponent implements OnInit {
             let datosAccion = {
               id_empleado: idEmpl_pedido,
               fec_creacion: form1.fechaForm,
-              fec_rige_desde: String(
-                moment(form2.fechaDesdeForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              ),
-              fec_rige_hasta: form2.fechaHastaForm !== null ? (String(
-                moment(form2.fechaHastaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )) : null,
+              fec_rige_desde: this.validar.DarFormatoFecha(form2.fechaDesdeForm, "yyyy-MM-dd"),
+              fec_rige_hasta: form2.fechaHastaForm !== null ?
+                (this.validar.DarFormatoFecha(form2.fechaHastaForm, 'yyyy-MM-dd')) : null,
               identi_accion_p: form1.identificacionForm,
               num_partida: form2.numPartidaForm,
               decre_acue_resol: form1.tipoDecretoForm,
@@ -508,16 +492,14 @@ export class EditarPedidoAccionComponent implements OnInit {
               id_empl_responsable: idEmpl_responsable,
               num_partida_individual: form2.numPartidaIForm,
               act_final_concurso: form3.actaForm,
-              fec_act_final_concurso: form3.fechaActaForm !== null ? (String(
-                moment(form3.fechaActaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )) : null,
+              fec_act_final_concurso: form3.fechaActaForm !== null ?
+                (this.validar.DarFormatoFecha(form3.fechaActaForm, 'yyyy-MM-dd')) : null,
               nombre_reemp: nombreCapitalizado,
               puesto_reemp: form4.puestoReempForm,
               funciones_reemp: form4.funcionesReempForm,
               num_accion_reemp: form4.accionReempForm,
-              primera_fecha_reemp: form4.fechaReempForm !== null ? (String(
-                moment(form4.fechaReempForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )) : null,
+              primera_fecha_reemp: form4.fechaReempForm !== null ?
+                (this.validar.DarFormatoFecha(form4.fechaReempForm, 'yyyy-MM-dd')) : null,
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
               id: this.idPedido,

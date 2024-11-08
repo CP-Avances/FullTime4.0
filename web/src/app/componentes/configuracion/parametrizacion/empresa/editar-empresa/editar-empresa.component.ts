@@ -1,14 +1,13 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Component, Input, OnInit } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+
 import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
 
 @Component({
@@ -40,12 +39,6 @@ export class EditarEmpresaComponent implements OnInit {
   otroE = new FormControl('');
   tipoF = new FormControl('');
   rucF = new FormControl('', Validators.required);
-
-  // VARIABLES PROGRESS SPINNER
-  color: ThemePalette = 'primary';
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -160,10 +153,7 @@ export class EditarEmpresaComponent implements OnInit {
     var verificar_tipo = 0;
     var verificar_establecimiento = 0;
     var verificar_dias = 0;
-
-    this.habilitarprogress === true;
     let empresa = {
-
       id: this.data.id,
       ruc: form1.rucForm,
       nombre: form1.nombreForm,
@@ -218,7 +208,6 @@ export class EditarEmpresaComponent implements OnInit {
   // GUARDAR DATOS DE EMPRESA
   GuardarDatos(datos: any) {
     this.rest.ActualizarEmpresa(datos).subscribe(response => {
-      this.habilitarprogress === false;
       this.Salir(2);
       this.toastr.success('Operación exitosa.', 'Datos actualizados.', {
         timeOut: 6000,

@@ -3,6 +3,7 @@ import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angula
 import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { PageEvent } from '@angular/material/paginator';
@@ -13,7 +14,7 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -29,32 +30,33 @@ L.Icon.Default.mergeOptions({
 });
 
 // IMPORTAR SERVICIOS
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { EmpleadoProcesosService } from 'src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service';
+import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { DiscapacidadService } from 'src/app/servicios/discapacidad/discapacidad.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
+import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { PerfilEmpleadoService } from 'src/app/servicios/usuarios/empleado/perfilEmpleado/perfil-empleado.service';
+import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
+import { DiscapacidadService } from 'src/app/servicios/usuarios/empleado/discapacidad/discapacidad.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/documentos.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
-import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permisos/permisos.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.service';
+import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
@@ -71,7 +73,6 @@ import { CancelarVacacionesComponent } from 'src/app/componentes/modulos/vacacio
 import { CancelarHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
 import { EditarPlanComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
 import { CambiarContrasenaComponent } from 'src/app/componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
-import { RegistroContratoComponent } from 'src/app/componentes/usuarios/empleados/asignar-contrato/registro-contrato/registro-contrato.component';
 import { AdministraComidaComponent } from 'src/app/componentes/modulos/alimentacion/administra-comida/administra-comida.component';
 import { CancelarPermisoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
 import { EditarEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/editar-empleado/editar-empleado.component';
@@ -84,10 +85,7 @@ import { CambiarFraseComponent } from 'src/app/componentes/usuarios/frase-seguri
 import { EditarVacunaComponent } from '../../vacunacion/editar-vacuna/editar-vacuna.component';
 import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna.component';
-import { EmplCargosComponent } from 'src/app/componentes/usuarios/empleados/asignar-cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { MatRadioChange } from '@angular/material/radio';
-import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -412,7 +410,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -1355,7 +1353,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
-    const ctrlValue = fecha.toISOString();
+    const ctrlValue = fecha;
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
@@ -1417,7 +1415,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     else {
       const now = DateTime.now();  // ALMACENAR LA FECHA ACTUAL UNA SOLA VEZ
       const inicio = now.toFormat('yyyy/MM/01');  // PRIMER DIA DEL MES
-      const final = now.toFormat('yyyy/MM/') + now.daysInMonth();  // ULTIMO DIA DEL MES
+      const final = now.toFormat('yyyy/MM/') + now.daysInMonth;  // ULTIMO DIA DEL MES
       this.ObtenerHorariosEmpleado(inicio, final, 2);
     }
   }
@@ -1427,10 +1425,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   mes_inicio: any = '';
   mes_fin: any = '';
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number) {
+    console.log("ver fec_inicio: ",fec_inicio )
+    console.log(" ver fec_final: ", fec_final)
+
     this.horariosEmpleado = [];
     if (opcion === 1) {
-      this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
-      this.mes_fin = fec_final.format("YYYY-MM-DD");
+      this.mes_inicio = DateTime.fromISO(fec_inicio).toFormat("yyyy-MM-dd")
+      this.mes_fin = DateTime.fromISO(fec_final).toFormat("yyyy-MM-dd")
     }
     else {
       this.mes_inicio = fec_inicio;

@@ -8,11 +8,11 @@ import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 // SECCION DE SERVICIOS
-import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoUbicacionService } from 'src/app/servicios/modulos/empleadoUbicacion/empleado-ubicacion.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 

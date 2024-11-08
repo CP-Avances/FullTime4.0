@@ -3,8 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
 
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
 
 interface Estados {
   valor: number;

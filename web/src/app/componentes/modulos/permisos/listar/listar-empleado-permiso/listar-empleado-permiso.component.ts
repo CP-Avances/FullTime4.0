@@ -1,34 +1,33 @@
 // IMPORTACION DE LIBRERIAS
-import { FormControl } from '@angular/forms';
 import { Component, OnInit } from "@angular/core";
 import { SelectionModel } from "@angular/cdk/collections";
+import { FormControl } from '@angular/forms';
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
-import * as moment from "moment";
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE SERVICIOS
-import { AutorizaDepartamentoService } from "src/app/servicios/autorizaDepartamento/autoriza-departamento.service";
+import { AutorizaDepartamentoService } from "src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service";
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
-import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
-import { PermisosService } from "src/app/servicios/permisos/permisos.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { PermisosService } from "src/app/servicios/modulos/modulo-permisos/permisos/permisos.service";
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
-import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { ToastrService } from 'ngx-toastr';
 
 import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
-import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
 
 import { EditarPermisoEmpleadoComponent } from '../../gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
+import { DepartamentoPipe } from "src/app/filtros/catDepartamentos/departamento/departamento.pipe";
 
 export interface PermisosElemento {
   apellido: string;
@@ -160,7 +159,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = "DD/MM/YYYY";
+  formato_fecha: string = "dd/MM/yyyy";
   formato_hora: string = "HH:mm:ss";
   ArrayAutorizacionTipos: any = []
   idioma_fechas: string = 'es';
@@ -349,7 +348,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     this.listafiltro = this.listaPermisosDeparta;
 
     if (this.Depata.value != undefined && this.Depata.value != null && this.Depata.value != '') {
-      this.listafiltro = new EmplDepaPipe().transform(this.listafiltro, this.Depata.value);
+      this.listafiltro = new DepartamentoPipe().transform(this.listafiltro, this.Depata.value);
     }
     if (this.Usuario.value != undefined && this.Usuario.value != null && this.Usuario.value != '') {
       this.listafiltro = new EmplUsuarioPipe().transform(this.listafiltro, this.Usuario.value);
@@ -408,8 +407,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         id_depa: obj.id_depa,
         nombre_depa: obj.depa_nombre,
         estado: obj.estado,
-        fecha_inicio: moment(obj.fec_inicio).format('YYYY-MM-DD'),
-        fecha_final: moment(obj.fec_final).format('YYYY-MM-DD'),
+        fecha_inicio: this.validar.DarFormatoFecha(obj.fec_inicio, 'yyyy-MM-dd'),
+        fecha_final: this.validar.DarFormatoFecha(obj.fec_final, 'yyyy-MM-dd'),
         codigo: obj.codigo,
         observacion: '',
         aprobar: '',
@@ -420,7 +419,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   lis: any = [];
   // AUTORIZACIÓN DE PERMISOS
-  AbrirAutorizaciones(datos_permiso, forma: string) {
+  AbrirAutorizaciones(datos_permiso: any, forma: string) {
     if (datos_permiso.length != 0) {
       this.multiple = true;
       this.lista_permisos = false;

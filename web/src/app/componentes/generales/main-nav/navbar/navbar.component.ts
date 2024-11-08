@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { PerfilEmpleadoService } from 'src/app/servicios/perfilEmpleado/perfil-empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { PerfilEmpleadoService } from 'src/app/servicios/usuarios/empleado/perfilEmpleado/perfil-empleado.service';
 
 @Component({
   selector: 'app-navbar',

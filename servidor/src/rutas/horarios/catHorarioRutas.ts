@@ -1,9 +1,9 @@
 import HORARIO_CONTROLADOR from '../../controlador/horarios/catHorarioControlador';
 import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
+import { DateTime } from 'luxon';
 import { Router } from 'express';
 import multer from 'multer';
-import moment from 'moment';
 
 // MANEJO DE PLANTILLAS DE DATOS
 const storage = multer.diskStorage({
@@ -28,10 +28,10 @@ const storage_horario = multer.diskStorage({
 
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        var fecha = DateTime.now();
+        var anio = fecha.toFormat('yyyy');
+        var mes = fecha.toFormat('MM');
+        var dia = fecha.toFormat('dd');
         let { id, codigo } = req.params;
         cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname)
     }

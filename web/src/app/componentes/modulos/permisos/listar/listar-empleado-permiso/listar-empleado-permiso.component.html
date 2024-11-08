@@ -75,7 +75,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of listaPermisosDeparta | empleDepa: Depata.value | emplUsuario: Usuario.value | emplEstado: Estado.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of listaPermisosDeparta | departamento: Depata.value | emplUsuario: Usuario.value | emplEstado: Estado.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
@@ -191,7 +191,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of listaPermisosAutorizadosFiltrados | empleDepa: AutoriDepata.value | emplUsuario: AutoriUsuario.value | emplEstado: AutoriEstado.value | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
+                        *ngFor="let e of listaPermisosAutorizadosFiltrados | departamento: AutoriDepata.value | emplUsuario: AutoriUsuario.value | emplEstado: AutoriEstado.value | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
                         <td>{{e.depa_nombre}}</td>
                         <td>{{e.fullname}}</td>
                         <td>{{e.estado}}</td>

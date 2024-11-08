@@ -9,20 +9,20 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistrarCiudadComponent } from 'src/app/componentes/configuracion/localizacion/ciudades/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableCiudades } from 'src/app/model/reportes.model';
-import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
 
 @Component({
   selector: 'app-listar-ciudad',

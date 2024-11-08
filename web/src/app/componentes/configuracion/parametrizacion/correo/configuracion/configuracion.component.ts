@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // SECCION DE SERVICICOS
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 // SECCION DE COMPONENTES
 import { CorreoEmpresaComponent } from 'src/app/componentes/configuracion/parametrizacion/correo/correo-empresa/correo-empresa.component';

@@ -6,21 +6,21 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 // IMPORTAR SERVICIOS
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { TipoPermisosService } from 'src/app/servicios/modulos/modulo-permisos/catTipoPermisos/tipo-permisos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permisos/permisos.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { PermisosMultiplesEmpleadosComponent } from '../permisos-multiples-empleados/permisos-multiples-empleados.component';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 
 interface opcionesDiasHoras {
   valor: string;
@@ -146,7 +146,7 @@ export class PermisosMultiplesComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     var f = DateTime.now();
-    this.FechaActual = f.toformat('yyyy-MM-dd');
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.ObtenerTiposPermiso();
     this.BuscarParametro();
   }
@@ -155,7 +155,7 @@ export class PermisosMultiplesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -311,8 +311,8 @@ export class PermisosMultiplesComponent implements OnInit {
       // CAPTURAR FECHA INGRESADA
       this.dSalida = event.value;
       var leer_fecha = event.value._i;
-      var fecha = leer_fecha.toISOString();
-      var salida = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      //var fecha = leer_fecha.toISOString();
+      var salida = this.dSalida.toFormat('yyyy-MM-dd');
 
       // VALIDAR SI EXISTE RESTRICCION DE FECHAS
       if (this.datosPermiso.fecha_restrinccion === true) {
@@ -345,6 +345,8 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO DE TRATAMIENTO DE CONFIGURACIONES DE FECHAS DE TIPO DE PERMISOS
   ValidarRestricionesFechas(inicio: any, form: any) {
+    console.log("DateTime.fromISO(inicio).toFormat('yyyy')", DateTime.fromISO(inicio).toFormat('yyyy'))
+
     if (DateTime.fromISO(inicio).toFormat('yyyy') < DateTime.fromISO(this.FechaActual).toFormat('yyyy')) {
       this.ValidarAñosAnteriores(inicio, form);
     }
@@ -355,6 +357,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR FECHAS DE AÑOS PASADOS
   ValidarAñosAnteriores(inicio: any, form: any) {
+
     const mesInicial = DateTime.now().startOf('year');
     var dias = this.datosPermiso.crear_dias_anteriores;
     if (dias > 0) {
@@ -373,8 +376,15 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
   ValidarDiasPrevios(inicio: any, form: any) {
+
+
     var dias = this.datosPermiso.dias_anticipar_permiso;
-    const restar = DateTime.fromFormat(inicio, 'yyyy/MM/dd').minus({ days: dias }).toFormat('yyyy/MM/dd');
+    console.log("ver dias: ", dias)
+    const restar = DateTime.fromFormat(inicio, 'yyyy-MM-dd').minus({ days: dias }).toFormat('yyyy-MM-dd');
+
+    console.log("ver restar: ", restar)
+    console.log("ver FechaActual: ", this.FechaActual)
+
     if (dias > 0) {
       if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
         this.ImprimirFecha(form);
@@ -398,7 +408,7 @@ export class PermisosMultiplesComponent implements OnInit {
       // SI CASO ESPECIAL SELECCIONADO
       if (form.especialForm === true) {
         // SUMAR UN DIA A LA FECHA
-        var fecha = DateTime.fromFormat(form.fechaInicioForm, 'yyyy-MM-dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
+        var fecha = form.fechaInicioForm.plus({ days: 1 }).toFormat('yyyy-MM-dd');
         this.fechaFinalF.setValue(fecha);
       } else {
         // MENTENER FECHA IGUAL
@@ -421,9 +431,13 @@ export class PermisosMultiplesComponent implements OnInit {
       }
       else {
         // CAPTURAR FECHA INGRESADA
-        var fecha = event.value._i.toISOString();
-        var inicio = DateTime.fromFormat(form.fechaInicioForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-        var fin = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+        //var fecha = event.value._i.toISOString();
+        console.log("ver form.fechaInicioForm", form.fechaInicioForm)
+
+        var inicio = form.fechaInicioForm.toFormat('yyyy-MM-dd');
+        console.log("ver inicio", inicio)
+
+        var fin = this.dIngreso.toFormat('yyyy-MM-dd');
 
         // VERIFICAR QUE LA FECHA INGRESADA SEA CORRECTA
         if (Date.parse(inicio) <= Date.parse(fin)) {
@@ -467,8 +481,13 @@ export class PermisosMultiplesComponent implements OnInit {
   // METODO PARA VERIFICAR INGRESO DE DIAS DE ACUERDO A LA CONFIGURACION DEL PERMISO
   ValidarConfiguracionDias() {
     if (this.configuracion_permiso === 'Dias') {
-      const resta = this.dIngreso.diff(this.dSalida, 'days');
+      const restaDias = this.dIngreso.diff(this.dSalida, 'days');
+      const resta = restaDias.values.days
+
+      console.log("ver resta de dias ", resta)
       this.diasF.setValue(resta + 1);
+      console.log("ver  this.diasF", this.diasF)
+
       if ((resta + 1) > this.Tdias) {
         this.toastr.warning(
           `Sin embargo los dias máximos de permiso son ${this.Tdias}.`,
@@ -494,16 +513,21 @@ export class PermisosMultiplesComponent implements OnInit {
     this.horasF.setValue('');
     // VALIDAR HORAS INGRESDAS
     if (form.horaSalidaForm != '' && form.horasIngresoForm != '') {
+
+      console.log("form.horaSalidaForm: ", form.horaSalidaForm)
+
       //FORMATO DE HORAS
-      var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm:ss').toFormat('HH:mm:ss'));
-      var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm:ss').toFormat('HH:mm:ss'));
+      var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm').toFormat('HH:mm:ss'));
+      var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm').toFormat('HH:mm:ss'));
+
+      console.log("ver inicio: ",  inicio);
       var resta: any;
 
       // FECHAS EN UN MISMO DIA
       if (form.especialForm === false) {
         if (inicio < fin) {
           // RESTAR HORAS
-          resta = fin.subtract(inicio);
+          resta = fin.minus(inicio)
           this.CalcularTiempo(resta);
         }
         else {
@@ -519,33 +543,33 @@ export class PermisosMultiplesComponent implements OnInit {
         var inicio_dia = Duration.fromISOTime('00:00:00');
 
         // SI LAS HORA DESDE ES MAYOR A LA HORA HASTA
-        if (inicio.hours() > fin.hours()) {
+        if (inicio.values.hours > fin.values.hours) {
 
           // SI LA HORA DESDE ESTA DENTRO DEL RAGO ESTABLECIDO MOSTRAR HORAS
-          if (inicio.hours() >= 17 && inicio.hours() <= Duration.fromISOTime('23:59:00').hours()) {
+          if (inicio.values.hours >= 17 && inicio.values.hours <= Duration.fromISOTime('23:59:00').values.hours) {
             // RESTAR HORAS
-            var entrada = media_noche.subtract(inicio);
-            var salida = fin.subtract(inicio_dia);
-            resta = entrada.add(salida);
+            var entrada = media_noche.minus(inicio);
+            var salida = fin.minus(inicio_dia);
+            resta = entrada.plus(salida);
             this.CalcularTiempo(resta);
           }
           // SI LA HORA DESDE NO ESTA DENTRO DEL RANGO SUMAR LAS HORAS DE LOS DOS DIAS
           else {
-            var entrada = media_noche.subtract(inicio);
-            resta = entrada.add(fin);
+            var entrada = media_noche.minus(inicio);
+            resta = entrada.plus(fin);
             this.CalcularTiempo(resta);
           }
         }
-        else if (inicio.hours() < fin.hours()) {
-          var entrada = media_noche.subtract(inicio);
-          resta = entrada.add(fin);
+        else if (inicio.values.hours < fin.values.hours) {
+          var entrada = media_noche.minus(inicio);
+          resta = entrada.plus(fin);
           this.CalcularTiempo(resta);
         }
         else {
           // RESTAR HORAS
-          var entrada = media_noche.subtract(inicio);
-          var salida = fin.subtract(inicio_dia);
-          resta = entrada.add(salida);
+          var entrada = media_noche.minus(inicio);
+          var salida = fin.minus(inicio_dia);
+          resta = entrada.plus(salida);
           this.CalcularTiempo(resta);
         }
       }
@@ -562,18 +586,20 @@ export class PermisosMultiplesComponent implements OnInit {
   tiempoTotal: string;
   CalcularTiempo(resta: any) {
     // COLOCAR FORMATO DE HORAS EN FORMULARIO
-    var horas = String(resta.hours());
-    var minutos = String(resta.minutes());
+    console.log("CalcularTiempo resta:", resta)
+    var horas = resta.values.hours;
+    var minutos = resta.values.minutes;
 
-    if (resta.days() === 0) {
-      if (resta.hours() < 10) {
-        horas = '0' + resta.hours();
+    if (!resta.values.days) {
+      if (resta.hours < 10) {
+        horas = '0' + resta.values.hours;
       }
-      if (resta.minutes() < 10) {
-        minutos = '0' + resta.minutes();
+      if (resta.values.minutes < 10) {
+        minutos = '0' + resta.values.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       this.tiempoTotal = horas + ':' + minutos;
+      console.log("ver this.tiempoTotal", this.tiempoTotal)
 
       // VALIDAR NUMERO DE HORAS SOLICITADAS
       this.ValidarConfiguracionHoras(this.tiempoTotal);
@@ -720,9 +746,9 @@ export class PermisosMultiplesComponent implements OnInit {
     this.verificar_ = false;
 
     // FECHAS TOMADAS DEL FORMULARIO
-    var fecha_inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    var fecha_inicio_ = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    var fecha_final = DateTime.fromFormat(form.fechaFinalForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+    var fecha_inicio = this.dSalida.toFormat('yyyy-MM-dd');
+    var fecha_inicio_ = this.dSalida.toFormat('yyyy-MM-dd');
+    var fecha_final = form.fechaFinalForm.toFormat('yyyy-MM-dd');
 
     this.fechasHorario = '';
     this.totalFechas = [];

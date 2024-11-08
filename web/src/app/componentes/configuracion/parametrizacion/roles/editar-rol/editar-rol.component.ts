@@ -5,8 +5,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
   selector: 'app-editar-rol',

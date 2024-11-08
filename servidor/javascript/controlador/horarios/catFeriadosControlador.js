@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const settingsMail_1 = require("../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
-const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../libs/settingsMail");
 class FeriadosControlador {
     // CONSULTA DE LISTA DE FERIADOS ORDENADOS POR SU DESCRIPCION   **USADO
     ListarFeriados(req, res) {
@@ -117,9 +117,8 @@ class FeriadosControlador {
                     const [feriado] = response.rows;
                     const fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
                     feriado.fecha = fecha_formato;
-                    let fec_recuperacion_formato = '';
                     if (fec_recuperacion) {
-                        fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                        let fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
                         feriado.fecha_recuperacion = fec_recuperacion_formato;
                     }
                     // AUDITORIA
@@ -206,10 +205,9 @@ class FeriadosControlador {
                     const [datosNuevos] = actualizacion.rows;
                     const fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
                     datosNuevos.fecha = fecha_formato;
-                    let fec_recuperacion_formato = '';
                     if (fec_recuperacion) {
-                        fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
-                        datosNuevos.fecha_recuperacion = fec_recuperacion_formato;
+                        let fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                        datosNuevos.fecha_recuperacion = fec_recuperacion_formato || '';
                     }
                     const fecha_formatoO = yield (0, settingsMail_1.FormatearFecha2)(feriado.fecha, 'ddd');
                     feriado.fecha = fecha_formatoO;
@@ -308,6 +306,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, id_empleado } = req.body;
+                console.log("ver req body, feriado recuperar: ", req.body);
                 const FERIADO = yield database_1.default.query(`
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
                 FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
@@ -494,8 +493,8 @@ class FeriadosControlador {
                 listFeriados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                     if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                        if ((0, moment_1.default)(item.fecha, 'YYYY-MM-DD', true).isValid()) {
+                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                        if (luxon_1.DateTime.fromFormat(item.fecha, 'yyyy-MM-dd').isValid) {
                             // VERIFICACION SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                             const VERIFICAR_FECHA = yield database_1.default.query(`SELECT * FROM ef_cat_feriados 
                             WHERE fecha = $1 OR fecha_recuperacion = $1
@@ -517,7 +516,7 @@ class FeriadosControlador {
                                         }
                                     }
                                     else {
-                                        if ((0, moment_1.default)(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                        if (luxon_1.DateTime.fromFormat(item.fec_recuperacion, 'yyyy-MM-dd').isValid) {
                                             fec_recuperacion_correcta = true;
                                             const VERIFICAR_FECHA_RECUPE = yield database_1.default.query(`
                                             SELECT * FROM ef_cat_feriados     

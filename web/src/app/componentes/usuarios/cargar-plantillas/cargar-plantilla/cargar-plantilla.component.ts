@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { FormControl, Validators } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -36,12 +34,6 @@ export class CargarPlantillaComponent implements OnInit {
 
   tamanio_paginaMulCargo: number = 5;
   numero_paginaMulCargo: number = 1;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -124,7 +116,6 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.restDep.RevisarFormatoNivelDep(formData).subscribe(res => {
       this.DatosNivelesDep = res.data;
       this.messajeExcel = res.message;
@@ -164,9 +155,6 @@ export class CargarPlantillaComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 
@@ -192,7 +180,6 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
             timeOut: 4000,
           });
-          this.progreso = false;
         }
       });
     } else {
@@ -258,7 +245,6 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     this.restE.RevisarFormato(formData).subscribe(res => {
       this.DatosContrato = res.data;
       this.messajeExcel = res.message;
@@ -299,9 +285,6 @@ export class CargarPlantillaComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 
@@ -343,7 +326,6 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
             timeOut: 4000,
           });
-          this.progreso = false;
         }
       });
 
@@ -518,7 +500,6 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubidoCargo.length; i++) {
       formData.append("uploads", this.archivoSubidoCargo[i], this.archivoSubidoCargo[i].name);
     }
-    this.progreso = true;
     console.log('formData: ',formData);
     this.restCa.RevisarFormato(formData).subscribe(res => {
       this.DatosCargos = res.data;
@@ -562,9 +543,6 @@ export class CargarPlantillaComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 
@@ -591,7 +569,6 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal', {
             timeOut: 4000,
           });
-          this.progreso = false;
         }
       });
     } else {

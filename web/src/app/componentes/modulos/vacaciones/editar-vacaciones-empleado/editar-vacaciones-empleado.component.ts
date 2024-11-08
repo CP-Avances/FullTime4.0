@@ -1,29 +1,21 @@
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 
 import { ListarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-vacaciones-empleado',
   templateUrl: './editar-vacaciones-empleado.component.html',
   styleUrls: ['./editar-vacaciones-empleado.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class EditarVacacionesEmpleadoComponent implements OnInit {
@@ -102,7 +94,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {

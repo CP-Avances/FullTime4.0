@@ -1,12 +1,10 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-feriados',
@@ -28,14 +26,6 @@ export class EditarFeriadosComponent implements OnInit {
     descripcionForm: this.descripcionF,
     fechaRecuperacionForm: this.fechaRecuperacionF
   });
-
-  /** ************************************************************* **
-   ** **           VARIABLES PROGRESS SPINNER                    ** **
-   ** ************************************************************* **/
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  value = 10;
-  mode: ProgressSpinnerMode = 'indeterminate';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -169,9 +159,7 @@ export class EditarFeriadosComponent implements OnInit {
 
   // METODO PARAR REGISTRAR ACTUALIZACION EN BASE DE DATOS
   RegistrarFeriado(feriado: any) {
-    this.habilitarprogress = true;
     this.rest.ActualizarUnFeriado(feriado).subscribe(response => {
-      this.habilitarprogress = false;
       if (response.message === 'error') {
         this.toastr.error(
           'Verificar los datos ingresados.',

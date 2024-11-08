@@ -9,7 +9,7 @@
         </mat-icon>
     </div>
 
-    <div *ngIf="!ver_informacion">
+    <div *ngIf="!ver_informacion" class="m-auto">
         <div class="container d-flex flex-wrap justify-content-center" style="padding-top: 8px;">
             <span>{{f | date: 'fullDate' : undefined : 'es-EC'}}</span>
         </div>
@@ -78,7 +78,7 @@
     </div>
     <!--  ******************  INFORMACION DEL TIMBRE  ********************  -->
     <div class="row" *ngIf="ver_informacion">
-        <div class="col-md" style="text-align: left;">
+        <div class="col-md m-auto p-0" style="align-content: center;">
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-calendar"></i>
                     {{this.fecha_hora}}
@@ -176,10 +176,10 @@
         </div>
         <div class="col-6 d-flex justify-content-center m-auto">
             <button *ngIf="imagenCamara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
-                ENVIAR TIMBRE.
+                ENVIAR TIMBRE
             </button>
             <button *ngIf="!ver_camara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
-                ENVIAR TIMBRE.......
+                ENVIAR TIMBRE
             </button>
             <br />
         </div>

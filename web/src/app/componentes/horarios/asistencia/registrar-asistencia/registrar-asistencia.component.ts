@@ -1,18 +1,16 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { BuscarAsistenciaComponent } from '../buscar-asistencia/buscar-asistencia.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 @Component({
   selector: 'app-registrar-asistencia',
@@ -23,12 +21,6 @@ import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 export class RegistrarAsistenciaComponent implements OnInit {
 
   @Input() informacion: any;
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -59,7 +51,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -107,9 +99,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
       if (data.message === 'OK') {
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
-          //console.log('ver fecha ', moment(obj.t_fec_timbre).format('YYYY-MM-DD'))
-          //console.log('ver hora ', moment(obj.t_hora_timbre).format('HH:mm:ss'))
-          obj.fecha = this.validar.FormatearFecha(moment(obj.t_fec_timbre).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          obj.fecha = this.validar.FormatearFecha(obj.t_fec_timbre, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           obj.hora = this.validar.FormatearHora(obj.t_hora_timbre, this.formato_hora);
         })
         this.ControlarBotones(true, true, true);
@@ -142,26 +132,24 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   // METODO PARA REASIGNAR TIMBRE
   ReasignarTimbre(seleccionado: any) {
-    this.progreso = true;
     let datos = {
       id: this.informacion.detalle.id,
-      fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
-      accion: this.informacion.detalle.tipo_entr_salida,
+      fecha: this.validar.DarFormatoFecha(seleccionado.fecha_hora_timbre_validado, 'yyyy-MM-dd HH:mm:ss'),
+      accion: this.informacion.detalle.tipo_accion,
       id_timbre: seleccionado.id,
       codigo: this.informacion.detalle.codigo,
       user_name: this.user_name,
       ip: this.ip
     }
+    //console.log('ver ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {
       if (data.message === 'OK') {
-        this.progreso = false;
         this.toastr.success('Registro asignado a la asistencia.', '', {
           timeOut: 6000,
         });
         this.CerrarVentana(2);
       }
       else {
-        this.progreso = false;
         this.toastr.warning('Ups!!! algo salio mal.', '', {
           timeOut: 6000,
         });
@@ -170,10 +158,9 @@ export class RegistrarAsistenciaComponent implements OnInit {
       this.toastr.warning('Ups!!! algo salio mal.', '', {
         timeOut: 6000,
       });
-      this.progreso = false;
     })
-
   }
+
   // METODO PARA CERRAR VENTANA
   CerrarVentana(opcion: number) {
     if (this.informacion.pagina === 'buscar-asistencia') {
@@ -187,6 +174,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   // METODO PARA ASIGNACION DESDE EL SISTEMA
   ReasignarSistema() {
+    console.log('info ', this.informacion)
     this.timbres = [];
     var funcion = '';
     funcion = this.VerificarFuncion();
@@ -195,19 +183,19 @@ export class RegistrarAsistenciaComponent implements OnInit {
       funcion: funcion,
       fecha: this.informacion.detalle.fecha_horario
     }
-
     let diferencias: any = [];
     this.timbre.BuscarTimbresAsistencia(datos).subscribe(data => {
       if (data.message === 'OK') {
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
-          var h_horario = moment(obj.t_hora_timbre, 'HH:mm:ss');
-          var h_timbre = moment(this.informacion.detalle.hora_horario, 'HH:mm:ss');
+          //console.log('obj ', this.informacion)
+          var h_horario = DateTime.fromFormat(obj.t_hora_timbre, 'HH:mm:ss');
+          var h_timbre = DateTime.fromFormat(this.informacion.detalle.hora_horario, 'HH:mm:ss');
           if (this.informacion.detalle.hora_horario < obj.t_hora_timbre) {
-            var duration = moment.duration(h_horario.diff(h_timbre)).asHours();
+            var duration = h_horario.diff(h_timbre, 'hours').hours;
           }
           else {
-            var duration = moment.duration(h_timbre.diff(h_horario)).asHours();
+            var duration = h_timbre.diff(h_horario, 'hours').hours;
           }
           let proceso = {
             duracion: duration,
@@ -216,14 +204,15 @@ export class RegistrarAsistenciaComponent implements OnInit {
             hora: obj.t_hora_timbre,
             id: obj.id
           }
+          //console.log('proceso ', proceso)
           diferencias = diferencias.concat(proceso);
         })
         // ENCUENTRA EL VALOR MINIMO
         var minValue = Math.min(...diferencias.map((x: any) => x.duracion))
         // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
-        var resultado = diferencias.filter(x => x.duracion == minValue)
+        var resultado = diferencias.filter((x: any) => x.duracion == minValue)
         // IMPRIME EL RESULTADO
-        this.ReasignarTimbre(resultado[0]);
+         this.ReasignarTimbre(resultado[0]);
       }
       else {
         this.toastr.warning('No se han encontrado registros.', '', {

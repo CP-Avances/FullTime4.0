@@ -1,9 +1,14 @@
 <div class="container" style="padding-top: 20px;">
-    <div id="titulo">
-        <span>
-            PLANIFICACIÓN DE HORAS EXTRAS
-        </span>
-        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    <div id="titulo" class="row w-100 m-auto">
+        <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+            <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                PLANIFICACIÓN DE HORAS EXTRAS
+            </span>
+        </div>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+        </div>
     </div>
     <mat-card class="example-card mat-elevation-z9">
         <div class="nota" id="espacio" style="margin-left: 20px;">

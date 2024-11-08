@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL
@@ -16,11 +16,11 @@ import * as xlsx from 'xlsx';
 
 // IMPORTACION DE SERVICIOS
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
+import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-horas-pedidas',

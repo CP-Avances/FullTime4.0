@@ -19,11 +19,11 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const settingsMail_1 = require("../../../libs/settingsMail");
-const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const luxon_1 = require("luxon");
 const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service")); //Importacion de llaves
 const sharp = require('sharp');
 class EmpleadoControlador {
@@ -708,10 +708,10 @@ class EmpleadoControlador {
             sharp.cache(false);
             try {
                 // FECHA DEL SISTEMA
-                const fecha = (0, moment_1.default)();
-                const anio = fecha.format('YYYY');
-                const mes = fecha.format('MM');
-                const dia = fecha.format('DD');
+                const fecha = luxon_1.DateTime.now();
+                const anio = fecha.toFormat('yyyy');
+                const mes = fecha.toFormat('MM');
+                const dia = fecha.toFormat('dd');
                 const id = req.params.id_empleado;
                 const separador = path_1.default.sep;
                 const { user_name, ip } = req.body;
@@ -1328,8 +1328,8 @@ class EmpleadoControlador {
                                         if (data.contrasena.toString().length <= 10) {
                                             if (estadoCivilArray.includes(data.estado_civil)) {
                                                 if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                    if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                                    if (luxon_1.DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                                                         // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                                         if (LONGITUD != undefined || LATITUD != undefined) {
                                                             if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
@@ -1473,9 +1473,9 @@ class EmpleadoControlador {
                                                             if (estadoCivilArray.includes(data.estado_civil)) {
                                                                 if (data.genero != 'No registrado') {
                                                                     if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                                                         if (data.fec_nacimiento != 'No registrado') {
-                                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                            if (luxon_1.DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                                                                                 // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                                                                 if (LONGITUD != undefined && LATITUD != undefined) {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
@@ -1936,8 +1936,8 @@ class EmpleadoControlador {
                                                 else {
                                                     if (estadoCivilArray.includes(data.estado_civil)) {
                                                         if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                                            if (luxon_1.DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                                                                 // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                                                 if (LONGITUD != undefined || LATITUD != undefined) {
                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
@@ -2090,9 +2090,9 @@ class EmpleadoControlador {
                                                             if (estadoCivilArray.includes(data.estado_civil)) {
                                                                 if (data.genero != 'No registrado') {
                                                                     if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO 
                                                                         if (data.fec_nacimiento != 'No registrado') {
-                                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                            if (luxon_1.DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                                                                                 // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                                                                 if (LONGITUD != undefined && LATITUD != undefined) {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {

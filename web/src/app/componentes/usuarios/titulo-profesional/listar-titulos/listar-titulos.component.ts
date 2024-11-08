@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -22,10 +22,10 @@ import { TitulosComponent } from '../titulos/titulos.component';
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
+import { NivelTitulosService } from 'src/app/servicios/usuarios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.service';
 
 import { ITableProvincias } from 'src/app/model/reportes.model';
 

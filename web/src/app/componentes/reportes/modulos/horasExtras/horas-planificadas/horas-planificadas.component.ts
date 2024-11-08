@@ -8,15 +8,15 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
+import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-horas-planificadas',

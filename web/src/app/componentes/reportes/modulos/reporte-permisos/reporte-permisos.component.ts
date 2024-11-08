@@ -1,6 +1,4 @@
 // IMPORTAR LIBRERIAS
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -9,28 +7,22 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-permisos',
   templateUrl: './reporte-permisos.component.html',
   styleUrls: ['./reporte-permisos.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  ]
 })
 
 export class ReportePermisosComponent implements OnInit {

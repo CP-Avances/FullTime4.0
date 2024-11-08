@@ -2,17 +2,15 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
 
 @Component({
   selector: 'app-editar-horario',
@@ -47,12 +45,6 @@ export class EditarHorarioComponent implements OnInit {
   // VARIABLES DE CONTROL
   contador: number = 0;
   isChecked: boolean = false;
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -118,7 +110,6 @@ export class EditarHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DE HORARIO
   ModificarHorario(form: any) {
-    this.habilitarprogress = true;
     var tipo = form.tipoHForm;
 
     if (tipo === 'L' && this.data.horario.default === 'DL') {
@@ -192,7 +183,6 @@ export class EditarHorarioComponent implements OnInit {
       this.toastr.warning('Código de horario ya se encuentra registrado.', 'Verificar Datos.', {
         timeOut: 6000,
       });
-      this.habilitarprogress = false;
     }, error => {
       this.VerificarInformacion(horario, form);
     });
@@ -220,7 +210,6 @@ export class EditarHorarioComponent implements OnInit {
         this.toastr.info('No ha seleccionado ningún archivo.', '', {
           timeOut: 6000,
         });
-        this.habilitarprogress = false;
       }
     }
     else {
@@ -239,11 +228,9 @@ export class EditarHorarioComponent implements OnInit {
 
   // METODO PARA INGRESAR DATOS CON ARCHIVO
   ActualizarDatosArchivo(datos: any) {
-    this.habilitarprogress = true;
     this.EliminarDocumentoServidor();
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
       this.SubirRespaldo(this.data.horario.id);
-      this.habilitarprogress = false;
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
@@ -252,7 +239,6 @@ export class EditarHorarioComponent implements OnInit {
       }
       this.SalirActualizar(datos, response);
     }, error => {
-      this.habilitarprogress = false;
       this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
@@ -263,7 +249,6 @@ export class EditarHorarioComponent implements OnInit {
   // METODO PARA GUARDAR DATOS SIN UN ARCHIVO SELECCIONADO
   GuardarDatos(datos: any) {
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
-      this.habilitarprogress = false;
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
@@ -272,7 +257,6 @@ export class EditarHorarioComponent implements OnInit {
       }
       this.SalirActualizar(datos, response);
     }, error => {
-      this.habilitarprogress = false;
       this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })

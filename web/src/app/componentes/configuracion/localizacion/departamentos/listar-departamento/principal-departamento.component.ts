@@ -2,10 +2,8 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { ScriptService } from 'src/app/servicios/empleado/script.service';
-import { ThemePalette } from '@angular/material/core';
+import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
@@ -13,14 +11,14 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/editar-departamento/editar-departamento.component';
@@ -78,12 +76,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
   hipervinculo: string = (localStorage.getItem('empresaURL') as string);
-
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -289,7 +281,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
@@ -332,9 +323,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
-      this.progreso = false;
-    }, () => {
-      this.progreso = false;
     });
   }
 

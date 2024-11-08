@@ -59,7 +59,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let he of horasExtras | filtroNombre: nombreF.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let he of horasExtras | filtroDescripcion: nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td style="padding-top: 10px;text-align: center;">{{he.descripcion}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.tipo_descuento}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.recargo_porcentaje}}</td>

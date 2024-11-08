@@ -9,26 +9,26 @@ import { DateTime } from 'luxon';
 import * as FileSaver from "file-saver";
 import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
 import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 
 // IMPORTACION DE SERVICIOS
-import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
 //PIPES DE FILTROS
-import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
 import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
+import { DepartamentoPipe } from '../../../../filtros/catDepartamentos/departamento/departamento.pipe';
 
 export interface VacacionesElemento {
   apellido: string;
@@ -149,7 +149,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
    ** **************************************************************************************** **/
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
   idioma_fechas: string = 'es';
   ArrayAutorizacionTipos: any = []
@@ -337,7 +337,7 @@ export class ListarVacacionesComponent implements OnInit {
     this.listafiltro = this.listaVacacionDeparta;
 
     if (this.Depata.value != undefined && this.Depata.value != null && this.Depata.value != '') {
-      this.listafiltro = new EmplDepaPipe().transform(this.listafiltro, this.Depata.value);
+      this.listafiltro = new DepartamentoPipe().transform(this.listafiltro, this.Depata.value);
     }
     if (this.Usuario.value != undefined && this.Usuario.value != null && this.Usuario.value != '') {
       this.listafiltro = new EmplUsuarioPipe().transform(this.listafiltro, this.Usuario.value);

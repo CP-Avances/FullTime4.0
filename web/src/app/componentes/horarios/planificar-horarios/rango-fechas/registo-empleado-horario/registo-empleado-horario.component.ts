@@ -6,18 +6,18 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { DateTime } from 'luxon';
 
 // IMPORTACION DE SERVICIOS
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 
 // IMPORTAR COMPONENTES
-import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-planificacion.component';
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
+import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-planificacion.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 
 @Component({
@@ -170,10 +170,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS
   VerificarIngresoFechas(form: any) {
-    let fechaInicioForm = form.fechaInicioForm.toDate();
-    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
-    let fechaFinalForm = form.fechaFinalForm.toDate();
-    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    this.fechaInicioFormluxon = this.validar.DarFormatoFecha(form.fechaInicioForm, 'yyyy-MM-dd');
+    this.fechaFinFormluxon = this.validar.DarFormatoFecha(form.fechaFinalForm, 'yyyy-MM-dd');
 
     if (form.fechaInicioForm === '' || form.fechaInicioForm === null || form.fechaInicioForm === undefined ||
       form.fechaFinalForm === '' || form.fechaFinalForm === null || form.fechaFinalForm === undefined) {
@@ -196,8 +194,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     }
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
-      const fechaInicioForm = form.fechaInicioForm.format('YYYY-MM-DD');
-      const fechaFinalForm = form.fechaFinalForm.format('YYYY-MM-DD')
+      const fechaInicioForm = form.fechaInicioForm;
+      const fechaFinalForm = form.fechaFinalForm;
 
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS (CONTRATO)
       if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(DateTime.fromISO(fechaInicioForm).toFormat('yyyy-MM-dd'))) &&
@@ -577,8 +575,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.plan_general = [];
 
     this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    this.inicioDate = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
-    this.finDate = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
+    this.inicioDate = this.fechaInicioFormluxon;
+    this.finDate = this.fechaFinFormluxon;
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
     while (this.inicioDate <= this.finDate) {
       this.fechasHorario.push(this.inicioDate);

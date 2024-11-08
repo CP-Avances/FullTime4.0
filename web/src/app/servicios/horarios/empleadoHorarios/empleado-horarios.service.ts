@@ -53,26 +53,19 @@ export class EmpleadoHorariosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horario-comida-horas-dias-diferentes`, datos);
   }
 
+
+
+
+
+
+
+
+  
+
+
   //Horarios Empleado
   ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/fechas_horario/${codigo}`, data)
-  }
-
-  // Verificar datos de la plantilla de horario fijo
-  VerificarDatos_EmpleadoHorario(formData: any, id: number) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/revisarData/${id}`, formData)
-  }
-
-  VerificarPlantilla_EmpleadoHorario(formData: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/verificarPlantilla/upload`, formData)
-  }
-
-  CreaPlanificacion(formData: any, id: number, codigo: string | number) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/plan_general/upload/${id}/${codigo}`, formData)
-  }
-
-  SubirArchivoExcel(formData: any, id: number, codigo: string | number) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/upload/${id}/${codigo}`, formData)
   }
 
   BuscarHorarioFechas(codigo: any, datos: any) {

@@ -6,11 +6,11 @@ import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
-import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { DateTime } from 'luxon';
 import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';//Importacion de llaves
 
 const sharp = require('sharp');
@@ -829,10 +829,10 @@ class EmpleadoControlador {
 
     try {
       // FECHA DEL SISTEMA
-      const fecha = moment();
-      const anio = fecha.format('YYYY');
-      const mes = fecha.format('MM');
-      const dia = fecha.format('DD');
+      const fecha = DateTime.now();
+      const anio = fecha.toFormat('yyyy');
+      const mes = fecha.toFormat('MM');
+      const dia = fecha.toFormat('dd');
 
       const id = req.params.id_empleado;
       const separador = path.sep;
@@ -1534,8 +1534,8 @@ class EmpleadoControlador {
                   if (data.contrasena.toString().length <= 10) {
                     if (estadoCivilArray.includes(data.estado_civil)) {
                       if (tipogenero.includes(data.genero.toLowerCase())) {
-                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                        if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                        if (DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                           // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                           if (LONGITUD != undefined || LATITUD != undefined) {
                             if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
@@ -1680,9 +1680,9 @@ class EmpleadoControlador {
                             if (estadoCivilArray.includes(data.estado_civil)) {
                               if (data.genero != 'No registrado') {
                                 if (tipogenero.includes(data.genero.toLowerCase())) {
-                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                   if (data.fec_nacimiento != 'No registrado') {
-                                    if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                    if (DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                       if (LONGITUD != undefined && LATITUD != undefined) {
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
@@ -2190,8 +2190,8 @@ class EmpleadoControlador {
                       else {
                         if (estadoCivilArray.includes(data.estado_civil)) {
                           if (tipogenero.includes(data.genero.toLowerCase())) {
-                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                            if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                            if (DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
 
                               // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                               if (LONGITUD != undefined || LATITUD != undefined) {
@@ -2348,9 +2348,9 @@ class EmpleadoControlador {
                             if (estadoCivilArray.includes(data.estado_civil)) {
                               if (data.genero != 'No registrado') {
                                 if (tipogenero.includes(data.genero.toLowerCase())) {
-                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO 
                                   if (data.fec_nacimiento != 'No registrado') {
-                                    if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                    if (DateTime.fromFormat(FECHA_NACIMIENTO, 'yyyy-MM-dd').isValid) {
 
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                                       if (LONGITUD != undefined && LATITUD != undefined) {

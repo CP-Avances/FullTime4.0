@@ -109,7 +109,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let r of regimen | sucNombre: filtroNombreSuc | emplNombre: filtroNombreReg | paginate:tamanio_pagina_reg:numero_pagina_reg">
+                        *ngFor="let r of regimen | sucNombre: filtroNombreSuc | filtrosNombres: filtroNombreReg | paginate:tamanio_pagina_reg:numero_pagina_reg">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionReg.toggle(r) : null" [checked]="selectionReg.isSelected(r)"
@@ -152,7 +152,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let c of cargos | sucNombre: filtroNombreSuc | emplNombre: filtroNombreCar | paginate:tamanio_pagina_car:numero_pagina_car">
+                        *ngFor="let c of cargos | sucNombre: filtroNombreSuc | filtrosNombres: filtroNombreCar | paginate:tamanio_pagina_car:numero_pagina_car">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionCar.toggle(c) : null" [checked]="selectionCar.isSelected(c)"
@@ -239,7 +239,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"

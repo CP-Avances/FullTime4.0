@@ -13,17 +13,16 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // SECCION DE SERVICIOS
-import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoUbicacionService } from 'src/app/servicios/modulos/empleadoUbicacion/empleado-ubicacion.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { NumericLiteral } from 'typescript';
 
 export interface EmpleadoElemento {
   id_emplu: number;

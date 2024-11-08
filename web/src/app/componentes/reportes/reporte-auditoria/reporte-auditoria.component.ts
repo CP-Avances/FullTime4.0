@@ -1,23 +1,20 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { HttpResponse } from '@angular/common/http';
-import { ThemePalette } from '@angular/material/core';
 import { DateTime } from 'luxon';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from '../../../servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
+import { ValidacionesService } from '../../../servicios/generales/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { AuditoriaService } from 'src/app/servicios/reportes/auditoria/auditoria.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { FormControl } from '@angular/forms';
 
@@ -52,14 +49,8 @@ export class ReporteAuditoriaComponent implements OnInit {
     tabla_ = new FormControl('');
     modulo_ = new FormControl('');
 
-    // VARIABLES PROGRESS SPINNER
-    habilitarprogress: boolean = false;
-    mode: ProgressSpinnerMode = 'indeterminate';
-    color: ThemePalette = 'primary';
-    value = 10;
-
     // VARIABLES  
-    formato_fecha: string = 'DD/MM/YYYY';
+    formato_fecha: string = 'dd/MM/yyyy';
     formato_hora: string = 'HH:mm:ss';
     idioma_fechas: string = 'es';
     verDetalle: boolean = false;
@@ -318,7 +309,6 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
-        this.habilitarprogress = true;
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
         // ARRAY PARA ALMACENAR TODAS LAS PROMESAS DE CONSULTA
@@ -384,7 +374,6 @@ export class ReporteAuditoriaComponent implements OnInit {
                     break;
             }
         } finally {
-            this.habilitarprogress = false;
         }
     }
 
@@ -564,8 +553,8 @@ export class ReporteAuditoriaComponent implements OnInit {
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
-                            { style: 'itemsTable', text: this.validar.FormatearFecha(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) },
-                            { style: 'itemsTable', text: this.validar.FormatearHora(audi.fecha_hora.split(' ')[1], this.formato_hora) },
+                            { style: 'itemsTable', text: audi.fecha_hora_format },
+                            { style: 'itemsTable', text: audi.solo_hora },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                             { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                         ]

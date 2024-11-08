@@ -4,22 +4,22 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
-import { HorasExtrasService } from 'src/app/servicios/catalogos/catHorasExtras/horas-extras.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
+import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({

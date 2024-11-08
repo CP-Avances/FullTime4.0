@@ -31,8 +31,8 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row m-auto">
-                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                        <div class="col-12 col-md-auto m-auto w-auto align-content-center" style="padding-top: 5px; padding-bottom: 5px;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -48,9 +48,9 @@
                                 </label>
                             </form>
                         </div>
-                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="col-12 col-md-auto m-auto w-auto align-content-center" style="padding-top: 5px; padding-bottom: 5px;">
                             <div *ngIf="!DataDepartamentos" class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
+                                style="text-align: center; justify-content: center; margin: auto;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -137,7 +137,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let departamento of departamentos | filtroDepartamento: departamentoF.value | departamentoPadre: departamentoPadreF.value | filtroSucursalR: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let departamento of departamentos | filtrosNombres: departamentoF.value | departamentoPadre: departamentoPadreF.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionDepartamentos.toggle(departamento) : null"

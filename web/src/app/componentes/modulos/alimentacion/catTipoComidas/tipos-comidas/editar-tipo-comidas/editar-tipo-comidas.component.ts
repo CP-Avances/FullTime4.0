@@ -2,10 +2,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
 
-import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/tipo-comidas.service';
-import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
+import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
+import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
 
 @Component({
   selector: 'app-editar-tipo-comidas',
@@ -37,7 +36,6 @@ export class EditarTipoComidasComponent implements OnInit {
 
   constructor(
     private rest: TipoComidasService,
-    private router: Router,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarTipoComidasComponent>,
     public restPlan: PlanComidasService,

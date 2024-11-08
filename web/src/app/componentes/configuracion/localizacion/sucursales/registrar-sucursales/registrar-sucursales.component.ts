@@ -1,15 +1,13 @@
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
 
-import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
 @Component({
   selector: 'app-registrar-sucursales',
@@ -52,12 +50,6 @@ export class RegistrarSucursalesComponent implements OnInit {
     nombrePaisForm: this.nombrePaisF,
     idCiudadForm: this.idCiudad,
   });
-
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
 
   constructor(
     private restP: ProvinciaService,
@@ -210,14 +202,11 @@ export class RegistrarSucursalesComponent implements OnInit {
 
     // VALIDAR SI LA CIUDAD SELECCIONADA ES CORRECTA
     if (ciudad_id != 0) {
-
-      this.habilitarprogress = true;
       let buscar = {
         nombre: form.sucursalNombreForm.toUpperCase()
       }
       // VERIFICACION DE NOMBRES DUPLICADOS
       this.restSucursal.BuscarNombreSucursal(buscar).subscribe(responseS => {
-        this.habilitarprogress = false;
         this.toastr.warning('El nombre de establecimiento ya se encuentra registrado.', 'Ups!! algo salio mal.', {
           timeOut: 6000,
         });
@@ -232,7 +221,6 @@ export class RegistrarSucursalesComponent implements OnInit {
           ip: this.ip,
         };
         this.restSucursal.RegistrarSucursal(sucursal).subscribe(info => {
-          this.habilitarprogress = false;
           this.toastr.success('Operación exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });

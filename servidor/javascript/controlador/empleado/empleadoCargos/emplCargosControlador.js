@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CARGO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const settingsMail_1 = require("../../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const xlsx_1 = __importDefault(require("xlsx"));
 class EmpleadoCargosControlador {
     // METODO PARA BUSCAR CARGO ACTIVO   **USADO
@@ -470,16 +470,16 @@ class EmpleadoCargosControlador {
                                 data.observacion = 'La cédula ingresada no es válida';
                             }
                             else {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                                if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
-                                    if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                         // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                                         if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                                             data.observacion = 'El sueldo es incorrecto';
                                         }
                                         else {
-                                            if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                            if (luxon_1.DateTime.fromFormat(HORA_TRABAJA, 'HH:mm:ss').isValid) {
                                                 if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                                                     data.observacion = 'Columna jefe formato incorrecto';
                                                 }
@@ -563,12 +563,12 @@ class EmpleadoCargosControlador {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                     if (data.fecha_desde != 'No registrado') {
-                                        if ((0, moment_1.default)(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
-                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
+                                        if (luxon_1.DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                             if (data.fecha_hasta != 'No registrado') {
-                                                if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
+                                                if (luxon_1.DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
                                                     if (data.sueldo != 'No registrado') {
                                                         // VERIFICA EL VALOR DEL SUELO QUE SEA SOLO NUMEROS
                                                         if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
@@ -577,7 +577,7 @@ class EmpleadoCargosControlador {
                                                         else {
                                                             // VERFICAR FORMATO DE HORAS
                                                             if (data.hora_trabaja != 'No registrado') {
-                                                                if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                                                if (luxon_1.DateTime.fromFormat(HORA_TRABAJA, 'HH:mm:ss').isValid) {
                                                                     if (data.admini_depa != 'No registrado') {
                                                                         if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
                                                                             data.observacion = 'Columna jefe formato incorrecto';
@@ -654,7 +654,7 @@ class EmpleadoCargosControlador {
                       SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                       `, [valor.cargo.toUpperCase()]);
                                                 if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                                    if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                    if (luxon_1.DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= luxon_1.DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
                                                         valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                                     }
                                                     else {

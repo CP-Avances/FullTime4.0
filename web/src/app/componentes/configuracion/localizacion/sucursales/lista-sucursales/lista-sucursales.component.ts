@@ -11,19 +11,19 @@ import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistrarSucursalesComponent } from '../registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/editar-sucursal/editar-sucursal.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';

@@ -6,13 +6,13 @@ import { Router } from '@angular/router';
 
 import { EditarTipoComidasComponent } from '../../tipos-comidas/editar-tipo-comidas/editar-tipo-comidas.component';
 import { EditarDetalleMenuComponent } from '../editar-detalle-menu/editar-detalle-menu.component';
+import { ListarTipoComidasComponent } from '../../tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
 import { DetalleMenuComponent } from '../detalle-menu/detalle-menu.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/tipo-comidas.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ListarTipoComidasComponent } from '../../tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
 
 @Component({
   selector: 'app-vista-menu',
@@ -38,13 +38,13 @@ export class VistaMenuComponent implements OnInit {
 
 
   constructor(
-    public router: Router,
+    public componentel: ListarTipoComidasComponent,
+    public parametro: ParametrosService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
-    public parametro: ParametrosService,
+    public router: Router,
     private rest: TipoComidasService,
     private toastr: ToastrService,
-    public componentel: ListarTipoComidasComponent,
   ) { }
 
   ngOnInit(): void {

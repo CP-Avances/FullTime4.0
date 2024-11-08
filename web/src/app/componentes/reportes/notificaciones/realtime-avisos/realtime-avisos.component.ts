@@ -4,8 +4,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
 

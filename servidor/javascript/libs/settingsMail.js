@@ -15,8 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = __importDefault(require("../database"));
-const moment_1 = __importDefault(require("moment"));
-moment_1.default.locale('es');
+const luxon_1 = require("luxon");
 exports.email = process.env.EMAIL || '';
 let pass = process.env.PASSWORD || '';
 exports.nombre = process.env.NOMBRE || '';
@@ -113,13 +112,13 @@ const enviarCorreos = function (servidor, puerto, email, pass) {
 };
 exports.enviarCorreos = enviarCorreos;
 const fechaHora = function () {
-    var f = (0, moment_1.default)();
-    var dia = moment_1.default.weekdays((0, moment_1.default)(f.format('YYYY-MM-DD')).day()).charAt(0).toUpperCase()
-        + moment_1.default.weekdays((0, moment_1.default)(f.format('YYYY-MM-DD')).day()).slice(1);
-    var tiempo = {
-        fecha_formato: f.format('YYYY-MM-DD'),
-        fecha: f.format('DD/MM/YYYY'),
-        hora: f.format('HH:mm:ss'),
+    const f = luxon_1.DateTime.now();
+    // OBTENER EL DIA DE LA SEMANA EN ESPAÑOL Y CAPITALIZAR LA PRIMERA LETRA
+    const dia = f.setLocale('es').toFormat('cccc').charAt(0).toUpperCase() + f.setLocale('es').toFormat('cccc').slice(1);
+    const tiempo = {
+        fecha_formato: f.toFormat('yyyy-MM-dd'),
+        fecha: f.toFormat('dd/MM/yyyy'),
+        hora: f.toFormat('HH:mm:ss'),
         dia: dia
     };
     return tiempo;
@@ -129,71 +128,103 @@ exports.dia_abreviado = 'ddd';
 exports.dia_completo = 'dddd';
 const FormatearFecha = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        let formato = yield (0, exports.BuscarFecha)();
+        const formato = yield (0, exports.BuscarFecha)();
         console.log('formato ', formato.fecha);
         console.log(' fecha ', fecha);
-        let valor = (0, moment_1.default)(fecha).format(dia).charAt(0).toUpperCase() +
-            (0, moment_1.default)(fecha).format(dia).slice(1) +
-            ', ' + (0, moment_1.default)(fecha).format(formato.fecha);
-        console.log(' fecha.. ', (0, moment_1.default)(fecha).format(formato.fecha));
+        const fechaLuxon = luxon_1.DateTime.fromISO(fecha);
+        const diaFormateado = fechaLuxon.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+            fechaLuxon.setLocale('es').toFormat(dia).slice(1);
+        const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+        const valor = `${diaFormateado}, ${fechaFormateada}`;
+        console.log(' fecha.. ', fechaFormateada);
         return valor;
     });
 };
 exports.FormatearFecha = FormatearFecha;
 const FormatearFecha2 = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        let formato = yield (0, exports.BuscarFecha)();
-        let diaFormateado = (0, moment_1.default)(fecha).format(dia);
-        // Limpia el día formateado de puntos no deseados
-        diaFormateado = diaFormateado.replace('.', '');
-        // Asegúrate de que la primera letra esté en mayúscula
-        diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-        let fechaFormateada = (0, moment_1.default)(fecha).format(formato.fecha);
-        let valor = `${diaFormateado}, ${fechaFormateada}`;
-        return valor;
+        console.log("ver fecha: ", fecha);
+        const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+        const formato = yield (0, exports.BuscarFecha)();
+        if (!regex.test(fecha)) {
+            const date = new Date(fecha);
+            // Obtener las partes de la fecha y formatearlas con dos dígitos
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            // Devolver la fecha formateada
+            fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        console.log("fecha ver", fecha);
+        const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
+        // Formatear el día
+        if (dia == "ddd") {
+            let diaFormateado = fechaObj.toFormat("EEE", { locale: 'es' });
+            // Limpia el día formateado de puntos no deseados
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+            // Formatear la fecha
+            const fechaFormateada = fechaObj.toFormat(formato.fecha);
+            let valor = `${diaFormateado}, ${fechaFormateada}`;
+            return valor;
+        }
+        else if (dia == "dddd") {
+            let diaFormateado = fechaObj.toFormat("EEEE", { locale: 'es' });
+            // Limpia el día formateado de puntos no deseados
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+            // Formatear la fecha
+            const fechaFormateada = fechaObj.toFormat(formato.fecha);
+            let valor = `${diaFormateado}, ${fechaFormateada}`;
+            return valor;
+        }
     });
 };
 exports.FormatearFecha2 = FormatearFecha2;
 const FormatearFechaBase = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        let formato = yield (0, exports.BuscarFecha)();
-        let diaFormateado = (0, moment_1.default)(transformDate(fecha)).format(dia);
-        // Limpia el día formateado de puntos no deseados
-        diaFormateado = diaFormateado.replace('.', '');
-        // Asegúrate de que la primera letra esté en mayúscula
+        const formato = yield (0, exports.BuscarFecha)();
+        const fechaISO = transformDate(fecha); // CONVERTIR A ISO USANDO transformDate
+        const fechaLuxon = luxon_1.DateTime.fromISO(fechaISO);
+        // FORMATEAR EL DIA DE LA SEMANA Y LIMPIAR LOS PUNTOS
+        let diaFormateado = fechaLuxon.setLocale('es').toFormat(dia).replace('.', '');
+        // PRIMERA LETRA EN MAYUSCULA
         diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-        let fechaFormateada = (0, moment_1.default)(fecha).format(formato.fecha);
-        let valor = `${diaFormateado}, ${fechaFormateada}`;
+        // FORMATEA LA FECHA SEGUN EL FORMATO OBTENIDO
+        const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+        const valor = `${diaFormateado}, ${fechaFormateada}`;
         return valor;
     });
 };
 exports.FormatearFechaBase = FormatearFechaBase;
+// FUNCION TRANSFORMDATE USANDO LUXON PARA AJUSTAR ZONAS HORARIAS Y FORMATO
 function transformDate(date) {
-    var f = date.toString();
-    let fechaSinZona = f.split(' (')[0]; // Eliminar la zona horaria y el texto adicional
-    let partesFecha = fechaSinZona.split(' ');
-    let diaSemana = partesFecha[0]; // "Sat"
-    let mes = partesFecha[1]; // "Dec"
-    let dia = partesFecha[2]; // "23"
-    let anio = partesFecha[3]; // "2024"
-    let hora = partesFecha[4]; // "00:00:00"
-    let zonaHoraria = partesFecha[5]; // "GMT-0500"
-    // Construir la cadena de fecha en formato ISO 8601
-    // Primero, convertir el mes de texto a número de mes
-    let meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    let numeroMes = meses.indexOf(mes); // Crear objeto Date en la zona local
-    let fechaLocal = new Date(`${anio}-${('0' + (numeroMes + 1)).slice(-2)}-${dia}T${hora}`);
-    // Ajustar la zona horaria
-    let offset = parseInt(zonaHoraria.replace('GMT', ''));
-    let fechaUTC = new Date(fechaLocal.getTime() + (offset * 60 * 60 * 1000));
-    // Convertir la fecha a ISO 8601 UTC
-    let fechaISO1 = fechaUTC.toISOString();
-    return fechaISO1;
+    const f = date.toString();
+    let fechaSinZona = f.split(' (')[0]; // ELIMINAR LA ZONA HORARIA Y EL TEXTO ADICIONAL
+    const partesFecha = fechaSinZona.split(' ');
+    const mesTexto = partesFecha[1]; // MES EN FORMATO DE TEXTO ("DEC")
+    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const numeroMes = meses.indexOf(mesTexto) + 1; // CONVERTIR MES A NUMERO (1-12)
+    const fechaFormateada = `${partesFecha[3]}-${('0' + numeroMes).slice(-2)}-${partesFecha[2]}T${partesFecha[4]}`;
+    const fechaLuxon = luxon_1.DateTime.fromISO(fechaFormateada, { zone: 'utc' });
+    // AJUSTA LA ZONA HORARIA
+    const zonaHoraria = partesFecha[5]; // "GMT-0500"
+    const offset = parseInt(zonaHoraria.replace('GMT', ''));
+    const fechaConZona = fechaLuxon.plus({ hours: offset });
+    // DEVUELVE LA FECHA EN FORMATO ISO 8601 UTC
+    return fechaConZona.toUTC().toISO();
 }
 const FormatearHora = function (hora) {
     return __awaiter(this, void 0, void 0, function* () {
-        let formato = yield (0, exports.BuscarHora)();
-        let valor = (0, moment_1.default)(hora, 'HH:mm:ss').format(formato.hora);
+        console.log("ver hora: ", hora);
+        const formato = yield (0, exports.BuscarHora)(); // Obtenemos el formato deseado desde la función
+        const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
+        const valor = luxon_1.DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
         return valor;
     });
 };

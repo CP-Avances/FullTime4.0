@@ -108,7 +108,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let d of datosEmpleado | emplCodigo: codigo.value | emplCedula: cedula.value | nombreApellido: nombre.value  | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let d of datosEmpleado | filtroCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value  | paginate:tamanio_pagina:numero_pagina">
                         <td>{{d.cedula}}</td>
                         <th scope="row">{{d.codigo}}</th>
                         <td>{{d.apellido}} {{d.nombre}}</td>

@@ -79,7 +79,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let prov of provincias | provincia: provinciaF.value | bPaises: paisF.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let prov of provincias | filtrosNombres: provinciaF.value | bPaises: paisF.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionProvincias.toggle(prov) : null"

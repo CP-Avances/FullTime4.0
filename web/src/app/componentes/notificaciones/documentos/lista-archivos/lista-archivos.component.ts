@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { SubirDocumentoComponent } from '../subir-documento/subir-documento.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
-import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
+import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/documentos.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableArchivos } from 'src/app/model/reportes.model';

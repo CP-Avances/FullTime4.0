@@ -6,8 +6,8 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Md5 } from 'ts-md5';
 
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({

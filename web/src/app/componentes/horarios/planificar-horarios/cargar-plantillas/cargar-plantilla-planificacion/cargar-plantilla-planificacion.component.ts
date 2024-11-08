@@ -9,7 +9,7 @@ import { DateTime } from 'luxon';
 
 
 //IMPORTAR SERVICIOS
-import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
+import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
 import { ToastrService } from 'ngx-toastr';
 
 //IMPORTAR COMPONENTES
@@ -92,14 +92,11 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>) {
-    const ctrlValue = fecha.toDate();
+    const ctrlValue = fecha;
     console.log("ctrlValue", ctrlValue)
-    const dateLuxon = DateTime.fromJSDate(ctrlValue)
-    console.log("ver dateLuxon", dateLuxon)
-
-    let inicio = dateLuxon.set({ day: 1 }).toFormat('dd/MM/yyyy');
+    let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
     console.log("inicio luxon", inicio)
-    let final = `${dateLuxon.daysInMonth}${dateLuxon.toFormat('/MM/yyyy')}`;
+    let final = `${ctrlValue.daysInMonth}${ctrlValue.toFormat('/MM/yyyy')}`;
     console.log("final luxon", final)
     this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
     console.log("fechaInicialF", this.fechaInicialF.value)

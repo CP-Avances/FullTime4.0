@@ -1,5 +1,3 @@
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -9,7 +7,7 @@ import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
@@ -17,23 +15,17 @@ import * as xlsx from 'xlsx';
 
 // LLAMADA DE SERVICIOS GENERALES
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-alimentos-general',
   templateUrl: './alimentos-general.component.html',
   styleUrls: ['./alimentos-general.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  ]
 })
 
 export class AlimentosGeneralComponent implements OnInit {
