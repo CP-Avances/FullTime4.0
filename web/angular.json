@@ -4,8 +4,13 @@
   "newProjectRoot": "projects",
   "projects": {
     "fulltimeweb": {
-      "projectType": "application",
-      "schematics": {},
+      "projectType": "application", 
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "standalone": false
+        }
+      },   
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -20,7 +25,7 @@
               "file-saver",
               "ts-md5/dist/md5",
               "xml2js"
-           ],
+            ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -41,7 +46,7 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",         
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },
@@ -114,7 +119,7 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",         
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           }
