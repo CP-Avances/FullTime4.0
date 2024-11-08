@@ -7,8 +7,8 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO PDF
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL

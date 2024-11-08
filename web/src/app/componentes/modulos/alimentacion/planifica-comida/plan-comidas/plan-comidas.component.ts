@@ -8,8 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';

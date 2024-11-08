@@ -6,8 +6,8 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';

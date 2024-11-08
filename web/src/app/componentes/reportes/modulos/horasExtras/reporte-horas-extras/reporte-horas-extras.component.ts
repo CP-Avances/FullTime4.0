@@ -9,8 +9,8 @@ import { PlantillaReportesService } from '../../../plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
+declare const pdfMake: any;
+declare const pdfFonts: any;
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
