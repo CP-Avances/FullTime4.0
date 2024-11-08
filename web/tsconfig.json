@@ -34,6 +34,7 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
     "enableIvy":false,
-    "fullTemplateTypeCheck":true
+    "fullTemplateTypeCheck":true,
+    "types": ["node"]
   }
 }

@@ -41,9 +41,7 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "src/assets/build/vfs_fonts.js",
-              "src/assets/build/pdfmake.js"
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },
           "configurations": {

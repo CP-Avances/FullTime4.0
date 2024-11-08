@@ -8,8 +8,8 @@ import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS
 import * as xlsx from 'xlsx';
-declare const pdfMake: any;
-declare const pdfFonts: any;
+const pdfMake = require('src/assets/build/pdfmake.js');
+const pdfFonts = require('src/assets/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS

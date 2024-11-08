@@ -11,8 +11,8 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-declare const pdfMake: any;
-declare const pdfFonts: any;
+const pdfMake = require('src/assets/build/pdfmake.js');
+const pdfFonts = require('src/assets/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // MODELOS

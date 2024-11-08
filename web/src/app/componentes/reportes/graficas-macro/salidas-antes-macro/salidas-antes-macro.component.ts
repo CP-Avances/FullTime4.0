@@ -7,8 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 
-declare const pdfMake: any;
-declare const pdfFonts: any;
+const pdfMake = require('src/assets/build/pdfmake.js');
+const pdfFonts = require('src/assets/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import * as echarts from 'echarts/core';

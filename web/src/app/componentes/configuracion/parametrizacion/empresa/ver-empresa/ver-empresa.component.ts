@@ -6,8 +6,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-declare const pdfMake: any;
-declare const pdfFonts: any;
+const pdfMake = require('src/assets/build/pdfmake.js');
+const pdfFonts = require('src/assets/build/vfs_fonts.js');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistrarSucursalesComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/registrar-sucursales/registrar-sucursales.component';
