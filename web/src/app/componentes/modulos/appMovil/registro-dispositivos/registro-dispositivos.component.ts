@@ -12,7 +12,7 @@ import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // MODELOS

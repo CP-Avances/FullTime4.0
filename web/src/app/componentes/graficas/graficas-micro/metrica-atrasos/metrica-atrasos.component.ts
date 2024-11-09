@@ -12,7 +12,7 @@ import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 
 import * as echarts from 'echarts/core';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({

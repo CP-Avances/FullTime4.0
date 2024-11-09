@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
 
 import * as FileSaver from "file-saver";
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as xlsx from "xlsx";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;

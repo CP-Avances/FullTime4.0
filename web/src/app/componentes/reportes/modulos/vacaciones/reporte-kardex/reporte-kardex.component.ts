@@ -11,7 +11,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({

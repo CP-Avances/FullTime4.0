@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL

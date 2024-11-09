@@ -6,7 +6,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfFonts from 'src/assets/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
