@@ -12,10 +12,7 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR COMPONENTES
 import { ConfirmarDesactivadosComponent } from '../../confirmar-desactivados/confirmar-desactivados.component';
@@ -738,7 +735,9 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                             PARA LA EXPORTACION DE ARCHIVOS PDF                             ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = 'open', numero: any) {
+
+  async GenerarPdf(action = 'open', numero: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF(numero);
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

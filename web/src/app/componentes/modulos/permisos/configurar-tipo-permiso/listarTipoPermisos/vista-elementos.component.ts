@@ -10,9 +10,6 @@ import { Router } from '@angular/router';
 
 import * as FileSaver from 'file-saver';
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -197,14 +194,15 @@ export class VistaElementosComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A PDF                                  ** **
    ** ************************************************************************************************** **/
-  generarPdf(action = 'open') {
-    const documentDefinition = this.DefinirInformacionPDF();
 
+
+   async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 

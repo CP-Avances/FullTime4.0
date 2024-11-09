@@ -9,9 +9,6 @@ import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
 import * as xlsx from "xlsx";
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE SERVICIOS
 import { AutorizaDepartamentoService } from "src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service";
@@ -513,22 +510,23 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
-  // METODO PARA CREAR ARCHIVO PDF
-  generarPdf(action = "open", opcion: string) {
-    const documentDefinition = this.DefinirInformacionPDF(opcion);
 
+  // METODO PARA CREAR ARCHIVO PDF
+  async GenerarPdf(action = "open", opcion: string) {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF(opcion);
     switch (action) {
       case "open":
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.createPdf(documentDefinition).print();
+        pdfMake.default.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.default.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
     }
   }

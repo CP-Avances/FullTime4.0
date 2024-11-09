@@ -8,13 +8,11 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { CatModalidadLaboralService } from 'src/app/servicios/configuracion/parametrizacion/catModalidadLaboral/cat-modalidad-laboral.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
@@ -81,6 +79,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public validar: ValidacionesService,
     public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -361,8 +360,10 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

@@ -3,14 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { NotificacionService } from 'src/app/servicios/reportes/notificaciones/notificacion.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { ToastrService } from 'ngx-toastr';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-por-usuario',
@@ -45,9 +42,10 @@ export class PorUsuarioComponent implements OnInit {
   });
 
   constructor(
-    public restN: NotificacionService,
-    public restEmpre: EmpresaService,
     public restE: EmpleadoService,
+    public restN: NotificacionService,
+    public validar: ValidacionesService,
+    public restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -321,8 +319,11 @@ export class PorUsuarioComponent implements OnInit {
     }
   }
 
-  GenerarPDF(action = 'download', tipo: number, forma: string, consulta) {
-var documentDefinition: any;
+
+
+  async GenerarPDF(action = 'download', tipo: number, forma: string, consulta: any) {
+    const pdfMake = await this.validar.ImportarPDF();
+    var documentDefinition: any;
     if (tipo === 1) {
       documentDefinition = this.DocumentarPermisos(forma, consulta);
     }
@@ -335,12 +336,10 @@ var documentDefinition: any;
     else if (tipo === 4) {
       documentDefinition = this.DocumentarPlanificaciones(forma, consulta);
     }
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }

@@ -7,9 +7,6 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -361,21 +358,23 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                         METODO DE CREACION DE  PDF                                   ** **
    ** ****************************************************************************************** **/
 
-  GenerarPDF(action: any) {
+
+  async GenerarPDF(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open':
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
       case 'print':
-        pdfMake.createPdf(documentDefinition).print();
+        pdfMake.default.createPdf(documentDefinition).print();
         break;
       case 'download':
-        pdfMake.createPdf(documentDefinition).download(doc_name);
+        pdfMake.default.createPdf(documentDefinition).download(doc_name);
         break;
       default:
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
     }
   }

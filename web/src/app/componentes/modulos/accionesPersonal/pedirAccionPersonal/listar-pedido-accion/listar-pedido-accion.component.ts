@@ -7,10 +7,7 @@ import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
 
 import * as FileSaver from "file-saver";
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as xlsx from "xlsx";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 // LLAMADO DE SERVICIOS
@@ -516,20 +513,22 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF INDIVIDUAL                   ** **
    ** ************************************************************************************************* **/
 
-  generarPdf(action = "open") {
+
+  async generarPdf(action = "open") {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDFIndividual();
     switch (action) {
       case "open":
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.createPdf(documentDefinition).print();
+        pdfMake.default.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.default.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
     }
   }
@@ -3986,20 +3985,21 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = "open") {
+  async GenerarPdf(action = "open") {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.createPdf(documentDefinition).print();
+        pdfMake.default.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.default.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
     }
   }

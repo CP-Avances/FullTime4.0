@@ -8,15 +8,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -122,7 +117,6 @@ export class PlanComidasComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public informacion: DatosGeneralesService,
-    private restUsuario: UsuarioService,
     private funciones: MainNavService,
     private toastr: ToastrService,
     private asignaciones: AsignacionesService,

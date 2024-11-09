@@ -6,10 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { RegistrarSucursalesComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/editar-sucursal/editar-sucursal.component';
 import { ColoresEmpresaComponent } from 'src/app/componentes/configuracion/parametrizacion/empresa/colores-empresa/colores-empresa.component';
@@ -18,6 +14,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 import { LogosComponent } from 'src/app/componentes/configuracion/parametrizacion/empresa/logos/logos.component';
 
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -81,6 +78,7 @@ export class VerEmpresaComponent implements OnInit {
   constructor(
     public ventana: MatDialog,
     public empresa: EmpresaService,
+    public validar: ValidacionesService,
     public router: Router,
     public restS: SucursalService,
     public restE: EmpleadoService,
@@ -300,9 +298,9 @@ export class VerEmpresaComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
-
   // GENERACION DE REPORTE DE PDF
-  GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     pdfMake.createPdf(documentDefinition).open();
   }

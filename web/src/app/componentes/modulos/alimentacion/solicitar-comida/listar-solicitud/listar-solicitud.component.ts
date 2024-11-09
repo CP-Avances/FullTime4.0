@@ -7,10 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from "xlsx";
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from "file-saver";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // LLAMADO A COMPONENTES
 import { EditarSolicitudComidaComponent } from '../editar-solicitud-comida/editar-solicitud-comida.component';
@@ -452,21 +449,23 @@ export class ListarSolicitudComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
+
   // METODO PARA CREAR ARCHIVO PDF
-  generarPdf(action = "open", opcion: string) {
+  async GenerarPdf(action = "open", opcion: string) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF(opcion);
     switch (action) {
       case "open":
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.createPdf(documentDefinition).print();
+        pdfMake.default.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.default.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.createPdf(documentDefinition).open();
+        pdfMake.default.createPdf(documentDefinition).open();
         break;
     }
   }

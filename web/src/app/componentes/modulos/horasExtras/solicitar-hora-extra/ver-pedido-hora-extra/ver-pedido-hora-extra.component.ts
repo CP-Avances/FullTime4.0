@@ -4,10 +4,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // IMPORTAR COMPONENTES
 import { TiempoAutorizadoComponent } from '../../tiempo-autorizado/tiempo-autorizado.component';
 
@@ -360,7 +356,10 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   /** ******************************************************************************************************* * 
    **                                 METODO PARA EXPORTAR A PDF ----HORAS EXTRAS                             *
    ** ******************************************************************************************************* */
-  GenerarPdf(action = 'open') {
+
+
+   async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

@@ -5,11 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-// LIBRERIA PARA GENERAR ARCHIVOS PDF
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
@@ -81,7 +76,7 @@ export class DetallePlanificadosComponent implements OnInit {
     public restA: AlimentacionService,
     public router: Router,
     private toastr: ToastrService,
-    private validacionesService: ValidacionesService
+    private validar: ValidacionesService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -170,7 +165,7 @@ export class DetallePlanificadosComponent implements OnInit {
         }, err => {
           // 4. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error)
+          return this.validar.RedireccionarHomeAdmin(err.error)
         });
       }, err => {
         // 5. Buscamos registros de servicios solicitados
@@ -181,10 +176,10 @@ export class DetallePlanificadosComponent implements OnInit {
         }, err => {
           // 7. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error)
+          return this.validar.RedireccionarHomeAdmin(err.error)
         });
 
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
     }
     else {
@@ -209,7 +204,7 @@ export class DetallePlanificadosComponent implements OnInit {
       }, err => {
         // Llamado a METODO de impresión de archivos
         this.ImprimirArchivo(archivo, form);
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
     }, err => {
       // 3. BUSQUEDA de servicios extras solicitados
@@ -226,7 +221,7 @@ export class DetallePlanificadosComponent implements OnInit {
             timeOut: 10000,
           }).onTap.subscribe(obj => {
             // Llamado a METODO de impresión de archivo sin registros
-            this.generarPdf('open');
+            this.GenerarPdf('open');
             this.LimpiarFechas();
           });
         }
@@ -235,16 +230,16 @@ export class DetallePlanificadosComponent implements OnInit {
           this.ImprimirArchivo(archivo, form);
         }
 
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
 
-      return this.validacionesService.RedireccionarHomeAdmin(err.error)
+      return this.validar.RedireccionarHomeAdmin(err.error)
     });
   }
 
   ImprimirArchivo(archivo: string, form) {
     if (archivo === 'pdf') {
-      this.generarPdf('open');
+      this.GenerarPdf('open');
       this.LimpiarFechas();
     }
     else if (archivo === 'excel') {
@@ -313,8 +308,10 @@ export class DetallePlanificadosComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
     if (this.planificados.length === 0 && this.solicitados.length === 0 && this.extras.length === 0) {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition_ = this.GenerarSinRegstros();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition_).open(); break;
@@ -325,6 +322,7 @@ export class DetallePlanificadosComponent implements OnInit {
       }
     }
     else {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition = this.DefinirInformacionPDF();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;

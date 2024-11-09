@@ -21,6 +21,7 @@
             "allowedCommonJsDependencies": [
               "leaflet",
               "pdfmake",
+              "vfs_fonts",
               "file-saver",
               "ts-md5/dist/md5",
               "xml2js"

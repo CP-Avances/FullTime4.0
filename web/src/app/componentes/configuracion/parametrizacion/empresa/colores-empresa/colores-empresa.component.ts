@@ -7,12 +7,9 @@ import { Location } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-colores-empresa',
@@ -50,6 +47,7 @@ export class ColoresEmpresaComponent implements OnInit {
     public restE: EmpleadoService,
     public router: Router,
     public ventana: MatDialogRef<ColoresEmpresaComponent>,
+    public validar: ValidacionesService,
     public location: Location,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -182,25 +180,21 @@ export class ColoresEmpresaComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
-
   // GENERACION DE REPORTE DE PDF
-  GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
 
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },

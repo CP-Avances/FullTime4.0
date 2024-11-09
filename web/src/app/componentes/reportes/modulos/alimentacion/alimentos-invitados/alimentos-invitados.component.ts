@@ -5,11 +5,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
 
-// LIBRERIA PARA GENERAR ARCHIVOS PDF
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
@@ -48,7 +43,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   constructor(
     public restA: AlimentacionService,
     public rest: EmpleadoService,
-    public validacionesService: ValidacionesService,
+    public validar: ValidacionesService,
     public restR: ReportesService,
     public restEmpre: EmpresaService,
     public router: Router,
@@ -115,7 +110,7 @@ export class AlimentosInvitadosComponent implements OnInit {
           timeOut: 10000,
         }).onTap.subscribe(obj => {
           // LLAMADO A METODO DE IMPRESIÓN DE ARCHIVO SIN REGISTROS
-          this.generarPdf('open');
+          this.GenerarPdf('open');
           this.LimpiarFechas();
         });
         // return this.validacionesService.RedireccionarHomeAdmin(err.error)
@@ -130,7 +125,7 @@ export class AlimentosInvitadosComponent implements OnInit {
 
   ImprimirArchivo(archivo: string, form) {
     if (archivo === 'pdf') {
-      this.generarPdf('open');
+      this.GenerarPdf('open');
       this.LimpiarFechas();
     }
     else if (archivo === 'excel') {
@@ -148,8 +143,10 @@ export class AlimentosInvitadosComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
     if (this.invitados.length === 0) {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition_ = this.GenerarSinRegistros();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition_).open(); break;
@@ -160,6 +157,7 @@ export class AlimentosInvitadosComponent implements OnInit {
       }
     }
     else {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition = this.DefinirInformacionPDF();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;

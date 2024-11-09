@@ -14,10 +14,7 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
@@ -1935,8 +1932,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    **                        METODO PARA EXPORTAR A PDF SOLICITUDES DE PERMISOS                            **
    ** **************************************************************************************************** **/
 
+
   // METODO PARA DESCARGAR SOLICITUD DE PERMISO
-  GenerarPDFPermisos(action = 'open') {
+  async GenerarPDFPermisos(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     var documentDefinition: any;
     if (this.empleado_estado.length === 0) {
       documentDefinition = this.CabeceraDocumentoPermisoEmpleado();
@@ -1944,7 +1943,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     else {
       documentDefinition = this.CabeceraDocumentoPermisoAprobacion();
     }
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -3047,7 +3045,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** **                               PARA LA GENERACION DE PDFs                             ** **                                           *
    ** ****************************************************************************************** **/
 
-  GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -3452,7 +3451,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  GenerarPdf_Historico(action = 'open') {
+  async GenerarPdf_Historico(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInfoHistoricoPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

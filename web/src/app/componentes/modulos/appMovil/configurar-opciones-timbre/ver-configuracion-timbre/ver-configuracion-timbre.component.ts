@@ -7,15 +7,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ConfigurarOpcionesTimbresComponent } from '../configurar-opciones-timbres/configurar-opciones-timbres.component';
 
 @Component({
@@ -56,6 +54,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     public ventanac: ConfigurarOpcionesTimbresComponent,
     public ventanae: MatDialog,
     public opciones: TimbresService,
+    public validar: ValidacionesService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
   ) {
@@ -300,7 +299,10 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     });
   }
 
-  GenerarPDF(action: any) {
+
+
+  async GenerarPDF(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

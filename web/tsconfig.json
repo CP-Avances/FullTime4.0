@@ -27,6 +27,10 @@
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
   },
+  "include": [
+    "src",
+    "src/typings"
+  ],
   "angularCompilerOptions": {
     "standalone": false,
     "enableI18nLegacyMessageIdFormat": false,

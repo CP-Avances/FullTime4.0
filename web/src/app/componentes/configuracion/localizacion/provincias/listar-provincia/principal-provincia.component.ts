@@ -8,9 +8,6 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
 
 import { RegistroProvinciaComponent } from '../registro-provincia/registro-provincia.component';
@@ -158,9 +155,10 @@ export class PrincipalProvinciaComponent implements OnInit {
   /** ************************************************************************************************** **
   ** **                                      METODO PARA EXPORTAR A PDF                              ** **
   ** ************************************************************************************************** **/
-  generarPdf(action = "open") {
+  // GENERACION DE REPORTE DE PDF
+  async GenerarPdf(action = "open") {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();

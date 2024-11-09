@@ -8,16 +8,14 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ITableVacuna } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vacunas.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
 
 import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
@@ -76,10 +74,11 @@ export class CatVacunasComponent implements OnInit {
 
   constructor(
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
-    private rest: CatVacunasService,
-    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
-    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    private rest: CatVacunasService,
+    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -348,8 +347,10 @@ export class CatVacunasComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.vacunas);
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

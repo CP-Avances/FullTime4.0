@@ -6,11 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-// LIBRERIA PARA GENERAR REPORTES EN FORMATO PDF
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL
 import * as xlsx from 'xlsx';
 
@@ -141,7 +136,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     this.restPedido.ListarPedidosHE().subscribe(data => {
       this.solicitudHoras = data;
       if (archivo === 'PDF') {
-        this.generarPdf(accion, forma, this.solicitudHoras);
+        this.GenerarPdf(accion, forma, this.solicitudHoras);
       }
       else {
         this.GenerarExcel(forma, this.solicitudHoras);
@@ -160,7 +155,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     this.restPedido.ListarPedidosHEAutorizadas().subscribe(data => {
       this.horasAutorizadas = data;
       if (archivo === 'PDF') {
-        this.generarPdf(accion, forma, this.horasAutorizadas);
+        this.GenerarPdf(accion, forma, this.horasAutorizadas);
       }
       else {
         this.GenerarExcel(forma, this.horasAutorizadas);
@@ -239,8 +234,10 @@ export class ReporteHorasPedidasComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF SOLICITUDES
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open', forma: string, solicitudHoras) {
+
+  async GenerarPdf(action = 'open', forma: string, solicitudHoras: any) {
     var documentDefinition: any;
+    const pdfMake = await this.validar.ImportarPDF();
     if (forma === 'solicitudes') {
       documentDefinition = this.GenerarArchivoSolicitudes(solicitudHoras);
     }
@@ -251,7 +248,6 @@ export class ReporteHorasPedidasComponent implements OnInit {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -545,8 +541,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
    *                             EXPORTAR ARCHIVOS EN FORMATO PDF SOLICITUDES POR EMPLEADO
    *  **********************************************************************************************/
 
-  GenerarPdfEmpleado(action = 'open', forma: string, id_seleccionado: number) {
+  async GenerarPdfEmpleado(action = 'open', forma: string, id_seleccionado: number) {
     var documentDefinition: any;
+    const pdfMake = await this.validar.ImportarPDF();
     if (forma === 'solicitudes') {
       documentDefinition = this.GenerarSolicitudEmpleado(id_seleccionado);
     }
@@ -557,7 +554,6 @@ export class ReporteHorasPedidasComponent implements OnInit {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
