@@ -213,7 +213,7 @@
                 <tbody>
                     <tr *ngFor="let data of DataTitulosProfesionales | paginate:tamanio_paginaMul:numero_paginaMul">
                         <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
-                        <td style="font-size: 12px;">
+                        <td style="font-size: 12px;" class="td_ob">
                             <div style="width: 250px; margin: auto;">
                                 <div id="t-editar" class="circulo"
                                     [style.background-color]="EstiloCelda(data.observacion)"></div>
@@ -226,14 +226,18 @@
                 </tbody>
             </table>
         </div>
-        <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-            <div id="t-editar" class="circulo circuloTotal"></div>
-            <div>{{titulosCorrectos}}</div>
-          </div>
-          <mat-paginator [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{titulosCorrectos}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-            </mat-paginator>
+                </mat-paginator>
+            </div>
         </div>
     </div>
 </div>

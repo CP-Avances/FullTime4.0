@@ -49,9 +49,6 @@ td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.td_ob{
-    white-space: normal; /* Permite que el texto se ajuste en varias líneas */
-}
 
 #td_usuario {
     font-size: 10px;

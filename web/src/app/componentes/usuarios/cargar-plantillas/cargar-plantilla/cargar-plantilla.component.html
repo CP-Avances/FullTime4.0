@@ -91,7 +91,7 @@
                                 *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaDepaNivel: numero_paginaDepaNivel; let i = index">
                                 <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                                     {{nt.fila}}</td>
-                                <td style="font-size: 12px;">
+                                <td style="font-size: 12px;" class="td_ob">
                                     <div style="width: 270px; margin: auto;">
                                         <div id="t-editar" class="circulo"
                                             [style.background-color]="EstiloCeldaNivel(nt.observacion)"></div>
@@ -112,15 +112,19 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                        <div id="t-editar" class="circulo circuloTotal"></div>
-                        <div>{{nivelesDepartamentoCorrectos}}</div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{nivelesDepartamentoCorrectos}}</div>
+                        </div>
                     </div>
-                    <mat-paginator [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
                         showFirstLastButtons>
-                    </mat-paginator>
+                        </mat-paginator>
+                    </div>
                 </div>
             </div>
         </div>
@@ -219,7 +223,7 @@
                                 *ngFor="let contrato of DatosContrato | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                                 <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                                     {{contrato.fila}}</td>
-                                <td style="font-size: 12px;">
+                                <td style="font-size: 12px;" class="td_ob">
                                     <div style="width: 270px; margin: auto;">
                                         <div id="t-editar" class="circulo"
                                             [style.background-color]="EstiloCelda(contrato.observacion)"></div>
@@ -247,15 +251,19 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                        <div id="t-editar" class="circulo circuloTotal"></div>
-                        <div>{{contratosCorrectos}}</div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{contratosCorrectos}}</div>
+                        </div>
                     </div>
-                    <mat-paginator [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
                         showFirstLastButtons>
-                    </mat-paginator>
+                        </mat-paginator>
+                    </div>
                 </div>
             </div>
         </div>
@@ -352,7 +360,7 @@
                                 *ngFor="let cargo of DatosCargos | paginate:tamanio_paginaMulCargo:numero_paginaMulCargo; let i = index">
                                 <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                                     {{cargo.fila}}</td>
-                                <td style="font-size: 12px;">
+                                <td style="font-size: 12px;" class="td_ob">
                                     <div style="width: 270px; margin: auto;">
                                         <div id="t-editar" class="circulo"
                                             [style.background-color]="EstiloCelda(cargo.observacion)"></div>
@@ -381,15 +389,19 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                        <div id="t-editar" class="circulo circuloTotal"></div>
-                        <div>{{cargosCorrectos}}</div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{cargosCorrectos}}</div>
+                        </div>
                     </div>
-                    <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
                         showFirstLastButtons>
-                    </mat-paginator>
+                        </mat-paginator>
+                    </div>
                 </div>
             </div>
         </div>
