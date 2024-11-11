@@ -9,10 +9,7 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
 import { RegistroRolComponent } from 'src/app/componentes/configuracion/parametrizacion/roles/registro-rol/registro-rol.component';
@@ -21,13 +18,14 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
-import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-vista-roles',
@@ -73,6 +71,7 @@ export class VistaRolesComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: RolesService, // SERVICIO DATOS DE ROLES
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -200,10 +199,11 @@ export class VistaRolesComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
-  // METODO PARA CREAR ARCHIVO PDF
 
-  GenerarPdf(action = 'open', id: number) {
+  // METODO PARA CREAR ARCHIVO PDF
+  async GenerarPdf(action = 'open', id: number) {
     this.SeleccionarDatos(id);
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

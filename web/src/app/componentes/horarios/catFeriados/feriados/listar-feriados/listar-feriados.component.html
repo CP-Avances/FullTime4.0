@@ -217,7 +217,7 @@
                         <tr *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                                 {{f.fila}}</td>
-                            <td style="font-size: 12px;">
+                            <td style="font-size: 12px;" class="td_ob">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
                                         [style.background-color]="EstiloCelda(f.observacion)"></div>
@@ -283,15 +283,19 @@
                     </tbody>
                 </table>
             </div>
-            <div style="display: flex; align-items: center;">
-                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                    <div id="t-editar" class="circulo circuloTotal"></div>
-                    <div>{{feriadosCiudadesCorrectos}}</div>
+            <div class="row mt-2">
+                <div class="col-12 col-md-2">
+                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                        <div id="t-editar" class="circulo circuloTotal"></div>
+                        <div>{{feriadosCiudadesCorrectos}}</div>
+                    </div>
                 </div>
-                <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
+                <div class="col-12 col-md-10">
+                    <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti2($event)"
                     showFirstLastButtons>
-                </mat-paginator>
+                    </mat-paginator>
+                </div>
             </div>
         </div>
     </div>

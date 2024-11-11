@@ -3,10 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { NotificacionService } from 'src/app/servicios/reportes/notificaciones/notificacion.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -42,6 +39,7 @@ export class AdministradorTodasComponent implements OnInit {
     public restN: NotificacionService,
     public restEmpre: EmpresaService,
     public restE: EmpleadoService,
+    public validar: ValidacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -136,8 +134,10 @@ export class AdministradorTodasComponent implements OnInit {
     })
   }
 
-  GenerarPDF(action = 'open', tipo: number, forma: string) {
 
+
+  async GenerarPDF(action = 'open', tipo: number, forma: string) {
+    const pdfMake = await this.validar.ImportarPDF();
     var documentDefinition: any;
     if (tipo === 1) {
       documentDefinition = this.DocumentarPermisos(forma);
@@ -151,12 +151,10 @@ export class AdministradorTodasComponent implements OnInit {
     else if (tipo === 4) {
       documentDefinition = this.DocumentarPlanificaciones(forma);
     }
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -173,6 +171,7 @@ export class AdministradorTodasComponent implements OnInit {
     sessionStorage.setItem('Permisos', this.permisos_enviados);
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -288,6 +287,7 @@ export class AdministradorTodasComponent implements OnInit {
     sessionStorage.setItem('Horas Extras', this.solicita_horas_enviados);
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -407,6 +407,7 @@ export class AdministradorTodasComponent implements OnInit {
     sessionStorage.setItem('VACACIONES', this.vacaciones_enviados);
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -524,6 +525,7 @@ export class AdministradorTodasComponent implements OnInit {
     sessionStorage.setItem('PLANIFICACIONES', this.planificaciones_enviados);
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

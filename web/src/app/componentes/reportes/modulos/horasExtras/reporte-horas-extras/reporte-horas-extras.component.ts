@@ -6,12 +6,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import { PlantillaReportesService } from '../../../plantilla-reportes.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
-
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
 
@@ -54,6 +51,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
     private toastr: ToastrService,
     private plantillaPDF: PlantillaReportesService,
     public vistaFlotante: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -106,7 +104,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
     this.restReporte.ReporteHorasExtras(id_empleado, this.fec_inicia, this.fec_fin).subscribe(res => {
       console.log(res);
       this.horas_extras = res
-      this.generarPdf(palabra, 2)
+      this.GenerarPdf(palabra, 2)
 
     }, err => {
       console.log(err);
@@ -119,10 +117,10 @@ export class ReporteHorasExtrasComponent implements OnInit {
  * ****************************************************************************************************/
   fechaHoy: string;
 
-  generarPdf(action = 'open', pdf: number) {
 
+  async GenerarPdf(action = 'open', pdf: number) {
     let documentDefinition;
-
+    const pdfMake = await this.validar.ImportarPDF();
     if (pdf === 2) {
       documentDefinition = this.getDocumentHorasExtras();
     }
@@ -131,7 +129,6 @@ export class ReporteHorasExtrasComponent implements OnInit {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(name_document); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }

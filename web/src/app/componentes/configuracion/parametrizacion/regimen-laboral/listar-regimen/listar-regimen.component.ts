@@ -9,10 +9,7 @@ import { Router } from "@angular/router";
 
 import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from "file-saver";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/metodos.component";
@@ -24,6 +21,7 @@ import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 
 @Component({
   selector: "app-listar-regimen",
@@ -78,7 +76,8 @@ export class ListarRegimenComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: RegimenService, // SERVICIO DE DATOS DE REGIMEN
     public router: Router, // VARIABLE DE NAVEGACION DE PAGINAS CON URL
-    public ventana: MatDialog // VARIABLE MANEJO DE VENTANAS
+    public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -176,9 +175,11 @@ export class ListarRegimenComponent implements OnInit {
    ** **                               PARA LA EXPORTACION DE ARCHIVOS PDF                           ** **
    ** ************************************************************************************************* **/
 
+
   // METODO PARA GENERAR ARCHIVO PDF
-  GenerarPdf(action = "open") {
+  async GenerarPdf(action = "open") {
     this.OrdenarDatos(this.regimen);
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
@@ -201,6 +202,7 @@ export class ListarRegimenComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,

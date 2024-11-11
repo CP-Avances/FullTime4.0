@@ -6,9 +6,6 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -69,7 +66,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     public restHorario: EmpleadoHorariosService,
     public restD: DatosGeneralesService,
     public router: Router,
-    public validacionesService: ValidacionesService,
+    public validar: ValidacionesService,
     private toastr: ToastrService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -321,7 +318,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
   VerArchivos(codigo, archivo, form, fechasTotales) {
     if (archivo === 'pdf') {
-      this.generarPdf('open', codigo, form, fechasTotales);
+      this.GenerarPdf('open', codigo, form, fechasTotales);
     }
     else if (archivo === 'excel') {
       this.exportToExcel(codigo, form, fechasTotales);
@@ -329,13 +326,13 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   }
 
   // METODO para ingresar solo letras
-  IngresarSoloLetras(e) {
-    return this.validacionesService.IngresarSoloLetras(e);
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS
-  IngresarSoloNumeros(evt) {
-    return this.validacionesService.IngresarSoloNumeros(evt);
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
 
   }
 
@@ -356,14 +353,14 @@ export class ReporteEntradaSalidaComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open', id_seleccionado, form, fechasTotales: any) {
-    const documentDefinition = this.DefinirInformacionPDF(id_seleccionado, form, fechasTotales);
 
+  async GenerarPdf(action = 'open', id_seleccionado, form, fechasTotales: any) {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF(id_seleccionado, form, fechasTotales);
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -374,6 +371,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -793,14 +791,13 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
   /** GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS */
 
-  PDF_Vacio(action = 'open', id_seleccionado, form) {
+ async  PDF_Vacio(action = 'open', id_seleccionado: any, form: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.GenerarSinRegstros(id_seleccionado, form);
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 
@@ -813,6 +810,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     return {
 
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       //pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

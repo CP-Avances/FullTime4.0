@@ -8,10 +8,8 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 
 import { RegistrarCiudadComponent } from 'src/app/componentes/configuracion/localizacion/ciudades/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
@@ -153,7 +151,11 @@ export class ListarCiudadComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
-  generarPdf(action = "open") {
+
+
+  // GENERACION DE REPORTE DE PDF
+  async GenerarPdf(action = "open") {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
@@ -175,6 +177,7 @@ export class ListarCiudadComponent implements OnInit {
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "portrait",
       watermark: {
         text: this.frase,

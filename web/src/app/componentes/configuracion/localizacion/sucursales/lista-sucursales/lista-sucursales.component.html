@@ -163,7 +163,7 @@
             <!--  *************************  DESCARGAR REPORTES  *****************************  -->
             <div>
                 <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                    <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Sucursales en formato PDF.">
                         <p>PDF</p>
                     </i>
@@ -216,7 +216,7 @@
                         <tr
                             *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
-                            <td>
+                            <td class="td_ob">
                                 <div style="width: 250px; margin: auto;">
                                     <div id="t-editar" class="circulo"
                                         [style.background-color]="EstiloCelda(data.observacion)">
@@ -231,15 +231,19 @@
                     </tbody>
                 </table>
             </div>
-            <div style="display: flex; align-items: center;">
-              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{establecimientosCorrectos}}</div>
-              </div>
-              <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
+            <div class="row mt-2">
+                <div class="col-12 col-md-2">
+                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                        <div id="t-editar" class="circulo circuloTotal"></div>
+                        <div>{{establecimientosCorrectos}}</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-10">
+                    <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                     showFirstLastButtons>
-                </mat-paginator>
+                    </mat-paginator>
+                </div>
             </div>
         </div>
     </div>

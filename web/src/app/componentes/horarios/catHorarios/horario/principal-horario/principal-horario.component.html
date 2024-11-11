@@ -254,14 +254,18 @@
                 </tbody>
             </table>
         </div>
-        <div style="display: flex; align-items: center;">
-            <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{horariosCorrectos}}</div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{horariosCorrectos}}</div>
+                </div>
             </div>
-            <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
+            <div class="col-12 col-md-10">
+                <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
                 [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
-            </mat-paginator>
+                </mat-paginator>
+            </div>
         </div>
     </div>
 </div>
@@ -308,14 +312,18 @@
                 </tbody>
             </table>
         </div>
-        <div style="display: flex; align-items: center;">
-            <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-                <div id="t-editar" class="circulo circuloTotal"></div>
-                <div>{{detallesCorrectos}}</div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{detallesCorrectos}}</div>
+                </div>
             </div>
-            <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
+            <div class="col-12 col-md-10">
+                <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
                 [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
-            </mat-paginator>
+                </mat-paginator>
+            </div>
         </div>
     </div>
 </div>

@@ -12,15 +12,13 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RelojesComponent } from 'src/app/componentes/timbres/dispositivos/relojes/relojes.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -83,6 +81,7 @@ export class ListarRelojesComponent implements OnInit {
   constructor(
     public restEmpre: EmpresaService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public router: Router,
     public restE: EmpleadoService,
     private rest: RelojesService,
@@ -433,13 +432,14 @@ export class ListarRelojesComponent implements OnInit {
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
-  generarPdf(action = 'open') {
-    const documentDefinition = this.DefinirInformacionPDF();
 
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Lista_Dispositivos'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -447,6 +447,7 @@ export class ListarRelojesComponent implements OnInit {
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -472,14 +473,16 @@ export class ListarRelojesComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Dispositivos ', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE DISPOSITIVOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.presentarDataPDFRelojes(),
       ],
       styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 9 },
-        itemsTableC: { fontSize: 9, alignment: 'center' }
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 8 },
+        itemsTableC: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -490,6 +493,7 @@ export class ListarRelojesComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [

@@ -1,19 +1,17 @@
 
+import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
 import { DateTime } from 'luxon';
-import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 
 import * as echarts from 'echarts/core';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-metrica-atrasos',
@@ -43,6 +41,7 @@ export class MetricaAtrasosComponent implements OnInit {
     private restGraficas: GraficasService,
     private toastr: ToastrService,
     private restEmpre: EmpresaService,
+    public validar: ValidacionesService,
   ) {
     var empre = localStorage.getItem('empresa');
     if (empre) {
@@ -155,10 +154,13 @@ export class MetricaAtrasosComponent implements OnInit {
   graficaBase64: any;
   metodosPDF(accion: any) {
     this.graficaBase64 = this.thisChart.getDataURL({ type: 'jpg', pixelRatio: 5 });
-    this.generarPdf(accion)
+    this.GenerarPdf(accion)
   }
 
-  generarPdf(action: any) {
+
+
+  async GenerarPdf(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_atrasos" + f.toLocaleString() + ".pdf";

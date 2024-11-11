@@ -11,9 +11,6 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -487,8 +484,10 @@ export class PrincipalHorarioComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************* **/
 
+
   // GENERAR ARCHIVO PDF
-  GenerarPDF(action = 'open') {
+  async GenerarPDF(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.EstructurarPDF();
     console.log('horarios', this.horarios);
     switch (action) {

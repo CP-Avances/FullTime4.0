@@ -69,7 +69,7 @@
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%;">
-            <i (click)="generarPdf('download','Servicios de alimentación solicitados')" id="pdf" class="fas fa-file-pdf"
+            <i (click)="GenerarPdf('download','Servicios de alimentación solicitados')" id="pdf" class="fas fa-file-pdf"
                 matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de servicios de alimentación solicitados en formato PDF.">
                 <p>PDF</p>
@@ -168,7 +168,7 @@
             (page)="ManejarPaginaAutorizados($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%;">
-            <i (click)="generarPdf('download','Servicios de alimentación aprobados')" id="pdf" class="fas fa-file-pdf"
+            <i (click)="GenerarPdf('download','Servicios de alimentación aprobados')" id="pdf" class="fas fa-file-pdf"
                 matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de servicios de alimentación aprobados en formato PDF.">
                 <p>PDF</p>
@@ -230,7 +230,7 @@
             showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%;">
-            <i (click)="generarPdf('download','Servicios de alimentación finalizados')" id="pdf" class="fas fa-file-pdf"
+            <i (click)="GenerarPdf('download','Servicios de alimentación finalizados')" id="pdf" class="fas fa-file-pdf"
                 matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de servicios de alimentación finalizados en formato PDF.">
                 <p>PDF</p>

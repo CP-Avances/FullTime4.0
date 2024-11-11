@@ -5,10 +5,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from '../../../servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
@@ -433,8 +429,8 @@ export class ReporteAuditoriaComponent implements OnInit {
     /** ****************************************************************************************** **
      ** **                                             PDF                                      ** **
      ** ****************************************************************************************** **/
-
-    GenerarPDF(data: any, action: any) {
+    async GenerarPDF(data: any, action: any) {
+        const pdfMake = await this.validar.ImportarPDF();
         let documentDefinition: any;
         documentDefinition = this.DefinirInformacionPDF(data);
         let doc_name = `Auditoría.pdf`;

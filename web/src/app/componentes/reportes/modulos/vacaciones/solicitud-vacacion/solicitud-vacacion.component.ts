@@ -2,14 +2,11 @@
 import { ITableEmpleados, ReporteVacacion, vacacion } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
+import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-import { ToastrService } from 'ngx-toastr';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
@@ -77,7 +74,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
 
   constructor(
     private R_asistencias: ReportesAsistenciasService, // SERVICIO BUSQUEDA DE DATOS DE DEPARTAMENTOS
-    private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
+    private validar: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
     private R_vacacion: VacacionesService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
@@ -177,7 +174,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -203,7 +200,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -236,7 +233,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -267,14 +264,14 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
    *                                   PDF                                        *
    * **************************************************************************** */
 
-  generarPdf(action) {
-    let documentDefinition;
 
+  async GenerarPdf(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
+    let documentDefinition: any;
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true) {
       documentDefinition = this.DefinirInformacionPDF();
     }
-
-    var f = new Date()
+    var f = new Date();
     let doc_name = "Reporte Solicitud de Vacaciones" + f.toLocaleString() + ".pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -282,7 +279,6 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   DefinirInformacionPDF() {
@@ -592,12 +588,12 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
   }
 
   // METODO PARA INGRESAR DATOS DE LETRAS O NÚMEROS
-  IngresarSoloLetras(e) {
-    return this.validacionService.IngresarSoloLetras(e)
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
-    return this.validacionService.IngresarSoloNumeros(evt)
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   MostrarLista() {
