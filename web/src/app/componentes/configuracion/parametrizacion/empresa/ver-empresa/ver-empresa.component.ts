@@ -6,10 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import { RegistrarSucursalesComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/editar-sucursal/editar-sucursal.component';
 import { ColoresEmpresaComponent } from 'src/app/componentes/configuracion/parametrizacion/empresa/colores-empresa/colores-empresa.component';
@@ -18,6 +14,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 import { LogosComponent } from 'src/app/componentes/configuracion/parametrizacion/empresa/logos/logos.component';
 
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -81,6 +78,7 @@ export class VerEmpresaComponent implements OnInit {
   constructor(
     public ventana: MatDialog,
     public empresa: EmpresaService,
+    public validar: ValidacionesService,
     public router: Router,
     public restS: SucursalService,
     public restE: EmpleadoService,
@@ -300,11 +298,21 @@ export class VerEmpresaComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
-
   // GENERACION DE REPORTE DE PDF
-  GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
-    pdfMake.createPdf(documentDefinition).open();
+    switch (action) {
+      case 'open':
+        pdfMake.createPdf(documentDefinition).open();
+        break;
+      case 'download':
+        pdfMake.createPdf(documentDefinition).download('Formato_Reportes');
+        break;
+      default:
+        pdfMake.createPdf(documentDefinition).open();
+        break;
+    }
   }
 
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
@@ -312,6 +320,7 @@ export class VerEmpresaComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 5, fontSize: 9, opacity: 0.3, alignment: 'right', color: '#0A54A7' },
@@ -337,15 +346,17 @@ export class VerEmpresaComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 50, margin: [10, -25, 0, 5] },
-        { text: 'FORMATO REPORTES', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'FORMATO REPORTES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         this.PresentarDataPDFEmpresas(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        tableHeaderS: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.s_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' },
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        tableHeaderS: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color },
+        itemsTable: { fontSize: 8 },
+        itemsTableC: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 5, 0, 0] },
       }
     };
   }
@@ -357,6 +368,7 @@ export class VerEmpresaComponent implements OnInit {
         { width: '*', text: '' },
         {
           width: 'auto',
+          style: 'tableMargin',
           table: {
             widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto', '*', 'auto'],
             body: [

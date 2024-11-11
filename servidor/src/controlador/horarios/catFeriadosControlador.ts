@@ -848,6 +848,12 @@ class FeriadosControlador {
 
                 const [feriado] = response.rows;
 
+
+                const fechaF = await FormatearFecha2(fecha, 'ddd');
+                const fecha_recuperacionF = await FormatearFecha2(fec_recuperacion, 'ddd');
+                feriado.fecha = fechaF
+                feriado.fecha_recuperacion = fecha_recuperacionF
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ef_cat_feriados',

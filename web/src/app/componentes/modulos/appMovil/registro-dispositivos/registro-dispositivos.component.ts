@@ -10,9 +10,6 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // MODELOS
 import { ItableDispositivos } from 'src/app/model/reportes.model';
@@ -22,12 +19,11 @@ import { DeleteRegistroDispositivoComponent } from '../delete-registro-dispositi
 
 // SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-registro-dispositivos',
@@ -83,14 +79,13 @@ export class RegistroDispositivosComponent implements OnInit {
 
   constructor(
     private usuariosService: UsuarioService,
+    private asignaciones: AsignacionesService,
     private funciones: MainNavService,
     private validar: ValidacionesService,
     private ventana: MatDialog,
     private toastr: ToastrService,
-    private rest: RelojesService,
     public restEmpre: EmpresaService,
     public restE: EmpleadoService,
-    private asignaciones: AsignacionesService,
   ) { this.idEmpleado = parseInt(localStorage.getItem('empleado') as string); }
 
   ngOnInit(): void {
@@ -297,9 +292,10 @@ export class RegistroDispositivosComponent implements OnInit {
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
-  generarPdf(action = 'open') {
-    const documentDefinition = this.DefinirInformacionPDF();
 
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -312,6 +308,7 @@ export class RegistroDispositivosComponent implements OnInit {
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

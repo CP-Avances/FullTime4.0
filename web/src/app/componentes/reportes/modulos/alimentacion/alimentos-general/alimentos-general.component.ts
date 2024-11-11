@@ -5,11 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-// LIBRERIA PARA GENERAR ARCHIVOS PDF
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 import * as xlsx from 'xlsx';
 
@@ -82,7 +77,7 @@ export class AlimentosGeneralComponent implements OnInit {
     public restA: AlimentacionService,
     public router: Router,
     private toastr: ToastrService,
-    private validacionesService: ValidacionesService
+    private validar: ValidacionesService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -171,7 +166,7 @@ export class AlimentosGeneralComponent implements OnInit {
         }, err => {
           // 4. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error)
+          return this.validar.RedireccionarHomeAdmin(err.error)
         });
       }, err => {
         // 5. Buscamos registros de servicios solicitados
@@ -182,10 +177,10 @@ export class AlimentosGeneralComponent implements OnInit {
         }, err => {
           // 7. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error)
+          return this.validar.RedireccionarHomeAdmin(err.error)
         });
 
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
     }
     else {
@@ -210,7 +205,7 @@ export class AlimentosGeneralComponent implements OnInit {
       }, err => {
         // Llamado a METODO de impresión de archivos
         this.ImprimirArchivo(archivo, form);
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
     }, err => {
       // 3. BUSQUEDA de servicios extras solicitados
@@ -227,7 +222,7 @@ export class AlimentosGeneralComponent implements OnInit {
             timeOut: 10000,
           }).onTap.subscribe(obj => {
             // Llamado a METODO de impresión de archivo sin registros
-            this.generarPdf('open');
+            this.GenerarPdf('open');
             this.LimpiarFechas();
           });
         }
@@ -236,16 +231,16 @@ export class AlimentosGeneralComponent implements OnInit {
           this.ImprimirArchivo(archivo, form);
         }
 
-        return this.validacionesService.RedireccionarHomeAdmin(err.error)
+        return this.validar.RedireccionarHomeAdmin(err.error)
       });
 
-      return this.validacionesService.RedireccionarHomeAdmin(err.error)
+      return this.validar.RedireccionarHomeAdmin(err.error)
     });
   }
 
   ImprimirArchivo(archivo: string, form) {
     if (archivo === 'pdf') {
-      this.generarPdf('open');
+      this.GenerarPdf('open');
       this.LimpiarFechas();
     }
     else if (archivo === 'excel') {
@@ -254,12 +249,12 @@ export class AlimentosGeneralComponent implements OnInit {
     }
   }
 
-  IngresarSoloLetras(e) {
-    return this.validacionesService.IngresarSoloLetras(e)
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
-    return this.validacionesService.IngresarSoloNumeros(evt)
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt)
   }
 
   LimpiarCampos() {
@@ -281,24 +276,25 @@ export class AlimentosGeneralComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open') {
+
+   async GenerarPdf(action = 'open') {
     if (this.planificados.length === 0 && this.solicitados.length === 0 && this.extras.length === 0) {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition_ = this.GenerarSinRegstros();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition_).open(); break;
         case 'print': pdfMake.createPdf(documentDefinition_).print(); break;
         case 'download': pdfMake.createPdf(documentDefinition_).download(); break;
-
         default: pdfMake.createPdf(documentDefinition_).open(); break;
       }
     }
     else {
+      const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition = this.DefinirInformacionPDF();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition).open(); break;
         case 'print': pdfMake.createPdf(documentDefinition).print(); break;
         case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
         default: pdfMake.createPdf(documentDefinition).open(); break;
       }
     }
@@ -311,6 +307,7 @@ export class AlimentosGeneralComponent implements OnInit {
     return {
 
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -541,6 +538,7 @@ export class AlimentosGeneralComponent implements OnInit {
     return {
 
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       //pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

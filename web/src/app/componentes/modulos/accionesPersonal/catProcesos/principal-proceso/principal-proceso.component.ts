@@ -8,10 +8,7 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
 import { EditarCatProcesosComponent } from 'src/app/componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
@@ -201,17 +198,16 @@ export class PrincipalProcesoComponent implements OnInit {
    ** **                               METODO PARA EXPORTAR A PDF                                     ** **
    ** ************************************************************************************************** **/
 
-  generarPdf(action = 'open') {
-    const documentDefinition = this.DefinirInformacionPDF();
 
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   DefinirInformacionPDF() {
@@ -219,6 +215,7 @@ export class PrincipalProcesoComponent implements OnInit {
     return {
 
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

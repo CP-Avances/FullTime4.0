@@ -8,9 +8,6 @@ import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -202,7 +199,7 @@ export class ReportePermisosComponent implements OnInit {
 
   GenerarArchivo(archivo: String, id_seleccionado: any, form: any) {
     if (archivo === 'pdf') {
-      this.generarPdf('open', id_seleccionado);
+      this.GenerarPdf('open', id_seleccionado);
     }
     else if (archivo === 'excel') {
       this.exportToExcel(id_seleccionado, form);
@@ -297,9 +294,10 @@ export class ReportePermisosComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open', codigo) {
-    const documentDefinition = this.DefinirInformacionPDF(codigo);
 
+  async GenerarPdf(action = 'open', codigo: any) {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF(codigo);
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -315,6 +313,7 @@ export class ReportePermisosComponent implements OnInit {
     return {
 
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -617,14 +616,13 @@ export class ReportePermisosComponent implements OnInit {
 
   // GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS
 
-  PDF_Vacio(action = 'open', codigo, form) {
+  async PDF_Vacio(action = 'open', codigo: any, form: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.GenerarSinRegstros(codigo, form);
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 

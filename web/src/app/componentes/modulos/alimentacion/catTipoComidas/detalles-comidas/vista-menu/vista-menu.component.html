@@ -1,33 +1,57 @@
 <div class="container" *ngFor="let m of datosMenu" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+        
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-6 col-md-3 mb-2 mb-md-0 mb-2 mb-md-0 order-2 order-md-2"> 
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
                 (click)="VerListaServicios()">
                 Listar menús
             </button>
-            <span>MENÚ: {{m.nombre.toUpperCase()}}</span>
-            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+            </div>
+            <div class="col-12 col-md-7 mb-2 mb-md-0 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    MENÚ: {{m.nombre.toUpperCase()}}
+                </span>
+            </div>
+            <div class="col-6 col-md-2 mb-2 mb-md-0 mb-2 mb-md-0 order-3 order-md-2">
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="AbrirVentanaEditar(m)" *ngIf="getEditarMenu()">
                 Editar
-            </button>
+                </button>
+            </div>
         </div>
         <mat-card-content>
             <div class="container" style="padding-top: 15px;">
                 <div class="row">
                     <div class="col-md">
-                        <label id="datosF" class="col-sm col-form-label">Servicio:</label>
-                        <br>
-                        <label class="col-sm col-form-label">{{m.tipo}}</label>
+                        <div class="row">
+                            <div class="col-6 col-md-12">
+                                <label id="datosF" class="col-sm col-form-label">Servicio:</label>
+                            </div>
+                            <div class="col-6 col-md-12">
+                                <label class="col-sm col-form-label">{{m.tipo}}</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md">
-                        <label id="datosF" class="col-sm col-form-label">Hora desde:</label>
-                        <br>
-                        <label class="col-sm col-form-label">{{m.hora_inicio_}}</label>
+                        <div class="row">
+                            <div class="col-6 col-md-12">
+                                <label id="datosF" class="col-sm col-form-label">Hora desde:</label>
+                            </div>
+                            <div class="col-6 col-md-12">
+                                <label class="col-sm col-form-label">{{m.hora_inicio_}}</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md">
-                        <label id="datosF" class="col-sm col-form-label">Hora hasta:</label>
-                        <br>
-                        <label class="col-sm col-form-label">{{m.hora_fin_}}</label>
+                        <div class="row">
+                            <div class="col-6 col-md-12">
+                                <label id="datosF" class="col-sm col-form-label">Hora hasta:</label>
+                            </div>
+                            <div class="col-6 col-md-12">
+                                <label class="col-sm col-form-label">{{m.hora_fin_}}</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

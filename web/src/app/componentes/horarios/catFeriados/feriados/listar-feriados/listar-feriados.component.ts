@@ -9,10 +9,7 @@ import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
 import { EditarFeriadosComponent } from '../editar-feriados/editar-feriados.component';
@@ -491,7 +488,9 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
     this.OrdenarDatos(this.feriados);
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {

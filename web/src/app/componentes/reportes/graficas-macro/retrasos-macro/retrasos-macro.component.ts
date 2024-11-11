@@ -1,14 +1,11 @@
-import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { DateTime } from 'luxon';
 
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
-import { DateTime } from 'luxon';
-
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
@@ -42,6 +39,7 @@ export class RetrasosMacroComponent implements OnInit {
     private restGraficas: GraficasService,
     private toastr: ToastrService,
     private restEmpre: EmpresaService,
+    public validar: ValidacionesService,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -155,12 +153,15 @@ export class RetrasosMacroComponent implements OnInit {
   graficaBase64: any;
   metodosPDF(accion) {
     this.graficaBase64 = this.thisChart.getDataURL({ type: 'jpg', pixelRatio: 5 });
-    this.generarPdf(accion)
+    this.GenerarPdf(accion)
   }
 
-  generarPdf(action) {
+
+
+  async GenerarPdf(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
-    var f = new Date()
+    var f = new Date();
     let doc_name = "metrica_atrasos" + f.toLocaleString() + ".pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

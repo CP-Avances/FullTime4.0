@@ -10,10 +10,6 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 @Component({
   selector: 'app-reporte-kardex',
   templateUrl: './reporte-kardex.component.html',
@@ -135,7 +131,7 @@ export class ReporteKardexComponent implements OnInit {
         console.log(this.kardex);
         if (!res.message) {
           this.kardex = res;
-          this.generarPdf(palabra, 3)
+          this.GenerarPdf(palabra, 3)
         } else {
           this.toastr.error(res.message, 'Error Calculos');
         }
@@ -152,19 +148,17 @@ export class ReporteKardexComponent implements OnInit {
   * ****************************************************************************************************/
   fechaHoy: string;
 
-  generarPdf(action = 'open', pdf: number) {
 
+  async GenerarPdf(action = 'open', pdf: number) {
+    const pdfMake = await this.validar.ImportarPDF();
     let documentDefinition;
-
     if (pdf === 3) {
       documentDefinition = this.DefinirInformacionPDFKardex();
     }
-
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -180,6 +174,7 @@ export class ReporteKardexComponent implements OnInit {
     console.log(this.fechaHoy);
 
     return {
+      pageSize: 'A4',
       // pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3 },

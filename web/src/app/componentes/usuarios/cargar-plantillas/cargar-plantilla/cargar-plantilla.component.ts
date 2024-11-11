@@ -502,6 +502,7 @@ export class CargarPlantillaComponent implements OnInit {
     }
     console.log('formData: ',formData);
     this.restCa.RevisarFormato(formData).subscribe(res => {
+      console.log("ver cargos: ", res)
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
       if(this.DatosCargos?.length > 0){

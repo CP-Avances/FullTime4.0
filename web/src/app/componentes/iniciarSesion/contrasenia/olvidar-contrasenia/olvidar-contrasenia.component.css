@@ -33,12 +33,28 @@ mat-card {
     margin: auto;
 }
 
-#home-section {
-    background: url('../../../../../assets/imagenes/apple.jpg') no-repeat;
-    min-height: 100vh;
-    background-size: cover;
-    background-attachment: fixed;
+@media (max-width: 550px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+
+    #home-section {
+        background: url('../../../../../assets/imagenes/contrasena_mobil.png') no-repeat !important;
+        min-height: 100vh;
+        background-size: cover !important;
+        background-attachment: scroll !important;
+    }
 }
+
+@media (min-width: 551px) {
+    #home-section {
+        background: url('../../../../../assets/imagenes/apple.jpg') no-repeat;
+        min-height: 100vh;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+}
+
 
 .dark-overlay {
     top: 0;

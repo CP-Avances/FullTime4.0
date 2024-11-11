@@ -8,15 +8,13 @@ import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
 import * as FileSaver from 'file-saver';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { ITableTipoCargo } from 'src/app/model/reportes.model';
 
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 import { CatTipoCargosService } from 'src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
@@ -79,6 +77,7 @@ export class CatTipoCargosComponent {
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public parametro: ParametrosService,
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -445,8 +444,10 @@ export class CatTipoCargosComponent {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  GenerarPdf(action = 'open') {
+
+  async GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaTipoCargos);
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;

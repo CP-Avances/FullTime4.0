@@ -15,6 +15,13 @@ body {
 }
 td{
     white-space: nowrap;
+    padding: 4px;
+}
+
+.td_ob{
+    white-space: normal;  /* Permite que el texto se ajuste en varias líneas */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 *::-webkit-scrollbar-thumb {

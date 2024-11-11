@@ -197,7 +197,7 @@
                     <tr *ngFor="let va of Datos_vacunas | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                         <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                             {{va.fila}}</td>
-                        <td style="font-size: 12px;">
+                        <td style="font-size: 12px;" class="td_ob">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
                                     [style.background-color]="EstiloCelda(va.observacion)"></div>
@@ -210,14 +210,18 @@
                 </tbody>
             </table>
         </div>
-        <div style="display: flex; align-items: center;">
-          <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
-            <div id="t-editar" class="circulo circuloTotal"></div>
-            <div>{{vacunasCorrectas}}</div>
-          </div>
-          <mat-paginator [length]="Datos_vacunas.length" [pageSize]="tamanio_paginaMul"
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{vacunasCorrectas}}</div>
+                  </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_vacunas.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-            </mat-paginator>
+                </mat-paginator>
+            </div>
         </div>
     </div>
 </div>

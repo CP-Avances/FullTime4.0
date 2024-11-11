@@ -9,10 +9,6 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
 import { BarChart } from 'echarts/charts';
@@ -174,10 +170,13 @@ export class HoraExtraMacroComponent implements OnInit {
   graficaBase64: any;
   metodosPDF(accion) {
     this.graficaBase64 = this.thisChart.getDataURL({ type: 'jpg', pixelRatio: 5 });
-    this.generarPdf(accion)
+    this.GenerarPdf(accion)
   }
 
-  generarPdf(action) {
+
+
+  async GenerarPdf(action) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "metrica_hora_extra_" + f.toLocaleString() + ".pdf";

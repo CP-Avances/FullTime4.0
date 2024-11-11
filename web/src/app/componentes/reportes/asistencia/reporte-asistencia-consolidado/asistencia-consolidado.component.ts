@@ -7,9 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from '../../plantilla-reportes.service';
@@ -197,7 +194,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
         this.asistencia = res;
 
         console.log('ver info ********************', this.asistencia)
-        this.generarPdf(palabra, 1);
+        this.GenerarPdf(palabra, 1);
       }, err => {
         this.toastr.error(err.error.message, 'Algo salio mal', {
           timeOut: 6000,
@@ -233,11 +230,12 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
   * ****************************************************************************************************/
 
-  generarPdf(action = 'open', pdf: number) {
 
-    let documentDefinition;
-
+  async GenerarPdf(action = 'open', pdf: number) {
+    let documentDefinition: any;
+    let pdfMake: any;
     if (pdf === 1) {
+      pdfMake = await this.validar.ImportarPDF();
       documentDefinition = this.DefinirInformacionPDFAsistencia();
     }
 
@@ -265,6 +263,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     var nomEmpleado = this.empleadoD[0].nombre;
     var apelEmpleado = this.empleadoD[0].apellido;
     return {
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: 'Confidencial', color: 'blue', opacity: 0.1, bold: true, italics: false },
       //header1: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3 },

@@ -3,6 +3,7 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
@@ -10,9 +11,6 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RegistrarSucursalesComponent } from '../registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/editar-sucursal/editar-sucursal.component';
@@ -80,10 +78,10 @@ export class ListaSucursalesComponent implements OnInit {
   ip: string | null;
 
   constructor(
-    private rest: SucursalService,
     private serviciudades: CiudadService,
     private toastr: ToastrService,
     private router: Router,
+    private rest: SucursalService,
     public restEmpre: EmpresaService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -233,14 +231,15 @@ export class ListaSucursalesComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
-  generarPdf(action = 'open') {
-    const documentDefinition = this.DefinirInformacionPDF();
 
+
+   async GenerarPdf(action = 'open') {
+    const pdfMake = await this.validar.ImportarPDF();
+    const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
       case 'download': pdfMake.createPdf(documentDefinition).download('Establecimientos.pdf'); break;
-
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 
@@ -249,6 +248,7 @@ export class ListaSucursalesComponent implements OnInit {
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

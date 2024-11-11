@@ -6,9 +6,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -309,7 +306,9 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                         METODO DE CREACION DE  PDF                                   ** **
    ** ****************************************************************************************** **/
 
-  GenerarPDF(action: any) {
+
+  async GenerarPDF(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {

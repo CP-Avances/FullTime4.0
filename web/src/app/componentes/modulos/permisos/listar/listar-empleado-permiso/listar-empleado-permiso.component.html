@@ -111,7 +111,7 @@
         <!--  ***********************  DESCARGAR REPORTES  ******************************  -->
         <div>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                <i (click)="generarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix
+                <i (click)="GenerarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                     <p>PDF</p>
                 </i>
@@ -215,7 +215,7 @@
             (page)="ManejarPaginaAutorizados($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="generarPdf('download','Permisos autorizados')" id="pdf" class="fas fa-file-pdf" matSuffix
+            <i (click)="GenerarPdf('download','Permisos autorizados')" id="pdf" class="fas fa-file-pdf" matSuffix
                 matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                 <p>PDF</p>
             </i>

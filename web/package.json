@@ -36,7 +36,7 @@
     "ngx-socket-io": "^4.7.0",
     "ngx-toastr": "^19.0.0",
     "ngx-webcam": "^0.4.1",
-    "pdfmake": "^0.2.14",
+    "pdfmake": "^0.2.15",
     "rxjs": "~7.8.1",
     "stream": "^0.0.3",
     "timers": "^0.1.1",

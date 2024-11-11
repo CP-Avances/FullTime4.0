@@ -6,15 +6,12 @@ import { DateTime } from 'luxon';
 
 import { ITableEmpleados, IReportePuntualidad, model_pdf_puntualidad } from 'src/app/model/reportes.model';
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
-
-import * as xlsx from 'xlsx';
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+
+import * as xlsx from 'xlsx';
 
 @Component({
   selector: 'app-reporte-puntualidad',
@@ -63,7 +60,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private reporteService: ReportesService,
     private R_asistencias: ReportesAsistenciasService,
-    private restEmpre: EmpresaService
+    private restEmpre: EmpresaService,
+    public validar: ValidacionesService,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -174,7 +172,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       console.log(this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -204,7 +202,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       console.log(this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -242,7 +240,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       console.log(this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPdf(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -281,7 +279,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
    *
    *******************************************/
 
-  generarPdf(action) {
+
+  async GenerarPdf(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     var f = new Date()
     let doc_name = "Reporte puntualidad" + f.toLocaleString() + ".pdf";

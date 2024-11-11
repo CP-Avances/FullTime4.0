@@ -611,6 +611,17 @@ export class ValidacionesService {
     return seleccionados;
   }
 
+  /** ********************************************************************************* **
+   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
+   ** ********************************************************************************* **/
+  
+  async ImportarPDF() {
+    const pdfMake = await import('src/assets/build/pdfmake.js');
+    const pdfFonts = await import('src/assets/build/vfs_fonts.js');
+    pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
+    return pdfMake.default;
+  }
+
 }
 
 

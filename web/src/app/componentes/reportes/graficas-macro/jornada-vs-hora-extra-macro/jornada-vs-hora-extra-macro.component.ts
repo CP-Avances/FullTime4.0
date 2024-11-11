@@ -9,10 +9,6 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
-const pdfMake = require('src/assets/build/pdfmake.js');
-const pdfFonts = require('src/assets/build/vfs_fonts.js');
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -165,12 +161,15 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
   graficaBase64: any;
   metodosPDF(accion) {
     this.graficaBase64 = this.thisChart.getDataURL({ type: 'jpg', pixelRatio: 5 });
-    this.generarPdf(accion)
+    this.GenerarPdf(accion)
   }
 
-  generarPdf(action) {
+
+
+  async GenerarPdf(action: any) {
+    const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
-    var f = new Date()
+    var f = new Date();
     let doc_name = "metrica_jornadaVShoraExtra" + f.toLocaleString() + ".pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
