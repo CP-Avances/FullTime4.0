@@ -386,7 +386,7 @@ class TimbresControlador {
                     console.log('error ', error);
                     console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha_timbre, 'ddd');
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fecha_timbre, 'ddd');
                     let existe_imagen = false;
                     if (imagen) {
                         existe_imagen = true;

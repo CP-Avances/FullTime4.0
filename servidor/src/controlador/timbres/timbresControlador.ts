@@ -412,7 +412,7 @@ class TimbresControlador {
                     console.log('error ', error)
                     console.log('result ', results.rows[0].timbres_web)
                     const fechaHora = await FormatearHora(hora_timbre);
-                    const fechaTimbre = await FormatearFecha(fecha_timbre, 'ddd');
+                    const fechaTimbre = await FormatearFecha2(fecha_timbre, 'ddd');
                     let existe_imagen = false;
 
                     if (imagen) {
