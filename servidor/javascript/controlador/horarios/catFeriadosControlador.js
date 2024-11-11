@@ -739,6 +739,10 @@ class FeriadosControlador {
                     VALUES ($1, $2, $3) RETURNING *
                     `, [fecha, descripcion, fec_recuperacion]);
                     const [feriado] = response.rows;
+                    const fechaF = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                    const fecha_recuperacionF = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                    feriado.fecha = fechaF;
+                    feriado.fecha_recuperacion = fecha_recuperacionF;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',

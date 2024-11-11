@@ -319,7 +319,7 @@ class EmpleadoControlador {
           domicilio, telefono, id_nacionalidad, codigo]);
 
       const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
-      const fechaNacimientoN = await FormatearFecha2(fec_nacimiento.toLocaleString(), 'ddd');
+      const fechaNacimientoN = await FormatearFecha2(datosNuevos.rows[0].fecha_nacimiento, 'ddd');
 
       datosOriginales.fecha_nacimiento = fechaNacimientoO;
       datosNuevos.rows[0].fecha_nacimiento = fechaNacimientoN;

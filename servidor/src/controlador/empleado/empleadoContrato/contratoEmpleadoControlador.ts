@@ -978,6 +978,11 @@ class ContratoEmpleadoControlador {
 
                 const [contrato] = response.rows;
 
+                const fechaDesdeF = await FormatearFecha2(fecha_desde, 'ddd');
+                const fechaHastaF = await FormatearFecha2(fecha_hasta, 'ddd');
+                contrato.fecha_ingreso = fechaDesdeF
+                contrato.fecha_salida = fechaHastaF
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_empleado_contratos',
