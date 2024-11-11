@@ -18,6 +18,8 @@ export class EditarTimbreComponent implements OnInit {
   datosTimbre: any;
   teclaFuncionF: any;
   accionF: any;
+  user_name: string | null;
+  ip: string | null;
 
   // LISTA DE ACCIONES DE TIMBRES
   acciones: any = [
@@ -56,6 +58,8 @@ export class EditarTimbreComponent implements OnInit {
 
   ngOnInit() {
     this.LeerDatosTimbre();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   /** **************************************************************************************** **
@@ -160,6 +164,8 @@ export class EditarTimbreComponent implements OnInit {
       tecla: formTimbre.teclaFunTimbre,
       observacion: this.simbolo_ + formTimbre.ObservacionForm,
       fecha: this.datosTimbre.fecha_hora_timbre_validado,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any = res

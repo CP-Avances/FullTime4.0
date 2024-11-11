@@ -239,14 +239,66 @@ class TimbresControlador {
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id, codigo, tecla, observacion, fecha } = req.body;
-                yield database_1.default.query(`
+                let { id, codigo, tecla, observacion, fecha, user_name, ip } = req.body;
+                const timbre = yield database_1.default.query(`
+                SELECT * FROM eu_timbres WHERE id = $1
+                `, [id]);
+                const [datosOriginales] = timbre.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_timbres',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar timbre con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar timbre' });
+                }
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre.toLocaleString().split(' ')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre, 'ddd');
+                const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
+                const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre_servidor, 'ddd');
+                const fechaHoraValidado = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre_validado.toLocaleString().split(' ')[1]);
+                const fechaTimbreValidado = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre_validado, 'ddd');
+                const actualizacion = yield database_1.default.query(`
                 SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                     $3::character varying, $4::integer, $5::character varying) 
-                `, [fecha, codigo, tecla, id, observacion])
-                    .then((result) => {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                `, [fecha, codigo, tecla, id, observacion]);
+                const [datosNuevos] = actualizacion.rows;
+                let existe_imagen = false;
+                if (datosOriginales.imagen) {
+                    existe_imagen = true;
+                }
+                let existe_documento = false;
+                if (datosOriginales.documento) {
+                    existe_documento = true;
+                }
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_timbres',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosOriginales.accion}, tecla_funcion: ${datosOriginales.tecla_funcion}, observacion: ${datosOriginales.observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${datosOriginales.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosNuevos.modificartimbre}, tecla_funcion: ${tecla}, observacion: ${observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento}  }`,
+                    ip,
+                    observacion: null
                 });
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                /*
+                await pool.query(
+                    `
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying,
+                        $3::character varying, $4::integer, $5::character varying)
+                    `
+                    , [fecha, codigo, tecla, id, observacion])
+                    .then((result: any) => {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                    });
+    */
             }
             catch (err) {
                 console.log('timbre error ', err);
@@ -335,12 +387,16 @@ class TimbresControlador {
                     console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha_timbre, 'ddd');
+                    let existe_imagen = false;
+                    if (imagen) {
+                        existe_imagen = true;
+                    }
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen} }`,
                         ip,
                         observacion: null
                     });
@@ -410,12 +466,16 @@ class TimbresControlador {
                     var hora = fecha_.toFormat('HH:mm:ss');
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
+                    let existe_documento = false;
+                    if (documento) {
+                        existe_documento = true;
+                    }
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, documento: ${documento} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, documento: ${existe_documento} }`,
                         ip,
                         observacion: null
                     });
@@ -1215,12 +1275,16 @@ class TimbresControlador {
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
                 const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
+                let imagen_existe = false;
+                if (timbre.imagen) {
+                    imagen_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${timbre.imagen} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${imagen_existe} }`,
                     ip: timbre.ip,
                     observacion: null
                 });
@@ -1261,6 +1325,10 @@ class TimbresControlador {
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraSubida = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
                 const fechaTimbreSubida = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
+                let imagen_existe = false;
+                if (timbre.imagen) {
+                    imagen_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
@@ -1298,12 +1366,16 @@ class TimbresControlador {
                 });
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
+                let documento_existe = false;
+                if (documento) {
+                    documento_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre}, documento: ${documento_existe} }`,
                     ip: ip,
                     observacion: null
                 });
