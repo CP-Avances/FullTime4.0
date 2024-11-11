@@ -1955,6 +1955,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   CabeceraDocumentoPermisoEmpleado() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -2082,6 +2083,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   CabeceraDocumentoPermisoAprobacion() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -3068,6 +3070,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -3465,6 +3468,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   DefinirInfoHistoricoPDF() {
     const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
     return {
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

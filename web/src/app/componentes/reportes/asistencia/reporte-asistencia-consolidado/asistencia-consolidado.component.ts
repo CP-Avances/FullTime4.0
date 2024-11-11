@@ -263,6 +263,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     var nomEmpleado = this.empleadoD[0].nombre;
     var apelEmpleado = this.empleadoD[0].apellido;
     return {
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: 'Confidencial', color: 'blue', opacity: 0.1, bold: true, italics: false },
       //header1: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3 },

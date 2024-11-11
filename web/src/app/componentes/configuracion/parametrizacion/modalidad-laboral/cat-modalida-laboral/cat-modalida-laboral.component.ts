@@ -360,7 +360,6 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-
   async GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const pdfMake = await this.validar.ImportarPDF();

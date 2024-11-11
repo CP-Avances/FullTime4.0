@@ -183,16 +183,16 @@ export class ListarRegimenComponent implements OnInit {
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.default.createPdf(documentDefinition).print();
+        pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.default.createPdf(documentDefinition).download('Regimen_laboral' + '.pdf');
+        pdfMake.createPdf(documentDefinition).download('Regimen_laboral' + '.pdf');
         break;
       default:
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
     }
     this.ObtenerRegimen();
@@ -202,6 +202,7 @@ export class ListarRegimenComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,

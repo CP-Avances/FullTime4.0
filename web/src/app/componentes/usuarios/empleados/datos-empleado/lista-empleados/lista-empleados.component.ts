@@ -750,6 +750,7 @@ export class ListaEmpleadosComponent implements OnInit {
   DefinirInformacionPDF(numero: any) {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

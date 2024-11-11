@@ -403,6 +403,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     }
 
     return {
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

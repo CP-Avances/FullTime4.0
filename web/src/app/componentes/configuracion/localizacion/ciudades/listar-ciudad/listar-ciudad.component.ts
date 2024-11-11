@@ -159,17 +159,17 @@ export class ListarCiudadComponent implements OnInit {
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.default.createPdf(documentDefinition).print();
+        pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.default.createPdf(documentDefinition).download('Ciudades' + '.pdf');
+        pdfMake.createPdf(documentDefinition).download('Ciudades' + '.pdf');
         break;
 
       default:
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
     }
   }
@@ -177,6 +177,7 @@ export class ListarCiudadComponent implements OnInit {
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "portrait",
       watermark: {
         text: this.frase,

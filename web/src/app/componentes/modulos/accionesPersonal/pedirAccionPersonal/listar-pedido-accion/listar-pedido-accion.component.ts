@@ -519,16 +519,16 @@ export class ListarPedidoAccionComponent implements OnInit {
     const documentDefinition = this.DefinirInformacionPDFIndividual();
     switch (action) {
       case "open":
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.default.createPdf(documentDefinition).print();
+        pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.default.createPdf(documentDefinition).download();
+        pdfMake.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
     }
   }
@@ -3990,16 +3990,16 @@ export class ListarPedidoAccionComponent implements OnInit {
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case "open":
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
       case "print":
-        pdfMake.default.createPdf(documentDefinition).print();
+        pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.default.createPdf(documentDefinition).download();
+        pdfMake.createPdf(documentDefinition).download();
         break;
       default:
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
     }
   }
@@ -4008,6 +4008,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,
