@@ -719,12 +719,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
   CargarTimbres(data: any, timbre: any) {
 
-    let fechaInicioForm = timbre.fechaInicioForm.toDate();
-    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
+    console.log("ver timbre", timbre)
+    this.fechaInicioFormluxon = timbre.fechaInicioForm;
     console.log("fechaInicioFormluxon: ", this.fechaInicioFormluxon)
-
-    let fechaFinalForm = timbre.fechaFinalForm.toDate();
-    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    this.fechaFinFormluxon = timbre.fechaFinalForm;
     console.log("ver data: ", data);
     if (data.length > 0) {
       var inicio = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');

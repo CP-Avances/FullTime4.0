@@ -322,6 +322,9 @@ class FeriadosControlador {
     public async FeriadosCiudadMultiplesEmpleados(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, ids } = req.body;
+            console.log("ver fecha_inicio", fecha_inicio);
+            console.log("ver fecha_final", fecha_final);
+
             const FERIADO = await pool.query(
                 `
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre, de.id

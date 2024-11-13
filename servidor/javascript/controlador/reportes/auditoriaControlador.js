@@ -16,6 +16,50 @@ exports.AUDITORIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const stream_1 = require("stream");
 class AuditoriaControlador {
+    constructor() {
+        this.InsertarAuditoriaPorLotes = (data, user_name, ip) => __awaiter(this, void 0, void 0, function* () {
+            const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
+            const totalResults = [];
+            for (let i = 0; i < data.length; i += batchSize) {
+                const batch = data.slice(i, i + batchSize);
+                const valores = [];
+                const placeholders = [];
+                for (let j = 0; j < batch.length; j++) {
+                    const auditoria = batch[j];
+                    const index = j * 9; // 9 es el número de campos a insertar
+                    valores.push("APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
+                    auditoria.tabla, user_name, new Date(), auditoria.accion, auditoria.datosOriginales, auditoria.datosNuevos, ip, auditoria.observacion);
+                    // Crear los placeholders para la consulta de inserción masiva
+                    placeholders.push(`($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9})`);
+                }
+                const query = `
+                INSERT INTO audit.auditoria (
+                    plataforma, table_name, user_name, fecha_hora,
+                    action, original_data, new_data, ip_address, observacion
+                ) VALUES ${placeholders.join(', ')}
+            `;
+                try {
+                    // INICIAR TRANSACCIÓN
+                    yield database_1.default.query('BEGIN');
+                    // Ejecutar la consulta de inserción masiva
+                    yield database_1.default.query(query, valores);
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCIÓN
+                    console.error("Detalles del error:", {
+                        message: error.message,
+                        stack: error.stack,
+                        code: error.code,
+                        detail: error.detail
+                    });
+                    yield database_1.default.query('ROLLBACK');
+                    throw new Error('Error al insertar auditoría por lotes: ' + error.message);
+                }
+            }
+        });
+    }
     BuscarDatosAuditoriaporTablasEmpaquetados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tabla, desde, hasta, action } = req.body;

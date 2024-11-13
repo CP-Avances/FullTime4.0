@@ -465,7 +465,7 @@ class TimbresControlador {
                     var fecha = fecha_.toFormat('yyyy-MM-dd');
                     var hora = fecha_.toFormat('HH:mm:ss');
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                     let existe_documento = false;
                     if (documento) {
                         existe_documento = true;

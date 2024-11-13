@@ -508,7 +508,7 @@ class TimbresControlador {
                     var hora = fecha_.toFormat('HH:mm:ss');
 
                     const fechaHora = await FormatearHora(hora);
-                    const fechaTimbre = await FormatearFecha(fecha, 'ddd');
+                    const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
                     let existe_documento = false;
 
                     if (documento) {

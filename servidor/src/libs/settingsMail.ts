@@ -136,7 +136,7 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   const fechaLuxon = DateTime.fromISO(fecha);
 
   const diaFormateado = fechaLuxon.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-                        fechaLuxon.setLocale('es').toFormat(dia).slice(1);
+    fechaLuxon.setLocale('es').toFormat(dia).slice(1);
   const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
 
   const valor = `${diaFormateado}, ${fechaFormateada}`;
@@ -147,7 +147,7 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
 
 export const FormatearFecha2 = async function (fecha: string, dia: string) {
 
-  console.log("ver fecha: ", fecha)
+  // console.log("ver fecha: ", fecha)
   const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
   const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
 
@@ -165,7 +165,6 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
 
     // Devolver la fecha formateada
     fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    console.log("fecha ver", fecha)
   }
   const fechaObj = DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
   // Formatear el día
@@ -178,7 +177,6 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
     // Formatear la fecha
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
-    console.log("valor transformado: ",valor )
 
     return valor;
   } else if (dia == "dddd") {
@@ -190,7 +188,7 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
     // Formatear la fecha
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
-    console.log("valor transformado: ",valor )
+    console.log("valor transformado: ", valor)
     return valor;
   }
 }
@@ -239,7 +237,10 @@ export const FormatearHora = async function (hora: string) {
   console.log("ver hora: ", hora)
   const formato = await BuscarHora(); // Obtenemos el formato deseado desde la función
   const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
-  const valor = DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
+  
+  const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
+
+  const valor = DateTime.fromFormat(horaFormateada , 'HH:mm:ss').toFormat(formato.hora);
   return valor;
 };
 

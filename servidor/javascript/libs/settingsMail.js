@@ -143,7 +143,7 @@ const FormatearFecha = function (fecha, dia) {
 exports.FormatearFecha = FormatearFecha;
 const FormatearFecha2 = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("ver fecha: ", fecha);
+        // console.log("ver fecha: ", fecha)
         const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
         const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
         const formato = yield (0, exports.BuscarFecha)();
@@ -159,7 +159,6 @@ const FormatearFecha2 = function (fecha, dia) {
             const seconds = String(date.getUTCSeconds()).padStart(2, '0');
             // Devolver la fecha formateada
             fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-            console.log("fecha ver", fecha);
         }
         const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
         // Formatear el día
@@ -172,7 +171,6 @@ const FormatearFecha2 = function (fecha, dia) {
             // Formatear la fecha
             const fechaFormateada = fechaObj.toFormat(formato.fecha);
             let valor = `${diaFormateado}, ${fechaFormateada}`;
-            console.log("valor transformado: ", valor);
             return valor;
         }
         else if (dia == "dddd") {
@@ -228,7 +226,8 @@ const FormatearHora = function (hora) {
         console.log("ver hora: ", hora);
         const formato = yield (0, exports.BuscarHora)(); // Obtenemos el formato deseado desde la función
         const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
-        const valor = luxon_1.DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
+        const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
+        const valor = luxon_1.DateTime.fromFormat(horaFormateada, 'HH:mm:ss').toFormat(formato.hora);
         return valor;
     });
 };
