@@ -143,7 +143,6 @@ const FormatearFecha = function (fecha, dia) {
 exports.FormatearFecha = FormatearFecha;
 const FormatearFecha2 = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        // console.log("ver fecha: ", fecha)
         const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
         const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
         const formato = yield (0, exports.BuscarFecha)();
@@ -182,7 +181,6 @@ const FormatearFecha2 = function (fecha, dia) {
             // Formatear la fecha
             const fechaFormateada = fechaObj.toFormat(formato.fecha);
             let valor = `${diaFormateado}, ${fechaFormateada}`;
-            console.log("valor transformado: ", valor);
             return valor;
         }
     });

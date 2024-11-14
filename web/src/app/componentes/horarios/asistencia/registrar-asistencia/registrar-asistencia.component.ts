@@ -132,6 +132,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   // METODO PARA REASIGNAR TIMBRE
   ReasignarTimbre(seleccionado: any) {
+    console.log("seleccionado: ",seleccionado)
     let datos = {
       id: this.informacion.detalle.id,
       fecha: this.validar.DarFormatoFecha(seleccionado.fecha_hora_timbre_validado, 'yyyy-MM-dd HH:mm:ss'),
@@ -188,18 +189,26 @@ export class RegistrarAsistenciaComponent implements OnInit {
       if (data.message === 'OK') {
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
-          //console.log('obj ', this.informacion)
+          console.log('obj.t_hora_timbre: ', obj.t_hora_timbre)
+          console.log('this.informacion.detalle.hora_horario: ', this.informacion.detalle.hora_horario)
+
           var h_horario = DateTime.fromFormat(obj.t_hora_timbre, 'HH:mm:ss');
           var h_timbre = DateTime.fromFormat(this.informacion.detalle.hora_horario, 'HH:mm:ss');
+          console.log("h_horario: ", h_horario)
+          console.log("h_timbre: ", h_timbre)
+
+
           if (this.informacion.detalle.hora_horario < obj.t_hora_timbre) {
             var duration = h_horario.diff(h_timbre, 'hours').hours;
           }
           else {
             var duration = h_timbre.diff(h_horario, 'hours').hours;
           }
+
+          console.log("ver duration",duration )
           let proceso = {
             duracion: duration,
-            fec_hora_timbre_servidor: obj.fecha_hora_timbre_validado,
+            fecha_hora_timbre_validado: obj.fecha_hora_timbre_validado,
             fecha: obj.t_fec_timbre,
             hora: obj.t_hora_timbre,
             id: obj.id
@@ -207,12 +216,19 @@ export class RegistrarAsistenciaComponent implements OnInit {
           //console.log('proceso ', proceso)
           diferencias = diferencias.concat(proceso);
         })
+
+        console.log("diferencias: ", diferencias)
         // ENCUENTRA EL VALOR MINIMO
         var minValue = Math.min(...diferencias.map((x: any) => x.duracion))
+        console.log("minValue: ", minValue)
+
+
         // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
         var resultado = diferencias.filter((x: any) => x.duracion == minValue)
+        console.log("resultado: ", resultado)
+
         // IMPRIME EL RESULTADO
-         this.ReasignarTimbre(resultado[0]);
+        this.ReasignarTimbre(resultado[0]);
       }
       else {
         this.toastr.warning('No se han encontrado registros.', '', {

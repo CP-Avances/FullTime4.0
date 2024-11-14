@@ -722,24 +722,33 @@ export class VerCoordenadasComponent implements OnInit {
   error: number = 0;
   RegistrarUbicacionUsuario(data: any) {
     if (data.length > 0) {
-      this.cont = 0;
-      data.forEach((obj: any) => {
-        var datos = {
-          id_empl: obj.id,
-          id_ubicacion: this.idUbicacion,
-          user_name: this.user_name,
-          ip: this.ip
+      const arrayIds = data.map((obj: any) => obj.id);
+      var datos = {
+        id_empl: arrayIds,
+        id_ubicacion: this.idUbicacion,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
+        this.cont = this.cont + 1;
+        console.log('ver ', res)
+        if (res.message == 'Con duplicados') {
+          this.toastr.success('Algunos registros ya existen en el sistema.', 'Registros de ubicación asignados exitosamente.', {
+            timeOut: 6000,
+          });
+        } else if (res.message == 'Sin duplicados') {
+          this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
+            timeOut: 6000,
+          });
+        } else if (res.message == 'No hay nuevos registros para insertar.') {
+          this.toastr.warning('Los registros de ubicación ya existen en el sistema.', '', {
+            timeOut: 6000,
+          });
         }
-        console.log('coordenada ', datos)
-        this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
-          this.cont = this.cont + 1;
-          console.log('ver ', res)
-          if (res.message === 'error') {
-            this.error = this.error + 1;
-          }
-          this.MostrarMensajes(data);
-        });
-      })
+        this.ConsultarDatos();
+        this.AbrirVentanaBusqueda();
+
+      });
     }
     else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
@@ -747,29 +756,6 @@ export class VerCoordenadasComponent implements OnInit {
       });
     }
 
-  }
-
-  // METODO PARA MOSTRAR MENSAJES
-  MostrarMensajes(data: any) {
-    if (data.length === this.error) {
-      this.toastr.warning('Los registros de ubicación ya existen en el sistema.', '', {
-        timeOut: 6000,
-      });
-    }
-    else if (this.cont === data.length) {
-      if (this.error != 0) {
-        this.toastr.success('Algunos registros ya existen en el sistema.', 'Registros de ubicación asignados exitosamente.', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
-          timeOut: 6000,
-        });
-      }
-    }
-    this.ConsultarDatos();
-    this.AbrirVentanaBusqueda();
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS

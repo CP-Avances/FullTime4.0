@@ -195,19 +195,19 @@ class PlanGeneralControlador {
         // Respuesta final con 'OK' si todo se procesó correctamente
         return res.status(200).json({ message: 'OK', totalResults });
     };
-  
+
     public CrearPlanificacionPorLotes = async (req: Request, res: Response): Promise<any> => {
         const { parte, user_name, ip } = req.body;
-    
+
         // Validación del input
         if (!Array.isArray(parte) || parte.length === 0) {
             return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
         }
-    
+
         const client = await pool.connect();  // Conectar al cliente
         try {
             await client.query('BEGIN');  // Iniciar una transacción
-    
+
             // Crear un flujo de datos para el COPY usando pg-copy-streams, desde un flujo de entrada en formato csv
             const stream = client.query(copyStream.from(
                 `COPY eu_asistencia_general (
@@ -217,7 +217,7 @@ class PlanGeneralControlador {
                     minutos_despues, estado_origen, minutos_alimentacion
                 ) FROM STDIN WITH (FORMAT csv, DELIMITER '\t')`
             ));
-    
+
             // Escribir los datos en el flujo COPY
             for (const p of parte) {
                 const row = [
@@ -237,19 +237,19 @@ class PlanGeneralControlador {
                     p.estado_origen,
                     p.min_alimentacion
                 ].join('\t');  // Formatear la fila con tabuladores
-    
+
                 stream.write(`${row}\n`);  // Escribir la fila en el flujo
             }
-    
+
             stream.end();  // Finalizar el flujo
-    
+
             // Esperar a que el COPY termine
             await new Promise<void>((resolve, reject) => {
                 stream.on('finish', resolve);  // Esperar la finalización del COPY
                 stream.on('error', reject);  // Manejar posibles errores
             });
-    
-            
+
+
             // Realizar la inserción en auditoría después de completar la inserción masiva
             const auditoria = parte.map((p) => ({
                 tabla: 'eu_asistencia_general',
@@ -261,7 +261,7 @@ class PlanGeneralControlador {
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
-    
+
             await client.query('COMMIT');  // Finalizar la transacción
             res.status(200).json({ message: 'OK', totalResults: parte.length });
         } catch (error) {
@@ -273,14 +273,14 @@ class PlanGeneralControlador {
                 detail: error.detail
             });
             res.status(500).json({ message: 'Error al procesar la parte', error: error.message });
-        } 
-        
+        }
+
         finally {
             client.release();  // Liberar el cliente
         }
     };
-    
-    
+
+
 
 
     public BuscarFechasMultiples = async (req: Request, res: Response): Promise<any> => {
@@ -744,13 +744,17 @@ class PlanGeneralControlador {
             var fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd')
             var fecha_horario = await FormatearFecha2(datosOriginales.fecha_horario, 'ddd')
 
+
+            var fecha_hora_timbre1 = await FormatearHora(datosOriginales.fecha_hora_timbre.toLocaleString().split(' ')[1])
+            var fecha_hora_timbre = await FormatearFecha2(datosOriginales.fecha_hora_timbre, 'ddd')
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
                 datosNuevos: `id: ${datosOriginales.id}
                             , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
                 observacion: null

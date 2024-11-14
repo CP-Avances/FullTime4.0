@@ -147,7 +147,6 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
 
 export const FormatearFecha2 = async function (fecha: string, dia: string) {
 
-  // console.log("ver fecha: ", fecha)
   const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
   const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
 
@@ -188,7 +187,6 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
     // Formatear la fecha
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
-    console.log("valor transformado: ", valor)
     return valor;
   }
 }

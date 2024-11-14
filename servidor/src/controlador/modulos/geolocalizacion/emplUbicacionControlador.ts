@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
+import { Integer } from 'read-excel-file';
 
 class UbicacionControlador {
 
@@ -240,6 +241,7 @@ class UbicacionControlador {
     }
 
     // ASIGNAR COORDENADAS GENERALES DE UBICACION A LOS USUARIOS    **USADO
+    /*
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
             const { id_empl, id_ubicacion, user_name, ip } = req.body;
@@ -290,6 +292,91 @@ class UbicacionControlador {
             res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
+*/
+
+    public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
+        try {
+            const { id_empl, id_ubicacion, user_name, ip } = req.body;
+            // `id_empleados` es una lista de IDs de empleados
+            console.log("ver req.body: ", req.body)
+
+            console.log('Empleados y ubicación recibidos:', req.body);
+
+            // Iniciar transacción
+            await pool.query('BEGIN');
+
+            // Filtrar empleados que ya tienen la ubicación registrada
+            const resultadoExistente = await pool.query(
+                `
+                SELECT id_empleado FROM mg_empleado_ubicacion 
+                WHERE id_ubicacion = $1 AND id_empleado = ANY($2::int[])
+                `,
+                [id_ubicacion, id_empl]
+            );
+
+            // Extraer empleados ya registrados
+            const empleadosExistentes = resultadoExistente.rows.map((row: { id_empleado: number }) => row.id_empleado);
+
+            // Filtrar solo los empleados nuevos para insertar
+            const nuevosEmpleados = id_empl.filter(
+                (id_empleado: number) => !empleadosExistentes.includes(id_empleado)
+            );
+
+            // Si no hay empleados nuevos, finalizar la transacción
+            if (nuevosEmpleados.length === 0) {
+                await pool.query('ROLLBACK');
+                res.jsonp({ message: 'No hay nuevos registros para insertar.' });
+            } else {
+
+                const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+                const batches = [];
+                // Dividir los empleados en lotes pequeños
+                for (let i = 0; i < nuevosEmpleados.length; i += batchSize) {
+                    batches.push(nuevosEmpleados.slice(i, i + batchSize));
+                }
+
+                // Insertar los empleados en lotes
+                for (const batch of batches) {
+                    const valores = batch
+                        .map((id_empleado: number) => `(${id_empleado}, ${id_ubicacion})`)
+                        .join(', ');
+
+                    // Ejecutar la inserción en cada lote
+                    await pool.query(
+                        `
+                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                    VALUES ${valores}`
+                    );
+                }
+
+                const auditoria = nuevosEmpleados.map( (id_empleado: number)=> ({
+                    tabla: 'mg_empleado_ubicacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `id_empleado: ${id_empleado}, id_ubicacion: ${id_ubicacion}`,
+                    ip,
+                    observacion: null
+                }));
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                // Finalizar transacción
+                await pool.query('COMMIT');
+
+                if (resultadoExistente.rows.length !== 0) {
+                    res.jsonp({ message: 'Con duplicados' });
+                } else {
+                    res.jsonp({ message: 'Sin duplicados' });
+                }
+
+            }
+        } catch (error) {
+            // Revertir la transacción en caso de error
+            console.log("ver el error: ", error)
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar registros.' });
+        }
+    }
+
 
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACION   **USADO
     public async ListarRegistroUsuarioU(req: Request, res: Response) {

@@ -433,17 +433,6 @@ class TimbresControlador {
                 const fecha_ = luxon_1.DateTime.fromISO(fec_hora_timbre);
                 var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
                 // OBTENER LA FECHA Y HORA ACTUAL
-                var now = luxon_1.DateTime.now();
-                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var fecha_hora = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
-                let servidor;
-                //console.log('req... ', hora_fecha_timbre)
-                if (tipo === 'administrar') {
-                    servidor = hora_fecha_timbre;
-                }
-                else {
-                    servidor = fecha_hora;
-                }
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM eu_empleados WHERE id = $1
                 `, [id_empleado]).then((result) => { return result.rows; });
@@ -457,8 +446,8 @@ class TimbresControlador {
                     to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
                     to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                `, [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion,
+                    observacion, 'APP_WEB', documento, true, hora_fecha_timbre], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
                     //console.log('result ', results)
                     // FORMATEAR FECHAS
@@ -475,7 +464,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, documento: ${existe_documento} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
                         ip,
                         observacion: null
                     });
@@ -504,6 +493,8 @@ class TimbresControlador {
     BuscarTimbresPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo, fec_inicio, fec_final } = req.body;
+            console.log("ver fec_inicio", fec_inicio);
+            console.log("ver fec_final", fec_final);
             const TIMBRES = yield database_1.default.query("SELECT * FROM eu_timbres " +
                 "WHERE fecha_hora_timbre_validado BETWEEN $1 AND $2 " +
                 "AND codigo IN (" + codigo + ") " +

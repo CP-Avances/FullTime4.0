@@ -49,7 +49,7 @@ class VacacionesControlador {
       FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da, 
         ed_departamentos AS depa   
       WHERE dc.id_empleado = e.id  
-	      AND da.id_contrato = dc.contrato_id
+	      AND da.id_contrato = dc.id_contrato
         AND depa.id = da.id_depa
 	      AND (v.estado = 1 OR v.estado = 2) 
         AND da.estado = $1
