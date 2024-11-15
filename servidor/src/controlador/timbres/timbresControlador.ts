@@ -268,7 +268,7 @@ class TimbresControlador {
 
             const fechaHoraValidado = await FormatearHora(datosOriginales.fecha_hora_timbre_validado.toLocaleString().split(' ')[1]);
             const fechaTimbreValidado = await FormatearFecha2(datosOriginales.fecha_hora_timbre_validado, 'ddd');
-            
+
             const actualizacion = await pool.query(
                 `
                 SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
@@ -278,11 +278,11 @@ class TimbresControlador {
                 ;
             const [datosNuevos] = actualizacion.rows;
             let existe_imagen = false;
-            if(datosOriginales.imagen){
+            if (datosOriginales.imagen) {
                 existe_imagen = true
             }
             let existe_documento = false;
-            if(datosOriginales.documento){
+            if (datosOriginales.documento) {
                 existe_documento = true
             }
             // AUDITORIA
@@ -500,7 +500,7 @@ class TimbresControlador {
                     if (documento) {
                         existe_documento = true;
                     }
-                    
+
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
@@ -811,49 +811,45 @@ class TimbresControlador {
      ** ************************************************************************************************* **/
 
     // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
-    public async IngresarOpcionTimbre(req: Request, res: Response): Promise<Response> {
+    public async IngresarOpcionTimbre(req: Request, res: Response): Promise<void> {
 
         try {
             const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+            const batches = [];
+            for (let i = 0; i < id_empleado.length; i += batchSize) {
+                batches.push(id_empleado.slice(i, i + batchSize));
+            }
+            for (const batch of batches) {
+                const valores = batch
+                    .map((id_empleado: number) => `(${id_empleado}, ${timbre_internet}, ${timbre_foto}, ${timbre_especial}, ${timbre_ubicacion_desconocida})`)
+                    .join(', ');
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const response: QueryResult = await pool.query(
-                `
-                INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial,
+                // Ejecutar la inserción en cada lote
+                await pool.query(
+                    `INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial,
                     timbre_ubicacion_desconocida) 
-                VALUES ($1, $2, $3, $4, $5) RETURNING *
-                `
-                , [id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-
-            const [opciones] = response.rows;
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'mrv_opciones_marcacion',
+                VALUES ${valores}`
+                );
+            }
+            const auditoria = id_empleado.map((id_empleado: number) => ({
+                tabla: 'mtv_opciones_marcacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(opciones),
+                datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                 ip,
                 observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
+            }));
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
             await pool.query('COMMIT');
-
-            if (opciones) {
-                return res.status(200).jsonp(opciones)
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
-
+            res.jsonp({ message: 'Sin duplicados' });
         } catch (error) {
             console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
+            res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -867,6 +863,7 @@ class TimbresControlador {
             var opciones: any;
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
+            let rowsAffected: number = 0;
 
             if (timbre_internet != null && timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('1')
@@ -874,177 +871,178 @@ class TimbresControlador {
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4,
                         timbre_ubicacion_desconocida = $5
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_foto != null && timbre_especial != null) {
                 //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_foto != null && timbre_ubicacion_desconocida != null) {
                 //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_foto, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_foto != null) {
                 //console.log('2')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_foto]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_especial != null) {
                 //console.log('3')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null && timbre_ubicacion_desconocida != null) {
                 //console.log('3')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null && timbre_especial != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_foto, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null && timbre_ubicacion_desconocida != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_foto, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_internet != null) {
                 //console.log('5')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_internet]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null) {
                 //console.log('6')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_foto]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_especial != null) {
                 //console.log('7')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_ubicacion_desconocida != null) {
                 //console.log('7')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mrv_opciones_marcacion SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `
                     , [id_empleado, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            const auditoria = id_empleado.map((id_empleado: number) => ({
                 tabla: 'mrv_opciones_marcacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(opciones),
+                datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                 ip,
                 observacion: null
-            });
+            }));
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
@@ -1059,6 +1057,7 @@ class TimbresControlador {
 
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log("ver error de actualizar: ", error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
@@ -1168,49 +1167,48 @@ class TimbresControlador {
      ** ************************************************************************************************* **/
 
     // METODO PARA ALMACENAR CONFIGURACION DE TIMBRE     **USADO
-    public async IngresarOpcionTimbreWeb(req: Request, res: Response): Promise<Response> {
+    public async IngresarOpcionTimbreWeb(req: Request, res: Response): Promise<void> {
 
         try {
             const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+            const batches = [];
+            for (let i = 0; i < id_empleado.length; i += batchSize) {
+                batches.push(id_empleado.slice(i, i + batchSize));
+            }
+            for (const batch of batches) {
+                const valores = batch
+                    .map((id_empleado: number) => `(${id_empleado}, ${timbre_foto}, ${timbre_especial}, ${timbre_ubicacion_desconocida})`)
+                    .join(', ');
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const response: QueryResult = await pool.query(
-                `
+                // Ejecutar la inserción en cada lote
+                await pool.query(
+                    `
                 INSERT INTO mtv_opciones_marcacion (id_empleado, timbre_foto, timbre_especial, 
                     timbre_ubicacion_desconocida) 
-                VALUES ($1, $2, $3, $4) RETURNING *
-                `
-                , [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
+                VALUES ${valores}`
+                );
+            }
 
-            const [opciones] = response.rows;
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            const auditoria = id_empleado.map((id_empleado: number) => ({
                 tabla: 'mtv_opciones_marcacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(opciones),
+                datosNuevos: `id_empleado: ${id_empleado}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                 ip,
                 observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
+            }));
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
             await pool.query('COMMIT');
-
-            if (opciones) {
-                return res.status(200).jsonp(opciones)
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
+            res.jsonp({ message: 'Sin duplicados' });
 
         } catch (error) {
-            console.log('error ', error)
-            // REVERTIR TRANSACCION
+            // Revertir la transacción en caso de error
+            console.log("ver el error: ", error)
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
+            res.status(500).jsonp({ message: 'Error al guardar registros.' });
         }
     }
 
@@ -1221,106 +1219,109 @@ class TimbresControlador {
             const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
             //console.log(req.body)
 
-            var opciones: any;
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
+            let rowsAffected: number = 0;
 
             if (timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('1')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3,
-                        timbre_ubicacion_deconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                        timbre_ubicacion_desconocida = $4
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null && timbre_especial != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_foto, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null && timbre_ubicacion_desconocida != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_foto, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
                 //console.log('4')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_especial, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null) {
                 //console.log('6')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) *
                     `
                     , [id_empleado, timbre_foto]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_especial != null) {
                 //console.log('7')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_especial]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
             else if (timbre_ubicacion_desconocida != null) {
                 //console.log('7')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_ubicacion_desconocida]);
 
-                [opciones] = response.rows;
+                rowsAffected = response.rowCount || 0;
             }
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+
+
+            const auditoria = id_empleado.map((id_empleado: number) => ({
                 tabla: 'mtv_opciones_marcacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(opciones),
+                datosNuevos: `id_empleado: ${id_empleado}, , timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                 ip,
                 observacion: null
-            });
+            }));
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             //console.log('opciones ', opciones)
 
-            if (opciones) {
-                return res.status(200).jsonp(opciones)
+            if (rowsAffected > 0) {
+                return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
             }
             else {
                 return res.status(404).jsonp({ message: 'error' })
@@ -1328,6 +1329,7 @@ class TimbresControlador {
 
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log("ver error de actualizar: ", error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
@@ -1347,6 +1349,33 @@ class TimbresControlador {
         }
         else {
             return res.status(404).jsonp({ message: 'vacio' });
+        }
+    }
+
+
+    public async BuscarMultipleOpcionesTimbreWebMultiple(req: Request, res: Response): Promise<any> {
+        try {
+            const { ids_empleados } = req.body; // ids_empleados debe ser un array de ids
+
+            // Validar que ids_empleados sea un array
+            if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+            }
+
+            const OPCIONES = await pool.query(
+                "SELECT * FROM mtv_opciones_marcacion " +
+                "WHERE id_empleado = ANY($1)",
+                [ids_empleados] // Pasamos el array directamente a la consulta
+            );
+
+            if (OPCIONES.rowCount !== 0) {
+                return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
+            } else {
+                return res.status(404).jsonp({ message: 'vacio' });
+            }
+        } catch (error) {
+            console.error('Error al buscar opciones de marcación:', error);
+            return res.status(500).jsonp({ message: 'Error interno del servidor' });
         }
     }
 

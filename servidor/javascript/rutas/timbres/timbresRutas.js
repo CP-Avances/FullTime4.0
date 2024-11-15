@@ -42,8 +42,10 @@ class TimbresRutas {
         this.router.post('/opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.IngresarOpcionTimbreWeb);
         // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
         this.router.put('/actualizar-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarOpcionTimbreWeb);
-        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE  USUARIOS  **USADO
         this.router.post('/listar-varias-opciones-timbre-web', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbreWeb);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre-web-multiple', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarMultipleOpcionesTimbreWebMultiple);
         // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.post('/eliminar-opcion-marcacion-web', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarRegistrosWeb);
         // METODO DE BUSQUEDA DE AVISOS GENERALES

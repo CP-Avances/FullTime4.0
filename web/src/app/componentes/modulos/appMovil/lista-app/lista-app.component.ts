@@ -1027,6 +1027,7 @@ export class ListaAppComponent implements OnInit {
 
     const datos = {
       array: seleccionados,
+      app_habilita: seleccionados[0].app_habilita,
       user_name: this.user_name,
       ip: this.ip,
     }

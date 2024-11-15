@@ -213,6 +213,7 @@ export class ReporteAuditoriaComponent implements OnInit {
         { nombre: "Perimetros de Ubicación", tabla: "mg_cat_ubicaciones", modulo: "Geolocalización", disponibilidad: this.geolocalizacion },
         { nombre: "Ubicaciones asignadas al Usuario", tabla: "mg_empleado_ubicacion", modulo: "Geolocalización", disponibilidad: this.geolocalizacion },
         // MODULO DE RELOJ VIRTUAL
+        { nombre: "Opciones de Marcación", tabla: "mtv_opciones_marcacion", modulo: "", disponibilidad: true },
         { nombre: "Dispositivos Móviles", tabla: "mrv_dispositivos", modulo: "Reloj Virtual", disponibilidad: this.reloj_virtual },
     ];
 

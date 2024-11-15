@@ -653,10 +653,6 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   contador: number = 0;
   RegistrarMultiple(data: any) {
-    //console.log(data, ' lenght ', data.length)
-    //console.log('timbre especial ', this.seleccion_especial.value)
-    //console.log('timbre internet ', this.seleccion_internet.value)
-    //console.log('timbre foto ', this.seleccion_foto.value)
     this.contador = 0;
     var info = {
       id_empleado: '',
@@ -679,6 +675,10 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     } else {
       //console.log('ingresa en data')
       if (data.length > 0) {
+
+        const ids_empleados = data.map((empl: any) => empl.id);
+
+
         data.forEach((empl: any) => {
           let buscar = {
             id_empleado: empl.id,
@@ -729,7 +729,6 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
   ActualizarOpcionMarcacion(informacion: any, contador: number, data: any) {
     this.restTimbres.ActualizarOpcionesMarcacion(informacion).subscribe((a) => {
-      //console.log('actualiza ', a);
       this.MostrarMensaje(contador, data);
     });
   }

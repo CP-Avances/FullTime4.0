@@ -650,12 +650,17 @@ export class OpcionesTimbreWebComponent implements OnInit {
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   contador: number = 0;
   RegistrarMultiple(data: any) {
-    //console.log(data, ' lenght ', data.length)
-    //console.log('timbre especial ', this.seleccion_especial.value)
-    //console.log('timbre internet ', this.seleccion_internet.value)
-    //console.log('timbre foto ', this.seleccion_foto.value)
+    
     this.contador = 0;
     var info = {
+      id_empleado: '',
+      timbre_foto: this.seleccion_foto.value,
+      timbre_especial: this.seleccion_especial.value,
+      timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+    var infoActualizar = {
       id_empleado: '',
       timbre_foto: this.seleccion_foto.value,
       timbre_especial: this.seleccion_especial.value,
@@ -674,25 +679,46 @@ export class OpcionesTimbreWebComponent implements OnInit {
     } else {
       //console.log('ingresa en data')
       if (data.length > 0) {
-        data.forEach((empl: any) => {
-          let buscar = {
-            id_empleado: empl.id,
-          };
-          console.log('ingresa en data ', buscar);
-          this.restTimbres.BuscarVariasOpcionesMarcacionWeb(buscar).subscribe(
-            (o) => {
-              console.log('ingresa busqueda ');
-              this.contador = this.contador + 1;
-              info.id_empleado = empl.id;
-              this.ActualizarOpcionMarcacion(info, this.contador, data);
-            },
-            (vacio) => {
-              this.contador = this.contador + 1;
-              info.id_empleado = empl.id;
-              this.IngresarOpcionMarcacion(info, this.contador, data);
+
+        const ids_empleados = data.map((empl: any) => empl.id);
+
+        this.restTimbres.BuscarVariasOpcionesMarcacionWebMultiple({ ids_empleados }).subscribe(
+          async res => {
+            if (res && res.respuesta) {
+              // Almacenar los datos encontrados en un array
+              const datosEncontrados = res.respuesta; // Array con los objetos devueltos por el backend
+              // Extraer los IDs devueltos por la respuesta
+              const idsEncontrados = datosEncontrados.map((item: any) => item.id_empleado);
+              const idsFaltantes = ids_empleados.filter((id: number) => !idsEncontrados.includes(id));
+
+              console.log("ver idsEncontrados", idsEncontrados )
+              console.log("ver idsFaltantes", idsFaltantes )
+
+              if (idsEncontrados.length != 0) {
+                infoActualizar.id_empleado = idsEncontrados;
+                await this.ActualizarOpcionMarcacion(infoActualizar, idsFaltantes);
+
+              }
+              // Comparar los IDs iniciales con los devueltos y obtener los faltantes
+              if (idsFaltantes.length != 0) {
+                info.id_empleado = idsFaltantes;
+                await this.IngresarOpcionMarcacion(info);
+              }
+            } else {
+              console.log('No se encontraron datos en la respuesta.');
             }
-          );
-        });
+          },
+          async error => {
+            if (error.status === 404) {
+              console.log('El backend devolvió un 404: No se encontraron datos.');
+              // Realizar acciones específicas para el caso de 404
+              info.id_empleado = ids_empleados;
+              await this.IngresarOpcionMarcacion(info)
+            } else {
+              console.error('Error inesperado:', error);
+            }
+          }
+        )
       } else {
         this.toastr.warning('No ha seleccionado usuarios.', '', {
           timeOut: 6000,
@@ -702,7 +728,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR OPCION DE MARCACION
-  IngresarOpcionMarcacion(informacion: any, contador: number, data: any) {
+  IngresarOpcionMarcacion(informacion: any) {
     if (this.seleccion_especial.value === null) {
       informacion.timbre_especial = false;
     }
@@ -712,29 +738,28 @@ export class OpcionesTimbreWebComponent implements OnInit {
     if (this.seleccion_ubicacion.value === null) {
       informacion.timbre_ubicacion_desconocida = false;
     }
-    //console.log('info ', informacion)
     this.restTimbres.IngresarOpcionesMarcacionWeb(informacion).subscribe((i) => {
-      this.MostrarMensaje(contador, data);
+      this.MostrarMensaje();
     });
   }
 
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
-  ActualizarOpcionMarcacion(informacion: any, contador: number, data: any) {
+  ActualizarOpcionMarcacion(informacion: any, arregloIngreso) {
+    console.log("ver arregloIngreso: ", arregloIngreso)
+
     this.restTimbres.ActualizarOpcionesMarcacionWeb(informacion).subscribe((a) => {
-      //console.log('actualiza ', a);
-      this.MostrarMensaje(contador, data);
+      if (arregloIngreso.length  == 0) {
+        this.MostrarMensaje();
+      }
     });
   }
 
   // METODO DE ALMACENAMIENTO DE DATOS
-  MostrarMensaje(contador: number, data: any) {
-    //console.log('data ', data.length, 'contador ', contador);
-    if (data.length === contador) {
-      this.toastr.success('Registros ingresados exitosamente.', '', {
-        timeOut: 6000,
-      });
-      this.LimpiarFormulario();
-    }
+  MostrarMensaje() {
+    this.toastr.success('Registros ingresados exitosamente.', '', {
+      timeOut: 6000,
+    });
+    this.LimpiarFormulario();
   }
 
   // METODO PARA VER INFORMACION DE OPCIONES MARCACION

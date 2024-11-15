@@ -95,6 +95,11 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/listar-varias-opciones-timbre-web`, datos);
   }
 
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacionWebMultiple(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/listar-varias-opciones-timbre-web-multiple`, datos);
+  }
+
   // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
   IngresarOpcionesMarcacionWeb(datos: any) {
     return this.http.post<any>(`${environment.url}/timbres/opciones-timbre-web`, datos);

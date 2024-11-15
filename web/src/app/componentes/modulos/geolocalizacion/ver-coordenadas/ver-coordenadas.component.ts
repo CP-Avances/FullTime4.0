@@ -747,7 +747,6 @@ export class VerCoordenadasComponent implements OnInit {
         }
         this.ConsultarDatos();
         this.AbrirVentanaBusqueda();
-
       });
     }
     else {
