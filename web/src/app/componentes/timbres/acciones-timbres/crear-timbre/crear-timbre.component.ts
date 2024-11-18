@@ -141,6 +141,8 @@ export class CrearTimbreComponent implements OnInit {
   // METODO DE INGRESO DE TIMBRES
   contador: number = 0;
   InsertarTimbre(form: any) {
+    this.ventana.close();
+
     var hora_timbre = form.horaForm;
     if (this.capturar_segundos === 60) {
       hora_timbre = form.horaForm + ':00';
@@ -164,6 +166,19 @@ export class CrearTimbreComponent implements OnInit {
     }
     else {
       this.contador = 0;
+      const ids_empleados = this.data.map((empl: any) => empl.id);
+
+      timbre.id_empleado = ids_empleados;
+      this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
+       // this.contador = this.contador + 1;
+      //  if (this.contador === this.data.length) {
+          this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
+            timeOut: 6000,
+          })
+      //  }
+      })
+
+      /*
       this.data.map((obj: any) => {
         timbre.id_empleado = obj.id;
         // METODO DE INSERCION DE TIMBRES
@@ -177,6 +192,8 @@ export class CrearTimbreComponent implements OnInit {
           }
         })
       })
+
+      */
     }
   }
 

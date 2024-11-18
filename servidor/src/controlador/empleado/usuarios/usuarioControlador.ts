@@ -368,68 +368,43 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB    **USADO
   public async ActualizarEstadoTimbreWeb(req: Request, res: Response) {
     try {
-      const { array, user_name, ip } = req.body;
+      const { array, web_habilita, user_name, ip } = req.body;
+      console.log("ver req.body", req.body)
+      const ids_empleados = array.map((empl: any) => empl.id);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      const datosOriginales = consulta.rows;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
+      let rowsAffected: number = 0;
 
-      const nuevo = await Promise.all(array.map(async (o: any) => {
+      const response: QueryResult = await pool.query(
+        `
+            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = ANY($2::int[])
+          `
+        , [!web_habilita, ids_empleados]);
 
-        try {
-          // INICIA TRANSACCION
-          await pool.query('BEGIN');
 
-          // CONSULTA DATOSORIGINALES
-          const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
-          const [datosOriginales] = consulta.rows;
+      rowsAffected = response.rowCount || 0;
 
-          if (!datosOriginales) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'eu_usuarios',
-              usuario: user_name,
-              accion: 'U',
-              datosOriginales: '',
-              datosNuevos: '',
-              ip,
-              observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-          }
-
-          const [result] = await pool.query(
-            `
-            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
-            `
-            , [!o.web_habilita, o.userid])
-            .then((result: any) => { return result.rows });
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_usuarios',
-            usuario: user_name,
-            accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginales),
-            datosNuevos: `{web_habilita: ${!o.web_habilita}}`,
-            ip,
-            observacion: null
-          });
-
-          // FINALIZAR TRANSACCION
-          await pool.query('COMMIT');
-          return result;
-
-        } catch (error) {
-          // REVERTIR TRANSACCION
-          await pool.query('ROLLBACK');
-          return { error: error.toString() }
+      const auditoria = datosOriginales.map((item: any) => (
+        {
+          tabla: 'eu_usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: JSON.stringify(item),
+          datosNuevos: `{"web_habilita": ${!item.web_habilita}}`,
+          ip,
+          observacion: null
         }
+      ));
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
 
-      }))
-
-      return res.status(200).jsonp({ message: 'Datos actualizados exitosamente.', nuevo })
-
+      if (rowsAffected > 0) {
+        return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
     } catch (error) {
       return res.status(500).jsonp({ message: error })
     }
@@ -484,7 +459,9 @@ class UsuarioControlador {
       const { array, app_habilita, user_name, ip } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      const datosOriginales = consulta.rows;
+      
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
@@ -494,13 +471,14 @@ class UsuarioControlador {
           `
         , [!app_habilita, ids_empleados]);
 
+
       rowsAffected = response.rowCount || 0;
 
-      const auditoria = array.map((item: any) => (
+      const auditoria = datosOriginales.map((item: any) => (
         {
           tabla: 'eu_usuarios',
           usuario: user_name,
-          accion: 'I',
+          accion: 'U',
           datosOriginales: JSON.stringify(item),
           datosNuevos: `{"app_habilita": ${!item.app_habilita}}`,
           ip,

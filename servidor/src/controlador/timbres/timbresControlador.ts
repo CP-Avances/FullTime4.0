@@ -452,6 +452,7 @@ class TimbresControlador {
         }
     }
 
+    /*
     // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
@@ -466,9 +467,12 @@ class TimbresControlador {
             // OBTENER LA FECHA Y HORA ACTUAL
             let code = await pool.query(
                 `
-                SELECT codigo FROM eu_empleados WHERE id = $1
+                SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])
                 `
                 , [id_empleado]).then((result: any) => { return result.rows });
+
+            const code_empleados = code.map((empl: any) => empl.codigo);
+
 
             if (code.length === 0) return { mensaje: 'El usuario no tiene un código asignado.' };
 
@@ -476,63 +480,127 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            pool.query(
-                `
-                SELECT * FROM public.timbres_crear ($1, $2,
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
-                    to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `
-                , [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento, true, hora_fecha_timbre]
+            for (let i = 0; i < code_empleados.length; i++) {
+                pool.query(
+                    `
+                    SELECT * FROM public.timbres_crear ($1, $2,
+                        to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                        to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
+                        to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
+                    `
+                    , [code_empleados[i], id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion,
+                        observacion, 'APP_WEB', documento, true, hora_fecha_timbre]
+                )
+            }
+            var fecha = fecha_.toFormat('yyyy-MM-dd');
+            var hora = fecha_.toFormat('HH:mm:ss');
 
-                , async (error, results) => {
-                    console.log('error ', error)
-                    //console.log('result ', results)
-                    // FORMATEAR FECHAS
-                    var fecha = fecha_.toFormat('yyyy-MM-dd');
-                    var hora = fecha_.toFormat('HH:mm:ss');
+            const fechaHora = await FormatearHora(hora);
+            const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
+            let existe_documento = false;
 
-                    const fechaHora = await FormatearHora(hora);
-                    const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
-                    let existe_documento = false;
+            if (documento) {
+                existe_documento = true;
+            }
 
-                    if (documento) {
-                        existe_documento = true;
-                    }
+            const auditoria = code_empleados.map((codigo: number) => ({
+                tabla: 'eu_timbres',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
+                ip,
+                observacion: null
+            }));
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+            res.status(200).jsonp({ message: 'Registro guardado.' });
 
-
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'eu_timbres',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
-                        ip,
-                        observacion: null
-                    });
-
-                    await pool.query('COMMIT');
-                    if (results) {
-                        if (results.rows[0].timbres_crear === 0) {
-                            res.status(200).jsonp({ message: 'Registro duplicado.' });
-                        }
-                        else {
-                            res.status(200).jsonp({ message: 'Registro guardado.' });
-                        }
-                    }
-                    else {
-                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
-                    }
-                }
-            )
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });
         }
     }
+*/
+    public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
+        const client = await pool.connect(); // Obtener un cliente para la transacción
 
+        try {
+            // Datos requeridos para el método
+            const {
+                fec_hora_timbre, accion, tecl_funcion, observacion,
+                id_empleado, id_reloj, tipo, ip, user_name, documento
+            } = req.body;
+
+            console.log('req ', req.body);
+            const fecha_ = DateTime.fromISO(fec_hora_timbre);
+            var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
+
+            // Obtener códigos de los empleados
+            const code = await client.query(
+                `SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])`,
+                [id_empleado]
+            );
+
+            if (code.rows.length === 0) {
+                res.status(404).json({ mensaje: 'El usuario no tiene un código asignado.' });
+                return;
+            }
+
+            const code_empleados = code.rows.map((empl: any) => empl.codigo);
+
+            // Iniciar transacción
+            await client.query('BEGIN');
+
+            const timbrePromises = code_empleados.map((codigo: number) =>
+                client.query(
+                    `SELECT * FROM public.timbres_crear ($1, $2,
+                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone,
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
+                    to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
+                `,
+                    [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion, observacion, 'APP_WEB', documento, true, hora_fecha_timbre]
+                )
+            );
+
+            // Esperar a que todas las promesas se resuelvan
+            await Promise.all(timbrePromises);
+
+            var fecha = fecha_.toFormat('yyyy-MM-dd');
+            var hora = fecha_.toFormat('HH:mm:ss');
+
+            const fechaHora = await FormatearHora(hora);
+            const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
+            let existe_documento = !!documento;
+
+            const auditoria = code_empleados.map((codigo: number) => ({
+                tabla: 'eu_timbres',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
+                ip,
+                observacion: null
+            }));
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+
+            // Confirmar la transacción
+            await client.query('COMMIT');
+
+            res.status(200).json({ message: 'Registro guardado.' });
+
+        } catch (error) {
+            console.error('Error durante la transacción:', error);
+
+            // Revertir la transacción en caso de error
+            await client.query('ROLLBACK');
+
+            res.status(500).json({ message: 'Error interno del servidor.' });
+        } finally {
+            client.release(); // Liberar el cliente al final
+        }
+    }
 
     // METODO PARA BUSCAR TIMBRES   **USADO
     public async BuscarTimbresPlanificacion(req: Request, res: Response) {
@@ -858,7 +926,7 @@ class TimbresControlador {
 
         try {
             const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-            //console.log(req.body)
+            console.log(req.body)
 
             var opciones: any;
             // INICIAR TRANSACCION
@@ -1048,8 +1116,8 @@ class TimbresControlador {
             await pool.query('COMMIT');
             //console.log('opciones ', opciones)
 
-            if (opciones) {
-                return res.status(200).jsonp(opciones)
+            if (rowsAffected > 0) {
+                return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
             }
             else {
                 return res.status(404).jsonp({ message: 'error' })
@@ -1066,23 +1134,33 @@ class TimbresControlador {
 
     // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
     public async BuscarOpcionesTimbre(req: Request, res: Response): Promise<any> {
+        try {
+            const { ids_empleados } = req.body;
 
-        const { id_empleado } = req.body;
-        const OPCIONES = await pool.query(
-            `
+            console.log("ver req.body: ", req.body)
+            // Validar que ids_empleados sea un array
+            if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+            }
+
+            const OPCIONES = await pool.query(
+                `
             SELECT * FROM mrv_opciones_marcacion 
-            WHERE id_empleado = $1
+            WHERE id_empleado = ANY($1)
             `
-            , [id_empleado]);
+                , [ids_empleados]);
 
-        if (OPCIONES.rowCount != 0) {
-            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
-        }
-        else {
-            return res.status(404).jsonp({ message: 'vacio' });
+            if (OPCIONES.rowCount != 0) {
+                return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+            }
+            else {
+                return res.status(404).jsonp({ message: 'vacio' });
+            }
+        } catch (error) {
+            console.error('Error al buscar opciones de marcación:', error);
+            return res.status(500).jsonp({ message: 'Error interno del servidor' });
         }
     }
-
 
     // METODO PARA BUSCAR OPCIONES DE TIMBRES DE VARIOS USUARIOS    **USADO
     public async BuscarMultipleOpcionesTimbre(req: Request, res: Response): Promise<any> {
@@ -1108,12 +1186,12 @@ class TimbresControlador {
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip, id } = req.body;
-            //console.log('req.body ', req.body)
+            console.log('req.body ', req.body)
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT * FROM mrv_opciones_marcacion WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
@@ -1134,7 +1212,7 @@ class TimbresControlador {
 
             await pool.query(
                 `
-                DELETE FROM mrv_opciones_marcacion WHERE id = $1
+                DELETE FROM mrv_opciones_marcacion WHERE id_empleado = $1
                 `
                 , [id]);
 
@@ -1301,8 +1379,6 @@ class TimbresControlador {
 
                 rowsAffected = response.rowCount || 0;
             }
-
-
 
             const auditoria = id_empleado.map((id_empleado: number) => ({
                 tabla: 'mtv_opciones_marcacion',

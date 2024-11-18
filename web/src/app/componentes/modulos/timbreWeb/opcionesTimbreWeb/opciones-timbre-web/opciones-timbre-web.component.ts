@@ -668,6 +668,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
+
     if (
       this.seleccion_especial.value === null &&
       this.seleccion_foto.value === null && this.seleccion_ubicacion.value === null
@@ -746,7 +747,6 @@ export class OpcionesTimbreWebComponent implements OnInit {
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
   ActualizarOpcionMarcacion(informacion: any, arregloIngreso) {
     console.log("ver arregloIngreso: ", arregloIngreso)
-
     this.restTimbres.ActualizarOpcionesMarcacionWeb(informacion).subscribe((a) => {
       if (arregloIngreso.length  == 0) {
         this.MostrarMensaje();

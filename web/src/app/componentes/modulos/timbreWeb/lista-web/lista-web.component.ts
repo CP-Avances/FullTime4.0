@@ -1022,6 +1022,7 @@ export class ListaWebComponent implements OnInit {
     }
     const datos = {
       array: seleccionados,
+      web_habilita: seleccionados[0].web_habilita,
       user_name: this.user_name,
       ip: this.ip,
     }

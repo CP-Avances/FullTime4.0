@@ -321,55 +321,34 @@ class UsuarioControlador {
     ActualizarEstadoTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { array, user_name, ip } = req.body;
+                const { array, web_habilita, user_name, ip } = req.body;
+                console.log("ver req.body", req.body);
+                const ids_empleados = array.map((empl) => empl.id);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+                const datosOriginales = consulta.rows;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
-                const nuevo = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    try {
-                        // INICIA TRANSACCION
-                        yield database_1.default.query('BEGIN');
-                        // CONSULTA DATOSORIGINALES
-                        const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
-                        const [datosOriginales] = consulta.rows;
-                        if (!datosOriginales) {
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'eu_usuarios',
-                                usuario: user_name,
-                                accion: 'U',
-                                datosOriginales: '',
-                                datosNuevos: '',
-                                ip,
-                                observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                        }
-                        const [result] = yield database_1.default.query(`
-            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
-            `, [!o.web_habilita, o.userid])
-                            .then((result) => { return result.rows; });
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'eu_usuarios',
-                            usuario: user_name,
-                            accion: 'U',
-                            datosOriginales: JSON.stringify(datosOriginales),
-                            datosNuevos: `{web_habilita: ${!o.web_habilita}}`,
-                            ip,
-                            observacion: null
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        return result;
-                    }
-                    catch (error) {
-                        // REVERTIR TRANSACCION
-                        yield database_1.default.query('ROLLBACK');
-                        return { error: error.toString() };
-                    }
-                })));
-                return res.status(200).jsonp({ message: 'Datos actualizados exitosamente.', nuevo });
+                let rowsAffected = 0;
+                const response = yield database_1.default.query(`
+            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = ANY($2::int[])
+          `, [!web_habilita, ids_empleados]);
+                rowsAffected = response.rowCount || 0;
+                const auditoria = datosOriginales.map((item) => ({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(item),
+                    datosNuevos: `{"web_habilita": ${!item.web_habilita}}`,
+                    ip,
+                    observacion: null
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                if (rowsAffected > 0) {
+                    return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });
@@ -415,6 +394,8 @@ class UsuarioControlador {
                 const { array, app_habilita, user_name, ip } = req.body;
                 console.log("ver req.body", req.body);
                 const ids_empleados = array.map((empl) => empl.id);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+                const datosOriginales = consulta.rows;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
                 let rowsAffected = 0;
@@ -422,10 +403,10 @@ class UsuarioControlador {
             UPDATE eu_usuarios SET app_habilita = $1 WHERE id = ANY($2::int[])
           `, [!app_habilita, ids_empleados]);
                 rowsAffected = response.rowCount || 0;
-                const auditoria = array.map((item) => ({
+                const auditoria = datosOriginales.map((item) => ({
                     tabla: 'eu_usuarios',
                     usuario: user_name,
-                    accion: 'I',
+                    accion: 'U',
                     datosOriginales: JSON.stringify(item),
                     datosNuevos: `{"app_habilita": ${!item.app_habilita}}`,
                     ip,
