@@ -14,6 +14,7 @@ class NotificacionTiempoRealRutas {
     configuracion() {
         // METODO PARA CONTROLAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
         this.router.get('/config/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerConfigEmpleado);
+        this.router.post('/config-multiple/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerConfigMultipleEmpleado);
         // RUTA PARA CREAR NOTIFICACION
         this.router.post('/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.CrearNotificacion);
         this.router.get('/all-receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListaNotificacionesRecibidas);

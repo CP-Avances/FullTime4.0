@@ -1,6 +1,6 @@
 .btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
 
-mat-form-field { padding: 10px 15px 0px 15px; width: 250px;}
+mat-form-field { padding: 10px 15px 0px 15px; width: 90%;}
 
 
 .scrollbar {

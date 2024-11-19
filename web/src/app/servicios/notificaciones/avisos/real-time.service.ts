@@ -24,6 +24,11 @@ export class RealTimeService {
   ObtenerConfiguracionEmpleado(id_empleado: number) {
     return this.http.get<any>(`${environment.url}/noti-real-time/config/${id_empleado}`);
   }
+  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
+  ObtenerConfiguracionEmpleadoMultiple(datos: any) {
+    return this.http.post<any>(`${environment.url}/noti-real-time/config-multiple`, datos);
+  }
+
 
   // METODO PARA INGRESAR NOTIFICACIONES DE PERMISOS
   IngresarNotificacionEmpleado(datos: any) {

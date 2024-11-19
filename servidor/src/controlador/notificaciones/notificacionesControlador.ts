@@ -104,6 +104,27 @@ class NotificacionTiempoRealControlador {
       res.status(404).jsonp({ text: 'Sin registros encontrados.' });
     }
   }
+    // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
+  public async ObtenerConfigMultipleEmpleado(req: Request, res: Response): Promise<any> {
+    const { id_empleado } = req.body;
+
+    if (id_empleado) {
+      const CONFIG_NOTI = await pool.query(
+        `
+        SELECT * FROM eu_configurar_alertas WHERE id_empleado = ANY($1::int[])
+        `
+        , [id_empleado]);
+      if (CONFIG_NOTI.rowCount != 0) {
+        return res.jsonp(CONFIG_NOTI.rows);
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registro no encontrados.' });
+      }
+    } else {
+      res.status(404).jsonp({ text: 'Sin registros encontrados.' });
+    }
+  }
+
 
 
 

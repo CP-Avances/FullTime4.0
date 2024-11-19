@@ -139,6 +139,17 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     contador: number = 0;
     ConfigurarMultiple(form: any) {
         this.contador = 0;
+
+        const id_empleado =  this.empleados.map((empl: any) => empl.id);
+
+        this.avisos.ObtenerConfiguracionEmpleadoMultiple({id_empleado}).subscribe(
+            async res => {},
+            async error => {
+            }
+        )
+
+
+
         this.empleados.forEach((item: any) => {
             let data = {
                 vaca_mail: form.vacaMail,
