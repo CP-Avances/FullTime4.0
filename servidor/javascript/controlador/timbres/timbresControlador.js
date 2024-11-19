@@ -423,87 +423,18 @@ class TimbresControlador {
             }
         });
     }
-    /*
-    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
-    public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
-        try {
-            // ESTE USUARIO NO TIMBRA CON UBICACION
-            const { fec_hora_timbre, accion, tecl_funcion, observacion,
-                id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body
-
-            console.log('req ', req.body)
-            const fecha_ = DateTime.fromISO(fec_hora_timbre);
-            var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
-
-            // OBTENER LA FECHA Y HORA ACTUAL
-            let code = await pool.query(
-                `
-                SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])
-                `
-                , [id_empleado]).then((result: any) => { return result.rows });
-
-            const code_empleados = code.map((empl: any) => empl.codigo);
-
-
-            if (code.length === 0) return { mensaje: 'El usuario no tiene un código asignado.' };
-
-            var codigo = code[0].codigo;
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            for (let i = 0; i < code_empleados.length; i++) {
-                pool.query(
-                    `
-                    SELECT * FROM public.timbres_crear ($1, $2,
-                        to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone,
-                        to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
-                        to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                    `
-                    , [code_empleados[i], id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion,
-                        observacion, 'APP_WEB', documento, true, hora_fecha_timbre]
-                )
-            }
-            var fecha = fecha_.toFormat('yyyy-MM-dd');
-            var hora = fecha_.toFormat('HH:mm:ss');
-
-            const fechaHora = await FormatearHora(hora);
-            const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
-            let existe_documento = false;
-
-            if (documento) {
-                existe_documento = true;
-            }
-
-            const auditoria = code_empleados.map((codigo: number) => ({
-                tabla: 'eu_timbres',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
-                ip,
-                observacion: null
-            }));
-            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
-            res.status(200).jsonp({ message: 'Registro guardado.' });
-
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            res.status(500).jsonp({ message: error });
-        }
-    }
-*/
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const client = yield database_1.default.connect(); // Obtener un cliente para la transacción
             try {
                 // Datos requeridos para el método
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body;
+                const id_empleados = Array.isArray(id_empleado) ? id_empleado : [id_empleado];
                 console.log('req ', req.body);
                 const fecha_ = luxon_1.DateTime.fromISO(fec_hora_timbre);
                 var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
                 // Obtener códigos de los empleados
-                const code = yield client.query(`SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])`, [id_empleado]);
+                const code = yield client.query(`SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])`, [id_empleados]);
                 if (code.rows.length === 0) {
                     res.status(404).json({ mensaje: 'El usuario no tiene un código asignado.' });
                     return;

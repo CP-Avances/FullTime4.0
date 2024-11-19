@@ -170,30 +170,13 @@ export class CrearTimbreComponent implements OnInit {
 
       timbre.id_empleado = ids_empleados;
       this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
-       // this.contador = this.contador + 1;
-      //  if (this.contador === this.data.length) {
+    
           this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
             timeOut: 6000,
           })
-      //  }
       })
 
-      /*
-      this.data.map((obj: any) => {
-        timbre.id_empleado = obj.id;
-        // METODO DE INSERCION DE TIMBRES
-        this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
-          this.contador = this.contador + 1;
-          if (this.contador === this.data.length) {
-            this.ventana.close();
-            this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
-              timeOut: 6000,
-            })
-          }
-        })
-      })
-
-      */
+  
     }
   }
 
