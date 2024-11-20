@@ -21,7 +21,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private empleadoService: EmpleadoService,
     private perfil: PerfilEmpleadoService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.infoUser();
@@ -39,14 +39,19 @@ export class NavbarComponent implements OnInit {
     let correo = localStorage.getItem('correo') as string;
     let iniciales = localStorage.getItem('iniciales');
     let view_imagen = localStorage.getItem('view_imagen');
+    console.log("ver imagen nav: ", localStorage.getItem('view_imagen'));
+
     //console.log(fullname, correo, iniciales, view_imagen);
 
     if (fullname === null && correo === null && iniciales === null && view_imagen === null) {
       this.empleadoService.BuscarUnEmpleado(id_empleado).subscribe(res => {
+        console.log("ver res BuscarUnEmpleado: ", res)
 
         localStorage.setItem('fullname', res[0].nombre.split(" ")[0] + " " + res[0].apellido.split(" ")[0])
         localStorage.setItem('fullname_print', res[0].nombre + " " + res[0].apellido)
         localStorage.setItem('correo', res[0].correo)
+
+        console.log("ver imagen nav: ", localStorage.getItem('view_imagen') )
 
         this.UserEmail = localStorage.getItem('correo') as string;
         this.UserName = localStorage.getItem('fullname') as string;

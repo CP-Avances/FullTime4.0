@@ -63,9 +63,20 @@ export class RealTimeService {
     return this.http.post(`${environment.url}/noti-real-time/config`, datos);
   }
 
+  // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
+  IngresarConfigNotiEmpleadoMultiple(datos: any) {
+    return this.http.post(`${environment.url}/noti-real-time/config-multiple-crear`, datos);
+  }
+
+
   // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
   ActualizarConfigNotiEmpl(id_empleado: number, datos: any) {
     return this.http.put(`${environment.url}/noti-real-time/config/noti-put/${id_empleado}`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
+  ActualizarConfigNotiEmplMultiple(datos: any) {
+    return this.http.put(`${environment.url}/noti-real-time/config/noti-put-multiple`, datos);
   }
 
   // METODO PARA BUSCAR NOTIFICACIONES RECIBIDAS POR UN USUARIO
