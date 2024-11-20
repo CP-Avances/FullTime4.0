@@ -257,12 +257,20 @@
 
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}
+                </span>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
-            </button>
+                </button>
+            </div>
         </div>
         <mat-card-content>
             <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
