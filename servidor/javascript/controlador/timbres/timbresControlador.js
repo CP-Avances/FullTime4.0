@@ -987,43 +987,61 @@ class TimbresControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id } = req.body;
+                const { user_name, ip, ids } = req.body;
                 console.log('req.body ', req.body);
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
+                const datosOriginales = consulta.rows;
+                const idsEncontrados = datosOriginales.map((row) => row.id_empleado);
+                const idsNoEncontrados = ids.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id_empleado) => ({
                         tabla: 'mrv_opciones_marcacion',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar registro con id ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
+                        observacion: `Error al eliminar registro con id ${id_empleado}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
-                yield database_1.default.query(`
-                DELETE FROM mrv_opciones_marcacion WHERE id_empleado = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mrv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id_empleado) => ({
+                            tabla: 'mrv_opciones_marcacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar registro con id ${id_empleado}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    yield database_1.default.query(`
+                DELETE FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)
+                `, [idsEncontrados]);
+                    const auditoria = datosOriginales.map((item) => ({
+                        tabla: 'mrv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -1214,43 +1232,63 @@ class TimbresControlador {
     EliminarRegistrosWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id } = req.body;
-                //console.log('req.body ', req.body)
+                const { user_name, ip, ids } = req.body;
+                console.log('req.body ', req.body);
                 // INICIAR TRANSACCION
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM mtv_opciones_marcacion WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                const consulta = yield database_1.default.query(`SELECT * FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
+                const datosOriginales = consulta.rows;
+                // Obtener los IDs encontrados
+                const idsEncontrados = datosOriginales.map((row) => row.id_empleado);
+                const idsNoEncontrados = ids.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id_empleado) => ({
                         tabla: 'mtv_opciones_marcacion',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar registro con id ${id}`
-                    });
+                        observacion: `Error al eliminar registro con id ${id_empleado}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
-                yield database_1.default.query(`
-                DELETE FROM mtv_opciones_marcacion WHERE id = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mtv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id_empleado) => ({
+                            tabla: 'mtv_opciones_marcacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar registro con id ${id_empleado}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    yield database_1.default.query(`
+                DELETE FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)
+                `, [idsEncontrados]);
+                    const auditoria = datosOriginales.map((item) => ({
+                        tabla: 'mtv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION

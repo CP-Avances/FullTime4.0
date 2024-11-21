@@ -27,7 +27,7 @@ class UbicacionRutas {
         // METODO PARA LISTAR DATOS DE UBICACIONES       **USADO
         this.router.get('/coordenadas-usuarios/general/:id_ubicacion', emplUbicacionControlador_1.default.ListarRegistroUsuarioU);
         // METODO PARA ELIMINAR REGISTROS   **USADO
-        this.router.delete('/eliminar-coordenadas-usuario/:id', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.EliminarCoordenadasUsuario);
+        this.router.delete('/eliminar-coordenadas-usuario', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.EliminarCoordenadasUsuario);
         /** *********************************************************************************************** **
          ** **           RUTAS DE ACCESO A CONSULTAS DE COORDENADAS DE UBICACIÓN GENERALES               ** **
          ** *********************************************************************************************** **/

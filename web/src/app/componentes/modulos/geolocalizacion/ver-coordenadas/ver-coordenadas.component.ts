@@ -244,9 +244,10 @@ export class VerCoordenadasComponent implements OnInit {
   EliminarRegistro(id_emplu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ids: [id_emplu]
     }
-    this.restU.EliminarCoordenadasUsuario(id_emplu, datos).subscribe(res => {
+    this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -274,6 +275,7 @@ export class VerCoordenadasComponent implements OnInit {
     let ubicacion = {
       ubicacion: this.idUbicacion
     }
+    console.log("ver ubicacion: ", ubicacion)
     this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     })
@@ -807,31 +809,25 @@ export class VerCoordenadasComponent implements OnInit {
 
   // METODO PARA ELIMNAR REGISTROS DE UBICACION
   Remover() {
-    let EmpleadosSeleccionados: any;
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
-      return {
-        id_emplu: obj.id_emplu,
-        empleado: obj.nombre + ' ' + obj.apellido,
-        codigo: obj.codigo,
-        id_ubicacion: obj.id_ubicacion
-      }
-    })
-    if (EmpleadosSeleccionados.length > 0) {
-      EmpleadosSeleccionados.forEach((obj: any) => {
-        this.restU.EliminarCoordenadasUsuario(obj.id_emplu, datos).subscribe(res => {
-          this.ConsultarDatos();
+    
+    if (this.selectionUno.selected.length > 0) {
+
+      const ids: number[] = this.selectionUno.selected.map((obj: any) => obj.id_emplu).filter((id) => id !== undefined);
+
+      const datos = {
+        user_name: this.user_name,
+        ip: this.ip, 
+        ids: ids
+      };
+      this.restU.EliminarCoordenadasUsuario( datos).subscribe(res => {
+        this.ConsultarDatos();
+        this.toastr.error('Registros removidos de la lista.', '', {
+          timeOut: 6000,
         });
-      })
-      this.toastr.error('Registros removidos de la lista.', '', {
-        timeOut: 6000,
       });
+      
       this.HabilitarSeleccion();
       this.selectionUno.clear();
-      EmpleadosSeleccionados = [];
     }
   }
 
