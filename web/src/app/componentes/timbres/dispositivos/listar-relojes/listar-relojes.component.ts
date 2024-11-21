@@ -477,9 +477,9 @@ export class ListarRelojesComponent implements OnInit {
         this.presentarDataPDFRelojes(),
       ],
       styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 9 },
-        itemsTableC: { fontSize: 9, alignment: 'center' }
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 7 },
+        itemsTableC: { fontSize: 7, alignment: 'center' }
       }
     };
   }
@@ -513,11 +513,11 @@ export class ListarRelojesComponent implements OnInit {
               ...this.relojes.map((obj: any) => {
                 return [
                   { text: obj.codigo, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
+                  { text: obj.nomempresa, style: 'itemsTable'},
                   { text: obj.nomciudad, style: 'itemsTable' },
-                  { text: obj.nomsucursal, style: 'itemsTable' },
+                  { text: obj.nomsucursal, style: 'itemsTable'},
                   { text: obj.nomdepar, style: 'itemsTable' },
-                  { text: obj.nombre, style: 'itemsTable' },
+                  { text: obj.nombre, style: 'itemsTable'},
                   { text: obj.ip, style: 'itemsTableC' },
                   { text: obj.puerto, style: 'itemsTableC' },
                   { text: obj.marca, style: 'itemsTable' },
