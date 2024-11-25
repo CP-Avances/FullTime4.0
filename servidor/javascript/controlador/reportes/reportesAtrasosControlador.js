@@ -22,7 +22,6 @@ class ReportesAtrasosControlador {
             let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                 suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.atrasos = yield BuscarAtrasos(desde, hasta, o.id);
-                    console.log('atrasos: ', o);
                     return o;
                 })));
                 return suc;

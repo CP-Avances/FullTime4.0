@@ -1,5 +1,5 @@
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import {FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
@@ -1245,7 +1245,7 @@ class TimbresControlador {
 
         try {
             const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-            //console.log(req.body)
+            console.log(req.body)
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -1286,7 +1286,7 @@ class TimbresControlador {
                 rowsAffected = response.rowCount || 0;
             }
             else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
-                //console.log('4')
+                console.log('timbre_especial != null && timbre_ubicacion_desconocida != null')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
@@ -1297,11 +1297,11 @@ class TimbresControlador {
                 rowsAffected = response.rowCount || 0;
             }
             else if (timbre_foto != null) {
-                //console.log('6')
+                console.log('6')
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = ANY($1::int[]) *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `
                     , [id_empleado, timbre_foto]);
 

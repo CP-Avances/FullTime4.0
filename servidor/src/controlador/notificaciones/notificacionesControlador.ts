@@ -88,6 +88,9 @@ class NotificacionTiempoRealControlador {
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
+
+    
+    console.log("ver id_empleado", id_empleado)
     if (id_empleado != 'NaN') {
       const CONFIG_NOTI = await pool.query(
         `

@@ -1,10 +1,14 @@
 <div class="container" style="padding-top: 15px; padding-bottom: 30px;">
     <mat-card class="mat-elevation-z8">
-        <div class="d-flex bd-highlight" id="titulo" *ngIf="HabilitarBtn">
-            <div class="w-100 bd-highlight">
-                <h5>CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS</h5>
+        <div *ngIf="HabilitarBtn" id="titulo" class="row w-100 m-auto">
+            <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
             </div>
-            <div class="flex-shrink-1 bd-highlight">
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS
+                </span>
+            </div>
+            <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                     (click)="AbrirRegistrarMensaje()">
                     Añadir
@@ -13,13 +17,22 @@
         </div>
         <br>
         <div class="container" *ngFor="let c of cumple">
-            <div id="titulo">
-                <span>CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS</span>
-                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px; margin-top: -3px;"
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                </div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS
+                    </span>
+                </div>
+                <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px; margin-top: -3px;"
                     (click)="EditarMensaje(c)">
-                    Editar
-                </button>
+                        Editar
+                    </button>
+                </div>
             </div>
+
             <div style="padding-top: 15px;">
                 <div class="caja">
                     <label>Asunto:</label>

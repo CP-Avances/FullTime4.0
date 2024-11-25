@@ -25,10 +25,12 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.infoUser();
+    /*
     this.perfil.urlImagen$.subscribe(url => {
       this.urlImagen = url;
       this.mostrarImagen = !!url;
     });
+    */
   }
 
   infoUser() {
@@ -57,7 +59,7 @@ export class NavbarComponent implements OnInit {
         this.UserName = localStorage.getItem('fullname') as string;
         if (res[0]['imagen'] != null) {
           localStorage.setItem('view_imagen', `${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen'])
-          //this.urlImagen = localStorage.getItem('view_imagen');
+          this.urlImagen = localStorage.getItem('view_imagen');
           this.perfil.SetImagen(`${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen']);
           this.mostrarImagen = true;
         } else {

@@ -170,15 +170,21 @@ class AccionPersonalControlador {
     }
     ListarUnCargoPropuestos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_cargo_propuesto WHERE id = $1
-            `, [id]);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
+            try {
+                const { id } = req.params;
+                const ACCION = yield database_1.default.query(`
+                SELECT * FROM map_cargo_propuesto WHERE id = $1
+                `, [id]);
+                if (ACCION.rowCount != 0) {
+                    return res.jsonp(ACCION.rows);
+                }
+                else {
+                    return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            catch (error) {
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

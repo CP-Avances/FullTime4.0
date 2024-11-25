@@ -1100,7 +1100,7 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-                //console.log(req.body)
+                console.log(req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 let rowsAffected = 0;
@@ -1130,7 +1130,7 @@ class TimbresControlador {
                     rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
-                    //console.log('4')
+                    console.log('timbre_especial != null && timbre_ubicacion_desconocida != null');
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
                     WHERE id_empleado = ANY($1::int[]) 
@@ -1138,10 +1138,10 @@ class TimbresControlador {
                     rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null) {
-                    //console.log('6')
+                    console.log('6');
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = ANY($1::int[]) *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_foto]);
                     rowsAffected = response.rowCount || 0;
                 }

@@ -130,12 +130,8 @@ export const dia_completo: string = 'dddd';
 
 export const FormatearFecha = async function (fecha: string, dia: string) {
   const formato = await BuscarFecha();
-  console.log('formato ', formato.fecha);
   console.log(' fecha ', fecha);
-  console.log("dia", dia)
-
   const fechaLuxon = DateTime.fromISO(fecha);
-
   console.log("ver fechaLuxon", fechaLuxon)
 
   let diaFormateado =''
@@ -159,6 +155,31 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   console.log(' fecha.. ', fechaFormateada);
   return valor;
 }
+
+export const FormatearFechaPlanificacion = async function (fecha: string, dia: string) {
+  const formato = await BuscarFecha();
+  const fechaLuxon = DateTime.fromJSDate(new Date(fecha));
+  let diaFormateado =''
+  /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+    fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+    if (dia == "dddd") {
+       diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }else{
+       diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }
+  const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+
+  const valor = `${diaFormateado}, ${fechaFormateada}`;
+
+  return valor;
+}
+
 
 export const FormatearFecha2 = async function (fecha: string, dia: string) {
 

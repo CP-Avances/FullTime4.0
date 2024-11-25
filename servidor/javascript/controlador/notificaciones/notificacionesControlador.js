@@ -84,6 +84,7 @@ class NotificacionTiempoRealControlador {
     ObtenerConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_empleado = req.params.id;
+            console.log("ver id_empleado", id_empleado);
             if (id_empleado != 'NaN') {
                 const CONFIG_NOTI = yield database_1.default.query(`
         SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1

@@ -138,7 +138,6 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbres(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;
@@ -160,7 +159,6 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.id);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;
@@ -183,7 +181,6 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbreSistemas(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;
@@ -205,7 +202,6 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;
@@ -227,7 +223,6 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.timbres = yield BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;

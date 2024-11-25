@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
+exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFechaPlanificacion = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = __importDefault(require("../database"));
 const luxon_1 = require("luxon");
@@ -129,9 +129,7 @@ exports.dia_completo = 'dddd';
 const FormatearFecha = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
         const formato = yield (0, exports.BuscarFecha)();
-        console.log('formato ', formato.fecha);
         console.log(' fecha ', fecha);
-        console.log("dia", dia);
         const fechaLuxon = luxon_1.DateTime.fromISO(fecha);
         console.log("ver fechaLuxon", fechaLuxon);
         let diaFormateado = '';
@@ -156,6 +154,31 @@ const FormatearFecha = function (fecha, dia) {
     });
 };
 exports.FormatearFecha = FormatearFecha;
+const FormatearFechaPlanificacion = function (fecha, dia) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const formato = yield (0, exports.BuscarFecha)();
+        const fechaLuxon = luxon_1.DateTime.fromJSDate(new Date(fecha));
+        let diaFormateado = '';
+        /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+          fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+        if (dia == "dddd") {
+            diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
+        else {
+            diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
+        const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+        const valor = `${diaFormateado}, ${fechaFormateada}`;
+        return valor;
+    });
+};
+exports.FormatearFechaPlanificacion = FormatearFechaPlanificacion;
 const FormatearFecha2 = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
         const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;

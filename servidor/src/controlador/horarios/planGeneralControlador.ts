@@ -1,8 +1,9 @@
-import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import { FormatearFecha2, FormatearHora, FormatearFechaPlanificacion } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import pool from '../../database';
 import * as copyStream from 'pg-copy-streams'; // Importar pg-copy-streams
+import { DateTime } from 'luxon';
 
 class PlanGeneralControlador {
 
@@ -422,78 +423,90 @@ class PlanGeneralControlador {
 
     public async EliminarRegistrosMultiples(req: Request, res: Response): Promise<Response> {
         const { user_name, ip, id_plan } = req.body;
+        console.log("ver req.body", req.body)
         // Iniciar transacción
         try {
+            if (!Array.isArray(id_plan) || id_plan.length === 0) {
+                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+            }
+
             await pool.query('BEGIN');
-            /*
-    
-        // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
-        const consulta = await pool.query(
-            `SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`,
-            [id_plan]
-        );
-    
-        const datosOriginales = consulta.rows;
-        if (datosOriginales.length !== id_plan.length) {
-            const idsEncontrados = datosOriginales.map((d: any) => d.id);
-            const idsNoEncontrados = id_plan.filter((id: any) => !idsEncontrados.includes(id));
-            // Registrar auditoría de errores
-            for (const id of idsNoEncontrados) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = ANY($1)`, [id_plan]);
+            const datosOriginales = consulta.rows;
+
+            const idsEncontrados = datosOriginales.map((row: any) => row.id);
+            const idsNoEncontrados = id_plan.filter((id: number) => !idsEncontrados.includes(id));
+
+            if (idsEncontrados.length === 0) {
+                const auditoria = idsNoEncontrados.map((id: number) => ({
                     tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
+                    observacion: `Error al eliminar registro con id ${id}`
+                }));
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: id_plan });
+            } else {
+
+                if (idsNoEncontrados.length != 0) {
+                    const auditoria = idsNoEncontrados.map((id: number) => ({
+
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro con id ${id}`
+                    }));
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                }
+
+                const result = await pool.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
+
+                if (result.rowCount === 0) {
+                    console.log("No se eliminaron registros con los IDs proporcionados.");
+                }
+
+                await pool.query('COMMIT');
+
+                await Promise.all(datosOriginales.map(async (item: any) => {
+                    item.fecha_horario = await FormatearFechaPlanificacion(
+                        item.fecha_horario.toString(),
+                        'ddd'
+                    );
+                
+                    item.fecha_hora_horario = await FormatearFechaPlanificacion(
+                        item.fecha_hora_horario.toString(),
+                        'ddd'
+                    )+ ' '+  DateTime.fromJSDate(new Date(item.fecha_hora_horario)).toFormat('HH:mm:ss');;
+                }));
+                   
+                const auditoria = datosOriginales.map((item: any) => {
+                    return {
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null,
+                    };
                 });
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await pool.query('COMMIT');
+                return res.jsonp({ message: 'OK' });
+
             }
-     
-            // Si alguno de los registros no se encontró, hacer ROLLBACK
-            await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
-        }
-    */
-            // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
-            await pool.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
-
-
-            // Formatear las fechas de los datos originales para la auditoría
-            /*
-            for (const datos of datosOriginales) {
-                const fecha_hora_horario1 = await FormatearHora(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
-                const fecha_hora_horario = await FormatearFecha2(datos.fecha_hora_horario, 'ddd');
-                const fecha_horario = await FormatearFecha2(datos.fecha_horario, 'ddd');
-     
-                datos.fecha_horario = fecha_horario;
-                datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-            }
-                /*/
-
-            // AUDITORÍA: Registrar todos los registros eliminados
-            //for (const datos of datosOriginales) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_asistencia_general',
-                usuario: user_name,
-                accion: 'D',
-                datosOriginales: 'Identificadores de planificación horaria: ' + id_plan,
-                datosNuevos: '',
-                ip,
-                observacion: null
-            });
-            // }
-
-
-            // Finalizar transacción
-            await pool.query('COMMIT');
-            return res.status(200).jsonp({ message: 'OK' });
 
         } catch (error) {
-            // Revertir la transacción si ocurre un error
+            // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            console.error('Error en la eliminación múltiple:', error);
-            return res.status(500).jsonp({ message: 'Error en el proceso de eliminación', error });
+            return res.jsonp({ message: 'error' });
         }
     }
 

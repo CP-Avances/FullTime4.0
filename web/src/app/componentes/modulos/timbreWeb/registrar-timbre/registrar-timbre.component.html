@@ -78,7 +78,7 @@
     </div>
     <!--  ******************  INFORMACION DEL TIMBRE  ********************  -->
     <div class="row" *ngIf="ver_informacion">
-        <div class="col-md m-auto p-0" style="align-content: center;">
+        <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-calendar"></i>
                     {{this.fecha_hora}}
@@ -128,8 +128,8 @@
             </span>
         </div>
         <!--  ******************  USO DE LA CAMARA  ********************  -->
-        <div class="col-md mt-4">
-            <div *ngIf="ver_camara" class="camara">
+        <div class="col-12 col-md-6 m-auto mt-4" *ngIf="ver_camara">
+            <div class="camara">
                 <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
                     <webcam [height]="300" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
                         (imageCapture)="handleImage($event)">
