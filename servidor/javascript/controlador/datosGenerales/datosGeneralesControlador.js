@@ -80,13 +80,16 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             let { ubicacion } = req.body;
+            console.log("ver ubicacion: ", ubicacion);
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let respuesta = yield database_1.default.query(`
-            SELECT * FROM informacion_general
-            WHERE estado = $1
-                AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
-                    WHERE eu.id_empleado = id AND eu.id_ubicacion = $2)
-            ORDER BY id ASC
+            SELECT ig.*
+                FROM informacion_general ig
+                LEFT JOIN mg_empleado_ubicacion eu
+                ON eu.id_empleado = ig.id AND eu.id_ubicacion = $2
+                WHERE ig.estado = $1
+                AND eu.id_empleado IS NULL
+            ORDER BY ig.id ASC;
             `, [estado, ubicacion]).then((result) => { return result.rows; });
             if (respuesta.length === 0)
                 return res.status(404)

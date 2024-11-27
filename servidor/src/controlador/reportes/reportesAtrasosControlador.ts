@@ -10,7 +10,6 @@ class ReportesAtrasosControlador {
         let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
             suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
                 o.atrasos = await BuscarAtrasos(desde, hasta, o.id);
-                console.log('atrasos: ', o);
                 return o;
             }));
             return suc;

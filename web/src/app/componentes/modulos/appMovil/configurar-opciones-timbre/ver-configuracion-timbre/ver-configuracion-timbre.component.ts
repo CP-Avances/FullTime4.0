@@ -192,7 +192,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     const datos = {
       user_name: this.user_name,
       ip: this.ip,
-      id: id_opcion
+      ids: [id_opcion]
     };
     console.log('ver datos ', datos)
     this.opciones.EliminarOpcionesMarcacion(datos).subscribe((res: any) => {
@@ -230,21 +230,23 @@ export class VerConfiguracionTimbreComponent implements OnInit {
       id: '',
     };
     this.ingresar = false;
-    this.contador = 0;
     this.eliminar_datos = this.selectionUsuario.selected;
-    this.eliminar_datos.forEach((datos: any) => {
-      this.configuracion = this.configuracion.filter((item: any) => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      data.id = datos.id;
+    if (this.selectionUsuario.selected.length > 0) {
+      const ids: number[] = this.selectionUsuario.selected.map((obj: any) => obj.id).filter((id) => id !== undefined);
+      const data = {
+        user_name: this.user_name,
+        ip: this.ip,
+        ids: ids,
+      };
+
       this.opciones.EliminarOpcionesMarcacion(data).subscribe((res: any) => {
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con el usuario ' + datos.codigo + '.', 'No fue posible eliminar.', {
+          this.toastr.error('Existen datos relacionados con los registros ' + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
           if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+            this.toastr.error(res.message, '', {
               timeOut: 6000,
             });
             this.ingresar = true;
@@ -253,7 +255,6 @@ export class VerConfiguracionTimbreComponent implements OnInit {
         }
       });
     }
-    )
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE

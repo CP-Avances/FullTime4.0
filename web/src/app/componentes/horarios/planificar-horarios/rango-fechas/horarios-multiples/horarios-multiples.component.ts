@@ -249,10 +249,10 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO DE LLAMADO DE FUNCIONES DE VALIDACION
   ValidarSeleccionados(form: any) {
-    let fechaInicioForm = form.fechaInicioForm.toDate();
-    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
-    let fechaFinalForm = form.fechaFinalForm.toDate();
-    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    console.log("form.fechaInicioForm", form.fechaInicioForm)
+    console.log("form.fechaFinalForm", form.fechaFinalForm)
+    this.fechaInicioFormluxon = form.fechaInicioForm;
+    this.fechaFinFormluxon = form.fechaFinalForm;
 
     if (form.horarioForm) {
       this.VerificarDuplicidad(form);
@@ -1439,10 +1439,9 @@ export class HorariosMultiplesComponent implements OnInit {
   }
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
-    let fechaInicioForm = form.fechaInicioForm.toDate();
-    this.fechaInicioFormluxon = DateTime.fromJSDate(fechaInicioForm);
-    let fechaFinalForm = form.fechaFinalForm.toDate();
-    this.fechaFinFormluxon = DateTime.fromJSDate(fechaFinalForm);
+    
+    this.fechaInicioFormluxon =form.fechaInicioForm;
+    this.fechaFinFormluxon = form.fechaFinalForm;
 
     if (form.horarioForm) {
       this.eliminar_horarios = [];

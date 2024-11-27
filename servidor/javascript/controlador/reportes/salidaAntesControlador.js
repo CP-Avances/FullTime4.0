@@ -22,7 +22,6 @@ class SalidasAntesControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.salidas = yield BuscarSalidasAnticipadas(desde, hasta, o.id);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;

@@ -14,6 +14,7 @@ class NotificacionTiempoRealRutas {
 
         // METODO PARA CONTROLAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
         this.router.get('/config/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerConfigEmpleado);
+        this.router.post('/config-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerConfigMultipleEmpleado);
 
         // RUTA PARA CREAR NOTIFICACION
         this.router.post('/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearNotificacion);
@@ -28,9 +29,11 @@ class NotificacionTiempoRealRutas {
 
         // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
         this.router.post('/config/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearConfiguracion);
+        this.router.post('/config-multiple-crear/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearConfiguracionMultiple);
+
         // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
         this.router.put('/config/noti-put/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarConfigEmpleado);
-
+        this.router.put('/config/noti-put-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarConfigEmpleadoMultiple);
 
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
         this.router.post('/mail-comunicado-movil/:id_empresa/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoComunicadoMovil);
@@ -60,8 +63,8 @@ class NotificacionTiempoRealRutas {
         this.router.post('/noti-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
         //------------------------------------------ METODOS APP MOVIL -----------------------------------------------------------------------
         this.router.get('/info-empl-recieve', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getInfoEmpleadoByCodigo);
-        this.router.get('/all-noti',TokenValidation,  NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacion);
-        this.router.get('/noti-tim/all-noti',TokenValidation,  NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacionTimbres);
+        this.router.get('/all-noti', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacion);
+        this.router.get('/noti-tim/all-noti', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacionTimbres);
 
     }
 }
