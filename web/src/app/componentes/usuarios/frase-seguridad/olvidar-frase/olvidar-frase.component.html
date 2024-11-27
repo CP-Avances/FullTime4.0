@@ -18,11 +18,14 @@
                                     <mat-error *ngIf="correo.invalid">{{ObtenerMensajeError()}}</mat-error>
                                 </mat-form-field>
                             </form>
-                            <br>
-                            <div style="margin: auto;">
-                                <button type="submit" class="btn" (click)="EnviarCorreoConfirmacion(formulario.value)"
-                                    [disabled]="!formulario.valid">Enviar</button>
-                                <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                            <div class="w-100" style="margin: auto;">
+                                <div class="row">
+                                    <div class="col-12 p-0">
+                                        <button type="submit" class="btn" (click)="EnviarCorreoConfirmacion(formulario.value)"
+                                            [disabled]="!formulario.valid">Enviar</button>
+                                        <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                                    </div>
+                                </div>
                             </div>
                         </mat-card>
                     </div>
