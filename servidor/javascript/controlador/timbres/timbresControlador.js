@@ -943,27 +943,21 @@ class TimbresControlador {
     // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
     BuscarOpcionesTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { ids_empleados } = req.body;
-                console.log("ver req.body: ", req.body);
-                // Validar que ids_empleados sea un array
-                if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
-                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
-                }
-                const OPCIONES = yield database_1.default.query(`
+            const { ids_empleados } = req.body;
+            console.log("ver req.body: ", req.body);
+            // Validar que ids_empleados sea un array
+            if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+            }
+            const OPCIONES = yield database_1.default.query(`
             SELECT * FROM mrv_opciones_marcacion 
             WHERE id_empleado = ANY($1)
             `, [ids_empleados]);
-                if (OPCIONES.rowCount != 0) {
-                    return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'vacio' });
-                }
+            if (OPCIONES.rowCount != 0) {
+                return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
             }
-            catch (error) {
-                console.error('Error al buscar opciones de marcación:', error);
-                return res.status(500).jsonp({ message: 'Error interno del servidor' });
+            else {
+                return res.status(404).jsonp({ message: 'vacio' });
             }
         });
     }

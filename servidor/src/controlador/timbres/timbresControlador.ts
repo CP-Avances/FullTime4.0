@@ -1,5 +1,5 @@
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import {FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
@@ -1066,31 +1066,26 @@ class TimbresControlador {
 
     // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
     public async BuscarOpcionesTimbre(req: Request, res: Response): Promise<any> {
-        try {
-            const { ids_empleados } = req.body;
+        const { ids_empleados } = req.body;
 
-            console.log("ver req.body: ", req.body)
-            // Validar que ids_empleados sea un array
-            if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
-                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
-            }
+        console.log("ver req.body: ", req.body)
+        // Validar que ids_empleados sea un array
+        if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+            return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+        }
 
-            const OPCIONES = await pool.query(
-                `
+        const OPCIONES = await pool.query(
+            `
             SELECT * FROM mrv_opciones_marcacion 
             WHERE id_empleado = ANY($1)
             `
-                , [ids_empleados]);
+            , [ids_empleados]);
 
-            if (OPCIONES.rowCount != 0) {
-                return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
-            }
-            else {
-                return res.status(404).jsonp({ message: 'vacio' });
-            }
-        } catch (error) {
-            console.error('Error al buscar opciones de marcación:', error);
-            return res.status(500).jsonp({ message: 'Error interno del servidor' });
+        if (OPCIONES.rowCount != 0) {
+            return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
         }
     }
 
@@ -1145,7 +1140,7 @@ class TimbresControlador {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
-            }else{
+            } else {
                 if (idsNoEncontrados.length != 0) {
                     const auditoria = idsNoEncontrados.map((id_empleado: number) => ({
                         tabla: 'mrv_opciones_marcacion',
@@ -1165,7 +1160,7 @@ class TimbresControlador {
                 `
                     , [idsEncontrados]);
 
-                    
+
                 const auditoria = datosOriginales.map((item: any) => ({
                     tabla: 'mrv_opciones_marcacion',
                     usuario: user_name,
@@ -1176,11 +1171,11 @@ class TimbresControlador {
                     observacion: null
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
-                
+
                 await pool.query('COMMIT');
                 return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
 
-                
+
             }
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -1461,7 +1456,7 @@ class TimbresControlador {
                 `
                     , [idsEncontrados]);
 
-                    
+
                 const auditoria = datosOriginales.map((item: any) => ({
                     tabla: 'mtv_opciones_marcacion',
                     usuario: user_name,
@@ -1472,7 +1467,7 @@ class TimbresControlador {
                     observacion: null
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
-                
+
                 await pool.query('COMMIT');
                 return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
 
