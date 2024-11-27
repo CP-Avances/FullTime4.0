@@ -19,12 +19,16 @@
                                     <mat-hint id="fuente" align="start"><strong>Ingresar hasta 100 caracteres</strong></mat-hint>
                                     <mat-hint id="fuente" align="end">{{message2.value.length}} / 100</mat-hint>
                                 </mat-form-field>
-                                <br><br>
-                                <div style="margin: auto;">
-                                    <button type="submit" class="btn" (click)="IngresarFrase(formulario.value)"
-                                        [disabled]="!formulario.valid">Resetear frase</button>
-                                </div>
                             </form>
+                            <div class="w-100" style="margin: auto;">
+                                <div class="row">
+                                    <div class="col-12 p-0">
+                                        <button type="submit" class="btn" (click)="IngresarFrase(formulario.value)"
+                                        [disabled]="!formulario.valid">Resetear frase</button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </mat-card>
                     </div>
                 </div>

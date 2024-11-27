@@ -3,11 +3,11 @@
         <div class="home-inner">
             <div class="container">
                 <div class="row">
-                    <div class="col d-flex align-items-center justify-content-center">
+                    <div class="col d-flex align-items-center justify-content-center m-auto">
                         <mat-card class="mat-elevation-z8">
-                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
+                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br>
                             <span>Confirmar nueva contraseña</span>
-                            <form [formGroup]="formulario">
+                            <form [formGroup]="formulario" class="m-3">
                                 <mat-form-field>
                                     <mat-label>Nueva contraseña</mat-label>
                                     <input matInput placeholder="máximo 10 caracteres"
@@ -35,13 +35,16 @@
                                             {{hide2 ? 'visibility_off' : 'visibility'}}</mat-icon>
                                     </button>
                                 </mat-form-field>
-                                <br>
-                                <div style="margin: auto;">
-                                    <button type="submit" class="btn" (onclick)="CompararContrasenia(formulario.value)"
+                            </form>
+                            <div class="w-100" style="margin: auto;">
+                                <div class="row">
+                                    <div class="col-12 p-0">
+                                        <button type="submit" class="btn verde" (onclick)="CompararContrasenia(formulario.value)"
                                         (click)="EnviarContraseniaConfirmacion(formulario.value)"
                                         [disabled]="!formulario.valid">Resetear Password</button>
+                                    </div>
                                 </div>
-                            </form>
+                            </div>
                         </mat-card>
                     </div>
                 </div>
