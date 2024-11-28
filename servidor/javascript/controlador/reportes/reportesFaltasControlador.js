@@ -19,11 +19,9 @@ class FaltasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
             let datos = req.body;
-            console.log("ver datos, ", req.body);
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     o.faltas = yield BuscarFaltas(desde, hasta, o.id);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;

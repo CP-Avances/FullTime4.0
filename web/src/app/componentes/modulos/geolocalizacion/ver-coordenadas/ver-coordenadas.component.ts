@@ -244,9 +244,10 @@ export class VerCoordenadasComponent implements OnInit {
   EliminarRegistro(id_emplu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ids: [id_emplu]
     }
-    this.restU.EliminarCoordenadasUsuario(id_emplu, datos).subscribe(res => {
+    this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -274,6 +275,7 @@ export class VerCoordenadasComponent implements OnInit {
     let ubicacion = {
       ubicacion: this.idUbicacion
     }
+    console.log("ver ubicacion: ", ubicacion)
     this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     })
@@ -722,24 +724,32 @@ export class VerCoordenadasComponent implements OnInit {
   error: number = 0;
   RegistrarUbicacionUsuario(data: any) {
     if (data.length > 0) {
-      this.cont = 0;
-      data.forEach((obj: any) => {
-        var datos = {
-          id_empl: obj.id,
-          id_ubicacion: this.idUbicacion,
-          user_name: this.user_name,
-          ip: this.ip
+      const arrayIds = data.map((obj: any) => obj.id);
+      var datos = {
+        id_empl: arrayIds,
+        id_ubicacion: this.idUbicacion,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
+        this.cont = this.cont + 1;
+        console.log('ver ', res)
+        if (res.message == 'Con duplicados') {
+          this.toastr.success('Algunos registros ya existen en el sistema.', 'Registros de ubicación asignados exitosamente.', {
+            timeOut: 6000,
+          });
+        } else if (res.message == 'Sin duplicados') {
+          this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
+            timeOut: 6000,
+          });
+        } else if (res.message == 'No hay nuevos registros para insertar.') {
+          this.toastr.warning('Los registros de ubicación ya existen en el sistema.', '', {
+            timeOut: 6000,
+          });
         }
-        console.log('coordenada ', datos)
-        this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
-          this.cont = this.cont + 1;
-          console.log('ver ', res)
-          if (res.message === 'error') {
-            this.error = this.error + 1;
-          }
-          this.MostrarMensajes(data);
-        });
-      })
+        this.ConsultarDatos();
+        this.AbrirVentanaBusqueda();
+      });
     }
     else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
@@ -747,29 +757,6 @@ export class VerCoordenadasComponent implements OnInit {
       });
     }
 
-  }
-
-  // METODO PARA MOSTRAR MENSAJES
-  MostrarMensajes(data: any) {
-    if (data.length === this.error) {
-      this.toastr.warning('Los registros de ubicación ya existen en el sistema.', '', {
-        timeOut: 6000,
-      });
-    }
-    else if (this.cont === data.length) {
-      if (this.error != 0) {
-        this.toastr.success('Algunos registros ya existen en el sistema.', 'Registros de ubicación asignados exitosamente.', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
-          timeOut: 6000,
-        });
-      }
-    }
-    this.ConsultarDatos();
-    this.AbrirVentanaBusqueda();
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -822,31 +809,25 @@ export class VerCoordenadasComponent implements OnInit {
 
   // METODO PARA ELIMNAR REGISTROS DE UBICACION
   Remover() {
-    let EmpleadosSeleccionados: any;
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
-      return {
-        id_emplu: obj.id_emplu,
-        empleado: obj.nombre + ' ' + obj.apellido,
-        codigo: obj.codigo,
-        id_ubicacion: obj.id_ubicacion
-      }
-    })
-    if (EmpleadosSeleccionados.length > 0) {
-      EmpleadosSeleccionados.forEach((obj: any) => {
-        this.restU.EliminarCoordenadasUsuario(obj.id_emplu, datos).subscribe(res => {
-          this.ConsultarDatos();
+    
+    if (this.selectionUno.selected.length > 0) {
+
+      const ids: number[] = this.selectionUno.selected.map((obj: any) => obj.id_emplu).filter((id) => id !== undefined);
+
+      const datos = {
+        user_name: this.user_name,
+        ip: this.ip, 
+        ids: ids
+      };
+      this.restU.EliminarCoordenadasUsuario( datos).subscribe(res => {
+        this.ConsultarDatos();
+        this.toastr.error('Registros removidos de la lista.', '', {
+          timeOut: 6000,
         });
-      })
-      this.toastr.error('Registros removidos de la lista.', '', {
-        timeOut: 6000,
       });
+      
       this.HabilitarSeleccion();
       this.selectionUno.clear();
-      EmpleadosSeleccionados = [];
     }
   }
 

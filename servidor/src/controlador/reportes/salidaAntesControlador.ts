@@ -11,7 +11,6 @@ class SalidasAntesControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.salidas = await BuscarSalidasAnticipadas(desde, hasta, o.id);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;

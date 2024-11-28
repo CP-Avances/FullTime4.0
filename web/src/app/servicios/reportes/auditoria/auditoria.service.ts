@@ -23,6 +23,9 @@ export class AuditoriaService {
     });
   }
 
+
+  
+
   ConsultarAuditoria(data: any): Observable<HttpResponse<Blob>> {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reportes-auditoria/auditar`, data, {
       observe: 'response',

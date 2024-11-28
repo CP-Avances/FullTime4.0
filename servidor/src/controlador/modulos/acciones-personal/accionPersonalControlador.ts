@@ -181,18 +181,24 @@ class AccionPersonalControlador {
     }
 
     public async ListarUnCargoPropuestos(req: Request, res: Response) {
-        const { id } = req.params;
-        const ACCION = await pool.query(
-            `
-            SELECT * FROM map_cargo_propuesto WHERE id = $1
-            `
-            , [id]);
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
+        try {
+            const { id } = req.params;
+            const ACCION = await pool.query(
+                `
+                SELECT * FROM map_cargo_propuesto WHERE id = $1
+                `
+                , [id]);
+            if (ACCION.rowCount != 0) {
+                return res.jsonp(ACCION.rows)
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
+
     }
 
     // TABLA CONTEXTO_LEGAL 

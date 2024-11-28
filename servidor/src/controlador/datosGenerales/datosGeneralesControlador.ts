@@ -81,14 +81,17 @@ class DatosGeneralesControlador {
         let estado = req.params.estado;
         let { ubicacion } = req.body;
 
+        console.log("ver ubicacion: ", ubicacion);
         // CONSULTA DE BUSQUEDA DE SUCURSALES
         let respuesta = await pool.query(
             `
-            SELECT * FROM informacion_general
-            WHERE estado = $1
-                AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
-                    WHERE eu.id_empleado = id AND eu.id_ubicacion = $2)
-            ORDER BY id ASC
+            SELECT ig.*
+                FROM informacion_general ig
+                LEFT JOIN mg_empleado_ubicacion eu
+                ON eu.id_empleado = ig.id AND eu.id_ubicacion = $2
+                WHERE ig.estado = $1
+                AND eu.id_empleado IS NULL
+            ORDER BY ig.id ASC;
             `
             , [estado, ubicacion]
         ).then((result: any) => { return result.rows });
@@ -133,29 +136,6 @@ class DatosGeneralesControlador {
             return res.status(404).jsonp({ text: 'error' });
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO  
     public async ListarDatosActualesEmpleado(req: Request, res: Response) {

@@ -233,7 +233,6 @@ class AlimentacionControlador {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     const listaTimbres = yield BuscarAlimentacion(desde, hasta, o.id);
                     o.alimentacion = yield AgruparTimbres(listaTimbres);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return obj;

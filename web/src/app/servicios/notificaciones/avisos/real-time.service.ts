@@ -23,6 +23,11 @@ export class RealTimeService {
   ObtenerConfiguracionEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/${id_empleado}`);
   }
+  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
+  ObtenerConfiguracionEmpleadoMultiple(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config-multiple`, datos);
+  }
+
 
   // METODO PARA INGRESAR NOTIFICACIONES DE PERMISOS
   IngresarNotificacionEmpleado(datos: any) {
@@ -56,9 +61,20 @@ export class RealTimeService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config`, datos);
   }
 
+  // METODO PARA REGISTRAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
+  IngresarConfigNotiEmpleadoMultiple(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config-multiple-crear`, datos);
+  }
+
+
   // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
   ActualizarConfigNotiEmpl(id_empleado: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/noti-put/${id_empleado}`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES     **USADO
+  ActualizarConfigNotiEmplMultiple(datos: any) {
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/noti-put-multiple`, datos);
   }
 
   // METODO PARA BUSCAR NOTIFICACIONES RECIBIDAS POR UN USUARIO

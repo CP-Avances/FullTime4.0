@@ -81,7 +81,11 @@ export class TimbresService {
 
   // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
   EliminarOpcionesMarcacion(datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion`, datos);
+    const url = `${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
@@ -92,6 +96,11 @@ export class TimbresService {
   // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
   BuscarVariasOpcionesMarcacionWeb(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre-web`, datos);
+  }
+
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  BuscarVariasOpcionesMarcacionWebMultiple(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre-web-multiple`, datos);
   }
 
   // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
@@ -106,17 +115,14 @@ export class TimbresService {
 
   // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
   EliminarOpcionesMarcacionWeb(datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion-web`, datos);
+    //return this.http.post<any>(`${environment.url}/timbres/eliminar-opcion-marcacion-web`, datos);
+
+    const url = `${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion-web`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
-
-
-
-
-
-
-
-
-
 
   /**
    * METODO PARA TRAER LAS NOTIFICACIONES DE ATRASOS O SALIDAS ANTES SOLO VIENEN 5 NOTIFICACIONES

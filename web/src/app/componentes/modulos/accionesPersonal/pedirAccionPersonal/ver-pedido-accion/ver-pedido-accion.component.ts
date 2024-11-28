@@ -115,6 +115,7 @@ export class VerPedidoAccionComponent implements OnInit {
             this.restProcesos.getOneProcesoRest(this.datosPedido[0].id_proceso_propuesto).subscribe(data6 => {
               this.proceso = data6[0].nombre;
             });
+            console.log("ver this.datosPedido[0]", this.datosPedido[0])
             this.restAccion.ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto).subscribe(data7 => {
               this.cargop = data7[0].descripcion;
             });

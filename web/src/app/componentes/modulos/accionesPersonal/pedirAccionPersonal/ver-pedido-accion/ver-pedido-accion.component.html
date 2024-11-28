@@ -1,16 +1,26 @@
 <div class="container" *ngFor="let d of datosPedido" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-7 col-md-3 mb-2 mb-md-0 mb-2 mb-md-0 order-2 order-md-2"> 
+                <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
                 (click)="VerListaPedidos()">
-                Listar acciones de personal
-            </button>
-            <span>DATOS GENERALES</span>
-            <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    Listar acciones de personal
+                </button>
+            </div>
+            <div class="col-12 col-md-6 mb-2 mb-md-0 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    DATOS GENERALES
+                </span>
+            </div>
+            <div class="col-5 col-md-2 mb-2 mb-md-0 mb-2 mb-md-0 order-3 order-md-2">
+                <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                 (click)="AbrirEditar(d.id)">
-                Editar
-            </button>
+                    Editar
+                </button>
+            </div>
         </div>
+
         <mat-card-content>
             <div class="container" style="padding-top: 5px;">
                 <div class="container" style="padding-top: 20px;">

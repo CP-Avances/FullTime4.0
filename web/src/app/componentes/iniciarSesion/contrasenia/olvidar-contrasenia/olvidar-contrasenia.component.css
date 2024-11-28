@@ -5,7 +5,7 @@
 }
 
 mat-form-field {
-    width: 230px;
+    width: 90%;
 }
 
 img {
@@ -24,13 +24,13 @@ img {
 }
 
 mat-card {
-    padding-bottom: 25px;
-    border-radius: 25px;
-    border-style: groove;
-    padding-top: 25px;
-    text-align: center;
-    width: 300px;
+    width: 320px;
     margin: auto;
+    text-align: center;
+    padding-top: 10px;
+    border-style: groove;
+    border-radius: 25px;
+    padding-bottom: 25px;
 }
 
 @media (max-width: 550px) {
@@ -67,20 +67,14 @@ mat-card {
 }
 
 .home-inner {
-    padding: 55px 100px 15px 100px;
+    padding: 45px 100px 15px 100px;
 }
 
-.caja1 {
-    font-size: 13px;
-    text-align: right;
-    margin-right: 16px;
-    margin-bottom: 25px;
+.verde {
+    background-color: rgb(0, 176, 103);
+    color: rgb(255, 255, 255);
 }
 
-.caja2 {
-    margin-bottom: 10px;
-    text-align: center;
-    margin-top: 12px;
-    font-size: 13px;
-    color: rgb(177, 173, 173);
+button{
+    width: 100%;
 }

@@ -24,9 +24,9 @@
                     </span>
                 </div>
                 <form [formGroup]="primerFormulario">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                    <div class="row w-100 m-auto">
+                        <div class="col-md m-auto p-0">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-form-field>
                                     <mat-label id="letras">Seleccionar sucursal</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -74,8 +74,8 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                        <div class="col-md m-auto p-0">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-form-field>
                                     <mat-label id="letras">IP</mat-label>
                                     <input matInput placeholder="Ingresar IP del reloj." [formControl]="ipF"
@@ -98,7 +98,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-radio-group aria-label="Select an option" formControlName="funcionesForm" required>
                                     <label class="d-flex justify-content-start">
                                         <span style="margin-left: 10px;">Tipo de conexión *</span>
@@ -113,7 +113,7 @@
                                     </div>
                                 </mat-radio-group>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-radio-group aria-label="Select an option" formControlName="temperaturaForm"
                                     required>
                                     <label class="d-flex justify-content-start">
@@ -155,9 +155,9 @@
                     <span>Llenar todos los campos obligatorios (*) del formulario y dar click en Guardar.</span>
                 </div>
                 <form [formGroup]="segundoFormulario">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                    <div class="row w-100 m-auto">
+                        <div class="col-md p-0 m-auto">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-form-field>
                                     <mat-label>Marca</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -201,8 +201,8 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
+                        <div class="col-md m-auto p-0">
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-form-field>
                                     <mat-label>Serie</mat-label>
                                     <input matInput placeholder="Ingresar serie" [formControl]="serieF" required>

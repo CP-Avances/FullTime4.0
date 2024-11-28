@@ -529,11 +529,12 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   // METODO PARA CARGAR TIMBRES
   cargar: boolean = false;
   CargarTimbres(form: any) {
+    console.log("ver fechaFinFormluxon: ", this.fechaFinFormluxon)
     var codigos = '\'' + this.data_horario.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final: this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'),
-      fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
+      fec_final:  DateTime.fromISO(this.fechaFinFormluxon).plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: DateTime.fromISO( this.fechaInicioFormluxon).toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {
@@ -846,7 +847,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         // VERIFICAMOS SI TODAS LAS FECHAS HAN SIDO LEIDAS
         fechas = fechas + 1;
         // SE AGREGA ID DE HORARIOS A ELIMINAR
-        datos.id_plan = res;
+        datos.id_plan = res.map(item => item.id);
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(datos).subscribe(datos => {
           // VERIIFCAR SI SE REALIZO EL PROCESO

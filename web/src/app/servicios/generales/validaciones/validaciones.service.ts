@@ -161,6 +161,11 @@ export class ValidacionesService {
   }
 
   DarFormatoFecha(fechaString: any, formatoSalida: any) {
+
+    console.log("fechaString: ", fechaString)
+    console.log("formatoSalida: ", formatoSalida)
+
+
     let formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
     let fecha: DateTime;
     // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT

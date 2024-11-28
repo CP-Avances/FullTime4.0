@@ -11,7 +11,6 @@ class ReportesTiempoLaboradoControlador {
             suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
                 const listaTimbres = await BuscarTiempoLaborado(desde, hasta, o.id);
                 o.tLaborado = await AgruparTimbres(listaTimbres);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return suc;

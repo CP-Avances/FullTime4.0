@@ -541,8 +541,12 @@
                                 library_add_check
                             </mat-icon>
                         </div>
-                        <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>USUARIOS ASIGNADOS EN {{c.descripcion.toUpperCase()}}</span>
+                        </div>
+                        <div class="col-10 col-md-1 mb-2 mb-md-0 order-2 order-md-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" 
+                                (click)="ConfirmarDeleteVarios()">Eliminar</button>
                         </div>
                         <div class="col-10 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"

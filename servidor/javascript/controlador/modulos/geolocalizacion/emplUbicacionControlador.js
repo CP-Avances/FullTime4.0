@@ -221,44 +221,123 @@ class UbicacionControlador {
         });
     }
     // ASIGNAR COORDENADAS GENERALES DE UBICACION A LOS USUARIOS    **USADO
+    /*
+    public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
+        try {
+            const { id_empl, id_ubicacion, user_name, ip } = req.body;
+            console.log('ubicacion ', req.body)
+
+            const existe = await pool.query(
+                `
+                SELECT * FROM mg_empleado_ubicacion WHERE id_empleado = $1 AND id_ubicacion = $2
+                `
+                , [id_empl, id_ubicacion]);
+
+            console.log(' existe ', existe.rows)
+
+            if (existe.rowCount != 0) {
+                res.jsonp({ message: 'error' });
+            }
+            else {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                await pool.query(
+                    `
+                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion)
+                    VALUES ($1, $2)
+                    `
+                    ,
+                    [id_empl, id_ubicacion]);
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'mg_empleado_ubicacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar registro.' });
+        }
+    }
+*/
     RegistrarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl, id_ubicacion, user_name, ip } = req.body;
-                console.log('ubicacion ', req.body);
-                const existe = yield database_1.default.query(`
-                SELECT * FROM mg_empleado_ubicacion WHERE id_empleado = $1 AND id_ubicacion = $2
-                `, [id_empl, id_ubicacion]);
-                console.log(' existe ', existe.rows);
-                if (existe.rowCount != 0) {
-                    res.jsonp({ message: 'error' });
+                // `id_empleados` es una lista de IDs de empleados
+                console.log("ver req.body: ", req.body);
+                console.log('Empleados y ubicación recibidos:', req.body);
+                // Iniciar transacción
+                yield database_1.default.query('BEGIN');
+                // Filtrar empleados que ya tienen la ubicación registrada
+                const resultadoExistente = yield database_1.default.query(`
+                SELECT id_empleado FROM mg_empleado_ubicacion 
+                WHERE id_ubicacion = $1 AND id_empleado = ANY($2::int[])
+                `, [id_ubicacion, id_empl]);
+                // Extraer empleados ya registrados
+                const empleadosExistentes = resultadoExistente.rows.map((row) => row.id_empleado);
+                // Filtrar solo los empleados nuevos para insertar
+                const nuevosEmpleados = id_empl.filter((id_empleado) => !empleadosExistentes.includes(id_empleado));
+                // Si no hay empleados nuevos, finalizar la transacción
+                if (nuevosEmpleados.length === 0) {
+                    yield database_1.default.query('ROLLBACK');
+                    res.jsonp({ message: 'No hay nuevos registros para insertar.' });
                 }
                 else {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    yield database_1.default.query(`
+                    const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+                    const batches = [];
+                    // Dividir los empleados en lotes pequeños
+                    for (let i = 0; i < nuevosEmpleados.length; i += batchSize) {
+                        batches.push(nuevosEmpleados.slice(i, i + batchSize));
+                    }
+                    // Insertar los empleados en lotes
+                    for (const batch of batches) {
+                        const valores = batch
+                            .map((id_empleado) => `(${id_empleado}, ${id_ubicacion})`)
+                            .join(', ');
+                        // Ejecutar la inserción en cada lote
+                        yield database_1.default.query(`
                     INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                    VALUES ($1, $2)
-                    `, [id_empl, id_ubicacion]);
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                    VALUES ${valores}`);
+                    }
+                    const auditoria = nuevosEmpleados.map((id_empleado) => ({
                         tabla: 'mg_empleado_ubicacion',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                        datosNuevos: `id_empleado: ${id_empleado}, id_ubicacion: ${id_ubicacion}`,
                         ip,
                         observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    // Finalizar transacción
                     yield database_1.default.query('COMMIT');
-                    res.jsonp({ message: 'Registro guardado.' });
+                    if (resultadoExistente.rows.length !== 0) {
+                        res.jsonp({ message: 'Con duplicados' });
+                    }
+                    else {
+                        res.jsonp({ message: 'Sin duplicados' });
+                    }
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCION
+                // Revertir la transacción en caso de error
+                console.log("ver el error: ", error);
                 yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'Error al guardar registro.' });
+                res.status(500).jsonp({ message: 'Error al guardar registros.' });
             }
         });
     }
@@ -284,43 +363,62 @@ class UbicacionControlador {
     EliminarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
-                const { id } = req.params;
+                const { user_name, ip, ids } = req.body;
+                console.log("ver req.body: ", req.body);
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const ubicacion = yield database_1.default.query(`SELECT * FROM mg_empleado_ubicacion WHERE id = $1`, [id]);
-                const [datosOriginales] = ubicacion.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                const ubicacion = yield database_1.default.query(`SELECT * FROM mg_empleado_ubicacion  WHERE id = ANY($1)`, [ids]);
+                const datosOriginales = ubicacion.rows;
+                // Obtener los IDs encontrados
+                const idsEncontrados = datosOriginales.map((row) => row.id);
+                const idsNoEncontrados = ids.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id_empleado) => ({
                         tabla: 'mg_empleado_ubicacion',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar ubicación con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
+                        observacion: `Error al eliminar ubicación con id: ${id_empleado}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    // FINALIZAR TRANSACCIÓN
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
-                yield database_1.default.query(`
-                DELETE FROM mg_empleado_ubicacion WHERE id = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mg_empleado_ubicacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id_empleado) => ({
+                            tabla: 'mg_empleado_ubicacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar ubicación con id: ${id_empleado}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    yield database_1.default.query(`
+                    DELETE FROM mg_empleado_ubicacion WHERE id = ANY($1)`, [idsEncontrados]);
+                    const auditoria = datosOriginales.map((item) => ({
+                        tabla: 'mg_empleado_ubicacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Registros eliminados.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION

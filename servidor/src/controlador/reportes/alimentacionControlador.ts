@@ -231,7 +231,6 @@ class AlimentacionControlador {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 const listaTimbres = await BuscarAlimentacion(desde, hasta, o.id);
                 o.alimentacion = await AgruparTimbres(listaTimbres);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;

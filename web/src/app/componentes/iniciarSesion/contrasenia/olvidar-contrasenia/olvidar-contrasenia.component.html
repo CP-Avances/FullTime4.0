@@ -3,11 +3,11 @@
         <div class="home-inner">
             <div class="container">
                 <div class="row">
-                    <div class="col d-flex align-items-center justify-content-center">
+                    <div class="col d-flex align-items-center justify-content-center m-auto">
                         <mat-card class="mat-elevation-z8">
-                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
+                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br>
                             <span>Cambiar contraseña</span>
-                            <form [formGroup]="formulario">
+                            <form [formGroup]="formulario" class="m-3">
                                 <mat-form-field>
                                     <mat-label>Ingresa correo electrónico</mat-label>
                                     <input matInput placeholder="pat@example.com" [formControl]="correo" required>
@@ -35,11 +35,17 @@
                                     <mat-error *ngIf="empresa.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
                                 </mat-form-field>
                             </form>
-                            <br>
-                            <div style="margin: auto;">
-                                <button type="submit" class="btn" (click)="EnviarCorreoConfirmacion(formulario.value)"
-                                    [disabled]="!formulario.valid">Enviar</button>
-                                <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                            <div class="w-75" style="margin: auto;">
+                                <div class="row w-100">
+                                    <div class="col-12 p-0">
+                                        <button type="submit" class="btn verde"(click)="EnviarCorreoConfirmacion(formulario.value)"
+                                        [disabled]="!formulario.valid">Enviar</button>
+                                    </div>
+                                    <div class="col-12 mt-3 p-0">
+                                        <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                                    </div>
+                                </div>
+                                 
                             </div>
                         </mat-card>
                     </div>

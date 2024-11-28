@@ -44,16 +44,18 @@ class TimbresRutas {
         // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
         this.router.post('/listar-varias-opciones-timbre', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbre);
         // METODO PARA ELIMINAR REGISTRO   **USADO
-        this.router.post('/eliminar-opcion-marcacion', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistros);
+        this.router.delete('/eliminar-opcion-marcacion', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistros);
 
         // METODO PARA REGISTRAR OPCIONES DE MARCACION   **USADO
         this.router.post('/opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.IngresarOpcionTimbreWeb);
         // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
         this.router.put('/actualizar-opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.ActualizarOpcionTimbreWeb);
-        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE  USUARIOS  **USADO
         this.router.post('/listar-varias-opciones-timbre-web', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbreWeb);
+        // METODO PARA BUSCAR OPCIONES DE MARCACION DE MULTIPLES USUARIOS  **USADO
+        this.router.post('/listar-varias-opciones-timbre-web-multiple', TokenValidation, TIMBRES_CONTROLADOR.BuscarMultipleOpcionesTimbreWebMultiple);
         // METODO PARA ELIMINAR REGISTRO   **USADO
-        this.router.post('/eliminar-opcion-marcacion-web', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistrosWeb);
+        this.router.delete('/eliminar-opcion-marcacion-web', TokenValidation, TIMBRES_CONTROLADOR.EliminarRegistrosWeb);
 
 
         // METODO DE BUSQUEDA DE AVISOS GENERALES

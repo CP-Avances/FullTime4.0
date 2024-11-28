@@ -11,7 +11,6 @@ class ReportesTimbresMrlControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;

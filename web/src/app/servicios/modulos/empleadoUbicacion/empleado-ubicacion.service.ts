@@ -32,8 +32,8 @@ export class EmpleadoUbicacionService {
   }
 
   // METODO PARA ELIMINAR REGISTROS   **USADO
-  EliminarCoordenadasUsuario(id: number, datos: any) {
-    const url = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar-coordenadas-usuario/${id}`;
+  EliminarCoordenadasUsuario( datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar-coordenadas-usuario`;
     const httpOtions = {
       body: datos
     };
