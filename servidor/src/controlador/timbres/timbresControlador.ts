@@ -484,16 +484,27 @@ class TimbresControlador {
             // Iniciar transacción
             await client.query('BEGIN');
 
-            const timbrePromises = code_empleados.map((codigo: number) =>
-                client.query(
-                    `SELECT * FROM public.timbres_crear ($1, $2,
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone,
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
-                    to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `,
-                    [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion, observacion, 'APP_WEB', documento, true, hora_fecha_timbre]
-                )
-            );
+            const timbrePromises = code_empleados.map(async (codigo) => {
+                const res = await client.query(
+                    `
+                    SELECT public.timbres_verificar(
+                        $1,
+                        to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone
+                    ) AS resultado;
+                    `,
+                    [codigo, hora_fecha_timbre]
+                );
+
+                return { codigo, resultado: res.rows[0].resultado }; // Retorna el código y el resultado
+            });
+
+            const timbresResultados = await Promise.all(timbrePromises); // Espera a que todas las promesas se resuelvan
+
+            // Filtra solo los códigos donde el resultado sea 1
+            const filtrados = timbresResultados
+                .filter((timbre) => timbre.resultado === 1)
+                .map((timbre) => timbre.codigo); // Extrae solo los códigos
+
 
             // Esperar a que todas las promesas se resuelvan
             await Promise.all(timbrePromises);

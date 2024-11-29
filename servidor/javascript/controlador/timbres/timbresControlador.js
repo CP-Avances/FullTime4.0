@@ -442,11 +442,20 @@ class TimbresControlador {
                 const code_empleados = code.rows.map((empl) => empl.codigo);
                 // Iniciar transacción
                 yield client.query('BEGIN');
-                const timbrePromises = code_empleados.map((codigo) => client.query(`SELECT * FROM public.timbres_crear ($1, $2,
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone,
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
-                    to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `, [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion, observacion, 'APP_WEB', documento, true, hora_fecha_timbre]));
+                const timbrePromises = code_empleados.map((codigo) => __awaiter(this, void 0, void 0, function* () {
+                    const res = yield client.query(`
+                    SELECT public.timbres_verificar(
+                        $1,
+                        to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone
+                    ) AS resultado;
+                    `, [codigo, hora_fecha_timbre]);
+                    return { codigo, resultado: res.rows[0].resultado }; // Retorna el código y el resultado
+                }));
+                const timbresResultados = yield Promise.all(timbrePromises); // Espera a que todas las promesas se resuelvan
+                // Filtra solo los códigos donde el resultado sea 1
+                const filtrados = timbresResultados
+                    .filter((timbre) => timbre.resultado === 1)
+                    .map((timbre) => timbre.codigo); // Extrae solo los códigos
                 // Esperar a que todas las promesas se resuelvan
                 yield Promise.all(timbrePromises);
                 var fecha = fecha_.toFormat('yyyy-MM-dd');
