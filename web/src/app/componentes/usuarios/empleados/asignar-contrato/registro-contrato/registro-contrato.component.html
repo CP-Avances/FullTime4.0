@@ -90,7 +90,7 @@
                             <div class="row">
                                 <div class="col-md">
                                     <div class="d-flex flex-wrap justify-content-center">
-                                            <mat-form-field style="width: 140px;">
+                                            <mat-form-field style="width: 90%">
                                                 <mat-label>Fecha de ingreso</mat-label>
                                                 <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                                 [formControl]="fechaIngresoF" required>
@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="col-md">
                                     <div class="d-flex flex-wrap justify-content-center">
-                                        <mat-form-field style="width: 140px;">
+                                        <mat-form-field style="width: 90%">
                                             <mat-label>Fecha de salida</mat-label>
                                             <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
                                             [formControl]="fechaSalidaF" required>
@@ -163,8 +163,8 @@
                             </div>
                         </div>
 
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around" *ngIf="isChecked">
+                        <div *ngIf="isChecked" class="col-md">
+                            <div class="d-flex flex-wrap justify-content-around" >
                                 <div class="separar">
                                     <form method="post" enctype="multipart/form-data">
                                         <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"

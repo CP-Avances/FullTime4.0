@@ -27,24 +27,26 @@
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row m-auto">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 65px;  padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
+                            <div class="d-flex flex-wrap justify-content-center m-auto">
+                                <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
+                                    <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 65px; padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 65px;  padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir nueva plantilla
+                                    </label>
+                                </form>
+                            </div>
                         </div>
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div *ngIf="!DataFeriados" class="d-flex flex-wrap justify-content-around"
+                            <div *ngIf="!DataFeriados" class="d-flex flex-wrap justify-content-center m-auto"
                                 style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
@@ -53,7 +55,7 @@
                                     Descargar plantilla
                                 </a>
                             </div>
-                            <div *ngIf="mostrarbtnsubir" class="d-flex flex-wrap justify-content-around"
+                            <div *ngIf="mostrarbtnsubir" class="d-flex flex-wrap justify-content-center m-auto"
                                 style="text-align: center; justify-content: center;">
                                 <button *ngIf="DataFeriados && messajeExcel != 'error'" id="descargar"
                                     class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
