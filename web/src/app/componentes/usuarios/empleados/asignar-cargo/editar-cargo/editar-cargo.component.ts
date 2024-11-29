@@ -134,17 +134,16 @@ export class EditarCargoComponent implements OnInit {
 
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
-
-    this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal && !asignacion.administra) {
-        return;
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-    });
-
+    //console.log('res ', res)
+    if (this.asignacionesAcceso) {
+      this.asignacionesAcceso.map((asignacion: any) => {
+        if (asignacion.principal && !asignacion.administra) {
+          return;
+        }
+        this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+        this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+      });
+    }
   }
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS

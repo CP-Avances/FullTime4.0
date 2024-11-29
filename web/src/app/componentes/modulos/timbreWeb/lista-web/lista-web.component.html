@@ -9,7 +9,7 @@
                     <div class="col-1 col-md-2 mb-2 mb-md-0"> 
                     </div>
                     <div class="col-10 col-md-8 mb-2 mb-md-0 Tabla_titulo">
-                        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                        <span>
                             LISTAR USUARIOS ACTIVOS TIMBRE VIRTUAL
                         </span>
                     </div>
@@ -556,12 +556,11 @@
         <!--  ******************************  LISTA DE USUARIOS DESHABILITADOS  ************************************  -->
         <div style="padding-top: 20px;" *ngIf="activar_deshabilitados">
             <mat-card-content>
-
-                <div id="resultados_dh" class="row w-100 m-auto">
+                <div id="resultados" class="row w-100 m-auto">
                     <div class="col-1 col-md-2 mb-2 mb-md-0"> 
                     </div>
                     <div class="col-10 col-md-8 mb-2 mb-md-0 Tabla_titulo">
-                        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                        <span>
                             LISTAR USUARIOS INACTIVOS TIMBRE VIRTUAL
                         </span>
                     </div>
@@ -569,8 +568,6 @@
                         <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario(1)">highlight_off</mat-icon>
                     </div>
                 </div>
-
-
                 <br>
                 <form>
                     <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_dh">
