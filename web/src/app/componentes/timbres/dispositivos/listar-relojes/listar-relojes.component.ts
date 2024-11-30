@@ -92,7 +92,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.totalDispositivos = 10;
+    this.totalDispositivos = 3;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
