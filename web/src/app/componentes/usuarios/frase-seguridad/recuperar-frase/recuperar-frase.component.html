@@ -3,8 +3,8 @@
         <div class="home-inner">
             <div class="container">
                 <div class="row">
-                    <div class="col d-flex align-items-center justify-content-center">
-                        <mat-card class="mat-elevation-z8">
+                    <div class="col d-flex align-items-center justify-content-center m-auto">
+                        <mat-card class="mat-elevation-z8 p-4">
                             <img src="../../../../../assets/imagenes/logo/logoAdmin.png"><br>
                             <span>Confirmar nueva frase</span>
                             <form [formGroup]="formulario">
@@ -20,8 +20,9 @@
                                     <mat-hint id="fuente" align="end">{{message2.value.length}} / 100</mat-hint>
                                 </mat-form-field>
                             </form>
+                            <br>
                             <div class="w-100" style="margin: auto;">
-                                <div class="row">
+                                <div class="row mt-2">
                                     <div class="col-12 p-0">
                                         <button type="submit" class="btn" (click)="IngresarFrase(formulario.value)"
                                         [disabled]="!formulario.valid">Resetear frase</button>
