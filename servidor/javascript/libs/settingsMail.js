@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
+exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFechaPlanificacion = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = __importDefault(require("../database"));
 const luxon_1 = require("luxon");
@@ -129,11 +129,24 @@ exports.dia_completo = 'dddd';
 const FormatearFecha = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
         const formato = yield (0, exports.BuscarFecha)();
-        console.log('formato ', formato.fecha);
         console.log(' fecha ', fecha);
         const fechaLuxon = luxon_1.DateTime.fromISO(fecha);
-        const diaFormateado = fechaLuxon.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-            fechaLuxon.setLocale('es').toFormat(dia).slice(1);
+        console.log("ver fechaLuxon", fechaLuxon);
+        let diaFormateado = '';
+        /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+          fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+        if (dia == "dddd") {
+            diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
+        else {
+            diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
         const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
         const valor = `${diaFormateado}, ${fechaFormateada}`;
         console.log(' fecha.. ', fechaFormateada);
@@ -141,24 +154,49 @@ const FormatearFecha = function (fecha, dia) {
     });
 };
 exports.FormatearFecha = FormatearFecha;
+const FormatearFechaPlanificacion = function (fecha, dia) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const formato = yield (0, exports.BuscarFecha)();
+        const fechaLuxon = luxon_1.DateTime.fromJSDate(new Date(fecha));
+        let diaFormateado = '';
+        /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+          fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+        if (dia == "dddd") {
+            diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
+        else {
+            diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' });
+            diaFormateado = diaFormateado.replace('.', '');
+            // Asegúrate de que la primera letra esté en mayúscula
+            diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        }
+        const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+        const valor = `${diaFormateado}, ${fechaFormateada}`;
+        return valor;
+    });
+};
+exports.FormatearFechaPlanificacion = FormatearFechaPlanificacion;
 const FormatearFecha2 = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("ver fecha: ", fecha);
         const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+        const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
         const formato = yield (0, exports.BuscarFecha)();
-        if (!regex.test(fecha)) {
+        if (!regex.test(fecha) && !regexSinHora.test(fecha)) {
+            console;
             const date = new Date(fecha);
             // Obtener las partes de la fecha y formatearlas con dos dígitos
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
             // Devolver la fecha formateada
             fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
-        console.log("fecha ver", fecha);
         const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
         // Formatear el día
         if (dia == "ddd") {
@@ -224,7 +262,8 @@ const FormatearHora = function (hora) {
         console.log("ver hora: ", hora);
         const formato = yield (0, exports.BuscarHora)(); // Obtenemos el formato deseado desde la función
         const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
-        const valor = luxon_1.DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
+        const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
+        const valor = luxon_1.DateTime.fromFormat(horaFormateada, 'HH:mm:ss').toFormat(formato.hora);
         return valor;
     });
 };

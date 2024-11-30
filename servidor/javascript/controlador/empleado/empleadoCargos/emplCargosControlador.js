@@ -619,7 +619,7 @@ class EmpleadoCargosControlador {
                         fs_1.default.unlinkSync(ruta);
                     }
                 });
-                listCargos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
+                yield Promise.all(listCargos.map((valor) => __awaiter(this, void 0, void 0, function* () {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query(`
             SELECT * FROM eu_empleados WHERE cedula = $1
@@ -666,6 +666,7 @@ class EmpleadoCargosControlador {
                           `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
                                                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                                             valor.observacion = 'Existe un cargo en esas fechas';
+                                                            //console.log("ver valor.observacion", valor.observacion)
                                                         }
                                                         else {
                                                             // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -706,7 +707,8 @@ class EmpleadoCargosControlador {
                             valor.observacion = 'Cédula no existe en el sistema';
                         }
                     }
-                }));
+                    //console.log("ver valor.observacion final", valor.observacion)
+                })));
                 var tiempo = 2000;
                 if (listCargos.length > 500 && listCargos.length <= 1000) {
                     tiempo = 4000;
@@ -727,15 +729,15 @@ class EmpleadoCargosControlador {
                     });
                     var filaDuplicada = 0;
                     listCargos.forEach((item) => {
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado (cédula)';
-                        }
+                        let io = item.observacion;
+                        console.log("ver ioo", io);
                         if (item.observacion != undefined) {
                             let arrayObservacion = item.observacion.split(" ");
                             if (arrayObservacion[0] == 'no') {
                                 item.observacion = 'ok';
                             }
                         }
+                        console.log("ver item.observacion: ", item.observacion);
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
                             // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
@@ -870,6 +872,10 @@ class EmpleadoCargosControlador {
                             });
                         }
                     }
+                    const fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fecha_desde, 'ddd');
+                    const fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fecha_hasta, 'ddd');
+                    cargos.fecha_inicio = fechaIngresoN;
+                    cargos.fecha_final = fechaSalidaN;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_cargos',

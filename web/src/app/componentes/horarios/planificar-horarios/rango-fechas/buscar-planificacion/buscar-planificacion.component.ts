@@ -77,8 +77,11 @@ export class BuscarPlanificacionComponent {
     console.log()
     const ctrlValue = fecha;
     if (opcion === 1) {
+      console.log("opcion 1")
       if (this.fechaFinalF.value) {
-        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
+        console.log("existente fecha final")
+
+        this.ValidarFechas(ctrlValue, DateTime.fromJSDate(this.fechaFinalF.value) , this.fechaInicialF, opcion);
       }
       else {
         let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
@@ -88,7 +91,9 @@ export class BuscarPlanificacionComponent {
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
+      console.log("NO opcion 1")
+
+      this.ValidarFechas(DateTime.fromJSDate(this.fechaInicialF.value), ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }
@@ -96,7 +101,9 @@ export class BuscarPlanificacionComponent {
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = DateTime.fromJSDate(fec_inicio).set({ day: 1 }).toFormat('dd/MM/yyyy');
+
+    let inicio = fec_inicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
+    console.log("ver fec_inicio: ", fec_inicio)
     console.log("ver fecha_fin: ", fec_fin)
     console.log("ver formulario: ", formulario)
     console.log("ver opcion: ", opcion)

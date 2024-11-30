@@ -343,14 +343,17 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
       // LECTURA DE FECHAS
       this.dSalida = event.value;
-      var leer_fecha = event.value._i;
-      var fecha = leer_fecha.toISOString();
-      var inicio = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      console.log("event.value: ", event.value)
+      var inicio = event.value.toFormat('yyyy-MM-dd');
+      console.log("inicio: ", inicio)
 
       // VERIFICACION DE RESTRICCION DE FECHAS
       if (this.datosPermiso.fecha_restrinccion === true) {
         var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
         var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
+        console.log("fecha_negada_inicio: ", fecha_negada_inicio)
+        console.log("fecha_negada_fin: ", fecha_negada_fin)
+
 
         // VERIFICACION DE FECHA NO VALIDA CON LA SALIDA DE PERMISO
         if (Date.parse(inicio) >= Date.parse(fecha_negada_inicio) && Date.parse(inicio) <= Date.parse(fecha_negada_fin)) {
@@ -404,11 +407,22 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
   ValidarDiasPrevios(inicio: any) {
+    console.log("inicio: ", inicio)
     const diasAnticipar = this.datosPermiso.dias_anticipar_permiso;
-    const fechaInicio = DateTime.fromFormat(inicio, 'yyyy/MM/dd');
-    const fechaRestada = fechaInicio.minus({ days: diasAnticipar }).toFormat('yyyy/MM/dd');
+    const fechaInicio = DateTime.fromFormat(inicio, 'yyyy-MM-dd');
+
+    console.log("fechaInicio: ", fechaInicio)
+    console.log("diasAnticipar: ", diasAnticipar)
+
+    const fechaRestada = fechaInicio.minus({ days: diasAnticipar }).toFormat('yyyy-MM-dd');
+    console.log("fechaRestada: ", fechaRestada)
+
+
     if (diasAnticipar > 0) {
-      const fechaActual = DateTime.now().toFormat('yyyy/MM/dd');
+      const fechaActual = DateTime.now().toFormat('yyyy-MM-dd');
+      console.log("fechaActual: ", fechaActual)
+
+      console.log("DateTime.fromISO(fechaActual) : ", DateTime.fromISO(fechaActual))
       // COMPARAR LAS FECHAS
       if (DateTime.fromISO(fechaActual) <= DateTime.fromISO(fechaRestada)) {
         // SI LA FECHA ACTUAL ES MENOR O IGUAL A LA FECHA RESTADA
@@ -443,11 +457,14 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     //VALIDAR INGRESO DE FECHA DE SALIDA Y SELECCION DE TIPO DE PERMISO
     if (form.fechaInicioForm != '' && form.idPermisoForm != '') {
+      console.log("this.dSalida: ", this.dSalida)
 
       // CAPTURAR FECHA Y FORMATEAR A YYYY-MM-DD
       this.dIngreso = event.value;
-      var inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-      var final = DateTime.fromFormat(this.dIngreso, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+      console.log("this.dIngreso: ", this.dIngreso)
+
+      var inicio = this.dSalida.toFormat('yyyy-MM-dd');
+      var final = this.dIngreso.toFormat('yyyy-MM-dd');
 
       // VERIFICAR QUE LAS FECHAS INGRESADAS DE FORMA CORRECTA
       if (Date.parse(inicio) > Date.parse(final)) {
@@ -462,6 +479,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
         // VERIFICACION DE RESTRICCION DE FECHAS
         if (this.datosPermiso.fecha_restrinccion === true) {
+
           var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
           var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
@@ -496,8 +514,14 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA VALIDAR QUE SE INGRESE DIAS - HORAS DE SOLICITUD DE PERMISOS
   ValidarConfiguracionDias() {
+
+    console.log("this.dIngreso", this.dIngreso)
+    console.log("this.dSalida", this.dSalida)
+
     if (this.configuracion_permiso === 'Dias') {
-      const resta = this.dIngreso.diff(this.dSalida, 'days');
+      const resta = this.dIngreso.diff(this.dSalida, 'days').values.days;
+      console.log("ver resta :", resta)
+
       this.diasF.setValue(resta + 1);
       if ((resta + 1) > this.Tdias) {
         this.toastr.warning(
@@ -1165,13 +1189,16 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   feriados: any = [];
   BuscarFeriados(form: any) {
     this.feriados = [];
+    console.log("form.fechaInicioForm: ", form.fechaInicioForm)
+    console.log("form.fechaFinalForm: ", form.fechaFinalForm)
+
     let datos = {
-      fecha_inicio: DateTime.fromISO(form.fechaInicioForm).toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromISO(form.fechaFinalForm).toFormat('yyyy-MM-dd'),
+      fecha_inicio: form.fechaInicioForm.toFormat('yyyy-MM-dd'),
+      fecha_final: form.fechaFinalForm.toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.empleado.id)
     }
     if (form.solicitarForm === 'Horas' && form.especialForm === false) {
-      datos.fecha_final = DateTime.fromISO(form.fechaInicioForm).toFormat('yyyy-MM-dd');
+      datos.fecha_final = form.fechaInicioForm.toFormat('yyyy-MM-dd');
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
       this.feriados = data;
@@ -1235,9 +1262,9 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   totalFechas: any = [];
   BuscarFechasHorario(form: any) {
     this.horario = [];
-    let inicio = DateTime.fromISO(form.fechaInicioForm).toFormat('yyyy-MM-dd');
-    let inicio_ = DateTime.fromISO(form.fechaInicioForm).toFormat('yyyy-MM-dd');
-    let final = DateTime.fromISO(form.fechaFinalForm).toFormat('yyyy-MM-dd');
+    let inicio = form.fechaInicioForm.toFormat('yyyy-MM-dd');
+    let inicio_ = form.fechaInicioForm.toFormat('yyyy-MM-dd');
+    let final = form.fechaFinalForm.toFormat('yyyy-MM-dd');
 
     this.fechasHorario = '';
     this.totalFechas = [];
@@ -1355,10 +1382,12 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     this.contar_feriados = 0;
     this.contar_laborables = 0;
     this.contar_recuperables = 0;
+    console.log("this.dSalida: ", this.dSalida)
+    console.log("this.dIngreso: ", this.dIngreso)
 
     this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    var inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    var fin = DateTime.fromFormat(this.dIngreso, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+    var inicio = this.dSalida.toFormat('yyyy-MM-dd');
+    var fin = this.dIngreso.toFormat('yyyy-MM-dd');
 
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIA DEL PERIODO INDICADO
     while (inicio <= fin) {

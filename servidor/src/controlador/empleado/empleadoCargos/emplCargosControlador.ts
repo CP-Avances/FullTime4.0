@@ -521,6 +521,7 @@ class EmpleadoCargosControlador {
           (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
           (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
           (JEFE != undefined)) {
+
           data.fila = ITEM;
           data.cedula = CEDULA; data.departamento = DEPARTAMENTO;
           data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
@@ -571,6 +572,7 @@ class EmpleadoCargosControlador {
           listCargos.push(data);
         }
         else {
+
           data.fila = ITEM;
           data.cedula = CEDULA; data.departamento = DEPARTAMENTO;
           data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
@@ -686,7 +688,7 @@ class EmpleadoCargosControlador {
         }
       });
 
-      listCargos.forEach(async (valor: any) => {
+      await Promise.all(listCargos.map(async (valor: any) => {
         if (valor.observacion == 'no registrado') {
           var VERIFICAR_CEDULA = await pool.query(
             `
@@ -714,7 +716,6 @@ class EmpleadoCargosControlador {
                   ($3 BETWEEN fecha_ingreso AND fecha_salida))
                 `
                 , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
-
 
               if (ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '') {
 
@@ -759,8 +760,10 @@ class EmpleadoCargosControlador {
                           `
                             , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
 
+                       
                           if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                             valor.observacion = 'Existe un cargo en esas fechas'
+                            //console.log("ver valor.observacion", valor.observacion)
                           }
                           else {
                             // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -802,7 +805,11 @@ class EmpleadoCargosControlador {
             valor.observacion = 'Cédula no existe en el sistema'
           }
         }
-      });
+
+        //console.log("ver valor.observacion final", valor.observacion)
+
+      }));
+
       var tiempo = 2000;
       if (listCargos.length > 500 && listCargos.length <= 1000) {
         tiempo = 4000;
@@ -810,6 +817,7 @@ class EmpleadoCargosControlador {
       else if (listCargos.length > 1000) {
         tiempo = 7000;
       }
+
       setTimeout(() => {
 
         listCargos.sort((a: any, b: any) => {
@@ -826,9 +834,9 @@ class EmpleadoCargosControlador {
         var filaDuplicada: number = 0;
 
         listCargos.forEach((item: any) => {
-          if (item.observacion == '1') {
-            item.observacion = 'Registro duplicado (cédula)'
-          }
+
+          let io = item.observacion
+          console.log("ver ioo", io)
 
           if (item.observacion != undefined) {
             let arrayObservacion = item.observacion.split(" ");
@@ -836,6 +844,7 @@ class EmpleadoCargosControlador {
               item.observacion = 'ok'
             }
           }
+          console.log("ver item.observacion: ", item.observacion)
 
           // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
@@ -1029,6 +1038,14 @@ class EmpleadoCargosControlador {
           }
 
         }
+
+        const fechaIngresoN = await FormatearFecha2(fecha_desde, 'ddd');
+        const fechaSalidaN = await FormatearFecha2(fecha_hasta, 'ddd');
+
+        cargos.fecha_inicio = fechaIngresoN;
+        cargos.fecha_final = fechaSalidaN;
+
+
 
 
         // AUDITORIA

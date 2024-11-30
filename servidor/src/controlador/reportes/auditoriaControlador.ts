@@ -6,7 +6,7 @@ import { Readable } from 'stream';
 class AuditoriaControlador {
 
 
-    public async BuscarDatosAuditoriaporTablasEmpaquetados(req: Request, res: Response):  Promise<void> {
+    public async BuscarDatosAuditoriaporTablasEmpaquetados(req: Request, res: Response): Promise<void> {
         const { tabla, desde, hasta, action } = req.body;
 
         // Convertir las cadenas de acciones en arrays
@@ -36,7 +36,7 @@ class AuditoriaControlador {
                     fecha_hora DESC;
             `;
 
-       // console.log('Query:', query);
+        // console.log('Query:', query);
         //console.log('Params:', params);
 
 
@@ -212,6 +212,70 @@ class AuditoriaControlador {
             throw error;
         }
     }
+
+    public InsertarAuditoriaPorLotes = async (data: Auditoria[], user_name: string, ip: string): Promise<void> => {
+        const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
+        const totalResults = [];
+
+        for (let i = 0; i < data.length; i += batchSize) {
+            const batch = data.slice(i, i + batchSize);
+            const valores: any[] = [];
+            const placeholders: string[] = [];
+
+            for (let j = 0; j < batch.length; j++) {
+                const auditoria = batch[j];
+                const index = j * 9; // 9 es el número de campos a insertar
+
+                valores.push(
+                    "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
+                    auditoria.tabla,
+                    user_name,
+                    new Date(),                    
+                    auditoria.accion,
+                    auditoria.datosOriginales,
+                    auditoria.datosNuevos,
+                    ip,
+                    auditoria.observacion
+                );
+
+                // Crear los placeholders para la consulta de inserción masiva
+                placeholders.push(
+                    `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9})`
+                );
+            }
+
+            const query = `
+                INSERT INTO audit.auditoria (
+                    plataforma, table_name, user_name, fecha_hora,
+                    action, original_data, new_data, ip_address, observacion
+                ) VALUES ${placeholders.join(', ')}
+            `;
+
+            try {
+                // INICIAR TRANSACCIÓN
+                await pool.query('BEGIN');
+
+                // Ejecutar la consulta de inserción masiva
+                await pool.query(query, valores);
+
+                // FINALIZAR TRANSACCIÓN
+                await pool.query('COMMIT');
+
+            } catch (error) {
+                // REVERTIR TRANSACCIÓN
+                console.error("Detalles del error:", {
+                    message: error.message,
+                    stack: error.stack,
+                    code: error.code,
+                    detail: error.detail
+                });
+                await pool.query('ROLLBACK');
+
+                throw new Error('Error al insertar auditoría por lotes: ' + error.message);
+            }
+        }
+    };
+
 
 }
 

@@ -477,7 +477,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
-        this.perfil.SetImagen(this.urlImagen);
+        //this.perfil.SetImagen(this.urlImagen);
         this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
@@ -661,7 +661,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     localStorage.removeItem('fullname');
     localStorage.removeItem('correo');
     localStorage.removeItem('iniciales');
-    localStorage.removeItem('view_imagen');
+   // localStorage.removeItem('view_imagen');
   }
 
 
@@ -1955,6 +1955,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   CabeceraDocumentoPermisoEmpleado() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -2082,6 +2083,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   CabeceraDocumentoPermisoAprobacion() {
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -3068,6 +3070,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -3465,6 +3468,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   DefinirInfoHistoricoPDF() {
     const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
     return {
+      pageSize: 'A4',
       pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },

@@ -4,7 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
-
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from '../../../servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
@@ -13,6 +13,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { FormControl } from '@angular/forms';
+import { ThemePalette } from '@angular/material/core';
 
 interface Tablas {
     nombre: string;
@@ -44,6 +45,12 @@ export class ReporteAuditoriaComponent implements OnInit {
     // CAMPOS DEL FORMULARIO
     tabla_ = new FormControl('');
     modulo_ = new FormControl('');
+
+     // VARIABLES PROGRESS SPINNER
+     habilitarprogress: boolean = false;
+     mode: ProgressSpinnerMode = 'indeterminate';
+     color: ThemePalette = 'primary';
+     value = 10;
 
     // VARIABLES  
     formato_fecha: string = 'dd/MM/yyyy';
@@ -206,6 +213,9 @@ export class ReporteAuditoriaComponent implements OnInit {
         { nombre: "Perimetros de Ubicación", tabla: "mg_cat_ubicaciones", modulo: "Geolocalización", disponibilidad: this.geolocalizacion },
         { nombre: "Ubicaciones asignadas al Usuario", tabla: "mg_empleado_ubicacion", modulo: "Geolocalización", disponibilidad: this.geolocalizacion },
         // MODULO DE RELOJ VIRTUAL
+        { nombre: "Opciones de Marcación", tabla: "mtv_opciones_marcacion", modulo: "", disponibilidad: true },
+        { nombre: "Opciones de Marcación RV", tabla: "mrv_opciones_marcacion", modulo: "", disponibilidad: true },
+
         { nombre: "Dispositivos Móviles", tabla: "mrv_dispositivos", modulo: "Reloj Virtual", disponibilidad: this.reloj_virtual },
     ];
 
@@ -305,6 +315,7 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
+        
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
         // ARRAY PARA ALMACENAR TODAS LAS PROMESAS DE CONSULTA
@@ -344,6 +355,7 @@ export class ReporteAuditoriaComponent implements OnInit {
         }
         try {
             // ESPERAR A QUE TODAS LAS PROMESAS SE RESUELVAN
+            this.habilitarprogress = true;
             const resultados = await Promise.allSettled(consultasPromesas);
             this.datosbusqueda = resultados
                 .filter(result => result.status === 'fulfilled')
@@ -370,6 +382,7 @@ export class ReporteAuditoriaComponent implements OnInit {
                     break;
             }
         } finally {
+            this.habilitarprogress = false
         }
     }
 

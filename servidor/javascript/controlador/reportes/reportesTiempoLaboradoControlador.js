@@ -23,7 +23,6 @@ class ReportesTiempoLaboradoControlador {
                 suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
                     const listaTimbres = yield BuscarTiempoLaborado(desde, hasta, o.id);
                     o.tLaborado = yield AgruparTimbres(listaTimbres);
-                    console.log('Timbres: ', o);
                     return o;
                 })));
                 return suc;

@@ -880,6 +880,10 @@ class ContratoEmpleadoControlador {
                     `, [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
                         id_tipo_contrato]);
                     const [contrato] = response.rows;
+                    const fechaDesdeF = yield (0, settingsMail_1.FormatearFecha2)(fecha_desde, 'ddd');
+                    const fechaHastaF = yield (0, settingsMail_1.FormatearFecha2)(fecha_hasta, 'ddd');
+                    contrato.fecha_ingreso = fechaDesdeF;
+                    contrato.fecha_salida = fechaHastaF;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_contratos',

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,78 +39,11 @@ exports.PLAN_GENERAL_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const copyStream = __importStar(require("pg-copy-streams")); // Importar pg-copy-streams
+const luxon_1 = require("luxon");
 class PlanGeneralControlador {
     constructor() {
-        this.CrearPlanificacion3 = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { parte, user_name, ip, parteIndex, totalPartes } = req.body;
-            console.log("ver body", req.body);
-            let partesRecibidas = []; // Ajusta 'any' al tipo adecuado según los datos que estés manejando
-            let errores = 0;
-            let ocurrioError = false;
-            let mensajeError = '';
-            let codigoError = 0;
-            partesRecibidas = parte;
-            let contador = 0;
-            for (let i = 0; i < partesRecibidas.length; i++) {
-                try {
-                    contador += 1;
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    const result = yield database_1.default.query(`
-                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
-                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [
-                        partesRecibidas[i].fec_hora_horario, partesRecibidas[i].tolerancia, partesRecibidas[i].estado_timbre,
-                        partesRecibidas[i].id_det_horario, partesRecibidas[i].fec_horario, partesRecibidas[i].id_empl_cargo,
-                        partesRecibidas[i].tipo_entr_salida, partesRecibidas[i].id_empleado, partesRecibidas[i].id_horario, partesRecibidas[i].tipo_dia,
-                        partesRecibidas[i].salida_otro_dia, partesRecibidas[i].min_antes, partesRecibidas[i].min_despues, partesRecibidas[i].estado_origen,
-                        partesRecibidas[i].min_alimentacion
-                    ]);
-                    const [plan] = result.rows;
-                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(partesRecibidas[i].fec_hora_horario.split(' ')[1]);
-                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(partesRecibidas[i].fec_hora_horario, 'ddd');
-                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(partesRecibidas[i].fec_horario, 'ddd');
-                    plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                    plan.fecha_horario = fecha_horario;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_asistencia_general',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(plan),
-                        ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    console.error("Detalles del error:", {
-                        message: error.message,
-                        stack: error.stack, // Para ver dónde ocurre el error
-                        code: error.code, // Código de error (si lo hay)
-                        detail: error.detail // Información adicional de la BD (si la hay)
-                    });
-                    yield database_1.default.query('ROLLBACK');
-                    ocurrioError = true;
-                    mensajeError = error.message;
-                    codigoError = 500;
-                    errores++;
-                    break;
-                }
-            }
-            if (ocurrioError) {
-                // Si ocurrió un error, devolver el error con el mensaje adecuado
-                return res.status(500).jsonp({ message: 'Error al procesar la parte', error: mensajeError });
-            }
-            // Respuesta final con 'OK' si todo se procesó correctamente
-            return res.status(200).jsonp({ message: 'OK' });
-        });
-        this.CrearPlanificacionPorLotes = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.CrearPlanificacionPorLotes1 = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { parte, user_name, ip } = req.body;
             // Validación del input
             if (!Array.isArray(parte) || parte.length === 0) {
@@ -125,14 +81,14 @@ class PlanGeneralControlador {
                     const result = yield database_1.default.query(query, valores);
                     const plans = result.rows;
                     totalResults.push(...plans); // Guardar resultados del lote
+                    let auditoria = [];
                     for (const plan of plans) {
                         const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan.fecha_hora_horario.toLocaleString().split(' ')[1]);
                         const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan.fecha_hora_horario, 'ddd');
                         const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan.fecha_horario, 'ddd');
                         plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
                         plan.fecha_horario = fecha_horario;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                        auditoria.push({
                             tabla: 'eu_asistencia_general',
                             usuario: user_name,
                             accion: 'I',
@@ -142,6 +98,7 @@ class PlanGeneralControlador {
                             observacion: null
                         });
                     }
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                     // FINALIZAR TRANSACCIÓN
                     yield database_1.default.query('COMMIT');
                 }
@@ -159,6 +116,77 @@ class PlanGeneralControlador {
             }
             // Respuesta final con 'OK' si todo se procesó correctamente
             return res.status(200).json({ message: 'OK', totalResults });
+        });
+        this.CrearPlanificacionPorLotes = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { parte, user_name, ip } = req.body;
+            // Validación del input
+            if (!Array.isArray(parte) || parte.length === 0) {
+                return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
+            }
+            const client = yield database_1.default.connect(); // Conectar al cliente
+            try {
+                yield client.query('BEGIN'); // Iniciar una transacción
+                // Crear un flujo de datos para el COPY usando pg-copy-streams, desde un flujo de entrada en formato csv
+                const stream = client.query(copyStream.from(`COPY eu_asistencia_general (
+                    fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
+                    id_horario, tipo_dia, salida_otro_dia, minutos_antes,
+                    minutos_despues, estado_origen, minutos_alimentacion
+                ) FROM STDIN WITH (FORMAT csv, DELIMITER '\t')`));
+                // Escribir los datos en el flujo COPY
+                for (const p of parte) {
+                    const row = [
+                        p.fec_hora_horario,
+                        p.tolerancia,
+                        p.estado_timbre,
+                        p.id_det_horario,
+                        p.fec_horario,
+                        p.id_empl_cargo,
+                        p.tipo_entr_salida,
+                        p.id_empleado,
+                        p.id_horario,
+                        p.tipo_dia,
+                        p.salida_otro_dia,
+                        p.min_antes,
+                        p.min_despues,
+                        p.estado_origen,
+                        p.min_alimentacion
+                    ].join('\t'); // Formatear la fila con tabuladores
+                    stream.write(`${row}\n`); // Escribir la fila en el flujo
+                }
+                stream.end(); // Finalizar el flujo
+                // Esperar a que el COPY termine
+                yield new Promise((resolve, reject) => {
+                    stream.on('finish', resolve); // Esperar la finalización del COPY
+                    stream.on('error', reject); // Manejar posibles errores
+                });
+                // Realizar la inserción en auditoría después de completar la inserción masiva
+                const auditoria = parte.map((p) => ({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(p),
+                    ip,
+                    observacion: null
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield client.query('COMMIT'); // Finalizar la transacción
+                res.status(200).json({ message: 'OK', totalResults: parte.length });
+            }
+            catch (error) {
+                yield client.query('ROLLBACK'); // Revertir la transacción en caso de error
+                console.error("Detalles del error:", {
+                    message: error.message,
+                    stack: error.stack,
+                    code: error.code,
+                    detail: error.detail
+                });
+                res.status(500).json({ message: 'Error al procesar la parte', error: error.message });
+            }
+            finally {
+                client.release(); // Liberar el cliente
+            }
         });
         this.BuscarFechasMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar } = req.body;
@@ -227,6 +255,7 @@ class PlanGeneralControlador {
                     yield database_1.default.query('COMMIT');
                 }
                 catch (error) {
+                    console.log("ver error: ", error);
                     console.error("Detalles del error:", {
                         message: error.message,
                         stack: error.stack, // Para ver dónde ocurre el error
@@ -324,6 +353,7 @@ class PlanGeneralControlador {
                     yield database_1.default.query('COMMIT');
                 }
                 catch (error) {
+                    console.log("ver error eliminar: ", error);
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
                     errores++;
@@ -349,73 +379,74 @@ class PlanGeneralControlador {
     EliminarRegistrosMultiples(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { user_name, ip, id_plan } = req.body;
+            console.log("ver req.body", req.body);
             // Iniciar transacción
             try {
+                if (!Array.isArray(id_plan) || id_plan.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 yield database_1.default.query('BEGIN');
-                /*
-    
-            // CONSULTAR LOS DATOS ORIGINALES PARA TODOS LOS PLANES
-            const consulta = await pool.query(
-                `SELECT * FROM eu_asistencia_general WHERE id = ANY($1::int[])`,
-                [id_plan]
-            );
-    
-            const datosOriginales = consulta.rows;
-            if (datosOriginales.length !== id_plan.length) {
-                const idsEncontrados = datosOriginales.map((d: any) => d.id);
-                const idsNoEncontrados = id_plan.filter((id: any) => !idsEncontrados.includes(id));
-                // Registrar auditoría de errores
-                for (const id of idsNoEncontrados) {
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = ANY($1)`, [id_plan]);
+                const datosOriginales = consulta.rows;
+                const idsEncontrados = datosOriginales.map((row) => row.id);
+                const idsNoEncontrados = id_plan.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id) => ({
                         tabla: 'eu_asistencia_general',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
+                        observacion: `Error al eliminar registro con id ${id}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: id_plan });
+                }
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id) => ({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar registro con id ${id}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    const result = yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
+                    if (result.rowCount === 0) {
+                        console.log("No se eliminaron registros con los IDs proporcionados.");
+                    }
+                    yield database_1.default.query('COMMIT');
+                    yield Promise.all(datosOriginales.map((item) => __awaiter(this, void 0, void 0, function* () {
+                        item.fecha_horario = yield (0, settingsMail_1.FormatearFechaPlanificacion)(item.fecha_horario.toString(), 'ddd');
+                        item.fecha_hora_horario = (yield (0, settingsMail_1.FormatearFechaPlanificacion)(item.fecha_hora_horario.toString(), 'ddd')) + ' ' + luxon_1.DateTime.fromJSDate(new Date(item.fecha_hora_horario)).toFormat('HH:mm:ss');
+                        ;
+                    })));
+                    const auditoria = datosOriginales.map((item) => {
+                        return {
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(item),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null,
+                        };
                     });
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'OK' });
                 }
-     
-                // Si alguno de los registros no se encontró, hacer ROLLBACK
-                await pool.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'Algunos registros no se encontraron.' });
-            }
-    */
-                // ELIMINAR TODOS LOS REGISTROS DE UNA SOLA VEZ
-                yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
-                // Formatear las fechas de los datos originales para la auditoría
-                /*
-                for (const datos of datosOriginales) {
-                    const fecha_hora_horario1 = await FormatearHora(datos.fecha_hora_horario.toLocaleString().split(' ')[1]);
-                    const fecha_hora_horario = await FormatearFecha2(datos.fecha_hora_horario, 'ddd');
-                    const fecha_horario = await FormatearFecha2(datos.fecha_horario, 'ddd');
-        
-                    datos.fecha_horario = fecha_horario;
-                    datos.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                }
-                    /*/
-                // AUDITORÍA: Registrar todos los registros eliminados
-                //for (const datos of datosOriginales) {
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_asistencia_general',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: 'Identificadores de planificación horaria: ' + id_plan,
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // }
-                // Finalizar transacción
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'OK' });
             }
             catch (error) {
-                // Revertir la transacción si ocurre un error
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                console.error('Error en la eliminación múltiple:', error);
-                return res.status(500).jsonp({ message: 'Error en el proceso de eliminación', error });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -644,13 +675,15 @@ class PlanGeneralControlador {
                 var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
                 var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
                 var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
+                var fecha_hora_timbre1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre.toLocaleString().split(' ')[1]);
+                var fecha_hora_timbre = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
                     datosNuevos: `id: ${datosOriginales.id}
                             , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
                     observacion: null

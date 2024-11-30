@@ -24,7 +24,9 @@
               "vfs_fonts",
               "file-saver",
               "ts-md5/dist/md5",
-              "xml2js"
+              "xml2js",
+              "src/assets/build/pdfmake.js",
+              "src/assets/build/vfs_fonts.js"
             ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",

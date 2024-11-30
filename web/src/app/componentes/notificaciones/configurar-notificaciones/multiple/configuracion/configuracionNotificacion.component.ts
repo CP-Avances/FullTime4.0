@@ -39,8 +39,8 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-      this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+        this.user_name = localStorage.getItem('usuario');
+        this.ip = localStorage.getItem('ip');
         this.ImprimirDatosUsuario();
     }
 
@@ -138,9 +138,11 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     // REGISTRO DE CONFIGURACION MULTIPLE
     contador: number = 0;
     ConfigurarMultiple(form: any) {
-        this.contador = 0;
-        this.empleados.forEach((item: any) => {
+        if (this.empleados.length > 0) {
+
+            const id_empleado = this.empleados.map((empl: any) => empl.id);
             let data = {
+                id_empleado: '',
                 vaca_mail: form.vacaMail,
                 vaca_noti: form.vacaNoti,
                 permiso_mail: form.permisoMail,
@@ -154,21 +156,68 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 user_name: this.user_name,
                 ip: this.ip,
             }
-            this.avisos.ObtenerConfiguracionEmpleado(item.id).subscribe(res => {
-                this.avisos.ActualizarConfigNotiEmpl(item.id, data).subscribe(res => {
-                    this.contador = this.contador + 1;
-                    if (this.empleados.length == this.contador) {
-                        this.ventana.close(true);
-                        this.toaster.success('Operación exitosa.', 'Configuración actualizada.', {
-                            timeOut: 6000,
-                        });
+
+            this.avisos.ObtenerConfiguracionEmpleadoMultiple({ id_empleado }).subscribe(
+                async res => {
+                    if (res && res.respuesta) {
+                        const datosEncontrados = res.respuesta; // Array con los objetos devueltos por el backend
+                        const idsEncontrados = datosEncontrados.map((item: any) => item.id_empleado);
+                        const idsFaltantes = id_empleado.filter((id: number) => !idsEncontrados.includes(id));
+
+                        console.log("ver idsEncontrados", idsEncontrados)
+                        console.log("ver idsFaltantes", idsFaltantes)
+
+                        if (idsEncontrados.length != 0) {
+                            // infoActualizar.id_empleado = idsEncontrados;
+                            data.id_empleado = idsEncontrados
+                            // await this.ActualizarOpcionMarcacion(infoActualizar, idsFaltantes);
+                            this.avisos.ActualizarConfigNotiEmplMultiple(data).subscribe(res => {
+                                if (idsFaltantes.length == 0) {
+                                    this.toaster.success('Operación exitosa.', 'Configuración actualizada.', {
+                                        timeOut: 6000,
+                                    });
+                                }
+                            })
+                        }
+
+                        if (idsFaltantes.length != 0) {
+                            data.id_empleado = idsFaltantes;
+                            this.avisos.IngresarConfigNotiEmpleadoMultiple(data).subscribe(res => {
+                                this.toaster.success('Operación exitosa.', 'Configuración actualizada.', {
+                                    timeOut: 6000,
+                                });
+                                this.ventana.close(true);
+                            });
+                        }
+
                     }
-                });
-            }, error => {
-                this.contador = this.contador + 1;
-                this.CrearConfiguracion(form, item, this.contador);
-            });
-        });
+
+                },
+                async error => {
+
+                    if (error.status === 404) {
+                        console.log('El backend devolvió un 404: No se encontraron datos.');
+                        // Realizar acciones específicas para el caso de 404}
+                        data.id_empleado = id_empleado;
+                        this.avisos.IngresarConfigNotiEmpleadoMultiple(data).subscribe(res => {
+                            this.toaster.success('Operación exitosa.', 'Configuración actualizada.', {
+                                timeOut: 6000,
+                            });
+                            this.ventana.close(true);
+                        });
+                    } else {
+                        console.error('Error inesperado:', error);
+                    }
+                }
+            )
+
+
+        } else { 
+            this.toaster.warning('No ha seleccionado usuarios.', '', {
+                timeOut: 6000,
+              });
+        }
+
     }
 
     // METODO DE CONFIGURCAION DE NOTIFICACIONES

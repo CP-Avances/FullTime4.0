@@ -239,14 +239,66 @@ class TimbresControlador {
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id, codigo, tecla, observacion, fecha } = req.body;
-                yield database_1.default.query(`
+                let { id, codigo, tecla, observacion, fecha, user_name, ip } = req.body;
+                const timbre = yield database_1.default.query(`
+                SELECT * FROM eu_timbres WHERE id = $1
+                `, [id]);
+                const [datosOriginales] = timbre.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_timbres',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar timbre con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar timbre' });
+                }
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre.toLocaleString().split(' ')[1]);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre, 'ddd');
+                const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
+                const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre_servidor, 'ddd');
+                const fechaHoraValidado = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_timbre_validado.toLocaleString().split(' ')[1]);
+                const fechaTimbreValidado = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_timbre_validado, 'ddd');
+                const actualizacion = yield database_1.default.query(`
                 SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
                     $3::character varying, $4::integer, $5::character varying) 
-                `, [fecha, codigo, tecla, id, observacion])
-                    .then((result) => {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                `, [fecha, codigo, tecla, id, observacion]);
+                const [datosNuevos] = actualizacion.rows;
+                let existe_imagen = false;
+                if (datosOriginales.imagen) {
+                    existe_imagen = true;
+                }
+                let existe_documento = false;
+                if (datosOriginales.documento) {
+                    existe_documento = true;
+                }
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_timbres',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosOriginales.accion}, tecla_funcion: ${datosOriginales.tecla_funcion}, observacion: ${datosOriginales.observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${datosOriginales.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosNuevos.modificartimbre}, tecla_funcion: ${tecla}, observacion: ${observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento}  }`,
+                    ip,
+                    observacion: null
                 });
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                /*
+                await pool.query(
+                    `
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying,
+                        $3::character varying, $4::integer, $5::character varying)
+                    `
+                    , [fecha, codigo, tecla, id, observacion])
+                    .then((result: any) => {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                    });
+    */
             }
             catch (err) {
                 console.log('timbre error ', err);
@@ -334,13 +386,17 @@ class TimbresControlador {
                     console.log('error ', error);
                     console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha_timbre, 'ddd');
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fecha_timbre, 'ddd');
+                    let existe_imagen = false;
+                    if (imagen) {
+                        existe_imagen = true;
+                    }
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${imagen} }`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen} }`,
                         ip,
                         observacion: null
                     });
@@ -367,76 +423,59 @@ class TimbresControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const client = yield database_1.default.connect(); // Obtener un cliente para la transacción
             try {
-                // ESTE USUARIO NO TIMBRA CON UBICACION
+                // Datos requeridos para el método
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, id_empleado, id_reloj, tipo, ip, user_name, documento } = req.body;
+                const id_empleados = Array.isArray(id_empleado) ? id_empleado : [id_empleado];
                 console.log('req ', req.body);
                 const fecha_ = luxon_1.DateTime.fromISO(fec_hora_timbre);
                 var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
-                // OBTENER LA FECHA Y HORA ACTUAL
-                var now = luxon_1.DateTime.now();
-                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
-                var fecha_hora = now.toFormat('dd/MM/yyyy, hh:mm:ss a');
-                let servidor;
-                //console.log('req... ', hora_fecha_timbre)
-                if (tipo === 'administrar') {
-                    servidor = hora_fecha_timbre;
+                // Obtener códigos de los empleados
+                const code = yield client.query(`SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])`, [id_empleados]);
+                if (code.rows.length === 0) {
+                    res.status(404).json({ mensaje: 'El usuario no tiene un código asignado.' });
+                    return;
                 }
-                else {
-                    servidor = fecha_hora;
-                }
-                let code = yield database_1.default.query(`
-                SELECT codigo FROM eu_empleados WHERE id = $1
-                `, [id_empleado]).then((result) => { return result.rows; });
-                if (code.length === 0)
-                    return { mensaje: 'El usuario no tiene un código asignado.' };
-                var codigo = code[0].codigo;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                database_1.default.query(`
-                SELECT * FROM public.timbres_crear ($1, $2,
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, 
+                const code_empleados = code.rows.map((empl) => empl.codigo);
+                // Iniciar transacción
+                yield client.query('BEGIN');
+                const timbrePromises = code_empleados.map((codigo) => client.query(`SELECT * FROM public.timbres_crear ($1, $2,
+                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone,
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10,
                     to_timestamp($11, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `, [codigo, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion,
-                    observacion, 'APP_WEB', documento, true, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                    console.log('error ', error);
-                    //console.log('result ', results)
-                    // FORMATEAR FECHAS
-                    var fecha = fecha_.toFormat('yyyy-MM-dd');
-                    var hora = fecha_.toFormat('HH:mm:ss');
-                    const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fecha, 'ddd');
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_timbres',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, documento: ${documento} }`,
-                        ip,
-                        observacion: null
-                    });
-                    yield database_1.default.query('COMMIT');
-                    if (results) {
-                        if (results.rows[0].timbres_crear === 0) {
-                            res.status(200).jsonp({ message: 'Registro duplicado.' });
-                        }
-                        else {
-                            res.status(200).jsonp({ message: 'Registro guardado.' });
-                        }
-                    }
-                    else {
-                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
-                    }
+                `, [codigo, id_reloj, hora_fecha_timbre, hora_fecha_timbre, accion, tecl_funcion, observacion, 'APP_WEB', documento, true, hora_fecha_timbre]));
+                // Esperar a que todas las promesas se resuelvan
+                yield Promise.all(timbrePromises);
+                var fecha = fecha_.toFormat('yyyy-MM-dd');
+                var hora = fecha_.toFormat('HH:mm:ss');
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                let existe_documento = !!documento;
+                const auditoria = code_empleados.map((codigo) => ({
+                    tabla: 'eu_timbres',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
+                    ip,
+                    observacion: null
                 }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                // Confirmar la transacción
+                yield client.query('COMMIT');
+                res.status(200).json({ message: 'Registro guardado.' });
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: error });
+                console.error('Error durante la transacción:', error);
+                // Revertir la transacción en caso de error
+                yield client.query('ROLLBACK');
+                res.status(500).json({ message: 'Error interno del servidor.' });
+            }
+            finally {
+                client.release(); // Liberar el cliente al final
             }
         });
     }
@@ -444,6 +483,8 @@ class TimbresControlador {
     BuscarTimbresPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { codigo, fec_inicio, fec_final } = req.body;
+            console.log("ver fec_inicio", fec_inicio);
+            console.log("ver fec_final", fec_final);
             const TIMBRES = yield database_1.default.query("SELECT * FROM eu_timbres " +
                 "WHERE fecha_hora_timbre_validado BETWEEN $1 AND $2 " +
                 "AND codigo IN (" + codigo + ") " +
@@ -703,38 +744,39 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial,
+                const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+                const batches = [];
+                for (let i = 0; i < id_empleado.length; i += batchSize) {
+                    batches.push(id_empleado.slice(i, i + batchSize));
+                }
+                for (const batch of batches) {
+                    const valores = batch
+                        .map((id_empleado) => `(${id_empleado}, ${timbre_internet}, ${timbre_foto}, ${timbre_especial}, ${timbre_ubicacion_desconocida})`)
+                        .join(', ');
+                    // Ejecutar la inserción en cada lote
+                    yield database_1.default.query(`INSERT INTO mrv_opciones_marcacion (id_empleado, timbre_internet, timbre_foto, timbre_especial,
                     timbre_ubicacion_desconocida) 
-                VALUES ($1, $2, $3, $4, $5) RETURNING *
-                `, [id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                const [opciones] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mrv_opciones_marcacion',
+                VALUES ${valores}`);
+                }
+                const auditoria = id_empleado.map((id_empleado) => ({
+                    tabla: 'mtv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(opciones),
+                    datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                     ip,
                     observacion: null
-                });
-                // FINALIZAR TRANSACCION
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                 yield database_1.default.query('COMMIT');
-                if (opciones) {
-                    return res.status(200).jsonp(opciones);
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+                res.jsonp({ message: 'Sin duplicados' });
             }
             catch (error) {
                 console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -743,146 +785,148 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-                //console.log(req.body)
+                console.log(req.body);
                 var opciones;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                let rowsAffected = 0;
                 if (timbre_internet != null && timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4,
                         timbre_ubicacion_desconocida = $5
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_foto != null && timbre_especial != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_especial = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_foto, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_foto != null && timbre_ubicacion_desconocida != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_foto, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_foto != null) {
                     //console.log('2')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_foto = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_foto]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_especial != null) {
                     //console.log('3')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null && timbre_ubicacion_desconocida != null) {
                     //console.log('3')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null && timbre_especial != null) {
                     //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_foto, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null && timbre_ubicacion_desconocida != null) {
                     //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_foto, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
                     //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_internet != null) {
                     //console.log('5')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_internet = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_internet]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null) {
                     //console.log('6')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_foto]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_especial != null) {
                     //console.log('7')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_ubicacion_desconocida != null) {
                     //console.log('7')
                     const response = yield database_1.default.query(`
                     UPDATE mrv_opciones_marcacion SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[])
                     `, [id_empleado, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
+                const auditoria = id_empleado.map((id_empleado) => ({
                     tabla: 'mrv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(opciones),
+                    datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                     ip,
                     observacion: null
-                });
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 //console.log('opciones ', opciones)
-                if (opciones) {
-                    return res.status(200).jsonp(opciones);
+                if (rowsAffected > 0) {
+                    return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }
                 else {
                     return res.status(404).jsonp({ message: 'error' });
@@ -890,6 +934,7 @@ class TimbresControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("ver error de actualizar: ", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -898,11 +943,16 @@ class TimbresControlador {
     // METODO PARA BUSCAR OPCIONES DE TIMBRES    **USADO
     BuscarOpcionesTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.body;
+            const { ids_empleados } = req.body;
+            console.log("ver req.body: ", req.body);
+            // Validar que ids_empleados sea un array
+            if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+                return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+            }
             const OPCIONES = yield database_1.default.query(`
             SELECT * FROM mrv_opciones_marcacion 
-            WHERE id_empleado = $1
-            `, [id_empleado]);
+            WHERE id_empleado = ANY($1)
+            `, [ids_empleados]);
             if (OPCIONES.rowCount != 0) {
                 return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
             }
@@ -931,43 +981,61 @@ class TimbresControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id } = req.body;
-                //console.log('req.body ', req.body)
+                const { user_name, ip, ids } = req.body;
+                console.log('req.body ', req.body);
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
+                const datosOriginales = consulta.rows;
+                const idsEncontrados = datosOriginales.map((row) => row.id_empleado);
+                const idsNoEncontrados = ids.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id_empleado) => ({
                         tabla: 'mrv_opciones_marcacion',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar registro con id ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
+                        observacion: `Error al eliminar registro con id ${id_empleado}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
-                yield database_1.default.query(`
-                DELETE FROM mrv_opciones_marcacion WHERE id = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mrv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id_empleado) => ({
+                            tabla: 'mrv_opciones_marcacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar registro con id ${id_empleado}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    yield database_1.default.query(`
+                DELETE FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)
+                `, [idsEncontrados]);
+                    const auditoria = datosOriginales.map((item) => ({
+                        tabla: 'mrv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -984,38 +1052,40 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
+                const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+                const batches = [];
+                for (let i = 0; i < id_empleado.length; i += batchSize) {
+                    batches.push(id_empleado.slice(i, i + batchSize));
+                }
+                for (const batch of batches) {
+                    const valores = batch
+                        .map((id_empleado) => `(${id_empleado}, ${timbre_foto}, ${timbre_especial}, ${timbre_ubicacion_desconocida})`)
+                        .join(', ');
+                    // Ejecutar la inserción en cada lote
+                    yield database_1.default.query(`
                 INSERT INTO mtv_opciones_marcacion (id_empleado, timbre_foto, timbre_especial, 
                     timbre_ubicacion_desconocida) 
-                VALUES ($1, $2, $3, $4) RETURNING *
-                `, [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                const [opciones] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
+                VALUES ${valores}`);
+                }
+                const auditoria = id_empleado.map((id_empleado) => ({
                     tabla: 'mtv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(opciones),
+                    datosNuevos: `id_empleado: ${id_empleado}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                     ip,
                     observacion: null
-                });
-                // FINALIZAR TRANSACCION
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                 yield database_1.default.query('COMMIT');
-                if (opciones) {
-                    return res.status(200).jsonp(opciones);
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+                res.jsonp({ message: 'Sin duplicados' });
             }
             catch (error) {
-                console.log('error ', error);
-                // REVERTIR TRANSACCION
+                // Revertir la transacción en caso de error
+                console.log("ver el error: ", error);
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                res.status(500).jsonp({ message: 'Error al guardar registros.' });
             }
         });
     }
@@ -1024,82 +1094,83 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
-                //console.log(req.body)
-                var opciones;
+                console.log(req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                let rowsAffected = 0;
                 if (timbre_foto != null && timbre_especial != null && timbre_ubicacion_desconocida != null) {
                     //console.log('1')
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3,
-                        timbre_ubicacion_deconocida = $4
-                    WHERE id_empleado = $1 RETURNING *
+                        timbre_ubicacion_desconocida = $4
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null && timbre_especial != null) {
                     //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_foto, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null && timbre_ubicacion_desconocida != null) {
                     //console.log('4')
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_foto, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_especial != null && timbre_ubicacion_desconocida != null) {
-                    //console.log('4')
+                    console.log('timbre_especial != null && timbre_ubicacion_desconocida != null');
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_especial, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_foto != null) {
-                    //console.log('6')
+                    console.log('6');
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_foto = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_foto]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_especial != null) {
                     //console.log('7')
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_especial = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_especial]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
                 else if (timbre_ubicacion_desconocida != null) {
                     //console.log('7')
                     const response = yield database_1.default.query(`
                     UPDATE mtv_opciones_marcacion SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = $1 RETURNING *
+                    WHERE id_empleado = ANY($1::int[]) 
                     `, [id_empleado, timbre_ubicacion_desconocida]);
-                    [opciones] = response.rows;
+                    rowsAffected = response.rowCount || 0;
                 }
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
+                const auditoria = id_empleado.map((id_empleado) => ({
                     tabla: 'mtv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(opciones),
+                    datosNuevos: `id_empleado: ${id_empleado}, , timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
+                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
                     ip,
                     observacion: null
-                });
+                }));
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 //console.log('opciones ', opciones)
-                if (opciones) {
-                    return res.status(200).jsonp(opciones);
+                if (rowsAffected > 0) {
+                    return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }
                 else {
                     return res.status(404).jsonp({ message: 'error' });
@@ -1107,6 +1178,7 @@ class TimbresControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("ver error de actualizar: ", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -1126,47 +1198,91 @@ class TimbresControlador {
             }
         });
     }
+    BuscarMultipleOpcionesTimbreWebMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { ids_empleados } = req.body; // ids_empleados debe ser un array de ids
+                // Validar que ids_empleados sea un array
+                if (!Array.isArray(ids_empleados) || ids_empleados.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs de empleados válido' });
+                }
+                const OPCIONES = yield database_1.default.query("SELECT * FROM mtv_opciones_marcacion " +
+                    "WHERE id_empleado = ANY($1)", [ids_empleados] // Pasamos el array directamente a la consulta
+                );
+                if (OPCIONES.rowCount !== 0) {
+                    return res.jsonp({ message: 'OK', respuesta: OPCIONES.rows });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'vacio' });
+                }
+            }
+            catch (error) {
+                console.error('Error al buscar opciones de marcación:', error);
+                return res.status(500).jsonp({ message: 'Error interno del servidor' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarRegistrosWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id } = req.body;
-                //console.log('req.body ', req.body)
+                const { user_name, ip, ids } = req.body;
+                console.log('req.body ', req.body);
                 // INICIAR TRANSACCION
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
+                }
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM mtv_opciones_marcacion WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                const consulta = yield database_1.default.query(`SELECT * FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
+                const datosOriginales = consulta.rows;
+                // Obtener los IDs encontrados
+                const idsEncontrados = datosOriginales.map((row) => row.id_empleado);
+                const idsNoEncontrados = ids.filter((id) => !idsEncontrados.includes(id));
+                if (idsEncontrados.length === 0) {
+                    const auditoria = idsNoEncontrados.map((id_empleado) => ({
                         tabla: 'mtv_opciones_marcacion',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar registro con id ${id}`
-                    });
+                        observacion: `Error al eliminar registro con id ${id_empleado}`
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                    return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
-                yield database_1.default.query(`
-                DELETE FROM mtv_opciones_marcacion WHERE id = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mtv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                else {
+                    if (idsNoEncontrados.length != 0) {
+                        const auditoria = idsNoEncontrados.map((id_empleado) => ({
+                            tabla: 'mtv_opciones_marcacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar registro con id ${id_empleado}`
+                        }));
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    }
+                    yield database_1.default.query(`
+                DELETE FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)
+                `, [idsEncontrados]);
+                    const auditoria = datosOriginales.map((item) => ({
+                        tabla: 'mtv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(item),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    }));
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -1215,12 +1331,16 @@ class TimbresControlador {
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
                 const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
+                let imagen_existe = false;
+                if (timbre.imagen) {
+                    imagen_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${timbre.imagen} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${imagen_existe} }`,
                     ip: timbre.ip,
                     observacion: null
                 });
@@ -1261,6 +1381,10 @@ class TimbresControlador {
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraSubida = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_subida_servidor.toLocaleString().split(' ')[1]);
                 const fechaTimbreSubida = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_subida_servidor.toLocaleString(), 'ddd');
+                let imagen_existe = false;
+                if (timbre.imagen) {
+                    imagen_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
@@ -1298,12 +1422,16 @@ class TimbresControlador {
                 });
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
+                let documento_existe = false;
+                if (documento) {
+                    documento_existe = true;
+                }
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre}, documento: ${documento_existe} }`,
                     ip: ip,
                     observacion: null
                 });

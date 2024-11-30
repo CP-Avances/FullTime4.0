@@ -39,6 +39,5 @@
     "strictTemplates": true,
     "enableIvy":false,
     "fullTemplateTypeCheck":true,
-    "types": ["node"]
   }
 }

@@ -482,6 +482,7 @@ export class RegistrarTimbreComponent implements OnInit {
   informacion_timbre: any;
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
+
     this.dataTimbre = {
       capturar_segundos: this.capturar_segundos,
       zona_dispositivo: this.timeZone,
@@ -497,7 +498,7 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name,
     }
-    //console.log('data timbre.... ', this.dataTimbre)
+    console.log('data timbre.... ', this.dataTimbre)
     this.informacion_timbre = this.dataTimbre;
   }
 

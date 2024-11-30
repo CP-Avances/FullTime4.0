@@ -143,7 +143,6 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;
@@ -167,7 +166,6 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;
@@ -191,7 +189,6 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;
@@ -214,7 +211,6 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;
@@ -237,7 +233,6 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
                 o.timbres = await BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
-                console.log('Timbres: ', o);
                 return o;
             }));
             return obj;

@@ -276,7 +276,7 @@ class EmpleadoControlador {
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
                 const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
-                const fechaNacimientoN = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento.toLocaleString(), 'ddd');
+                const fechaNacimientoN = yield (0, settingsMail_1.FormatearFecha2)(datosNuevos.rows[0].fecha_nacimiento, 'ddd');
                 datosOriginales.fecha_nacimiento = fechaNacimientoO;
                 datosNuevos.rows[0].fecha_nacimiento = fechaNacimientoN;
                 // AUDITORIA

@@ -180,6 +180,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
     return {
       // ENCABEZADO DE LA PAGINA
+      pageSize: 'A4',
       pageOrientation: "portrait",
       watermark: {
         text: this.frase,

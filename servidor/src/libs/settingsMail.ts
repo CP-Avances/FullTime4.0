@@ -130,13 +130,24 @@ export const dia_completo: string = 'dddd';
 
 export const FormatearFecha = async function (fecha: string, dia: string) {
   const formato = await BuscarFecha();
-  console.log('formato ', formato.fecha);
   console.log(' fecha ', fecha);
-
   const fechaLuxon = DateTime.fromISO(fecha);
+  console.log("ver fechaLuxon", fechaLuxon)
 
-  const diaFormateado = fechaLuxon.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-                        fechaLuxon.setLocale('es').toFormat(dia).slice(1);
+  let diaFormateado =''
+  /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+    fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+    if (dia == "dddd") {
+       diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }else{
+       diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }
   const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
 
   const valor = `${diaFormateado}, ${fechaFormateada}`;
@@ -145,24 +156,51 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   return valor;
 }
 
+export const FormatearFechaPlanificacion = async function (fecha: string, dia: string) {
+  const formato = await BuscarFecha();
+  const fechaLuxon = DateTime.fromJSDate(new Date(fecha));
+  let diaFormateado =''
+  /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
+    fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
+    if (dia == "dddd") {
+       diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }else{
+       diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
+       diaFormateado = diaFormateado.replace('.', '');
+       // Asegúrate de que la primera letra esté en mayúscula
+       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+    }
+  const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
+
+  const valor = `${diaFormateado}, ${fechaFormateada}`;
+
+  return valor;
+}
+
+
 export const FormatearFecha2 = async function (fecha: string, dia: string) {
 
-  console.log("ver fecha: ", fecha)
   const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+  const regexSinHora = /^\d{4}-\d{2}-\d{2}/;
+
   const formato = await BuscarFecha();
-  if (!regex.test(fecha)) {
+  if (!regex.test(fecha) && !regexSinHora.test(fecha)) {
+    console
     const date = new Date(fecha);
     // Obtener las partes de la fecha y formatearlas con dos dígitos
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
     // Devolver la fecha formateada
     fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-  console.log("fecha ver", fecha)
   const fechaObj = DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
   // Formatear el día
   if (dia == "ddd") {
@@ -174,6 +212,7 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
     // Formatear la fecha
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
+
     return valor;
   } else if (dia == "dddd") {
     let diaFormateado = fechaObj.toFormat("EEEE", { locale: 'es' });
@@ -232,7 +271,10 @@ export const FormatearHora = async function (hora: string) {
   console.log("ver hora: ", hora)
   const formato = await BuscarHora(); // Obtenemos el formato deseado desde la función
   const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
-  const valor = DateTime.fromFormat(horaConSegundos, 'HH:mm:ss').toFormat(formato.hora);
+  
+  const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
+
+  const valor = DateTime.fromFormat(horaFormateada , 'HH:mm:ss').toFormat(formato.hora);
   return valor;
 };
 

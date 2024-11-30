@@ -365,16 +365,16 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     let doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open':
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
       case 'print':
-        pdfMake.default.createPdf(documentDefinition).print();
+        pdfMake.createPdf(documentDefinition).print();
         break;
       case 'download':
-        pdfMake.default.createPdf(documentDefinition).download(doc_name);
+        pdfMake.createPdf(documentDefinition).download(doc_name);
         break;
       default:
-        pdfMake.default.createPdf(documentDefinition).open();
+        pdfMake.createPdf(documentDefinition).open();
         break;
     }
   }
