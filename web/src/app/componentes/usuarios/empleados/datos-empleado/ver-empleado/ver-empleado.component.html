@@ -26,7 +26,7 @@
                         <mat-card-content>
                             <div class="container" style="padding-top: 15px;">
                                 <div class="row">
-                                    <div class="col-md d-flex align-items-center justify-content-center">
+                                    <div class="col-md m-auto d-flex align-items-center justify-content-center">
                                         <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
                                             <img src="{{urlImagen}}" alt="" id="avatarImagen">
                                         </div>
@@ -39,7 +39,7 @@
                                             </div>
                                         </ng-template>
                                     </div>
-                                    <div class="col-md d-flex align-items-center justify-content-center">
+                                    <div class="col-md m-auto d-flex align-items-center justify-content-center">
                                         <form method="post" enctype="multipart/form-data">
                                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
                                                 id="file" accept="image/png, image/jpeg">
