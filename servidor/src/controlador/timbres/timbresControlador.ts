@@ -468,6 +468,10 @@ class TimbresControlador {
             const fecha_ = DateTime.fromISO(fec_hora_timbre);
             var hora_fecha_timbre = fecha_.toFormat('dd/MM/yyyy, hh:mm:ss a');
 
+            const fecha_insertar = DateTime.fromISO(fec_hora_timbre);
+            const hora_fecha_timbre_insertar = fecha_insertar.toFormat('yyyy-MM-dd HH:mm:ss');  // Formato adecuado para PostgreSQL
+
+
             // Obtener códigos de los empleados
             const code = await client.query(
                 `SELECT codigo FROM eu_empleados WHERE id = ANY($1::int[])`,
@@ -486,17 +490,14 @@ class TimbresControlador {
 
             const timbrePromises = code_empleados.map(async (codigo) => {
                 const res = await client.query(
-                    `
-                    SELECT public.timbres_verificar(
-                        $1,
-                        to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone
-                    ) AS resultado;
-                    `,
+                    `SELECT   public.timbres_verificar ($1, to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)  AS resultado`,
+
                     [codigo, hora_fecha_timbre]
                 );
 
                 return { codigo, resultado: res.rows[0].resultado }; // Retorna el código y el resultado
             });
+
 
             const timbresResultados = await Promise.all(timbrePromises); // Espera a que todas las promesas se resuelvan
 
@@ -505,9 +506,33 @@ class TimbresControlador {
                 .filter((timbre) => timbre.resultado === 1)
                 .map((timbre) => timbre.codigo); // Extrae solo los códigos
 
+            //console.log("ver codigos filtrados", filtrados);
 
-            // Esperar a que todas las promesas se resuelvan
-            await Promise.all(timbrePromises);
+            const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+            const batches = [];
+            for (let i = 0; i < filtrados.length; i += batchSize) {
+                batches.push(filtrados.slice(i, i + batchSize));
+            }
+            console.log("ver batches: ", batches)
+
+            for (const batch of batches) {
+                const valores = batch
+                    .map((filtrados: any) => {
+                        // Verifica si alguno de los valores es 'undefined' y lo reemplaza por NULL o un valor predeterminado
+                        const documentoValue = documento === undefined ? 'NULL' : `'${documento}'`;  // Reemplaza undefined por NULL
+                        const horaFechaTimbre = `'${hora_fecha_timbre_insertar}'`;  // Asegúrate de que la fecha esté en formato correcto
+
+                        return `('${filtrados}', '${id_reloj}', ${horaFechaTimbre}, ${horaFechaTimbre}, '${accion}','${tecl_funcion}' , '${observacion}', 'APP_WEB', ${documentoValue}, true, ${horaFechaTimbre})`;
+                    })
+                    .join(', ');
+                // Ejecutar la inserción en cada lote
+                await pool.query(
+                    `INSERT INTO eu_timbres (codigo, id_reloj, fecha_hora_timbre, fecha_hora_timbre_servidor, accion, tecla_funcion, 
+		                observacion, dispositivo_timbre, documento, conexion, fecha_hora_timbre_validado) 
+                    VALUES ${valores}`
+                );
+            }
+
 
             var fecha = fecha_.toFormat('yyyy-MM-dd');
             var hora = fecha_.toFormat('HH:mm:ss');
@@ -515,13 +540,12 @@ class TimbresControlador {
             const fechaHora = await FormatearHora(hora);
             const fechaTimbre = await FormatearFecha2(fecha, 'ddd');
             let existe_documento = !!documento;
-
-            const auditoria = code_empleados.map((codigo: number) => ({
+            const auditoria = code_empleados.map((codigo: any) => ({
                 tabla: 'eu_timbres',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento} }`,
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento}, fecha_hora_timbre_validado: ${fechaTimbre + ' ' + fechaHora} }`,
                 ip,
                 observacion: null
             }));
