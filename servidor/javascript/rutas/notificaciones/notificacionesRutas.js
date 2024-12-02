@@ -31,6 +31,7 @@ class NotificacionTiempoRealRutas {
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
         this.router.post('/mail-comunicado-movil/:id_empresa/', notificacionesControlador_1.default.EnviarCorreoComunicadoMovil);
         this.router.post('/noti-comunicado-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneral);
+        this.router.post('/noti-comunicado-multiplador-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneralMultiple);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
         this.router.get('/one/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerUnaNotificacion);
         /** *************************************************************************************** **
@@ -47,6 +48,7 @@ class NotificacionTiempoRealRutas {
         this.router.post('/mail-comunicado/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarCorreoComunicado);
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS    **USADO
         this.router.post('/noti-comunicado/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarNotificacionGeneral);
+        this.router.post('/noti-comunicado-multiplador/', notificacionesControlador_1.default.EnviarNotificacionGeneralMultiple);
         //------------------------------------------ METODOS APP MOVIL -----------------------------------------------------------------------
         this.router.get('/info-empl-recieve', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getInfoEmpleadoByCodigo);
         this.router.get('/all-noti', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getNotificacion);

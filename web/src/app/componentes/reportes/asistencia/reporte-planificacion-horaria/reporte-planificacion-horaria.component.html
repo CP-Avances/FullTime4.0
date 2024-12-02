@@ -295,7 +295,7 @@
     </div>
 </div>
 
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="!verDetalle">
+<div style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="!verDetalle">
     <div id="titulo" style="margin-bottom: 25px;">
         <span>DETALLES - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
         <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
@@ -304,7 +304,7 @@
         </button>
     </div>
     <!-- *********************** TABLA DE DETALLES DE HORARIOS Y DEFINICIONES ******************************* -->
-    <div class="container" id="horarios" *ngIf="ver_acciones">
+    <div id="horarios" *ngIf="ver_acciones">
         <div class="row">
             <div class="col-md">
                 <div class="mat-elevation-z8" style="background: white;">
