@@ -26,11 +26,13 @@
                     <span>REGISTRO MULTIPLE DE DISPOSITIVOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row m-auto">
+                    <div class="row">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-center m-auto">
-                                <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
-                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
+                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                                        id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                         style="height: 65px;  padding-top: 25px;"
@@ -275,7 +277,8 @@
                             </td>
                             <td [style.color]="EstiloTextoCelda(d.puerto)" id="letras">{{d.puerto}}
                             </td>
-                            <td [style.color]="EstiloTextoCelda(d.tipo_conexion)" style="font-size: 12px;">{{d.tipo_conexion}}
+                            <td [style.color]="EstiloTextoCelda(d.tipo_conexion)" style="font-size: 12px;">
+                                {{d.tipo_conexion}}
                             </td>
                             <td [style.color]="EstiloTextoCelda(d.temperatura)" id="letras">
                                 {{d.temperatura}}</td>
@@ -295,7 +298,7 @@
                                 {{d.contrasena}}</td>
                             <td [style.color]="EstiloTextoCelda(d.zona_horaria)" id="letras">
                                 {{d.zona_horaria}}</td>
-                                
+
                         </tr>
                     </tbody>
                 </table>
@@ -309,8 +312,8 @@
                 </div>
                 <div class="col-12 col-md-10">
                     <mat-paginator [length]="DataDispositivos.length" [pageSize]="tamanio_paginaMul"
-                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-                    showFirstLastButtons>
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
                     </mat-paginator>
                 </div>
             </div>

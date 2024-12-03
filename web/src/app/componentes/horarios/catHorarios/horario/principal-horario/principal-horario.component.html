@@ -25,9 +25,10 @@
                     <span>CARGAR PLANTILLA DE HORARIOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row m-auto">
+                    <div class="row">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-center m-auto">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <form method="post" class="btn-2" enctype="multipart/form-data">
                                     <input (change)="CargarPlantillaGeneral($event)" type="file"
                                         [formControl]="archivo1Form" id="file1"
@@ -44,7 +45,7 @@
                                     </label>
                                 </form>
                             </div>
-                            
+
                         </div>
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                             <div *ngIf="!dataHorarios" class="d-flex flex-wrap justify-content-center m-auto"
@@ -72,7 +73,7 @@
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!dataHorarios">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo" class="row w-100 m-auto">
-                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
                         (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
                         matTooltip="Elimar múltiples registros." id="SelectCheck">
@@ -265,8 +266,9 @@
                 </div>
             </div>
             <div class="col-12 col-md-10">
-                <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
-                [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
+                <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length"
+                    [pageSize]="tamanio_paginaH" [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)"
+                    showFirstLastButtons>
                 </mat-paginator>
             </div>
         </div>
@@ -323,8 +325,9 @@
                 </div>
             </div>
             <div class="col-12 col-md-10">
-                <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
-                [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
+                <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length"
+                    [pageSize]="tamanio_paginaD" [pageSizeOptions]="pageSizeOptionsD" id="paginaD"
+                    (page)="ManejarPaginaD($event)" showFirstLastButtons>
                 </mat-paginator>
             </div>
         </div>

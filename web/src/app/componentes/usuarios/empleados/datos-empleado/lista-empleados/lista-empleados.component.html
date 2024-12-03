@@ -35,15 +35,16 @@
                 <span>REGISTRO MÚLTIPLE DE USUARIOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row m-auto">
+                <div class="row ">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-center m-auto">
-                            <form method="post" class="btn-2" enctype="multipart/form-data"  style="margin: auto;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto; ">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                     style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                    matTooltip="Dar click para seleccionar plantilla y cargar registros.">
                                     Subir plantilla
                                 </label>
                                 <label for="file" matSuffix matTooltipPosition="right"
@@ -53,29 +54,31 @@
                                     Subir nueva plantilla
                                 </label>
                             </form>
-                        </div> 
-                    </div>
-                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
-                                href="{{link}}">
-                                <br>
-                                Descargar plantilla usuarios
-                            </a>
-                        </div>
-                        <div *ngIf="DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto"
-                            style="text-align: center; justify-content: center;">
-                            <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
-                                Registrar
-                            </button>
                         </div>
                     </div>
                 </div>
-            </mat-card>
-        </div>
+
+                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto">
+                        <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                            href="{{link}}">
+                            <br>
+                            Descargar plantilla usuarios
+                        </a>
+                    </div>
+                    <div *ngIf="DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto"
+                        style="text-align: center; justify-content: center;">
+                        <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                            matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                            Registrar
+                        </button>
+                    </div>
+                </div>
+    
+        </mat-card>
     </div>
+</div>
 </div>
 
 <!--  ****  LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA  ****  -->
@@ -84,8 +87,7 @@
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckDeshabilitado">
         <div class="row w-100">
             <div class="col-3 col-md-4">
-                <button class="btn btn-primary btn-outline-light"
-                    (click)="Deshabilitar(2)">
+                <button class="btn btn-primary btn-outline-light" (click)="Deshabilitar(2)">
                     Activar
                 </button>
             </div>
@@ -96,8 +98,7 @@
                 </button>
             </div>
             <div class="col-3 col-md-4">
-                <button class="btn btn-primary btn-outline-light"
-                    (click)="ConfirmarDeleteMultiple(2)">
+                <button class="btn btn-primary btn-outline-light" (click)="ConfirmarDeleteMultiple(2)">
                     Eliminar
                 </button>
             </div>
@@ -214,8 +215,7 @@
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
         <div class="row w-100">
             <div class="col-3 col-md-4">
-                <button class="btn btn-primary btn-outline-light"
-                    (click)="Deshabilitar(1)">
+                <button class="btn btn-primary btn-outline-light" (click)="Deshabilitar(1)">
                     Inactivar
                 </button>
             </div>
@@ -227,8 +227,7 @@
                 </button>
             </div>
             <div class="col-3 col-md-4">
-                <button class="btn btn-primary btn-outline-light"
-                    (click)="ConfirmarDeleteMultiple(1)">
+                <button class="btn btn-primary btn-outline-light" (click)="ConfirmarDeleteMultiple(1)">
                     Eliminar
                 </button>
             </div>
@@ -287,7 +286,7 @@
                                     (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
-                   
+
                         <td></td>
                         <td></td>
                         <td>
@@ -430,8 +429,8 @@
             </div>
             <div class="col-12 col-md-10 text-center">
                 <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-                showFirstLastButtons>
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
                 </mat-paginator>
             </div>
         </div>
