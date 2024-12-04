@@ -11,6 +11,7 @@ import ipaddr from 'ipaddr.js';
 import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
+import * as os from 'os';
 import fs from 'fs';
 
 interface IPayload {
@@ -27,31 +28,50 @@ class LoginControlador {
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
-    // OBTENCION DE DIRECCION IP
-    /*var requestIp = require('request-ip');
-    var clientIp = requestIp.getClientIp(req);
-    if (clientIp != null && clientIp != '' && clientIp != undefined) {
-      var ip_cliente = clientIp.split(':')[3];
-    }*/
-
-    // OBTENCION DE DIRECCION IP
-    const getClientIp = (req: Request): string | null => {
-      // OBTIENE LA IP DEL ENCABEZADO O DEL SOCKET
-      const rawIp = req.headers['x-forwarded-for']
-        ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
-        : req.socket.remoteAddress;
-
-      // VALIDA Y FORMATEA LA IP
-      if (rawIp && ipaddr.isValid(rawIp)) {
-        const ip = ipaddr.process(rawIp); // NORMALIZA IPV4/IPV6
-        return ip.toString(); // DEVUELVE LA IP COMO STRING
+    // OBTENCION DE DIRECCIONES IPs LOCALES
+    const ObtenerIPsLocales = () => {
+      const interfaces = os.networkInterfaces();
+      const ips: string[] = [];
+      // ITERAR SOBRE LAS INTERFACES DE RED
+      for (const interfaceName in interfaces) {
+        interfaces[interfaceName]?.forEach((networkInterface) => {
+          // FILTRAR SOLO LAS DIRECCIONES IPV4 Y EVITAR DIRECCIONES DE TIPO LOOPBACK (127.0.0.1)
+          if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
+            // NORMALIZA LA DIRECCION IP
+            const ip = ipaddr.process(networkInterface.address);
+            // AGREGA LA IP LOCAL A LA LISTA
+            ips.push(ip.toString());
+          }
+        });
       }
-      return null; // SI NO ES VALIDA, DEVUELVE NULL
+      return ips;
     };
 
-    const ip_cliente = getClientIp(req);
+    // METODO PARA OBTENER DIRECCION IP PUBLICA
+    const ObtenerIPs = (req: Request): { publicIp: string | null, localIps: string[] } => {
+      // OBTENER LA IP PUBLICA (DE LA CABECERA 'X-FORWARDED-FOR' O 'REMOTEADDRESS' SI NO ESTA DISPONIBLE)
+      const rawPublicIp = req.headers['x-forwarded-for']
+        ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
+        : req.socket.remoteAddress;
+      // VALIDAR Y PROCESAR LA IP PUBLICA
+      let publicIp = null;
+      if (rawPublicIp && ipaddr.isValid(rawPublicIp)) {
+        // NORMALIZA IPV4/IPV6
+        const ip = ipaddr.process(rawPublicIp);
+        // DEVUELVE LA IP PUBLICA COMO STRING
+        publicIp = ip.toString();
+      }
 
+      // OBTIENE TODAS LAS IPS LOCALES
+      const localIps = ObtenerIPsLocales();
+      return { publicIp, localIps };
+    };
 
+    const { publicIp, localIps } = ObtenerIPs(req);
+    const ip_cliente = localIps;
+    const ip_principal = publicIp;
+    console.log('IP Pública:', ip_principal);
+    console.log('IPs Locales:', ip_cliente);
     try {
       const { nombre_usuario, pass, movil } = req.body;
       // BUSQUEDA DE USUARIO
@@ -157,6 +177,7 @@ class LoginControlador {
             _empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
+            ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato
           }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
@@ -173,6 +194,7 @@ class LoginControlador {
             empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
+            ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato,
             nombre: nombre,
@@ -189,12 +211,13 @@ class LoginControlador {
           if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos
+              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal,
+              modulos: modulos
             },
               process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
             return res.status(200).jsonp({
               caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-              empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos
+              empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal, modulos: modulos
             });
           }
           else {
