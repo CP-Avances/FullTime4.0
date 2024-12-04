@@ -261,7 +261,7 @@
         <br>
     </div>
 </div>
-<div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
+<div style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>DETALLES DE TIMBRES LIBRES - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
@@ -271,7 +271,7 @@
             </button>
         </div>
         <mat-card-content>
-            <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+            <div style="padding-bottom: 25px; text-align: center; margin-top: 1rem">
                 <div class="table-responsive">
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
@@ -312,7 +312,7 @@
                                 <td class="t_horarios">{{ t.longitud }}</td>
                                 <td class="t_horarios">{{ t.latitud }}</td>
                                 <td class="t_horarios">
-                                    <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
+                                    <mat-icon  id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
                                         matSuffix matTooltipPtosition="right"
                                         matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
                                         *ngIf="t.longitud && t.latitud">

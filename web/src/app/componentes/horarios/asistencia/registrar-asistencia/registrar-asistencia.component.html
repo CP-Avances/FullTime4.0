@@ -16,77 +16,74 @@
                         {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
                     </b>
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                <div class="row w-100">
+                    <div class="col-10 col-md-4 m-auto">
+                        <div class="row mt-2 mt-md-3">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(14, 15, 15);">
                                 Código:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(14, 15, 15);">
                                 {{informacion.detalle.codigo}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(14, 15, 15);">
                                 Cédula:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(14, 15, 15);">
                                 {{informacion.detalle.cedula}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(14, 15, 15);">
                                 Fecha:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(14, 15, 15);">
                                 {{informacion.detalle.fecha_general_}}
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
+                    <div class="col-10 col-md-4 m-auto">
+                        <div class="row mt-2 mt-md-3">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Fecha horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.fecha_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Hora horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.hora_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Tipo:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.tipo_}}
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
+                    <div class="col-10 col-md-4 m-auto">
+                        <div class="row mt-2 mt-md-3">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Fecha timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.fecha_timbre_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
+                            <div class="col-5 col-md-5" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Hora timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
+                            <div class="col-7 col-md-7" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.hora_timbre_}}
                             </div>
                         </div>
@@ -101,6 +98,7 @@
                 <button class="btn btn-sm float-right" id="btn-raised" [disabled]="manual" (click)="VerificarManual()">
                     Verificar Manual
                 </button>
+                
             </div>
         </div>
 

@@ -3,16 +3,15 @@ import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
-
+import { ObtenerRutaLicencia, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-
 import { Request, Response } from 'express';
 import { Licencias } from '../../class/Licencia';
+import ipaddr from 'ipaddr.js';
 import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import { ObtenerRutaLicencia, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
@@ -30,11 +29,29 @@ class LoginControlador {
     let caducidad_licencia: Date = new Date();
 
     // OBTENCION DE DIRECCION IP
-    var requestIp = require('request-ip');
+    /*var requestIp = require('request-ip');
     var clientIp = requestIp.getClientIp(req);
     if (clientIp != null && clientIp != '' && clientIp != undefined) {
       var ip_cliente = clientIp.split(':')[3];
-    }
+    }*/
+
+    // OBTENCION DE DIRECCION IP
+    const getClientIp = (req: Request): string | null => {
+      // OBTIENE LA IP DEL ENCABEZADO O DEL SOCKET
+      const rawIp = req.headers['x-forwarded-for']
+        ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
+        : req.socket.remoteAddress;
+
+      // VALIDA Y FORMATEA LA IP
+      if (rawIp && ipaddr.isValid(rawIp)) {
+        const ip = ipaddr.process(rawIp); // NORMALIZA IPV4/IPV6
+        return ip.toString(); // DEVUELVE LA IP COMO STRING
+      }
+      return null; // SI NO ES VALIDA, DEVUELVE NULL
+    };
+
+    const ip_cliente = getClientIp(req);
+
 
     try {
       const { nombre_usuario, pass, movil } = req.body;
@@ -74,7 +91,7 @@ class LoginControlador {
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
         if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil" })
-        
+
         // BUSQUEDA DE MODULOS DEL SISTEMA
         const [modulos] = await pool.query(
           `

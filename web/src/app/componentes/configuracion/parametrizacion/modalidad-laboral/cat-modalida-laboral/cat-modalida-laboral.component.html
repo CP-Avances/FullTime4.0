@@ -25,26 +25,30 @@
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row m-auto" *ngIf="getCargarPlantillaModalidadLaboral()">
+                <div class="row" *ngIf="getCargarPlantillaModalidadLaboral()">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
-                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                style="height: 65px; padding-top: 25px"
-                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                Subir plantilla
-                            </label>
-                            <label for="file" matSuffix matTooltipPosition="right"
-                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                style="height: 65px; padding-top: 25px;"
-                                matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                Subir nueva plantilla
-                            </label>
-                        </form>
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px"
+                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
+                        </div>
+
                     </div>
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div *ngIf="!Datos_modalidad_laboral" class="d-flex flex-wrap justify-content-around">
+                        <div *ngIf="!Datos_modalidad_laboral" class="d-flex flex-wrap justify-content-center m-auto">
                             <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -69,7 +73,7 @@
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_modalidad_laboral">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo" class="row w-100 m-auto">
-            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
             </div>
             <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                 <span>RESULTADO DE BÚSQUEDA</span>
@@ -220,7 +224,8 @@
             </div>
             <div class="col-12 col-md-10">
                 <mat-paginator [length]="Datos_modalidad_laboral.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
                 </mat-paginator>
             </div>
         </div>

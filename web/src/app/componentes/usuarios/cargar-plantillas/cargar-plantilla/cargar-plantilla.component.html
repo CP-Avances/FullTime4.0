@@ -121,8 +121,8 @@
                     </div>
                     <div class="col-12 col-md-10">
                         <mat-paginator [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
-                        showFirstLastButtons>
+                            [pageSizeOptions]="pageSizeOptions" id="pagina"
+                            (page)="ManejarPaginaMulti($event, 'depaNivel')" showFirstLastButtons>
                         </mat-paginator>
                     </div>
                 </div>
@@ -260,8 +260,8 @@
                     </div>
                     <div class="col-12 col-md-10">
                         <mat-paginator [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
-                        showFirstLastButtons>
+                            [pageSizeOptions]="pageSizeOptions" id="pagina"
+                            (page)="ManejarPaginaMulti($event, 'contrato')" showFirstLastButtons>
                         </mat-paginator>
                     </div>
                 </div>
@@ -285,22 +285,27 @@
                         <div class="row">
                             <div class="col-12 col-md-auto m-auto w-auto"
                                 style="padding-top: 5px; padding-bottom: 5px;">
-                                <form method="post" class="btn-2" enctype="multipart/form-data">
-                                    <input (change)="FileChangeCargo($event)" type="file" [formControl]="archivoForm"
-                                        id="file"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir && getCargarCargos()"
-                                        style="height: 65px; padding-top: 25px;"
-                                        matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                        Subir plantilla
-                                    </label>
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcelCargos != 'error'"
-                                        style="height: 65px; padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nueva plantilla
-                                    </label>
-                                </form>
+
+                                <div class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <form method="post" class="btn-2" enctype="multipart/form-data">
+                                        <input (change)="FileChangeCargo($event)" type="file"
+                                            [formControl]="archivoForm" id="file"
+                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir && getCargarCargos()"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                            Subir plantilla
+                                        </label>
+                                        <label for="file" matSuffix matTooltipPosition="right"
+                                            *ngIf="mostrarbtnsubir && messajeExcelCargos != 'error'"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                            Subir nueva plantilla
+                                        </label>
+                                    </form>
+                                </div>
+
                             </div>
                             <div class="col-12 col-md-auto m-auto w-auto"
                                 style="padding-top: 5px; padding-bottom: 5px;">
@@ -398,8 +403,8 @@
                     </div>
                     <div class="col-12 col-md-10">
                         <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
-                        showFirstLastButtons>
+                            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
+                            showFirstLastButtons>
                         </mat-paginator>
                     </div>
                 </div>

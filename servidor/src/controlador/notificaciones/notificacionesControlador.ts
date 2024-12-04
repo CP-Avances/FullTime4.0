@@ -89,7 +89,7 @@ class NotificacionTiempoRealControlador {
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
 
-    
+
     console.log("ver id_empleado", id_empleado)
     if (id_empleado != 'NaN') {
       const CONFIG_NOTI = await pool.query(
@@ -786,8 +786,6 @@ class NotificacionTiempoRealControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
-
-  // NOTIFICACIONES GENERALES    **USADO
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
@@ -847,6 +845,86 @@ class NotificacionTiempoRealControlador {
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
 
+  }
+
+
+  // NOTIFICACIONES GENERALES    **USADO
+  public async EnviarNotificacionGeneralMultiple(req: Request, res: Response): Promise<any> {
+
+    const client = await pool.connect(); // Obtener un cliente para la transacción
+
+    try {
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
+
+
+      const id_empleados = Array.isArray(id_empl_recive) ? id_empl_recive : [id_empl_recive];
+      const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+      const batches = [];
+
+      for (let i = 0; i < id_empleados.length; i += batchSize) {
+        batches.push(id_empleados.slice(i, i + batchSize));
+      }
+
+      var tiempo = fechaHora();
+      let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+
+
+      await client.query('BEGIN');
+      const resultados = []; // Aquí almacenaremos los resultados
+
+      for (const batch of batches) {
+        const valores = batch
+          .map((id_empleado: number) => `('${create_at}', ${id_empl_envia}, ${id_empleado}, '${descripcion}', '${tipo}', '${mensaje}')`)
+          .join(', ');
+
+
+        // Ejecutar la inserción en cada lote
+        const response = await client.query(
+          ` INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
+          tipo, mensaje) VALUES ${valores} RETURNING *`
+        );
+
+        resultados.push(...response.rows); // Agregar las filas insertadas al arreglo
+
+      }
+      const fechaHoraN = await FormatearHora(create_at.split(' ')[1])
+      const fechaN = await FormatearFecha2(create_at, 'ddd')
+      const auditoria = id_empleados.map((id_empleado_recibe: any) => ({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empleado_recibe},fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${descripcion}, mensaje: ${mensaje}, tipo: ${tipo}}`,
+        ip,
+        observacion: null
+      }));
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+
+      const USUARIO = await pool.query(
+        `
+        SELECT (nombre || ' ' || apellido) AS usuario
+        FROM eu_empleados WHERE id = $1
+        `
+        , [id_empl_envia]);
+
+      const usuario = USUARIO.rows[0].usuario;
+      resultados.map(async (notificiacion: any) => {
+        notificiacion.usuario = usuario;
+        notificiacion.fecha_hora = `${fechaN} ${fechaHoraN}`;
+      })
+      // FINALIZAR TRANSACCION
+      await client.query('COMMIT');
+      return res.status(200)
+        .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: resultados });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      console.log("ver el error: ", error)
+      await pool.query('ROLLBACK');
+      return res.status(500)
+        .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    } finally {
+      client.release(); // Liberar el cliente al final
+    }
   }
 
 

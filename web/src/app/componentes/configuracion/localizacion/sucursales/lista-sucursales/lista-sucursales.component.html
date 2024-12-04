@@ -26,26 +26,30 @@
                     <span>REGISTRO MULTIPLE</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row m-auto" *ngIf="getPlantillaEstablecimiento()">
+                    <div class="row" *ngIf="getPlantillaEstablecimiento()">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
-                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
+                                    <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
+                                        id="file"
+                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 65px; padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 65px; padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir nueva plantilla
+                                    </label>
+                                </form>
+                            </div>
                         </div>
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div *ngIf="!Datasucursales" class="d-flex flex-wrap justify-content-around"
+                            <div *ngIf="!Datasucursales" class="d-flex flex-wrap justify-content-center m-auto"
                                 style="text-align: center; justify-content: center; margin: auto;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
@@ -71,7 +75,7 @@
     <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo" class="row w-100 m-auto">
-                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                 </div>
                 <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                     <span>
@@ -157,8 +161,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-                id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <!--  *************************  DESCARGAR REPORTES  *****************************  -->
             <div>
@@ -240,8 +244,8 @@
                 </div>
                 <div class="col-12 col-md-10">
                     <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
-                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-                    showFirstLastButtons>
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
                     </mat-paginator>
                 </div>
             </div>
@@ -250,4 +254,5 @@
 </div>
 
 <!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
-<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [idDepartamentosAcceso]="idDepartamentosAcceso" [pagina_]="pagina"></app-ver-sucursal>
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [idDepartamentosAcceso]="idDepartamentosAcceso"
+    [pagina_]="pagina"></app-ver-sucursal>

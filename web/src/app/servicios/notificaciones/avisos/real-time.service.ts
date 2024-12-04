@@ -101,4 +101,9 @@ export class RealTimeService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/noti-comunicado/`, data);
   }
 
+  // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS   **USADO
+  EnviarMensajeGeneralMultiple(data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}noti-real-time/noti-comunicado-multiplador/`, data);
+  }
+
 }

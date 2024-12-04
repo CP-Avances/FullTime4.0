@@ -534,23 +534,10 @@ export class ComunicadosComponent implements OnInit {
     if (data.length > 0) {
       this.LeerCorreos(data);
       this.cont = 0;
-      data.forEach((obj: any) => {
-        this.cont = this.cont + 1;
-        if (obj.comunicado_noti === true) {
-          this.NotificarPlanificacion(this.idEmpleadoLogueado, obj.id, form);
-        }
-        if (this.cont === data.length) {
-          if (this.info_correo === '') {
-            this.toastr.success('Mensaje enviado exitosamente.', '', {
-              timeOut: 6000,
-            });
-          }
-          else {
-            this.EnviarCorreo(this.info_correo, form);
-          }
-          this.LimpiarFormulario();
-        }
-      })
+      let ids = data
+        .filter((obj: any) => obj.comunicado_noti === true)
+        .map((obj: any) => obj.id);
+      this.NotificarPlanificacion(this.idEmpleadoLogueado, ids, form);
     }
     else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
@@ -586,8 +573,23 @@ export class ComunicadosComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     }
-    this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
-      this.realTime.RecibirNuevosAvisos(res.respuesta);
+    this.realTime.EnviarMensajeGeneralMultiple(mensaje).subscribe(res => {
+
+      res.respuesta.forEach((notificaciones: any) => {
+        this.realTime.RecibirNuevosAvisos(notificaciones);
+      })
+
+      if (this.info_correo === '') {
+        this.toastr.success('Mensaje enviado exitosamente.', '', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        this.EnviarCorreo(this.info_correo, form);
+      }
+      this.LimpiarFormulario();
+    }, error => {
+      console.log("Error al enviar mensaje general")
     })
   }
 

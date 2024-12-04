@@ -39,6 +39,7 @@ class NotificacionTiempoRealRutas {
         this.router.post('/mail-comunicado-movil/:id_empresa/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoComunicadoMovil);
         this.router.post('/noti-comunicado-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
 
+        this.router.post('/noti-comunicado-multiplador-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneralMultiple);
 
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
         this.router.get('/one/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerUnaNotificacion);
@@ -61,6 +62,8 @@ class NotificacionTiempoRealRutas {
         this.router.post('/mail-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoComunicado);
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS    **USADO
         this.router.post('/noti-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
+        this.router.post('/noti-comunicado-multiplador/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneralMultiple);
+
         //------------------------------------------ METODOS APP MOVIL -----------------------------------------------------------------------
         this.router.get('/info-empl-recieve', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getInfoEmpleadoByCodigo);
         this.router.get('/all-noti', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacion);
