@@ -618,13 +618,42 @@ export class ValidacionesService {
   /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
    ** ********************************************************************************* **/
-  
+
   async ImportarPDF() {
     const pdfMake = await import('src/assets/build/pdfmake.js');
     const pdfFonts = await import('src/assets/build/vfs_fonts.js');
     pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
     return pdfMake.default;
   }
+
+
+  /** ********************************************************************************* **
+   ** **                           OBTENER IPs DEL CLIENTE                           ** **
+   ** ********************************************************************************* **/
+
+  // METODO PARA OBTENER EL IP DEL CLIENTE
+  ObtenerIPsLocales = () => {
+    return new Promise((resolve) => {
+      const ips: any = [];
+      const peerConnection = new RTCPeerConnection();
+      peerConnection.createDataChannel("");
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          const ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
+          const ip = ipRegex.exec(event.candidate.candidate);
+          if (ip && !ips.includes(ip[0])) {
+            // AGREGAR IP UNICA
+            ips.push(ip[0]);
+          }
+        } else {
+          peerConnection.close();
+          // FINALIZAR Y DEVOLVER IPS LOCALES
+          resolve(ips);
+        }
+      };
+      peerConnection.createOffer().then((offer) => peerConnection.setLocalDescription(offer));
+    });
+  };
 
 }
 

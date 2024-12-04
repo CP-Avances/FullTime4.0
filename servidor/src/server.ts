@@ -223,6 +223,7 @@ class Servidor {
 
 
     start(): void {
+        this.app.set('trust proxy', true);
         this.server.listen(this.app.get('puerto'), () => {
             console.log('Servidor en el puerto', this.app.get('puerto'));
         });

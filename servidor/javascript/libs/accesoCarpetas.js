@@ -195,11 +195,11 @@ const ObtenerRutaLicencia = function () {
 exports.ObtenerRutaLicencia = ObtenerRutaLicencia;
 // METODO PARA OBTENER POSICION DE PLANTILLA
 const ObtenerIndicePlantilla = function (libroExcel, hoja) {
-    const sheet_name_list = libroExcel.SheetNames;
+    const sheet_name_list = libroExcel.worksheets.map((sheet) => sheet.name);
     let indice = 0;
     let verificador = 0;
     for (var i = 0; i < sheet_name_list.length; i++) {
-        if ((sheet_name_list[i]).toUpperCase() === hoja) {
+        if ((sheet_name_list[i]).toUpperCase() === hoja.toUpperCase()) {
             indice = i;
             verificador = 1;
             break;

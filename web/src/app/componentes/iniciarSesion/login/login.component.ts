@@ -8,6 +8,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,8 @@ export class LoginComponent implements OnInit {
   // ALMACENAMIENTO DATOS USUARIO INGRESADO
   datosUsuarioIngresado: any = [];
 
+  ips_locales: any = '';
+
   // VALIDACIONES DE CAMPOS DE FORMULARIO
   userMail = new FormControl('', Validators.required);
   pass = new FormControl('', Validators.required);
@@ -37,6 +40,7 @@ export class LoginComponent implements OnInit {
   constructor(
     public rest: LoginService,
     public restU: UsuarioService,
+    public validar: ValidacionesService,
     private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
@@ -50,6 +54,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.url = this.router.url;
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+      //console.log("IPs Locales del Cliente:", ips);
+    });
   }
 
   // MENSAJE DE ERROR AL INGRESAR INFORMACION
@@ -105,16 +113,15 @@ export class LoginComponent implements OnInit {
     // CIFRADO DE CONTRASENA
     const md5 = new Md5();
     let clave = md5.appendStr(form.passwordF).end();
-
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
       pass: clave,
       movil: false
     };
-
+    console.log("IPs Locales del Cliente:", this.ips_locales);
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      //console.log('res login ', datos)
+      console.log('res login ', datos)
       if (datos.message === 'error') {
         const f = DateTime.now();
         const espera = Duration.fromISO('PT1M'); // 1 minuto
@@ -131,37 +138,31 @@ export class LoginComponent implements OnInit {
           })
         }
       }
-
       else if (datos.message === 'error_') {
         this.toastr.error('Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.', 'Oops!', {
           timeOut: 6000,
         })
       }
-
       else if (datos.message === 'inactivo') {
         this.toastr.error('Usuario no se encuentra activo en el sistema.', 'Oops!', {
           timeOut: 6000,
         })
       }
-
       else if (datos.message === 'licencia_expirada') {
         this.toastr.error('Licencia del sistema ha expirado.', 'Oops!', {
           timeOut: 6000,
         })
       }
-
       else if (datos.message === 'sin_permiso_acceso') {
         this.toastr.error('Usuario no tiene permisos de acceso al sistema.', 'Oops!', {
           timeOut: 6000,
         })
       }
-
       else if (datos.message === 'licencia_no_existe') {
         this.toastr.error('No se ha encontrado registro de licencia del sistema.', 'Oops!', {
           timeOut: 6000,
         })
       }
-
       else {
         localStorage.setItem('rol', datos.rol);
         localStorage.setItem('token', datos.token);
@@ -174,15 +175,11 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('departamento', datos.departamento);
         localStorage.setItem('ultimoContrato', datos.id_contrato);
         localStorage.setItem('bool_timbres', datos.acciones_timbres);
-        localStorage.setItem('ip_principal', datos.ip_adress_principal);
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
-
         this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
-
-        this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress_principal, 'Usuario y contraseña válidos', {
+        this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         })
-
         if (!!localStorage.getItem("redireccionar")) {
           let redi = localStorage.getItem("redireccionar");
           this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
