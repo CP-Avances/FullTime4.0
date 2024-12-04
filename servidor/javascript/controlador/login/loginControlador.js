@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const ipaddr_js_1 = __importDefault(require("ipaddr.js"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
@@ -27,11 +28,25 @@ class LoginControlador {
             // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
             let caducidad_licencia = new Date();
             // OBTENCION DE DIRECCION IP
-            var requestIp = require('request-ip');
+            /*var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
-                var ip_cliente = clientIp.split(':')[3];
-            }
+              var ip_cliente = clientIp.split(':')[3];
+            }*/
+            // OBTENCION DE DIRECCION IP
+            const getClientIp = (req) => {
+                // OBTIENE LA IP DEL ENCABEZADO O DEL SOCKET
+                const rawIp = req.headers['x-forwarded-for']
+                    ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
+                    : req.socket.remoteAddress;
+                // VALIDA Y FORMATEA LA IP
+                if (rawIp && ipaddr_js_1.default.isValid(rawIp)) {
+                    const ip = ipaddr_js_1.default.process(rawIp); // NORMALIZA IPV4/IPV6
+                    return ip.toString(); // DEVUELVE LA IP COMO STRING
+                }
+                return null; // SI NO ES VALIDA, DEVUELVE NULL
+            };
+            const ip_cliente = getClientIp(req);
             try {
                 const { nombre_usuario, pass, movil } = req.body;
                 // BUSQUEDA DE USUARIO
