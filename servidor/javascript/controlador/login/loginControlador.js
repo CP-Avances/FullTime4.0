@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,6 +53,7 @@ const ipaddr_js_1 = __importDefault(require("ipaddr.js"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const os = __importStar(require("os"));
 const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
@@ -27,26 +61,48 @@ class LoginControlador {
         return __awaiter(this, void 0, void 0, function* () {
             // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
             let caducidad_licencia = new Date();
-            // OBTENCION DE DIRECCION IP
-            /*var requestIp = require('request-ip');
-            var clientIp = requestIp.getClientIp(req);
-            if (clientIp != null && clientIp != '' && clientIp != undefined) {
-              var ip_cliente = clientIp.split(':')[3];
-            }*/
-            // OBTENCION DE DIRECCION IP
-            const getClientIp = (req) => {
-                // OBTIENE LA IP DEL ENCABEZADO O DEL SOCKET
-                const rawIp = req.headers['x-forwarded-for']
+            // OBTENCION DE DIRECCIONES IPs LOCALES
+            const ObtenerIPsLocales = () => {
+                var _a;
+                const interfaces = os.networkInterfaces();
+                const ips = [];
+                // ITERAR SOBRE LAS INTERFACES DE RED
+                for (const interfaceName in interfaces) {
+                    (_a = interfaces[interfaceName]) === null || _a === void 0 ? void 0 : _a.forEach((networkInterface) => {
+                        // FILTRAR SOLO LAS DIRECCIONES IPV4 Y EVITAR DIRECCIONES DE TIPO LOOPBACK (127.0.0.1)
+                        if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
+                            // NORMALIZA LA DIRECCION IP
+                            const ip = ipaddr_js_1.default.process(networkInterface.address);
+                            // AGREGA LA IP LOCAL A LA LISTA
+                            ips.push(ip.toString());
+                        }
+                    });
+                }
+                return ips;
+            };
+            // METODO PARA OBTENER DIRECCION IP PUBLICA
+            const ObtenerIPs = (req) => {
+                // OBTENER LA IP PUBLICA (DE LA CABECERA 'X-FORWARDED-FOR' O 'REMOTEADDRESS' SI NO ESTA DISPONIBLE)
+                const rawPublicIp = req.headers['x-forwarded-for']
                     ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
                     : req.socket.remoteAddress;
-                // VALIDA Y FORMATEA LA IP
-                if (rawIp && ipaddr_js_1.default.isValid(rawIp)) {
-                    const ip = ipaddr_js_1.default.process(rawIp); // NORMALIZA IPV4/IPV6
-                    return ip.toString(); // DEVUELVE LA IP COMO STRING
+                // VALIDAR Y PROCESAR LA IP PUBLICA
+                let publicIp = null;
+                if (rawPublicIp && ipaddr_js_1.default.isValid(rawPublicIp)) {
+                    // NORMALIZA IPV4/IPV6
+                    const ip = ipaddr_js_1.default.process(rawPublicIp);
+                    // DEVUELVE LA IP PUBLICA COMO STRING
+                    publicIp = ip.toString();
                 }
-                return null; // SI NO ES VALIDA, DEVUELVE NULL
+                // OBTIENE TODAS LAS IPS LOCALES
+                const localIps = ObtenerIPsLocales();
+                return { publicIp, localIps };
             };
-            const ip_cliente = getClientIp(req);
+            const { publicIp, localIps } = ObtenerIPs(req);
+            const ip_cliente = localIps;
+            const ip_principal = publicIp;
+            console.log('IP Pública:', ip_principal);
+            console.log('IPs Locales:', ip_cliente);
             try {
                 const { nombre_usuario, pass, movil } = req.body;
                 let pass_encriptado = rsa_keys_service_1.default.encriptarLogin(pass);
@@ -133,6 +189,8 @@ class LoginControlador {
                             _empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
+                            ip_address_principal: ip_principal,
+                            modulos: modulos,
                             id_contrato: id_contrato
                         }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
                         return res.status(200).jsonp({
@@ -147,6 +205,8 @@ class LoginControlador {
                             empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
+                            ip_address_principal: ip_principal,
+                            modulos: modulos,
                             id_contrato: id_contrato,
                             nombre: nombre,
                             apellido: apellido,
@@ -162,11 +222,12 @@ class LoginControlador {
                         if (id_rol === 1) {
                             const token = jsonwebtoken_1.default.sign({
                                 _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente //, modulos: modulos
+                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal,
+                                modulos: modulos
                             }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
                             return res.status(200).jsonp({
                                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-                                empresa: id_empresa, ip_adress: ip_cliente //, modulos: modulos
+                                empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal, modulos: modulos //, modulos: modulos
                             });
                         }
                         else {
