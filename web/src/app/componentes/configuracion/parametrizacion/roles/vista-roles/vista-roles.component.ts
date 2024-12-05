@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 // IMPORTACION DE COMPONENTES
 import { RegistroRolComponent } from 'src/app/componentes/configuracion/parametrizacion/roles/registro-rol/registro-rol.component';
@@ -34,6 +35,18 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class VistaRolesComponent implements OnInit {
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   ver_roles: boolean = true;
   ver_funciones: boolean = false;
@@ -82,6 +95,29 @@ export class VistaRolesComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
 
@@ -343,25 +379,18 @@ export class VistaRolesComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
+  async generarExcelRoles() {
 
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Roles');
-    xlsx.writeFile(wb, "RolesEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
+    let datos: any[] = [];
     let n: number = 1;
     this.data_general.forEach((obj: any) => {
       obj.funciones.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'ROL': obj.nombre,
-          'PÁGINA': det.pagina,
-          'FUNCIÓN': det.accion,
-          'MÓDULO': det.nombre_modulo === 'permisos'
+        datos.push([
+          n++,
+          obj.nombre,
+          det.pagina,
+          det.accion,
+          det.nombre_modulo === 'permisos'
             ? 'Módulo de Permisos'
             : det.nombre_modulo === 'vacaciones'
               ? 'Módulo de Vacaciones'
@@ -380,14 +409,116 @@ export class VistaRolesComponent implements OnInit {
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
                             : det.nombre_modulo,
-          'APLICACIÓN WEB': det.movil == false ? 'Sí' : '',
-          'APLICACIÓN MÓVIL': det.movil == true ? 'Sí' : '',
-        });
+          det.movil == false ? 'Sí' : '',
+          det.movil == true ? 'Sí' : '',
+        ]);
       });
     });
 
-    return datos;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Funcionalidades de Rol");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "PERMISOS O FUNCIONALIDADES DEL ROL";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "rol", width: 30 },
+      { key: "pagina", width: 40 },
+      { key: "funcion", width: 60 },
+      { key: "modulo", width: 30 },
+      { key: "appweb", width: 20 },
+      { key: "appmovil", width: 20 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "ROL", totalsRowLabel: "Total:", filterButton: true },
+      { name: "PÁGINA", totalsRowLabel: "", filterButton: true },
+      { name: "FUNCIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "MÓDULO", totalsRowLabel: "", filterButton: true },
+      { name: "APLICACIÓN WEB", totalsRowLabel: "", filterButton: true },
+      { name: "APLICACIÓN MÓVIL", totalsRowLabel: "", filterButton: true },
+
+    ];
+
+    worksheet.addTable({
+      name: "RolesTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 7; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "RolesEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
 
   /** ************************************************************************************************* **
    ** **                               PARA LA EXPORTACION DE ARCHIVOS XML                           ** **

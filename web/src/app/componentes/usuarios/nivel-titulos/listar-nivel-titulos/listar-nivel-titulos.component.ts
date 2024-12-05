@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -36,6 +37,17 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   nivelesEliminar: any = [];
   nivelTitulos: any = [];
@@ -94,6 +106,29 @@ export class ListarNivelTitulosComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNiveles();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // EVENTO PARA MOSTRAR NUMERO DE FILAS DE TABLA
@@ -462,6 +497,120 @@ export class ListarNivelTitulosComponent implements OnInit {
     xlsx.writeFile(wb, "NivelesTitulosEXCEL" + '.xlsx');
     this.ObtenerNiveles();
   }
+
+
+  async generarExcelNivelesTitulos() {
+    this.OrdenarDatos(this.nivelTitulos);
+
+    const niveles: any[] = [];
+    this.nivelTitulos.forEach((nivel: any, index: number) => {
+      niveles.push([
+        index + 1,
+        nivel.id,
+        nivel.nombre,
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Niveles Títulos");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "Lista de Niveles de Títulos Profesionales";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "nombre", width: 20 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "NivelesTitulosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: niveles,
+    });
+
+
+    const numeroFilas = niveles.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "NivelesTitulosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
 
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **

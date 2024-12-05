@@ -10,6 +10,7 @@ import { Router } from "@angular/router";
 import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
 import * as FileSaver from "file-saver";
+import ExcelJS, { FillPattern } from "exceljs";
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/metodos.component";
@@ -30,6 +31,17 @@ import { ValidacionesService } from "src/app/servicios/generales/validaciones/va
 })
 
 export class ListarRegimenComponent implements OnInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   regimenesEliminar: any = [];
 
@@ -88,6 +100,29 @@ export class ListarRegimenComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -373,6 +408,159 @@ export class ListarRegimenComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wsr, "LISTAR REGIMEN");
     xlsx.writeFile(wb, "RegimenEXCEL" + ".xlsx");
     this.ObtenerRegimen();
+  }
+
+  async generarExcelRegimen() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.regimen.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.descripcion,
+        obj.pais,
+        obj.mes_periodo,
+        obj.dias_mes,
+        obj.trabajo_minimo_mes,
+        obj.trabajo_minimo_horas,
+        obj.vacacion_dias_laboral,
+        obj.vacacion_dias_libre,
+        obj.vacacion_dias_calendario,
+        obj.dias_maximo_acumulacion,
+        obj.vacacion_dias_laboral_mes,
+        obj.vacacion_dias_calendario_mes,
+        obj.laboral_dias,
+        obj.calendario_dias,
+        obj.anio_antiguedad,
+        obj.dias_antiguedad,
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Régimen");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "Lista de Régimen Laboral";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "descripcion", width: 20 },
+      { key: "pais", width: 20 },
+      //
+      { key: "mes_periodo", width: 20 },
+      { key: "dias_mes", width: 20 },
+      { key: "trabajo_minimo_mes", width: 20 },
+      { key: "trabajo_minimo_horas", width: 20 },
+      { key: "vacacion_dias_laboral", width: 20 },
+      { key: "vacacion_dias_libre", width: 20 },
+      { key: "vacacion_dias_calendario", width: 20 },      
+      { key: "dias_maximo_acumulacion", width: 20 },
+      { key: "vacacion_dias_laboral_mes", width: 20 },
+      { key: "vacacion_dias_calendario_mes", width: 20 },
+      { key: "laboral_dias", width: 20 },
+      { key: "calendario_dias", width: 20 },
+      { key: "anio_antiguedad", width: 20 },
+      { key: "dias_antiguedad", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: false },
+      { name: "DESCRIPCION", totalsRowLabel: "", filterButton: true },
+      { name: "PAÍS", totalsRowLabel: "", filterButton: true },
+      //
+      { name: "MESES_PERIODO", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "TRABAJO_MINIMO_MES", totalsRowLabel: "", filterButton: true },
+      { name: "TRABAJO_MINIMO_HORA", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_ANIO_VACACION", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LIBRES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_VACACION", totalsRowLabel: "", filterButton: true },
+      { name: "MAX_DIAS_ACUMULABLES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LABORALES_GANADOS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_GANADOS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LABORALES_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
+      { name: "ANIOS_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
+      { name: "DIA_INCR_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "RegimenTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 17; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "RegimenEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
