@@ -61,7 +61,8 @@ import '@angular/localize/init';
  */
 import 'zone.js/dist/zone';  // Included with Angular CLI.
 
-
+(window as any).Buffer = require('buffer').Buffer;
+(window as any).process = require('process');
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */

@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import ExcelJS, { FillPattern } from "exceljs";
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
@@ -29,6 +30,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
+(ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
 
 @Component({
   selector: 'app-lista-empleados',
@@ -39,7 +41,15 @@ import { EmpleadoElemento } from 'src/app/model/empleado.model';
 export class ListaEmpleadosComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
 
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   empleadosEliminarActivos: any = [];
   empleadosEliminarInactivos: any = [];
 
@@ -94,6 +104,9 @@ export class ListaEmpleadosComponent implements OnInit {
 
   usuariosCorrectos: number = 0;
 
+
+  private imagen: any;
+
   constructor(
     public loginService: LoginService,
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -108,6 +121,9 @@ export class ListaEmpleadosComponent implements OnInit {
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
+
+
+
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -124,6 +140,30 @@ export class ListaEmpleadosComponent implements OnInit {
     this.DescargarPlantilla();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
+
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -870,6 +910,7 @@ export class ListaEmpleadosComponent implements OnInit {
     else {
       arreglo = this.desactivados
     }
+    console.log("ver arreglo: ", arreglo)
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
@@ -903,6 +944,175 @@ export class ListaEmpleadosComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wse, 'LISTA EMPLEADOS');
     xlsx.writeFile(wb, "EmpleadosEXCEL" + '.xlsx');
   }
+  // ---------------- excel con nueva libreria ------------------------- // 
+
+  async generarExcelEmpleados(numero: any) {
+
+    //const { usuarios, empresa, id_empresa } = datos;
+    if (numero === 1) {
+      var arreglo = this.empleado
+    }
+    else {
+      arreglo = this.desactivados
+    }
+
+    var f = DateTime.now();
+    let fecha = f.toFormat('yyyy-MM-dd');
+    let hora = f.toFormat('HH:mm:ss');
+
+    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
+
+    const empleados: any[] = [];
+    arreglo.forEach((usuario: any, index: number) => {
+      let nacionalidad: any;
+      this.nacionalidades.forEach((element: any) => {
+        if (usuario.id_nacionalidad == element.id) {
+          nacionalidad = element.nombre;
+        }
+      });
+      empleados.push([
+        index + 1,
+        usuario.codigo,
+        usuario.cedula,
+        usuario.apellido,
+        usuario.nombre,
+        usuario.fecha_nacimiento.split("T")[0],
+        this.EstadoCivilSelect[usuario.estado_civil - 1],
+        this.GeneroSelect[usuario.genero - 1],
+        usuario.correo,
+        this.EstadoSelect[usuario.estado - 1],
+        usuario.domicilio,
+        usuario.telefono,
+        nacionalidad,
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Empleados");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "Lista de Empleados";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "cedula", width: 20 },
+      { key: "apellido", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "fecha_nacimiento", width: 20 },
+      { key: "estado_civil", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "correo", width: 20 },
+      { key: "estado", width: 20 },
+      { key: "domicilio", width: 20 },
+      { key: "telefono", width: 20 },
+      { key: "nacionalidad", width: 20 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CEDULA", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA_NACIMIENTO", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO_CIVIL", totalsRowLabel: "", filterButton: true },
+      { name: "GENERO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO", totalsRowLabel: "", filterButton: true },
+      { name: "DOMICILIO", totalsRowLabel: "", filterButton: true },
+      { name: "TELEFONO", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
+    ];
+    console.log("ver empleados", empleados);
+    console.log("Columnas:", columnas);
+
+    worksheet.addTable({
+      name: "Empleados",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: empleados,
+    });
+
+    
+    const numeroFilas = empleados.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 13; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Lista_Empleados.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
+
+
+
 
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
