@@ -36,7 +36,7 @@ export class DepartamentosService {
 
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  **USADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/depatramento/${idDepartamento}`, data).pipe(
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/departamento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }

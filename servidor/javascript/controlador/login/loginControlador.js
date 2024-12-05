@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getClientPublicIp = void 0;
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
@@ -129,7 +128,6 @@ class LoginControlador {
                             _empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            //ip_address_principal: ip_principal,
                             modulos: modulos,
                             id_contrato: id_contrato
                         }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
@@ -145,7 +143,6 @@ class LoginControlador {
                             empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            //ip_address_principal: ip_principal,
                             modulos: modulos,
                             id_contrato: id_contrato,
                             nombre: nombre,
@@ -341,16 +338,3 @@ class LoginControlador {
 }
 const LOGIN_CONTROLADOR = new LoginControlador();
 exports.default = LOGIN_CONTROLADOR;
-const getClientPublicIp = (req) => {
-    // Intenta obtener la IP desde 'x-forwarded-for' (caso de proxys o balanceadores)
-    const rawIp = req.headers['x-forwarded-for']
-        ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
-        : req.socket.remoteAddress;
-    // Limpia y devuelve la IP
-    if (rawIp) {
-        // Asegúrate de eliminar prefijos IPv6 "::ffff:" si están presentes
-        return rawIp.replace(/^::ffff:/, '');
-    }
-    return null; // Devuelve null si no puede obtener la IP
-};
-exports.getClientPublicIp = getClientPublicIp;
