@@ -23,56 +23,39 @@ interface IPayload {
 
 class LoginControlador {
 
+
+
+
+
   // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
 
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
-    // OBTENCION DE DIRECCIONES IPs LOCALES
-    const ObtenerIPsLocales = () => {
-      const interfaces = os.networkInterfaces();
-      const ips: string[] = [];
-      // ITERAR SOBRE LAS INTERFACES DE RED
-      for (const interfaceName in interfaces) {
-        interfaces[interfaceName]?.forEach((networkInterface) => {
-          // FILTRAR SOLO LAS DIRECCIONES IPV4 Y EVITAR DIRECCIONES DE TIPO LOOPBACK (127.0.0.1)
-          if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
-            // NORMALIZA LA DIRECCION IP
-            const ip = ipaddr.process(networkInterface.address);
-            // AGREGA LA IP LOCAL A LA LISTA
-            ips.push(ip.toString());
-          }
-        });
-      }
-      return ips;
-    };
-
-    // METODO PARA OBTENER DIRECCION IP PUBLICA
-    const ObtenerIPs = (req: Request): { publicIp: string | null, localIps: string[] } => {
-      // OBTENER LA IP PUBLICA (DE LA CABECERA 'X-FORWARDED-FOR' O 'REMOTEADDRESS' SI NO ESTA DISPONIBLE)
-      const rawPublicIp = req.headers['x-forwarded-for']
+    // OBTENCIÓN DE DIRECCIÓN IP
+    const getClientIp = (req: Request): string | null => {
+      // Obtiene la IP del encabezado o del socket
+      const rawIp = req.headers['x-forwarded-for']
         ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
         : req.socket.remoteAddress;
-      // VALIDAR Y PROCESAR LA IP PUBLICA
-      let publicIp = null;
-      if (rawPublicIp && ipaddr.isValid(rawPublicIp)) {
-        // NORMALIZA IPV4/IPV6
-        const ip = ipaddr.process(rawPublicIp);
-        // DEVUELVE LA IP PUBLICA COMO STRING
-        publicIp = ip.toString();
-      }
 
-      // OBTIENE TODAS LAS IPS LOCALES
-      const localIps = ObtenerIPsLocales();
-      return { publicIp, localIps };
+      // Valida y formatea la IP
+      if (rawIp && ipaddr.isValid(rawIp)) {
+        const ip = ipaddr.process(rawIp); // Normaliza IPv4/IPv6
+        return ip.toString(); // Devuelve la IP como string
+      }
+      return null; // Si no es válida, devuelve null
     };
 
-    const { publicIp, localIps } = ObtenerIPs(req);
-    const ip_cliente = localIps;
-    const ip_principal = publicIp;
-    console.log('IP Pública:', ip_principal);
-    console.log('IPs Locales:', ip_cliente);
+    const ip_cliente = getClientIp(req);
+
+    console.log('IP Pública:', ip_cliente);
+
+
+
+
+
     try {
       const { nombre_usuario, pass, movil } = req.body;
       let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
@@ -181,7 +164,7 @@ class LoginControlador {
             _empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            ip_address_principal: ip_principal,
+            //ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato
           }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
@@ -198,7 +181,7 @@ class LoginControlador {
             empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            ip_address_principal: ip_principal,
+            //ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato,
             nombre: nombre,
@@ -215,13 +198,13 @@ class LoginControlador {
           if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal,
+              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente,
               modulos: modulos
             },
               process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
             return res.status(200).jsonp({
               caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-              empresa: id_empresa, ip_adress: ip_cliente, ip_address_principal: ip_principal, modulos: modulos//, modulos: modulos
+              empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos//, modulos: modulos
             });
           }
           else {
@@ -419,5 +402,19 @@ class LoginControlador {
 
 const LOGIN_CONTROLADOR = new LoginControlador();
 export default LOGIN_CONTROLADOR;
+
+export const getClientPublicIp = (req: Request): string | null => {
+  // Intenta obtener la IP desde 'x-forwarded-for' (caso de proxys o balanceadores)
+  const rawIp = req.headers['x-forwarded-for']
+    ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
+    : req.socket.remoteAddress;
+
+  // Limpia y devuelve la IP
+  if (rawIp) {
+    // Asegúrate de eliminar prefijos IPv6 "::ffff:" si están presentes
+    return rawIp.replace(/^::ffff:/, '');
+  }
+  return null; // Devuelve null si no puede obtener la IP
+};
 
 
