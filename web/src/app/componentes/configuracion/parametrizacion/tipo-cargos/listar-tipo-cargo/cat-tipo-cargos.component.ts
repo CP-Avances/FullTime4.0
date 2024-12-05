@@ -10,6 +10,7 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { ITableTipoCargo } from 'src/app/model/reportes.model';
 
@@ -30,6 +31,17 @@ import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo
 })
 
 export class CatTipoCargosComponent {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -90,6 +102,29 @@ export class CatTipoCargosComponent {
     this.listaTipoCargos = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -486,26 +521,113 @@ export class CatTipoCargosComponent {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.listaTipoCargos);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map((obj: any) => {
-      return {
-        ITEM: obj.id,
-        CARGO: obj.cargo,
+  
+  async generarExcelModalidad() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.listaTipoCargos.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.cargo,
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Tipos de Cargos");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "Lista de Tipos de Cargos";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "cargo", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "TipoCargoTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.listaTipoCargos[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA CARGOS');
-    xlsx.writeFile(wb, "CargosEXCEL" + '.xlsx');
-    this.BuscarParametro();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "CargosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
 
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
