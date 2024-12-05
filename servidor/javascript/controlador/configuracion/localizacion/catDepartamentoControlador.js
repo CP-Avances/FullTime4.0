@@ -536,7 +536,6 @@ class DepartamentoControlador {
                     });
                     // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
                     if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['SUCURSAL']) {
-                        console.log('Cabeceras faltantes: ITEM:', headers['ITEM'], ' NOMBRE:', headers['NOMBRE'], ' SUCURSAL:', headers['SUCURSAL']);
                         return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA

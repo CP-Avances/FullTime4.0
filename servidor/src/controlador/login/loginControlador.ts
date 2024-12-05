@@ -32,8 +32,8 @@ class LoginControlador {
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
-    // OBTENCIÓN DE DIRECCIÓN IP
-    const getClientIp = (req: Request): string | null => {
+     // OBTENCIÓN DE DIRECCIÓN IP
+     const getClientIp = (req: Request): string | null => {
       // Obtiene la IP del encabezado o del socket
       const rawIp = req.headers['x-forwarded-for']
         ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
@@ -48,12 +48,7 @@ class LoginControlador {
     };
 
     const ip_cliente = getClientIp(req);
-
     console.log('IP Pública:', ip_cliente);
-
-
-
-
 
     try {
       const { nombre_usuario, pass, movil } = req.body;
@@ -160,7 +155,6 @@ class LoginControlador {
             _empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            //ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato
           }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
@@ -177,7 +171,6 @@ class LoginControlador {
             empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            //ip_address_principal: ip_principal,
             modulos: modulos,
             id_contrato: id_contrato,
             nombre: nombre,
@@ -211,7 +204,6 @@ class LoginControlador {
       else {
         return res.jsonp({ message: 'error' });
       }
-
     } catch (error) {
       return res.jsonp({ message: 'error', text: ip_cliente });
     }
@@ -396,18 +388,5 @@ const LOGIN_CONTROLADOR = new LoginControlador();
 
 export default LOGIN_CONTROLADOR;
 
-export const getClientPublicIp = (req: Request): string | null => {
-  // Intenta obtener la IP desde 'x-forwarded-for' (caso de proxys o balanceadores)
-  const rawIp = req.headers['x-forwarded-for']
-    ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
-    : req.socket.remoteAddress;
-
-  // Limpia y devuelve la IP
-  if (rawIp) {
-    // Asegúrate de eliminar prefijos IPv6 "::ffff:" si están presentes
-    return rawIp.replace(/^::ffff:/, '');
-  }
-  return null; // Devuelve null si no puede obtener la IP
-};
 
 
