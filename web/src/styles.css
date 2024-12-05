@@ -351,6 +351,11 @@ mat-progress-spinner {
 }
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
+
+    #resultados span{
+        font-size: medium !important;
+    }
+
     .Tabla_titulo span{
         font-size: medium;
     }
@@ -364,8 +369,9 @@ mat-progress-spinner {
         }
     }
 
-    mat-paginator {
-        font-size:smaller;
+    .mat-mdc-paginator-container{
+        padding: 0% !important;
+        font-size: 11px !important;
     }
 }
 
