@@ -343,7 +343,7 @@ class SucursalControlador {
                         data = {};
                     }));
                 }
-                console.log('listaSucursales ', listSucursales);
+                //console.log('listaSucursales ', listSucursales)
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
