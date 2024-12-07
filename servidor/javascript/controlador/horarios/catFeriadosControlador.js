@@ -359,8 +359,8 @@ class FeriadosControlador {
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
-            let verificador_feriado = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'FERIADOS');
-            let verificador_ciudad = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'CIUDAD_FERIADOS');
+            let verificador_feriado = (0, accesoCarpetas_1.ObtenerIndicePlantilla2)(workbook, 'FERIADOS');
+            let verificador_ciudad = (0, accesoCarpetas_1.ObtenerIndicePlantilla2)(workbook, 'CIUDAD_FERIADOS');
             if (verificador_feriado === false) {
                 return res.jsonp({ message: 'no_existe_feriado', data: undefined });
             }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
+exports.ObtenerIndicePlantilla2 = exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
@@ -213,3 +213,23 @@ const ObtenerIndicePlantilla = function (libroExcel, hoja) {
     }
 };
 exports.ObtenerIndicePlantilla = ObtenerIndicePlantilla;
+// METODO PARA OBTENER POSICION DE PLANTILLA
+const ObtenerIndicePlantilla2 = function (libroExcel, hoja) {
+    const sheet_name_list = libroExcel.SheetNames;
+    let indice = 0;
+    let verificador = 0;
+    for (var i = 0; i < sheet_name_list.length; i++) {
+        if ((sheet_name_list[i]).toUpperCase() === hoja) {
+            indice = i;
+            verificador = 1;
+            break;
+        }
+    }
+    if (verificador === 1) {
+        return indice;
+    }
+    else {
+        return false;
+    }
+};
+exports.ObtenerIndicePlantilla2 = ObtenerIndicePlantilla2;

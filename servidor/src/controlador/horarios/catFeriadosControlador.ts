@@ -1,5 +1,5 @@
 
-import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla2, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -410,8 +410,8 @@ class FeriadosControlador {
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         const workbook = excel.readFile(ruta);
 
-        let verificador_feriado: any = ObtenerIndicePlantilla(workbook, 'FERIADOS');
-        let verificador_ciudad: any = ObtenerIndicePlantilla(workbook, 'CIUDAD_FERIADOS');
+        let verificador_feriado: any = ObtenerIndicePlantilla2(workbook, 'FERIADOS');
+        let verificador_ciudad: any = ObtenerIndicePlantilla2(workbook, 'CIUDAD_FERIADOS');
 
         if (verificador_feriado === false) {
             return res.jsonp({ message: 'no_existe_feriado', data: undefined });
