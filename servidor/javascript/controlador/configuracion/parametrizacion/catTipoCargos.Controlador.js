@@ -18,7 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class TiposCargosControlador {
     // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE   **USADO
     BuscarTipoCargoNombre(req, res) {
@@ -225,14 +225,15 @@ class TiposCargosControlador {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TIPO_CARGO');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
                 else {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantilla_cargo = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla_cargo = workbook.getWorksheet(sheet_name_list[verificador]);
                     let data = {
                         fila: '',
                         tipo_cargo: '',
@@ -241,33 +242,51 @@ class TiposCargosControlador {
                     var listCargos = [];
                     var duplicados = [];
                     var mensaje = 'correcto';
-                    // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla_cargo.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, CARGO } = dato;
-                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((ITEM != undefined && ITEM != '') &&
-                            (CARGO != undefined && CARGO != '')) {
-                            data.fila = ITEM;
-                            data.tipo_cargo = CARGO;
-                            data.observacion = 'no registrado';
-                            listCargos.push(data);
+                    if (plantilla_cargo) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla_cargo.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['CARGO']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
-                        else {
-                            data.fila = ITEM;
-                            data.tipo_cargo = CARGO;
-                            data.observacion = 'no registrado';
-                            if (data.fila == '' || data.fila == undefined) {
-                                data.fila = 'error';
-                                mensaje = 'error';
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla_cargo.eachRow((row, rowNumber) => {
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const CARGO = row.getCell(headers['CARGO']).value;
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (CARGO != undefined && CARGO != '')) {
+                                data.fila = ITEM;
+                                data.tipo_cargo = CARGO;
+                                data.observacion = 'no registrado';
+                                listCargos.push(data);
                             }
-                            if (data.tipo_cargo == undefined) {
-                                data.tipo_cargo = 'No registrado';
-                                data.observacion = 'Cargo ' + data.observacion;
+                            else {
+                                data.fila = ITEM;
+                                data.tipo_cargo = CARGO;
+                                data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (data.tipo_cargo == undefined) {
+                                    data.tipo_cargo = 'No registrado';
+                                    data.observacion = 'Cargo ' + data.observacion;
+                                }
+                                listCargos.push(data);
                             }
-                            listCargos.push(data);
-                        }
-                        data = {};
-                    }));
+                            data = {};
+                        });
+                    }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                         if (err) {

@@ -263,12 +263,22 @@
 
 <div style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto align-items-center">
+            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-1" >
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+                    matTooltip="Regresar">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span class="text-uppercase">DETALLES DE TIEMPO LABORADO - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
+            </div>
+            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-3">
+            </div>
+        </div>
         <div id="titulo">
-            <span>DETALLES DE TIEMPO LABORADO - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
-            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
-                matTooltip="Regresar">
-                <i class="fas fa-arrow-left"></i>
-            </button>
+            
+            
         </div>
         <mat-card-content>
             <div style="padding-bottom: 25px; text-align: center; margin-top: 1rem">

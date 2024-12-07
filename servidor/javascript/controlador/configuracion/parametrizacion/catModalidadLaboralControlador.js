@@ -18,7 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class ModalidaLaboralControlador {
     // METODO PARA LISTAR MODALIDAD LABORAL
     ListaModalidadLaboral(req, res) {
@@ -209,14 +209,15 @@ class ModalidaLaboralControlador {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'MODALIDAD_LABORAL');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
                 else {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantilla_modalidad_laboral = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla_modalidad_laboral = workbook.getWorksheet(sheet_name_list[verificador]);
                     let data = {
                         fila: '',
                         modalida_laboral: '',
@@ -225,33 +226,51 @@ class ModalidaLaboralControlador {
                     var listModalidad = [];
                     var duplicados = [];
                     var mensaje = 'correcto';
-                    // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, MODALIDAD_LABORAL } = dato;
-                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((ITEM != undefined && ITEM != '') &&
-                            (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
-                            data.fila = ITEM;
-                            data.modalida_laboral = MODALIDAD_LABORAL;
-                            data.observacion = 'no registrada';
-                            listModalidad.push(data);
+                    if (plantilla_modalidad_laboral) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla_modalidad_laboral.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['MODALIDAD_LABORAL']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
-                        else {
-                            data.fila = ITEM;
-                            data.modalida_laboral = MODALIDAD_LABORAL;
-                            data.observacion = 'no registrada';
-                            if (data.fila == '' || data.fila == undefined) {
-                                data.fila = 'error';
-                                mensaje = 'error';
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla_modalidad_laboral.eachRow((row, rowNumber) => {
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
+                                data.fila = ITEM;
+                                data.modalida_laboral = MODALIDAD_LABORAL;
+                                data.observacion = 'no registrada';
+                                listModalidad.push(data);
                             }
-                            if (MODALIDAD_LABORAL == undefined) {
-                                data.modalida_laboral = 'No registrado';
-                                data.observacion = 'Modalidad Laboral ' + data.observacion;
+                            else {
+                                data.fila = ITEM;
+                                data.modalida_laboral = MODALIDAD_LABORAL;
+                                data.observacion = 'no registrada';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (MODALIDAD_LABORAL == undefined) {
+                                    data.modalida_laboral = 'No registrado';
+                                    data.observacion = 'Modalidad Laboral ' + data.observacion;
+                                }
+                                listModalidad.push(data);
                             }
-                            listModalidad.push(data);
-                        }
-                        data = {};
-                    }));
+                            data = {};
+                        });
+                    }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                         if (err) {

@@ -2,10 +2,10 @@ import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
-import excel from 'xlsx';
+import pool from '../../../database';
+import Excel from 'exceljs';
 
 class DiscapacidadControlador {
 
@@ -222,58 +222,74 @@ class DiscapacidadControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_DISCAPACIDAD');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     discapacidad: '',
                     observacion: ''
                 };
-
                 var listaDiscapacidad: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any) => {
-                    var { ITEM, DISCAPACIDAD } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
-                        data.fila = ITEM;
-                        data.discapacidad = DISCAPACIDAD;
-                        data.observacion = 'no registrada';
-
-                        listaDiscapacidad.push(data);
-
-                    } else {
-                        data.fila = ITEM;
-                        data.discapacidad = DISCAPACIDAD;
-                        data.observacion = 'no registrada';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (DISCAPACIDAD == undefined) {
-                            data.discapacidad = 'No registrado';
-                            data.observacion = 'Discapacidad no registrada';
-                        }
-
-                        listaDiscapacidad.push(data);
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['DISCAPACIDAD']
+                    ) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const DISCAPACIDAD = row.getCell(headers['DISCAPACIDAD']).value;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
 
-                    data = {};
+                            listaDiscapacidad.push(data);
 
-                });
+                        } else {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
 
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (DISCAPACIDAD == undefined) {
+                                data.discapacidad = 'No registrado';
+                                data.observacion = 'Discapacidad no registrada';
+                            }
+
+                            listaDiscapacidad.push(data);
+                        }
+
+                        data = {};
+
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {

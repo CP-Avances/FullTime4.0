@@ -1,14 +1,14 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
-import { Request, Response, query } from 'express';
+import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
-import excel from 'xlsx';
+import { DateTime } from 'luxon';
+import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import { DateTime } from 'luxon';
 
 class ContratoEmpleadoControlador {
 
@@ -460,7 +460,6 @@ class ContratoEmpleadoControlador {
     }
 
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
-
     public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
@@ -477,7 +476,6 @@ class ContratoEmpleadoControlador {
             return res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
-
 
     // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
     public async EncontrarFechaContratoUsuarios(req: Request, res: Response): Promise<any> {
@@ -608,14 +606,15 @@ class ContratoEmpleadoControlador {
         const documento = req.file?.originalname;
         let separador = path.sep;
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-        const workbook = excel.readFile(ruta);
+        const workbook = new Excel.Workbook();
+        await workbook.xlsx.readFile(ruta);
         let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS_CONTRATOS');
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
         else {
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+            const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+            const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
             let data: any = {
                 fila: '',
                 cedula: '',
@@ -632,91 +631,52 @@ class ContratoEmpleadoControlador {
             var listContratos: any = [];
             var duplicados: any = [];
             var mensaje: string = 'correcto';
+            if (plantilla) {
+                // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                const headerRow = plantilla.getRow(1);
+                const headers: any = {};
+                // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                headerRow.eachCell((cell: any, colNumber) => {
+                    headers[cell.value.toString().toUpperCase()] = colNumber;
+                });
+                // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                if (!headers['ITEM'] || !headers['CEDULA'] || !headers['PAIS'] ||
+                    !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||
+                    !headers['FECHA_HASTA'] || !headers['CONTROLAR_ASISTENCIA'] || !headers['CONTROLAR_VACACIONES']
+                ) {
+                    console.log('ingresa a cabeceras')
+                    return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                }
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla.eachRow((row, rowNumber) => {
+                    // SALTAR LA FILA DE LAS CABECERAS
+                    if (rowNumber === 1) return;
+                    // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                    const ITEM = row.getCell(headers['ITEM']).value;
+                    const CEDULA = row.getCell(headers['CEDULA']).value;
+                    const PAIS = row.getCell(headers['PAIS']).value;
+                    const REGIMEN_LABORAL = row.getCell(headers['REGIMEN_LABORAL']).value;
+                    const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
+                    const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value;
+                    const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value;
+                    const CONTROLAR_ASISTENCIA = row.getCell(headers['CONTROLAR_ASISTENCIA']).value;
+                    const CONTROLAR_VACACIONES = row.getCell(headers['CONTROLAR_VACACIONES']).value;
 
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach(async (dato: any) => {
-                var { ITEM, CEDULA, PAIS, REGIMEN_LABORAL, MODALIDAD_LABORAL, FECHA_DESDE, FECHA_HASTA,
-                    CONTROLAR_ASISTENCIA, CONTROLAR_VACACIONES, TIPO_CARGO } = dato;
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
+                        (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
+                        (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined)) {
+                        data.fila = ITEM;
+                        data.pais = PAIS;
+                        data.cedula = CEDULA;
+                        data.regimen_la = REGIMEN_LABORAL;
+                        data.fecha_desde = FECHA_DESDE;
+                        data.fecha_hasta = FECHA_HASTA;
+                        data.observacion = 'no registrado';
+                        data.modalida_la = MODALIDAD_LABORAL;
+                        data.control_asis = CONTROLAR_ASISTENCIA;
+                        data.control_vaca = CONTROLAR_VACACIONES;
 
-                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
-                    (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
-                    (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined) &&
-                    (TIPO_CARGO != undefined)) {
-                    data.fila = ITEM;
-                    data.cedula = CEDULA; data.pais = PAIS;
-                    data.regimen_la = REGIMEN_LABORAL; data.modalida_la = MODALIDAD_LABORAL;
-                    data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
-                    data.control_asis = CONTROLAR_ASISTENCIA; data.control_vaca = CONTROLAR_VACACIONES;
-
-                    data.observacion = 'no registrado';
-
-                    // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                    const rege = /^[0-9]+$/;
-                    if (rege.test(data.cedula)) {
-                        if (data.cedula.toString().length != 10) {
-                            data.observacion = 'La cédula ingresada no es válida';
-                        } else {
-                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                            if (DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid) {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) { } else {
-                                    data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
-                                }
-                            } else {
-                                data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
-                            }
-                        }
-                    } else {
-                        data.observacion = 'La cédula ingresada no es válida';
-                    }
-                    listContratos.push(data);
-                } else {
-                    data.fila = ITEM;
-                    data.cedula = CEDULA; data.pais = PAIS;
-                    data.regimen_la = REGIMEN_LABORAL; data.modalida_la = MODALIDAD_LABORAL;
-                    data.fecha_desde = FECHA_DESDE; data.fecha_hasta = FECHA_HASTA;
-                    data.control_asis = CONTROLAR_ASISTENCIA; data.control_vaca = CONTROLAR_VACACIONES;
-                    data.observacion = 'no registrado';
-
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error'
-                    }
-                    if (PAIS == undefined) {
-                        data.pais = 'No registrado';
-                        data.observacion = 'Pais no registrado';
-                    }
-                    if (REGIMEN_LABORAL == undefined) {
-                        data.regimen_la = 'No registrado';
-                        data.observacion = 'Régimen laboral no registrado';
-                    }
-                    if (MODALIDAD_LABORAL == undefined) {
-                        data.modalida_la = 'No registrado';
-                        data.observacion = 'Modalidad laboral no registrado';
-                    }
-                    if (FECHA_DESDE == undefined) {
-                        data.fecha_desde = 'No registrado';
-                        data.observacion = 'Fecha desde no registrado';
-                    }
-                    if (FECHA_HASTA == undefined) {
-                        data.fecha_hasta = 'No registrado';
-                        data.observacion = 'Fecha hasta no registrado';
-                    }
-                    if (CONTROLAR_ASISTENCIA == undefined) {
-                        data.control_asis = 'No registrado';
-                        data.observacion = 'Control asistencia no registrado';
-                    }
-                    if (CONTROLAR_VACACIONES == undefined) {
-                        data.control_vaca = 'No registrado';
-                        data.observacion = 'Control vacaciones no registrado';
-                    }
-
-                    if (CEDULA == undefined) {
-                        data.cedula = 'No registrado'
-                        data.observacion = 'Cédula no registrado';
-                    }
-                    else {
                         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
@@ -724,46 +684,117 @@ class ContratoEmpleadoControlador {
                                 data.observacion = 'La cédula ingresada no es válida';
                             } else {
                                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                if (data.fecha_desde != 'No registrado') {
-                                    if (
-                                        DateTime.fromFormat(FECHA_DESDE, 'yyyy-MM-dd').isValid
-                                    ) {
-                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                        if (data.fecha_hasta != 'No registrado') {
-                                            if (DateTime.fromFormat(FECHA_HASTA, 'yyyy-MM-dd').isValid) {
-                                                if (data.control_vaca != 'No registrado') {
-                                                    if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
-                                                        data.observacion = 'Control de vacaciones es incorrecto'
-                                                    }
-                                                    else {
-                                                        if (data.control_asis != 'No registrado') {
-                                                            if (data.control_asis.toUpperCase() != 'NO' && data.control_asis.toUpperCase() != 'SI') {
-                                                                data.observacion = 'Control de asistencia es incorrecto'
+                                if (DateTime.fromFormat(data.fecha_desde, 'yyyy-MM-dd').isValid) {
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (DateTime.fromFormat(data.fecha_hasta, 'yyyy-MM-dd').isValid) { } else {
+                                        data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
+                                    }
+                                } else {
+                                    data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
+                                }
+                            }
+                        } else {
+                            data.observacion = 'La cédula ingresada no es válida';
+                        }
+                        listContratos.push(data);
+                    } else {
+                        data.fila = ITEM;
+                        data.pais = PAIS;
+                        data.cedula = CEDULA;
+                        data.regimen_la = REGIMEN_LABORAL;
+                        data.modalida_la = MODALIDAD_LABORAL;
+                        data.fecha_desde = FECHA_DESDE;
+                        data.observacion = 'no registrado';
+                        data.fecha_hasta = FECHA_HASTA;
+                        data.control_asis = CONTROLAR_ASISTENCIA;
+                        data.control_vaca = CONTROLAR_VACACIONES;
+
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
+                        if (PAIS == undefined) {
+                            data.pais = 'No registrado';
+                            data.observacion = 'Pais no registrado';
+                        }
+                        if (REGIMEN_LABORAL == undefined) {
+                            data.regimen_la = 'No registrado';
+                            data.observacion = 'Régimen laboral no registrado';
+                        }
+                        if (MODALIDAD_LABORAL == undefined) {
+                            data.modalida_la = 'No registrado';
+                            data.observacion = 'Modalidad laboral no registrado';
+                        }
+                        if (FECHA_DESDE == undefined) {
+                            data.fecha_desde = 'No registrado';
+                            data.observacion = 'Fecha desde no registrado';
+                        }
+                        if (FECHA_HASTA == undefined) {
+                            data.fecha_hasta = 'No registrado';
+                            data.observacion = 'Fecha hasta no registrado';
+                        }
+                        if (CONTROLAR_ASISTENCIA == undefined) {
+                            data.control_asis = 'No registrado';
+                            data.observacion = 'Control asistencia no registrado';
+                        }
+                        if (CONTROLAR_VACACIONES == undefined) {
+                            data.control_vaca = 'No registrado';
+                            data.observacion = 'Control vacaciones no registrado';
+                        }
+
+                        if (CEDULA == undefined) {
+                            data.cedula = 'No registrado'
+                            data.observacion = 'Cédula no registrado';
+                        }
+                        else {
+                            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
+                            const rege = /^[0-9]+$/;
+                            if (rege.test(data.cedula)) {
+                                if (data.cedula.toString().length != 10) {
+                                    data.observacion = 'La cédula ingresada no es válida';
+                                } else {
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (data.fecha_desde != 'No registrado') {
+                                        if (
+                                            DateTime.fromFormat(data.fecha_desde, 'yyyy-MM-dd').isValid
+                                        ) {
+                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                            if (data.fecha_hasta != 'No registrado') {
+                                                if (DateTime.fromFormat(data.fecha_hasta, 'yyyy-MM-dd').isValid) {
+                                                    if (data.control_vaca != 'No registrado') {
+                                                        if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
+                                                            data.observacion = 'Control de vacaciones es incorrecto'
+                                                        }
+                                                        else {
+                                                            if (data.control_asis != 'No registrado') {
+                                                                if (data.control_asis.toUpperCase() != 'NO' && data.control_asis.toUpperCase() != 'SI') {
+                                                                    data.observacion = 'Control de asistencia es incorrecto'
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
-                                            }
-                                            else {
-                                                data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
+                                                else {
+                                                    data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
+                                                }
                                             }
                                         }
-                                    }
-                                    else {
-                                        data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
+                                        else {
+                                            data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
+                                        }
                                     }
                                 }
                             }
+                            else {
+                                data.observacion = 'La cédula ingresada no es válida';
+                            }
                         }
-                        else {
-                            data.observacion = 'La cédula ingresada no es válida';
-                        }
+                        listContratos.push(data);
                     }
-                    listContratos.push(data);
-                }
-                data = {}
-            });
-
+                    data = {}
+                });
+            }
+            //console.log('contratos ', listContratos)
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs.access(ruta, fs.constants.F_OK, (err) => {
                 if (err) {

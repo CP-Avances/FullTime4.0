@@ -5,7 +5,7 @@ import { QueryResult } from 'pg';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class TiposCargosControlador {
 
@@ -246,55 +246,70 @@ class TiposCargosControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_CARGO');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla_cargo = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     tipo_cargo: '',
                     observacion: ''
                 };
-
                 var listCargos: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_cargo.forEach(async (dato: any) => {
-                    var { ITEM, CARGO } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (CARGO != undefined && CARGO != '')) {
-                        data.fila = ITEM;
-                        data.tipo_cargo = CARGO;
-                        data.observacion = 'no registrado';
-
-                        listCargos.push(data);
-                    } else {
-                        data.fila = ITEM;
-                        data.tipo_cargo = CARGO;
-                        data.observacion = 'no registrado';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (data.tipo_cargo == undefined) {
-                            data.tipo_cargo = 'No registrado';
-                            data.observacion = 'Cargo ' + data.observacion;
-                        }
-
-                        listCargos.push(data);
+                if (plantilla_cargo) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla_cargo.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['CARGO']) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
-                    data = {};
-                });
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla_cargo.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const CARGO = row.getCell(headers['CARGO']).value;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (CARGO != undefined && CARGO != '')) {
+                            data.fila = ITEM;
+                            data.tipo_cargo = CARGO;
+                            data.observacion = 'no registrado';
 
+                            listCargos.push(data);
+                        } else {
+                            data.fila = ITEM;
+                            data.tipo_cargo = CARGO;
+                            data.observacion = 'no registrado';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (data.tipo_cargo == undefined) {
+                                data.tipo_cargo = 'No registrado';
+                                data.observacion = 'Cargo ' + data.observacion;
+                            }
+
+                            listCargos.push(data);
+                        }
+                        data = {};
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
