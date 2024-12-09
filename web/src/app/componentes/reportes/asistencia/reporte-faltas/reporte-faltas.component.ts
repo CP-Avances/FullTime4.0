@@ -7,7 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
@@ -24,7 +25,17 @@ import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service'
 })
 
 export class ReporteFaltasComponent implements OnInit, OnDestroy {
+  private imagen: any;
 
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -122,6 +133,29 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy(): void {
@@ -281,7 +315,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.restFaltas.BuscarFaltas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel(); break;
+        case 'excel': this.generarExcel(); break;
         case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -318,7 +352,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-   async GenerarPDF(action: any) {
+  async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
@@ -603,38 +637,135 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(): void {
-    const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Faltas');
-    xlsx.writeFile(wb_regimen_cargo, `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`)
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.data_pdf.forEach((suc) => {
+      suc.empleados.map((empl: any) => {
+        empl.faltas.map((obj3: any) => {
+          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          datos.push([
+            n++,
+            empl.cedula,
+            empl.codigo,
+            empl.apellido + ' ' + empl.nombre,
+            empl.ciudad,
+            empl.sucursal,
+            empl.regimen,
+            empl.departamento,
+            empl.cargo,
+            fecha,
+          ])
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Faltas");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = 'Lista de Faltas';
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fecha", width: 20 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "FaltasReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 10; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
 
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((suc: any) => {
-      suc.empleados.forEach((empl: any) => {
-        empl.faltas.forEach((obj3: any) => {
-          n++;
-          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-          let ele = {
-            'N°': n,
-            'Cédula': empl.cedula,
-            'Código': empl.codigo,
-            'Nombre Empleado': empl.apellido + ' ' + empl.nombre,
-            'Ciudad': empl.ciudad,
-            'Sucursal': empl.sucursal,
-            'Régimen': empl.regimen,
-            'Departamento': empl.departamento,
-            'Cargo': empl.cargo,
-            'Fecha': fecha,
-          }
-          nuevo.push(ele);
-        })
-      })
-    })
-    return nuevo;
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **

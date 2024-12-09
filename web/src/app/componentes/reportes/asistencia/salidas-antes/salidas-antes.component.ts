@@ -7,6 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -24,7 +26,17 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class SalidasAntesComponent implements OnInit, OnDestroy {
+  private imagen: any;
 
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -122,6 +134,28 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy() {
@@ -281,7 +315,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.restSalida.BuscarTimbresSalidasAnticipadas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel(); break;
+        case 'excel': this.generarExcel(); break;
         case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -691,21 +725,13 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
 
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Salidas Anticipadas');
-    xlsx.writeFile(wb, `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-  }
-
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((data: any) => {
-      data.empleados.forEach((usu: any) => {
-        usu.salidas.forEach((sal: any) => {
-          n++;
+    this.data_pdf.forEach((data) => {
+      data.empleados.map((usu: any) => {
+        usu.salidas.map((sal: any) => {
           const horaHorario = this.validar.FormatearHora(
             sal.fecha_hora_horario.split(' ')[1],
             this.formato_hora);
@@ -714,28 +740,144 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             this.formato_hora);
           const minutos = this.SegundosAMinutosConDecimales(Number(sal.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
-          let ele = {
-            'N°': n,
-            'Cédula': usu.cedula,
-            'Código': usu.codigo,
-            'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
-            'Ciudad': usu.ciudad,
-            'Sucursal': usu.sucursal,
-            'Régimen': usu.regimen,
-            'Departamento': usu.departamento,
-            'Cargo': usu.cargo,
-            'Fecha Horario': new Date(sal.fecha_hora_horario),
-            'Hora Horario': horaHorario,
-            'Fecha Timbre': new Date(sal.fecha_hora_timbre),
-            'Hora Timbre': horaTimbre,
-            'Salida Anticipada HH:MM:SS': tiempo,
-            'Salida Anticipada Minutos': minutos.toFixed(2)
-          }
-          nuevo.push(ele);
-        })
+
+          datos.push([
+            n++,
+            usu.cedula,
+            usu.codigo,
+            usu.apellido + ' ' + usu.nombre,
+            usu.ciudad,
+            usu.sucursal,
+            usu.regimen,
+            usu.departamento,
+            usu.cargo,
+            new Date(sal.fecha_hora_horario),
+            horaHorario,
+            new Date(sal.fecha_hora_timbre),
+            horaTimbre,
+            tiempo,
+            minutos.toFixed(2)
+          ])
+        });
       })
-    })
-    return nuevo;
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Salidas_Anticipadas");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = 'Lista de Salidas Anticipadas';
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fechaHorario", width: 20 },
+      { key: "horaHorario", width: 20 },
+      { key: "fechaTimbre", width: 20 },
+      { key: "horaTimbre", width: 20 },
+      { key: "salidaAnticipada", width: 20 },
+      { key: "salidaAnticipadaMinutos", width: 20 },
+
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA HORARIO", totalsRowLabel: "", filterButton: true },
+      { name: "HORA HORARIO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA TIMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "HORA TIMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "SALIDA ANTICIPADA HH:MM:SS", totalsRowLabel: "", filterButton: true },
+      { name: "SALIDA ANTICIPADA MINUTOS", totalsRowLabel: "", filterButton: true },     
+    ]
+
+    worksheet.addTable({
+      name: "SalidaAnticipadaReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 15; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob,`Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **
