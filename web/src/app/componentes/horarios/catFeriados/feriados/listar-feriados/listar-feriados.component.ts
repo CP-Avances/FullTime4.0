@@ -616,28 +616,7 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.feriados);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
-      }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.feriados[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
-    }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
-    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
-    this.BuscarParametro();
-  }
+
 
   async generarExcel() {
     let datos: any[] = [];
@@ -806,6 +785,7 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
+   /*
   ExportToCVS() {
     this.OrdenarDatos(this.feriados);
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
@@ -819,6 +799,43 @@ export class ListarFeriadosComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
+    this.BuscarParametro();
+  }
+    */
+
+  ExportToCSV() {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('FeriadosCSV');
+  
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'CODIGO', key: 'codigo', width: 10 },
+      { header: 'FERIADO', key: 'feriado', width: 30 },
+      { header: 'FECHA', key: 'fecha', width: 15 },
+      { header: 'FECHA_RECUPERA', key: 'fecha_recupera', width: 15 }
+    ];
+  
+    // 4. Llenar las filas con los datos
+    this.feriados.forEach((obj: any) => {
+      worksheet.addRow({
+        codigo: obj.id,
+        feriado: obj.descripcion,
+        fecha: obj.fecha_,
+        fecha_recupera: obj.fec_recuperacion_
+      }).commit();
+    });
+  
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "FeriadosCSV.csv");
+    });
+  
+    // Llamar a la función BuscarParametro
     this.BuscarParametro();
   }
 

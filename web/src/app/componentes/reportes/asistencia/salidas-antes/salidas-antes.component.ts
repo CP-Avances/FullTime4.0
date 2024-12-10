@@ -6,7 +6,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 
