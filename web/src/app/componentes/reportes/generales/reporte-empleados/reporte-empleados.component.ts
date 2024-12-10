@@ -6,7 +6,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
+import * as xlsx from 'xlsx';// Eliminar
+import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -16,6 +18,7 @@ import { ValidacionesService } from '../../../../servicios/generales/validacione
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -25,6 +28,13 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
+
+  private imagen: any;
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+  private fillAzul!: FillPattern;
+  private fontTitulo!: Partial<ExcelJS.Font>;
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
@@ -134,6 +144,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
+    private restP: ParametrosService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -143,7 +154,57 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
+    this.ObtenerParametros();
+    this.ObtenerColores();
+    this.ObtenerLogo();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
+    // METODO PARA LISTAR PARÁMETROS
+    parametros: any = [];
+    ObtenerParametros() {
+      this.parametros = [];
+      this.numero_pagina = 1;
+      this.restP.ListarParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.parametros = datos;
+        this.ObtenerDetallesParametro();
+      });
+    }
+  
+    // METOOD PARA OBTENER DETALLES DE PARAMETROS
+    detalles: any = [];
+    ObtenerDetallesParametro() {
+      this.detalles = [];
+      this.restP.BuscarDetallesParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.detalles = datos;
+        this.parametros.forEach((parametro: any) => {
+          parametro.detalles = this.detalles.filter((detalle: any) => detalle.id_parametro === parametro.id);
+        });
+      });
+    }
 
   ngOnDestroy() {
     this.departamentos = [];
@@ -153,6 +214,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.cargos = [];
     this.arr_emp = [];
   }
+
 
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
@@ -272,7 +334,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.data_pdf = seleccionados;
     switch (accion) {
-      case 'excel': this.ExportarExcel(); break;
+      case 'excel': this.generarExcelParametros(); break;
       case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
@@ -489,44 +551,189 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
     xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xls`);
   }
 
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let usuarios: any[] = [];
-    let c = 0;
-    array.forEach((empl) => {
-      empl.empleados.forEach((usu: any) => {
-        let ele = {
-          'Cédula': usu.cedula,
-          'Código': usu.codigo,
-          'Apellido': usu.apellido,
-          'Nombre': usu.nombre,
-          'Género': usu.genero == 1 ? 'M' : 'F',
-          'Ciudad': usu.ciudad,
-          'Sucursal': usu.sucursal,
-          'Régimen': usu.regimen,
-          'Departamento': usu.departamento,
-          'Cargo': usu.cargo,
-          'Correo': usu.correo,
-        }
-        nuevo.push(ele)
-      })
-    });
-    nuevo.sort(function (a: any, b: any) {
-      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
-    });
-    nuevo.forEach((u: any) => {
-      c = c + 1;
-      const usuarioNuevo = Object.assign({ 'N°': c }, u);
-      usuarios.push(usuarioNuevo);
+  EstructurarDatosExcel() {
+    let datos: any = [];
+    let n: number = 1;
+    this.data_pdf.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'N°': n++,
+          'CÉDULA': det.cedula,
+          'CÓDIGO': det.codigo,
+          'APELLIDO': det.apellido,
+          'NOMBRE': det.nombre,
+          'GÉNERO': det.genero == 1 ? 'M' : 'F',
+          'CIUDAD': det.ciudad,
+          'SUCURSAL': det.sucursal,
+          'RÉGIMEN': det.regimen,
+          'DEPARTAMENTO': det.departamento,
+          'CARGO': det.cargo,
+          'CORREO': det.correo
+        });
+      });
     });
 
-    return usuarios;
+    return datos;
+  }
+
+  async generarExcelParametros() {
+
+    const listaUsuarios: any[] = [];
+    let n: number = 1;
+    console.log('dataaaaa: ',this.data_pdf);
+    this.data_pdf.forEach((obj: any) => {
+      console.log('objjjj: ',obj);
+      obj.empleados.forEach((det: any) => {
+        listaUsuarios.push([
+          n++,
+          det.cedula,
+          det.codigo,
+          det.apellido,
+          det.nombre,
+          det.genero == 1 ? 'M' : 'F',
+          det.ciudad,
+          det.sucursal,
+          det.regimen,
+          det.departamento,
+          det.cargo,
+          det.correo
+        ]);
+      });
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("USUARIOS");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:L1");
+    worksheet.mergeCells("B2:L2");
+    worksheet.mergeCells("B3:L3");
+    worksheet.mergeCells("B4:L4");
+    worksheet.mergeCells("B5:L5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = "Lista de Usuarios";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "N°", width: 10 },
+      { key: 'cedula', width: 20 },
+      { key: 'codigo', width: 20 },
+      { key: 'apellido', width: 20 },
+      { key: 'nombre', width: 20 },
+      { key: 'genero', width: 20 },
+      { key: 'ciudad', width: 20 },
+      { key: 'sucursal', width: 20 },
+      { key: 'regimen', width: 20 },
+      { key: 'departamento', width: 20 },
+      { key: 'cargo', width: 20 },
+      { key: 'correo', width: 70 }
+    ];
+
+    // Ajustar dinámicamente el ancho
+    worksheet.columns.forEach((column, index) => {
+    let maxLength = 10; // Ancho mínimo
+    column.eachCell!({ includeEmpty: true }, (cell) => {
+      if (cell.value) {
+        const cellValueLength = cell.value.toString().length;
+        maxLength = Math.max(maxLength, cellValueLength);
+      }
+    });
+    column.width = maxLength + 2; // Añadir margen
+  });
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true }
+    ];
+
+    worksheet.addTable({
+      name: "UsuariosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: listaUsuarios,
+    });
+
+
+    const numeroFilas = listaUsuarios.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 12; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "UsuariosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **
