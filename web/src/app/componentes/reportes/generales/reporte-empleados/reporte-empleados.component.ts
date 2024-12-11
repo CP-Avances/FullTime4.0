@@ -7,6 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -25,6 +27,18 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
@@ -143,6 +157,29 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy() {
@@ -272,7 +309,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.data_pdf = seleccionados;
     switch (accion) {
-      case 'excel': this.ExportarExcel(); break;
+      case 'excel': this.generarExcel(); break;
       case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
@@ -487,46 +524,137 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
-
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xls`);
-  }
-
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let usuarios: any[] = [];
-    let c = 0;
-    array.forEach((empl) => {
-      empl.empleados.forEach((usu: any) => {
-        let ele = {
-          'Cédula': usu.cedula,
-          'Código': usu.codigo,
-          'Apellido': usu.apellido,
-          'Nombre': usu.nombre,
-          'Género': usu.genero == 1 ? 'M' : 'F',
-          'Ciudad': usu.ciudad,
-          'Sucursal': usu.sucursal,
-          'Régimen': usu.regimen,
-          'Departamento': usu.departamento,
-          'Cargo': usu.cargo,
-          'Correo': usu.correo,
-        }
-        nuevo.push(ele)
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+    this.data_pdf.forEach((empl) => {
+      empl.empleados.map((usu: any) => {
+        datos.push([
+          n++,
+          usu.cedula,
+          usu.codigo,
+          usu.apellido,
+          usu.nombre,
+          usu.genero == 1 ? 'M' : 'F',
+          usu.ciudad,
+          usu.sucursal,
+          usu.regimen,
+          usu.departamento,
+          usu.cargo,
+          usu.correo,
+        ])
       })
     });
-    nuevo.sort(function (a: any, b: any) {
-      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
-    });
-    nuevo.forEach((u: any) => {
-      c = c + 1;
-      const usuarioNuevo = Object.assign({ 'N°': c }, u);
-      usuarios.push(usuarioNuevo);
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Usuarios");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
     });
 
-    return usuarios;
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = 'Lista de Usuarios';
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apellido", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "correo", width: 35 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "UsuariosexcelTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 12; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob,`Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **

@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { RelojesComponent } from 'src/app/componentes/timbres/dispositivos/relojes/relojes.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
@@ -30,6 +31,17 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 })
 
 export class ListarRelojesComponent implements OnInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -103,6 +115,29 @@ export class ListarRelojesComponent implements OnInit {
     this.ObtenerColores();
     this.ObtenerReloj();
     this.ObtenerLogo();
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -414,7 +449,7 @@ export class ListarRelojesComponent implements OnInit {
         });
       }
       else {
-        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos (' + this.listaDispositivosCorrectos.length+ ').', 'Permitido ingresar solo ' + this.totalDispositivos + ' dispositivos.', {
+        this.toastr.info('En la plantilla se ha excedido el límite máximo de dispositivos (' + this.listaDispositivosCorrectos.length + ').', 'Permitido ingresar solo ' + this.totalDispositivos + ' dispositivos.', {
           timeOut: 4000,
         });
       }
@@ -516,11 +551,11 @@ export class ListarRelojesComponent implements OnInit {
               ...this.relojes.map((obj: any) => {
                 return [
                   { text: obj.codigo, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable'},
+                  { text: obj.nomempresa, style: 'itemsTable' },
                   { text: obj.nomciudad, style: 'itemsTable' },
-                  { text: obj.nomsucursal, style: 'itemsTable'},
+                  { text: obj.nomsucursal, style: 'itemsTable' },
                   { text: obj.nomdepar, style: 'itemsTable' },
-                  { text: obj.nombre, style: 'itemsTable'},
+                  { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.ip, style: 'itemsTableC' },
                   { text: obj.puerto, style: 'itemsTableC' },
                   { text: obj.marca, style: 'itemsTable' },
@@ -550,12 +585,168 @@ export class ListarRelojesComponent implements OnInit {
    ** **                              GENERACION DE EXCEL                            ** **
    ** ********************************************************************************* **/
 
-  exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.relojes);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'relojes');
-    xlsx.writeFile(wb, "RelojesEXCEL" + new Date().getTime() + '.xlsx');
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.relojes.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.codigo,
+        obj.nombre,
+        obj.ip,
+        obj.puerto,
+        obj.contrasenia,
+        obj.marca,
+        obj.modelo,
+        obj.serie,
+        obj.id_fabricacion,
+        obj.fabricante,
+        obj.mac,
+        obj.tipo_conexion,
+        obj.id_sucursal,
+        obj.id_departamento,
+        obj.nomdepar,
+        obj.nomciudad,
+        obj.temperatura,
+        obj.zona_horaria_dispositivo,
+        obj.formato_gmt_dispositivo,
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Relojes");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = 'Lista de Relojes';
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "id", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "ip", width: 20 },
+      { key: "puerto", width: 20 },
+      { key: "contrasenia", width: 20 },
+      { key: "marca", width: 20 },
+      { key: "modelo", width: 20 },
+      { key: "serie", width: 20 },
+      { key: "id_fabricacion", width: 20 },
+      { key: "fabricante", width: 20 },
+      { key: "mac", width: 20 },
+      { key: "tipo_conexion", width: 20 },
+      { key: "id_sucursal", width: 20 },
+      { key: "id_departamento", width: 20 },
+      { key: "nomdepar", width: 20 },
+      { key: "nomciudad", width: 20 },
+      { key: "temperatura", width: 20 },
+      { key: "zona_horaria_dispositivo", width: 30 },
+      { key: "formato_gmt_dispositivo", width: 30 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "ID", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CODIGO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "IP", totalsRowLabel: "", filterButton: true },
+      { name: "PUERTO", totalsRowLabel: "", filterButton: true },
+      { name: "CONTRASEÑA", totalsRowLabel: "", filterButton: true },
+      { name: "MARCA", totalsRowLabel: "", filterButton: true },
+      { name: "MODELO", totalsRowLabel: "", filterButton: true },
+      { name: "SERIE", totalsRowLabel: "", filterButton: true },
+      { name: "ID_FABRICACION", totalsRowLabel: "", filterButton: true },
+      { name: "FABRICANTE", totalsRowLabel: "", filterButton: true },
+      { name: "MAC", totalsRowLabel: "", filterButton: true },
+      { name: "TIPO CONEXION", totalsRowLabel: "", filterButton: true },
+      { name: "ID SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "ID DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "TEMPERATURA", totalsRowLabel: "", filterButton: true },
+      { name: "ZONA HORARIA DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+      { name: "FORMATO GMT DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "CoordenadasTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 21; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "RelojesEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
 
   /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **

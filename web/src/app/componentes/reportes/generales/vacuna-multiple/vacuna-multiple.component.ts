@@ -7,7 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
 import * as xlsx from 'xlsx';
-
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
@@ -26,7 +27,17 @@ import { environment } from 'src/environments/environment';
 })
 
 export class VacunaMultipleComponent implements OnInit, OnDestroy {
+  private imagen: any;
 
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
     return this.reporteService.criteriosBusqueda;
@@ -147,6 +158,29 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+    
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy() {
@@ -308,7 +342,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.ExportarExcel();
+            this.generarExcel();
             break;
           case 'ver':
             this.VerDatos();
@@ -645,6 +679,150 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     });
 
     return nuevo;
+  }
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+    this.data_pdf.forEach((selec) => {
+      selec.empleados.map((empl: any) => {
+        empl.vacunas.map((vac: any) => {
+          datos.push([
+            n++,
+            empl.cedula,
+            empl.codigo,
+            empl.apellido + ' ' + empl.nombre,
+            empl.genero == 1 ? 'M' : 'F',
+            empl.ciudad,
+            empl.sucursal,
+            empl.regimen,
+            empl.departamento,
+            empl.cargo,
+            empl.correo,
+            vac.carnet?.length ? 'Si' : 'No',
+            vac.tipo_vacuna,
+            vac.fecha.split('T')[0],
+            vac.descripcion,
+          ])
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Vacunas");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B2").value = 'Lista de Vacunas';
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "correo", width: 35 },
+      { key: "carnet", width: 20 },
+      { key: "tipo_vacuna", width: 20 },
+      { key: "fecha", width: 20 },
+      { key: "descripcion", width: 20 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+      { name: "CARNET", totalsRowLabel: "", filterButton: true },
+      { name: "TIPO VACUNA", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA", totalsRowLabel: "", filterButton: true },
+      { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "VacunasReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 15; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **
