@@ -19,7 +19,7 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class HorarioControlador {
     // REGISTRAR HORARIO    **USADO
     CrearHorario(req, res) {
@@ -655,7 +655,8 @@ class HorarioControlador {
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 rutaPlantilla = ruta;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
                 let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
                 if (verificador_horario === false) {
@@ -669,9 +670,37 @@ class HorarioControlador {
                     res.status(404).jsonp({ mensaje });
                 }
                 else if (verificador_horario != false && verificador_detalle != false) {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
-                    let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const sheetHorarios = workbook.getWorksheet(sheet_name_list[verificador_horario]);
+                    const sheetDetalles = workbook.getWorksheet(sheet_name_list[verificador_detalle]);
+                    if (!sheetHorarios || !sheetDetalles) {
+                        const mensaje = 'No se encontraron las hojas requeridas';
+                        EliminarPlantilla(ruta);
+                        return res.status(404).json({ mensaje });
+                    }
+                    // CONVERTIR HOJAS A JSON
+                    const plantillaHorarios = [];
+                    sheetHorarios.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                        if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                            const rowData = {};
+                            row.eachCell((cell, colIndex) => {
+                                const header = sheetHorarios.getRow(1).getCell(colIndex).text.trim();
+                                rowData[header] = cell.text.trim();
+                            });
+                            plantillaHorarios.push(rowData);
+                        }
+                    });
+                    const plantillaDetalles = [];
+                    sheetDetalles.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                        if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                            const rowData = {};
+                            row.eachCell((cell, colIndex) => {
+                                const header = sheetDetalles.getRow(1).getCell(colIndex).text.trim();
+                                rowData[header] = cell.text.trim();
+                            });
+                            plantillaDetalles.push(rowData);
+                        }
+                    });
                     let codigos = [];
                     for (const [index, data] of plantillaHorarios.entries()) {
                         let { CODIGO_HORARIO, MINUTOS_ALIMENTACION, HORARIO_NOCTURNO } = data;

@@ -6,7 +6,7 @@ import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class HorarioControlador {
 
@@ -605,7 +605,7 @@ class HorarioControlador {
 
           } catch (error) {
             // REVERTIR TRANSACCION
-            console.log("ver error al insertar solo el horario: ", error )
+            console.log("ver error al insertar solo el horario: ", error)
             await pool.query('ROLLBACK');
             horariosCargados = false;
           }
@@ -670,7 +670,7 @@ class HorarioControlador {
             console.log("ver codigosHorariosCargados: ", codigosHorariosCargados)
             // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
             const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
-            console.log("verID_HORARIO ", ID_HORARIO );
+            console.log("verID_HORARIO ", ID_HORARIO);
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -719,7 +719,7 @@ class HorarioControlador {
       }
 
     } catch (error) {
-      console.log("ver error horarios: ",  error)
+      console.log("ver error horarios: ", error)
       return res.status(500).jsonp({ message: 'error' });
     }
   }
@@ -732,8 +732,8 @@ class HorarioControlador {
       let separador = path.sep;
       let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
       rutaPlantilla = ruta;
-      const workbook = excel.readFile(ruta);
-
+      const workbook = new Excel.Workbook();
+      await workbook.xlsx.readFile(ruta);
       let verificador_horario: any = ObtenerIndicePlantilla(workbook, 'HORARIOS');
       let verificador_detalle: any = ObtenerIndicePlantilla(workbook, 'DETALLE_HORARIOS');
 
@@ -748,9 +748,41 @@ class HorarioControlador {
         res.status(404).jsonp({ mensaje });
       }
       else if (verificador_horario != false && verificador_detalle != false) {
-        const sheet_name_list = workbook.SheetNames;
-        const plantillaHorarios: Horario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
-        let plantillaDetalles: DetalleHorario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
+        const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+        const sheetHorarios = workbook.getWorksheet(sheet_name_list[verificador_horario]);
+        const sheetDetalles = workbook.getWorksheet(sheet_name_list[verificador_detalle]);
+
+        if (!sheetHorarios || !sheetDetalles) {
+          const mensaje = 'No se encontraron las hojas requeridas';
+          EliminarPlantilla(ruta);
+          return res.status(404).json({ mensaje });
+        }
+
+        // CONVERTIR HOJAS A JSON
+        const plantillaHorarios: any[] = [];
+        sheetHorarios.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+          if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+            const rowData: any = {};
+            row.eachCell((cell, colIndex) => {
+              const header = sheetHorarios.getRow(1).getCell(colIndex).text.trim();
+              rowData[header] = cell.text.trim();
+            });
+            plantillaHorarios.push(rowData);
+          }
+        });
+
+        const plantillaDetalles: any[] = [];
+        sheetDetalles.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+          if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+            const rowData: any = {};
+            row.eachCell((cell, colIndex) => {
+              const header = sheetDetalles.getRow(1).getCell(colIndex).text.trim();
+              rowData[header] = cell.text.trim();
+            });
+            plantillaDetalles.push(rowData);
+          }
+        });
+
 
         let codigos: string[] = [];
 

@@ -5,7 +5,7 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class VacunaControlador {
 
@@ -227,60 +227,72 @@ class VacunaControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_VACUNA');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
-
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     vacuna: '',
                     observacion: ''
                 };
-
                 var listaVacunas: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any) => {
-                    var { ITEM, VACUNA } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (VACUNA != undefined && VACUNA != '')) {
-                        data.fila = ITEM;
-                        data.vacuna = VACUNA;
-                        data.observacion = 'no registrada';
-
-                        listaVacunas.push(data);
-
-                    } else {
-                        data.fila = ITEM;
-                        data.vacuna = VACUNA;
-                        data.observacion = 'no registrada';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (VACUNA == undefined) {
-                            data.vacuna = 'No registrado';
-                            data.observacion = 'Vacuna ' + data.observacion;
-                        }
-
-                        listaVacunas.push(data);
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['VACUNA']
+                    ) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const VACUNA = row.getCell(headers['VACUNA']).value;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (VACUNA != undefined && VACUNA != '')) {
+                            data.fila = ITEM;
+                            data.vacuna = VACUNA;
+                            data.observacion = 'no registrada';
 
-                    data = {};
+                            listaVacunas.push(data);
 
-                });
+                        } else {
+                            data.fila = ITEM;
+                            data.vacuna = VACUNA;
+                            data.observacion = 'no registrada';
 
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (VACUNA == undefined) {
+                                data.vacuna = 'No registrado';
+                                data.observacion = 'Vacuna ' + data.observacion;
+                            }
+
+                            listaVacunas.push(data);
+                        }
+                        data = {};
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -289,7 +301,6 @@ class VacunaControlador {
                         fs.unlinkSync(ruta);
                     }
                 });
-
                 // VALIDACINES DE LOS DATOS DE LA PLANTILLA
                 listaVacunas.forEach(async (item: any) => {
                     if (item.observacion == 'no registrada') {

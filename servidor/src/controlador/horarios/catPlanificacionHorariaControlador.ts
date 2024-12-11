@@ -3,7 +3,7 @@ import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 import AUDITORIA_CONTROLADOR from "../reportes/auditoriaControlador";
 import path from 'path';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 import pool from '../../database';
 import fs from 'fs';
 import { DateTime } from "luxon";
@@ -18,10 +18,30 @@ class PlanificacionHorariaControlador {
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
             rutaPlantilla = ruta;
-            const workbook = excel.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantillaPlanificacionHoraria: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            const plantillaPlanificacionHorariaHeaders: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
+
+            const worksheet = workbook.worksheets[0];
+            const plantillaPlanificacionHoraria: any = [];
+
+            worksheet.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                    const rowData: any = {};
+                    row.eachCell((cell, colIndex) => {
+                        const header = worksheet.getRow(1).getCell(colIndex).text.trim();
+                        rowData[header] = cell.text.trim();
+                    });
+                    plantillaPlanificacionHoraria.push(rowData);
+                }
+            });
+
+            // OBTENER LOS ENCABEZADOS, ASEGURANDOSE DE QUE LA PRIMERA FILA EXISTA
+            const primeraFila = worksheet.getRow(1);
+            let plantillaPlanificacionHorariaHeaders: any;
+
+            if (primeraFila && Array.isArray(primeraFila.values)) {
+                plantillaPlanificacionHorariaHeaders = [primeraFila.values.slice(1)];
+            }
 
             // OBTENER FECHA DE LA PLANTILLA
             const terceraColumna = plantillaPlanificacionHorariaHeaders[0][2];
@@ -35,7 +55,6 @@ class PlanificacionHorariaControlador {
             let fechaFormateada: string = `${dia}/${mes}/${ano}`;
             let fechaInicial: string;
             let fechaFinal: string;
-
 
             try {
                 let fechaEntrada = DateTime.fromFormat(fechaFormateada, 'dd/MM/yyyy', { zone: 'utc' });
@@ -465,7 +484,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
 
             // VERIFICAR SI LA EL DIAS[DIA] ES FERIADO
             let esFeriado = feriados ? feriados.find((feriado: any) => feriado.fecha === dia) : false;
-            dias[dia].feriado = esFeriado? true : false;
+            dias[dia].feriado = esFeriado ? true : false;
 
             for (let i = 0; i < horarios.length; i++) {
                 const horario = horarios[i];
@@ -642,11 +661,11 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                         delete dias[horario1.dia];
                         break;
                     }
-                
+
                     if (horario2.codigo === 'DEFAULT-LIBRE' || horario2.codigo === 'DEFAULT-FERIADO') {
                         continue;
                     }
-                
+
                     if (dias[horario1.dia].feriado && (horario2.tipo_dia === 'N' || horario2.tipo_dia === 'L') && horario1.dia === horario2.dia) {
                         dias[horario1.dia].observacion6 = `Existe una planificación que no corresponde para un día feriado`;
                         dias[horario1.dia].eliminarPlanificacionExistente = true;
@@ -1024,10 +1043,10 @@ function EliminarPlantilla(ruta: string) {
         if (err) {
         }
         else {
-          // ELIMINAR DEL SERVIDOR
-          fs.unlinkSync(ruta);
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(ruta);
         }
-      });
+    });
 }
 
 interface DatosVerificacionHorarios {

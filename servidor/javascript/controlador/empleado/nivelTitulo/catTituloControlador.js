@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TITULO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -184,14 +184,15 @@ class TituloControlador {
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-            const workbook = xlsx_1.default.readFile(ruta);
+            const workbook = new exceljs_1.default.Workbook();
+            yield workbook.xlsx.readFile(ruta);
             let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TITULOS');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data = {
                     fila: '',
                     titulo: '',
@@ -201,80 +202,104 @@ class TituloControlador {
                 var listTitulosProfesionales = [];
                 var duplicados = [];
                 var mensaje = 'correcto';
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                    var { NOMBRE, NIVEL } = dato;
-                    data.fila = dato.ITEM;
-                    data.titulo = dato.NOMBRE;
-                    data.nivel = dato.NIVEL;
-                    if ((data.fila != undefined && data.fila != '') &&
-                        (data.titulo != undefined && data.titulo != '') &&
-                        (data.nivel != undefined && data.nivel != '')) {
-                        // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-                        const existe_nivel = yield database_1.default.query(`
-            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-            `, [NIVEL]);
-                        var id_nivel = existe_nivel.rows[0];
-                        if (id_nivel != undefined && id_nivel != '') {
-                            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
-                            const VERIFICAR_Titulos = yield database_1.default.query(`
-              SELECT * FROM et_titulos
-              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
-              `, [NOMBRE, id_nivel.id]);
-                            if (VERIFICAR_Titulos.rowCount == 0) {
-                                data.fila = dato.ITEM;
-                                data.titulo = dato.NOMBRE;
-                                data.nivel = dato.NIVEL;
-                                if (duplicados.find((p) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
-                                    p.NIVEL.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
-                                    data.observacion = 'ok';
-                                    duplicados.push(dato);
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['NIVEL']) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                    }
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => __awaiter(this, void 0, void 0, function* () {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1)
+                            return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const NOMBRE = row.getCell(headers['NOMBRE']).value;
+                        const NIVEL = row.getCell(headers['NIVEL']).value;
+                        const dato = {
+                            ITEM: ITEM,
+                            NOMBRE: NOMBRE,
+                            NIVEL: NIVEL,
+                        };
+                        data.fila = ITEM;
+                        data.titulo = NOMBRE;
+                        data.nivel = NIVEL;
+                        if ((data.fila != undefined && data.fila != '') &&
+                            (data.titulo != undefined && data.titulo != '') &&
+                            (data.nivel != undefined && data.nivel != '')) {
+                            // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
+                            const existe_nivel = yield database_1.default.query(`
+              SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+              `, [NIVEL]);
+                            var id_nivel = existe_nivel.rows[0];
+                            if (id_nivel != undefined && id_nivel != '') {
+                                // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
+                                const VERIFICAR_Titulos = yield database_1.default.query(`
+                SELECT * FROM et_titulos
+                WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
+                `, [NOMBRE, id_nivel.id]);
+                                if (VERIFICAR_Titulos.rowCount == 0) {
+                                    data.fila = ITEM;
+                                    data.titulo = NOMBRE;
+                                    data.nivel = NIVEL;
+                                    if (duplicados.find((p) => p.NOMBRE.toLowerCase() === data.titulo.toLowerCase() &&
+                                        p.NIVEL.toLowerCase() === data.nivel.toLowerCase()) == undefined) {
+                                        data.observacion = 'ok';
+                                        duplicados.push(dato);
+                                    }
+                                    listTitulosProfesionales.push(data);
                                 }
-                                listTitulosProfesionales.push(data);
+                                else {
+                                    data.fila = ITEM;
+                                    data.titulo = NOMBRE;
+                                    data.nivel = NIVEL;
+                                    data.observacion = 'Ya existe en el sistema';
+                                    listTitulosProfesionales.push(data);
+                                }
                             }
                             else {
-                                data.fila = dato.ITEM;
+                                data.fila = ITEM;
                                 data.titulo = NOMBRE;
                                 data.nivel = NIVEL;
-                                data.observacion = 'Ya existe en el sistema';
+                                if (data.nivel == '' || data.nivel == undefined) {
+                                    data.nivel = 'No registrado';
+                                    data.observacion = 'Nivel no registrado';
+                                }
+                                data.observacion = 'Nivel no existe en el sistema';
                                 listTitulosProfesionales.push(data);
                             }
                         }
                         else {
-                            data.fila = dato.ITEM;
-                            data.titulo = dato.NOMBRE;
-                            data.nivel = dato.NIVEL;
+                            data.fila = ITEM;
+                            data.titulo = NOMBRE;
+                            data.nivel = NIVEL;
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error';
+                            }
+                            if (data.titulo == '' || data.titulo == undefined) {
+                                data.titulo = 'No registrado';
+                                data.observacion = 'Título no registrado';
+                            }
                             if (data.nivel == '' || data.nivel == undefined) {
                                 data.nivel = 'No registrado';
                                 data.observacion = 'Nivel no registrado';
                             }
-                            data.observacion = 'Nivel no existe en el sistema';
+                            if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
+                                data.observacion = 'Título y Nivel no registrado';
+                            }
                             listTitulosProfesionales.push(data);
                         }
-                    }
-                    else {
-                        data.fila = dato.ITEM;
-                        data.titulo = dato.NOMBRE;
-                        data.nivel = dato.NIVEL;
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error';
-                        }
-                        if (data.titulo == '' || data.titulo == undefined) {
-                            data.titulo = 'No registrado';
-                            data.observacion = 'Título no registrado';
-                        }
-                        if (data.nivel == '' || data.nivel == undefined) {
-                            data.nivel = 'No registrado';
-                            data.observacion = 'Nivel no registrado';
-                        }
-                        if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
-                            data.observacion = 'Título y Nivel no registrado';
-                        }
-                        listTitulosProfesionales.push(data);
-                    }
-                    data = {};
-                }));
+                        data = {};
+                    }));
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {

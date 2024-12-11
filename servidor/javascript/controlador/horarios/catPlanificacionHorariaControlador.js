@@ -17,7 +17,7 @@ const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
 const luxon_1 = require("luxon");
@@ -32,10 +32,26 @@ class PlanificacionHorariaControlador {
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 rutaPlantilla = ruta;
-                const workbook = xlsx_1.default.readFile(ruta);
-                const sheet_name_list = workbook.SheetNames;
-                const plantillaPlanificacionHoraria = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                const plantillaPlanificacionHorariaHeaders = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
+                const worksheet = workbook.worksheets[0];
+                const plantillaPlanificacionHoraria = [];
+                worksheet.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                    if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                        const rowData = {};
+                        row.eachCell((cell, colIndex) => {
+                            const header = worksheet.getRow(1).getCell(colIndex).text.trim();
+                            rowData[header] = cell.text.trim();
+                        });
+                        plantillaPlanificacionHoraria.push(rowData);
+                    }
+                });
+                // OBTENER LOS ENCABEZADOS, ASEGURANDOSE DE QUE LA PRIMERA FILA EXISTA
+                const primeraFila = worksheet.getRow(1);
+                let plantillaPlanificacionHorariaHeaders;
+                if (primeraFila && Array.isArray(primeraFila.values)) {
+                    plantillaPlanificacionHorariaHeaders = [primeraFila.values.slice(1)];
+                }
                 // OBTENER FECHA DE LA PLANTILLA
                 const terceraColumna = plantillaPlanificacionHorariaHeaders[0][2];
                 if (!terceraColumna) {

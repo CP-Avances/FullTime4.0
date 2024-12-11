@@ -17,7 +17,7 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class RelojesControlador {
     // METODO PARA BUSCAR DISPOSITIVOS    **USADO
     ListarRelojes(req, res) {
@@ -292,14 +292,15 @@ class RelojesControlador {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'BIOMETRICOS');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
                 else {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantilla_dispositivos = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla_dispositivos = workbook.getWorksheet(sheet_name_list[verificador]);
                     let data = {
                         fila: '',
                         establecimiento: '',
@@ -332,189 +333,226 @@ class RelojesControlador {
                     const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
                     // EXPRECION REGULAR PARA VALIDAR EL FORMATO DE SOLO NUMEROS.
                     const regex = /^[0-9]+$/;
-                    // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla_dispositivos.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO, CODIGO, DIRECCION_IP, PUERTO, TIPO_CONEXION, TEMPERATURA, MARCA, MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA, ZONA_HORARIA } = dato;
-                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
-                            (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
-                            (CODIGO != undefined && CODIGO != '') && (DIRECCION_IP != undefined && DIRECCION_IP != '') &&
-                            (PUERTO != undefined && PUERTO != '') && (TIPO_CONEXION != undefined && TIPO_CONEXION != '') &&
-                            (TEMPERATURA != undefined && TEMPERATURA != '') && (MARCA != undefined && MARCA != '') &&
-                            (MODELO != undefined && MODELO != '') && (ID_FABRICANTE != undefined && ID_FABRICANTE != '') &&
-                            (FABRICANTE != undefined && FABRICANTE != '') && (NUMERO_SERIE != undefined && NUMERO_SERIE != '') &&
-                            (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '') &&
-                            (ZONA_HORARIA != undefined && ZONA_HORARIA != '')) {
-                            data.fila = ITEM;
-                            data.establecimiento = ESTABLECIMIENTO;
-                            data.departamento = DEPARTAMENTO;
-                            data.nombre_dispo = NOMBRE_DISPOSITIVO;
-                            data.codigo = CODIGO;
-                            data.direccion_ip = DIRECCION_IP;
-                            data.puerto = PUERTO;
-                            data.tipo_conexion = TIPO_CONEXION;
-                            data.temperatura = TEMPERATURA;
-                            data.marca = MARCA;
-                            data.modelo = MODELO;
-                            data.id_fabricante = ID_FABRICANTE;
-                            data.fabricante = FABRICANTE;
-                            data.numero_serie = NUMERO_SERIE;
-                            data.direccion_mac = DIRECCION_MAC;
-                            data.contrasena = CONTRASENA;
-                            data.zona_horaria = ZONA_HORARIA;
-                            data.observacion = 'no registrado';
-                            // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
-                            if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
-                                // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
-                                if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
-                                    // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
-                                    if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
-                                        // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
-                                        if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
-                                            duplicados3.push(data);
+                    if (plantilla_dispositivos) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla_dispositivos.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['ESTABLECIMIENTO'] || !headers['DEPARTAMENTO'] ||
+                            !headers['NOMBRE_DISPOSITIVO'] || !headers['CODIGO'] || !headers['DIRECCION_IP'] ||
+                            !headers['PUERTO'] || !headers['TIPO_CONEXION'] || !headers['TEMPERATURA'] ||
+                            !headers['MARCA'] || !headers['MODELO'] || !headers['ID_FABRICANTE'] ||
+                            !headers['FABRICANTE'] || !headers['NUMERO_SERIE'] || !headers['DIRECCION_MAC'] ||
+                            !headers['CONTRASENA'] || !headers['ZONA_HORARIA']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                        }
+                        plantilla_dispositivos.eachRow((row, rowNumber) => {
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const ESTABLECIMIENTO = row.getCell(headers['ESTABLECIMIENTO']).value;
+                            const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
+                            const NOMBRE_DISPOSITIVO = row.getCell(headers['NOMBRE_DISPOSITIVO']).value;
+                            const CODIGO = row.getCell(headers['CODIGO']).value;
+                            const DIRECCION_IP = row.getCell(headers['DIRECCION_IP']).value;
+                            const PUERTO = row.getCell(headers['PUERTO']).value;
+                            const TIPO_CONEXION = row.getCell(headers['TIPO_CONEXION']).value;
+                            const TEMPERATURA = row.getCell(headers['TEMPERATURA']).value;
+                            const MARCA = row.getCell(headers['MARCA']).value;
+                            const MODELO = row.getCell(headers['MODELO']).value;
+                            const ID_FABRICANTE = row.getCell(headers['ID_FABRICANTE']).value;
+                            const FABRICANTE = row.getCell(headers['FABRICANTE']).value;
+                            const NUMERO_SERIE = row.getCell(headers['NUMERO_SERIE']).value;
+                            const DIRECCION_MAC = row.getCell(headers['DIRECCION_MAC']).value;
+                            const CONTRASENA = row.getCell(headers['CONTRASENA']).value;
+                            const ZONA_HORARIA = row.getCell(headers['ZONA_HORARIA']).value;
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
+                                (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
+                                (CODIGO != undefined && CODIGO != '') && (DIRECCION_IP != undefined && DIRECCION_IP != '') &&
+                                (PUERTO != undefined && PUERTO != '') && (TIPO_CONEXION != undefined && TIPO_CONEXION != '') &&
+                                (TEMPERATURA != undefined && TEMPERATURA != '') && (MARCA != undefined && MARCA != '') &&
+                                (MODELO != undefined && MODELO != '') && (ID_FABRICANTE != undefined && ID_FABRICANTE != '') &&
+                                (FABRICANTE != undefined && FABRICANTE != '') && (NUMERO_SERIE != undefined && NUMERO_SERIE != '') &&
+                                (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '') &&
+                                (ZONA_HORARIA != undefined && ZONA_HORARIA != '')) {
+                                data.fila = ITEM;
+                                data.establecimiento = ESTABLECIMIENTO;
+                                data.departamento = DEPARTAMENTO;
+                                data.nombre_dispo = NOMBRE_DISPOSITIVO;
+                                data.codigo = CODIGO;
+                                data.direccion_ip = DIRECCION_IP;
+                                data.puerto = PUERTO;
+                                data.tipo_conexion = TIPO_CONEXION;
+                                data.temperatura = TEMPERATURA;
+                                data.marca = MARCA;
+                                data.modelo = MODELO;
+                                data.id_fabricante = ID_FABRICANTE;
+                                data.fabricante = FABRICANTE;
+                                data.numero_serie = NUMERO_SERIE;
+                                data.direccion_mac = DIRECCION_MAC;
+                                data.contrasena = CONTRASENA;
+                                data.zona_horaria = ZONA_HORARIA;
+                                data.observacion = 'no registrado';
+                                // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
+                                if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
+                                    if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
+                                        // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                        if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
+                                            // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
+                                            if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
+                                                duplicados3.push(data);
+                                            }
+                                            else {
+                                                data.observacion = '4';
+                                            }
+                                            duplicados2.push(data);
                                         }
                                         else {
-                                            data.observacion = '4';
+                                            data.observacion = '3';
                                         }
-                                        duplicados2.push(data);
+                                        duplicados1.push(data);
                                     }
                                     else {
-                                        data.observacion = '3';
+                                        data.observacion = '2';
                                     }
-                                    duplicados1.push(data);
+                                    duplicados.push(data);
                                 }
                                 else {
-                                    data.observacion = '2';
+                                    data.observacion = '1';
                                 }
-                                duplicados.push(data);
+                                listDispositivos.push(data);
                             }
                             else {
-                                data.observacion = '1';
-                            }
-                            listDispositivos.push(data);
-                        }
-                        else {
-                            data.fila = ITEM;
-                            data.establecimiento = ESTABLECIMIENTO;
-                            data.departamento = DEPARTAMENTO;
-                            data.nombre_dispo = NOMBRE_DISPOSITIVO;
-                            data.codigo = CODIGO;
-                            data.direccion_ip = DIRECCION_IP;
-                            data.puerto = PUERTO;
-                            data.tipo_conexion = TIPO_CONEXION;
-                            data.temperatura = TEMPERATURA;
-                            data.marca = MARCA;
-                            data.modelo = MODELO;
-                            data.id_fabricante = ID_FABRICANTE;
-                            data.fabricante = FABRICANTE;
-                            data.numero_serie = NUMERO_SERIE;
-                            data.direccion_mac = DIRECCION_MAC;
-                            data.contrasena = CONTRASENA;
-                            data.zona_horaria = ZONA_HORARIA;
-                            data.observacion = 'no registrado';
-                            if (data.fila == '' || data.fila == undefined) {
-                                data.fila = 'error';
-                                mensaje = 'error';
-                            }
-                            if (ESTABLECIMIENTO == undefined) {
-                                data.establecimiento = 'No registrado';
-                                data.observacion = 'Sucursal no registrado';
-                            }
-                            if (DEPARTAMENTO == undefined) {
-                                data.departamento = 'No registrado';
-                                data.observacion = 'Departamento no registrado';
-                            }
-                            if (NOMBRE_DISPOSITIVO == undefined) {
-                                data.nombre_dispo = 'No registrado';
-                                data.observacion = 'Nombre dispositivo no registrado';
-                            }
-                            if (CODIGO == undefined) {
-                                data.codigo = 'No registrado';
-                                data.observacion = 'Código no registrado';
-                            }
-                            if (DIRECCION_IP == undefined) {
-                                data.direccion_ip = 'No registrado';
-                                data.observacion = 'Dirección IP no registrado';
-                            }
-                            if (PUERTO == undefined) {
-                                data.puerto = 'No registrado';
-                                data.observacion = 'Puerto no registrado';
-                            }
-                            if (TIPO_CONEXION == undefined) {
-                                data.tipo_conexion = 'No registrado';
-                                data.observacion = 'Tipo conexión no registrado';
-                            }
-                            if (TEMPERATURA == undefined) {
-                                data.temperatura = 'No registrado';
-                                data.observacion = 'Función temperatura no registrado';
-                            }
-                            if (MARCA == undefined) {
-                                data.marca = 'No registrado';
-                                data.observacion = 'Marca no registrado';
-                            }
-                            if (MODELO == undefined) {
-                                data.modelo = ' - ';
-                            }
-                            if (ID_FABRICANTE == undefined) {
-                                data.id_fabricante = ' - ';
-                            }
-                            if (FABRICANTE == undefined) {
-                                data.fabricante = ' - ';
-                            }
-                            if (NUMERO_SERIE == undefined) {
-                                data.numero_serie = 'No registrado';
-                                data.observacion = 'Número de serie no registrado';
-                            }
-                            if (DIRECCION_MAC == undefined) {
-                                data.direccion_mac = ' - ';
-                            }
-                            if (CONTRASENA == undefined) {
-                                data.contrasena = ' - ';
-                            }
-                            if (ZONA_HORARIA == undefined) {
-                                data.zona_horaria = 'No registrado';
-                                data.observacion = 'Zona horaria no registrada';
-                            }
-                            if (data.observacion == 'no registrado') {
-                                if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
-                                    // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
-                                    if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
-                                        // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
-                                        if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
-                                            if (data.numero_serie != ' - ') {
-                                                // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
-                                                if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
-                                                    duplicados2.push(data);
+                                data.fila = ITEM;
+                                data.establecimiento = ESTABLECIMIENTO;
+                                data.departamento = DEPARTAMENTO;
+                                data.nombre_dispo = NOMBRE_DISPOSITIVO;
+                                data.codigo = CODIGO;
+                                data.direccion_ip = DIRECCION_IP;
+                                data.puerto = PUERTO;
+                                data.tipo_conexion = TIPO_CONEXION;
+                                data.temperatura = TEMPERATURA;
+                                data.marca = MARCA;
+                                data.modelo = MODELO;
+                                data.id_fabricante = ID_FABRICANTE;
+                                data.fabricante = FABRICANTE;
+                                data.numero_serie = NUMERO_SERIE;
+                                data.direccion_mac = DIRECCION_MAC;
+                                data.contrasena = CONTRASENA;
+                                data.zona_horaria = ZONA_HORARIA;
+                                data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (ESTABLECIMIENTO == undefined) {
+                                    data.establecimiento = 'No registrado';
+                                    data.observacion = 'Sucursal no registrado';
+                                }
+                                if (DEPARTAMENTO == undefined) {
+                                    data.departamento = 'No registrado';
+                                    data.observacion = 'Departamento no registrado';
+                                }
+                                if (NOMBRE_DISPOSITIVO == undefined) {
+                                    data.nombre_dispo = 'No registrado';
+                                    data.observacion = 'Nombre dispositivo no registrado';
+                                }
+                                if (CODIGO == undefined) {
+                                    data.codigo = 'No registrado';
+                                    data.observacion = 'Código no registrado';
+                                }
+                                if (DIRECCION_IP == undefined) {
+                                    data.direccion_ip = 'No registrado';
+                                    data.observacion = 'Dirección IP no registrado';
+                                }
+                                if (PUERTO == undefined) {
+                                    data.puerto = 'No registrado';
+                                    data.observacion = 'Puerto no registrado';
+                                }
+                                if (TIPO_CONEXION == undefined) {
+                                    data.tipo_conexion = 'No registrado';
+                                    data.observacion = 'Tipo conexión no registrado';
+                                }
+                                if (TEMPERATURA == undefined) {
+                                    data.temperatura = 'No registrado';
+                                    data.observacion = 'Función temperatura no registrado';
+                                }
+                                if (MARCA == undefined) {
+                                    data.marca = 'No registrado';
+                                    data.observacion = 'Marca no registrado';
+                                }
+                                if (MODELO == undefined) {
+                                    data.modelo = ' - ';
+                                }
+                                if (ID_FABRICANTE == undefined) {
+                                    data.id_fabricante = ' - ';
+                                }
+                                if (FABRICANTE == undefined) {
+                                    data.fabricante = ' - ';
+                                }
+                                if (NUMERO_SERIE == undefined) {
+                                    data.numero_serie = 'No registrado';
+                                    data.observacion = 'Número de serie no registrado';
+                                }
+                                if (DIRECCION_MAC == undefined) {
+                                    data.direccion_mac = ' - ';
+                                }
+                                if (CONTRASENA == undefined) {
+                                    data.contrasena = ' - ';
+                                }
+                                if (ZONA_HORARIA == undefined) {
+                                    data.zona_horaria = 'No registrado';
+                                    data.observacion = 'Zona horaria no registrada';
+                                }
+                                if (data.observacion == 'no registrado') {
+                                    if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
+                                        // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
+                                        if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
+                                            // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION IP
+                                            if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
+                                                if (data.numero_serie != ' - ') {
+                                                    // DISCRIMINACION DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                                    if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
+                                                        duplicados2.push(data);
+                                                    }
+                                                    else {
+                                                        data.observacion = '3';
+                                                    }
                                                 }
-                                                else {
-                                                    data.observacion = '3';
+                                                if (data.direccion_mac != ' - ') {
+                                                    // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
+                                                    if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
+                                                        duplicados3.push(data);
+                                                    }
+                                                    else {
+                                                        data.observacion = '4';
+                                                    }
                                                 }
+                                                duplicados1.push(data);
                                             }
-                                            if (data.direccion_mac != ' - ') {
-                                                // DISCRIMINACION DE ELEMENTOS IGUALES DIRECCION MAC
-                                                if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
-                                                    duplicados3.push(data);
-                                                }
-                                                else {
-                                                    data.observacion = '4';
-                                                }
+                                            else {
+                                                data.observacion = '2';
                                             }
-                                            duplicados1.push(data);
+                                            duplicados.push(data);
                                         }
                                         else {
-                                            data.observacion = '2';
+                                            data.observacion = '1';
                                         }
-                                        duplicados.push(data);
-                                    }
-                                    else {
-                                        data.observacion = '1';
                                     }
                                 }
+                                listDispositivos.push(data);
                             }
-                            listDispositivos.push(data);
-                        }
-                        data = {};
-                    }));
+                            data = {};
+                        });
+                    }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
