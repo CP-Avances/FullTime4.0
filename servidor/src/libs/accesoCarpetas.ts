@@ -31,7 +31,6 @@ export const ObtenerRutaVacuna = async function (id: any) {
         SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `
         , [id]);
-
     ruta = path.join(__dirname, `..${separador}..`);
     return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
@@ -149,7 +148,6 @@ export const ObtenerRutaLogos = function () {
     return ruta + separador + 'logos';
 }
 
-
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
 export const ObtenerRutaPlatilla = function () {
     let ruta = '';
@@ -181,27 +179,6 @@ export const ObtenerIndicePlantilla = function (libroExcel: any, hoja: string) {
     let verificador: number = 0;
     for (var i = 0; i < sheet_name_list.length; i++) {
         if ((sheet_name_list[i]).toUpperCase() === hoja.toUpperCase()) {
-            indice = i;
-            verificador = 1;
-            break;
-        }
-    }
-    if (verificador === 1) {
-        return indice;
-    }
-    else {
-        return false;
-    }
-
-}
-
-// METODO PARA OBTENER POSICION DE PLANTILLA
-export const ObtenerIndicePlantilla2 = function (libroExcel: any, hoja: string) {
-    const sheet_name_list = libroExcel.SheetNames;
-    let indice: number = 0;
-    let verificador: number = 0;
-    for (var i = 0; i < sheet_name_list.length; i++) {
-        if ((sheet_name_list[i]).toUpperCase() === hoja) {
             indice = i;
             verificador = 1;
             break;
