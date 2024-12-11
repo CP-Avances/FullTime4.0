@@ -502,7 +502,10 @@ export class ListarFeriadosComponent implements OnInit {
     }
     else if (observacion == 'La ciudad no existe en el sistema' ||
       observacion == 'La provincia no existe en el sistema') {
-      return 'rgb(255, 192, 203';
+      return 'rgb(255, 192, 203)';
+    }
+    else if (observacion == 'La ciudad no pertenece a la provincia'){
+      return 'rgb(238, 34, 207)';
     }
     else {
       return 'white'

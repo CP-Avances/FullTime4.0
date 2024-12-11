@@ -18,6 +18,7 @@ import { ValidacionesService } from '../../../../servicios/generales/validacione
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -148,6 +149,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
+    private restP: ParametrosService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -157,7 +159,6 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
-
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -181,6 +182,30 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
+    // METODO PARA LISTAR PARÁMETROS
+    parametros: any = [];
+    ObtenerParametros() {
+      this.parametros = [];
+      this.numero_pagina = 1;
+      this.restP.ListarParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.parametros = datos;
+        this.ObtenerDetallesParametro();
+      });
+    }
+  
+    // METOOD PARA OBTENER DETALLES DE PARAMETROS
+    detalles: any = [];
+    ObtenerDetallesParametro() {
+      this.detalles = [];
+      this.restP.BuscarDetallesParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.detalles = datos;
+        this.parametros.forEach((parametro: any) => {
+          parametro.detalles = this.detalles.filter((detalle: any) => detalle.id_parametro === parametro.id);
+        });
+      });
+    }
 
   ngOnDestroy() {
     this.departamentos = [];
@@ -190,6 +215,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.cargos = [];
     this.arr_emp = [];
   }
+
 
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **

@@ -268,7 +268,7 @@ export class RegistroContratoComponent implements OnInit {
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
     this.rest.BuscarContratosEmpleado(this.datoEmpleado).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = DateTime.fromISO(datos.fec_ingreso.toISOString()).toFormat('yyyy-MM-dd');
+      var ingreso = DateTime.fromISO(datos.fec_ingreso).toFormat('yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
         var fecha_salida = DateTime.fromISO(this.revisarFecha[i].fecha_salida).toFormat('yyyy-MM-dd');
@@ -335,7 +335,10 @@ export class RegistroContratoComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   fileChange(element: any) {
+    console.log('this.archivoSubido: ',element);
+
     this.archivoSubido = element.target.files;
+    
     if (this.archivoSubido.length != 0) {
       const name = this.archivoSubido[0].name;
       if (this.archivoSubido[0].size <= 2e+6) {
