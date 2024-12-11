@@ -5,7 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -315,14 +314,6 @@ export class ListarCiudadComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
-  exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.datosCiudades);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, "Ciudades");
-    xlsx.writeFile(wb, "Ciudades" + ".xlsx");
-  }
-
-
   async generarExcelCiudades() {
 
     const ciudadeslista: any[] = [];
@@ -360,8 +351,8 @@ export class ListarCiudadComponent implements OnInit {
     worksheet.mergeCells("B5:K5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Lista de Ciudades";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Ciudades".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -445,16 +436,22 @@ export class ListarCiudadComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A CSV                              ** **
    ** ************************************************************************************************** **/
 
-  exportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.datosCiudades);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], {
-      type: "text/csv;charset=utf-8;",
+  ExportToCSV() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('CiudadesCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.datosCiudades[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.datosCiudades.forEach((obj: any) => {
+      worksheet.addRow(obj);
     });
-    FileSaver.saveAs(
-      data,
-      "CiudadesCSV" + ".csv"
-    );
+  
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "CiudadesCSV.csv");
+    });
+
   }
 
   /** ************************************************************************************************* **

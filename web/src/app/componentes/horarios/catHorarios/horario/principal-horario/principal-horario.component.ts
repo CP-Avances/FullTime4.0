@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -666,40 +665,6 @@ export class PrincipalHorarioComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'horarios');
-    xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
-    let n: number = 1;
-    this.horarios.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'HORARIO': obj.nombre,
-          'CÓDIGO': obj.codigo,
-          'HORAS DE TRABAJO': obj.hora_trabajo,
-          'MINUTOS DE ALIMENTACIÓN': obj.minutos_comida,
-          'HORARIO NOTURNO': obj.noturno == true ? 'Sí' : 'No',
-          'DOCUMENTO': obj.documento ? obj.documento : '',
-          'ORDEN': det.orden,
-          'HORA': det.hora,
-          'TOLERANCIA': det.tolerancia != null ? det.tolerancia : '',
-          'ACCIÓN': det.tipo_accion_show,
-          'OTRO DÍA': det.segundo_dia == true ? 'Sí' : 'No',
-          'MINUTOS ANTES': det.minutos_antes,
-          'MINUTOS DESPUES': det.minutos_despues,
-        });
-      });
-    });
-    return datos;
-  }
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -744,8 +709,8 @@ export class PrincipalHorarioComponent implements OnInit {
     worksheet.mergeCells("B5:K5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Horarios';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Horarios'.toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -844,37 +809,55 @@ export class PrincipalHorarioComponent implements OnInit {
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
 
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "HorariosCSV" + '.csv');
-  }
-
-  EstructurarDatosCSV() {
-    let datos: any = [];
+  ExportToCSV() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('HorariosCSV');
+    worksheet.columns = [
+      { header: 'n', key: 'n', width: 10 },
+      { header: 'horario', key: 'horario', width: 30 },
+      { header: 'codigo', key: 'codigo', width: 15 },
+      { header: 'horas_trabajo', key: 'horas_trabajo', width: 15 },
+      { header: 'minutos_alimentacion', key: 'minutos_alimentacion', width: 15 },
+      { header: 'horario_noturno', key: 'horario_noturno', width: 15 },
+      { header: 'documento', key: 'documento', width: 15 },
+      { header: 'orden', key: 'orden', width: 15 },
+      { header: 'hora', key: 'hora', width: 15 },
+      { header: 'tolerancia', key: 'tolerancia', width: 15 },
+      { header: 'accion', key: 'accion', width: 15 },
+      { header: 'otro_dia', key: 'otro_dia', width: 15 },
+      { header: 'minutos_antes', key: 'minutos_antes', width: 15 },
+      { header: 'minutos_despues', key: 'minutos_despues', width: 15 },
+    ];
+    // 4. Llenar las filas con los datos
     let n: number = 1;
+
     this.horarios.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'n': n++,
-          'horario': obj.nombre,
-          'codigo': obj.codigo,
-          'horas_trabajo': obj.hora_trabajo,
-          'minutos_alimentacion': obj.minutos_comida,
-          'horario_noturno': obj.noturno == true ? 'Sí' : 'No',
-          'documento': obj.documento ? obj.documento : '',
-          'orden': det.orden,
-          'hora': det.hora,
-          'tolerancia': det.tolerancia != null ? det.tolerancia : '',
-          'accion': det.tipo_accion,
-          'otro_dia': det.segundo_dia == true ? 'Sí' : 'No',
-          'minutos_antes': det.minutos_antes,
-          'minutos_despues': det.minutos_despues,
-        });
-      });
+        worksheet.addRow({
+          n: n++,
+          horario: obj.nombre,
+          codigo: obj.codigo,
+          horas_trabajo: obj.hora_trabajo,
+          minutos_alimentacion: obj.minutos_comida,
+          horario_noturno: obj.noturno == true ? 'Sí' : 'No',
+          documento: obj.documento ? obj.documento : '',
+          orden: det.orden,
+          hora: det.hora,
+          tolerancia: det.tolerancia != null ? det.tolerancia : '',
+          accion: det.tipo_accion,
+          otro_dia: det.segundo_dia == true ? 'Sí' : 'No',
+          minutos_antes: det.minutos_antes,
+          minutos_despues: det.minutos_despues,
+        }).commit();                                                                                                                                             
+      })
+    })
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "HorariosCSV.csv");
     });
-    return datos;
   }
 
   /** ************************************************************************************************* **

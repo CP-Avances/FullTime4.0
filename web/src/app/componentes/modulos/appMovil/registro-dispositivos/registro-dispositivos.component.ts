@@ -8,9 +8,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 // LIBRERIAS DE ARCHIVOS
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 // MODELOS
 import { ItableDispositivos } from 'src/app/model/reportes.model';
@@ -33,6 +33,18 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class RegistroDispositivosComponent implements OnInit {
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // VARIABLES DE ALMACENAMIENTO
   dispositivosRegistrados: any = [];
@@ -90,6 +102,8 @@ export class RegistroDispositivosComponent implements OnInit {
   ) { this.idEmpleado = parseInt(localStorage.getItem('empleado') as string); }
 
   ngOnInit(): void {
+    this.ObtenerLogo();
+
     if (this.habilitarMovil === false) {
       let mensaje = {
         access: false,
@@ -111,6 +125,29 @@ export class RegistroDispositivosComponent implements OnInit {
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerDispositivosRegistrados();
     }
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -393,51 +430,161 @@ export class RegistroDispositivosComponent implements OnInit {
    ** **                              GENERACION DE EXCEL                            ** **
    ** ********************************************************************************* **/
 
-  exportToExcel() {
-    var objeto: any;
-    var cont: number = 1;
-    var ListaDispositivosRegistrados: any = [];
+  async generarExcel() {
+    console.log("this.logo: ", this.logo)
+    let datos: any[] = [];
+    let n: number = 1;
+
     this.dispositivosRegistrados.forEach((obj: any) => {
-      objeto = {
-        'N#': cont++,
-        "CODIGO": obj.codigo,
-        "NOMBRE": obj.nombre,
-        "CEDULA": obj.cedula,
-        "ID DISPOSITIVOS": obj.id_dispositivo,
-        "MODELO": obj.modelo_dispositivo,
-      }
-      ListaDispositivosRegistrados.push(objeto);
+      datos.push([
+        n++,
+        obj.codigo,
+        obj.nombre,
+        obj.cedula,
+        obj.id_dispositivo,
+        obj.modelo_dispositivo,
+      ]);
     });
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(ListaDispositivosRegistrados);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'dispositivos');
-    xlsx.writeFile(wb, "DispositivosEXCEL" + new Date().getTime() + '.xlsx');
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Dispositivos");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:K1");
+    worksheet.mergeCells("B2:K2");
+    worksheet.mergeCells("B3:K3");
+    worksheet.mergeCells("B4:K4");
+    worksheet.mergeCells("B5:K5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Dispositivos'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "cedula", width: 20 },
+      { key: "id_dispositivo", width: 20 },
+      { key: "modelo_dispositivo", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CEDULA", totalsRowLabel: "", filterButton: true },
+      { name: "ID_DIPOSITIVO", totalsRowLabel: "", filterButton: true },
+      { name: "MODELO DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "DispositivosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 6; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Dispositivos.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **
    ** ********************************************************************************************** **/
 
-  exportToCVS() {
-    var objeto: any;
+  ExportToCSV() {
     var cont: number = 1;
-    var ListaDispositivosRegistrados: any = [];
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('DispositivosCSV');
+    worksheet.columns = [
+      { header: 'N#', key: 'n', width: 10 },
+      { header: 'CODIGO', key: 'codigo', width: 30 },
+      { header: 'NOMBRE', key: 'nombre', width: 15 },
+      { header: 'CEDULA', key: 'cedula', width: 15 },
+      { header: 'ID DISPOSITIVOS', key: 'id_dispositivo', width: 15 },
+      { header: 'MODELO', key: 'modelo_dispositivo', width: 15 },
+
+    ];
+    // 4. Llenar las filas con los datos
+    let n: number = 1;
+
     this.dispositivosRegistrados.forEach((obj: any) => {
-      objeto = {
-        'N#': cont++,
-        "CODIGO": obj.codigo,
-        "NOMBRE": obj.nombre,
-        "CEDULA": obj.cedula,
-        "ID DISPOSITIVOS": obj.id_dispositivo,
-        "MODELO": obj.modelo_dispositivo,
-      }
-      ListaDispositivosRegistrados.push(objeto);
+      worksheet.addRow({
+        'n': cont++,
+        "codigo": obj.codigo,
+        "nombre": obj.nombre,
+        "cedula": obj.cedula,
+        "id_dispositivo": obj.id_dispositivo,
+        "modelo_dispositivo": obj.modelo_dispositivo,
+      })
+    })
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "DispositivosCSV.csv");
     });
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(ListaDispositivosRegistrados);
-    const csvDataR = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataR], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "DispositivosCSV" + new Date().getTime() + '.csv');
   }
+
+
 
   /** ********************************************************************************************** **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS XML                             ** **

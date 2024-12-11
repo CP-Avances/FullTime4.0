@@ -5,7 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -289,31 +288,6 @@ export class ListarParametroComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'ParametrosGenerales');
-    xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
-    let n: number = 1;
-    this.parametros.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'PARÁMETRO': obj.descripcion,
-          'DETALLE': det.descripcion,
-          'DESCRIPCIÓN': det.observacion
-        });
-      });
-    });
-
-    return datos;
-  }
-
   async generarExcelParametros() {
 
     const parametroslista: any[] = [];
@@ -352,8 +326,8 @@ export class ListarParametroComponent implements OnInit {
     worksheet.mergeCells("B5:K5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Lista de Parámetros Generales";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Parámetros Generales".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -434,28 +408,37 @@ export class ListarParametroComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
-
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "ParametrosGeneralesCSV" + '.csv');
-  }
-
-  EstructurarDatosCSV() {
-    let datos: any = [];
+  ExportToCSV() {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
     let n: number = 1;
+
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('ParametrosGeneralesCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'n', key: 'n', width: 10 },
+      { header: 'parametro', key: 'parametro', width: 30 },
+      { header: 'detalle', key: 'detalle', width: 15 },
+      { header: 'descripcion', key: 'descripcion', width: 15 }
+    ];
+    // 4. Llenar las filas con los datos
     this.parametros.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'n': n++,
-          'parametro': obj.descripcion,
-          'detalle': det.descripcion,
-          'descripcion': det.observacion
-        });
-      });
+        worksheet.addRow({
+          n: n++,
+          parametro: obj.descripcion,
+          detalle: det.descripcion,
+          descripcion: det.observacion
+        }).commit();
+      })
     });
-    return datos;
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "ParametrosGeneralesCSV.csv");
+    });
   }
 
   /** ************************************************************************************************* **

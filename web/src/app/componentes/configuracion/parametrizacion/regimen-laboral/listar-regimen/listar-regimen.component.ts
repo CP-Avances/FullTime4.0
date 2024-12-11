@@ -7,7 +7,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
 
-import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
 import * as FileSaver from "file-saver";
 import ExcelJS, { FillPattern } from "exceljs";
@@ -23,6 +22,7 @@ import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
 import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
+import { Console } from "console";
 
 @Component({
   selector: "app-listar-regimen",
@@ -371,45 +371,6 @@ export class ListarRegimenComponent implements OnInit {
    ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.regimen);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.regimen.map((obj: any) => {
-        return {
-          CODIGO: obj.id,
-          DESCRIPCION: obj.descripcion,
-          PAIS: obj.pais,
-          MESES_PERIODO: obj.mes_periodo,
-          DIAS_MES: obj.dias_mes,
-          TRABAJO_MINIMO_MES: obj.trabajo_minimo_mes,
-          TRABAJO_MINIMO_HORA: obj.trabajo_minimo_horas,
-          DIAS_ANIO_VACACION: obj.vacacion_dias_laboral,
-          DIAS_LIBRES: obj.vacacion_dias_libre,
-          DIAS_CALENDARIO_VACACION: obj.vacacion_dias_calendario,
-          MAX_DIAS_ACUMULABLES: obj.dias_maximo_acumulacion,
-          DIAS_LABORALES_GANADOS_MES: obj.vacacion_dias_laboral_mes,
-          DIAS_CALENDARIO_GANADOS_MES: obj.vacacion_dias_calendario_mes,
-          DIAS_LABORALES_GANADOS_DIA: obj.laboral_dias,
-          DIAS_CALENDARIO_GANADOS_DIA: obj.calendario_dias,
-          ANIOS_ANTIGUEDAD: obj.anio_antiguedad,
-          DIA_INCR_ANTIGUEDAD: obj.dias_antiguedad,
-        };
-      })
-    );
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.regimen[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {
-      // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 });
-    }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, "LISTAR REGIMEN");
-    xlsx.writeFile(wb, "RegimenEXCEL" + ".xlsx");
-    this.ObtenerRegimen();
-  }
-
   async generarExcelRegimen() {
     let datos: any[] = [];
     let n: number = 1;
@@ -456,8 +417,8 @@ export class ListarRegimenComponent implements OnInit {
     worksheet.mergeCells("B5:K5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Lista de Régimen Laboral";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Régimen Laboral".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -627,15 +588,28 @@ export class ListarRegimenComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
    ** ************************************************************************************************** **/
-
-  ExportToCVS() {
+  ExportToCSV() {
+  
     this.OrdenarDatos(this.regimen);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.regimen);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], {
-      type: "text/csv;charset=utf-8;",
+  
+    const workbook = new ExcelJS.Workbook();
+  
+    const worksheet = workbook.addWorksheet('RegimenCSV');
+  
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.regimen[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+  
+    // Llenar las filas con los datos
+    this.regimen.forEach((obj: any) => {
+      worksheet.addRow(obj);
     });
-    FileSaver.saveAs(data, "RegimenCSV" + ".csv");
+  
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "RegimenCSV.csv");
+    });
+
     this.ObtenerRegimen();
   }
 

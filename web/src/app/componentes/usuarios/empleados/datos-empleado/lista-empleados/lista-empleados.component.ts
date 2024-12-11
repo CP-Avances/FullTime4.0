@@ -11,7 +11,6 @@ import { DateTime } from 'luxon';
 import ExcelJS, { FillPattern } from "exceljs";
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -902,50 +901,6 @@ export class ListaEmpleadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel(numero: any) {
-    if (numero === 1) {
-      var arreglo = this.empleado
-    }
-    else {
-      arreglo = this.desactivados
-    }
-    console.log("ver arreglo: ", arreglo)
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
-      let nacionalidad: any;
-      this.nacionalidades.forEach((element: any) => {
-        if (obj.id_nacionalidad == element.id) {
-          nacionalidad = element.nombre;
-        }
-      });
-      return {
-        CODIGO: obj.codigo,
-        CEDULA: obj.cedula,
-        APELLIDO: obj.apellido,
-        NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
-        GENERO: this.GeneroSelect[obj.genero - 1],
-        CORREO: obj.correo,
-        ESTADO: this.EstadoSelect[obj.estado - 1],
-        DOMICILIO: obj.domicilio,
-        TELEFONO: obj.telefono,
-        NACIONALIDAD: nacionalidad,
-      }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(arreglo[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
-    }
-    wse["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wse, 'LISTA EMPLEADOS');
-    xlsx.writeFile(wb, "EmpleadosEXCEL" + '.xlsx');
-  }
-  // ---------------- excel con nueva libreria ------------------------- // 
-
   async generarExcelEmpleados(numero: any) {
 
     //const { usuarios, empresa, id_empresa } = datos;
@@ -1010,8 +965,8 @@ export class ListaEmpleadosComponent implements OnInit {
     worksheet.mergeCells("B5:K5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Lista de Empleados";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Empleados".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -1071,7 +1026,7 @@ export class ListaEmpleadosComponent implements OnInit {
       rows: empleados,
     });
 
-    
+
     const numeroFilas = empleados.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 13; j++) {
@@ -1089,7 +1044,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     worksheet.getRow(6).font = this.fontTitulo;
 
-    
+
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
@@ -1186,7 +1141,9 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS(numero: any) {
+  
+
+  ExportToCSV(numero: any) {
     if (numero === 1) {
       var arreglo = this.empleado;
     }
@@ -1194,31 +1151,58 @@ export class ListaEmpleadosComponent implements OnInit {
       arreglo = this.desactivados;
     }
 
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('EmpleadosCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'CODIGO', key: 'codigo', width: 10 },
+      { header: 'CEDULA', key: 'cedula', width: 30 },
+      { header: 'APELLIDO', key: 'apellido', width: 15 },
+      { header: 'NOMBRE', key: 'nombre', width: 15 },
+      { header: 'FECHA_NACIMIENTO', key: 'fecha_nacimiento', width: 15 },
+      { header: 'ESTADO_CIVIL', key: 'estado_civil', width: 15 },
+      { header: 'GENERO', key: 'genero', width: 15 },
+      { header: 'CORREO', key: 'correo', width: 15 },
+      { header: 'ESTADO', key: 'estado', width: 15 },
+      { header: 'DOMICILIO', key: 'domicilio', width: 15 },
+      { header: 'TELEFONO', key: 'telefono', width: 15 },
+      { header: 'NACIONALIDAD', key: 'nacionalidad', width: 15 }
+
+
+    ];
+    // 4. Llenar las filas con los datos
+    arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
       });
-      return {
-        CODIGO: obj.codigo,
-        CEDULA: obj.cedula,
-        APELLIDO: obj.apellido,
-        NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
-        GENERO: this.GeneroSelect[obj.genero - 1],
-        CORREO: obj.correo,
-        ESTADO: this.EstadoSelect[obj.estado - 1],
-        DOMICILIO: obj.domicilio,
-        TELEFONO: obj.telefono,
-        NACIONALIDAD: nacionalidad,
-      }
-    }));
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
+
+      worksheet.addRow({
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        apellido: obj.apellido,
+        nombre: obj.nombre,
+        fecha_nacimiento: obj.fecha_nacimiento.split("T")[0],
+        estado_civil: this.EstadoCivilSelect[obj.estado_civil - 1],
+        genero: this.GeneroSelect[obj.genero - 1],
+        correo: obj.correo,
+        estado: this.EstadoSelect[obj.estado - 1],
+        domicilio: obj.domicilio,
+        telefono: obj.telefono,
+        nacionalidad: nacionalidad,
+      }).commit();
+    });
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "EmpleadosCSV.csv");
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
