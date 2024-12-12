@@ -15,6 +15,8 @@ import { DateTime } from 'luxon';
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
+
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
@@ -92,6 +94,17 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerEmpleadoComponent implements OnInit, AfterViewInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild('tabla2') tabla2: ElementRef;
   @ViewChild('pestana') pestana!: MatTabGroup;
@@ -190,6 +203,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.LeerDatosIniciales();
         this.VerEmpresa();
       });
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngAfterViewInit(): void {
@@ -661,7 +697,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     localStorage.removeItem('fullname');
     localStorage.removeItem('correo');
     localStorage.removeItem('iniciales');
-   // localStorage.removeItem('view_imagen');
+    // localStorage.removeItem('view_imagen');
   }
 
 
@@ -1406,7 +1442,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   mes_inicio: any = '';
   mes_fin: any = '';
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number) {
-    console.log("ver fec_inicio: ",fec_inicio )
+    console.log("ver fec_inicio: ", fec_inicio)
     console.log(" ver fec_final: ", fec_final)
 
     this.horariosEmpleado = [];
@@ -3773,6 +3809,525 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     xlsx.writeFile(wb, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.xlsx');
   }
+
+
+  async generarExcel() {
+
+    const datos: any = this.ObtenerDatos();
+
+    const workbook = new ExcelJS.Workbook();
+    await this.generarHojaPerfil(workbook);
+
+
+    if (this.discapacidadUser.length > 0) {
+      await this.generarHojaDiscapacidad(workbook);
+    }
+    if (this.tituloEmpleado.length > 0) {
+      await this.generarHojaTitulo(workbook);
+    }
+    if (this.contratoEmpleado.length > 0) {
+      await this.generarHojaContrato(workbook);
+    }
+    if (this.cargoEmpleado.length > 0) {
+      await this.generarHojaCargo(workbook);
+
+
+    }
+    // await this.generarHojaDefiniciones(workbook);
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.xlsx');
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  async generarHojaPerfil(workbook: ExcelJS.Workbook) {
+    const datos: any = this.ObtenerDatos();
+    let n = 0;
+    const horarioslista: any[] = [];
+
+    datos[0].forEach((empleado) => {
+      horarioslista.push(
+        Object.values(empleado)
+      );
+    })
+
+
+    const worksheet = workbook.addWorksheet("PERFIL");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:Q1");
+    worksheet.mergeCells("B2:Q2");
+    worksheet.mergeCells("B3:Q3");
+    worksheet.mergeCells("B4:Q4");
+    worksheet.mergeCells("B5:Q5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "PERFIL";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+
+      { key: "codigo", width: 20 },
+      { key: "apellido", width: 30 },
+      { key: "nombre", width: 20 },
+      { key: "cedula", width: 20 },
+      { key: "estadoCivil", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "correo", width: 20 },
+      { key: "fechaNacimiento", width: 20 },
+      { key: "estado", width: 20 },
+      { key: "domicilio", width: 20 },
+      { key: "telefono", width: 20 },
+      { key: "nacionalidad", width: 20 },
+
+    ];
+
+    const columnas = [
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA DE NACIMIENTO", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO", totalsRowLabel: "", filterButton: true },
+      { name: "DOMICILIO", totalsRowLabel: "", filterButton: true },
+      { name: "TELÉFONO", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "Perfil",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: horarioslista,
+    });
+
+    const numeroFilas = horarioslista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 12; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+
+  async generarHojaTitulo(workbook: ExcelJS.Workbook) {
+    const titulolista: any[] = [];
+
+    this.tituloEmpleado.forEach((titulo) => {
+      titulolista.push(
+        Object.values(titulo)
+      );
+    })
+
+
+    const worksheet = workbook.addWorksheet("TITULOS");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:Q1");
+    worksheet.mergeCells("B2:Q2");
+    worksheet.mergeCells("B3:Q3");
+    worksheet.mergeCells("B4:Q4");
+    worksheet.mergeCells("B5:Q5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "TITULOS";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "id", width: 20 },
+      { key: "observaciones", width: 30 },
+      { key: "id_titulo", width: 20 },
+      { key: "id_empleado", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "nivel", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ID", totalsRowLabel: "", filterButton: true },
+      { name: "OBSERVACIONES", totalsRowLabel: "", filterButton: true },
+      { name: "ID TÍTULO", totalsRowLabel: "", filterButton: true },
+      { name: "ID EMPLEADOS", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "NIVEL", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "TituloPTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: titulolista,
+    });
+
+    const numeroFilas = titulolista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 7; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+  async generarHojaContrato(workbook: ExcelJS.Workbook) {
+    const datos: any = this.ObtenerDatos();
+    const contratolista: any[] = [];
+    datos[1].forEach((contrato) => {
+      contratolista.push(
+        Object.values(contrato)
+      );
+    })
+
+    const worksheet = workbook.addWorksheet("CONTRATO");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:Q1");
+    worksheet.mergeCells("B2:Q2");
+    worksheet.mergeCells("B3:Q3");
+    worksheet.mergeCells("B4:Q4");
+    worksheet.mergeCells("B5:Q5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "CONTRATO";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "regimen", width: 20 },
+      { key: "fechaDesde", width: 20 },
+      { key: "fechaHasta", width: 20 },
+      { key: "modalidadLaboral", width: 20 },
+      { key: "controlAsistencia", width: 20 },
+      { key: "controlVaciones", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "RÉGIMEN", totalsRowLabel: "Total:", filterButton: false },
+      { name: "FECHA DESDE", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA HASTA", totalsRowLabel: "", filterButton: true },
+      { name: "MODALIDAD LABORAL", totalsRowLabel: "", filterButton: true },
+      { name: "CONTROL ASISTENCIA", totalsRowLabel: "", filterButton: true },
+      { name: "CONTROL VACACIONES", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "ContratoPTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: contratolista,
+    });
+
+    const numeroFilas = contratolista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 6; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+  async generarHojaDiscapacidad(workbook: ExcelJS.Workbook) {
+    const cargolista: any[] = [];
+    this.discapacidadUser.forEach((discapacidad) => {
+      cargolista.push(
+        Object.values(discapacidad)
+      );
+    })
+
+    const worksheet = workbook.addWorksheet("DISCAPACIDAD");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:Q1");
+    worksheet.mergeCells("B2:Q2");
+    worksheet.mergeCells("B3:Q3");
+    worksheet.mergeCells("B4:Q4");
+    worksheet.mergeCells("B5:Q5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "DISCAPACIDAD";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "id_empleado", width: 20 },
+      { key: "carnet_conadis", width: 20 },
+      { key: "porcentaje", width: 20 },
+      { key: "id_discapacidad", width: 20 },
+      { key: "nom_tipo", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ID_EMPLEADO", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CARNET_CONADIS", totalsRowLabel: "", filterButton: true },
+      { name: "PORCENTAJE", totalsRowLabel: "", filterButton: true },
+      { name: "ID_DISCAPACIDAD", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE TIPO", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "DiscapacidadPTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: cargolista,
+    });
+
+    const numeroFilas = cargolista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 5; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+  async generarHojaCargo(workbook: ExcelJS.Workbook) {
+    const datos: any = this.ObtenerDatos();
+    const cargolista: any[] = [];
+    datos[2].forEach((contrato) => {
+      cargolista.push(
+        Object.values(contrato)
+      );
+    })
+
+    const worksheet = workbook.addWorksheet("CARGO");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:Q1");
+    worksheet.mergeCells("B2:Q2");
+    worksheet.mergeCells("B3:Q3");
+    worksheet.mergeCells("B4:Q4");
+    worksheet.mergeCells("B5:Q5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "CARGO";
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "sucursal", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fechadesde", width: 20 },
+      { key: "fechahasta", width: 20 },
+      { key: "sueldo", width: 20 },
+      { key: "horasTrabaja", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "SUCURSAL", totalsRowLabel: "Total:", filterButton: false },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA DESDE", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA HASTA", totalsRowLabel: "", filterButton: true },
+      { name: "SUELDO", totalsRowLabel: "", filterButton: true },
+      { name: "HORAS TRABAJA", totalsRowLabel: "", filterButton: true },
+
+    ];
+
+    worksheet.addTable({
+      name: "CargoPTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: cargolista,
+    });
+
+    const numeroFilas = cargolista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 7; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j >= 10 || j == 1) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
+
+
+
 
   /** ******************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS CSV                          ** **                                *

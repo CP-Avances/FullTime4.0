@@ -7,9 +7,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { VistaRolesComponent } from '../vista-roles/vista-roles.component';
@@ -28,6 +28,17 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RolPermisosMovilComponent implements OnInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @Input() id_rol: number;
 
@@ -134,6 +145,28 @@ export class RolPermisosMovilComponent implements OnInit {
     this.ObtenerModulos();
     this.ObtenerTodasModulosAcciones();
     this.VerModulos();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA OBTENER ROLES
@@ -1044,25 +1077,18 @@ export class RolPermisosMovilComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Roles');
-    xlsx.writeFile(wb, "RolesEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
+  async generarExcel() {
+    let datos: any[] = [];
     let n: number = 1;
+
     this.data_general.forEach((obj: any) => {
       obj.funciones.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'ROL': obj.nombre,
-          'PÁGINA': det.pagina,
-          'FUNCIÓN': det.accion,
-          'MÓDULO': det.nombre_modulo === 'permisos'
+        datos.push([
+          n++,
+          obj.nombre,
+          det.pagina,
+          det.accion,
+          det.nombre_modulo === 'permisos'
             ? 'Módulo de Permisos'
             : det.nombre_modulo === 'vacaciones'
               ? 'Módulo de Vacaciones'
@@ -1081,13 +1107,113 @@ export class RolPermisosMovilComponent implements OnInit {
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
                             : det.nombre_modulo,
-          'APLICACIÓN WEB': det.movil == false ? 'Sí' : '',
-          'APLICACIÓN MÓVIL': det.movil == true ? 'Sí' : '',
-        });
-      });
+          det.movil == false ? 'Sí' : '',
+          det.movil == true ? 'Sí' : '',
+        ])
+      })
+
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Roles");
+    this.imagen = workbook.addImage({
+      base64: this.logoE,
+      extension: "png",
     });
 
-    return datos;
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:G1");
+    worksheet.mergeCells("B2:G2");
+    worksheet.mergeCells("B3:G3");
+    worksheet.mergeCells("B4:G4");
+    worksheet.mergeCells("B5:G5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Roles'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "rol", width: 20 },
+      { key: "pagina", width: 20 },
+      { key: "funcion", width: 40 },
+      { key: "modulo", width: 20 },
+      { key: "app_web", width: 20 },
+      { key: "app_movil", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "ROL", totalsRowLabel: "Total:", filterButton: true },
+      { name: "PÁGINA", totalsRowLabel: "", filterButton: true },
+      { name: "FUNCIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "MÓDULO", totalsRowLabel: "", filterButton: true },
+      { name: "APLICACIÓN WEB", totalsRowLabel: "", filterButton: true },
+      { name: "APLICACIÓN MÓVIL", totalsRowLabel: "", filterButton: true },
+
+    ]
+
+    worksheet.addTable({
+      name: "RolesTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 7; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "RolesEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
@@ -1169,24 +1295,17 @@ export class RolPermisosMovilComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "RolesCSV" + '.csv');
-  }
-
-  EstructurarDatosCSV() {
+  ExportToCSV() {
     let datos: any = [];
     let n: number = 1;
     this.data_general.forEach((obj: any) => {
       obj.funciones.forEach((det: any) => {
         datos.push({
-          'n': n++,
-          'rol': obj.nombre,
-          'pagina': det.pagina,
-          'funcion': det.accion,
-          'modulo': det.nombre_modulo === 'permisos'
+          n: n++,
+          rol: obj.nombre,
+          pagina: det.pagina,
+          funcion: det.accion,
+          modulo: det.nombre_modulo === 'permisos'
             ? 'Módulo de Permisos'
             : det.nombre_modulo === 'vacaciones'
               ? 'Módulo de Vacaciones'
@@ -1205,11 +1324,26 @@ export class RolPermisosMovilComponent implements OnInit {
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
                             : det.nombre_modulo,
-          'aplicacion_web': det.movil == false ? 'Sí' : '',
-          'aplicacion_movil': det.movil == true ? 'Sí' : '',
+          aplicacion_web: det.movil == false ? 'Sí' : '',
+          aplicacion_movil: det.movil == true ? 'Sí' : '',
         });
       });
     });
-    return datos;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('RolesCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(datos[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    datos.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "RolesCSV.csv");
+    });
+
   }
 }

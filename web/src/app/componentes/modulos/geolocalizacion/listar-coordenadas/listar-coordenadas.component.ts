@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -449,12 +448,22 @@ export class ListarCoordenadasComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
    ** ************************************************************************************************** **/
+  ExportToCSV() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('CoordenadasGeograficasCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.coordenadas[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.coordenadas.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+  
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "CoordenadasGeograficasCSV.csv");
+    });
 
-  exportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.coordenadas);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "CoordenadasGeograficasCSV" + new Date().getTime() + '.csv');
   }
 
   /** ************************************************************************************************* **
