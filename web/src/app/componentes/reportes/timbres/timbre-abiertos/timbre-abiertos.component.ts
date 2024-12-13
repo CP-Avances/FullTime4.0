@@ -719,28 +719,29 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
-
-    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Timbres Libres';
-    worksheet.getCell(
-      "B3"
-    ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
-    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2", "B3"].forEach((cell) => {
-      worksheet.getCell(cell).alignment = {
-        horizontal: "center",
-        vertical: "middle",
-      };
-      worksheet.getCell(cell).font = { bold: true, size: 14 };
-    });
+  
 
     if (this.timbreDispositivo) {
+      worksheet.mergeCells("B1:R1");
+      worksheet.mergeCells("B2:R2");
+      worksheet.mergeCells("B3:R3");
+      worksheet.mergeCells("B4:R4");
+      worksheet.mergeCells("B5:R5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+      worksheet.getCell("B2").value = 'Lista de Timbres Libres'.toUpperCase();
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
       worksheet.columns = [
         { key: "n", width: 10 },
         { key: "cedula", width: 20 },
@@ -799,7 +800,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
 
       const numeroFilas = datos.length;
       for (let i = 0; i <= numeroFilas; i++) {
-        for (let j = 1; j <= 16; j++) {
+        for (let j = 1; j <= 18; j++) {
           const cell = worksheet.getRow(i + 6).getCell(j);
           if (i === 0) {
             cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -814,6 +815,26 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       }
 
     } else {
+      worksheet.mergeCells("B1:P1");
+      worksheet.mergeCells("B2:P2");
+      worksheet.mergeCells("B3:P3");
+      worksheet.mergeCells("B4:P4");
+      worksheet.mergeCells("B5:P5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+      worksheet.getCell("B2").value = 'Lista de Timbres Libres'.toUpperCase();
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
 
       worksheet.columns = [
         { key: "n", width: 10 },
@@ -890,7 +911,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
-      FileSaver.saveAs(blob, `Timbres_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+      FileSaver.saveAs(blob, `Timbres_libres_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
     } catch (error) {
       console.error("Error al generar el archivo Excel:", error);
     }

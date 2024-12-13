@@ -919,19 +919,19 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:AP1");
+    worksheet.mergeCells("B2:AP2");
+    worksheet.mergeCells("B3:AP3");
+    worksheet.mergeCells("B4:AP4");
+    worksheet.mergeCells("B5:AP5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Planificacion horaria";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Planificacion horaria".toUpperCase();
     worksheet.getCell(
       "B3"
-    ).value = `Periodo del reporte: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} al ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
+    ).value = `PERIODO DEL REPORTE: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} AL ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2", "B3"].forEach((cell) => {
@@ -1092,16 +1092,16 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:F1");
+    worksheet.mergeCells("B2:F2");
+    worksheet.mergeCells("B3:F3");
+    worksheet.mergeCells("B4:F4");
+    worksheet.mergeCells("B5:F5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Planificacion horaria";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Planificacion horaria".toUpperCase();
     worksheet.getCell(
       "B3"
     ).value = `Periodo del reporte: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} al ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
@@ -1189,16 +1189,16 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Definiciones";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Definiciones".toUpperCase();
     worksheet.getCell(
       "B3"
     ).value = `Periodo del reporte: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} al ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
@@ -1213,9 +1213,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     });
 
     worksheet.columns = [
-      { key: "n", width: 10 },
-      { key: "nomenclatura", width: 20 },
-      { key: "descripcion", width: 20 },
+      { key: "n", width: 20 },
+      { key: "nomenclatura", width: 30 },
+      { key: "descripcion", width: 40 },
     ];
 
     const columnas = [

@@ -702,11 +702,11 @@ export class PrincipalHorarioComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:N1");
+    worksheet.mergeCells("B2:N2");
+    worksheet.mergeCells("B3:N3");
+    worksheet.mergeCells("B4:N4");
+    worksheet.mergeCells("B5:N5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
@@ -734,8 +734,8 @@ export class PrincipalHorarioComponent implements OnInit {
       { key: "tolerancia", width: 20 },
       { key: "tipo_accion_show", width: 20 },
       { key: "segundo_dia", width: 20 },
-      { key: "minutos_antes", width: 20 },
-      { key: "minutos_antes", width: 20 },
+      { key: "minutos_antes", width: 30 },
+      { key: "minutos_antes", width: 30 },
     ];
 
     const columnas = [

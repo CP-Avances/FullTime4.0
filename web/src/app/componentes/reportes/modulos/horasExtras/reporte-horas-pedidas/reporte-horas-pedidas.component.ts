@@ -7,7 +7,6 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL
-import * as xlsx from 'xlsx';
 
 // IMPORTACION DE SERVICIOS
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
@@ -367,6 +366,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   ExportarExcelSolicitudes(datos) {
+    /*
     this.contarRegistros = 0;
     const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       this.contarRegistros = this.contarRegistros + 1;
@@ -392,6 +392,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
     var f = DateTime.now();
     xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
+    */
   }
 
   /* ****************************************************************************************************
@@ -508,6 +509,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
    * ****************************************************************************************************/
 
   ExportarExcelSolicitudesAutorizadas(datos) {
+    /*
     this.contarRegistros = 0;
     const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       if (obj.estado === 3) {
@@ -537,6 +539,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wsa, 'HorasExtras Autorizadas');
     var f = DateTime.now();
     xlsx.writeFile(wb, "SolicitudesAutorizadas - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
+    */
   }
 
   /** *******************************************************************************************
@@ -734,6 +737,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   GenerarExcelSolicitudEmpleado(id_seleccionado) {
+    /*
     this.contarRegistros = 0;
     // INICIALIZACIÓN DE VARIABLES
     var datosGenerales, mensaje: string;
@@ -786,6 +790,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
     var f = DateTime.now();
     xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toformat('yyyy-MM-dd') + '.xlsx');
+    */
   }
 
   /** *******************************************************************************************
@@ -962,6 +967,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
    * ****************************************************************************************************/
 
   GenerarExcelSolicitudAutorizadaEmpleado(id_seleccionado) {
+    /*
     this.contarRegistros = 0;
     // INICIALIZACIÓN DE VARIABLES
     var datosGenerales: any;
@@ -1018,6 +1024,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wsa, 'SolicitudHoras Autorizadas');
     var f = DateTime.now();
     xlsx.writeFile(wb, "SolicitudAutorizadas - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
+    */
   }
 
 }

@@ -958,11 +958,11 @@ export class ListaEmpleadosComponent implements OnInit {
     });
 
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:M1");
+    worksheet.mergeCells("B2:M2");
+    worksheet.mergeCells("B3:M3");
+    worksheet.mergeCells("B4:M4");
+    worksheet.mergeCells("B5:M5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();

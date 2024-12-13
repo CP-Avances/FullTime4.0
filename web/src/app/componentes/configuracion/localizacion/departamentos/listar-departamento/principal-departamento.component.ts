@@ -569,11 +569,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:G1");
+    worksheet.mergeCells("B2:G2");
+    worksheet.mergeCells("B3:G3");
+    worksheet.mergeCells("B4:G4");
+    worksheet.mergeCells("B5:G5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
@@ -596,7 +596,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { key: "id", width: 20 },
       { key: "nombre", width: 20 },
       { key: "nivel", width: 20 },
-      { key: "departamento_padre", width: 20 },
+      { key: "departamento_padre", width: 30 },
     ];
 
 

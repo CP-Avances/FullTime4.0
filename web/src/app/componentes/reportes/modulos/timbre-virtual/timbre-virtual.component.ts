@@ -5,7 +5,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 // IMPORTAR MODELOS
@@ -722,29 +721,30 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
-
-    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
-    worksheet.getCell(
-      "B3"
-    ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
-    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2", "B3"].forEach((cell) => {
-      worksheet.getCell(cell).alignment = {
-        horizontal: "center",
-        vertical: "middle",
-      };
-      worksheet.getCell(cell).font = { bold: true, size: 14 };
-    });
 
 
     if (this.timbreDispositivo) {
+      worksheet.mergeCells("B1:R1");
+      worksheet.mergeCells("B2:R2");
+      worksheet.mergeCells("B3:R3");
+      worksheet.mergeCells("B4:R4");
+      worksheet.mergeCells("B5:R5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+      worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+  
       worksheet.columns = [
         { key: "n", width: 10 },
         { key: "cedula", width: 20 },
@@ -817,6 +817,27 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       }
 
     }else{
+      worksheet.mergeCells("B1:P1");
+      worksheet.mergeCells("B2:P2");
+      worksheet.mergeCells("B3:P3");
+      worksheet.mergeCells("B4:P4");
+      worksheet.mergeCells("B5:P5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+      worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+  
 
       worksheet.columns = [
         { key: "n", width: 10 },

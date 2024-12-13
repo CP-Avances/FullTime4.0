@@ -410,11 +410,11 @@ export class ListarRegimenComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:R1");
+    worksheet.mergeCells("B2:R2");
+    worksheet.mergeCells("B3:R3");
+    worksheet.mergeCells("B4:R4");
+    worksheet.mergeCells("B5:R5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
@@ -490,7 +490,7 @@ export class ListarRegimenComponent implements OnInit {
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 17; j++) {
+      for (let j = 1; j <= 18; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };

@@ -12,7 +12,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -3785,32 +3784,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     return [arregloEmpleado, arregloContrato, arregloCargo];
   }
 
-
-  ExportToExcel() {
-    const datos: any = this.ObtenerDatos();
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
-    if (this.discapacidadUser.length > 0) {
-      const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
-      xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
-    }
-    if (this.tituloEmpleado.length > 0) {
-      const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
-      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');
-    }
-    if (this.contratoEmpleado.length > 0) {
-      const wsco: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[1]);
-      xlsx.utils.book_append_sheet(wb, wsco, 'CONTRATO');
-    }
-    if (this.cargoEmpleado.length > 0) {
-      const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
-      xlsx.utils.book_append_sheet(wb, wsca, 'CARGO');
-    }
-    xlsx.writeFile(wb, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.xlsx');
-  }
-
-
   async generarExcel() {
 
     const datos: any = this.ObtenerDatos();
@@ -3866,11 +3839,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:L1");
+    worksheet.mergeCells("B2:L2");
+    worksheet.mergeCells("B3:L3");
+    worksheet.mergeCells("B4:L4");
+    worksheet.mergeCells("B5:L5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -3972,11 +3945,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:F1");
+    worksheet.mergeCells("B2:F2");
+    worksheet.mergeCells("B3:F3");
+    worksheet.mergeCells("B4:F4");
+    worksheet.mergeCells("B5:F5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -4026,7 +3999,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const numeroFilas = titulolista.length;
 
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 7; j++) {
+      for (let j = 1; j <= 6; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -4062,11 +4035,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:F1");
+    worksheet.mergeCells("B2:F2");
+    worksheet.mergeCells("B3:F3");
+    worksheet.mergeCells("B4:F4");
+    worksheet.mergeCells("B5:F5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -4151,11 +4124,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:E1");
+    worksheet.mergeCells("B2:E2");
+    worksheet.mergeCells("B3:E3");
+    worksheet.mergeCells("B4:E4");
+    worksheet.mergeCells("B5:E5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -4239,11 +4212,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:Q1");
-    worksheet.mergeCells("B2:Q2");
-    worksheet.mergeCells("B3:Q3");
-    worksheet.mergeCells("B4:Q4");
-    worksheet.mergeCells("B5:Q5");
+    worksheet.mergeCells("B1:G1");
+    worksheet.mergeCells("B2:G2");
+    worksheet.mergeCells("B3:G3");
+    worksheet.mergeCells("B4:G4");
+    worksheet.mergeCells("B5:G5");
 
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -4333,20 +4306,33 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS CSV                          ** **                                *
    ** ******************************************************************************************* **/
 
-  ExportToCVS() {
+
+  ExportToCSV() {
     const datos: any = this.ObtenerDatos();
-    const datosEmpleado: any = [];
-    const objeto = {
-      ...datos[0][0],
-      ...this.discapacidadUser[0],
-      ...this.tituloEmpleado[0],
-      ...datos[1][0],
-      ...datos[2][0],
-    };
-    datosEmpleado.push(objeto);
-    const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datosEmpleado));
-    const data: Blob = new Blob([csvDataE], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.csv');
+    console.log("ver datos: ",  datos)
+
+    const objeto = {...datos[0][0],
+    ...this.discapacidadUser[0],
+    ...this.tituloEmpleado[0],
+    ...datos[1][0],
+    ...datos[2][0],}
+
+    const arregloFinal = [objeto];
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet((datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.csv');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(arregloFinal[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    arregloFinal.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.csv');
+    });
+
   }
 
   /** ******************************************************************************************* **

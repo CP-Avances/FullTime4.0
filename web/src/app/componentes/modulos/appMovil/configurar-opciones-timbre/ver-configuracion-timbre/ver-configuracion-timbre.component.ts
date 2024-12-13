@@ -506,11 +506,11 @@ export class VerConfiguracionTimbreComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:O1");
+    worksheet.mergeCells("B2:O2");
+    worksheet.mergeCells("B3:O3");
+    worksheet.mergeCells("B4:O4");
+    worksheet.mergeCells("B5:O5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();

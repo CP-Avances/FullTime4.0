@@ -458,11 +458,11 @@ export class RegistroDispositivosComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:F1");
+    worksheet.mergeCells("B2:F2");
+    worksheet.mergeCells("B3:F3");
+    worksheet.mergeCells("B4:F4");
+    worksheet.mergeCells("B5:F5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
@@ -482,8 +482,8 @@ export class RegistroDispositivosComponent implements OnInit {
       { key: "codigo", width: 20 },
       { key: "nombre", width: 20 },
       { key: "cedula", width: 20 },
-      { key: "id_dispositivo", width: 20 },
-      { key: "modelo_dispositivo", width: 20 },
+      { key: "id_dispositivo", width: 50 },
+      { key: "modelo_dispositivo", width: 30 },
     ];
 
     const columnas = [

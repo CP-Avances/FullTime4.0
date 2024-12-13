@@ -1151,8 +1151,8 @@ export class RolPermisosMovilComponent implements OnInit {
       { key: "pagina", width: 20 },
       { key: "funcion", width: 40 },
       { key: "modulo", width: 20 },
-      { key: "app_web", width: 20 },
-      { key: "app_movil", width: 20 },
+      { key: "app_web", width: 30 },
+      { key: "app_movil", width: 30 },
     ];
 
     const columnas = [

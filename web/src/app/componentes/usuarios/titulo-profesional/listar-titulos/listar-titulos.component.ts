@@ -521,11 +521,11 @@ export class ListarTitulosComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:D1");
+    worksheet.mergeCells("B2:D2");
+    worksheet.mergeCells("B3:D3");
+    worksheet.mergeCells("B4:D4");
+    worksheet.mergeCells("B5:D5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
@@ -544,7 +544,7 @@ export class ListarTitulosComponent implements OnInit {
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
-      { key: "nivel", width: 20 },
+      { key: "nivel", width: 30 },
       { key: "titulo", width: 30 },
 
     ];

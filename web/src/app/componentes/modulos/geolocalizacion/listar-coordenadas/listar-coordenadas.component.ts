@@ -357,15 +357,15 @@ export class ListarCoordenadasComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:E1");
+    worksheet.mergeCells("B2:E2");
+    worksheet.mergeCells("B3:E3");
+    worksheet.mergeCells("B4:E4");
+    worksheet.mergeCells("B5:E5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Coordenadas';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Coordenadas'.toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -380,9 +380,9 @@ export class ListarCoordenadasComponent implements OnInit {
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
-      { key: "latitud", width: 20 },
-      { key: "longitud", width: 20 },
-      { key: "descripcion", width: 20 },
+      { key: "latitud", width: 30 },
+      { key: "longitud", width: 30 },
+      { key: "descripcion", width: 30 },
 
     ];
 
@@ -451,6 +451,7 @@ export class ListarCoordenadasComponent implements OnInit {
   ExportToCSV() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('CoordenadasGeograficasCSV');
+    console.log("ver doordenadas: ", this.coordenadas)
     //  Agregar encabezados dinámicos basados en las claves del primer objeto
     const keys = Object.keys(this.coordenadas[0] || {}); // Obtener las claves
     worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
