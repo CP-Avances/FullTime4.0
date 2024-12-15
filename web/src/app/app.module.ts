@@ -71,9 +71,8 @@ import { TipoSeguridadComponent } from './componentes/configuracion/parametrizac
 import { MainNavComponent } from './componentes/generales/main-nav/main-nav.component';
 import { NavbarComponent } from './componentes/generales/main-nav/navbar/navbar.component';
 import { SearchComponent } from './componentes/generales/main-nav/search/search.component';
-import { AyudaComponent } from './componentes/generales/preferencias/ayuda/ayuda.component';
+import { AyudaComponent } from './componentes/generales/ayuda/ayuda.component';
 import { VistaMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/vista-menu/vista-menu.component';
-import { AccionesTimbresComponent } from './componentes/generales/preferencias/acciones-timbres/acciones-timbres.component';
 import { RegistroModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/registro-modalidad/registro-modalidad.component';
 import { EditarModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/editar-modalidad/editar-modalidad.component';
 import { EditarTipoCargoComponent } from './componentes/configuracion/parametrizacion/tipo-cargos/editar-tipo-cargo/editar-tipo-cargo.component';
@@ -359,7 +358,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     SearchComponent,
     AyudaComponent,
     VistaMenuComponent,
-    AccionesTimbresComponent,
     RegistroModalidadComponent,
     EditarModalidadComponent,
     EditarTipoCargoComponent,

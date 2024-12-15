@@ -37,7 +37,7 @@ class DiscapacidadControlador {
     RegistrarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+                const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const usuario = yield database_1.default.query(`
@@ -55,7 +55,9 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip, observacion: null
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -73,7 +75,7 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id_empleado = req.params.id_empleado;
-                const { carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+                const { carn_conadis, porcentaje, tipo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -86,7 +88,8 @@ class DiscapacidadControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar discapacidad con id_empleado: ${id_empleado}`
                     });
                 }
@@ -101,7 +104,8 @@ class DiscapacidadControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -119,7 +123,7 @@ class DiscapacidadControlador {
     EliminarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -133,7 +137,8 @@ class DiscapacidadControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar discapacidad con id_empleado: ${id_empleado}`
                     });
                     // FINALIZAR TRANSACCION
@@ -150,7 +155,8 @@ class DiscapacidadControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -171,7 +177,7 @@ class DiscapacidadControlador {
     RegistrarTipo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, user_name, ip } = req.body;
+                const { nombre, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -185,7 +191,8 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{nombre: ${nombre}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

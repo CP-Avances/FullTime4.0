@@ -22,7 +22,7 @@ class RolesControlador {
   // METODO PARA ELIMINAR REGISTRO  **USADO
   public async EliminarRol(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -40,7 +40,8 @@ class RolesControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el rol con id ${id}`
         });
 
@@ -62,7 +63,8 @@ class RolesControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -80,7 +82,7 @@ class RolesControlador {
   // METODO PARA REGISTRAR ROL
   public async CrearRol(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, user_name, ip } = req.body;
+      const { nombre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -98,7 +100,8 @@ class RolesControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -148,7 +151,7 @@ class RolesControlador {
   // METODO PARA ACTUALIZAR ROLES  **USADO
   public async ActualizarRol(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id, user_name, ip } = req.body;
+      const { nombre, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -165,7 +168,8 @@ class RolesControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el rol con id ${id}`
         });
 
@@ -184,7 +188,8 @@ class RolesControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

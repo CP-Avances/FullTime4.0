@@ -47,7 +47,7 @@ class HorasExtrasControlador {
     CrearHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, user_name, ip } = req.body;
+                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -67,6 +67,7 @@ class HorasExtrasControlador {
                     datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, 
           hora_jornada: ${hora_jornada}, tipo_dia: ${tipo_dia}, codigo: ${codigo}, minutos_comida: ${incl_almuerzo}, tipo_funcion: ${tipo_funcion}}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -88,7 +89,7 @@ class HorasExtrasControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -104,6 +105,7 @@ class HorasExtrasControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -121,6 +123,7 @@ class HorasExtrasControlador {
                     datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -137,7 +140,7 @@ class HorasExtrasControlador {
     ActualizarHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip } = req.body;
+                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -152,6 +155,7 @@ class HorasExtrasControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -175,6 +179,7 @@ class HorasExtrasControlador {
                     datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
                     datosNuevos: `{codigo: ${codigo}, descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${hora_jornada}, minutos_comida: ${incl_almuerzo}, tipo_dia: ${tipo_dia}, tipo_funcion: ${tipo_funcion}}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

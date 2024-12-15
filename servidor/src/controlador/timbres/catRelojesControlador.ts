@@ -34,7 +34,7 @@ class RelojesControlador {
     // METODO PARA ELIMINAR REGISTROS   **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
 
             // INICIAR TRANSACCION
@@ -53,6 +53,7 @@ class RelojesControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -75,6 +76,7 @@ class RelojesControlador {
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
                 ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -94,7 +96,7 @@ class RelojesControlador {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                 tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip,
-                zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
+                zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -139,6 +141,7 @@ class RelojesControlador {
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(reloj),
                     ip: user_ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -185,7 +188,7 @@ class RelojesControlador {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                 tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip,
-                zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
+                zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -208,6 +211,7 @@ class RelojesControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: user_ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id: ${codigo}.`
                 });
 
@@ -258,6 +262,7 @@ class RelojesControlador {
                      "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}",
                      "zona_horaria_dispositivo":"${zona_horaria_dispositivo}", "formato_gmt_dispositivo":"${formato_gmt_dispositivo}"}`,
                     ip: user_ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -802,14 +807,15 @@ class RelojesControlador {
     // METODO PARA CARGAR DATOS DE PLANTILLA   **USADO
     public async CargaPlantillaRelojes(req: Request, res: Response): Promise<any> {
         try {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             var contador = 1;
             var respuesta: any;
 
             plantilla.forEach(async (data: any) => {
                 // DATOS DE LA PLANTILLA INGRESADA
                 const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, tipo_conexion,
-                    temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena, zona_horaria } = data;
+                    temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, 
+                    contrasena, zona_horaria } = data;
 
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
@@ -834,6 +840,7 @@ class RelojesControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al guardar el reloj con nombre: ${nombre_dispo} e ip: ${ip}.`
                     });
                 }
@@ -907,6 +914,7 @@ class RelojesControlador {
                     datosOriginales: '',
                     datosNuevos: `{"nombre": "${nombre_dispo}", "ip": "${direccion_ip}", "puerto": "${puerto}", "contrasenia": "${contrasena}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${numero_serie}", "id_fabricacion": "${id_fabricante}", "fabricante": "${fabricante}", "mac": "${direccion_mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo}", "temperatura": "${temperatura}"}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

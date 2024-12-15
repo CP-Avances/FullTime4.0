@@ -41,7 +41,7 @@ class EmpleadoCargosControlador {
     EditarEstadoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_cargo, estado, user_name, ip } = req.body;
+                const { id_cargo, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -57,7 +57,8 @@ class EmpleadoCargosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el cargo con id ${id_cargo}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -80,7 +81,8 @@ class EmpleadoCargosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(empleadoCargo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -120,7 +122,7 @@ class EmpleadoCargosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -140,7 +142,8 @@ class EmpleadoCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(empleadoCargo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -159,7 +162,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl_contrato, id } = req.params;
-                const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
+                const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -175,7 +178,8 @@ class EmpleadoCargosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el cargo con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -204,7 +208,8 @@ class EmpleadoCargosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(empleadoCargo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -380,7 +385,7 @@ class EmpleadoCargosControlador {
     CrearTipoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cargo, user_name, ip } = req.body;
+                const { cargo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -394,7 +399,8 @@ class EmpleadoCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(tipo_cargo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -790,7 +796,7 @@ class EmpleadoCargosControlador {
     // METODO PARA CARGAR DATOS DE PLANTILLA CARGOS   **USADO
     CargarPlantilla_cargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -896,7 +902,8 @@ class EmpleadoCargosControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(usuarioDep),
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                         }
@@ -912,7 +919,8 @@ class EmpleadoCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(cargos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -936,7 +944,7 @@ class EmpleadoCargosControlador {
     EliminarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, user_name, ip, } = req.body;
+                const { id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOS ORIGINALES
@@ -949,7 +957,8 @@ class EmpleadoCargosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -971,7 +980,8 @@ class EmpleadoCargosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosEliminados),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

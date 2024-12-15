@@ -46,15 +46,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
-const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
-const database_1 = __importDefault(require("../../database"));
-const copyStream = __importStar(require("pg-copy-streams")); // Importar pg-copy-streams
+const settingsMail_1 = require("../../libs/settingsMail");
 const luxon_1 = require("luxon");
+const database_1 = __importDefault(require("../../database"));
+const copyStream = __importStar(require("pg-copy-streams"));
 class PlanGeneralControlador {
     constructor() {
         this.CrearPlanificacionPorLotes1 = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { parte, user_name, ip } = req.body;
+            const { parte, user_name, ip, ip_local } = req.body;
             // Validación del input
             if (!Array.isArray(parte) || parte.length === 0) {
                 return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
@@ -104,7 +104,8 @@ class PlanGeneralControlador {
                             accion: 'I',
                             datosOriginales: '',
                             datosNuevos: JSON.stringify(plan),
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                     }
@@ -128,7 +129,7 @@ class PlanGeneralControlador {
             return res.status(200).json({ message: 'OK', totalResults });
         });
         this.CrearPlanificacionPorLotes = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { parte, user_name, ip } = req.body;
+            const { parte, user_name, ip, ip_local } = req.body;
             // Validación del input
             if (!Array.isArray(parte) || parte.length === 0) {
                 return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
@@ -177,7 +178,8 @@ class PlanGeneralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(p),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -228,7 +230,7 @@ class PlanGeneralControlador {
             let ocurrioError = false;
             let mensajeError = '';
             let codigoError = 0;
-            const { user_name, ip, plan_general } = req.body;
+            const { user_name, ip, plan_general, ip_local } = req.body;
             for (let i = 0; i < plan_general.length; i++) {
                 try {
                     // INICIAR TRANSACCION
@@ -258,7 +260,8 @@ class PlanGeneralControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(plan),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -318,7 +321,7 @@ class PlanGeneralControlador {
             let codigoError = 0;
             // CONTADORES INICIAN EN CERO (0)
             errores = 0;
-            const { user_name, ip, id_plan } = req.body;
+            const { user_name, ip, id_plan, ip_local } = req.body;
             console.log("ver req body eliminar: ", req.body);
             for (const plan of id_plan) {
                 try {
@@ -334,7 +337,8 @@ class PlanGeneralControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar el registro con id ${plan}. Registro no encontrado.`
                         });
                         // FINALIZAR TRANSACCION
@@ -356,7 +360,8 @@ class PlanGeneralControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -388,7 +393,7 @@ class PlanGeneralControlador {
     }
     EliminarRegistrosMultiples(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { user_name, ip, id_plan } = req.body;
+            const { user_name, ip, id_plan, ip_local } = req.body;
             console.log("ver req.body", req.body);
             // Iniciar transacción
             try {
@@ -407,7 +412,8 @@ class PlanGeneralControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id}`
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -422,7 +428,8 @@ class PlanGeneralControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar registro con id ${id}`
                         }));
                         yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -444,7 +451,8 @@ class PlanGeneralControlador {
                             accion: 'D',
                             datosOriginales: JSON.stringify(item),
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null,
                         };
                     });
@@ -656,7 +664,7 @@ class PlanGeneralControlador {
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+                const { codigo, fecha, id, accion, id_timbre, user_name, ip, ip_local } = req.body;
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `, [fecha, codigo]);
@@ -672,7 +680,8 @@ class PlanGeneralControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -695,7 +704,8 @@ class PlanGeneralControlador {
                     datosOriginales: `id: ${datosOriginales.id}
                             , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
                     datosNuevos: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 if (PLAN.rowCount != 0) {
@@ -709,7 +719,8 @@ class PlanGeneralControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(TIMBRE.rows),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

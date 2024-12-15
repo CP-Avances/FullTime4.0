@@ -54,7 +54,7 @@ class AutorizacionesControlador {
     public async CrearAutorizacion(req: Request, res: Response): Promise<Response> {
         try {
             const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra,
-                id_plan_hora_extra, id_documento, user_name, ip } = req.body;
+                id_plan_hora_extra, id_documento, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -78,6 +78,7 @@ class AutorizacionesControlador {
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -93,7 +94,7 @@ class AutorizacionesControlador {
 
     public async ActualizarEstadoAutorizacionPermiso(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_documento, estado, id_permiso, user_name, ip } = req.body;
+            const { id_documento, estado, id_permiso, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -110,6 +111,7 @@ class AutorizacionesControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
                 });
             }
@@ -131,6 +133,7 @@ class AutorizacionesControlador {
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -153,7 +156,7 @@ class AutorizacionesControlador {
 
         try {
             const id = req.params.id;
-            const { id_documento, estado, user_name, ip } = req.body;
+            const { id_documento, estado, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -170,6 +173,7 @@ class AutorizacionesControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro de autorizaciones con id: ${id}`
                 });
 
@@ -195,6 +199,7 @@ class AutorizacionesControlador {
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

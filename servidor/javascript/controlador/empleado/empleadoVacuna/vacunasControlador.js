@@ -71,7 +71,7 @@ class VacunasControlador {
     // CREAR REGISTRO DE VACUNACION    **USADO
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
+            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento, ip_local } = req.body;
             // CREAR CARPETA DE VACUNAS
             let verificar_vacunas = 0;
             if (subir_documento === true) {
@@ -116,7 +116,8 @@ class VacunasControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(vacuna),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION|
@@ -149,7 +150,7 @@ class VacunasControlador {
                 const anio = fecha.toFormat('yyyy');
                 const mes = fecha.toFormat('MM');
                 const dia = fecha.toFormat('dd');
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 let id = req.params.id;
                 let id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
@@ -171,7 +172,8 @@ class VacunasControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al guardar documento de vacuna con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -192,7 +194,8 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -210,7 +213,7 @@ class VacunasControlador {
     ActualizarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
+            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento, ip_local } = req.body;
             // CREAR CARPETA DE VACUNAS
             let verificar_vacunas = 0;
             if (subir_documento === true) {
@@ -249,7 +252,8 @@ class VacunasControlador {
                             accion: 'U',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al actualizar vacuna con id: ${id}`
                         });
                         // FINALIZAR TRANSACCION
@@ -271,7 +275,8 @@ class VacunasControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -314,7 +319,7 @@ class VacunasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let separador = path_1.default.sep;
-                let { documento, id, user_name, ip } = req.body;
+                let { documento, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -327,7 +332,8 @@ class VacunasControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar documento de vacuna con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -345,7 +351,8 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacuna),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -376,7 +383,7 @@ class VacunasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let separador = path_1.default.sep;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const { id, documento } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -390,7 +397,8 @@ class VacunasControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar vacuna con id: ${id}. No se encontro registro.`
                     });
                     // FINALIZAR TRANSACCION
@@ -410,7 +418,8 @@ class VacunasControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

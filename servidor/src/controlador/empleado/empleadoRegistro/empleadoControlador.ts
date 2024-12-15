@@ -6,14 +6,14 @@ import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
+import { DateTime } from 'luxon';
 import { Md5 } from 'ts-md5';
 import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
+import sharp from 'sharp';
 import fs from 'fs';
-import { DateTime } from 'luxon';
 
-const sharp = require('sharp');
 
 class EmpleadoControlador {
 
@@ -39,7 +39,7 @@ class EmpleadoControlador {
   // CREAR CODIGO DE EMPLEADO    **USADO
   public async CrearCodigo(req: Request, res: Response) {
     try {
-      const { id, valor, automatico, manual, user_name, ip } = req.body;
+      const { id, valor, automatico, manual, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -57,7 +57,8 @@ class EmpleadoControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -96,7 +97,7 @@ class EmpleadoControlador {
   public async ActualizarCodigoTotal(req: Request, res: Response): Promise<Response> {
     try {
 
-      const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
+      const { valor, automatico, manual, cedula, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -116,7 +117,8 @@ class EmpleadoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar código con id: ${id}`
         });
 
@@ -138,7 +140,8 @@ class EmpleadoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -156,7 +159,7 @@ class EmpleadoControlador {
   // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO   **USADO
   public async ActualizarCodigo(req: Request, res: Response): Promise<Response> {
     try {
-      const { valor, id, user_name, ip } = req.body;
+      const { valor, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -176,7 +179,8 @@ class EmpleadoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar código con id: ${id}`
         });
 
@@ -198,7 +202,8 @@ class EmpleadoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -222,7 +227,7 @@ class EmpleadoControlador {
   public async InsertarEmpleado(req: Request, res: Response) {
     try {
       const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+        domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -249,7 +254,8 @@ class EmpleadoControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(empleado),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -276,7 +282,7 @@ class EmpleadoControlador {
     try {
       const id = req.params.id;
       const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+        domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -299,7 +305,8 @@ class EmpleadoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar empleado con id: ${id}`
         });
 
@@ -331,7 +338,8 @@ class EmpleadoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -517,7 +525,7 @@ class EmpleadoControlador {
 
   // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
   public async DesactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const { arrayIdsEmpleados, user_name, ip } = req.body;
+    const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
       for (const obj of arrayIdsEmpleados) {
@@ -541,7 +549,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al inhabilitar empleado con id: ${obj}`
             });
 
@@ -551,7 +560,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al inhabilitar usuario con id_empleado: ${obj}`
             });
 
@@ -573,7 +583,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 2, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -588,7 +599,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginalesUsuario),
             datosNuevos: `{estado: false, app_habilita: false}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -610,7 +622,7 @@ class EmpleadoControlador {
 
   // METODO PARA HABILITAR EMPLEADOS    *USADO
   public async ActivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const { arrayIdsEmpleados, user_name, ip } = req.body;
+    const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
       for (const obj of arrayIdsEmpleados) {
@@ -642,7 +654,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al activar empleado con id: ${obj}`
             });
 
@@ -652,7 +665,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al activar usuario con id_empleado: ${obj}`
             });
 
@@ -678,7 +692,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 1, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -697,7 +712,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginalesUsuario),
             datosNuevos: `{estado: true, app_habilita: true}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -718,7 +734,7 @@ class EmpleadoControlador {
 
   // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
   public async ReactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const { arrayIdsEmpleados, user_name, ip } = req.body;
+    const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
     if (arrayIdsEmpleados.length > 0) {
       for (const obj of arrayIdsEmpleados) {
         try {
@@ -749,7 +765,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al reactivar empleado con id: ${obj}`
             });
 
@@ -759,7 +776,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al reactivar usuario con id_empleado: ${obj}`
             });
 
@@ -783,7 +801,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: `{estado: 1}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -802,7 +821,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginalesUsuario),
             datosNuevos: `{estado: true, app_habilita: true}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -837,7 +857,7 @@ class EmpleadoControlador {
       const id = req.params.id_empleado;
       const separador = path.sep;
 
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       const unEmpleado = await pool.query(
         `
@@ -913,7 +933,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al actualizar imagen del usuario con id: ${id}. Registro no encontrado.`
             });
 
@@ -938,7 +959,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
           // FINALIZAR TRANSACCION
@@ -962,7 +984,7 @@ class EmpleadoControlador {
   // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
   public async GeolocalizacionCrokis(req: Request, res: Response): Promise<Response> {
     let id = req.params.id
-    let { lat, lng, user_name, ip } = req.body
+    let { lat, lng, user_name, ip, ip_local } = req.body
     try {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -982,7 +1004,8 @@ class EmpleadoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
         });
 
@@ -1004,7 +1027,8 @@ class EmpleadoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -1064,7 +1088,7 @@ class EmpleadoControlador {
   // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
   public async CrearEmpleadoTitulos(req: Request, res: Response): Promise<void> {
     try {
-      const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
+      const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -1091,7 +1115,8 @@ class EmpleadoControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -1110,7 +1135,7 @@ class EmpleadoControlador {
   public async EditarTituloEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id_empleado_titulo;
-      const { observacion, id_titulo, user_name, ip } = req.body;
+      const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -1126,7 +1151,8 @@ class EmpleadoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
         });
 
@@ -1148,7 +1174,8 @@ class EmpleadoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -1166,7 +1193,7 @@ class EmpleadoControlador {
   // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
   public async EliminarTituloEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id_empleado_titulo;
 
       // INICIAR TRANSACCION
@@ -1183,7 +1210,8 @@ class EmpleadoControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
         });
 
@@ -1205,7 +1233,8 @@ class EmpleadoControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -1321,7 +1350,7 @@ class EmpleadoControlador {
 
   // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarEmpleado(req: Request, res: Response) {
-    const { empleados, user_name, ip } = req.body;
+    const { empleados, user_name, ip, ip_local } = req.body;
     let empleadosRegistrados: boolean = false;
     let errorEliminar: boolean = false;
 
@@ -1344,7 +1373,8 @@ class EmpleadoControlador {
             accion: 'D',
             datosOriginales: '',
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: `Error al eliminar usuario con id: ${e.id}. Registro no encontrado.`
           });
 
@@ -1354,7 +1384,8 @@ class EmpleadoControlador {
             accion: 'D',
             datosOriginales: '',
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: `Error al eliminar empleado con id: ${e.id}. Registro no encontrado.`
           });
 
@@ -1393,7 +1424,8 @@ class EmpleadoControlador {
           accion: 'D',
           datosOriginales: JSON.stringify(datosOriginalesUsuarios),
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -1410,7 +1442,8 @@ class EmpleadoControlador {
           accion: 'D',
           datosOriginales: JSON.stringify(datosOriginalesEmpleado),
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -1904,7 +1937,7 @@ class EmpleadoControlador {
 
   // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<any> {
-    const { plantilla, user_name, ip } = req.body;
+    const { plantilla, user_name, ip, ip_local } = req.body;
     const VALOR = await pool.query(
       `
       SELECT * FROM e_codigo
@@ -2053,7 +2086,8 @@ class EmpleadoControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -2075,7 +2109,8 @@ class EmpleadoControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -2095,7 +2130,8 @@ class EmpleadoControlador {
               accion: 'U',
               datosOriginales: JSON.stringify(codigo_dato),
               datosNuevos: `{valor: ${codigo}}`,
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: null
             });
           }
@@ -2647,7 +2683,7 @@ class EmpleadoControlador {
 
   // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<any> {
-    const { plantilla, user_name, ip } = req.body
+    const { plantilla, user_name, ip, ip_local } = req.body
     var contador = 1;
     let ocurrioError = false;
     let mensajeError = '';
@@ -2785,7 +2821,8 @@ class EmpleadoControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -2808,7 +2845,8 @@ class EmpleadoControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -2827,7 +2865,8 @@ class EmpleadoControlador {
             accion: 'U',
             datosOriginales: '',
             datosNuevos: `{valor: null}`,
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
           // FINALIZAR TRANSACCION

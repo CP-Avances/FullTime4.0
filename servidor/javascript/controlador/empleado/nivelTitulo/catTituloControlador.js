@@ -51,7 +51,7 @@ class TituloControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -66,7 +66,8 @@ class TituloControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el título con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -83,7 +84,8 @@ class TituloControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -101,7 +103,7 @@ class TituloControlador {
     ActualizarTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_nivel, id, user_name, ip } = req.body;
+                const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -115,7 +117,8 @@ class TituloControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el título con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -132,7 +135,8 @@ class TituloControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -150,7 +154,7 @@ class TituloControlador {
     CrearTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_nivel, user_name, ip } = req.body;
+                const { nombre, id_nivel, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -163,7 +167,8 @@ class TituloControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -348,7 +353,7 @@ class TituloControlador {
     // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
     RegistrarTitulosPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { titulos, user_name, ip } = req.body;
+            const { titulos, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const titulo of titulos) {
                 const { nombre, id_nivel } = titulo;
@@ -365,7 +370,8 @@ class TituloControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

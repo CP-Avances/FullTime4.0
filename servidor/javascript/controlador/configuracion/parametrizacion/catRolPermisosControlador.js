@@ -110,7 +110,7 @@ class RolPermisosControlador {
     AsignarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { funcion, link, id_rol, id_accion, movil, user_name, ip } = req.body;
+                const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -123,7 +123,8 @@ class RolPermisosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosOriginales),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -145,7 +146,7 @@ class RolPermisosControlador {
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, user_name, ip } = req.body;
+                const { id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -159,7 +160,8 @@ class RolPermisosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -175,7 +177,8 @@ class RolPermisosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

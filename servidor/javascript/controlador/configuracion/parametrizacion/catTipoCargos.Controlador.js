@@ -58,7 +58,7 @@ class TiposCargosControlador {
     CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cargo, user_name, ip } = req.body;
+                const { cargo, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `, [cargo.toUpperCase()]);
@@ -77,7 +77,8 @@ class TiposCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(TipoCargos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION
@@ -104,7 +105,7 @@ class TiposCargosControlador {
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, cargo } = req.body;
+                const { id, cargo, ip_local } = req.body;
                 // DAR FORMATO A LA PALABRA CARGO
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                 const tipoCargoExiste = yield database_1.default.query(`
@@ -122,6 +123,7 @@ class TiposCargosControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: req.body.ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
                     // FINALIZAR TRANSACCION
@@ -147,6 +149,7 @@ class TiposCargosControlador {
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(TipoCargos),
                         ip: req.body.ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION
@@ -171,7 +174,7 @@ class TiposCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR
@@ -186,7 +189,8 @@ class TiposCargosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -203,7 +207,8 @@ class TiposCargosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosTiposCargos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -359,7 +364,7 @@ class TiposCargosControlador {
     // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -380,7 +385,8 @@ class TiposCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(cargos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION

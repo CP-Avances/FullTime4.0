@@ -167,8 +167,8 @@ class PlanificacionHorariaControlador {
     RegistrarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { planificacionHoraria, user_name, ip } = req.body;
-                const datosUsuario = { user_name, ip };
+                const { planificacionHoraria, user_name, ip, ip_local } = req.body;
+                const datosUsuario = { user_name, ip, ip_local };
                 const horarioDefaultLibre = yield ConsultarHorarioDefault('DEFAULT-LIBRE');
                 const horarioDefaultFeriado = yield ConsultarHorarioDefault('DEFAULT-FERIADO');
                 let planificacionesImportadas = 0;
@@ -713,7 +713,7 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             // DESESCTRUCTURAR PLANIFICACION HORARIA
             let { entrada, inicioAlimentacion, finAlimentacion, salida } = planificacionHoraria;
             // DESESTRUCTURAR DATOS EMPLEADO
-            let { user_name, ip } = datosUsuario;
+            let { user_name, ip, ip_local } = datosUsuario;
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CONSULTAR SI EXISTE HORARIO REGISTRADO PARA EL EMPLEADO EN ESA FECHA CON CODIGO DEFAULT-LIBRE O DEFAULT-FERIADO Y ELIMINARLO
@@ -733,7 +733,8 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                         accion: 'D',
                         datosOriginales: JSON.stringify(asistencia),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                 }
@@ -761,7 +762,8 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevosEntrada),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
             // CREAR INICIO ALIMENTACION
@@ -788,7 +790,8 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevosInicioAlimentacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
             }
@@ -816,7 +819,8 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevosFinAlimentacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
             }
@@ -843,7 +847,8 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevosSalida),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
             // FINALIZAR TRANSACCION

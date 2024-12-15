@@ -19,13 +19,13 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const settingsMail_1 = require("../../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const ts_md5_1 = require("ts-md5");
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
+const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importDefault(require("fs"));
-const luxon_1 = require("luxon");
-const sharp = require('sharp');
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -48,7 +48,7 @@ class EmpleadoControlador {
     CrearCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, valor, automatico, manual, user_name, ip } = req.body;
+                const { id, valor, automatico, manual, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datos = yield database_1.default.query(`
@@ -61,7 +61,8 @@ class EmpleadoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -98,7 +99,7 @@ class EmpleadoControlador {
     ActualizarCodigoTotal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
+                const { valor, automatico, manual, cedula, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -113,7 +114,8 @@ class EmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar código con id: ${id}`
                     });
                     //FINALIZAR TRANSACCION
@@ -130,7 +132,8 @@ class EmpleadoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 //FINALIZAR TRANSACCION
@@ -148,7 +151,7 @@ class EmpleadoControlador {
     ActualizarCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { valor, id, user_name, ip } = req.body;
+                const { valor, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -163,7 +166,8 @@ class EmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar código con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -180,7 +184,8 @@ class EmpleadoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -201,7 +206,7 @@ class EmpleadoControlador {
     InsertarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -220,7 +225,8 @@ class EmpleadoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(empleado),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -244,7 +250,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -261,7 +267,8 @@ class EmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar empleado con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -286,7 +293,8 @@ class EmpleadoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // VARIABLES PARA VERIFICAR RENOBRAMIENTO DE CARPETAS
@@ -460,7 +468,7 @@ class EmpleadoControlador {
     // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
     DesactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { arrayIdsEmpleados, user_name, ip } = req.body;
+            const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 for (const obj of arrayIdsEmpleados) {
                     try {
@@ -478,7 +486,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al inhabilitar empleado con id: ${obj}`
                             });
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -487,7 +496,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al inhabilitar usuario con id_empleado: ${obj}`
                             });
                             // FINALIZAR TRANSACCION
@@ -504,7 +514,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
                             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 2, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FALSE => YA NO TIENE ACCESO
@@ -516,7 +527,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(datosOriginalesUsuario),
                             datosNuevos: `{estado: false, app_habilita: false}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -536,7 +548,7 @@ class EmpleadoControlador {
     // METODO PARA HABILITAR EMPLEADOS    *USADO
     ActivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { arrayIdsEmpleados, user_name, ip } = req.body;
+            const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 for (const obj of arrayIdsEmpleados) {
                     try {
@@ -558,7 +570,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al activar empleado con id: ${obj}`
                             });
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -567,7 +580,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al activar usuario con id_empleado: ${obj}`
                             });
                             // FINALIZAR TRANSACCION
@@ -586,7 +600,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
                             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 1, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // TRUE => TIENE ACCESO
@@ -600,7 +615,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(datosOriginalesUsuario),
                             datosNuevos: `{estado: true, app_habilita: true}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -620,7 +636,7 @@ class EmpleadoControlador {
     // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
     ReactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { arrayIdsEmpleados, user_name, ip } = req.body;
+            const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 for (const obj of arrayIdsEmpleados) {
                     try {
@@ -642,7 +658,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al reactivar empleado con id: ${obj}`
                             });
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -651,7 +668,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al reactivar usuario con id_empleado: ${obj}`
                             });
                             // FINALIZAR TRANSACCION
@@ -669,7 +687,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(datosOriginales),
                             datosNuevos: `{estado: 1}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // TRUE => TIENE ACCESO
@@ -683,7 +702,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(datosOriginalesUsuario),
                             datosNuevos: `{estado: true, app_habilita: true}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -705,7 +725,7 @@ class EmpleadoControlador {
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            sharp.cache(false);
+            sharp_1.default.cache(false);
             try {
                 // FECHA DEL SISTEMA
                 const fecha = luxon_1.DateTime.now();
@@ -714,7 +734,7 @@ class EmpleadoControlador {
                 const dia = fecha.toFormat('dd');
                 const id = req.params.id_empleado;
                 const separador = path_1.default.sep;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const unEmpleado = yield database_1.default.query(`
         SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
@@ -746,7 +766,7 @@ class EmpleadoControlador {
                         let ruta_guardar = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(unEmpleado.rows[0].id)) + separador + imagen;
                         fs_1.default.access(ruta_temporal, fs_1.default.constants.F_OK, (err) => {
                             if (!err) {
-                                sharp(ruta_temporal)
+                                (0, sharp_1.default)(ruta_temporal)
                                     .resize(800) // CAMBIA EL TAMAÑO DE LA IMAGEN A UN ANCHO DE 800 PIXELES, MANTIENE LA RELACION DE ASPECTO
                                     .jpeg({ quality: 80 }) // CONFIGURA LA CALIDAD DE LA IMAGEN JPEG AL 80%
                                     .toFile(ruta_guardar);
@@ -779,7 +799,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al actualizar imagen del usuario con id: ${id}. Registro no encontrado.`
                             });
                             // FINALIZAR TRANSACCION
@@ -797,7 +818,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
                             datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -820,7 +842,7 @@ class EmpleadoControlador {
     GeolocalizacionCrokis(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
-            let { lat, lng, user_name, ip } = req.body;
+            let { lat, lng, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -836,7 +858,8 @@ class EmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -853,7 +876,8 @@ class EmpleadoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -910,7 +934,7 @@ class EmpleadoControlador {
     CrearEmpleadoTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
+                const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const usuario = yield database_1.default.query(`
@@ -927,7 +951,8 @@ class EmpleadoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -946,7 +971,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id_empleado_titulo;
-                const { observacion, id_titulo, user_name, ip } = req.body;
+                const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -959,7 +984,8 @@ class EmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -976,7 +1002,8 @@ class EmpleadoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -994,7 +1021,7 @@ class EmpleadoControlador {
     EliminarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id_empleado_titulo;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -1008,7 +1035,8 @@ class EmpleadoControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -1025,7 +1053,8 @@ class EmpleadoControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -1139,7 +1168,7 @@ class EmpleadoControlador {
     // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { empleados, user_name, ip } = req.body;
+            const { empleados, user_name, ip, ip_local } = req.body;
             let empleadosRegistrados = false;
             let errorEliminar = false;
             for (const e of empleados) {
@@ -1158,7 +1187,8 @@ class EmpleadoControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar usuario con id: ${e.id}. Registro no encontrado.`
                         });
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1167,7 +1197,8 @@ class EmpleadoControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar empleado con id: ${e.id}. Registro no encontrado.`
                         });
                         errorEliminar = true;
@@ -1197,7 +1228,8 @@ class EmpleadoControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(datosOriginalesUsuarios),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // ELIMINAR EMPLEADO
@@ -1211,7 +1243,8 @@ class EmpleadoControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(datosOriginalesEmpleado),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -1693,7 +1726,7 @@ class EmpleadoControlador {
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
@@ -1815,7 +1848,8 @@ class EmpleadoControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // OBTENER EL ID DEL EMPLEADO INGRESADO
@@ -1833,7 +1867,8 @@ class EmpleadoControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     if (contador === plantilla.length) {
@@ -1849,7 +1884,8 @@ class EmpleadoControlador {
                                 accion: 'U',
                                 datosOriginales: JSON.stringify(codigo_dato),
                                 datosNuevos: `{valor: ${codigo}}`,
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                         }
@@ -2378,7 +2414,7 @@ class EmpleadoControlador {
     // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             var contador = 1;
             let ocurrioError = false;
             let mensajeError = '';
@@ -2490,7 +2526,8 @@ class EmpleadoControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // OBTENER EL ID DEL EMPELADO
@@ -2508,7 +2545,8 @@ class EmpleadoControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     if (contador === plantilla.length) {
@@ -2523,7 +2561,8 @@ class EmpleadoControlador {
                             accion: 'U',
                             datosOriginales: '',
                             datosNuevos: `{valor: null}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION

@@ -30,7 +30,7 @@ class VacunaControlador {
     // METODO PARA REGISTRAR TIPO VACUNA   **USADO
     public async CrearVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { vacuna, user_name, ip } = req.body;
+            const { vacuna, user_name, ip, ip_local } = req.body;
             var VERIFICAR_VACUNA = await pool.query(
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
@@ -59,7 +59,8 @@ class VacunaControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(vacunaInsertada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 })
 
@@ -85,7 +86,7 @@ class VacunaControlador {
     // METODO PARA EDITAR VACUNA    **USADO
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, nombre, user_name, ip } = req.body;
+            const { id, nombre, user_name, ip, ip_local } = req.body;
 
             var VERIFICAR_VACUNA = await pool.query(
                 `
@@ -111,6 +112,7 @@ class VacunaControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
 
@@ -135,7 +137,8 @@ class VacunaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacunaActualizada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -163,7 +166,7 @@ class VacunaControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -184,7 +187,8 @@ class VacunaControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -206,7 +210,8 @@ class VacunaControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosVacuna),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -371,7 +376,7 @@ class VacunaControlador {
 
     // REGISTRAR PLANTILLA TIPO VACUNA    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -399,7 +404,8 @@ class VacunaControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(vacuna_emp),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

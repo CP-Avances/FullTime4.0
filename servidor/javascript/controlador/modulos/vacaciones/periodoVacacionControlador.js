@@ -36,7 +36,7 @@ class PeriodoVacacionControlador {
     CrearPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, } = req.body;
+                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const datosNuevos = yield database_1.default.query(`
@@ -58,7 +58,8 @@ class PeriodoVacacionControlador {
                     accion: "I",
                     datosOriginales: "",
                     datosNuevos: JSON.stringify(periodo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -88,7 +89,7 @@ class PeriodoVacacionControlador {
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, } = req.body;
+                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -101,7 +102,8 @@ class PeriodoVacacionControlador {
                         accion: "U",
                         datosOriginales: "",
                         datosNuevos: "",
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar período de vacaciones con id: ${id}`,
                     });
                     // FINALIZAR TRANSACCION
@@ -131,7 +133,8 @@ class PeriodoVacacionControlador {
                     accion: "U",
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION

@@ -40,7 +40,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -62,7 +62,8 @@ class FeriadosControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(feriado),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar feriado con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -79,7 +80,8 @@ class FeriadosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(feriado),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -97,7 +99,7 @@ class FeriadosControlador {
     CrearFeriados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+                const { fecha, descripcion, fec_recuperacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // BUSCAR SI YA EXISTE UN FERIADO CON LA MISMA DESCRIPCION
@@ -128,7 +130,8 @@ class FeriadosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(feriado),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -167,7 +170,7 @@ class FeriadosControlador {
     ActualizarFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, descripcion, fec_recuperacion, id, user_name, ip } = req.body;
+                const { fecha, descripcion, fec_recuperacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const busqueda = yield database_1.default.query(`
@@ -191,7 +194,8 @@ class FeriadosControlador {
                             accion: 'U',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al actualizar feriado con id ${id}.`
                         });
                         // FINALIZAR TRANSACCION
@@ -223,7 +227,8 @@ class FeriadosControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(feriado),
                         datosNuevos: JSON.stringify(datosNuevos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -762,7 +767,7 @@ class FeriadosControlador {
     // METODO PARA REGISTRAR DATOS DE FERIADOS DE PLANTILLA   **USADO
     RegistrarFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -788,7 +793,8 @@ class FeriadosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(feriado),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -809,7 +815,7 @@ class FeriadosControlador {
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     RegistrarFeriado_Ciudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -834,7 +840,8 @@ class FeriadosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(ciudad_feria),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

@@ -22,7 +22,7 @@ class NotificacionTiempoRealControlador {
     // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
     EliminarMultiplesNotificaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { arregloNotificaciones, user_name, ip } = req.body;
+            const { arregloNotificaciones, user_name, ip, ip_local } = req.body;
             let contador = 0;
             if (arregloNotificaciones.length > 0) {
                 contador = 0;
@@ -40,7 +40,8 @@ class NotificacionTiempoRealControlador {
                                 accion: 'D',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al eliminar el registro con id ${obj}. No existe el registro en la base de datos.`
                             });
                             // FINALIZAR TRANSACCION
@@ -61,7 +62,8 @@ class NotificacionTiempoRealControlador {
                             accion: 'D',
                             datosOriginales: JSON.stringify(datosOriginales),
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -132,7 +134,7 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 var tiempo = (0, settingsMail_1.fechaHora)();
-                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
+                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip, ip_local } = req.body;
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -150,7 +152,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(notificiacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -215,7 +218,7 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { visto, user_name, ip } = req.body;
+                const { visto, user_name, ip, ip_local } = req.body;
                 console.log("ver parametros", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -229,7 +232,8 @@ class NotificacionTiempoRealControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al modificar el registro con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -246,7 +250,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{"visto": "${visto}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -267,7 +272,7 @@ class NotificacionTiempoRealControlador {
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -286,7 +291,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -362,7 +368,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
                 const id_empleado = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -376,7 +382,8 @@ class NotificacionTiempoRealControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al modificar el registro con id ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -398,7 +405,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -415,7 +423,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleadoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -439,7 +447,8 @@ class NotificacionTiempoRealControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(item), // Objeto original como JSON
                         datosNuevos: JSON.stringify(itemModificado), // Objeto modificado como JSON
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     };
                 });
@@ -677,7 +686,7 @@ class NotificacionTiempoRealControlador {
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
                 var tiempo = (0, settingsMail_1.fechaHora)();
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
                 // INICIAR TRANSACCION
@@ -697,7 +706,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(notificiacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -725,7 +735,7 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const client = yield database_1.default.connect(); // Obtener un cliente para la transacción
             try {
-                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
                 const id_empleados = Array.isArray(id_empl_recive) ? id_empl_recive : [id_empl_recive];
                 const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
                 const batches = [];
@@ -753,7 +763,8 @@ class NotificacionTiempoRealControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empleado_recibe},fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${descripcion}, mensaje: ${mensaje}, tipo: ${tipo}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);

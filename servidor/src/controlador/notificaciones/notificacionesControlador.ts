@@ -15,7 +15,7 @@ class NotificacionTiempoRealControlador {
 
   // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
   public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
-    const { arregloNotificaciones, user_name, ip } = req.body;
+    const { arregloNotificaciones, user_name, ip, ip_local } = req.body;
     let contador: number = 0;
 
     if (arregloNotificaciones.length > 0) {
@@ -38,7 +38,8 @@ class NotificacionTiempoRealControlador {
               accion: 'D',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al eliminar el registro con id ${obj}. No existe el registro en la base de datos.`
             });
 
@@ -64,7 +65,8 @@ class NotificacionTiempoRealControlador {
             accion: 'D',
             datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -142,7 +144,7 @@ class NotificacionTiempoRealControlador {
       var tiempo = fechaHora();
 
       const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso,
-        id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
+        id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip, ip_local } = req.body;
 
       let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
 
@@ -167,7 +169,8 @@ class NotificacionTiempoRealControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(notificiacion),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -240,7 +243,7 @@ class NotificacionTiempoRealControlador {
   public async ActualizarVista(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { visto, user_name, ip } = req.body;
+      const { visto, user_name, ip, ip_local } = req.body;
       console.log("ver parametros", req.body)
 
       // INICIAR TRANSACCION
@@ -257,7 +260,8 @@ class NotificacionTiempoRealControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al modificar el registro con id ${id}. Registro no encontrado.`
         });
 
@@ -279,7 +283,8 @@ class NotificacionTiempoRealControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{"visto": "${visto}"}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -303,7 +308,7 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -328,7 +333,8 @@ class NotificacionTiempoRealControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -415,7 +421,7 @@ class NotificacionTiempoRealControlador {
   public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
       const id_empleado = req.params.id;
 
       // INICIAR TRANSACCION
@@ -432,7 +438,8 @@ class NotificacionTiempoRealControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al modificar el registro con id ${id_empleado}. Registro no encontrado.`
         });
 
@@ -461,7 +468,8 @@ class NotificacionTiempoRealControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -480,7 +488,7 @@ class NotificacionTiempoRealControlador {
   public async ActualizarConfigEmpleadoMultiple(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -517,7 +525,8 @@ class NotificacionTiempoRealControlador {
           accion: 'U',
           datosOriginales: JSON.stringify(item), // Objeto original como JSON
           datosNuevos: JSON.stringify(itemModificado), // Objeto modificado como JSON
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         };
       });
@@ -788,7 +797,7 @@ class NotificacionTiempoRealControlador {
   }
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
-      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
 
       var tiempo = fechaHora();
       let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
@@ -817,7 +826,8 @@ class NotificacionTiempoRealControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(notificiacion),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -854,7 +864,7 @@ class NotificacionTiempoRealControlador {
     const client = await pool.connect(); // Obtener un cliente para la transacción
 
     try {
-      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
 
 
       const id_empleados = Array.isArray(id_empl_recive) ? id_empl_recive : [id_empl_recive];
@@ -895,7 +905,8 @@ class NotificacionTiempoRealControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `{id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empleado_recibe},fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${descripcion}, mensaje: ${mensaje}, tipo: ${tipo}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       }));
       await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);

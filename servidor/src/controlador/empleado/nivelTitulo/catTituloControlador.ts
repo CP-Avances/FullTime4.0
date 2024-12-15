@@ -41,7 +41,7 @@ class TituloControlador {
   // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -59,7 +59,8 @@ class TituloControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el título con id ${id}. Registro no encontrado.`
         });
 
@@ -81,7 +82,8 @@ class TituloControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -100,7 +102,7 @@ class TituloControlador {
   // METODO PARA ACTUALIZAR REGISTRO   **USADO
   public async ActualizarTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_nivel, id, user_name, ip } = req.body;
+      const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -117,7 +119,8 @@ class TituloControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el título con id ${id}. Registro no encontrado.`
         });
 
@@ -139,7 +142,8 @@ class TituloControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -157,7 +161,7 @@ class TituloControlador {
   // METODO PARA REGISTRAR TITULO   **USADO
   public async CrearTitulo(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, id_nivel, user_name, ip } = req.body;
+      const { nombre, id_nivel, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -175,7 +179,8 @@ class TituloControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -371,7 +376,7 @@ class TituloControlador {
 
   // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
   public async RegistrarTitulosPlantilla(req: Request, res: Response): Promise<any> {
-    const { titulos, user_name, ip } = req.body;
+    const { titulos, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const titulo of titulos) {
@@ -393,7 +398,8 @@ class TituloControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

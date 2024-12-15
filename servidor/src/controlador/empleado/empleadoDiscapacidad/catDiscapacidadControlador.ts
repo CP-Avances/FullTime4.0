@@ -30,7 +30,7 @@ class DiscapacidadControlador {
     // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD    **USADO
     public async CrearDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
-            const { discapacidad, user_name, ip } = req.body;
+            const { discapacidad, user_name, ip, ip_local } = req.body;
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
@@ -59,7 +59,8 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(discapacidadInsertada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -85,7 +86,7 @@ class DiscapacidadControlador {
     // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD    **USADO
     public async EditarDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, nombre, user_name, ip } = req.body;
+            const { id, nombre, user_name, ip, ip_local } = req.body;
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
@@ -101,7 +102,8 @@ class DiscapacidadControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -131,7 +133,8 @@ class DiscapacidadControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(discapacidadEditada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -158,7 +161,7 @@ class DiscapacidadControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -179,7 +182,8 @@ class DiscapacidadControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -201,7 +205,8 @@ class DiscapacidadControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -369,7 +374,7 @@ class DiscapacidadControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
 
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -395,7 +400,8 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(discapacidad_emp),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

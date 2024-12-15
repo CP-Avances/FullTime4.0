@@ -273,7 +273,7 @@ class LoginControlador {
     // METODO PARA CAMBIAR CONTRASEÑA
     CambiarContrasenia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { token, contrasena, user_name, ip } = req.body;
+            let { token, contrasena, user_name, ip, ip_local } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
@@ -292,7 +292,8 @@ class LoginControlador {
                             accion: 'U',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
                         });
                         // FINALIZAR TRANSACCION
@@ -309,7 +310,8 @@ class LoginControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(contrasenaOriginal),
                         datosNuevos: `{"contrasena": "${contrasena}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

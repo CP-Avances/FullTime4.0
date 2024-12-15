@@ -24,7 +24,7 @@ class DepartamentoControlador {
     CrearDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal, user_name, ip } = req.body;
+                const { nombre, id_sucursal, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -38,6 +38,7 @@ class DepartamentoControlador {
                     datosOriginales: '',
                     datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -55,7 +56,7 @@ class DepartamentoControlador {
     ActualizarDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal, user_name, ip } = req.body;
+                const { nombre, id_sucursal, user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -70,6 +71,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el departamento con ID: ${id}`,
                     });
                     // FINALIZAR TRANSACCION
@@ -88,6 +90,7 @@ class DepartamentoControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -221,7 +224,7 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ELIMINAR
@@ -235,6 +238,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el departamento con ID: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -252,6 +256,7 @@ class DepartamentoControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -269,7 +274,7 @@ class DepartamentoControlador {
     CrearNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel, user_name, ip } = req.body;
+                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -285,6 +290,7 @@ class DepartamentoControlador {
                     datosOriginales: '',
                     datosNuevos: `{Departamento: ${departamento}, Nivel: ${nivel}, Departamento Nivel: ${dep_nivel_nombre}}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -319,7 +325,7 @@ class DepartamentoControlador {
     ActualizarNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nivel, user_name, ip } = req.body;
+                const { nivel, user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -334,6 +340,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el nivel de departamento con ID: ${id}, Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -352,6 +359,7 @@ class DepartamentoControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: `{Nivel: ${nivel}}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -370,7 +378,7 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ELIMINAR
@@ -384,6 +392,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el nivel de departamento con ID: ${id}`,
                     });
                     // FINALIZAR TRANSACCION
@@ -401,6 +410,7 @@ class DepartamentoControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -418,7 +428,7 @@ class DepartamentoControlador {
     ActualizarNombreNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento, user_name, ip } = req.body;
+                const { id_departamento, departamento, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ACTUALIZAR
@@ -435,6 +445,7 @@ class DepartamentoControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
                         });
                         // FINALIZAR TRANSACCION
@@ -454,6 +465,7 @@ class DepartamentoControlador {
                             datosOriginales: JSON.stringify(datos1),
                             datosNuevos: `{departamento: ${departamento}}`,
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                     }
@@ -467,6 +479,7 @@ class DepartamentoControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
                         });
                         // FINALIZAR TRANSACCION
@@ -486,6 +499,7 @@ class DepartamentoControlador {
                             datosOriginales: JSON.stringify(datos2),
                             datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                     }
@@ -653,7 +667,7 @@ class DepartamentoControlador {
     // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -672,6 +686,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(departamento),
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -1037,7 +1052,7 @@ class DepartamentoControlador {
     // METODO PARA REGISTRAR NIVELES DE DEPARTAMENTO  **USADO
     CargarPlantillaNivelesDep(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -1074,6 +1089,7 @@ class DepartamentoControlador {
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(depaNivel),
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

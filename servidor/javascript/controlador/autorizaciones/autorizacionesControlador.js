@@ -62,7 +62,7 @@ class AutorizacionesControlador {
     CrearAutorizacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_plan_hora_extra, id_documento, user_name, ip } = req.body;
+                const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_plan_hora_extra, id_documento, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const autorizacion = yield database_1.default.query(`
@@ -80,6 +80,7 @@ class AutorizacionesControlador {
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -96,7 +97,7 @@ class AutorizacionesControlador {
     ActualizarEstadoAutorizacionPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_documento, estado, id_permiso, user_name, ip } = req.body;
+                const { id_documento, estado, id_permiso, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
@@ -110,6 +111,7 @@ class AutorizacionesControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
                     });
                 }
@@ -125,6 +127,7 @@ class AutorizacionesControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: JSON.stringify(datosNuevos),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -146,7 +149,7 @@ class AutorizacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { id_documento, estado, user_name, ip } = req.body;
+                const { id_documento, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
@@ -160,6 +163,7 @@ class AutorizacionesControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro de autorizaciones con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -179,6 +183,7 @@ class AutorizacionesControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: JSON.stringify(datosNuevos),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

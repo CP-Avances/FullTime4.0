@@ -198,16 +198,16 @@ class AuditoriaControlador {
     // INSERTAR REGISTRO DE AUDITORIA
     public async InsertarAuditoria(data: Auditoria) {
         try {
-            const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
+            const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion, ip_local } = data;
             let plataforma = "APLICACION WEB"
             await pool.query(
                 `
                 INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
-                    action, original_data, new_data, ip_address, observacion) 
-                VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)
+                    action, original_data, new_data, ip_address, observacion, ip_address_local) 
+                VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8, $9)
                 `
                 ,
-                [plataforma, tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
+                [plataforma, tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion, ip_local]);
         } catch (error) {
             throw error;
         }
@@ -286,6 +286,7 @@ interface Auditoria {
     datosOriginales: string,
     datosNuevos: string,
     ip: string,
+    ip_local: string,
     observacion: string | null
 }
 

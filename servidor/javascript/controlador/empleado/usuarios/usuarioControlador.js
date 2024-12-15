@@ -24,7 +24,7 @@ class UsuarioControlador {
     CrearUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
+                const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip, ip_local } = req.body;
                 // INCIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -38,7 +38,8 @@ class UsuarioControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(response.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -105,7 +106,7 @@ class UsuarioControlador {
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip } = req.body;
+                const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -118,7 +119,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -136,7 +138,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -154,7 +157,7 @@ class UsuarioControlador {
     CambiarPasswordUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { contrasena, id_empleado, user_name, ip } = req.body;
+                const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -167,7 +170,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -184,7 +188,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{contrasena: ${contrasena}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -202,7 +207,7 @@ class UsuarioControlador {
     RegistrarAdminComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { admin_comida, id_empleado, user_name, ip } = req.body;
+                const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
                 const adminComida = (yield admin_comida.toLowerCase()) === 'si' ? true : false;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -216,7 +221,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -234,7 +240,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -255,7 +262,7 @@ class UsuarioControlador {
     ActualizarFrase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { frase, id_empleado, user_name, ip } = req.body;
+                const { frase, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -268,7 +275,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -285,7 +293,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{frase: ${frase}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -321,7 +330,7 @@ class UsuarioControlador {
     ActualizarEstadoTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { array, web_habilita, user_name, ip } = req.body;
+                const { array, web_habilita, user_name, ip, ip_local } = req.body;
                 console.log("ver req.body", req.body);
                 const ids_empleados = array.map((empl) => empl.id);
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
@@ -339,7 +348,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(item),
                     datosNuevos: `{"web_habilita": ${!item.web_habilita}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -391,7 +401,7 @@ class UsuarioControlador {
     ActualizarEstadoTimbreMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { array, app_habilita, user_name, ip } = req.body;
+                const { array, app_habilita, user_name, ip, ip_local } = req.body;
                 console.log("ver req.body", req.body);
                 const ids_empleados = array.map((empl) => empl.id);
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
@@ -409,7 +419,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(item),
                     datosNuevos: `{"app_habilita": ${!item.app_habilita}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -452,7 +463,7 @@ class UsuarioControlador {
     EliminarDispositivoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const array = req.params.dispositivo;
                 let dispositivos = array.split(',');
                 if (dispositivos.length === 0)
@@ -471,7 +482,8 @@ class UsuarioControlador {
                                 accion: 'D',
                                 datosOriginales: '',
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: `Error al eliminar dispositivo con id: ${id_dispo}. Registro no encontrado.`
                             });
                             // FINALIZAR TRANSACCION
@@ -489,7 +501,8 @@ class UsuarioControlador {
                             accion: 'D',
                             datosOriginales: JSON.stringify(datosOriginales),
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -604,7 +617,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var token = req.body.token;
             var frase = req.body.frase;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
@@ -620,7 +633,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -637,7 +651,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{"frase": "${frase}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -676,7 +691,7 @@ class UsuarioControlador {
     CrearUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body;
+                const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = req.body;
                 // INICIA TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -690,7 +705,8 @@ class UsuarioControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}, "administra": ${administra}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -761,7 +777,7 @@ class UsuarioControlador {
     ActualizarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
+                const { id, id_departamento, principal, personal, administra, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOSORIGINALES
@@ -774,7 +790,8 @@ class UsuarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -792,7 +809,8 @@ class UsuarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosActuales.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -811,7 +829,7 @@ class UsuarioControlador {
     EliminarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id } = req.body;
+                const { user_name, ip, id, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOSORIGINALES
@@ -824,7 +842,8 @@ class UsuarioControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar eu_usuario_departamento con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -841,7 +860,8 @@ class UsuarioControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -949,7 +969,7 @@ class UsuarioControlador {
     ingresarIDdispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
+                const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones, ip_local } = req.body;
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo, terminos_condiciones)' +
                     'VALUES ($1, $2, $3, $4) RETURNING *', [id_empleado, id_celular, modelo_dispositivo, terminos_condiciones]);
@@ -962,6 +982,7 @@ class UsuarioControlador {
                     datosOriginales: "",
                     datosNuevos: JSON.stringify(objetoDispositivos),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 yield database_1.default.query('COMMIT');
@@ -1058,7 +1079,7 @@ function VerificarAsignaciones(datos, personal, isPersonal) {
 function RegistrarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
             // INICIA TRANSACCION
             yield database_1.default.query('BEGIN');
             const registro = yield database_1.default.query(`
@@ -1073,7 +1094,8 @@ function RegistrarUsuarioDepartamento(datos) {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
             // FINALIZAR TRANSACCION
@@ -1089,7 +1111,7 @@ function RegistrarUsuarioDepartamento(datos) {
 function EditarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CONSULTA DATOSORIGINALES
@@ -1104,7 +1126,8 @@ function EditarUsuarioDepartamento(datos) {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar registro con id_empleado: ${id_empleado} y id_departamento: ${id_departamento}. Registro no encontrado.`
                 });
                 // FINALIZAR TRANSACCION
@@ -1123,7 +1146,8 @@ function EditarUsuarioDepartamento(datos) {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
             // FINALIZAR TRANSACCION

@@ -28,7 +28,7 @@ class BirthdayControlador {
     // METODO PARA REGISTRAR MENSAJE DE CUMPLEANIOS    **USADO
     public async CrearMensajeBirthday(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_empresa, titulo, link, mensaje, user_name, ip } = req.body;
+            const { id_empresa, titulo, link, mensaje, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -48,7 +48,8 @@ class BirthdayControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: `{id_empresa: ${id_empresa}, titulo: ${titulo}, mensaje: ${mensaje}, url: ${link}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -77,7 +78,7 @@ class BirthdayControlador {
             let id = req.params.id_empresa;
             let separador = path.sep;
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -115,7 +116,8 @@ class BirthdayControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(cumpleanios.rows[0]),
                     datosNuevos: `{id: ${id}, img: ${imagen}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -151,7 +153,7 @@ class BirthdayControlador {
     // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS   **USADO
     public async EditarMensajeBirthday(req: Request, res: Response): Promise<Response> {
         try {
-            const { titulo, mensaje, link, user_name, ip } = req.body;
+            const { titulo, mensaje, link, user_name, ip, ip_local } = req.body;
             const { id } = req.params;
 
             // INICIAR TRANSACCION
@@ -167,7 +169,8 @@ class BirthdayControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el mensaje de cumpleaños, no se encuentra el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -189,7 +192,8 @@ class BirthdayControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: JSON.stringify({ titulo, mensaje, link }),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

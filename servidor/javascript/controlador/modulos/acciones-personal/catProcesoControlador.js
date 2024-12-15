@@ -51,7 +51,7 @@ class ProcesoControlador {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, nivel, proc_padre, user_name, ip } = req.body;
+                const { nombre, nivel, proc_padre, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -65,6 +65,7 @@ class ProcesoControlador {
                     datosOriginales: '',
                     datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -93,7 +94,7 @@ class ProcesoControlador {
     ActualizarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, nivel, proc_padre, id, user_name, ip } = req.body;
+                const { nombre, nivel, proc_padre, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -108,6 +109,7 @@ class ProcesoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -125,6 +127,7 @@ class ProcesoControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -143,7 +146,7 @@ class ProcesoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -160,6 +163,7 @@ class ProcesoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -177,6 +181,7 @@ class ProcesoControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComprimirImagen = exports.ConvertirImagenBase64 = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const sharp = require('sharp');
+const sharp_1 = __importDefault(require("sharp"));
 const ConvertirImagenBase64 = function (ruta) {
     console.log("Path img: ", ruta);
     try {
@@ -35,7 +35,7 @@ const ComprimirImagen = function (ruta_temporal, ruta_guardar) {
     try {
         fs_1.default.access(ruta_temporal, fs_1.default.constants.F_OK, (err) => {
             if (!err) {
-                sharp(ruta_temporal)
+                (0, sharp_1.default)(ruta_temporal)
                     .resize(800) // CAMBIA EL TAMAÑO DE LA IMAGEN A UN ANCHO DE 800 PÍXELES, MANTIENE LA RELACION DE ASPECTO
                     .jpeg({ quality: 80 }) // CONFIGURA LA CALIDAD DE LA IMAGEN JPEG AL 80%
                     .toFile(ruta_guardar);

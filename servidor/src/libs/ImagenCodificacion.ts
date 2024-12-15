@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-const sharp = require('sharp');
+import sharp from 'sharp';
 
 export const ConvertirImagenBase64: any = function (ruta: any) {
     console.log("Path img: ", ruta);

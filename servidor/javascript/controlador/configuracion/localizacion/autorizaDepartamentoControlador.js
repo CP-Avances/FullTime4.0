@@ -66,7 +66,7 @@ class AutorizaDepartamentoControlador {
     CrearAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip } = req.body;
+                const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const respuesta = yield database_1.default.query(`
@@ -81,7 +81,8 @@ class AutorizaDepartamentoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -99,7 +100,7 @@ class AutorizaDepartamentoControlador {
     ActualizarAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar, user_name, ip } = req.body;
+                const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ACTUALIZAR
@@ -112,7 +113,8 @@ class AutorizaDepartamentoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -132,7 +134,8 @@ class AutorizaDepartamentoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -151,7 +154,7 @@ class AutorizaDepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ELIMINAR
@@ -164,7 +167,8 @@ class AutorizaDepartamentoControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -181,7 +185,8 @@ class AutorizaDepartamentoControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

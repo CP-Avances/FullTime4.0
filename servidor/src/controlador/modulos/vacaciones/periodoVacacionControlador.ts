@@ -28,7 +28,7 @@ class PeriodoVacacionControlador {
     try {
       const {
         id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final,
-        dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip,
+        dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, ip_local
       } = req.body;
 
       // INICIAR TRANSACCION
@@ -60,7 +60,8 @@ class PeriodoVacacionControlador {
         accion: "I",
         datosOriginales: "",
         datosNuevos: JSON.stringify(periodo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -92,7 +93,7 @@ class PeriodoVacacionControlador {
     try {
       const {
         id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio,
-        fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip,
+        fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, ip_local
       } = req.body;
 
       // INICIAR TRANSACCION
@@ -112,7 +113,8 @@ class PeriodoVacacionControlador {
           accion: "U",
           datosOriginales: "",
           datosNuevos: "",
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar período de vacaciones con id: ${id}`,
         });
 
@@ -152,7 +154,8 @@ class PeriodoVacacionControlador {
         accion: "U",
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 

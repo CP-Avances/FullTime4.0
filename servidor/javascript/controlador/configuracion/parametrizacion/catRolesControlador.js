@@ -33,7 +33,7 @@ class RolesControlador {
     EliminarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -48,7 +48,8 @@ class RolesControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el rol con id ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -65,7 +66,8 @@ class RolesControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -83,7 +85,7 @@ class RolesControlador {
     CrearRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, user_name, ip } = req.body;
+                const { nombre, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -96,7 +98,8 @@ class RolesControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -144,7 +147,7 @@ class RolesControlador {
     ActualizarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id, user_name, ip } = req.body;
+                const { nombre, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -158,7 +161,8 @@ class RolesControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el rol con id ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -173,7 +177,8 @@ class RolesControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

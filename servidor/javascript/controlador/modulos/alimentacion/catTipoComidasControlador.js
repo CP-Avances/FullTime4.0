@@ -89,7 +89,7 @@ class TipoComidasControlador {
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, tipo_comida, hora_inicio, hora_fin, user_name, ip } = req.body;
+                const { nombre, tipo_comida, hora_inicio, hora_fin, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
@@ -106,7 +106,8 @@ class TipoComidasControlador {
                     accion: "I",
                     datosOriginales: "",
                     datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -128,7 +129,7 @@ class TipoComidasControlador {
     ActualizarComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip } = req.body;
+                const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -142,7 +143,8 @@ class TipoComidasControlador {
                         accion: "U",
                         datosOriginales: "",
                         datosNuevos: "",
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -164,7 +166,8 @@ class TipoComidasControlador {
                     accion: "U",
                     datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
                     datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -182,7 +185,7 @@ class TipoComidasControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
@@ -197,7 +200,8 @@ class TipoComidasControlador {
                         accion: "D",
                         datosOriginales: "",
                         datosNuevos: "",
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -216,7 +220,8 @@ class TipoComidasControlador {
                     accion: "D",
                     datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
                     datosNuevos: "",
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -234,7 +239,7 @@ class TipoComidasControlador {
     CrearDetalleMenu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, valor, observacion, id_menu, user_name, ip } = req.body;
+                const { nombre, valor, observacion, id_menu, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 yield database_1.default.query(`
@@ -248,7 +253,8 @@ class TipoComidasControlador {
                     accion: "I",
                     datosOriginales: "",
                     datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}, id_menu: ${id_menu}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -283,7 +289,7 @@ class TipoComidasControlador {
     ActualizarDetalleMenu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, valor, observacion, id, user_name, ip } = req.body;
+                const { nombre, valor, observacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -297,7 +303,8 @@ class TipoComidasControlador {
                         accion: "U",
                         datosOriginales: "",
                         datosNuevos: "",
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -315,7 +322,8 @@ class TipoComidasControlador {
                     accion: "U",
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -332,7 +340,7 @@ class TipoComidasControlador {
     EliminarDetalle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
@@ -347,7 +355,8 @@ class TipoComidasControlador {
                         accion: "D",
                         datosOriginales: "",
                         datosNuevos: "",
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id ${id}`,
                     });
                     // FINALIZAR TRANSACCION
@@ -364,7 +373,8 @@ class TipoComidasControlador {
                     accion: "D",
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: "",
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION

@@ -45,7 +45,7 @@ class CiudadFeriadoControlador {
     // METODO PARA ELIMINAR REGISTRO    **USADO
     public async EliminarCiudadFeriado(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
 
             // INICIAR TRANSACCION
@@ -63,7 +63,8 @@ class CiudadFeriadoControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar la ciudad con id ${id}`
                 });
 
@@ -85,7 +86,8 @@ class CiudadFeriadoControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -119,7 +121,7 @@ class CiudadFeriadoControlador {
     // METODO PARA ASIGNAR CIUDADES A FERIADO   **USADO
     public async AsignarCiudadFeriado(req: Request, res: Response) {
         try {
-            const { id_feriado, id_ciudad, user_name, ip } = req.body;
+            const { id_feriado, id_ciudad, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -139,7 +141,8 @@ class CiudadFeriadoControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(feriado),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -163,7 +166,7 @@ class CiudadFeriadoControlador {
     // METODO PARA ACTUALIZAR REGISTRO    **USADO
     public async ActualizarCiudadFeriado(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_feriado, id_ciudad, id, user_name, ip } = req.body;
+            const { id_feriado, id_ciudad, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -180,7 +183,8 @@ class CiudadFeriadoControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar la ciudad con id ${id}. Registro no encontrado.`
                 });
 
@@ -203,14 +207,15 @@ class CiudadFeriadoControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro actualizado.' });
-            
+
         } catch (error) {
             // FINALIZAR TRANSACCION
             await pool.query('ROLLBACK');

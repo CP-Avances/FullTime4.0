@@ -36,7 +36,7 @@ class AccionPersonalControlador {
     CrearTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, user_name, ip } = req.body;
+                const { descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -51,7 +51,8 @@ class AccionPersonalControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{"descripcion": "${descripcion}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -72,7 +73,7 @@ class AccionPersonalControlador {
     CrearTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, user_name, ip } = req.body;
+                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -94,7 +95,8 @@ class AccionPersonalControlador {
                             "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
                         }
                         `,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -129,7 +131,7 @@ class AccionPersonalControlador {
     CrearCargoPropuesto(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, user_name, ip } = req.body;
+                const { descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -142,7 +144,8 @@ class AccionPersonalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -205,7 +208,7 @@ class AccionPersonalControlador {
     CrearDecreto(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, user_name, ip } = req.body;
+                const { descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -218,7 +221,8 @@ class AccionPersonalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -309,7 +313,7 @@ class AccionPersonalControlador {
     ActualizarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id, user_name, ip } = req.body;
+                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
@@ -324,7 +328,8 @@ class AccionPersonalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -348,7 +353,8 @@ class AccionPersonalControlador {
                         "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
                     }
                     `,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -365,7 +371,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
@@ -380,7 +386,8 @@ class AccionPersonalControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -397,7 +404,8 @@ class AccionPersonalControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -414,7 +422,7 @@ class AccionPersonalControlador {
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip } = req.body;
+                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip, ip_local } = req.body;
                 let datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -456,7 +464,8 @@ class AccionPersonalControlador {
                     fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                     numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                     descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -472,7 +481,7 @@ class AccionPersonalControlador {
     ActualizarPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip } = req.body;
+                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip, ip_local } = req.body;
                 let datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -488,7 +497,8 @@ class AccionPersonalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -545,7 +555,8 @@ class AccionPersonalControlador {
                 fecha_acta_final_concurso: ${fecha_acta_final_concursoN}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                 numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                 descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
