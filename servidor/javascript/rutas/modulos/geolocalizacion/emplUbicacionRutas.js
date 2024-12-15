@@ -6,11 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const emplUbicacionControlador_1 = __importDefault(require("../../../controlador/modulos/geolocalizacion/emplUbicacionControlador"));
-// ALMACENAMIENTO DEL CERTIFICADO DE VACUNACIÓN EN CARPETA
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './carnetVacuna',
-});
 class UbicacionRutas {
     constructor() {
         this.router = (0, express_1.Router)();

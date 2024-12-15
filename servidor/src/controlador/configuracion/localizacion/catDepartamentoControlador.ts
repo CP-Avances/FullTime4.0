@@ -13,7 +13,7 @@ class DepartamentoControlador {
   // REGISTRAR DEPARTAMENTO    **USADO
   public async CrearDepartamento(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_sucursal, user_name, ip } = req.body;
+      const { nombre, id_sucursal, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -32,6 +32,7 @@ class DepartamentoControlador {
         datosOriginales: '',
         datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -50,7 +51,7 @@ class DepartamentoControlador {
   // ACTUALIZAR REGISTRO DE DEPARTAMENTO   **USADO
   public async ActualizarDepartamento(req: Request, res: Response) {
     try {
-      const { nombre, id_sucursal, user_name, ip } = req.body;
+      const { nombre, id_sucursal, user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -68,6 +69,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el departamento con ID: ${id}`,
         });
 
@@ -91,6 +93,7 @@ class DepartamentoControlador {
         datosOriginales: JSON.stringify(datos),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -252,7 +255,7 @@ class DepartamentoControlador {
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -269,6 +272,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el departamento con ID: ${id}. Registro no encontrado.`,
         });
 
@@ -291,6 +295,7 @@ class DepartamentoControlador {
         datosOriginales: JSON.stringify(datos),
         datosNuevos: '',
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -310,7 +315,7 @@ class DepartamentoControlador {
   public async CrearNivelDepa(req: Request, res: Response): Promise<any> {
     try {
       const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento,
-        id_suc_dep_nivel, user_name, ip } = req.body;
+        id_suc_dep_nivel, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -331,6 +336,7 @@ class DepartamentoControlador {
         datosOriginales: '',
         datosNuevos: `{Departamento: ${departamento}, Nivel: ${nivel}, Departamento Nivel: ${dep_nivel_nombre}}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -367,7 +373,7 @@ class DepartamentoControlador {
   // ACTUALIZAR REGISTRO DE NIVEL DE DEPARTAMENTO DE TABLA NIVEL_JERARQUICO   **USADO
   public async ActualizarNivelDepa(req: Request, res: Response) {
     try {
-      const { nivel, user_name, ip } = req.body;
+      const { nivel, user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -385,6 +391,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el nivel de departamento con ID: ${id}, Registro no encontrado.`,
         });
 
@@ -408,6 +415,7 @@ class DepartamentoControlador {
         datosOriginales: JSON.stringify(datos),
         datosNuevos: `{Nivel: ${nivel}}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -426,7 +434,7 @@ class DepartamentoControlador {
   public async EliminarRegistroNivelDepa(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -443,6 +451,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el nivel de departamento con ID: ${id}`,
         });
 
@@ -465,6 +474,7 @@ class DepartamentoControlador {
         datosOriginales: JSON.stringify(datos),
         datosNuevos: '',
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -482,7 +492,7 @@ class DepartamentoControlador {
   // METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  **USADO
   public async ActualizarNombreNivel(req: Request, res: Response): Promise<any> {
     try {
-      const { id_departamento, departamento, user_name, ip } = req.body;
+      const { id_departamento, departamento, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -503,6 +513,7 @@ class DepartamentoControlador {
             datosOriginales: '',
             datosNuevos: '',
             ip: ip,
+            ip_local: ip_local,
             observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
           });
 
@@ -526,6 +537,7 @@ class DepartamentoControlador {
             datosOriginales: JSON.stringify(datos1),
             datosNuevos: `{departamento: ${departamento}}`,
             ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
         }
@@ -540,6 +552,7 @@ class DepartamentoControlador {
             datosOriginales: '',
             datosNuevos: '',
             ip: ip,
+            ip_local: ip_local,
             observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
           });
 
@@ -563,6 +576,7 @@ class DepartamentoControlador {
             datosOriginales: JSON.stringify(datos2),
             datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
             ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
         }
@@ -726,7 +740,7 @@ class DepartamentoControlador {
 
   // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
   public async CargarPlantilla(req: Request, res: Response) {
-    const { plantilla, user_name, ip } = req.body;
+    const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const data of plantilla) {
@@ -756,6 +770,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: JSON.stringify(departamento),
           ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -1135,7 +1150,7 @@ class DepartamentoControlador {
 
   // METODO PARA REGISTRAR NIVELES DE DEPARTAMENTO  **USADO
   public async CargarPlantillaNivelesDep(req: Request, res: Response) {
-    const { plantilla, user_name, ip } = req.body;
+    const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const data of plantilla) {
@@ -1192,6 +1207,7 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: JSON.stringify(depaNivel),
           ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

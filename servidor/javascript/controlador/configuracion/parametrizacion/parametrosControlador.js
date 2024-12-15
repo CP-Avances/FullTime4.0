@@ -96,7 +96,7 @@ class ParametrosControlador {
     EliminarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -110,7 +110,8 @@ class ParametrosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar detalle tipo parametro con id ${id}`
                     });
                     //FINALIZAR TRANSACCION
@@ -127,7 +128,8 @@ class ParametrosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 //FINALIZAR TRANSACCION
@@ -145,7 +147,7 @@ class ParametrosControlador {
     IngresarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, observacion, user_name, ip } = req.body;
+                const { id_tipo, descripcion, observacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
@@ -159,7 +161,8 @@ class ParametrosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify({ id_tipo, descripcion, observacion }),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 //FINALIZAR TRANSACCION
@@ -177,7 +180,7 @@ class ParametrosControlador {
     ActualizarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, descripcion, observacion, user_name, ip } = req.body;
+                const { id, descripcion, observacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -192,7 +195,8 @@ class ParametrosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar detalle tipo parametro con id ${id}`
                     });
                     //FINALIZAR TRANSACCION
@@ -209,7 +213,8 @@ class ParametrosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 //FINALIZAR TRANSACCION

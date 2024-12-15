@@ -36,7 +36,8 @@ class RegimenControlador {
         laboral_dias,
         meses_calculo,
         user_name,
-        ip
+        ip,
+        ip_local
       } = req.body;
 
       // INICIAR TRANSACCION
@@ -89,6 +90,7 @@ class RegimenControlador {
         datosOriginales: "",
         datosNuevos: JSON.stringify(regimen),
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -136,12 +138,13 @@ class RegimenControlador {
         meses_calculo,
         id,
         user_name,
-        ip
+        ip,
+        ip_local
       } = req.body;
-  
+
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
-  
+
       // CONSULTAR DATOSORIGINALES
       const regimen = await pool.query(
         `
@@ -150,7 +153,7 @@ class RegimenControlador {
         , [id]
       );
       const [datosOriginales] = regimen.rows;
-  
+
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -160,16 +163,17 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
         });
-  
+
         // FINALIZAR TRANSACCION
         await pool.query("COMMIT");
         return res.status(404).jsonp({ message: "Registro no encontrado" });
       }
-  
+
       const datosNuevos = await pool.query(
-          `
+        `
       UPDATE ere_cat_regimenes SET id_pais = $1, descripcion = $2, mes_periodo = $3, dias_mes = $4, trabajo_minimo_mes = $5, 
         trabajo_minimo_horas = $6, continuidad_laboral = $7, vacacion_dias_laboral = $8, vacacion_dias_libre = $9, 
         vacacion_dias_calendario = $10, acumular = $11, dias_maximo_acumulacion = $12, 
@@ -214,12 +218,13 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
-  
+
       return res.jsonp({ message: "Regimen guardado" });
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -295,7 +300,7 @@ class RegimenControlador {
   // ELIMINAR REGISTRO DE REGIMEN LABORAL  **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -319,6 +324,7 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
         });
 
@@ -342,6 +348,7 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: "",
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -358,11 +365,11 @@ class RegimenControlador {
   /** ** ************************************************************************************************ **
    ** **                         CONSULTAS DE PERIODOS DE VACACIONES                                   ** **
    ** ** ************************************************************************************************ **/
- 
+
   // REGISTRAR PERIODO DE VACACIONES  **USADO
   public async CrearPeriodo(req: Request, res: Response): Promise<Response> {
     try {
-      const { id_regimen, descripcion, dias_vacacion, user_name, ip } = req.body;
+      const { id_regimen, descripcion, dias_vacacion, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -385,6 +392,7 @@ class RegimenControlador {
         datosOriginales: "",
         datosNuevos: JSON.stringify(periodo),
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -406,7 +414,7 @@ class RegimenControlador {
   // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES  **USADO
   public async ActualizarPeriodo(req: Request, res: Response): Promise<Response> {
     try {
-      const { descripcion, dias_vacacion, id, user_name, ip } = req.body;
+      const { descripcion, dias_vacacion, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -429,6 +437,7 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
         });
 
@@ -436,7 +445,7 @@ class RegimenControlador {
         await pool.query("COMMIT");
         return res.status(404).jsonp({ message: "error" });
       }
-  
+
       await pool.query(
         `
         UPDATE ere_dividir_vacaciones SET descripcion = $1, dias_vacacion = $2 WHERE id = $3
@@ -452,6 +461,7 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{"descripcion": "${descripcion}", "dias_vacacion": "${dias_vacacion}"}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -463,7 +473,7 @@ class RegimenControlador {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
-      
+
     }
   }
 
@@ -487,7 +497,7 @@ class RegimenControlador {
   // ELIMINAR REGISTRO DE PERIODO DE VACACIONES  **USADO
   public async EliminarPeriodo(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -511,6 +521,7 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
         });
 
@@ -534,6 +545,7 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: "",
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
       return res.jsonp({ message: "Registro eliminado." });
@@ -551,7 +563,7 @@ class RegimenControlador {
   // REGISTRAR ANTIGUEDAD DE VACACIONES  **USADO
   public async CrearAntiguedad(req: Request, res: Response): Promise<Response> {
     try {
-      const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip } = req.body;
+      const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -574,6 +586,7 @@ class RegimenControlador {
         datosOriginales: "",
         datosNuevos: JSON.stringify(antiguedad),
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -598,11 +611,11 @@ class RegimenControlador {
     res: Response
   ): Promise<Response> {
     try {
-      const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip } = req.body;
-  
+      const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip, ip_local } = req.body;
+
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
-  
+
       // CONSULTAR DATOSORIGINALES
       const antiguedad = await pool.query(
         `
@@ -611,7 +624,7 @@ class RegimenControlador {
         , [id]
       );
       const [datosOriginales] = antiguedad.rows;
-  
+
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -621,9 +634,10 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
         });
-  
+
         // FINALIZAR TRANSACCION
         await pool.query("COMMIT");
         return res.status(404).jsonp({ message: "error" });
@@ -634,7 +648,7 @@ class RegimenControlador {
         `
         , [anio_desde, anio_hasta, dias_antiguedad, id]
       );
-  
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: "ere_antiguedad",
@@ -643,9 +657,10 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{"anio_desde": "${anio_desde}", "anio_hasta": "${anio_hasta}", "dias_antiguedad": "${dias_antiguedad}"}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
-  
+
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
       return res.jsonp({ message: "Antiguedad guardada" });
@@ -676,7 +691,7 @@ class RegimenControlador {
   // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES  **USADO
   public async EliminarAntiguedad(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -700,6 +715,7 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
         });
 
@@ -723,13 +739,14 @@ class RegimenControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: "",
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
       return res.jsonp({ message: "Registro eliminado." });
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");

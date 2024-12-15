@@ -30,7 +30,7 @@ class ModalidaLaboralControlador {
     // METODO PARA REGISTRAR MODALIDAD LABORAL   **USADO
     public async CrearModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { modalidad, user_name, ip } = req.body;
+            const { modalidad, user_name, ip, ip_local } = req.body;
             var VERIFICAR_MODALIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
@@ -59,7 +59,8 @@ class ModalidaLaboralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(modalidadLaboral),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -86,7 +87,7 @@ class ModalidaLaboralControlador {
     // METODO PARA EDITAR MODALIDAD LABORAL    **USADO
     public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, modalidad, user_name, ip } = req.body;
+            const { id, modalidad, user_name, ip, ip_local } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
 
             const modalExiste = await pool.query(
@@ -109,7 +110,8 @@ class ModalidaLaboralControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -142,7 +144,8 @@ class ModalidaLaboralControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(modalidadLaboral),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -167,7 +170,7 @@ class ModalidaLaboralControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -188,7 +191,8 @@ class ModalidaLaboralControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}, no se encuentra el registro.`
                 });
 
@@ -210,7 +214,8 @@ class ModalidaLaboralControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(modalidadLaboral),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -373,7 +378,7 @@ class ModalidaLaboralControlador {
 
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -401,7 +406,8 @@ class ModalidaLaboralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(modalidad_la),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

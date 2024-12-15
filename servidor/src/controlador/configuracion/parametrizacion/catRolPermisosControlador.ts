@@ -106,7 +106,7 @@ class RolPermisosControlador {
   // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
-      const { funcion, link, id_rol, id_accion, movil, user_name, ip } = req.body;
+      const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = req.body;
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -122,7 +122,8 @@ class RolPermisosControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosOriginales),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -144,7 +145,7 @@ class RolPermisosControlador {
   // METODO PARA ELIMINAR REGISTRO  **USADO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
     try {
-      const { id, user_name, ip } = req.body
+      const { id, user_name, ip, ip_local } = req.body
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -162,7 +163,8 @@ class RolPermisosControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
         });
 
@@ -183,7 +185,8 @@ class RolPermisosControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import PLANTILLA_CONTROLADOR from '../../controlador/documentos/plantillaControlador';
-const multipart = require('connect-multiparty');  
 
 class PlantillaRutas {
     public router: Router = Router();

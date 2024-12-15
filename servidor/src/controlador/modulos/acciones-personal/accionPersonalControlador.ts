@@ -25,7 +25,7 @@ class AccionPersonalControlador {
 
     public async CrearTipoAccion(req: Request, res: Response) {
         try {
-            const { descripcion, user_name, ip } = req.body;
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -46,7 +46,8 @@ class AccionPersonalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -69,7 +70,7 @@ class AccionPersonalControlador {
 
         try {
             const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion,
-                tipo_situacion_propuesta, user_name, ip } = req.body;
+                tipo_situacion_propuesta, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -99,7 +100,8 @@ class AccionPersonalControlador {
                         }
                         `
                     ,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -136,7 +138,7 @@ class AccionPersonalControlador {
 
     public async CrearCargoPropuesto(req: Request, res: Response): Promise<Response> {
         try {
-            const { descripcion, user_name, ip } = req.body;
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -154,7 +156,8 @@ class AccionPersonalControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: `{"descripcion": "${descripcion}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -220,7 +223,7 @@ class AccionPersonalControlador {
 
     public async CrearDecreto(req: Request, res: Response): Promise<Response> {
         try {
-            const { descripcion, user_name, ip } = req.body;
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -238,7 +241,8 @@ class AccionPersonalControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: `{"descripcion": "${descripcion}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -334,7 +338,7 @@ class AccionPersonalControlador {
     public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta,
-                id, user_name, ip } = req.body;
+                id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -354,7 +358,8 @@ class AccionPersonalControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -384,7 +389,8 @@ class AccionPersonalControlador {
                     }
                     `
                 ,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -401,7 +407,7 @@ class AccionPersonalControlador {
     public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -421,7 +427,8 @@ class AccionPersonalControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -442,7 +449,8 @@ class AccionPersonalControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -465,7 +473,7 @@ class AccionPersonalControlador {
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip } = req.body;
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip, ip_local } = req.body;
 
             let datosNuevos = req.body;
 
@@ -516,7 +524,8 @@ class AccionPersonalControlador {
                     fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                     numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                     descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -536,7 +545,7 @@ class AccionPersonalControlador {
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip } = req.body;
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip, ip_local } = req.body;
 
             let datosNuevos = req.body;
 
@@ -558,7 +567,8 @@ class AccionPersonalControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -620,7 +630,8 @@ class AccionPersonalControlador {
                 fecha_acta_final_concurso: ${fecha_acta_final_concursoN}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                 numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                 descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

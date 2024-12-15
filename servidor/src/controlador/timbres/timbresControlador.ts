@@ -10,7 +10,7 @@ class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     public async EliminarMultiplesAvisos(req: Request, res: Response): Promise<any> {
         try {
-            const { arregloAvisos, user_name, ip } = req.body;
+            const { arregloAvisos, user_name, ip, ip_local } = req.body;
             let contador: number = 0;
             if (arregloAvisos.length > 0) {
                 contador = 0;
@@ -29,7 +29,8 @@ class TimbresControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar el registro con id ${obj}. Registro no encontrado.`
                         });
 
@@ -52,7 +53,8 @@ class TimbresControlador {
                                 accion: 'D',
                                 datosOriginales: JSON.stringify(datosOriginales),
                                 datosNuevos: '',
-                                ip,
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
 
@@ -235,7 +237,7 @@ class TimbresControlador {
     // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO   **USADO
     public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any> {
         try {
-            let { id, codigo, tecla, observacion, fecha, user_name, ip } = req.body;
+            let { id, codigo, tecla, observacion, fecha, user_name, ip, ip_local } = req.body;
 
             const timbre = await pool.query(
                 `
@@ -251,7 +253,8 @@ class TimbresControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar timbre con id: ${id}`
                 });
 
@@ -292,7 +295,8 @@ class TimbresControlador {
                 accion: 'U',
                 datosOriginales: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosOriginales.accion}, tecla_funcion: ${datosOriginales.tecla_funcion}, observacion: ${datosOriginales.observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${datosOriginales.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento} }`,
                 datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${datosNuevos.modificartimbre}, tecla_funcion: ${tecla}, observacion: ${observacion}, latitud: ${datosOriginales.latitud}, longitud: ${datosOriginales.longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, fecha_hora_timbre_validado: ${fechaTimbreValidado + ' ' + fechaHoraValidado}, id_reloj: ${datosOriginales.id_reloj}, ubicacion: ${datosOriginales.ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen}, documento:${existe_documento}  }`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -323,7 +327,7 @@ class TimbresControlador {
         try {
             // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos } = req.body;
+                ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos, ip_local } = req.body;
             console.log('datos del timbre ', req.body)
             const id_empleado = req.userIdEmpleado;
             var hora_diferente: boolean = false;
@@ -425,7 +429,8 @@ class TimbresControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_servidor}, fecha_hora_timbre_validado: ${fecha_validada}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB', imagen: ${existe_imagen} }`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
 
@@ -459,7 +464,7 @@ class TimbresControlador {
             // Datos requeridos para el método
             const {
                 fec_hora_timbre, accion, tecl_funcion, observacion,
-                id_empleado, id_reloj, tipo, ip, user_name, documento
+                id_empleado, id_reloj, tipo, ip, user_name, documento, ip_local
             } = req.body;
 
             const id_empleados = Array.isArray(id_empleado) ? id_empleado : [id_empleado];
@@ -546,7 +551,8 @@ class TimbresControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, documento: ${existe_documento}, fecha_hora_timbre_validado: ${fechaTimbre + ' ' + fechaHora} }`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
 
@@ -724,7 +730,7 @@ class TimbresControlador {
     public async ActualizarVista(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id_noti_timbre;
-            const { visto, user_name, ip } = req.body;
+            const { visto, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -740,7 +746,8 @@ class TimbresControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
                 });
 
@@ -762,7 +769,8 @@ class TimbresControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: `{visto: ${visto}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -849,7 +857,8 @@ class TimbresControlador {
     public async IngresarOpcionTimbre(req: Request, res: Response): Promise<void> {
 
         try {
-            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, 
+                user_name, ip, ip_local } = req.body;
             const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
             const batches = [];
             for (let i = 0; i < id_empleado.length; i += batchSize) {
@@ -874,7 +883,8 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
                     timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -892,7 +902,8 @@ class TimbresControlador {
     public async ActualizarOpcionTimbre(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida,
+                 user_name, ip, ip_local } = req.body;
             console.log(req.body)
 
             var opciones: any;
@@ -1074,7 +1085,8 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
                     timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1147,7 +1159,7 @@ class TimbresControlador {
     // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip, ids } = req.body;
+            const { user_name, ip, ids, ip_local } = req.body;
             console.log('req.body ', req.body)
 
             if (!Array.isArray(ids) || ids.length === 0) {
@@ -1169,7 +1181,8 @@ class TimbresControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar registro con id ${id_empleado}`
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1183,7 +1196,8 @@ class TimbresControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id_empleado}`
                     }));
                     await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1202,7 +1216,8 @@ class TimbresControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(item),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1228,7 +1243,7 @@ class TimbresControlador {
     public async IngresarOpcionTimbreWeb(req: Request, res: Response): Promise<void> {
 
         try {
-            const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local } = req.body;
             const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
             const batches = [];
             for (let i = 0; i < id_empleado.length; i += batchSize) {
@@ -1255,7 +1270,8 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `id_empleado: ${id_empleado}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
                     timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1274,7 +1290,7 @@ class TimbresControlador {
     public async ActualizarOpcionTimbreWeb(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip } = req.body;
+            const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local } = req.body;
             console.log(req.body)
 
             // INICIAR TRANSACCION
@@ -1367,7 +1383,8 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `id_empleado: ${id_empleado}, , timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
                     timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1439,7 +1456,7 @@ class TimbresControlador {
     // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistrosWeb(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip, ids } = req.body;
+            const { user_name, ip, ids, ip_local } = req.body;
             console.log('req.body ', req.body)
             // INICIAR TRANSACCION
             if (!Array.isArray(ids) || ids.length === 0) {
@@ -1462,7 +1479,8 @@ class TimbresControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar registro con id ${id_empleado}`
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1478,7 +1496,8 @@ class TimbresControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id_empleado}`
                     }));
                     await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1498,7 +1517,8 @@ class TimbresControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(item),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -1574,6 +1594,7 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbreServidor + ' ' + fechaHoraServidor}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, imagen: ${imagen_existe} }`,
                 ip: timbre.ip,
+                ip_local: timbre.ip_local,
                 observacion: null
             });
 
@@ -1631,6 +1652,7 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
                 ip: timbre.ip,
+                ip_local: timbre.ip_local,
                 observacion: null
             });
 
@@ -1651,7 +1673,8 @@ class TimbresControlador {
     //METODO PARA CREAR TIMBRE POR EL ADMINISTRADOR
     public async crearTimbreJustificadoAdmin(req: Request, res: Response) {
         try {
-            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente } = req.body
+            const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj,
+                user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente, ip_local } = req.body
             console.log(req.body);
             await pool.query('BEGIN');
             const zonaHorariaServidor = DateTime.local().zoneName;
@@ -1679,6 +1702,7 @@ class TimbresControlador {
                 datosOriginales: '',
                 datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fec_hora_timbre}, id_reloj: ${id_reloj}, ubicacion: 'null', dispositivo_timbre: ${dispositivo_timbre}, documento: ${documento_existe} }`,
                 ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

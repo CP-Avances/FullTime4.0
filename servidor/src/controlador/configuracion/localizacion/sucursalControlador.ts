@@ -30,7 +30,7 @@ class SucursalControlador {
   public async CrearSucursal(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
+      const { nombre, id_ciudad, id_empresa, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -50,7 +50,8 @@ class SucursalControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(sucursal),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -73,7 +74,7 @@ class SucursalControlador {
   // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO  **USADO
   public async ActualizarSucursal(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_ciudad, id, user_name, ip } = req.body;
+      const { nombre, id_ciudad, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -89,7 +90,8 @@ class SucursalControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -111,7 +113,8 @@ class SucursalControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -163,7 +166,7 @@ class SucursalControlador {
   // METODO PARA ELIMINAR REGISTRO **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       const id = req.params.id;
 
@@ -181,7 +184,8 @@ class SucursalControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -203,7 +207,8 @@ class SucursalControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -427,7 +432,7 @@ class SucursalControlador {
 
   // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
   public async RegistrarSucursales(req: Request, res: Response): Promise<Response> {
-    const { sucursales, user_name, ip } = req.body;
+    const { sucursales, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const sucursal of sucursales) {
@@ -452,7 +457,8 @@ class SucursalControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: JSON.stringify(sucursal),
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

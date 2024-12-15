@@ -43,7 +43,7 @@ class VacunaControlador {
     CrearVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { vacuna, user_name, ip } = req.body;
+                const { vacuna, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
                 `, [vacuna.toUpperCase()]);
@@ -62,7 +62,8 @@ class VacunaControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(vacunaInsertada),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -89,7 +90,7 @@ class VacunaControlador {
     EditarVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, nombre, user_name, ip } = req.body;
+                const { id, nombre, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
@@ -107,6 +108,7 @@ class VacunaControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                         });
                         // FINALIZAR TRANSACCION
@@ -125,7 +127,8 @@ class VacunaControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(vacunaActualizada),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -153,7 +156,7 @@ class VacunaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR
@@ -168,7 +171,8 @@ class VacunaControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -185,7 +189,8 @@ class VacunaControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosVacuna),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -342,7 +347,7 @@ class VacunaControlador {
     // REGISTRAR PLANTILLA TIPO VACUNA    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -363,7 +368,8 @@ class VacunaControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(vacuna_emp),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

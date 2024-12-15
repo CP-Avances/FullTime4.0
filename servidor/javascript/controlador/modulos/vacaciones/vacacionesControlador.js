@@ -134,7 +134,7 @@ class VacacionesControlador {
     CrearVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empleado, user_name, ip } = req.body;
+                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -151,7 +151,8 @@ class VacacionesControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(objetoVacacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -175,7 +176,7 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
+                const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -188,7 +189,8 @@ class VacacionesControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -207,7 +209,8 @@ class VacacionesControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(objetoVacacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -230,7 +233,7 @@ class VacacionesControlador {
     EliminarVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 let { id_vacacion } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -244,7 +247,8 @@ class VacacionesControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -261,7 +265,8 @@ class VacacionesControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // CONSULTAR DATOSORIGINALESAUTORIZACIONES
@@ -274,7 +279,8 @@ class VacacionesControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar registro con id_vacacion ${id_vacacion}. Registro no encontrado.`
                     });
                 }
@@ -288,7 +294,8 @@ class VacacionesControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // CONSULTAR DATOSORIGINALESVACACIONES
@@ -301,7 +308,8 @@ class VacacionesControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar registro con id ${id_vacacion}. Registro no encontrado.`
                     });
                 }
@@ -316,7 +324,8 @@ class VacacionesControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginalesVacaciones),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -359,7 +368,7 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { estado, user_name, ip } = req.body;
+                const { estado, user_name, ip, ip_local } = req.body;
                 console.log('estado', id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -373,7 +382,8 @@ class VacacionesControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -390,13 +400,14 @@ class VacacionesControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (3 === estado) {
-                    (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id), user_name, ip);
+                    (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id), user_name, ip, ip_local);
                 }
             }
             catch (error) {

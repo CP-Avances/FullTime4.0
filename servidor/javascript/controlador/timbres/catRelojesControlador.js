@@ -44,7 +44,7 @@ class RelojesControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -60,6 +60,7 @@ class RelojesControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -77,6 +78,7 @@ class RelojesControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -94,7 +96,7 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 var VERIFICAR_CODIGO;
@@ -127,6 +129,7 @@ class RelojesControlador {
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(reloj),
                         ip: user_ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -169,7 +172,7 @@ class RelojesControlador {
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo } = req.body;
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -186,6 +189,7 @@ class RelojesControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: user_ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${codigo}.`
                     });
                     // FINALIZAR TRANSACCION
@@ -225,6 +229,7 @@ class RelojesControlador {
                      "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}",
                      "zona_horaria_dispositivo":"${zona_horaria_dispositivo}", "formato_gmt_dispositivo":"${formato_gmt_dispositivo}"}`,
                         ip: user_ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -729,7 +734,7 @@ class RelojesControlador {
     CargaPlantillaRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { plantilla, user_name, ip } = req.body;
+                const { plantilla, user_name, ip, ip_local } = req.body;
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
@@ -751,6 +756,7 @@ class RelojesControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al guardar el reloj con nombre: ${nombre_dispo} e ip: ${ip}.`
                         });
                     }
@@ -810,6 +816,7 @@ class RelojesControlador {
                         datosOriginales: '',
                         datosNuevos: `{"nombre": "${nombre_dispo}", "ip": "${direccion_ip}", "puerto": "${puerto}", "contrasenia": "${contrasena}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${numero_serie}", "id_fabricacion": "${id_fabricante}", "fabricante": "${fabricante}", "mac": "${direccion_mac}", "tipo_conexion": "${tipo_conexion}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo}", "temperatura": "${temperatura}"}`,
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

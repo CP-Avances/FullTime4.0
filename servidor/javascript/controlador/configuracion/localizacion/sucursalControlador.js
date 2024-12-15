@@ -39,7 +39,7 @@ class SucursalControlador {
     CrearSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
+                const { nombre, id_ciudad, id_empresa, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -53,7 +53,8 @@ class SucursalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(sucursal),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -76,7 +77,7 @@ class SucursalControlador {
     ActualizarSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_ciudad, id, user_name, ip } = req.body;
+                const { nombre, id_ciudad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -89,7 +90,8 @@ class SucursalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -106,7 +108,8 @@ class SucursalControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -156,7 +159,7 @@ class SucursalControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -170,7 +173,8 @@ class SucursalControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -187,7 +191,8 @@ class SucursalControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -391,7 +396,7 @@ class SucursalControlador {
     // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
     RegistrarSucursales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { sucursales, user_name, ip } = req.body;
+            const { sucursales, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const sucursal of sucursales) {
                 const { nombre, id_ciudad, id_empresa } = sucursal;
@@ -409,7 +414,8 @@ class SucursalControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(sucursal),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

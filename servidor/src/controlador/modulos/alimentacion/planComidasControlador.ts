@@ -138,7 +138,7 @@ class PlanComidasControlador {
   public async CrearPlanComidas(req: Request, res: Response): Promise<Response> {
     try {
       const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, fec_inicio, fec_final, user_name, ip } = req.body;
+        extra, fec_inicio, fec_final, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -174,7 +174,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(planAlimentacion),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -279,7 +280,7 @@ class PlanComidasControlador {
 
   public async CrearTipoComidas(req: Request, res: Response) {
     try {
-      const { nombre, user_name, ip } = req.body;
+      const { nombre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -299,7 +300,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(tipo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -328,7 +330,7 @@ class PlanComidasControlador {
 
     try {
       const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, verificar, id_departamento, user_name, ip } = req.body;
+        extra, verificar, id_departamento, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -355,7 +357,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -381,7 +384,7 @@ class PlanComidasControlador {
 
     try {
       const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, id, id_departamento, user_name, ip } = req.body;
+        extra, id, id_departamento, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -397,7 +400,8 @@ class PlanComidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
         });
 
@@ -436,7 +440,8 @@ class PlanComidasControlador {
         accion: 'U',
         datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
         datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}}} `,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -460,7 +465,7 @@ class PlanComidasControlador {
   public async EliminarSolicitudComida(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -477,7 +482,8 @@ class PlanComidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar solicitud de comidas con id: ${id}. Registro no encontrado.`
         });
 
@@ -503,7 +509,8 @@ class PlanComidasControlador {
         accion: 'D',
         datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -528,7 +535,7 @@ class PlanComidasControlador {
   public async AprobarSolicitaComida(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { aprobada, verificar, id, user_name, ip } = req.body;
+      const { aprobada, verificar, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -544,7 +551,8 @@ class PlanComidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar estado de solicitud de comidas con id: ${id}. Registro no encontrado`
         });
 
@@ -568,7 +576,8 @@ class PlanComidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(objetoAlimento),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -592,7 +601,7 @@ class PlanComidasControlador {
   public async CrearComidaAprobada(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+      const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -620,7 +629,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -648,7 +658,7 @@ class PlanComidasControlador {
       const fecha = req.params.fecha;
       const id_empleado = req.params.id_empleado;
 
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -668,7 +678,8 @@ class PlanComidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
         });
 
@@ -697,7 +708,8 @@ class PlanComidasControlador {
         accion: 'D',
         datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -720,7 +732,7 @@ class PlanComidasControlador {
   // ELIMINAR REGISTRO DE ALIMENTACION
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -737,7 +749,8 @@ class PlanComidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado.`
         });
 
@@ -759,7 +772,8 @@ class PlanComidasControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -776,7 +790,7 @@ class PlanComidasControlador {
   // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO    **USADO
   public async EliminarPlanComidaEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       const id = req.params.id;
       const id_empleado = req.params.id_empleado;
@@ -799,7 +813,8 @@ class PlanComidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
         });
 
@@ -825,7 +840,8 @@ class PlanComidasControlador {
         accion: 'D',
         datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -867,7 +883,7 @@ class PlanComidasControlador {
   public async CrearPlanEmpleado(req: Request, res: Response): Promise<void> {
 
     try {
-      const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+      const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('COMMIT');
@@ -892,7 +908,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -935,7 +952,7 @@ class PlanComidasControlador {
   // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACION DE SERVICIO DE ALIMENTACION   **USADO
   public async EnviarNotificacionComidas(req: Request, res: Response): Promise<Response> {
     try {
-      let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip } = req.body;
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip, ip_local } = req.body;
       var tiempo = fechaHora();
       let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
       const SERVICIO_SOLICITADO = await pool.query(
@@ -971,7 +988,8 @@ class PlanComidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${notifica}, id_timbre: null, visto: null, tipo: ${tipo}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

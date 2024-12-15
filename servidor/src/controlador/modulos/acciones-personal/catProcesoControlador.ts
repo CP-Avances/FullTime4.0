@@ -47,7 +47,7 @@ class ProcesoControlador {
 
   public async create(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, nivel, proc_padre, user_name, ip } = req.body;
+      const { nombre, nivel, proc_padre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -66,6 +66,7 @@ class ProcesoControlador {
         datosOriginales: '',
         datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -94,7 +95,7 @@ class ProcesoControlador {
 
   public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, nivel, proc_padre, id, user_name, ip } = req.body;
+      const { nombre, nivel, proc_padre, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -112,6 +113,7 @@ class ProcesoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -134,6 +136,7 @@ class ProcesoControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -151,7 +154,7 @@ class ProcesoControlador {
   public async EliminarProceso(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -173,6 +176,7 @@ class ProcesoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -195,6 +199,7 @@ class ProcesoControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

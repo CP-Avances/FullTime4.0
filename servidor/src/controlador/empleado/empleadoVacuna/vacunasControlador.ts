@@ -63,7 +63,7 @@ class VacunasControlador {
 
     // CREAR REGISTRO DE VACUNACION    **USADO
     public async CrearRegistro(req: Request, res: Response): Promise<Response> {
-        const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
+        const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento, ip_local } = req.body;
 
         // CREAR CARPETA DE VACUNAS
         let verificar_vacunas = 0;
@@ -120,7 +120,8 @@ class VacunasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(vacuna),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -155,7 +156,7 @@ class VacunasControlador {
             const mes = fecha.toFormat('MM');
             const dia = fecha.toFormat('dd');
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             let id = req.params.id;
             let id_empleado = req.params.id_empleado;
 
@@ -187,7 +188,8 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al guardar documento de vacuna con id: ${id}`
                 });
 
@@ -214,7 +216,8 @@ class VacunasControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -233,7 +236,7 @@ class VacunasControlador {
     public async ActualizarRegistro(req: Request, res: Response): Promise<Response> {
 
         const { id } = req.params;
-        const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
+        const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento, ip_local } = req.body;
 
         // CREAR CARPETA DE VACUNAS
         let verificar_vacunas = 0;
@@ -279,7 +282,8 @@ class VacunasControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar vacuna con id: ${id}`
                     });
 
@@ -308,7 +312,8 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -351,7 +356,7 @@ class VacunasControlador {
     public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
-            let { documento, id, user_name, ip } = req.body;
+            let { documento, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -367,7 +372,8 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar documento de vacuna con id: ${id}`
                 });
 
@@ -391,7 +397,8 @@ class VacunasControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(vacuna),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -424,7 +431,7 @@ class VacunasControlador {
         try {
             let separador = path.sep;
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             const { id, documento } = req.params;
 
             // INICIAR TRANSACCION
@@ -441,7 +448,8 @@ class VacunasControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar vacuna con id: ${id}. No se encontro registro.`
                 });
 
@@ -468,7 +476,8 @@ class VacunasControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

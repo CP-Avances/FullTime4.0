@@ -232,7 +232,8 @@ class PermisosControlador {
             const id = req.params.id;
 
             const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
-                hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
+                hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento,
+                id_empleado, codigo, documento, ip_local } = req.body;
 
             console.log("ver datos a editar", req.body)
 
@@ -251,7 +252,8 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
 
@@ -382,7 +384,9 @@ class PermisosControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(objetoPermiso),
-                ip, observacion: null
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
             });
 
             // FINALIZAR TRANSACCION
@@ -451,7 +455,7 @@ class PermisosControlador {
     public async EliminarDocumentoPermiso(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id, archivo, codigo, user_name, ip } = req.body
+            const { id, archivo, codigo, user_name, ip, ip_local } = req.body
             console.log('ver data ', id, ' ', archivo, ' ', codigo, ' ', user_name, ' ', ip)
             let separador = path.sep;
 
@@ -469,7 +473,8 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
 
@@ -516,7 +521,8 @@ class PermisosControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -591,7 +597,7 @@ class PermisosControlador {
     // METODO PARA ELIMINAR PERMISO
     public async EliminarPermiso(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip, id_permiso, doc, codigo } = req.body;
+            const { user_name, ip, id_permiso, doc, codigo, ip_local } = req.body;
             let separador = path.sep;
 
             // INICIAR TRANSACCION
@@ -608,7 +614,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar eliminar notificación con id_permiso: ${id_permiso}`
                 });
             } else {
@@ -625,7 +632,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginalesRealTime),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
             }
@@ -641,7 +649,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar eliminar autorización con id_permiso: ${id_permiso}`
                 });
 
@@ -663,7 +672,8 @@ class PermisosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -678,7 +688,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
                 });
 
@@ -714,7 +725,8 @@ class PermisosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginalesPermisos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -1416,7 +1428,7 @@ class PermisosControlador {
     public async ActualizarEstado(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            const { estado, user_name, ip } = req.body;
+            const { estado, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -1432,7 +1444,8 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar estado del permiso con id ${id}`
                 });
                 await pool.query('ROLLBACK');
@@ -1454,7 +1467,8 @@ class PermisosControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -1916,7 +1930,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
             id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
             estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
-            depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = datos;
+            depa_user_loggin, user_name, ip, subir_documento, codigo, documento, ip_local } = datos;
 
         let codigoEmpleado = codigo || '';
 
@@ -1977,7 +1991,9 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             accion: 'I',
             datosOriginales: '',
             datosNuevos: JSON.stringify(objetoPermiso),
-            ip, observacion: null
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
         });
 
         // FINALIZAR TRANSACCION
@@ -2021,7 +2037,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const { id, codigo, nombreArchivo, user_name, ip, eliminar } = datos;
+        const { id, codigo, nombreArchivo, user_name, ip, eliminar, ip_local } = datos;
 
         const fecha = DateTime.now();
         const anio = fecha.toFormat('yyyy');
@@ -2042,7 +2058,8 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
                 accion: 'U',
                 datosOriginales: '',
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: `Error al intentar actualizar permiso con id: ${id}`
             });
 
@@ -2090,7 +2107,9 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: JSON.stringify(datosNuevos),
-            ip, observacion: null
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
         });
 
         // FINALIZAR TRANSACCION

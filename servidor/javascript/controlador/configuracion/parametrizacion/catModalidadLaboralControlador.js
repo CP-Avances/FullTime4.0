@@ -43,7 +43,7 @@ class ModalidaLaboralControlador {
     CrearModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { modalidad, user_name, ip } = req.body;
+                const { modalidad, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_MODALIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                 `, [modalidad.toUpperCase()]);
@@ -62,7 +62,8 @@ class ModalidaLaboralControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(modalidadLaboral),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -89,7 +90,7 @@ class ModalidaLaboralControlador {
     EditarModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, modalidad, user_name, ip } = req.body;
+                const { id, modalidad, user_name, ip, ip_local } = req.body;
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
                 const modalExiste = yield database_1.default.query(`
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
@@ -105,7 +106,8 @@ class ModalidaLaboralControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
                     // FINALIZAR TRANSACCION
@@ -130,7 +132,8 @@ class ModalidaLaboralControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(modalidadLaboral),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -155,7 +158,7 @@ class ModalidaLaboralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR
@@ -170,7 +173,8 @@ class ModalidaLaboralControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}, no se encuentra el registro.`
                     });
                     // FINALIZAR TRANSACCION
@@ -187,7 +191,8 @@ class ModalidaLaboralControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(modalidadLaboral),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -343,7 +348,7 @@ class ModalidaLaboralControlador {
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -364,7 +369,8 @@ class ModalidaLaboralControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(modalidad_la),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

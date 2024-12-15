@@ -23,7 +23,7 @@ class UbicacionControlador {
     RegistrarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { latitud, longitud, descripcion, user_name, ip } = req.body;
+                const { latitud, longitud, descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -38,7 +38,8 @@ class UbicacionControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -61,7 +62,7 @@ class UbicacionControlador {
     ActualizarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { latitud, longitud, descripcion, id, user_name, ip } = req.body;
+                const { latitud, longitud, descripcion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -74,7 +75,8 @@ class UbicacionControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar coordenada con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -92,7 +94,8 @@ class UbicacionControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -154,7 +157,7 @@ class UbicacionControlador {
     EliminarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const { id } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -168,7 +171,8 @@ class UbicacionControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar coordenada con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -185,7 +189,8 @@ class UbicacionControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -224,7 +229,7 @@ class UbicacionControlador {
     /*
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
-            const { id_empl, id_ubicacion, user_name, ip } = req.body;
+            const { id_empl, id_ubicacion, user_name, ip, ip_local } = req.body;
             console.log('ubicacion ', req.body)
 
             const existe = await pool.query(
@@ -257,8 +262,9 @@ class UbicacionControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
-                    ip,
-                    observacion: null
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
                 });
 
                 // FINALIZAR TRANSACCION
@@ -276,7 +282,7 @@ class UbicacionControlador {
     RegistrarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl, id_ubicacion, user_name, ip } = req.body;
+                const { id_empl, id_ubicacion, user_name, ip, ip_local } = req.body;
                 // `id_empleados` es una lista de IDs de empleados
                 console.log("ver req.body: ", req.body);
                 console.log('Empleados y ubicación recibidos:', req.body);
@@ -319,7 +325,8 @@ class UbicacionControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `id_empleado: ${id_empleado}, id_ubicacion: ${id_ubicacion}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -363,7 +370,7 @@ class UbicacionControlador {
     EliminarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, ids } = req.body;
+                const { user_name, ip, ids, ip_local } = req.body;
                 console.log("ver req.body: ", req.body);
                 if (!Array.isArray(ids) || ids.length === 0) {
                     return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
@@ -383,7 +390,8 @@ class UbicacionControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -399,7 +407,8 @@ class UbicacionControlador {
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                         }));
                         yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -412,7 +421,8 @@ class UbicacionControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(item),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);

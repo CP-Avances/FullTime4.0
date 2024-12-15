@@ -2,12 +2,6 @@ import { Router } from 'express';
 import { TokenValidation } from '../../../libs/verificarToken';
 import UBICACION_CONTROLADOR from '../../../controlador/modulos/geolocalizacion/emplUbicacionControlador';
 
-// ALMACENAMIENTO DEL CERTIFICADO DE VACUNACIÓN EN CARPETA
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './carnetVacuna',
-});
-
 class UbicacionRutas {
     public router: Router = Router();
 

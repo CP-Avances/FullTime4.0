@@ -1,13 +1,11 @@
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { FormatearFecha2, FormatearHora, FormatearFechaPlanificacion } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import pool from '../../database';
-import * as copyStream from 'pg-copy-streams'; // Importar pg-copy-streams
 import { DateTime } from 'luxon';
+import pool from '../../database';
+import * as copyStream from 'pg-copy-streams';
 
 class PlanGeneralControlador {
-
-
 
     // METODO PARA REGISTRAR PLAN GENERAL          **USADO
     public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
@@ -16,7 +14,7 @@ class PlanGeneralControlador {
         let mensajeError = '';
         let codigoError = 0;
 
-        const { user_name, ip, plan_general } = req.body;
+        const { user_name, ip, plan_general, ip_local } = req.body;
 
         for (let i = 0; i < plan_general.length; i++) {
 
@@ -57,7 +55,8 @@ class PlanGeneralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(plan),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -93,7 +92,7 @@ class PlanGeneralControlador {
     }
 
     public CrearPlanificacionPorLotes1 = async (req: Request, res: Response): Promise<any> => {
-        const { parte, user_name, ip } = req.body;
+        const { parte, user_name, ip, ip_local } = req.body;
 
         // Validación del input
         if (!Array.isArray(parte) || parte.length === 0) {
@@ -171,7 +170,8 @@ class PlanGeneralControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(plan),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     })
                 }
@@ -198,7 +198,7 @@ class PlanGeneralControlador {
     };
 
     public CrearPlanificacionPorLotes = async (req: Request, res: Response): Promise<any> => {
-        const { parte, user_name, ip } = req.body;
+        const { parte, user_name, ip, ip_local } = req.body;
 
         // Validación del input
         if (!Array.isArray(parte) || parte.length === 0) {
@@ -258,7 +258,8 @@ class PlanGeneralControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(p),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -339,7 +340,7 @@ class PlanGeneralControlador {
         // CONTADORES INICIAN EN CERO (0)
         errores = 0;
 
-        const { user_name, ip, id_plan } = req.body;
+        const { user_name, ip, id_plan, ip_local } = req.body;
         console.log("ver req body eliminar: ", req.body)
 
         for (const plan of id_plan) {
@@ -359,7 +360,8 @@ class PlanGeneralControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id ${plan}. Registro no encontrado.`
                     });
 
@@ -388,7 +390,8 @@ class PlanGeneralControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -422,7 +425,7 @@ class PlanGeneralControlador {
 
 
     public async EliminarRegistrosMultiples(req: Request, res: Response): Promise<Response> {
-        const { user_name, ip, id_plan } = req.body;
+        const { user_name, ip, id_plan, ip_local } = req.body;
         console.log("ver req.body", req.body)
         // Iniciar transacción
         try {
@@ -444,7 +447,8 @@ class PlanGeneralControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar registro con id ${id}`
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -460,7 +464,8 @@ class PlanGeneralControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id}`
                     }));
                     await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
@@ -479,13 +484,13 @@ class PlanGeneralControlador {
                         item.fecha_horario.toString(),
                         'ddd'
                     );
-                
+
                     item.fecha_hora_horario = await FormatearFechaPlanificacion(
                         item.fecha_hora_horario.toString(),
                         'ddd'
-                    )+ ' '+  DateTime.fromJSDate(new Date(item.fecha_hora_horario)).toFormat('HH:mm:ss');;
+                    ) + ' ' + DateTime.fromJSDate(new Date(item.fecha_hora_horario)).toFormat('HH:mm:ss');;
                 }));
-                   
+
                 const auditoria = datosOriginales.map((item: any) => {
                     return {
                         tabla: 'eu_asistencia_general',
@@ -493,7 +498,8 @@ class PlanGeneralControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(item),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null,
                     };
                 });
@@ -717,7 +723,7 @@ class PlanGeneralControlador {
     // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
     public async ActualizarManual(req: Request, res: Response) {
         try {
-            const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+            const { codigo, fecha, id, accion, id_timbre, user_name, ip, ip_local } = req.body;
             const ASIGNADO = await pool.query(
                 `
                 SELECT * FROM fnbuscarregistroasignado ($1, $2);
@@ -738,7 +744,8 @@ class PlanGeneralControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
                 });
 
@@ -769,7 +776,8 @@ class PlanGeneralControlador {
                 datosOriginales: `id: ${datosOriginales.id}
                             , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
                 datosNuevos: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -787,7 +795,8 @@ class PlanGeneralControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(TIMBRE.rows),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

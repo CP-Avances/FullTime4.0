@@ -311,7 +311,7 @@ class LoginControlador {
 
   // METODO PARA CAMBIAR CONTRASEÑA
   public async CambiarContrasenia(req: Request, res: Response): Promise<Response> {
-    let { token, contrasena, user_name, ip } = req.body;
+    let { token, contrasena, user_name, ip, ip_local } = req.body;
 
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
@@ -336,7 +336,8 @@ class LoginControlador {
             accion: 'U',
             datosOriginales: '',
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
           });
 
@@ -359,7 +360,8 @@ class LoginControlador {
           accion: 'U',
           datosOriginales: JSON.stringify(contrasenaOriginal),
           datosNuevos: `{"contrasena": "${contrasena}"}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

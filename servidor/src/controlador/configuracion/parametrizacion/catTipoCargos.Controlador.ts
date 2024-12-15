@@ -47,7 +47,7 @@ class TiposCargosControlador {
     // METODO PARA REGISTRAR TIPO CARGO    **USADO
     public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const { cargo, user_name, ip } = req.body;
+            const { cargo, user_name, ip, ip_local } = req.body;
             var VERIFICAR_CARGO = await pool.query(
                 `
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
@@ -77,7 +77,8 @@ class TiposCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(TipoCargos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -103,7 +104,7 @@ class TiposCargosControlador {
     // METODO PARA EDITAR TIPO CARGO   **USADO
     public async EditarCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, cargo } = req.body;
+            const { id, cargo, ip_local } = req.body;
             // DAR FORMATO A LA PALABRA CARGO
             const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
             const tipoCargoExiste = await pool.query(
@@ -127,6 +128,7 @@ class TiposCargosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: req.body.ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -159,6 +161,7 @@ class TiposCargosControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(TipoCargos),
                     ip: req.body.ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -183,7 +186,7 @@ class TiposCargosControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -204,7 +207,8 @@ class TiposCargosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -225,7 +229,8 @@ class TiposCargosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosTiposCargos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -390,7 +395,7 @@ class TiposCargosControlador {
 
     // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -418,7 +423,8 @@ class TiposCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(cargos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

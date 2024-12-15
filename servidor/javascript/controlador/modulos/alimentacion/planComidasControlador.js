@@ -136,7 +136,7 @@ class PlanComidasControlador {
     CrearPlanComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final, user_name, ip } = req.body;
+                const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -158,7 +158,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(planAlimentacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -256,7 +257,7 @@ class PlanComidasControlador {
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, user_name, ip } = req.body;
+                const { nombre, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -270,7 +271,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(tipo),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -297,7 +299,7 @@ class PlanComidasControlador {
     CrearSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar, id_departamento, user_name, ip } = req.body;
+                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar, id_departamento, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -317,7 +319,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -338,7 +341,7 @@ class PlanComidasControlador {
     ActualizarSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, id_departamento, user_name, ip } = req.body;
+                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, id_departamento, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -351,7 +354,8 @@ class PlanComidasControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -379,7 +383,8 @@ class PlanComidasControlador {
                     accion: 'U',
                     datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
                     datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}}} `,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -400,7 +405,7 @@ class PlanComidasControlador {
     EliminarSolicitudComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -414,7 +419,8 @@ class PlanComidasControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar solicitud de comidas con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -436,7 +442,8 @@ class PlanComidasControlador {
                     accion: 'D',
                     datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -459,7 +466,7 @@ class PlanComidasControlador {
     AprobarSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { aprobada, verificar, id, user_name, ip } = req.body;
+                const { aprobada, verificar, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -472,7 +479,8 @@ class PlanComidasControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar estado de solicitud de comidas con id: ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -490,7 +498,8 @@ class PlanComidasControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(objetoAlimento),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -513,7 +522,7 @@ class PlanComidasControlador {
     CrearComidaAprobada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -532,7 +541,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -558,7 +568,7 @@ class PlanComidasControlador {
                 const id = req.params.id;
                 const fecha = req.params.fecha;
                 const id_empleado = req.params.id_empleado;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -573,7 +583,8 @@ class PlanComidasControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -596,7 +607,8 @@ class PlanComidasControlador {
                     accion: 'D',
                     datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -619,7 +631,7 @@ class PlanComidasControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -633,7 +645,8 @@ class PlanComidasControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -650,7 +663,8 @@ class PlanComidasControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -668,7 +682,7 @@ class PlanComidasControlador {
     EliminarPlanComidaEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
@@ -685,7 +699,8 @@ class PlanComidasControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -705,7 +720,8 @@ class PlanComidasControlador {
                     accion: 'D',
                     datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -744,7 +760,7 @@ class PlanComidasControlador {
     CrearPlanEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 const response = yield database_1.default.query(`
@@ -763,7 +779,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -805,7 +822,7 @@ class PlanComidasControlador {
     EnviarNotificacionComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip } = req.body;
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip, ip_local } = req.body;
                 var tiempo = (0, settingsMail_1.fechaHora)();
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
                 const SERVICIO_SOLICITADO = yield database_1.default.query(`
@@ -832,7 +849,8 @@ class PlanComidasControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${notifica}, id_timbre: null, visto: null, tipo: ${tipo}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

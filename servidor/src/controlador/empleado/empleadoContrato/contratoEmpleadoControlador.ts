@@ -16,7 +16,7 @@ class ContratoEmpleadoControlador {
     public async CrearContrato(req: Request, res: Response): Promise<Response> {
 
         const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla,
-            id_regimen, id_tipo_contrato, user_name, ip, subir_documento } = req.body;
+            id_regimen, id_tipo_contrato, user_name, ip, subir_documento, ip_local } = req.body;
 
         let verificar_contrato = 0;
 
@@ -72,7 +72,8 @@ class ContratoEmpleadoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(contrato),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -106,7 +107,7 @@ class ContratoEmpleadoControlador {
             const mes = fecha.toFormat('MM');
             const dia = fecha.toFormat('dd');
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             let id = req.params.id;
 
@@ -131,7 +132,8 @@ class ContratoEmpleadoControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el documento del contrato con id ${id}. Registro no encontrado.`
                 });
 
@@ -155,7 +157,8 @@ class ContratoEmpleadoControlador {
                 accion: 'U',
                 datosOriginales: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${empleado.documento}}`,
                 datosNuevos: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${documento}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -227,7 +230,7 @@ class ContratoEmpleadoControlador {
 
         const { id } = req.params;
         const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-            id_tipo_contrato, user_name, ip, subir_documento, id_empleado } = req.body;
+            id_tipo_contrato, user_name, ip, subir_documento, id_empleado, ip_local } = req.body;
 
         let verificar_contrato = 0;
 
@@ -274,7 +277,8 @@ class ContratoEmpleadoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el contrato con id ${id}. Registro no encontrado.`
                     });
 
@@ -305,7 +309,8 @@ class ContratoEmpleadoControlador {
                     accion: 'U',
                     datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
                     datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${id_regimen}, id_modalidad_laboral: ${id_tipo_contrato}, fecha_ingreso: ${fechaIngresoN}, fecha_salida: ${fechaSalidaN}, controlar_vacacion: ${vaca_controla}, controlar_asistencia: ${asis_controla}, documento: ${datosOriginales.documento}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -327,7 +332,7 @@ class ContratoEmpleadoControlador {
     // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR    **USADO
     public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
         try {
-            let { documento, id, user_name, ip } = req.body;
+            let { documento, id, user_name, ip, ip_local } = req.body;
             let separador = path.sep;
 
             // INICIAR TRANSACCION
@@ -345,7 +350,8 @@ class ContratoEmpleadoControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el documento del contrato con id ${id}`
                 });
 
@@ -371,7 +377,8 @@ class ContratoEmpleadoControlador {
                 accion: 'U',
                 datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
                 datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: null}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -527,7 +534,7 @@ class ContratoEmpleadoControlador {
     // REGISTRAR MODALIDAD DE TRABAJO    **USADO
     public async CrearTipoContrato(req: Request, res: Response): Promise<Response> {
         try {
-            const { descripcion, user_name, ip } = req.body;
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -548,7 +555,8 @@ class ContratoEmpleadoControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(contrato),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -949,7 +957,7 @@ class ContratoEmpleadoControlador {
 
     // METODO PARA REGISTRAR DATOS DE CONTRATOS   **USADO
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<any> {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -1021,7 +1029,8 @@ class ContratoEmpleadoControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(contrato),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -1044,7 +1053,7 @@ class ContratoEmpleadoControlador {
     //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
     public async EliminarContrato(req: Request, res: Response): Promise<any> {
         try {
-            const { id, user_name, ip, } = req.body;
+            const { id, user_name, ip, ip_local } = req.body;
             //console.log('query ', req.body)
 
             // INICIAR TRANSACCION
@@ -1061,7 +1070,8 @@ class ContratoEmpleadoControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
                 });
 
@@ -1089,7 +1099,8 @@ class ContratoEmpleadoControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosEliminados),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

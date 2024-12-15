@@ -32,7 +32,7 @@ class EmpleadoCargosControlador {
   // METODO PARA ACTUALIZAR ESTADO DEL CARGO    **USADO
   public async EditarEstadoCargo(req: Request, res: Response): Promise<Response> {
     try {
-      const { id_cargo, estado, user_name, ip } = req.body;
+      const { id_cargo, estado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -54,7 +54,8 @@ class EmpleadoCargosControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el cargo con id ${id_cargo}. Registro no encontrado.`
         });
 
@@ -85,7 +86,8 @@ class EmpleadoCargosControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(empleadoCargo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -128,7 +130,7 @@ class EmpleadoCargosControlador {
   public async Crear(req: Request, res: Response): Promise<void> {
     try {
       const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo,
-        user_name, ip, jefe } = req.body;
+        user_name, ip, jefe, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -156,7 +158,8 @@ class EmpleadoCargosControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(empleadoCargo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -175,7 +178,7 @@ class EmpleadoCargosControlador {
   public async EditarCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empl_contrato, id } = req.params;
-      const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
+      const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -196,7 +199,8 @@ class EmpleadoCargosControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el cargo con id ${id}. Registro no encontrado.`
         });
 
@@ -235,7 +239,8 @@ class EmpleadoCargosControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(empleadoCargo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -431,7 +436,7 @@ class EmpleadoCargosControlador {
   // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
     try {
-      const { cargo, user_name, ip } = req.body;
+      const { cargo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -451,7 +456,8 @@ class EmpleadoCargosControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(tipo_cargo),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -899,7 +905,7 @@ class EmpleadoCargosControlador {
 
   // METODO PARA CARGAR DATOS DE PLANTILLA CARGOS   **USADO
   public async CargarPlantilla_cargos(req: Request, res: Response): Promise<any> {
-    const { plantilla, user_name, ip } = req.body;
+    const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const data of plantilla) {
@@ -1058,7 +1064,8 @@ class EmpleadoCargosControlador {
               accion: 'I',
               datosOriginales: '',
               datosNuevos: JSON.stringify(usuarioDep),
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: null
             });
 
@@ -1082,7 +1089,8 @@ class EmpleadoCargosControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: JSON.stringify(cargos),
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 
@@ -1108,7 +1116,7 @@ class EmpleadoCargosControlador {
   // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
   public async EliminarCargo(req: Request, res: Response): Promise<any> {
     try {
-      const { id, user_name, ip, } = req.body;
+      const { id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -1124,7 +1132,8 @@ class EmpleadoCargosControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
         });
 
@@ -1153,7 +1162,8 @@ class EmpleadoCargosControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosEliminados),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

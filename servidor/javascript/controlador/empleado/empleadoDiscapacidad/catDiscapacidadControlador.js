@@ -43,7 +43,7 @@ class DiscapacidadControlador {
     CrearDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { discapacidad, user_name, ip } = req.body;
+                const { discapacidad, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
                 `, [discapacidad.toUpperCase()]);
@@ -62,7 +62,8 @@ class DiscapacidadControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(discapacidadInsertada),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -89,7 +90,7 @@ class DiscapacidadControlador {
     EditarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, nombre, user_name, ip } = req.body;
+                const { id, nombre, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
@@ -102,7 +103,8 @@ class DiscapacidadControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
                     // FINALIZAR TRANSACCION
@@ -125,7 +127,8 @@ class DiscapacidadControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(discapacidadEditada),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -153,7 +156,7 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 //CONSULTAR DATOS DE LA DISCAPACIDAD A ELIMINAR
@@ -168,7 +171,8 @@ class DiscapacidadControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -185,7 +189,8 @@ class DiscapacidadControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -342,7 +347,7 @@ class DiscapacidadControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 const { discapacidad } = data;
@@ -362,7 +367,8 @@ class DiscapacidadControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(discapacidad_emp),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

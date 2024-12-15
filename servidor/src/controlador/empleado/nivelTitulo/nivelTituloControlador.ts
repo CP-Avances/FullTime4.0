@@ -29,7 +29,7 @@ class NivelTituloControlador {
   // METODO PARA ELIMINAR REGISTROS   **USADO
   public async EliminarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -46,7 +46,8 @@ class NivelTituloControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id ${id}. No existe el registro en la base de datos.`
         });
 
@@ -67,7 +68,8 @@ class NivelTituloControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -86,7 +88,7 @@ class NivelTituloControlador {
   // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
   public async CrearNivel(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, user_name, ip } = req.body;
+      const { nombre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -107,6 +109,7 @@ class NivelTituloControlador {
         datosOriginales: '',
         datosNuevos: JSON.stringify(nivel),
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -130,7 +133,7 @@ class NivelTituloControlador {
   // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO    **USADO
   public async ActualizarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id, user_name, ip } = req.body;
+      const { nombre, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -146,7 +149,8 @@ class NivelTituloControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
         });
 
@@ -168,7 +172,8 @@ class NivelTituloControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -333,7 +338,7 @@ class NivelTituloControlador {
 
   // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO    **USADO
   public async RegistrarNivelesPlantilla(req: Request, res: Response): Promise<any> {
-    const { niveles, user_name, ip } = req.body;
+    const { niveles, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const nivel of niveles) {
@@ -360,6 +365,7 @@ class NivelTituloControlador {
           datosOriginales: '',
           datosNuevos: JSON.stringify(nivel),
           ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

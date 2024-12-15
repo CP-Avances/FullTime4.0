@@ -24,7 +24,7 @@ class HorarioControlador {
     // REGISTRAR HORARIO    **USADO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -40,7 +40,8 @@ class HorarioControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(horario),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -83,7 +84,7 @@ class HorarioControlador {
             try {
                 let id = req.params.id;
                 let { archivo, codigo } = req.params;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // FECHA DEL SISTEMA
                 var fecha = luxon_1.DateTime.now();
                 var anio = fecha.toFormat('yyyy');
@@ -107,7 +108,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -125,7 +127,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -157,7 +160,7 @@ class HorarioControlador {
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -174,7 +177,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -194,7 +198,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: datosNuevos,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -213,7 +218,7 @@ class HorarioControlador {
     // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR   **USADO
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento, id, user_name, ip } = req.body;
+            let { documento, id, user_name, ip, ip_local } = req.body;
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
@@ -243,7 +248,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -261,7 +267,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -332,7 +339,7 @@ class HorarioControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -349,7 +356,8 @@ class HorarioControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -366,7 +374,8 @@ class HorarioControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -399,7 +408,7 @@ class HorarioControlador {
     EditarHorasTrabaja(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { hora_trabajo, user_name, ip } = req.body;
+            const { hora_trabajo, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -416,7 +425,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -434,7 +444,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -470,7 +481,7 @@ class HorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const { horarios, detalles, user_name, } = req.body;
+                const { horarios, detalles, user_name, ip, ip_local } = req.body;
                 let horariosCargados = true;
                 let detallesCargados = true;
                 let codigosHorariosCargados = [];
@@ -522,7 +533,8 @@ class HorarioControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(correcto),
-                                ip: '',
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                             // FINALIZAR TRANSACCION
@@ -612,7 +624,8 @@ class HorarioControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(response2.rows),
-                                ip: '',
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                             // FINALIZAR TRANSACCION

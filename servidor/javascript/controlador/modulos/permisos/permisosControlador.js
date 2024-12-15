@@ -223,7 +223,7 @@ class PermisosControlador {
             const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dias}_${nombreArchivo}`;
             try {
                 const id = req.params.id;
-                const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento } = req.body;
+                const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip, subir_documento, id_empleado, codigo, documento, ip_local } = req.body;
                 console.log("ver datos a editar", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -237,7 +237,8 @@ class PermisosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar actualizar permiso con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -350,7 +351,9 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(objetoPermiso),
-                    ip, observacion: null
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -408,7 +411,7 @@ class PermisosControlador {
     EliminarDocumentoPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, archivo, codigo, user_name, ip } = req.body;
+                const { id, archivo, codigo, user_name, ip, ip_local } = req.body;
                 console.log('ver data ', id, ' ', archivo, ' ', codigo, ' ', user_name, ' ', ip);
                 let separador = path_1.default.sep;
                 // INICIAR TRANSACCION
@@ -423,7 +426,8 @@ class PermisosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar actualizar permiso con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -461,7 +465,8 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -534,7 +539,7 @@ class PermisosControlador {
     EliminarPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip, id_permiso, doc, codigo } = req.body;
+                const { user_name, ip, id_permiso, doc, codigo, ip_local } = req.body;
                 let separador = path_1.default.sep;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -548,7 +553,8 @@ class PermisosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar notificación con id_permiso: ${id_permiso}`
                     });
                 }
@@ -563,7 +569,8 @@ class PermisosControlador {
                         accion: 'D',
                         datosOriginales: JSON.stringify(datosOriginalesRealTime),
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                 }
@@ -577,7 +584,8 @@ class PermisosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar autorización con id_permiso: ${id_permiso}`
                     });
                     // FINALIZAR TRANSACCION
@@ -594,7 +602,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // CONSULTAR DATOSORIGINALESPERMISOS
@@ -607,7 +616,8 @@ class PermisosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
                     });
                     // FINALIZAR TRANSACCION
@@ -636,7 +646,8 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginalesPermisos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -1270,7 +1281,7 @@ class PermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { estado, user_name, ip } = req.body;
+                const { estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -1283,7 +1294,8 @@ class PermisosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar estado del permiso con id ${id}`
                     });
                     yield database_1.default.query('ROLLBACK');
@@ -1300,7 +1312,8 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -1733,7 +1746,7 @@ const generarTablaHTMLWeb = function (datos, tipo) {
 function CrearPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = datos;
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento, codigo, documento, ip_local } = datos;
             let codigoEmpleado = codigo || '';
             if (subir_documento) {
                 try {
@@ -1785,7 +1798,9 @@ function CrearPermiso(datos) {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(objetoPermiso),
-                ip, observacion: null
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
             });
             // FINALIZAR TRANSACCION
             yield database_1.default.query('COMMIT');
@@ -1824,7 +1839,7 @@ function CrearPermiso(datos) {
 function RegistrarDocumentoPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { id, codigo, nombreArchivo, user_name, ip, eliminar } = datos;
+            const { id, codigo, nombreArchivo, user_name, ip, eliminar, ip_local } = datos;
             const fecha = luxon_1.DateTime.now();
             const anio = fecha.toFormat('yyyy');
             const mes = fecha.toFormat('MM');
@@ -1841,7 +1856,8 @@ function RegistrarDocumentoPermiso(datos) {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -1879,7 +1895,9 @@ function RegistrarDocumentoPermiso(datos) {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip, observacion: null
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
             });
             // FINALIZAR TRANSACCION
             yield database_1.default.query('COMMIT');
