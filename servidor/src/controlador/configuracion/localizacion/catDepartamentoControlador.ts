@@ -641,14 +641,21 @@ class DepartamentoControlador {
           if ((ITEM != undefined && ITEM != '') &&
             (NOMBRE != undefined) && (SUCURSAL != undefined)) {
             data.fila = ITEM;
-            data.nombre = NOMBRE; data.sucursal = SUCURSAL;
+            data.nombre = NOMBRE; 
+            data.sucursal = SUCURSAL;
             data.observacion = 'no registrado';
+
+            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+            data.nombre = data.nombre.trim();
+            data.sucursal = data.sucursal.trim();
+
             listDepartamentos.push(data);
           } else {
             data.fila = ITEM;
             data.nombre = NOMBRE;
             data.sucursal = SUCURSAL;
             data.observacion = 'no registrado';
+
             if (data.fila == '' || data.fila == undefined) {
               data.fila = 'error';
               mensaje = 'error'
@@ -661,6 +668,11 @@ class DepartamentoControlador {
               data.sucursal = 'No registrado';
               data.observacion = 'Sucursal no registrado';
             }
+
+            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+            data.nombre = data.nombre.trim();
+            data.sucursal = data.sucursal.trim();
+            
             listDepartamentos.push(data);
           }
           data = {};

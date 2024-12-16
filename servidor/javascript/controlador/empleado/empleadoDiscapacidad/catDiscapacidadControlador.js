@@ -255,6 +255,8 @@ class DiscapacidadControlador {
                                 data.fila = ITEM;
                                 data.discapacidad = DISCAPACIDAD;
                                 data.observacion = 'no registrada';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.discapacidad = data.discapacidad.trim();
                                 listaDiscapacidad.push(data);
                             }
                             else {
@@ -269,6 +271,8 @@ class DiscapacidadControlador {
                                     data.discapacidad = 'No registrado';
                                     data.observacion = 'Discapacidad no registrada';
                                 }
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.discapacidad = data.discapacidad.trim();
                                 listaDiscapacidad.push(data);
                             }
                             data = {};

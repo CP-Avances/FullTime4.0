@@ -1590,6 +1590,23 @@ class EmpleadoControlador {
               data.telefono = TELEFONO;
               data.nacionalidad = NACIONALIDAD;
               data.observacion = 'no registrado';
+
+              data.cedula = data.cedula.trim();
+              data.apellido = data.apellido.trim();
+              data.nombre = data.nombre.trim();
+              data.estado_civil = data.estado_civil.trim();
+              data.genero = data.genero.trim();
+              data.correo = data.correo.trim();
+              data.fec_nacimiento = data.fec_nacimiento.trim();
+              data.latitud = data.latitud.trim();
+              data.longitud = data.longitud.trim();
+              data.domicilio = data.domicilio.trim();
+              data.telefono = data.telefono.trim();
+              data.nacionalidad = data.nacionalidad.trim();
+              data.usuario = data.usuario.trim();
+              data.contrasena = data.contrasena.trim();
+              data.rol = data.rol.trim();
+
               if (regex.test(data.cedula)) {
                 if (data.cedula.toString().length != 10) {
                   data.observacion = 'La cédula ingresada no es válida';
@@ -1645,6 +1662,7 @@ class EmpleadoControlador {
               else {
                 data.observacion = 'La cédula ingresada no es válida';
               }
+
               listEmpleados.push(data);
             }
             else {
@@ -1732,6 +1750,23 @@ class EmpleadoControlador {
                 data.observacion = 'Cédula no registrado';
               }
               else {
+
+                data.cedula = data.cedula.trim();
+                data.apellido = data.apellido.trim();
+                data.nombre = data.nombre.trim();
+                data.estado_civil = data.estado_civil.trim();
+                data.genero = data.genero.trim();
+                data.correo = data.correo.trim();
+                data.fec_nacimiento = data.fec_nacimiento.trim();
+                data.latitud = data.latitud.trim();
+                data.longitud = data.longitud.trim();
+                data.domicilio = data.domicilio.trim();
+                data.telefono = data.telefono.trim();
+                data.nacionalidad = data.nacionalidad.trim();
+                data.usuario = data.usuario.trim();
+                data.contrasena = data.contrasena.trim();
+                data.rol = data.rol.trim();
+
                 if (regex.test(data.cedula)) {
                   if (data.cedula.toString().length != 10) {
                     data.observacion = 'La cédula ingresada no es válida';

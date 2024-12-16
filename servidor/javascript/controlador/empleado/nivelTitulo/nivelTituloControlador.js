@@ -246,12 +246,16 @@ class NivelTituloControlador {
                                     data.observacion = 'ok';
                                     duplicados.push(data);
                                 }
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.nombre = data.nombre.trim();
                                 listNivelesProfesionales.push(data);
                             }
                             else {
                                 data.fila = ITEM;
                                 data.nombre = NOMBRE;
                                 data.observacion = 'Ya existe en el sistema';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.nombre = data.nombre.trim();
                                 listNivelesProfesionales.push(data);
                             }
                         }
@@ -263,6 +267,8 @@ class NivelTituloControlador {
                                 data.fila = 'error';
                                 mensaje = 'error';
                             }
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.nombre = data.nombre.trim();
                             listNivelesProfesionales.push(data);
                         }
                         data = {};

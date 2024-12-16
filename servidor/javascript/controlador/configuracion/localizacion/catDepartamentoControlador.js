@@ -568,6 +568,9 @@ class DepartamentoControlador {
                             data.nombre = NOMBRE;
                             data.sucursal = SUCURSAL;
                             data.observacion = 'no registrado';
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.nombre = data.nombre.trim();
+                            data.sucursal = data.sucursal.trim();
                             listDepartamentos.push(data);
                         }
                         else {
@@ -587,6 +590,9 @@ class DepartamentoControlador {
                                 data.sucursal = 'No registrado';
                                 data.observacion = 'Sucursal no registrado';
                             }
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.nombre = data.nombre.trim();
+                            data.sucursal = data.sucursal.trim();
                             listDepartamentos.push(data);
                         }
                         data = {};

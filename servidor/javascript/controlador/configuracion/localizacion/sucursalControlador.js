@@ -302,6 +302,9 @@ class SucursalControlador {
                                         data.observacion = 'ok';
                                         duplicados.push(dato);
                                     }
+                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                    data.nom_sucursal = data.nom_sucursal.trim();
+                                    data.ciudad = data.ciudad.trim();
                                     listSucursales.push(data);
                                 }
                                 else {
@@ -309,6 +312,9 @@ class SucursalControlador {
                                     data.nom_sucursal = NOMBRE;
                                     data.ciudad = CIUDAD;
                                     data.observacion = 'Ya existe en el sistema';
+                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                    data.nom_sucursal = data.nom_sucursal.trim();
+                                    data.ciudad = data.ciudad.trim();
                                     listSucursales.push(data);
                                 }
                             }
@@ -320,6 +326,9 @@ class SucursalControlador {
                                     data.ciudad = 'No registrado';
                                 }
                                 data.observacion = 'Ciudad no existe en el sistema';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.nom_sucursal = data.nom_sucursal.trim();
+                                data.ciudad = data.ciudad.trim();
                                 listSucursales.push(data);
                             }
                         }
@@ -342,6 +351,9 @@ class SucursalControlador {
                             if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
                                 data.observacion = 'Sucursal y ciudad no registrada';
                             }
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.nom_sucursal = data.nom_sucursal.trim();
+                            data.ciudad = data.ciudad.trim();
                             listSucursales.push(data);
                         }
                         data = {};
