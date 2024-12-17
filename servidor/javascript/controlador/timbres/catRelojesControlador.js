@@ -433,6 +433,22 @@ class RelojesControlador {
                                 else {
                                     data.observacion = '1';
                                 }
+                                data.establecimiento = data.establecimiento.trim();
+                                data.departamento = data.departamento.trim();
+                                data.nombre_dispo = data.nombre_dispo.trim();
+                                data.codigo = data.codigo.trim();
+                                data.direccion_ip = data.direccion_ip.trim();
+                                data.puerto = data.puerto.trim();
+                                data.tipo_conexion = data.tipo_conexion.trim();
+                                data.temperatura = data.temperatura.trim();
+                                data.marca = data.marca.trim();
+                                data.modelo = data.modelo.trim();
+                                data.id_fabricante = data.id_fabricante();
+                                data.fabricante = data.fabricante();
+                                data.numero_serie = data.numero_serie();
+                                data.direccion_mac = data.direccion_mac.trim();
+                                data.contrasena = data.contrasena.trim();
+                                data.zona_horaria = data.zona_horaria.trim();
                                 listDispositivos.push(data);
                             }
                             else {
@@ -553,6 +569,22 @@ class RelojesControlador {
                                         }
                                     }
                                 }
+                                data.establecimiento = data.establecimiento.trim();
+                                data.departamento = data.departamento.trim();
+                                data.nombre_dispo = data.nombre_dispo.trim();
+                                data.codigo = data.codigo.trim();
+                                data.direccion_ip = data.direccion_ip.trim();
+                                data.puerto = data.puerto.trim();
+                                data.tipo_conexion = data.tipo_conexion.trim();
+                                data.temperatura = data.temperatura.trim();
+                                data.marca = data.marca.trim();
+                                data.modelo = data.modelo.trim();
+                                data.id_fabricante = data.id_fabricante();
+                                data.fabricante = data.fabricante();
+                                data.numero_serie = data.numero_serie();
+                                data.direccion_mac = data.direccion_mac.trim();
+                                data.contrasena = data.contrasena.trim();
+                                data.zona_horaria = data.zona_horaria.trim();
                                 listDispositivos.push(data);
                             }
                             data = {};

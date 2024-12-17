@@ -875,6 +875,14 @@ class DepartamentoControlador {
               data.depa_superior = DEPARTAMENTO_SUPERIOR;
               data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR;
               data.observacion = 'no registrada';
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+              data.sucursal = data.sucursal.trim();
+              data.departamento = data.departamento.trim();
+              data.nivel = data.nivel.trim();
+              data.depa_superior = data.depa_superior.trim();
+              data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
+
               listNivelesDep.push(data);
             } else {
               data.fila = ITEM;
@@ -908,6 +916,14 @@ class DepartamentoControlador {
                 data.sucursal_depa_superior = 'No registrado';
                 data.observacion = 'Sucursal superior no registrada';
               }
+            
+               //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+               data.sucursal = data.sucursal.trim();
+               data.departamento = data.departamento.trim();
+               data.nivel = data.nivel.trim();
+               data.depa_superior = data.depa_superior.trim();
+               data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
+
               listNivelesDep.push(data);
             }
             data = {};
