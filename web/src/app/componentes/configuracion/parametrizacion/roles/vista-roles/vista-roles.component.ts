@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -427,15 +426,15 @@ export class VistaRolesComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:G1");
+    worksheet.mergeCells("B2:G2");
+    worksheet.mergeCells("B3:G3");
+    worksheet.mergeCells("B4:G4");
+    worksheet.mergeCells("B5:G5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "PERMISOS O FUNCIONALIDADES DEL ROL";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "PERMISOS O FUNCIONALIDADES DEL ROL".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -453,8 +452,8 @@ export class VistaRolesComponent implements OnInit {
       { key: "pagina", width: 40 },
       { key: "funcion", width: 60 },
       { key: "modulo", width: 30 },
-      { key: "appweb", width: 20 },
-      { key: "appmovil", width: 20 },
+      { key: "appweb", width: 30 },
+      { key: "appmovil", width: 30 },
     ];
 
 
@@ -599,24 +598,34 @@ export class VistaRolesComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "RolesCSV" + '.csv');
-  }
 
-  EstructurarDatosCSV() {
-    let datos: any = [];
+  ExportToCSV() {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
     let n: number = 1;
+
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('RolesCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'n', key: 'n', width: 10 },
+      { header: 'rol', key: 'rol', width: 30 },
+      { header: 'pagina', key: 'pagina', width: 15 },
+      { header: 'funcion', key: 'funcion', width: 15 },
+      { header: 'modulo', key: 'modulo', width: 15 },
+      { header: 'aplicacion_web', key: 'aplicacion_web', width: 15 },
+      { header: 'aplicacion_movil', key: 'aplicacion_movil', width: 15 },
+
+    ];
+    // 4. Llenar las filas con los datos
     this.data_general.forEach((obj: any) => {
       obj.funciones.forEach((det: any) => {
-        datos.push({
-          'n': n++,
-          'rol': obj.nombre,
-          'pagina': det.pagina,
-          'funcion': det.accion,
-          'modulo': det.nombre_modulo === 'permisos'
+        worksheet.addRow({
+          n: n++,
+          rol: obj.nombre,
+          pagina: det.pagina,
+          funcion: det.accion,
+          modulo: det.nombre_modulo === 'permisos'
             ? 'Módulo de Permisos'
             : det.nombre_modulo === 'vacaciones'
               ? 'Módulo de Vacaciones'
@@ -635,12 +644,18 @@ export class VistaRolesComponent implements OnInit {
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
                             : det.nombre_modulo,
-          'aplicacion_web': det.movil == false ? 'Sí' : '',
-          'aplicacion_movil': det.movil == true ? 'Sí' : '',
-        });
-      });
+          aplicacion_web: det.movil == false ? 'Sí' : '',
+          aplicacion_movil: det.movil == true ? 'Sí' : '',
+
+        }).commit();
+      })
     });
-    return datos;
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "RolesCSV.csv");
+    });
   }
 
   /** ************************************************************************************************** **

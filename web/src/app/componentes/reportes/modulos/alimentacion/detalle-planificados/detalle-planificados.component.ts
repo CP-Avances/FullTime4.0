@@ -6,7 +6,6 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
-import * as xlsx from 'xlsx';
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -609,6 +608,7 @@ export class DetallePlanificadosComponent implements OnInit {
      *                                       METODO PARA EXPORTAR A EXCEL
      ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
+    /*
     var j = 0;
     const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map((obj: any) => {
       return {
@@ -695,6 +695,7 @@ export class DetallePlanificadosComponent implements OnInit {
       xlsx.utils.book_append_sheet(wb, wse, 'Alimentos Extras');
     }
     xlsx.writeFile(wb, "Alimentacion - " + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').format('dd/MM/yyyy') + '.xlsx');
-  }
+  */
+    }
 
 }

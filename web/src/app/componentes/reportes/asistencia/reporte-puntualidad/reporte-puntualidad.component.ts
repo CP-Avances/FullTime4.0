@@ -11,7 +11,6 @@ import { ReportesService } from '../../../../servicios/reportes/reportes.service
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import * as xlsx from 'xlsx';
 
 @Component({
   selector: 'app-reporte-puntualidad',
@@ -498,12 +497,12 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel(): void {
-
+/*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Puntualidad');
     xlsx.writeFile(wb, "Puntualidad " + new Date().getTime() + '.xlsx');
-
+*/
   }
 
   MapingDataPdfDefault(array: Array<any>) {

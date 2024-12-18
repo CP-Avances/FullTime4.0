@@ -773,25 +773,26 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:O1");
+    worksheet.mergeCells("B2:O2");
+    worksheet.mergeCells("B3:O3");
+    worksheet.mergeCells("B4:O4");
+    worksheet.mergeCells("B5:O5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Salidas Anticipadas';
-
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Salidas Anticipadas'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2"].forEach((cell) => {
+    ["B1", "B2", "B3"].forEach((cell) => {
       worksheet.getCell(cell).alignment = {
         horizontal: "center",
         vertical: "middle",
       };
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "cedula", width: 20 },
@@ -826,7 +827,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       { name: "FECHA TIMBRE", totalsRowLabel: "", filterButton: true },
       { name: "HORA TIMBRE", totalsRowLabel: "", filterButton: true },
       { name: "SALIDA ANTICIPADA HH:MM:SS", totalsRowLabel: "", filterButton: true },
-      { name: "SALIDA ANTICIPADA MINUTOS", totalsRowLabel: "", filterButton: true },     
+      { name: "SALIDA ANTICIPADA MINUTOS", totalsRowLabel: "", filterButton: true },
     ]
 
     worksheet.addTable({
@@ -863,7 +864,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
-      FileSaver.saveAs(blob,`Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+      FileSaver.saveAs(blob, `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
     } catch (error) {
       console.error("Error al generar el archivo Excel:", error);
     }

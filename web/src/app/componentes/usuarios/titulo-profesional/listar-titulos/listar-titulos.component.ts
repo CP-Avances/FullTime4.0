@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -522,15 +521,15 @@ export class ListarTitulosComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:D1");
+    worksheet.mergeCells("B2:D2");
+    worksheet.mergeCells("B3:D3");
+    worksheet.mergeCells("B4:D4");
+    worksheet.mergeCells("B5:D5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = "Lista de Títulos";
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Títulos".toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -545,7 +544,7 @@ export class ListarTitulosComponent implements OnInit {
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
-      { key: "nivel", width: 20 },
+      { key: "nivel", width: 30 },
       { key: "titulo", width: 30 },
 
     ];
@@ -660,13 +659,22 @@ export class ListarTitulosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
-    this.OrdenarDatos(this.verTitulos);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "TitulosCSV" + '.csv');
-    this.ObtenerTitulos();
+  ExportToCSV() {
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('TitulosCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.verTitulos[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.verTitulos.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "TitulosCSV.csv");
+    });
+
   }
 
 

@@ -6,8 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
-
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from '../../plantilla-reportes.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -1088,6 +1086,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcelAsistencia(id_empleado: number) {
+    /*
     this.asistencia = [];
     this.restKardex.ReporteAsistenciaDetalleConsolidado(id_empleado, '2021-08-01', '2021-08-31').subscribe(res => {
       console.log(this.asistencia);
@@ -1150,6 +1149,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
       }
 
     })
+      */
   }
 
   /**

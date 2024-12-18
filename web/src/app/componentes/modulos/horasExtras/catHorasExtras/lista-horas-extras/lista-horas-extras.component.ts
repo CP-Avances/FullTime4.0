@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
@@ -367,6 +366,7 @@ export class ListaHorasExtrasComponent implements OnInit {
    ** **                                  METODO PARA EXPORTAR A EXCEL                            ** **
    ** ********************************************************************************************** **/
   exportToExcel() {
+    /*
     if (Object.keys(this.horasExtras).length === 0) {
       this.toastr.error('No se ha encontrado registro de horas extras.')
     } else {
@@ -375,6 +375,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       xlsx.utils.book_append_sheet(wb, wsr, 'HorasExtras');
       xlsx.writeFile(wb, "HorasExtras" + new Date().getTime() + '.xlsx');
     }
+      */
   }
 
   /** ********************************************************************************************** **
@@ -382,6 +383,7 @@ export class ListaHorasExtrasComponent implements OnInit {
    ** ********************************************************************************************** **/
 
   exportToCVS() {
+    /*
     if (Object.keys(this.horasExtras).length === 0) {
       this.toastr.error('No se ha encontrado registro de horas extras.')
     } else {
@@ -390,6 +392,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "HorasExtrasCSV" + new Date().getTime() + '.csv');
     }
+      */
   }
 
   /** ********************************************************************************************** **

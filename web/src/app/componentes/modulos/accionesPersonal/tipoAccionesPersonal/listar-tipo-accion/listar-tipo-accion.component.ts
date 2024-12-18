@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
@@ -299,10 +298,12 @@ export class ListarTipoAccionComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'TipoPermisos');
     xlsx.writeFile(wb, "TipoAccionesPersonalEXCEL" + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -310,10 +311,12 @@ export class ListarTipoAccionComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TipoAccionesPersonalCSV" + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

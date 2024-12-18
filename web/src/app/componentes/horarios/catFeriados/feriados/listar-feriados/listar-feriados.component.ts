@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -647,15 +646,15 @@ export class ListarFeriadosComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:E1");
+    worksheet.mergeCells("B2:E2");
+    worksheet.mergeCells("B3:E3");
+    worksheet.mergeCells("B4:E4");
+    worksheet.mergeCells("B5:E5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Feriados';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Feriados'.toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
@@ -672,7 +671,7 @@ export class ListarFeriadosComponent implements OnInit {
       { key: "codigo", width: 20 },
       { key: "feriado", width: 20 },
       { key: "fecha", width: 20 },
-      { key: "fecha_recupera", width: 20 },
+      { key: "fecha_recupera", width: 30 },
 
     ];
 
@@ -788,31 +787,13 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-   /*
-  ExportToCVS() {
-    this.OrdenarDatos(this.feriados);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
-      }
-    }));
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
-    this.BuscarParametro();
-  }
-    */
 
   ExportToCSV() {
     // 1. Crear un nuevo workbook
+    this.OrdenarDatos(this.feriados);
     const workbook = new ExcelJS.Workbook();
-    
     // 2. Crear una hoja en el workbook
     const worksheet = workbook.addWorksheet('FeriadosCSV');
-  
     // 3. Agregar encabezados de las columnas
     worksheet.columns = [
       { header: 'CODIGO', key: 'codigo', width: 10 },
@@ -820,7 +801,6 @@ export class ListarFeriadosComponent implements OnInit {
       { header: 'FECHA', key: 'fecha', width: 15 },
       { header: 'FECHA_RECUPERA', key: 'fecha_recupera', width: 15 }
     ];
-  
     // 4. Llenar las filas con los datos
     this.feriados.forEach((obj: any) => {
       worksheet.addRow({
@@ -837,8 +817,6 @@ export class ListarFeriadosComponent implements OnInit {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "FeriadosCSV.csv");
     });
-  
-    // Llamar a la función BuscarParametro
     this.BuscarParametro();
   }
 

@@ -8,7 +8,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
@@ -295,10 +294,12 @@ export class PrincipalProcesoComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Procesos');
     xlsx.writeFile(wb, "Procesos" + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -306,10 +307,12 @@ export class PrincipalProcesoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "ProcesosCSV" + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

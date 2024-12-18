@@ -7,7 +7,6 @@ import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -479,29 +478,6 @@ export class CatDiscapacidadComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
-    this.OrdenarDatos(this.discapacidades);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        NOMBRE: obj.nombre,
-      }
-    }));
-
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.discapacidades[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
-    }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA TIPO DISCAPACIDADES');
-    xlsx.writeFile(wb, "DiscapacidadEXCEL" + '.xlsx');
-    this.ObtenerDiscapacidad();
-  }
-
   
   async generarExcel() {
     let datos: any[] = [];
@@ -527,14 +503,14 @@ export class CatDiscapacidadComponent implements OnInit {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
     worksheet.getCell("B2").value = 'LISTA TIPO DISCAPACIDADES';
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
@@ -548,9 +524,9 @@ export class CatDiscapacidadComponent implements OnInit {
 
 
     worksheet.columns = [
-      { key: "n", width: 10 },
-      { key: "codigo", width: 20 },
-      { key: "nombre", width: 30 },
+      { key: "n", width: 20 },
+      { key: "codigo", width: 30 },
+      { key: "nombre", width: 40 },
     ];
 
     const columnas = [
@@ -661,14 +637,23 @@ export class CatDiscapacidadComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
+  
+  ExportToCSV() {
 
-  ExportToCVS() {
-    this.OrdenarDatos(this.discapacidades);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "DiscapacidadesCSV" + '.csv');
-    this.ObtenerDiscapacidad();
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('DiscapacidadesCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.discapacidades[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.discapacidades.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "DiscapacidadesCSV.csv");
+    });
+
   }
 
   /** ************************************************************************************************* **

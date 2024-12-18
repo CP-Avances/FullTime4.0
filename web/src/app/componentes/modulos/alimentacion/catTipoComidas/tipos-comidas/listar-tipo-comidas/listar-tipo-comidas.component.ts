@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -383,6 +382,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'ServiciosAlimentacion');
@@ -408,16 +408,20 @@ export class ListarTipoComidasComponent implements OnInit {
     });
 
     return datos;
+    */
   }
 
   /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
   ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
+    /*
+    const wse: xlsx.Wor
+    kSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "ServiciosAlimentacionCSV" + '.csv');
+    */
   }
 
   EstructurarDatosCSV() {

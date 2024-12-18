@@ -8,7 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from "xlsx";
 import * as FileSaver from "file-saver";
 
 // LLAMADO A COMPONENTES
@@ -857,6 +856,7 @@ export class ListarPlanificacionComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -878,6 +878,7 @@ export class ListarPlanificacionComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
     xlsx.writeFile(wb, 'PAlimentacionEXCEL' + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -885,6 +886,7 @@ export class ListarPlanificacionComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -899,6 +901,7 @@ export class ListarPlanificacionComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, 'PAlimentacionCSV' + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

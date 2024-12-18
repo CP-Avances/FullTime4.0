@@ -6,7 +6,6 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
@@ -473,6 +472,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
    ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
    ** ************************************************************************************************** */
   exportToExcel(tipo: string): void {
+    /*
     switch (tipo) {
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
@@ -481,7 +481,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
         xlsx.writeFile(wb, "Vacaciones" + new Date().getTime() + '.xlsx');
         break;
     }
-
+*/
   }
 
   MapingDataPdfDefault(array: Array<any>) {
