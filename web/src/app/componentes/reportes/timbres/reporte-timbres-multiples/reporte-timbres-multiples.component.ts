@@ -647,7 +647,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
-          n++;
+
           let servidor_fecha: any = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
@@ -736,8 +736,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       worksheet.mergeCells("B5:R5");
 
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-      worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-      worksheet.getCell("B2").value = 'Lista de Timbres';
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+      worksheet.getCell("B2").value = 'Lista de Timbres'.toUpperCase();
       worksheet.getCell(
         "B3"
       ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
@@ -766,8 +766,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         { key: "observacion", width: 20 },
         { key: "latitud", width: 20 },
         { key: "longitud", width: 20 },
-        { key: "fechatimbredispositivo", width: 20 },
-        { key: "horatimbredispositivo", width: 20 },
+        { key: "fechatimbredispositivo", width: 40 },
+        { key: "horatimbredispositivo", width: 40 },
 
       ]
 
