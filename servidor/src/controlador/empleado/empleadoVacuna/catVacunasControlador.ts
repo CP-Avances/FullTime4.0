@@ -249,6 +249,7 @@ class VacunaControlador {
                 var listaVacunas: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
+
                 if (plantilla) {
                     // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
                     const headerRow = plantilla.getRow(1);
@@ -262,6 +263,7 @@ class VacunaControlador {
                     ) {
                         return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
+
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.eachRow((row, rowNumber) => {
                         // SALTAR LA FILA DE LAS CABECERAS
@@ -269,12 +271,16 @@ class VacunaControlador {
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
                         const VACUNA = row.getCell(headers['VACUNA']).value;
+
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
                             (VACUNA != undefined && VACUNA != '')) {
                             data.fila = ITEM;
                             data.vacuna = VACUNA;
                             data.observacion = 'no registrada';
+
+                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.vacuna = data.vacuna.trim();
 
                             listaVacunas.push(data);
 
@@ -292,6 +298,9 @@ class VacunaControlador {
                                 data.vacuna = 'No registrado';
                                 data.observacion = 'Vacuna ' + data.observacion;
                             }
+
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.vacuna = data.vacuna.trim();
 
                             listaVacunas.push(data);
                         }

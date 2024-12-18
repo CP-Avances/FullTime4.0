@@ -53,3 +53,8 @@ figure:hover>a {
     opacity: 1;
     cursor: pointer;
 }
+
+.imagenCorreo{
+    max-width: 400px;
+    max-height: 400px;
+}

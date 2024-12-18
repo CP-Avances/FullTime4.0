@@ -1,14 +1,15 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
 import { EditarCatProcesosComponent } from 'src/app/componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
@@ -31,6 +32,7 @@ export class PrincipalProcesoComponent implements OnInit {
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarNivel = new FormControl('');
   buscarPadre = new FormControl('', [Validators.minLength(2)]);
+  archivoForm = new FormControl('', Validators.required);
 
   procesos: any = [];
   empleado: any = [];
@@ -39,6 +41,18 @@ export class PrincipalProcesoComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+  // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
 
@@ -79,6 +93,7 @@ export class PrincipalProcesoComponent implements OnInit {
       this.ObtenerLogo();
       this.ObtenerColores();
     }
+
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -122,6 +137,13 @@ export class PrincipalProcesoComponent implements OnInit {
     this.buscarPadre.reset();
     this.ObtenerProcesos();
   }
+
+  LimpiarCampos() {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
+  }
+  
 
   // METODO PARA LISTAR PROCESOS
   ObtenerProcesos() {
@@ -193,6 +215,147 @@ export class PrincipalProcesoComponent implements OnInit {
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
+
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
+  FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.VerificarPlantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      this.nameFile = '';
+    }
+
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+
+  }
+
+  DataFeriados: any;
+  messajeExcel: string = '';
+  // METODO PARA LEER DATOS DE PLANTILLA
+  CargarPlantillaGeneral(element: any) {
+    if (element.target.files && element.target.files[0]) {
+      this.archivoSubido = element.target.files;
+      this.nameFile = this.archivoSubido[0].name;
+      let arrayItems = this.nameFile.split(".");
+      let itemExtencion = arrayItems[arrayItems.length - 1];
+      let itemName = arrayItems[0];
+      if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+          this.VerificarPlantilla();
+        } else {
+          this.toastr.error('Solo se acepta plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
+            timeOut: 6000,
+          });
+        }
+      } else {
+        this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
+          timeOut: 6000,
+        });
+      }
+    } else {
+      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }
+    this.LimpiarCamposPlantilla();
+  }
+
+   // METODO PARA VERIFICAR DATOS DE PLANTILLA
+   VerificarPlantilla() {
+
+    let formData = new FormData();
+    for (let i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+    
+  }
+  // LIMPIAR CAMPOS PLANTILLA
+  LimpiarCamposPlantilla() {
+    // this.numero_paginaH = 1;
+    // this.numero_paginaD = 1;
+    // this.tamanio_paginaH = 5;
+    // this.tamanio_paginaD = 5;
+    // if (this.paginatorH) {
+    //   this.paginatorH.firstPage();
+    // }
+    // if (this.paginatorD) {
+    //   this.paginatorD.firstPage();
+    // }
+  }
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.RegistrarFeriados();
+        }
+      });
+  }
+  // METODO PARA REGISTRAR DATOS
+  listFeriadosCorrectos: any = [];
+  listaFerediadCiudadCorrectos: any = [];
+  RegistrarFeriados() {
+    if (this.listFeriadosCorrectos?.length > 0) {
+      const data = {
+        plantilla: this.listFeriadosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      // this.rest.Crear_feriados(data).subscribe({
+      //   next: (response) => {
+      //     this.toastr.success('Plantilla de Feriados importada.', 'Operación exitosa.', {
+      //       timeOut: 5000,
+      //     });
+      //     if (this.listaFerediadCiudadCorrectos?.length > 0) {
+      //       setTimeout(() => {
+      //         //this.Crear_feriado_ciudad();
+      //       }, 500);
+      //     }
+      //     this.LimpiarCampos();
+      //   },
+      //   error: (error) => {
+      //     this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+      //       timeOut: 4000,
+      //     });
+      //     this.archivoForm.reset();
+      //   }
+      // });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
+
+  }
+
 
   /** ************************************************************************************************** **
    ** **                               METODO PARA EXPORTAR A PDF                                     ** **

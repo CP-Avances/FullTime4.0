@@ -685,6 +685,15 @@ class ContratoEmpleadoControlador {
                         data.control_asis = CONTROLAR_ASISTENCIA;
                         data.control_vaca = CONTROLAR_VACACIONES;
 
+                        data.cedula = data.cedula.trim();
+                        data.pais = data.pais.trim();
+                        data.regimen_la = data.regimen_la.trim();
+                        data.modalida_la = data.modalida_la.trim();
+                        data.fecha_desde = data.fecha_desde.trim();
+                        data.fecha_hasta = data.fecha_hasta.trim();
+                        data.control_asis = data.control_asis.trim();
+                        data.control_vaca = data.control_vaca.trim();
+
                         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
@@ -704,6 +713,7 @@ class ContratoEmpleadoControlador {
                         } else {
                             data.observacion = 'La cédula ingresada no es válida';
                         }
+
                         listContratos.push(data);
                     } else {
                         data.fila = ITEM;
@@ -755,6 +765,16 @@ class ContratoEmpleadoControlador {
                             data.observacion = 'Cédula no registrado';
                         }
                         else {
+
+                            data.cedula = data.cedula.trim();
+                            data.pais = data.pais.trim();
+                            data.regimen_la = data.regimen_la.trim();
+                            data.modalida_la = data.modalida_la.trim();
+                            data.fecha_desde = data.fecha_desde.trim();
+                            data.fecha_hasta = data.fecha_hasta.trim();
+                            data.control_asis = data.control_asis.trim();
+                            data.control_vaca = data.control_vaca.trim();
+
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {

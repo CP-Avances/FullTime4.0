@@ -249,20 +249,28 @@ class ModalidaLaboralControlador {
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
-                            const ITEM = row.getCell(headers['ITEM']).value;
-                            const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
+                            let ITEM = row.getCell(headers['ITEM']).value;
+                            let MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
                                 data.fila = ITEM;
                                 data.modalida_laboral = MODALIDAD_LABORAL;
                                 data.observacion = 'no registrada';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.fila.trim();
+                                data.modalida_laboral.trim();
+                                data.observacion.trim();
                                 listModalidad.push(data);
                             }
                             else {
                                 data.fila = ITEM;
                                 data.modalida_laboral = MODALIDAD_LABORAL;
                                 data.observacion = 'no registrada';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.fila.trim();
+                                data.modalida_laboral.trim();
+                                data.observacion.trim();
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';

@@ -273,12 +273,20 @@ class TiposCargosControlador {
                                 data.fila = ITEM;
                                 data.tipo_cargo = CARGO;
                                 data.observacion = 'no registrado';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.fila.trim();
+                                data.tipo_cargo.trim();
+                                data.observacion.trim();
                                 listCargos.push(data);
                             }
                             else {
                                 data.fila = ITEM;
                                 data.tipo_cargo = CARGO;
                                 data.observacion = 'no registrado';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.fila.trim();
+                                data.tipo_cargo.trim();
+                                data.observacion.trim();
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';

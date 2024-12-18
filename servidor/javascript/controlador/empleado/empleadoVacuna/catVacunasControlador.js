@@ -255,6 +255,8 @@ class VacunaControlador {
                                 data.fila = ITEM;
                                 data.vacuna = VACUNA;
                                 data.observacion = 'no registrada';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.vacuna = data.vacuna.trim();
                                 listaVacunas.push(data);
                             }
                             else {
@@ -269,6 +271,8 @@ class VacunaControlador {
                                     data.vacuna = 'No registrado';
                                     data.observacion = 'Vacuna ' + data.observacion;
                                 }
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.vacuna = data.vacuna.trim();
                                 listaVacunas.push(data);
                             }
                             data = {};

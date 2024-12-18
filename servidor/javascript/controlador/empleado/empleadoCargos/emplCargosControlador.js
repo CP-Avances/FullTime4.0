@@ -497,6 +497,15 @@ class EmpleadoCargosControlador {
                             data.admini_depa = JEFE;
                             data.hora_trabaja = HORA_TRABAJA;
                             data.departamento = DEPARTAMENTO;
+                            data.cargo = data.cargo.trim();
+                            data.cedula = data.cedula.trim();
+                            data.sueldo = data.sueldo.trim();
+                            data.sucursal = data.sucursal.trim();
+                            data.fecha_desde = data.fecha_desde.trim();
+                            data.fecha_hasta = data.fecha_hasta.trim();
+                            data.admini_depa = data.admini_depa.trim();
+                            data.hora_trabaja = data.hora_trabaja.trim();
+                            data.departamento = data.departamento.trim();
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {
@@ -590,6 +599,15 @@ class EmpleadoCargosControlador {
                                 data.observacion = 'Cédula no registrado';
                             }
                             else {
+                                data.cargo = data.cargo.trim();
+                                data.cedula = data.cedula.trim();
+                                data.sueldo = data.sueldo.trim();
+                                data.sucursal = data.sucursal.trim();
+                                data.fecha_desde = data.fecha_desde.trim();
+                                data.fecha_hasta = data.fecha_hasta.trim();
+                                data.admini_depa = data.admini_depa.trim();
+                                data.hora_trabaja = data.hora_trabaja.trim();
+                                data.departamento = data.departamento.trim();
                                 // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                                 const rege = /^[0-9]+$/;
                                 if (rege.test(data.cedula)) {

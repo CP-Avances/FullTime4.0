@@ -248,6 +248,7 @@ class TituloControlador {
           data.fila = ITEM
           data.titulo = NOMBRE;
           data.nivel = NIVEL;
+
           if ((data.fila != undefined && data.fila != '') &&
             (data.titulo != undefined && data.titulo != '') &&
             (data.nivel != undefined && data.nivel != '')) {
@@ -270,17 +271,29 @@ class TituloControlador {
                 data.fila = ITEM
                 data.titulo = NOMBRE;
                 data.nivel = NIVEL
+
                 if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === data.titulo.toLowerCase() &&
                   p.NIVEL.toLowerCase() === data.nivel.toLowerCase()) == undefined) {
                   data.observacion = 'ok';
                   duplicados.push(dato);
                 }
+
+                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                data.titulo = data.titulo.trim();
+                data.nivel = data.nivel.trim();
+
                 listTitulosProfesionales.push(data);
               } else {
                 data.fila = ITEM
                 data.titulo = NOMBRE;
                 data.nivel = NIVEL
+
                 data.observacion = 'Ya existe en el sistema';
+
+                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                data.titulo = data.titulo.trim();
+                data.nivel = data.nivel.trim();
+
                 listTitulosProfesionales.push(data);
               }
             } else {
@@ -293,6 +306,11 @@ class TituloControlador {
                 data.observacion = 'Nivel no registrado';
               }
               data.observacion = 'Nivel no existe en el sistema'
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+              data.titulo = data.titulo.trim();
+              data.nivel = data.nivel.trim();
+
               listTitulosProfesionales.push(data);
             }
 
@@ -319,6 +337,11 @@ class TituloControlador {
             if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
               data.observacion = 'Título y Nivel no registrado';
             }
+
+            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+            data.titulo = data.titulo.trim();
+            data.nivel = data.nivel.trim();
+
             listTitulosProfesionales.push(data);
           }
           data = {};

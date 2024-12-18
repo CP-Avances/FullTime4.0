@@ -1339,26 +1339,27 @@ class EmpleadoControlador {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const CEDULA = row.getCell(headers['CEDULA']).value;
-                            const APELLIDO = row.getCell(headers['APELLIDO']).value;
-                            const NOMBRE = row.getCell(headers['NOMBRE']).value;
-                            const USUARIO = row.getCell(headers['USUARIO']).value;
-                            const CONTRASENA = row.getCell(headers['CONTRASENA']).value;
-                            const ROL = row.getCell(headers['ROL']).value;
-                            const ESTADO_CIVIL = row.getCell(headers['ESTADO_CIVIL']).value;
-                            const GENERO = row.getCell(headers['GENERO']).value;
-                            const CORREO = row.getCell(headers['CORREO']).value;
-                            const FECHA_NACIMIENTO = row.getCell(headers['FECHA_NACIMIENTO']).value;
-                            const LATITUD = row.getCell(headers['LATITUD']).value;
-                            const LONGITUD = row.getCell(headers['LONGITUD']).value;
-                            const DOMICILIO = row.getCell(headers['DOMICILIO']).value;
-                            const TELEFONO = row.getCell(headers['TELEFONO']).value;
-                            const NACIONALIDAD = row.getCell(headers['NACIONALIDAD']).value;
+                            const CEDULA = (_a = row.getCell(headers['CEDULA']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                            const APELLIDO = (_b = row.getCell(headers['APELLIDO']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                            const NOMBRE = (_c = row.getCell(headers['NOMBRE']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                            const USUARIO = (_d = row.getCell(headers['USUARIO']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                            const CONTRASENA = (_e = row.getCell(headers['CONTRASENA']).value) === null || _e === void 0 ? void 0 : _e.toString();
+                            const ROL = (_f = row.getCell(headers['ROL']).value) === null || _f === void 0 ? void 0 : _f.toString();
+                            const ESTADO_CIVIL = (_g = row.getCell(headers['ESTADO_CIVIL']).value) === null || _g === void 0 ? void 0 : _g.toString();
+                            const GENERO = (_h = row.getCell(headers['GENERO']).value) === null || _h === void 0 ? void 0 : _h.toString();
+                            const CORREO = (_j = row.getCell(headers['CORREO']).value) === null || _j === void 0 ? void 0 : _j.toString();
+                            const FECHA_NACIMIENTO = (_k = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _k === void 0 ? void 0 : _k.toString();
+                            const LATITUD = (_l = row.getCell(headers['LATITUD']).value) === null || _l === void 0 ? void 0 : _l.toString();
+                            const LONGITUD = (_m = row.getCell(headers['LONGITUD']).value) === null || _m === void 0 ? void 0 : _m.toString();
+                            const DOMICILIO = (_o = row.getCell(headers['DOMICILIO']).value) === null || _o === void 0 ? void 0 : _o.toString();
+                            const TELEFONO = (_p = row.getCell(headers['TELEFONO']).value) === null || _p === void 0 ? void 0 : _p.toString();
+                            const NACIONALIDAD = (_q = row.getCell(headers['NACIONALIDAD']).value) === null || _q === void 0 ? void 0 : _q.toString();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (CEDULA != undefined) && (APELLIDO != undefined) &&
@@ -1442,6 +1443,22 @@ class EmpleadoControlador {
                                 else {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
+                                console.log('data: ', data);
+                                data.cedula = data.cedula.trim();
+                                data.apellido = data.apellido.trim();
+                                data.nombre = data.nombre.trim();
+                                data.estado_civil = data.estado_civil.trim();
+                                data.genero = data.genero.trim();
+                                data.correo = data.correo.trim();
+                                data.fec_nacimiento = data.fec_nacimiento.trim();
+                                data.latitud = data.latitud.trim();
+                                data.longitud = data.longitud.trim();
+                                data.domicilio = data.domicilio.trim();
+                                data.telefono = data.telefono.trim();
+                                data.nacionalidad = data.nacionalidad.trim();
+                                data.usuario = data.usuario.trim();
+                                data.contrasena = data.contrasena.trim();
+                                data.rol = data.rol.trim();
                                 listEmpleados.push(data);
                             }
                             else {
@@ -1527,6 +1544,21 @@ class EmpleadoControlador {
                                     data.observacion = 'Cédula no registrado';
                                 }
                                 else {
+                                    data.cedula = data.cedula.trim();
+                                    data.apellido = data.apellido.trim();
+                                    data.nombre = data.nombre.trim();
+                                    data.estado_civil = data.estado_civil.trim();
+                                    data.genero = data.genero.trim();
+                                    data.correo = data.correo.trim();
+                                    data.fec_nacimiento = data.fec_nacimiento.trim();
+                                    data.latitud = data.latitud.trim();
+                                    data.longitud = data.longitud.trim();
+                                    data.domicilio = data.domicilio.trim();
+                                    data.telefono = data.telefono.trim();
+                                    data.nacionalidad = data.nacionalidad.trim();
+                                    data.usuario = data.usuario.trim();
+                                    data.contrasena = data.contrasena.trim();
+                                    data.rol = data.rol.trim();
                                     if (regex.test(data.cedula)) {
                                         if (data.cedula.toString().length != 10) {
                                             data.observacion = 'La cédula ingresada no es válida';
@@ -1980,27 +2012,28 @@ class EmpleadoControlador {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const CODIGO = row.getCell(headers['CODIGO']).value;
-                            const CEDULA = row.getCell(headers['CEDULA']).value;
-                            const APELLIDO = row.getCell(headers['APELLIDO']).value;
-                            const NOMBRE = row.getCell(headers['NOMBRE']).value;
-                            const USUARIO = row.getCell(headers['USUARIO']).value;
-                            const CONTRASENA = row.getCell(headers['CONTRASENA']).value;
-                            const ROL = row.getCell(headers['ROL']).value;
-                            const ESTADO_CIVIL = row.getCell(headers['ESTADO_CIVIL']).value;
-                            const GENERO = row.getCell(headers['GENERO']).value;
-                            const CORREO = row.getCell(headers['CORREO']).value;
-                            const FECHA_NACIMIENTO = row.getCell(headers['FECHA_NACIMIENTO']).value;
-                            const LATITUD = row.getCell(headers['LATITUD']).value;
-                            const LONGITUD = row.getCell(headers['LONGITUD']).value;
-                            const DOMICILIO = row.getCell(headers['DOMICILIO']).value;
-                            const TELEFONO = row.getCell(headers['TELEFONO']).value;
-                            const NACIONALIDAD = row.getCell(headers['NACIONALIDAD']).value;
+                            const CODIGO = (_a = row.getCell(headers['CODIGO']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                            const CEDULA = (_b = row.getCell(headers['CEDULA']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                            const APELLIDO = (_c = row.getCell(headers['APELLIDO']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                            const NOMBRE = (_d = row.getCell(headers['NOMBRE']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                            const USUARIO = (_e = row.getCell(headers['USUARIO']).value) === null || _e === void 0 ? void 0 : _e.toString();
+                            const CONTRASENA = (_f = row.getCell(headers['CONTRASENA']).value) === null || _f === void 0 ? void 0 : _f.toString();
+                            const ROL = (_g = row.getCell(headers['ROL']).value) === null || _g === void 0 ? void 0 : _g.toString();
+                            const ESTADO_CIVIL = (_h = row.getCell(headers['ESTADO_CIVIL']).value) === null || _h === void 0 ? void 0 : _h.toString();
+                            const GENERO = (_j = row.getCell(headers['GENERO']).value) === null || _j === void 0 ? void 0 : _j.toString();
+                            const CORREO = (_k = row.getCell(headers['CORREO']).value) === null || _k === void 0 ? void 0 : _k.toString();
+                            const FECHA_NACIMIENTO = (_l = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _l === void 0 ? void 0 : _l.toString();
+                            const LATITUD = (_m = row.getCell(headers['LATITUD']).value) === null || _m === void 0 ? void 0 : _m.toString();
+                            const LONGITUD = (_o = row.getCell(headers['LONGITUD']).value) === null || _o === void 0 ? void 0 : _o.toString();
+                            const DOMICILIO = (_p = row.getCell(headers['DOMICILIO']).value) === null || _p === void 0 ? void 0 : _p.toString();
+                            const TELEFONO = (_q = row.getCell(headers['TELEFONO']).value) === null || _q === void 0 ? void 0 : _q.toString();
+                            const NACIONALIDAD = (_r = row.getCell(headers['NACIONALIDAD']).value) === null || _r === void 0 ? void 0 : _r.toString();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (CEDULA != undefined) && (APELLIDO != undefined) &&
@@ -2029,6 +2062,24 @@ class EmpleadoControlador {
                                 data.telefono = TELEFONO;
                                 data.nacionalidad = NACIONALIDAD;
                                 data.observacion = 'no registrado';
+                                console.log('dataaa: ', data);
+                                data.cedula = data.cedula.trim();
+                                data.apellido = data.apellido.trim();
+                                data.nombre = data.nombre.trim();
+                                data.codigo = data.codigo.trim();
+                                data.estado_civil = data.estado_civil.trim();
+                                data.genero = data.genero.trim();
+                                data.correo = data.correo.trim();
+                                data.fec_nacimiento = data.fec_nacimiento.trim();
+                                data.latitud = data.latitud.trim();
+                                data.longitud = data.longitud.trim();
+                                data.domicilio = data.domicilio.trim();
+                                data.telefono = data.telefono.trim();
+                                data.nacionalidad = data.nacionalidad.trim();
+                                data.usuario = data.usuario.trim();
+                                data.contrasena = data.contrasena.trim();
+                                data.rol = data.rol.trim();
+                                console.log('dataaa 1111: ', data);
                                 if (regex.test(data.cedula)) {
                                     if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
                                         data.observacion = 'La cédula ingresada no es válida';
@@ -2254,6 +2305,22 @@ class EmpleadoControlador {
                                     data.observacion = 'Cédula no registrada';
                                 }
                                 else {
+                                    data.cedula = data.cedula.trim();
+                                    data.apellido = data.apellido.trim();
+                                    data.nombre = data.nombre.trim();
+                                    data.codigo = data.codigo.trim();
+                                    data.estado_civil = data.estado_civil.trim();
+                                    data.genero = data.genero.trim();
+                                    data.correo = data.correo.trim();
+                                    data.fec_nacimiento = data.fec_nacimiento.trim();
+                                    data.latitud = data.latitud.trim();
+                                    data.longitud = data.longitud.trim();
+                                    data.domicilio = data.domicilio.trim();
+                                    data.telefono = data.telefono.trim();
+                                    data.nacionalidad = data.nacionalidad.trim();
+                                    data.usuario = data.usuario.trim();
+                                    data.contrasena = data.contrasena.trim();
+                                    data.rol = data.rol.trim();
                                     // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                                     const rege = /^[0-9]+$/;
                                     if (rege.test(data.cedula)) {

@@ -478,6 +478,12 @@ class FeriadosControlador {
                         data.descripcion = DESCRIPCION;
                         data.fec_recuperacion = FECHA_RECUPERACION;
                         data.observacion = 'no registrada'
+
+                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.fecha = data.fecha.trim();
+                        data.descripcion = data.descripcion.trim();
+                        data.fec_recuperacion = data.fec_recuperacion.trim();
+
                         listFeriados.push(data);
                     }
                     else {
@@ -509,6 +515,12 @@ class FeriadosControlador {
                         if (data.fec_recuperacion == undefined) {
                             data.fec_recuperacion = '-';
                         }
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.fecha = data.fecha.trim();
+                        data.descripcion = data.descripcion.trim();
+                        data.fec_recuperacion = data.fec_recuperacion.trim();
+
                         listFeriados.push(data);
                     }
                     data = {};
@@ -560,6 +572,13 @@ class FeriadosControlador {
                         data_fC.ciudad = CIUDAD;
                         data_fC.feriado = FERIADO;
                         data_fC.observacion = 'registrado'
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.provincia = data.provincia.trim();
+                        data.ciudad = data.ciudad.trim();
+                        data.feriado = data.feriado.trim();
+
+
                         listFeriados_ciudades.push(data_fC);
 
                     } else {
@@ -586,6 +605,11 @@ class FeriadosControlador {
                             data_fC.feriado = 'No registrado';
                             data_fC.observacion = 'Feriado no registrado';
                         }
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.provincia = data.provincia.trim();
+                        data.ciudad = data.ciudad.trim();
+                        data.feriado = data.feriado.trim();
 
                         listFeriados_ciudades.push(data_fC);
                     }
