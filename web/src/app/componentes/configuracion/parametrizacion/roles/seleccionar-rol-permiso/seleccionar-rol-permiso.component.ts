@@ -11,7 +11,6 @@ import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
 
-
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { VistaRolesComponent } from '../vista-roles/vista-roles.component';
 
@@ -537,7 +536,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip,
+                    ip: this.ip, ip_local: this.ips_locales,
                   }
                   this.contador = this.contador + 1;
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -577,7 +576,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             id_accion: null,
             movil: this.plataforma,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
@@ -666,7 +665,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip,
+                    ip: this.ip, ip_local: this.ips_locales,
                   }
                   this.contador = this.contador + 1;
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -707,7 +706,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             id_accion: null,
             movil: this.plataforma,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
             this.contador = this.contador + 1;
@@ -815,7 +814,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       var buscarPagina = {
         id: datos.id,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.contador = this.contador + 1;
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(

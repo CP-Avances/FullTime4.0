@@ -125,7 +125,7 @@ export class RegistroProvinciaComponent implements OnInit {
         nombre: form.nombreProvinciaForm,
         id_pais: idPais,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       };
       // VALIDAR SI EXISTE REGISTRO DE PROVINCIA
       if (this.provincias.length != 0) {

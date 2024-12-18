@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
 import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
@@ -22,6 +22,7 @@ interface Estado {
   styleUrls: ['./plan-hora-extra-autoriza.component.css']
 })
 export class PlanHoraExtraAutorizaComponent implements OnInit {
+  ips_locales: any = '';
 
   idDocumento = new FormControl('');
   TipoDocumento = new FormControl('');
@@ -65,6 +66,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
     public restPlanH: PlanHoraExtraService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<PlanHoraExtraAutorizaComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -73,6 +75,9 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
     this.id_user_loggin = parseInt(localStorage.getItem("empleado") as string);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.obtenerDepartamento();
   }
 
@@ -119,7 +124,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       id_plan_hora_extra: id_hora,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Autorizacion guardada', {
@@ -141,7 +146,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       estado: form.estadoF,
       id_plan_hora_extra: id_hora,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restAutorizaciones.PutEstadoAutoPermisoMultiple(newAutorizacionesM).subscribe(resA => {
       this.toastr.success('Operación exitosa.', 'Autorización Guardada', {
@@ -183,7 +188,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
     let datosHorasExtras = {
       estado: estado_hora,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlanH.EditarEstado(id_hora, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];
@@ -206,7 +211,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
     //// no sirve cambiar
     this.restPlanH.EnviarCorreoPlanificacion(mensaje).subscribe(res => {
       console.log(res.message);
-      this.toastr.success(res.message,'', {
+      this.toastr.success(res.message, '', {
         timeOut: 6000,
       });
     }, err => {

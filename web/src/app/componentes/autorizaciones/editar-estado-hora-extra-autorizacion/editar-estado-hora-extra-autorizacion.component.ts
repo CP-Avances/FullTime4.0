@@ -8,7 +8,7 @@ import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/loc
 import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
 import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 interface Estado {
   id: number,
   nombre: string
@@ -21,6 +21,7 @@ interface Estado {
 })
 
 export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estado[] = [];
 
@@ -48,6 +49,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     private realTime: RealTimeService,
     public ventana: MatDialogRef<EditarEstadoHoraExtraAutorizacionComponent>,
     public restAutoriza: AutorizaDepartamentoService,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
@@ -56,7 +58,9 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     if (this.data.autorizacion[0].estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -72,27 +76,27 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nombre == 'GERENCIA' && x.estado == true){
+          if (x.nombre == 'GERENCIA' && x.estado == true) {
             this.gerencia = true;
-            if(x.autorizar == true){
+            if (x.autorizar == true) {
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
                 { id: 4, nombre: 'Negado' }
               ];
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.estados = [
                 { id: 2, nombre: 'Pre-autorizado' },
                 { id: 4, nombre: 'Negado' }
               ];
             }
           }
-          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
-            if(x.autorizar == true){
+          else if ((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)) {
+            if (x.autorizar == true) {
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
                 { id: 4, nombre: 'Negado' }
               ];
-            }else if(x.preautorizar == true){
+            } else if (x.preautorizar == true) {
               this.estados = [
                 { id: 2, nombre: 'Pre-autorizado' },
                 { id: 4, nombre: 'Negado' }
@@ -142,7 +146,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
       id_hora_extra: this.data.autorizacion[0].id_hora_extra,
       id_departamento: this.data.autorizacion[0].id_departamento,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPH.ActualizarEstado(this.data.autorizacion[0].id_hora_extra, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];
@@ -158,7 +162,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
         id_vacaciones: null,
         id_hora_extra: this.data.autorizacion[0].id_hora_extra,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res1 => {
         this.NotifiRes = res1;

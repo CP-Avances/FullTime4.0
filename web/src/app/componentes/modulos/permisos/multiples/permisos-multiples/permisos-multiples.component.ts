@@ -1888,7 +1888,7 @@ export class PermisosMultiplesComponent implements OnInit {
         hora_numero: 0,
         id_peri_vacacion: 0,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
         subir_documento: subirDocumento,
       }
 
@@ -2086,7 +2086,7 @@ export class PermisosMultiplesComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     })
@@ -2166,7 +2166,7 @@ export class PermisosMultiplesComponent implements OnInit {
         mensaje: 'Se ha realizado un solicitud múltiple de permisos. Por favor revisar solicitudes pendientes de aprobación. Para mayor información revisar su correo.',
         tipo: 7,  // ES EL TIPO DE NOTIFICACION - PERMISOS MULTIPLES
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
         this.realTime.RecibirNuevosAvisos(res.respuesta);

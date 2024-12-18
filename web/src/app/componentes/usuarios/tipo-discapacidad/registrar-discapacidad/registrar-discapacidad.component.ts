@@ -46,7 +46,7 @@ export class RegistroDiscapacidadComponent implements OnInit{
     let discapacidad = {
       discapacidad: form.discapacidad,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.CrearDiscapacidad(discapacidad).subscribe(response => {
       if (response.status == '200') {

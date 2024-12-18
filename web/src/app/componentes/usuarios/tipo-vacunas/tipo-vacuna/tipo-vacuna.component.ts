@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vacunas.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-tipo-vacuna',
@@ -32,6 +33,7 @@ export class TipoVacunaComponent {
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
     public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -48,7 +50,7 @@ export class TipoVacunaComponent {
     let vacuna = {
       vacuna: form.vacuna,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.CrearVacuna(vacuna).subscribe(response => {
       if (response.status == '200') {

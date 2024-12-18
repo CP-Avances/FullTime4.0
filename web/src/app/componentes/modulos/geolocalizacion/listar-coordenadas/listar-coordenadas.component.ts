@@ -195,7 +195,7 @@ export class ListarCoordenadasComponent implements OnInit {
   Eliminar(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restU.EliminarCoordenadas(id, datos).subscribe((res: any) => {
       if (res.message === 'false') {

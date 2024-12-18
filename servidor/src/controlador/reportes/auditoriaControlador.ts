@@ -213,7 +213,7 @@ class AuditoriaControlador {
         }
     }
 
-    public InsertarAuditoriaPorLotes = async (data: Auditoria[], user_name: string, ip: string): Promise<void> => {
+    public InsertarAuditoriaPorLotes = async (data: Auditoria[], user_name: string, ip: string, ip_local: string): Promise<void> => {
         const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
         const totalResults = [];
 
@@ -224,7 +224,7 @@ class AuditoriaControlador {
 
             for (let j = 0; j < batch.length; j++) {
                 const auditoria = batch[j];
-                const index = j * 9; // 9 es el número de campos a insertar
+                const index = j * 10; // 9 es el número de campos a insertar
 
                 valores.push(
                     "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
@@ -235,19 +235,20 @@ class AuditoriaControlador {
                     auditoria.datosOriginales,
                     auditoria.datosNuevos,
                     ip,
-                    auditoria.observacion
+                    auditoria.observacion,
+                    ip_local
                 );
 
                 // Crear los placeholders para la consulta de inserción masiva
                 placeholders.push(
-                    `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9})`
+                    `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10})`
                 );
             }
 
             const query = `
                 INSERT INTO audit.auditoria (
                     plataforma, table_name, user_name, fecha_hora,
-                    action, original_data, new_data, ip_address, observacion
+                    action, original_data, new_data, ip_address, observacion, ip_address_local
                 ) VALUES ${placeholders.join(', ')}
             `;
 

@@ -123,7 +123,7 @@ export class CancelarPermisoComponent implements OnInit {
       doc: this.data.info.documento,
       codigo: this.data.info.codigo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restP.EliminarPermiso(datos).subscribe((res: any) => {
@@ -310,7 +310,7 @@ export class CancelarPermisoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

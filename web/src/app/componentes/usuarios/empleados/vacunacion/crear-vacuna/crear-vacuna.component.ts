@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 
 import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacuna.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-crear-vacuna',
@@ -29,6 +30,7 @@ export class CrearVacunaComponent implements OnInit {
     public toastr: ToastrService, // VARIABLE USADA PARA MENSAJES DE NOTIFICACIONES
     public ventana: MatDialog,
     private ventana_: MatDialogRef<CrearVacunaComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 
@@ -132,7 +134,7 @@ export class CrearVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
     let vacuna = {

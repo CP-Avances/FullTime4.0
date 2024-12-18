@@ -5,11 +5,9 @@ import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
-
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 
@@ -1252,7 +1250,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         laboral_dias: form3.dias_LaborableForm,
         meses_calculo: form3.meses_calculoForm,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);
@@ -1335,7 +1333,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       descripcion: '',
       dias_vacacion: 0,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     if (this.periodo_uno === true) {
@@ -1379,7 +1377,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       dias_antiguedad: 0,
       id_regimen: regimen,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     if (this.antiguo_uno === true) {

@@ -2,6 +2,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
 
@@ -34,6 +35,7 @@ export class EditarDetalleMenuComponent implements OnInit {
     private rest: TipoComidasService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarDetalleMenuComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -52,7 +54,7 @@ export class EditarDetalleMenuComponent implements OnInit {
       observacion: form.observacionForm,
       id: this.data.id_detalle,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.rest.ActualizarDetalleMenu(datosTipoComida).subscribe(response => {

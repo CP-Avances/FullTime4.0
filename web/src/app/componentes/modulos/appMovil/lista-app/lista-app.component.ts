@@ -1029,7 +1029,7 @@ export class ListaAppComponent implements OnInit {
       array: seleccionados,
       app_habilita: seleccionados[0].app_habilita,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.informacion.ActualizarEstadoTimbreMovil(datos).subscribe(res => {

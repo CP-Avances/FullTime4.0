@@ -107,7 +107,7 @@ export class CancelarHoraExtraComponent implements OnInit {
   aceptarAdvertencia() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restHE.EliminarHoraExtra(this.data.id, this.data.documento, datos).subscribe(res => {
       console.log('advertencia', res);
@@ -253,7 +253,7 @@ export class CancelarHoraExtraComponent implements OnInit {
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

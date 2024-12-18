@@ -46,7 +46,7 @@ export class RegistroModalidadComponent implements OnInit {
     let modalidadLaboral = {
       modalidad: form.modalidad,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.modalidad_.CrearModalidadLaboral(modalidadLaboral).subscribe(response => {
       if (response.status == '200') {

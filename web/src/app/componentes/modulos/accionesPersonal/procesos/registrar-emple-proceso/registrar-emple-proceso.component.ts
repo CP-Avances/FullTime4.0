@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-emple-proceso',
@@ -41,6 +42,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
     private restP: EmpleadoProcesosService,
     private rest: EmpleadoService,
     public ventana: MatDialogRef<RegistrarEmpleProcesoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any
   ) { }
 
@@ -89,7 +91,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
       fec_final: form.fecFinalForm,
       id: form.idProcesoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restP.RegistrarEmpleProcesos(datosProceso).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Procesos del Empleado registrados', {

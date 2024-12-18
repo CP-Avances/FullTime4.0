@@ -16,7 +16,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 @Component({
   selector: 'app-ver-sucursal',
   templateUrl: './ver-sucursal.component.html',
@@ -52,6 +52,7 @@ export class VerSucursalComponent implements OnInit {
     public restD: DepartamentosService,
     public rest: SucursalService,
     private toastr: ToastrService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -216,7 +217,7 @@ export class VerSucursalComponent implements OnInit {
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restD.EliminarRegistro(id_dep, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -282,7 +283,7 @@ export class VerSucursalComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

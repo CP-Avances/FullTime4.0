@@ -551,7 +551,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   Eliminar(id_prov: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarProvincia(id_prov, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -591,7 +591,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

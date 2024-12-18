@@ -166,7 +166,7 @@ export class ButtonAvisosComponent implements OnInit {
     const datos = {
       visto: true,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.aviso.ActualizarVistaAvisos(data.id, datos).subscribe(res => {
       this.LeerAvisos(this.formato_fecha, this.formato_hora);

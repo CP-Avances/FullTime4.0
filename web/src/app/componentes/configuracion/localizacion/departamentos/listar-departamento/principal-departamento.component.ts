@@ -8,7 +8,6 @@ import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
@@ -34,6 +33,8 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 })
 
 export class PrincipalDepartamentoComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -110,7 +111,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
 
     this.ObtenerEmpleados(this.idEmpleado);
@@ -377,7 +380,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       const data = {
         plantilla: this.listDepartamentosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.subirArchivoExcel(data).subscribe({
         next: (response) => {
@@ -780,7 +783,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.EliminarRegistro(id_dep, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -844,7 +847,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   EliminarMultiple() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.ingresar = false;
     this.contador = 0;

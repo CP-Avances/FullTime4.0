@@ -57,7 +57,7 @@ export class EditarModalidadComponent implements OnInit {
       id: this.data.id,
       modalidad: form.modalidad,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this._ModalidaLaboral.ActualizarModalidadLab(modalidad).subscribe(response => {
       if (response.status == '200') {

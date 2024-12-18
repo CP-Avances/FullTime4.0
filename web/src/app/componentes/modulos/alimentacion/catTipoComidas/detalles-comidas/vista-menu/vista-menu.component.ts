@@ -143,7 +143,7 @@ export class VistaMenuComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos: any = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.rest.EliminarDetalleMenu(id_detalle, datos).subscribe(res => {

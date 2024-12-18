@@ -219,7 +219,7 @@ export class ListarTipoComidasComponent implements OnInit {
   Eliminar(id_tipo: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
 

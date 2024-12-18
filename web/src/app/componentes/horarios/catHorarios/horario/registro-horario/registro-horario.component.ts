@@ -74,7 +74,7 @@ export class RegistroHorarioComponent implements OnInit {
       codigo: form.codigoForm,
       default_: form.tipoHForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // FORMATEAR HORAS

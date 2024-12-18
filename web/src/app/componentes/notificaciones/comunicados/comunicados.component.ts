@@ -570,7 +570,7 @@ export class ComunicadosComponent implements OnInit {
       mensaje: form.mensajeForm,
       tipo: 6,  // ES EL TIPO DE NOTIFICACION - COMUNICADOS
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.realTime.EnviarMensajeGeneralMultiple(mensaje).subscribe(res => {
 

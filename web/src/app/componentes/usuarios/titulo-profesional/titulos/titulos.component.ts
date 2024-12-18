@@ -104,7 +104,7 @@ export class TitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreNivelForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();
@@ -126,7 +126,7 @@ export class TitulosComponent implements OnInit {
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     // METODO PARA VALIDAR DUPLICADOS
     let verificar = {

@@ -128,7 +128,7 @@ export class ListarTipoAccionComponent implements OnInit {
   Eliminar(id_accion: number) {
     let datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
       if (res.message === 'error') {

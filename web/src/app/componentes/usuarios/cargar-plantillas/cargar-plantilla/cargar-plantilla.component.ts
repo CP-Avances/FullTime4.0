@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -50,6 +51,7 @@ export class CargarPlantillaComponent implements OnInit {
     public restDep: DepartamentosService, // SERVICIO DATOS DE DEPARTAMENTOS
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    public validar: ValidacionesService,
   ) {
     this.DatosContrato = [];
     this.DatosCargos = [];
@@ -165,7 +167,7 @@ export class CargarPlantillaComponent implements OnInit {
       const datos = {
         plantilla: this.listaNivelesCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restDep.SubirDepaNivel(datos).subscribe({
         next: (response) => {
@@ -311,7 +313,7 @@ export class CargarPlantillaComponent implements OnInit {
       const datos = {
         plantilla: this.listaContratosCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restE.SubirArchivoExcelContrato(datos).subscribe({
         next: (response) => {
@@ -554,7 +556,7 @@ export class CargarPlantillaComponent implements OnInit {
       const datos = {
         plantilla: this.listaCargosCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restCa.SubirArchivoExcelCargo(datos).subscribe({
         next: (response) => {

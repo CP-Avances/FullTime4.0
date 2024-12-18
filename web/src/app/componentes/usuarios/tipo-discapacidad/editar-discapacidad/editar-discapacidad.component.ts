@@ -57,7 +57,7 @@ export class EditarDiscapacidadComponent implements OnInit {
       id: this.data.id,
       nombre: form.discapacidad,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.ActualizarDiscapacidad(discapacidad).subscribe(response => {
       if (response.status == '200') {

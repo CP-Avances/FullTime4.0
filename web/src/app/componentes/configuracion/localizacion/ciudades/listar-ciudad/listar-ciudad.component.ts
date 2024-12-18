@@ -8,10 +8,8 @@ import { Router } from '@angular/router';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
-
 import { RegistrarCiudadComponent } from 'src/app/componentes/configuracion/localizacion/ciudades/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
@@ -27,6 +25,8 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class ListarCiudadComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -74,6 +74,7 @@ export class ListarCiudadComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
+    
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -81,7 +82,9 @@ export class ListarCiudadComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.ListarCiudades();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -551,7 +554,7 @@ export class ListarCiudadComponent implements OnInit {
   Eliminar(id_ciu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.EliminarCiudad(id_ciu, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -591,7 +594,7 @@ export class ListarCiudadComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.ingresar = false;
     this.contador = 0;

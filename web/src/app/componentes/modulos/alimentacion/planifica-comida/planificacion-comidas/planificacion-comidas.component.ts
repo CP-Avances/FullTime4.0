@@ -193,7 +193,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // METODO PARA VALIDAR FECHAS INGRESADAS
@@ -288,7 +288,7 @@ export class PlanificacionComidasComponent implements OnInit {
           hora_fin: form.horaFinForm,
           consumido: false,
           user_name: this.user_name,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         }
 
         // LECTURA DE DATOS DE USUARIO
@@ -510,7 +510,7 @@ export class PlanificacionComidasComponent implements OnInit {
             hora_fin: form.horaFinForm,
             consumido: false,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           // LEER DATOS DE CADA USUARIOS
           empleados_planificados.map((obj: any) => {
@@ -609,7 +609,7 @@ export class PlanificacionComidasComponent implements OnInit {
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPlan.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

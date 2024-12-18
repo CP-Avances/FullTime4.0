@@ -60,6 +60,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     private toastr: ToastrService,
     public componentev: VerEmpleadoComponent,
     public validar: ValidacionesService,
+    
   ) { }
 
   ngOnInit(): void {
@@ -127,7 +128,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       horas_vacaciones: form.horaVacacionForm,
       min_vacaciones: form.minVacacionForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     console.log('ver dara ', datosPerVacaciones)
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {

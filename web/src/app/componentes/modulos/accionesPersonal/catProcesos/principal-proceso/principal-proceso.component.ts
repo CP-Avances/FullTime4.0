@@ -177,7 +177,7 @@ export class PrincipalProcesoComponent implements OnInit {
   Eliminar(id_proceso: number) {
     let datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarProceso(id_proceso, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -323,7 +323,7 @@ export class PrincipalProcesoComponent implements OnInit {
       const data = {
         plantilla: this.listFeriadosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       // this.rest.Crear_feriados(data).subscribe({
       //   next: (response) => {

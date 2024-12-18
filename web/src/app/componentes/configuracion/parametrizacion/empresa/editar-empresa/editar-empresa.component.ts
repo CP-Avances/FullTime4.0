@@ -169,7 +169,7 @@ export class EditarEmpresaComponent implements OnInit {
       dias_cambio: form2.dias_cambioForm,
       cambios: true,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     if (form2.tipoForm === 'Otro') {

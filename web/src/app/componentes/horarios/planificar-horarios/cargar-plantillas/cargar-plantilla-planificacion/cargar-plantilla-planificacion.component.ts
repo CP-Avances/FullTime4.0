@@ -11,7 +11,8 @@ import { DateTime } from 'luxon';
 //IMPORTAR SERVICIOS
 import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+ 
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion.component';
@@ -70,6 +71,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     private toastr: ToastrService,
     private restP: PlanificacionHorariaService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -297,7 +299,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     const datos = {
       planificacionHoraria: this.planificacionesCorrectas,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.restP.RegistrarPlanificacionHoraria(datos).subscribe((res: any) => {

@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
     selector: 'app-configuracionNotificacion',
@@ -32,6 +33,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
         private avisos: RealTimeService,
         public formBuilder: FormBuilder,
         public ventana: MatDialogRef<ConfiguracionNotificacionComponent>,
+        public validar: ValidacionesService,
         private funciones: MainNavService,
         @Inject(MAT_DIALOG_DATA) public empleados: any
     ) {
@@ -95,7 +97,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             comunicado_mail: form.comunicadoMail,
             comunicado_noti: form.comunicadoNoti,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
         }
         this.avisos.IngresarConfigNotiEmpleado(data).subscribe(res => {
             if (this.empleados.length == contador) {
@@ -121,7 +123,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             comunicado_mail: form.comunicadoMail,
             comunicado_noti: form.comunicadoNoti,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
         }
         this.avisos.ObtenerConfiguracionEmpleado(this.empleados.id).subscribe(res => {
             this.avisos.ActualizarConfigNotiEmpl(this.empleados.id, data).subscribe(res => {
@@ -154,7 +156,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 comunicado_mail: form.comunicadoMail,
                 comunicado_noti: form.comunicadoNoti,
                 user_name: this.user_name,
-                ip: this.ip,
+                ip: this.ip, ip_local: this.ips_locales,
             }
 
             this.avisos.ObtenerConfiguracionEmpleadoMultiple({ id_empleado }).subscribe(

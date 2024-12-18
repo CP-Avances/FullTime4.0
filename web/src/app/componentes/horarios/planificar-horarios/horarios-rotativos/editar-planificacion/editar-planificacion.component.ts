@@ -770,7 +770,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
@@ -960,7 +960,7 @@ export class EditarPlanificacionComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
@@ -1064,7 +1064,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;

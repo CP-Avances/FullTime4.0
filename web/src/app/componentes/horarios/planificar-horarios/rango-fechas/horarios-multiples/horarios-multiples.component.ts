@@ -14,6 +14,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
@@ -77,6 +78,7 @@ export class HorariosMultiplesComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE USADA PARA MOSTRAR NOTIFICACIONES
     private buscar: BuscarPlanificacionComponent,
     private componente: HorarioMultipleEmpleadoComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -981,7 +983,7 @@ export class HorariosMultiplesComponent implements OnInit {
           let datos = {
             id_plan: [],
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
 
           horariosEliminarPorUsuario[u.id].forEach(h => {
@@ -1130,7 +1132,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let datos = {
       id_plan: this.eliminar,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
@@ -1162,7 +1164,7 @@ export class HorariosMultiplesComponent implements OnInit {
     const datosParcial = {
       parte: partes[parteIndex],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       parteIndex: parteIndex, // Enviar el índice de la parte actual
       totalPartes: totalPartes // Enviar el total de partes
     };
@@ -1412,7 +1414,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let datos = {
       id_plan: arrayIds,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     console.log("ver datos a eliminar: ", datos)
     // METODO PARA ELIMINAR DE LA BASE DE DATOS

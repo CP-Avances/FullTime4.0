@@ -293,7 +293,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       fec_final: form.fecFinalForm,
       dia_libre: form.diaLibreForm + form.diasTForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restV.EditarVacacion(this.dato.info.id, datosVacaciones).subscribe(vacaciones => {
       this.toastr.success('Operación exitosa.', 'Vacaciones del Empleado registradas', {
@@ -419,7 +419,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       mensaje: 'Ha actualizado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

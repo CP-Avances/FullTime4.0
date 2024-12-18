@@ -134,7 +134,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       min_vacaciones: form.minVacacionForm,
       id_empleado: this.empleados[0].id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {

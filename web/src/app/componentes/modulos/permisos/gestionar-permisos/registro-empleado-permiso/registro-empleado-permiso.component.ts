@@ -1500,7 +1500,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       estado: 1,
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       subir_documento: subirDocumento,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
@@ -1659,7 +1659,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     //console.log('this.departamento: ', newAutorizaciones);
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
@@ -1840,7 +1840,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

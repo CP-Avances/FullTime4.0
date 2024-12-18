@@ -130,7 +130,7 @@ export class DiscapacidadComponent implements OnInit {
       porcentaje: form.porcentajeForm,
       tipo: idTipoD,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.RegistroDiscapacidad(carnet).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
@@ -149,7 +149,7 @@ export class DiscapacidadComponent implements OnInit {
       porcentaje: form.porcentajeForm,
       tipo: idTipoD,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.ActualizarDiscapacidad(parseInt(this.idEmploy), carnet).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
@@ -164,7 +164,7 @@ export class DiscapacidadComponent implements OnInit {
     let tipo = {
       nombre: form.nombreForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // VERIFICAR EXISTENCIA DE DISCAPACIDAD
     let discapacidad = {
@@ -186,7 +186,7 @@ export class DiscapacidadComponent implements OnInit {
     let tipo = {
       nombre: form.nombreForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // VERIFICAR EXISTENCIA DE DISCAPACIDAD
     let discapacidad = {

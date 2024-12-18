@@ -659,7 +659,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       let h = {
         hora: EmpleadosSeleccionados[i].num_hora,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.restHE.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id, h).subscribe(res => {
         console.log(res);

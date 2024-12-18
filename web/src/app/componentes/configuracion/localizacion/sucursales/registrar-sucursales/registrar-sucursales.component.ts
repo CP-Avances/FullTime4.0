@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 @Component({
   selector: 'app-registrar-sucursales',
   templateUrl: './registrar-sucursales.component.html',
@@ -56,6 +56,7 @@ export class RegistrarSucursalesComponent implements OnInit {
     private restF: CiudadFeriadosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<RegistrarSucursalesComponent>,
+    public validar: ValidacionesService,
     public restSucursal: SucursalService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
@@ -218,7 +219,7 @@ export class RegistrarSucursalesComponent implements OnInit {
           id_ciudad: ciudad_id,
           id_empresa: empresa_id,
           user_name: this.user_name,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         };
         this.restSucursal.RegistrarSucursal(sucursal).subscribe(info => {
           this.toastr.success('Operación exitosa.', 'Registro guardado.', {

@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { use } from 'echarts';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-frase-seguridad',
@@ -34,6 +35,7 @@ export class FraseSeguridadComponent implements OnInit {
     public router: Router,
     public ventana: MatDialogRef<FraseSeguridadComponent>,
     public location: Location,
+    public validar: ValidacionesService,
   ) {
     this.usuario = localStorage.getItem('empleado') as string;
   }
@@ -49,7 +51,7 @@ export class FraseSeguridadComponent implements OnInit {
       frase: form.aFrase,
       id_empleado: parseInt(this.usuario),
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restUser.ActualizarFrase(data).subscribe(data => {
       this.toastr.success('Registro guardado.', '', {

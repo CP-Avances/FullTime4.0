@@ -244,7 +244,7 @@ export class VerCoordenadasComponent implements OnInit {
   EliminarRegistro(id_emplu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_emplu]
     }
     this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
@@ -729,7 +729,7 @@ export class VerCoordenadasComponent implements OnInit {
         id_empl: arrayIds,
         id_ubicacion: this.idUbicacion,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
         this.cont = this.cont + 1;
@@ -816,7 +816,7 @@ export class VerCoordenadasComponent implements OnInit {
 
       const datos = {
         user_name: this.user_name,
-        ip: this.ip, 
+        ip: this.ip, ip_local: this.ips_locales, 
         ids: ids
       };
       this.restU.EliminarCoordenadasUsuario( datos).subscribe(res => {

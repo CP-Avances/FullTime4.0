@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-recuperar-frase',
@@ -35,6 +36,7 @@ export class RecuperarFraseComponent implements OnInit {
     private toastr: ToastrService,
     public router: Router,
     public location: Location,
+    public validar: ValidacionesService,
   ) {
     var urlToken = this.location.prepareExternalUrl(this.location.path());
     this.token = urlToken.slice(1).split("/")[1];
@@ -50,7 +52,7 @@ export class RecuperarFraseComponent implements OnInit {
       token: this.token,
       frase: form.nFrase,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.CambiarFrase(data).subscribe(res => {
       this.mensaje = res;

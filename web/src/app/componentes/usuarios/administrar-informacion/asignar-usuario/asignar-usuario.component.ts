@@ -16,6 +16,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { PrincipalSucursalUsuarioComponent } from '../../../usuarios/administrar-informacion/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visualizar-asignaciones.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service'; 
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -71,6 +72,7 @@ export class AsignarUsuarioComponent implements OnInit {
     public toastr: ToastrService,
     private usuario: UsuarioService,
     private asignacionesService: AsignacionesService,
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -282,7 +284,7 @@ export class AsignarUsuarioComponent implements OnInit {
       departamentos_seleccionados: this.departamentosSeleccionados,
       isPersonal: this.isPersonal,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.usuario.RegistrarUsuarioDepartamentoMultiple(datos).subscribe({
@@ -423,7 +425,7 @@ export class AsignarUsuarioComponent implements OnInit {
     const datos = {
       nombre: `${usuario.nombre} ${usuario.apellido}`,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       id: usuario.id
     }
     this.ventana.open(VisualizarAsignacionesComponent, {

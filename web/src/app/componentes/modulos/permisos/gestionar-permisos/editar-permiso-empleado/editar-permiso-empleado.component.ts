@@ -1614,7 +1614,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       id_peri_vacacion: this.periodo_vacaciones,
       fec_edicion: this.FechaActual,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     if (this.info.id_tipo_permiso != datosPermiso.id_tipo_permiso) {
@@ -1834,7 +1834,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       id: this.info.id,
       codigo: this.empleado.codigo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
       this.toastr.error('Operación exitosa.', 'Documento eliminado.', {
@@ -2056,7 +2056,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

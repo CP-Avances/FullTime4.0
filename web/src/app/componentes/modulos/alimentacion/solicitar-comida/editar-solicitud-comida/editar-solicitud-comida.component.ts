@@ -301,7 +301,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       extra: form.extraForm,
       id_departamento: this.solInfo.id_dep,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restPlan.ActualizarSolicitudComida(datosPlanComida).subscribe(alimentacion => {
 
@@ -405,7 +405,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {

@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
@@ -26,6 +26,7 @@ interface Estado {
 })
 
 export class HoraExtraAutorizacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   TipoDocumento = new FormControl('');
   orden = new FormControl(0, Validators.required);
@@ -77,6 +78,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     private restH: PedHoraExtraService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<HoraExtraAutorizacionesComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
@@ -94,6 +96,9 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
 
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
   }
 
   BuscarTipoAutorizacion() {
@@ -416,7 +421,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       console.log('pasa')
@@ -446,7 +451,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       id_hora_extra: id_hora,
       id_departamento: id_departamento,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restH.ActualizarEstado(id_hora, datosHorasExtras).subscribe(res => {
@@ -484,7 +489,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
         id_vacaciones: null,
         id_hora_extra: id_hora,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res1 => {
         this.NotifiRes = res1;

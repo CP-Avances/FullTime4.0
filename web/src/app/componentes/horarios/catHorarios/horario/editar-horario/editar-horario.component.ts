@@ -130,7 +130,7 @@ export class EditarHorarioComponent implements OnInit {
       codigo: form.codigoForm,
       default_: tipo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // FORMATEAR HORAS
@@ -196,7 +196,7 @@ export class EditarHorarioComponent implements OnInit {
         documento: this.data.horario.documento,
         id: parseInt(this.data.horario.id),
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
       });
@@ -385,7 +385,7 @@ export class EditarHorarioComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
     });

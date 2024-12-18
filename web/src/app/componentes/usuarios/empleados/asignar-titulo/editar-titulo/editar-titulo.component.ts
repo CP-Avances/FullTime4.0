@@ -52,7 +52,7 @@ export class EditarTituloComponent implements OnInit {
       id_empleado: this.titulo.id_empleado,
       id_titulo: form.idTituloForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     // VERIFICAR TITULO SIMILAR AL REGISTRO
     if (titulo.id_titulo === this.titulo.id_titulo) {

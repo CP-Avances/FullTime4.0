@@ -661,7 +661,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     var infoActualizar = {
@@ -671,7 +671,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     if (

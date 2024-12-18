@@ -58,7 +58,7 @@ export class EditarRolComponent implements OnInit {
       id: this.data.datosRol.id,
       nombre: form.descripcionForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.data_nueva = dataRol;
     this.rest.ListarRolesActualiza(this.data.datosRol.id).subscribe(response => {

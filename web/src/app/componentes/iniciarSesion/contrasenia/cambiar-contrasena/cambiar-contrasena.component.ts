@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Md5 } from 'ts-md5';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-cambiar-contrasena',
@@ -41,6 +42,7 @@ export class CambiarContrasenaComponent implements OnInit {
     public router: Router,
     public ventana: MatDialogRef<CambiarContrasenaComponent>,
     public location: Location,
+    public validar: ValidacionesService,
   ) {
     this.usuario = localStorage.getItem('empleado') as string;
   }
@@ -85,7 +87,7 @@ export class CambiarContrasenaComponent implements OnInit {
       id_empleado: parseInt(this.usuario),
       contrasena: clave,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restUser.ActualizarPassword(datos).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {

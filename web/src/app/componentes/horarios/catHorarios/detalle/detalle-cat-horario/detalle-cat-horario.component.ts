@@ -151,7 +151,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       min_antes: 0,
       min_despues: 0,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);

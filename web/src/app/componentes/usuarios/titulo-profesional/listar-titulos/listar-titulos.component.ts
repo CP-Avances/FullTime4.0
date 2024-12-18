@@ -370,7 +370,7 @@ export class ListarTitulosComponent implements OnInit {
       const data = {
         titulos: this.listTitulosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.rest.RegistrarTitulosPlantilla(data).subscribe({
         next: (res: any) => {
@@ -728,7 +728,7 @@ export class ListarTitulosComponent implements OnInit {
   Eliminar(id_titulo: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_titulo, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -768,7 +768,7 @@ export class ListarTitulosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

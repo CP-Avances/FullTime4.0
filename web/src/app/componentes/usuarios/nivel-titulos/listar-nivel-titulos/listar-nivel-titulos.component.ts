@@ -272,7 +272,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       const data = {
         niveles: this.listNivelesCorrectos,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       this.nivel.RegistrarNivelesPlantilla(data).subscribe({
@@ -705,7 +705,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   Eliminar(id_nivel: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.nivel.EliminarNivel(id_nivel, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -746,7 +746,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

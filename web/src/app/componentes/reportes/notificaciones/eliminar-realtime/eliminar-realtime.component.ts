@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-eliminar-realtime',
@@ -26,6 +27,7 @@ export class EliminarRealtimeComponent implements OnInit {
     private realtime: RealTimeService,
     private restAvisos: TimbresService,
     public ventana: MatDialogRef<EliminarRealtimeComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public Notificaciones: any,
   ) { }
 
@@ -57,13 +59,13 @@ export class EliminarRealtimeComponent implements OnInit {
     const datos = {
       arregloNotificaciones: this.ids,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     const datosAvisos = {
       arregloAvisos: this.ids,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     // ELIMINACION DE NOTIFICACIONES DE AVISOS
     if (this.Notificaciones.opcion === 1) {

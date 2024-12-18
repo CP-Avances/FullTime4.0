@@ -353,7 +353,7 @@ export class CatDiscapacidadComponent implements OnInit {
       const data = {
         plantilla: this.listaDiscapacidadCorrectas,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.SubirArchivoExcel(data).subscribe({
         next: (response) => {
@@ -703,7 +703,7 @@ export class CatDiscapacidadComponent implements OnInit {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -736,7 +736,7 @@ export class CatDiscapacidadComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.ingresar = false;
     this.contador = 0;

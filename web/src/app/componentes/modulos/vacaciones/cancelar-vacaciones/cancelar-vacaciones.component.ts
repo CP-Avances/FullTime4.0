@@ -91,7 +91,7 @@ export class CancelarVacacionesComponent implements OnInit {
   aceptarAdvertencia() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restV.EliminarVacacion(this.data.id, datos).subscribe(res => {
@@ -210,7 +210,7 @@ export class CancelarVacacionesComponent implements OnInit {
       mensaje: 'Ha eliminado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

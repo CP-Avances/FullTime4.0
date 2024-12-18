@@ -41,7 +41,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();

@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 
@@ -82,6 +82,7 @@ export class VerDepartamentoComponent implements OnInit {
     public auto: AutorizaDepartamentoService,
     public rest: DepartamentosService,
     private toastr: ToastrService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -127,7 +128,7 @@ export class VerDepartamentoComponent implements OnInit {
     var data = {
       nivel: 0,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     var arreglo: any = [];
     var contador = 0;
@@ -280,7 +281,7 @@ export class VerDepartamentoComponent implements OnInit {
   Eliminar(id_dep: number, datos: any) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistroNivelDepa(id_dep, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -315,7 +316,7 @@ export class VerDepartamentoComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

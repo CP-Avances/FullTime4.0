@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
 import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-birthday',
@@ -35,7 +36,8 @@ export class RegistrarBirthdayComponent implements OnInit {
   constructor(
     private toastr: ToastrService,
     private restB: BirthdayService,
-    public ventana: MatDialogRef<RegistrarBirthdayComponent>
+    public ventana: MatDialogRef<RegistrarBirthdayComponent>,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -51,7 +53,7 @@ export class RegistrarBirthdayComponent implements OnInit {
       titulo: form.tituloForm,
       link: form.linkForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
       this.SubirRespaldo(res[0].id)

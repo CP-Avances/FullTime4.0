@@ -236,7 +236,7 @@ export class RegistroDispositivosComponent implements OnInit {
 
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // VALIDAR SELECCION DE REGISTROS

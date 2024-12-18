@@ -80,7 +80,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       automatico: this.automaticoF,
       cedula: this.cedulaF,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     if (form.inicioForm != '') {
       this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
@@ -107,7 +107,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       automatico: this.automaticoF,
       cedula: this.cedulaF,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {
@@ -128,7 +128,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       automatico: this.automaticoF,
       cedula: this.cedulaF,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (form.inicioForm != '') {
       this.rest.ObtenerCodigoMAX().subscribe(datosE => {
@@ -165,7 +165,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       automatico: this.automaticoF,
       cedula: this.cedulaF,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {

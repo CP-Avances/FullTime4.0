@@ -341,7 +341,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_negar: form3.correo_negarForm,
       correo_legalizar: form3.correo_legalizarForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     if (this.tipoPermiso.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {

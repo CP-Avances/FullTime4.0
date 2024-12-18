@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-empleado-proceso',
@@ -40,6 +41,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
     private restPro: ProcesoService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<EditarEmpleadoProcesoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -99,7 +101,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
       id: this.data.datosProcesos.id,
       id_proceso: form.idProcesoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restP.ActualizarUnProceso(datosProceso).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Proceso del Empleado actualizado', {

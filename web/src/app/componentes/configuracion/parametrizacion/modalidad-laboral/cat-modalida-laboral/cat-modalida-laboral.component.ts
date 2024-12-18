@@ -347,7 +347,7 @@ export class CatModalidaLaboralComponent implements OnInit {
       const data = {
         plantilla: this.listaModalidadCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this._ModalidaLaboral.SubirArchivoExcel(data).subscribe({
         next: (response: any) => {
@@ -716,7 +716,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -749,7 +749,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.ingresar = false;
     this.contador = 0;

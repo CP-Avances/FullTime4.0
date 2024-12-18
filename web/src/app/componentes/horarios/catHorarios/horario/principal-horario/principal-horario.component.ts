@@ -466,7 +466,7 @@ export class PrincipalHorarioComponent implements OnInit {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
@@ -1008,7 +1008,7 @@ export class PrincipalHorarioComponent implements OnInit {
   EliminarDetalle(id_horario: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_horario, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -1041,7 +1041,7 @@ export class PrincipalHorarioComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

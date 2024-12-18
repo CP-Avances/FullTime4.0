@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service'
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 @Component({
   selector: 'app-editar-ciudad',
   templateUrl: './editar-ciudad.component.html',
@@ -56,6 +56,7 @@ export class EditarCiudadComponent implements OnInit {
     private restP: ProvinciaService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarCiudadComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -224,7 +225,7 @@ export class EditarCiudadComponent implements OnInit {
       id_ciudad: nombreCiudad,
       id: this.data.idciudad_asignada,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.ciudadFeriados = [];
     // VALIDAR EXISTENCIA DE REGISTRO

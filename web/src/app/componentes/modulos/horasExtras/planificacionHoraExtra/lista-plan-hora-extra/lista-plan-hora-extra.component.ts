@@ -82,7 +82,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     public toastr: ToastrService,
     private restHEP: PlanHoraExtraService,
     private ventana: MatDialog,
-    private validacionesService: ValidacionesService
+    private validacionesService: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -414,7 +414,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
       let h = {
         hora: EmpleadosSeleccionados[i].hora_total_timbre,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restHEP.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id_plan_extra, h).subscribe(res => {
       }, err => {

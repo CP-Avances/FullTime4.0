@@ -2,7 +2,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dial
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
@@ -18,6 +18,7 @@ interface Nivel {
 })
 
 export class RegistrarNivelDepartamentoComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   depaPadre = new FormControl('', Validators.required);
@@ -56,6 +57,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     public sucursal: SucursalService,
     public ventana: MatDialog,
     public ventanacerrar: MatDialogRef<RegistrarNivelDepartamentoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public info: any
   ) { }
 
@@ -108,7 +110,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
         id_establecimiento: parseInt(this.datos.id_sucursal),
         id_suc_dep_nivel: parseInt(form.idSucursalForm),
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.GuardarDatos(departamento);
     });

@@ -408,7 +408,7 @@ export class ListarFeriadosComponent implements OnInit {
     const data = {
       plantilla: this.listaFerediadCiudadCorrectos,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.Crear_feriados_ciudad(data).subscribe();
   }
@@ -432,7 +432,7 @@ export class ListarFeriadosComponent implements OnInit {
       const data = {
         plantilla: this.listFeriadosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.Crear_feriados(data).subscribe({
         next: (response) => {
@@ -870,7 +870,7 @@ export class ListarFeriadosComponent implements OnInit {
   Eliminar(id_feriado: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarFeriado(id_feriado, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -909,7 +909,7 @@ export class ListarFeriadosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

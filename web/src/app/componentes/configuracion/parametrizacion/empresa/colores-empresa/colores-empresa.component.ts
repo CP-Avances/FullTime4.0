@@ -148,7 +148,7 @@ export class ColoresEmpresaComponent implements OnInit {
       marca_agua: this.frase,
       id: this.data.datos.id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.ActualizarMarcaAgua(datos).subscribe(data => {
       this.toastr.success('Frase registrada exitosamente.', '', {

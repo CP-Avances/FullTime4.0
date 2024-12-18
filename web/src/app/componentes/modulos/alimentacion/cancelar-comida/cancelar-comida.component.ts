@@ -110,7 +110,7 @@ export class CancelarComidaComponent implements OnInit {
   EliminarSolicitaComida() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.EliminarSolicitud(this.data.id, datos).subscribe(res => {
       var datos = {
@@ -217,7 +217,7 @@ export class CancelarComidaComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach((e: any) => {

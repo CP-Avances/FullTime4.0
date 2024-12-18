@@ -125,7 +125,7 @@ export class HorasExtrasComponent implements OnInit {
       incl_almuerzo: form2.inclAlmuerzoForm,
       tipo_funcion: form2.tipoFuncionForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.postHoraExtraRest(dataHoraExtra)

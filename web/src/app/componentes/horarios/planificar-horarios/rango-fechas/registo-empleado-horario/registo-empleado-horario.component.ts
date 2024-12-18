@@ -453,7 +453,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.lista_descanso.forEach((obj: any) => {
@@ -497,7 +497,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
@@ -804,7 +804,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // CONTABILIZAR CUANTOS HORARIOS TIENE EL USUARIO
@@ -951,7 +951,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     existe.forEach((h: any) => {
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {

@@ -197,7 +197,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   ObtenerEmpleadosPlanificacion(id: any, accion: any, lista_empleados: any, icono: any, editar: any, eliminar: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.planEmpleados = res;
@@ -276,7 +276,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   VerificarPlanificacion(id: number, accion: any, editar: any, eliminar: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.lista_empleados = true;
@@ -314,7 +314,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     // LECTURA DE DATOS DE USUARIO
@@ -382,7 +382,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     datos.map((obj: any) => {
@@ -498,7 +498,7 @@ export class ListaPlanificacionesComponent implements OnInit {
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

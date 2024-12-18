@@ -1064,7 +1064,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.lista_eliminar.forEach((eliminar: any) => {
       let plan_fecha = {
@@ -1196,7 +1196,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {

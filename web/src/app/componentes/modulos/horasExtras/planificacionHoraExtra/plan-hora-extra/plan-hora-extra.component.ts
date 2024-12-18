@@ -154,7 +154,7 @@ export class PlanHoraExtraComponent implements OnInit {
       fecha_hasta: form.fechaFinForm,
       hora_fin: form.horaFinForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // INSERCIÓN DE PLANIFICACION
@@ -184,7 +184,7 @@ export class PlanHoraExtraComponent implements OnInit {
           id_empl_realiza: this.data.planifica.id,
           id_empl_contrato: this.data.planifica.id_contrato,
           user_name: this.user_name,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         }
 
         // VALIDAR SI LA PLANIFICACION ES DE VARIOS USUARIOS
@@ -321,7 +321,7 @@ export class PlanHoraExtraComponent implements OnInit {
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPE.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

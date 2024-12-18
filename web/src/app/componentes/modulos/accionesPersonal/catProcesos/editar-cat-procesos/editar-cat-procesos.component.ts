@@ -91,7 +91,7 @@ export class EditarCatProcesosComponent implements OnInit {
         nombre: form.procesoNombreForm,
         nivel: form.procesoNivelForm,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.ActualizarDatos(dataProceso);
     } else {
@@ -103,7 +103,7 @@ export class EditarCatProcesosComponent implements OnInit {
           nivel: form.procesoNivelForm,
           proc_padre: procesoPadreId,
           user_name: this.user_name,
-          ip: this.ip
+          ip: this.ip, ip_local: this.ips_locales
         };
         this.ActualizarDatos(dataProceso);
       });

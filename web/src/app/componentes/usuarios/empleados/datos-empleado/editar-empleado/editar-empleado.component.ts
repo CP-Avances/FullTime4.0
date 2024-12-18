@@ -233,7 +233,7 @@ export class EditarEmpleadoComponent implements OnInit {
       estado: form2.estadoForm,
       codigo: form1.codigoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOLA VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -271,7 +271,7 @@ export class EditarEmpleadoComponent implements OnInit {
       id_rol: form3.rolForm,
       estado: estado_user,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.user.ActualizarDatos(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -316,7 +316,7 @@ export class EditarEmpleadoComponent implements OnInit {
         valor: codigo,
         id: 1,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })

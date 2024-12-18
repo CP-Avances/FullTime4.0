@@ -71,7 +71,7 @@ export class CorreoEmpresaComponent implements OnInit {
       servidor: form.servidorF || this.data.servidor,
       puerto: form.puertoF || this.data.puerto,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restE.EditarCredenciales(this.data.id, data).subscribe(res => {
       this.toastr.success(res.message)

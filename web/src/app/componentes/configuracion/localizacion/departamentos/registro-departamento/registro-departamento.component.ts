@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
@@ -14,6 +14,7 @@ import { SucursalService } from 'src/app/servicios/configuracion/localizacion/su
 })
 
 export class RegistroDepartamentoComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   idSucursal = new FormControl('');
@@ -40,12 +41,15 @@ export class RegistroDepartamentoComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     public ventana: MatDialogRef<RegistroDepartamentoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     if (this.data != undefined) {
       this.Habilitar = false;
       this.rest.BuscarDepartamentoSucursal(this.data).subscribe(datos => {
@@ -87,7 +91,7 @@ export class RegistroDepartamentoComponent implements OnInit {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // VERIFICAR ID DE SUCURSAL

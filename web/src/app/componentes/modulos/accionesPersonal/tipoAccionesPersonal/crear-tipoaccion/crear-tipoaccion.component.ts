@@ -68,7 +68,7 @@ export class CrearTipoaccionComponent implements OnInit {
       tipo_vacacion: this.selec2,
       tipo_situacion_propuesta: this.selec3,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -177,7 +177,7 @@ export class CrearTipoaccionComponent implements OnInit {
       let tipo = {
         descripcion: form.otroTipoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }

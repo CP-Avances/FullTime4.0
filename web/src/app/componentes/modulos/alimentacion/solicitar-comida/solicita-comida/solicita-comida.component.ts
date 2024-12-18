@@ -217,7 +217,7 @@ export class SolicitaComidaComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIFICAR SI EXISTE UNA SOLICITUD O PLANIFICACION REGISTRADA
     let datosDuplicados = {
@@ -264,7 +264,7 @@ export class SolicitaComidaComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {

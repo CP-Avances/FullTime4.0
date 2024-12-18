@@ -13,6 +13,7 @@ import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/d
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableArchivos } from 'src/app/model/reportes.model';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-lista-archivos',
@@ -49,6 +50,7 @@ export class ListaArchivosComponent implements OnInit {
     private route: ActivatedRoute,
     private rest: DocumentosService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -215,7 +217,7 @@ export class ListaArchivosComponent implements OnInit {
   EliminarArchivo(filename: string, id: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id, filename, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -255,7 +257,7 @@ export class ListaArchivosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

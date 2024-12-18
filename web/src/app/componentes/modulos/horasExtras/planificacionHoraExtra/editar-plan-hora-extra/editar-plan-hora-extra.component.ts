@@ -158,7 +158,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   InsertarPlanificacion(form: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // METODO PARA ELIMINAR PLANIFICACIÓN ANTERIOR
     this.restPE.EliminarPlanEmpleado(this.leer_datos.id_plan, this.leer_datos.id_empleado, datos)
@@ -173,7 +173,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
           descripcion: form.descripcionForm,
           hora_fin: form.horaFinForm,
           user_name: this.user_name,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         }
         // INSERCIÓN DE PLANIFICACIÓN
         this.restPE.CrearPlanificacionHoraExtra(planificacion).subscribe(res => {
@@ -202,7 +202,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
               id_empl_realiza: this.leer_datos.id_empleado,
               id_empl_contrato: this.leer_datos.id_contrato,
               user_name: this.user_name,
-              ip: this.ip,
+              ip: this.ip, ip_local: this.ips_locales,
             }
 
             // VALIDAR SI LA PLANIFICACIÓN ES DE VARIOS USUARIOS
@@ -340,7 +340,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPE.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

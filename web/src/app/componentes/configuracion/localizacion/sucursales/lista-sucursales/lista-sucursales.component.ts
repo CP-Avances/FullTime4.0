@@ -693,7 +693,7 @@ export class ListaSucursalesComponent implements OnInit {
       let data = {
         sucursales: this.listSucursalesCorrectas,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.RegistrarSucursales(data).subscribe({
         next: (res: any) => {
@@ -798,7 +798,7 @@ export class ListaSucursalesComponent implements OnInit {
   Eliminar(id_sucursal: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -838,7 +838,7 @@ export class ListaSucursalesComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

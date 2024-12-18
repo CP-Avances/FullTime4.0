@@ -140,7 +140,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
       id_timbre: seleccionado.id,
       codigo: this.informacion.detalle.codigo,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     //console.log('ver ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {

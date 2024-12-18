@@ -225,7 +225,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
   EliminarDetalle(id_opcion: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_opcion]
     };
     console.log('ver datos ', datos)
@@ -260,7 +260,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       id: '',
     };
     this.ingresar = false;
@@ -269,7 +269,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
       const ids: number[] = this.selectionUsuario.selected.map((obj: any) => obj.id).filter((id) => id !== undefined);
       const data = {
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
         ids: ids,
       };
 

@@ -233,7 +233,7 @@ export class EditarContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.CrearTiposContrato(tipo_contrato).subscribe(res => {
         datos.id_tipo_contrato = res.id;
@@ -270,7 +270,7 @@ export class EditarContratoComponent implements OnInit {
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -348,7 +348,7 @@ export class EditarContratoComponent implements OnInit {
         documento: this.contrato.documento,
         id: parseInt(this.contrato.id),
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {

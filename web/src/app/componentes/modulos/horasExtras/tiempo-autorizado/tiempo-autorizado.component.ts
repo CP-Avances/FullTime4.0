@@ -199,7 +199,7 @@ export class TiempoAutorizadoComponent implements OnInit {
     let h = {
       hora: valor,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // GUARDAR HORAS EXTRAS REALIZADAS POR EL USUARIO
     this.restPH.AutorizarTiempoHoraExtra(this.data.horaExtra.id, h).subscribe(res => {
@@ -213,7 +213,7 @@ export class TiempoAutorizadoComponent implements OnInit {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + estado + ',',
       estado: estado,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoHoraExtra(estado);
@@ -226,7 +226,7 @@ export class TiempoAutorizadoComponent implements OnInit {
     let datosHorasExtras = {
       estado: estado,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPH.ActualizarEstado(this.data.horaExtra.id, datosHorasExtras).subscribe(horaExtra => {
     })
@@ -273,7 +273,7 @@ export class TiempoAutorizadoComponent implements OnInit {
     var datos = {
       observacion: true,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPH.EditarObservacionPedido(this.data.horaExtra.id, datos).subscribe(res => {
     });
@@ -477,7 +477,7 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' estado ' + estado_n + ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm'),
       tipo: 12,  // APROBACIONES DE SOLICITUD DE HORAS EXTRAS
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     //Listado para eliminar el usuario duplicado
@@ -604,7 +604,7 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm'),
       tipo: 11,  // JUSTIFICACION DE SOLICITUD DE HORAS EXTRAS
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
       this.realTime.RecibirNuevosAvisos(res.respuesta);

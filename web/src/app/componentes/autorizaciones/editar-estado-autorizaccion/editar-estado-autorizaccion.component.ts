@@ -25,6 +25,8 @@ interface Estado {
 
 export class EditarEstadoAutorizaccionComponent implements OnInit {
 
+  ips_locales: any = '';
+
   estados: Estado[] = [];
   estado = new FormControl('', Validators.required);
 
@@ -208,7 +210,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
@@ -224,7 +226,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     let datosPermiso = {
       estado: estado_permiso,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.ActualizarEstado(id_permiso, datosPermiso).subscribe(res => {
     });
@@ -458,7 +460,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //ForEach para enviar la notificacion a cada usuario dentro de la nueva lista filtrada

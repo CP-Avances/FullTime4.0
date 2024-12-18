@@ -9,6 +9,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { EmpleadoUbicacionService } from 'src/app/servicios/modulos/empleadoUbicacion/empleado-ubicacion.service';
 
 import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-coordenadas',
@@ -40,6 +41,7 @@ export class EditarCoordenadasComponent implements OnInit {
     public restP: ParametrosService,
     public ventanas: MatDialog,
     public ventanap: MatDialogRef<EditarCoordenadasComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
@@ -95,7 +97,7 @@ export class EditarCoordenadasComponent implements OnInit {
         descripcion: form.descripcionForm,
         id: this.data.ubicacion.id,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.ActualizarCoordenadas(datos).subscribe(response => {
         this.toastr.success('Ubicación registrada exitosamente.',

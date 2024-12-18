@@ -5,7 +5,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-crear-detalle-parametro',
@@ -31,6 +31,7 @@ export class CrearDetalleParametroComponent implements OnInit {
     private rest: ParametrosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<CrearDetalleParametroComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -66,7 +67,7 @@ export class CrearDetalleParametroComponent implements OnInit {
       descripcion: form.descripcionForm,
       observacion: this.observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.rest.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

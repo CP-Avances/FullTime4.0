@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 @Component({
   selector: 'app-editar-departamento',
   templateUrl: './editar-departamento.component.html',
@@ -14,6 +14,7 @@ import { SucursalService } from 'src/app/servicios/configuracion/localizacion/su
 })
 
 export class EditarDepartamentoComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   idSucursal = new FormControl('');
@@ -40,6 +41,7 @@ export class EditarDepartamentoComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     public ventana: MatDialogRef<EditarDepartamentoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public info: any
   ) { }
 
@@ -48,7 +50,9 @@ export class EditarDepartamentoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.datos = this.info.data;
     if (this.info.establecimiento === true) {
       this.Habilitar = false;
@@ -99,7 +103,7 @@ export class EditarDepartamentoComponent implements OnInit {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -164,7 +168,7 @@ export class EditarDepartamentoComponent implements OnInit {
       departamento: departamento.nombre,
       id_departamento: this.datos.id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.ActualizarNombreNivel(data).subscribe(response => {
     });

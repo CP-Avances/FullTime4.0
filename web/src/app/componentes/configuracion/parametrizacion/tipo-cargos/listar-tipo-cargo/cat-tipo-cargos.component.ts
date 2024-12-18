@@ -207,7 +207,7 @@ export class CatTipoCargosComponent {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -384,7 +384,7 @@ export class CatTipoCargosComponent {
       const data = {
         plantilla: this.listaCargosCorrectas,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this._TipoCargos.SubirArchivoExcel(data).subscribe({
         next: (response) => {
@@ -755,7 +755,7 @@ export class CatTipoCargosComponent {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.ingresar = false;
     this.contador = 0;

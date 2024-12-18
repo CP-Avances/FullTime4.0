@@ -11,6 +11,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-contrato',
@@ -71,6 +72,7 @@ export class RegistroContratoComponent implements OnInit {
     public restCargo: EmplCargosService,
     public ventana: VerEmpleadoComponent,
     public pais: ProvinciaService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -178,7 +180,7 @@ export class RegistroContratoComponent implements OnInit {
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -208,7 +210,7 @@ export class RegistroContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       // VERIFICAR DUPLICIDAD DE MODALIDAD LABORAL
       let modalidad = {
@@ -316,7 +318,7 @@ export class RegistroContratoComponent implements OnInit {
       user_name: this.user_name,
       id_cargo: this.cargo_id,
       estado: false,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (this.cargo_id != 0) {
       this.restCargo.EditarEstadoCargo(valores).subscribe(data => {

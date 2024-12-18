@@ -15,6 +15,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -91,6 +92,7 @@ export class RegistrarTimbreComponent implements OnInit {
     public restU: EmpleadoUbicacionService,
     public restF: FuncionesService,
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
+    public validar: ValidacionesService,
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -495,7 +497,7 @@ export class RegistrarTimbreComponent implements OnInit {
       id_reloj: 98,
       latitud: this.latitud,
       accion: this.accionF,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       user_name: this.user_name,
     }
     console.log('data timbre.... ', this.dataTimbre)

@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ListaHorasExtrasComponent } from '../lista-horas-extras/lista-horas-extras.component';
 
 import { HorasExtrasService } from 'src/app/servicios/modulos/modulo-horas-extras/catHorasExtras/horas-extras.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 interface TipoDescuentos {
   value: number;
@@ -84,6 +85,7 @@ export class EditarHorasExtrasComponent implements OnInit {
     private rest: HorasExtrasService,
     private _formBuilder: FormBuilder,
     public componentel: ListaHorasExtrasComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -126,7 +128,7 @@ export class EditarHorasExtrasComponent implements OnInit {
       tipo_funcion: form2.tipoFuncionForm,
       id: this.data.id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.ActualizarDatos(dataHoraExtra)

@@ -207,14 +207,14 @@ export class EliminarIndividualComponent implements OnInit {
       let datosEliminar = {
         id_plan: res,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.EliminarDatos(datosEliminar);
     }, error => {
       let datosEliminar = {
         id_plan: [],
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.EliminarDatos(datosEliminar);
     })

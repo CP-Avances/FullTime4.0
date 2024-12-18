@@ -2,7 +2,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
@@ -29,6 +29,7 @@ export class TipoSeguridadComponent implements OnInit {
     private rest: EmpresaService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<TipoSeguridadComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -64,7 +65,7 @@ export class TipoSeguridadComponent implements OnInit {
       seg_frase: false,
       id: parseInt(localStorage.getItem('empresa') as string),
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     if (form.tipoForm === 'contrasena') {
       datosEmpresa.seg_contrasena = true;

@@ -10,7 +10,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 import { ListarParametroComponent } from '../../listar-parametro/listar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
@@ -79,6 +79,7 @@ export class VerParametroComponent implements OnInit {
     public ventana: MatDialog,
     public parametro: ParametrosService,
     public componentel: ListarParametroComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -261,7 +262,7 @@ export class VerParametroComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.parametro.EliminarDetalleParametro(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -311,7 +312,7 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.parametro.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -329,7 +330,7 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.parametro.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

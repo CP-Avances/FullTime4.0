@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../../database"));
 const stream_1 = require("stream");
 class AuditoriaControlador {
     constructor() {
-        this.InsertarAuditoriaPorLotes = (data, user_name, ip) => __awaiter(this, void 0, void 0, function* () {
+        this.InsertarAuditoriaPorLotes = (data, user_name, ip, ip_local) => __awaiter(this, void 0, void 0, function* () {
             const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
             const totalResults = [];
             for (let i = 0; i < data.length; i += batchSize) {
@@ -26,16 +26,16 @@ class AuditoriaControlador {
                 const placeholders = [];
                 for (let j = 0; j < batch.length; j++) {
                     const auditoria = batch[j];
-                    const index = j * 9; // 9 es el número de campos a insertar
+                    const index = j * 10; // 9 es el número de campos a insertar
                     valores.push("APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
-                    auditoria.tabla, user_name, new Date(), auditoria.accion, auditoria.datosOriginales, auditoria.datosNuevos, ip, auditoria.observacion);
+                    auditoria.tabla, user_name, new Date(), auditoria.accion, auditoria.datosOriginales, auditoria.datosNuevos, ip, auditoria.observacion, ip_local);
                     // Crear los placeholders para la consulta de inserción masiva
-                    placeholders.push(`($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9})`);
+                    placeholders.push(`($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10})`);
                 }
                 const query = `
                 INSERT INTO audit.auditoria (
                     plataforma, table_name, user_name, fecha_hora,
-                    action, original_data, new_data, ip_address, observacion
+                    action, original_data, new_data, ip_address, observacion, ip_address_local
                 ) VALUES ${placeholders.join(', ')}
             `;
                 try {

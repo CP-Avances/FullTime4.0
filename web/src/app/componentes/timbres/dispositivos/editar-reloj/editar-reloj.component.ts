@@ -234,7 +234,7 @@ export class EditarRelojComponent implements OnInit {
       formato_gmt_dispositivo: gmt,
       zona_horaria_dispositivo: nombre,
       user_name: this.user_name,
-      user_ip: this.ip,
+      user_ip: this.ip, ip_local: this.ips_locales,
     };
     /*console.log('form2 ', form2.zonaForm)
     console.log(`Nombre: ${nombre}`);

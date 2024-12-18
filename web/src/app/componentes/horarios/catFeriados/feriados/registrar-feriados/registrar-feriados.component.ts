@@ -84,7 +84,7 @@ export class RegistrarFeriadosComponent implements OnInit {
       descripcion: form.descripcionForm,
       fec_recuperacion: form.fechaRecuperacionForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIFICAR INGRESO DE FECHAS
     if (feriado.fec_recuperacion === '' || feriado.fec_recuperacion === null) {
@@ -385,7 +385,7 @@ export class RegistrarFeriadosComponent implements OnInit {
         id_feriado: id,
         id_ciudad: obj.id,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       // BUSCAR ID DE CIUDADES EXISTENTES
       this.ciudadFeriados = [];
