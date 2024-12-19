@@ -18,6 +18,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class AsignarCiudadComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() id_feriado: number;
   @Input() pagina: string;
@@ -72,7 +73,10 @@ export class AsignarCiudadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerContinentes();
     this.BuscarDatosFeriado(this.id_feriado);

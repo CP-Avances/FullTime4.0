@@ -21,6 +21,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RegistroComponent implements OnInit {
+  ips_locales: any = '';
 
   empleadoGuardado: any = [];
   nacionalidades: any = [];
@@ -56,7 +57,10 @@ export class RegistroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.CargarRoles();
     this.VerificarCodigo();

@@ -25,6 +25,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class ListarTipoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -63,7 +64,10 @@ export class ListarTipoAccionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.habilitarAccion === false) {
       let mensaje = {

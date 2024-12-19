@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class VisualizarAsignacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   asignaciones: any = [];
   nombre: string;
@@ -40,6 +41,9 @@ export class VisualizarAsignacionesComponent implements OnInit {
     this.user_name = this.data.user_name;
     this.nombre = this.data.nombre;
     this.ip = this.data.ip;
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.id = this.data.id;
 
     this.ObtenerAsignaciones();

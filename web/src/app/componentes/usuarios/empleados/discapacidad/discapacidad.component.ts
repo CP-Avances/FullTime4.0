@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class DiscapacidadComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmploy: string;
   editar: string;
@@ -48,7 +49,10 @@ export class DiscapacidadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.editar = this.datos.metodo;
     this.idEmploy = this.datos.idEmpleado;

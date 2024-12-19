@@ -22,6 +22,7 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 })
 
 export class EmplCargosComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
 
@@ -92,6 +93,9 @@ export class EmplCargosComponent implements OnInit {
     this.idEmpleado = this.datoEmpleado.idEmpleado;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;

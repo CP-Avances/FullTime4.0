@@ -329,7 +329,7 @@ class UbicacionControlador {
                         ip_local: ip_local,
                         observacion: null
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     // Finalizar transacción
                     yield database_1.default.query('COMMIT');
                     if (resultadoExistente.rows.length !== 0) {
@@ -394,7 +394,7 @@ class UbicacionControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     // FINALIZAR TRANSACCIÓN
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
@@ -411,7 +411,7 @@ class UbicacionControlador {
                             ip_local: ip_local,
                             observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                         }));
-                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     }
                     yield database_1.default.query(`
                     DELETE FROM mg_empleado_ubicacion WHERE id = ANY($1)`, [idsEncontrados]);
@@ -425,7 +425,7 @@ class UbicacionControlador {
                         ip_local: ip_local,
                         observacion: null
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'Registros eliminados.' });
                 }

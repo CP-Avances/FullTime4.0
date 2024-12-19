@@ -1,7 +1,7 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
@@ -11,6 +11,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 })
 
 export class ConfirmarCrearCarpetaComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   permisos: boolean = false;
@@ -23,6 +24,7 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
+    public validar: ValidacionesService,
     private restE: EmpleadoService,
     public ventana: MatDialogRef<ConfirmarCrearCarpetaComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -30,7 +32,9 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.empleados = this.data.empleados.map((obj: any) => {
       return obj;

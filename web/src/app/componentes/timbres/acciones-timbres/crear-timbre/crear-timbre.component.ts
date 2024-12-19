@@ -17,6 +17,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class CrearTimbreComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   teclaFuncionF = new FormControl('');
@@ -81,7 +82,10 @@ export class CrearTimbreComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.data.length === undefined) {
       this.nombre = this.data.name_empleado;

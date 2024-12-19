@@ -25,9 +25,9 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class PlanificacionMultipleComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datosSeleccionados: any;
-
 
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl;
@@ -61,7 +61,10 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarHorarios();
     this.BuscarHora();
     this.InicialiciarDatos();

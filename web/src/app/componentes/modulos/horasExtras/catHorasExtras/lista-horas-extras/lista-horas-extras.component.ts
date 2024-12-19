@@ -26,6 +26,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class ListaHorasExtrasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -76,7 +77,10 @@ export class ListaHorasExtrasComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
       this.BuscarHora();
       this.ObtenerLogo();

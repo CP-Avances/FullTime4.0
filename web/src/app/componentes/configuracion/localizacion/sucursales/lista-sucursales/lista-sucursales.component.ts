@@ -33,6 +33,8 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 })
 
 export class ListaSucursalesComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -104,7 +106,10 @@ export class ListaSucursalesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;

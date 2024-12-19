@@ -19,6 +19,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 })
 
 export class EditarEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   nacionalidades: any = [];
   private idNacionalidad: number;
@@ -59,7 +60,10 @@ export class EditarEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.CargarRoles();
     this.VerificarFormulario();

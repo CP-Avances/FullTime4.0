@@ -25,6 +25,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerOpcionesTimbreWebComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -76,7 +78,10 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('ver info ', this.informacion)
     this.ObtenerEmpleados(this.idEmpleadoLogueado);
     this.RevisarEmpleados();

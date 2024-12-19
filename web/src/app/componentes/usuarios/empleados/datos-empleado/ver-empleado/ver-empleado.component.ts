@@ -93,6 +93,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerEmpleadoComponent implements OnInit, AfterViewInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -185,7 +187,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params

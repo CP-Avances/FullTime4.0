@@ -18,6 +18,7 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 })
 
 export class RegimenComponent implements AfterViewInit, OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -97,7 +98,10 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerPaises();
     this.ObtenerRegimen();

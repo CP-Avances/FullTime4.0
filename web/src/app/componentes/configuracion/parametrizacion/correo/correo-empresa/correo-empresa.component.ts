@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class CorreoEmpresaComponent implements OnInit {
+  ips_locales: any = '';
 
   hide1 = true;
   hide = true;
@@ -54,7 +55,10 @@ export class CorreoEmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.formulario.patchValue({
       email: this.data.correo,

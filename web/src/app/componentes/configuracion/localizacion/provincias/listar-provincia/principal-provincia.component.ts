@@ -29,6 +29,7 @@ import { ITableProvincias } from 'src/app/model/reportes.model';
 })
 
 export class PrincipalProvinciaComponent implements OnInit {
+  ips_locales: any = '';
 
   private imagen: any;
 
@@ -84,8 +85,10 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.ListarProvincias();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -320,7 +323,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
- 
+
 
   async generarExcelProvincias() {
 
@@ -455,7 +458,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.provincias.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
-  
+
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "ProvinciasCSV.csv");

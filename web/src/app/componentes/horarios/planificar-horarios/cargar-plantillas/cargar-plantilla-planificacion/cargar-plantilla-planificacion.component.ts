@@ -12,7 +12,7 @@ import { DateTime } from 'luxon';
 import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
 import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
- 
+
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion.component';
@@ -26,6 +26,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class CargarPlantillaPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datosSeleccionados: any;
   usuarios: any;
@@ -77,6 +78,9 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 

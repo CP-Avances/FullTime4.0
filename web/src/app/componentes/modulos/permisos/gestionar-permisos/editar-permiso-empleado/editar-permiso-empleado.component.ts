@@ -34,6 +34,7 @@ interface opcionesDiasHoras {
 })
 
 export class EditarPermisoEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() solicita_permiso: any;
 
@@ -141,7 +142,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   ngOnInit(): void {
     console.log('datos permisos ', this.solicita_permiso[0])
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.info = this.solicita_permiso[0].permiso;

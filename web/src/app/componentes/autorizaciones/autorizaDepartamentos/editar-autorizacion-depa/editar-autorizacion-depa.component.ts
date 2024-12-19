@@ -62,11 +62,11 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-      //console.log("IPs Locales del Cliente:", ips);
-    });
+    }); 
+    
 
     this.ObtenerAutorizaciones();
     this.BuscarSucursales();

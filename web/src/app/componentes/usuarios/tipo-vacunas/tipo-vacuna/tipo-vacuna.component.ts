@@ -16,7 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class TipoVacunaComponent {
-
+  ips_locales: any = '';
 
   vacuna = new FormControl('', Validators.required);
   // FORMULARIO DENTRO DE UN GRUPO
@@ -38,7 +38,10 @@ export class TipoVacunaComponent {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   LimpiarCampos() {

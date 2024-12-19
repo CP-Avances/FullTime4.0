@@ -26,6 +26,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class EditarPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datos_horarios: any;
 
@@ -65,7 +66,10 @@ export class EditarPlanificacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarHora();
     this.BuscarFeriados();
   }

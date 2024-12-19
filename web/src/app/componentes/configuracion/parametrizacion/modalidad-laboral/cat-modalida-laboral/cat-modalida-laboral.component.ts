@@ -30,8 +30,10 @@ import { RegistroModalidadComponent } from '../registro-modalidad/registro-modal
 })
 
 export class CatModalidaLaboralComponent implements OnInit {
-  private imagen: any;
+  ips_locales: any = '';
 
+  private imagen: any;
+  
   private bordeCompleto!: Partial<ExcelJS.Borders>;
 
   private bordeGrueso!: Partial<ExcelJS.Borders>;
@@ -98,7 +100,10 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);

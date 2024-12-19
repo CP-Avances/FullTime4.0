@@ -16,6 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class RegistrarEmpleProcesoComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   procesos: any = [];
@@ -50,7 +51,10 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerProcesos();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO

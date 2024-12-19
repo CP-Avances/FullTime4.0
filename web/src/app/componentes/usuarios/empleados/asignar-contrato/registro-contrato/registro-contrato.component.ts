@@ -21,6 +21,8 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 export class RegistroContratoComponent implements OnInit {
 
+  ips_locales: any = '';
+
   @Input() datoEmpleado: any;
   @Input() pagina: any;
 
@@ -77,7 +79,10 @@ export class RegistroContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('dato ', this.datoEmpleado);
     this.ObtenerPaises();
     this.ObtenerEmpleados();

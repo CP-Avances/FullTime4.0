@@ -22,6 +22,7 @@ import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedi
   styleUrls: ["./editar-pedido-accion.component.css"],
 })
 export class EditarPedidoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idPedido: number;
   @Input() pagina: string = '';
@@ -150,7 +151,10 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.CargarInformacion();
     // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO

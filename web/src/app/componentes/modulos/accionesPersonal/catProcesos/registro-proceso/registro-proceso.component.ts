@@ -20,6 +20,8 @@ interface Nivel {
 
 export class RegistroProcesoComponent implements OnInit {
 
+  ips_locales: any = '';
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -58,7 +60,10 @@ export class RegistroProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.Obtenerprocesos();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO DE VALIDACION DE CAMPOS

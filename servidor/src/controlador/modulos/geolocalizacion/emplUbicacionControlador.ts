@@ -365,7 +365,7 @@ class UbicacionControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // Finalizar transacción
                 await pool.query('COMMIT');
 
@@ -438,7 +438,7 @@ class UbicacionControlador {
                     ip_local: ip_local,
                     observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                 }));
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCIÓN
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
@@ -454,7 +454,7 @@ class UbicacionControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                     }));
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 }
 
 
@@ -474,7 +474,7 @@ class UbicacionControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 await pool.query('COMMIT');
                 return res.jsonp({ message: 'Registros eliminados.' });
             }

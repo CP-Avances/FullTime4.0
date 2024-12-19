@@ -21,6 +21,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class EditarPlanComidasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VALIDACIONES DE CAMPOS DE FORMULARIO
   observacionF = new FormControl('', [Validators.required, Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{4,48}")]);
@@ -74,7 +75,10 @@ export class EditarPlanComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerServicios();
     this.CargarDatos();

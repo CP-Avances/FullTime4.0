@@ -43,6 +43,7 @@ export interface HoraExtraPlanElemento {
 })
 
 export class ListaPlanHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   horas_extras_plan: any = [];
   horas_extras_plan_observacion: any = [];
@@ -87,7 +88,9 @@ export class ListaPlanHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validacionesService.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.obtenerPlanHorasExtras();
     this.obtenerPlanHorasExtrasObservacion();

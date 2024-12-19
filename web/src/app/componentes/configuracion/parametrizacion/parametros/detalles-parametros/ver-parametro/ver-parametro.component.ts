@@ -20,6 +20,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class VerParametroComponent implements OnInit {
+  ips_locales: any = '';
 
   formato12: string = 'rgb(80, 87, 97)';
   formato24: string = 'rgb(80, 87, 97)';
@@ -84,7 +85,10 @@ export class VerParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarParametros(this.idParametro);
     this.ListarDetalles(this.idParametro);
     this.ActivarBoton();

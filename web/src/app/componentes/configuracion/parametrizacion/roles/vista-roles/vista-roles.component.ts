@@ -34,6 +34,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class VistaRolesComponent implements OnInit {
+  ips_locales: any = '';
 
   private imagen: any;
 
@@ -90,7 +91,10 @@ export class VistaRolesComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();

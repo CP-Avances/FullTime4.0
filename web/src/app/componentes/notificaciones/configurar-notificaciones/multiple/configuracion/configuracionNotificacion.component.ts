@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class ConfiguracionNotificacionComponent implements OnInit {
+    ips_locales: any = '';
 
     // FORMULARIO
     formGroup: FormGroup;
@@ -43,6 +44,9 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     ngOnInit(): void {
         this.user_name = localStorage.getItem('usuario');
         this.ip = localStorage.getItem('ip');
+        this.validar.ObtenerIPsLocales().then((ips) => {
+            this.ips_locales = ips;
+        });
         this.ImprimirDatosUsuario();
     }
 
@@ -214,10 +218,10 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             )
 
 
-        } else { 
+        } else {
             this.toaster.warning('No ha seleccionado usuarios.', '', {
                 timeOut: 6000,
-              });
+            });
         }
 
     }

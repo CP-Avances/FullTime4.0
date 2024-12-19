@@ -70,10 +70,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+      
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    });
-
+    }); 
+  
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,

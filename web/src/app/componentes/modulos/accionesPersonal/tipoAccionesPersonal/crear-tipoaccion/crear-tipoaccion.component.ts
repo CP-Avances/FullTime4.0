@@ -14,6 +14,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class CrearTipoaccionComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -55,7 +56,10 @@ export class CrearTipoaccionComponent implements OnInit {
     this.ObtenerTiposAccion();
     this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA CREAR TIPO DE ACCION

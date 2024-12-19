@@ -19,6 +19,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class CambiarFraseComponent implements OnInit {
+  ips_locales: any = '';
 
   usuario: string; // VARIABLE DE ALMACENAMIENTO DE ID DE USUARIO
   datosUser: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE USUARIO
@@ -50,7 +51,10 @@ export class CambiarFraseComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA COMPARAR FRASE ACTUAL CON LA INGRESADA POR EL USUARIO

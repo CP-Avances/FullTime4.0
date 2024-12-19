@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class CrearDetalleParametroComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -41,7 +42,10 @@ export class CrearDetalleParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.observacion = '';
     this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
       'Guardar.'

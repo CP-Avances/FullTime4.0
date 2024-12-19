@@ -19,6 +19,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class TiempoAutorizadoComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA MOSTRAR PROCESO
   aprobacion: boolean = false;
@@ -74,7 +75,10 @@ export class TiempoAutorizadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.obtenerInformacionEmpleado();
     this.MostrarProceso();

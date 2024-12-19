@@ -28,6 +28,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 })
 
 export class PrincipalProcesoComponent implements OnInit {
+  ips_locales: any = '';
 
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarNivel = new FormControl('');
@@ -76,7 +77,10 @@ export class PrincipalProcesoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.habilitarAccion === false) {
       let mensaje = {

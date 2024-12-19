@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarEmpleadoProcesoComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   procesos: any = [];
@@ -48,6 +49,9 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ObtenerProcesos();
@@ -86,7 +90,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
       this.InsertarProceso(form);
     }
     else {
-      this.toastr.info('La fecha de finalización debe ser mayor a la fecha de inicio','', {
+      this.toastr.info('La fecha de finalización debe ser mayor a la fecha de inicio', '', {
         timeOut: 6000,
       })
     }

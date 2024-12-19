@@ -25,6 +25,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerHorarioDetalleComponent implements OnInit {
+  ips_locales: any = '';
+
   @Input() idHorario: number;
   @Input() pagina: string;
 
@@ -57,7 +59,10 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarDatosHorario(this.idHorario);
     this.BuscarHora();

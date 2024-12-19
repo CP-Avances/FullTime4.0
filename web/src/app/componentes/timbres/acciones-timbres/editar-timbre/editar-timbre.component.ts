@@ -14,6 +14,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class EditarTimbreComponent implements OnInit {
+  ips_locales: any = '';
 
   datosTimbre: any;
   teclaFuncionF: any;
@@ -59,7 +60,10 @@ export class EditarTimbreComponent implements OnInit {
   ngOnInit() {
     this.LeerDatosTimbre();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   /** **************************************************************************************** **

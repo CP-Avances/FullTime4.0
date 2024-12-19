@@ -12,6 +12,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 })
 
 export class TipoSeguridadComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   tipoF = new FormControl('', [Validators.required]);
@@ -35,7 +36,10 @@ export class TipoSeguridadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ImprimirDatos();
   }

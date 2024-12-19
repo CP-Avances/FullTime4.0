@@ -34,6 +34,7 @@ interface Dia {
 })
 
 export class EditarHorasExtrasComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
   @Input() pagina: string = '';
@@ -90,7 +91,9 @@ export class EditarHorasExtrasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.primeroFormGroup = this._formBuilder.group({
       descripcionForm: this.descripcion,

@@ -28,6 +28,7 @@ interface Nivel {
 })
 
 export class VerDepartamentoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() id_departamento: number;
   @Input() pagina: string;
@@ -87,7 +88,10 @@ export class VerDepartamentoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     if (this.id_departamento) {
       this.rest.BuscarDepartamento(this.id_departamento).subscribe(dato => {

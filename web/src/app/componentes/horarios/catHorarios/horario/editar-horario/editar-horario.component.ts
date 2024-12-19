@@ -19,6 +19,8 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 })
 
 export class EditarHorarioComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // VALIDACIONES PARA EL FORMULARIO
   horaTrabajo = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
@@ -63,6 +65,9 @@ export class EditarHorarioComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ImprimirDatos();
   }

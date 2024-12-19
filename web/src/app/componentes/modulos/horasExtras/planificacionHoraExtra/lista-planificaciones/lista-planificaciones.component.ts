@@ -44,6 +44,7 @@ export interface PlanificacionHE {
 })
 
 export class ListaPlanificacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   // ITEMS DE PAGINACION DE LA LISTA DE PLANIFICACIONES
   tamanio_pagina: number = 5;
@@ -108,7 +109,10 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip'); 
+      this.validar.ObtenerIPsLocales().then((ips) => {
+        this.ips_locales = ips;
+      });
 
       var f = DateTime.now();
       this.ObtenerEmpleados(this.idEmpleadoLogueado);

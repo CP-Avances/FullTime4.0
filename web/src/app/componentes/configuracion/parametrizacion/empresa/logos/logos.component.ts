@@ -2,7 +2,7 @@
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 // SECCION DE SERVICIOS
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -14,6 +14,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 })
 
 export class LogosComponent implements OnInit {
+  ips_locales: any = '';
 
   logo: string;
   textoBoton: string = 'Editar';
@@ -26,12 +27,16 @@ export class LogosComponent implements OnInit {
     public restE: EmpresaService,
     public ventana: MatDialogRef<LogosComponent>,
     private toastr: ToastrService,
+    public validar: ValidacionesService,
+
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.MostrarImagen();
   }

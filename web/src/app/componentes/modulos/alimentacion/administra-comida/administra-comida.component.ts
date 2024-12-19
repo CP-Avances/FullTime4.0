@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class AdministraComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES DE ALMACENAMIENTO
   empleados: any = [];
@@ -44,6 +45,9 @@ export class AdministraComidaComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.MostrarDatos();

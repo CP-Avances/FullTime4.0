@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class ConfigurarCodigoComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES DE MANEJO DE ACTIVACIÓN O DESACTIVACIÓN DE FUNCIONES
   HabilitarDescrip: boolean = true;
@@ -47,6 +48,9 @@ export class ConfigurarCodigoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.VerUltimoCodigo();
   }

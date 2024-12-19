@@ -24,6 +24,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class VerSucursalComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idSucursal: number;
   @Input() pagina_: string = '';
@@ -57,7 +58,10 @@ export class VerSucursalComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.CargarDatosSucursal();

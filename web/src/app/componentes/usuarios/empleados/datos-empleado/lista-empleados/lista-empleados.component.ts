@@ -38,6 +38,7 @@ import { EmpleadoElemento } from 'src/app/model/empleado.model';
 })
 
 export class ListaEmpleadosComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -126,7 +127,10 @@ export class ListaEmpleadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;

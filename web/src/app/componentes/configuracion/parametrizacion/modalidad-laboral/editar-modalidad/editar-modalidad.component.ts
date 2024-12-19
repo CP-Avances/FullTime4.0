@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarModalidadComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -34,7 +35,10 @@ export class EditarModalidadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ImprimirDatos();
   }

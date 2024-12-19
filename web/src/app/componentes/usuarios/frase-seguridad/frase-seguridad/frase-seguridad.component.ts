@@ -16,7 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class FraseSeguridadComponent implements OnInit {
-
+  ips_locales: any = '';
   usuario: string;
   ActualFrase = new FormControl('', Validators.maxLength(100));
 
@@ -42,7 +42,10 @@ export class FraseSeguridadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA REGISTRAR FRASE DE SEGURIDAD

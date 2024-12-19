@@ -14,6 +14,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class EditarTipoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
   @Input() pagina: any;
@@ -63,7 +64,10 @@ export class EditarTipoAccionComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;

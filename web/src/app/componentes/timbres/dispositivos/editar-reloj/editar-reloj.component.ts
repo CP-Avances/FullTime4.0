@@ -21,6 +21,7 @@ import { map, Observable, startWith } from 'rxjs';
 })
 
 export class EditarRelojComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idReloj: number;
   @Input() pagina: string;
@@ -79,7 +80,9 @@ export class EditarRelojComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.FiltrarSucursales();
     this.ValidarFormulario();
     this.LeerZonasHorarias();

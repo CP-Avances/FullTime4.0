@@ -27,6 +27,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistoEmpleadoHorarioComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data_horario: any;
 
@@ -89,7 +90,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarHorarios();
     this.ObtenerEmpleado(this.data_horario.idEmpleado);

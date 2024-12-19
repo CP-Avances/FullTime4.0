@@ -19,6 +19,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class CargarPlantillaComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -60,7 +61,10 @@ export class CargarPlantillaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA

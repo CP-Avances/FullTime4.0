@@ -310,7 +310,7 @@ class NotificacionTiempoRealControlador {
     CrearConfiguracionMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
                 const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
                 const batches = [];
                 for (let i = 0; i < id_empleado.length; i += batchSize) {
@@ -351,9 +351,10 @@ class NotificacionTiempoRealControlador {
                         comunicado_notificacion: comunicado_noti
                     }),
                     ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 yield database_1.default.query('COMMIT'); // Finalizar transacción
                 res.jsonp({ message: 'Configuración guardada exitosamente' });
             }
@@ -452,7 +453,7 @@ class NotificacionTiempoRealControlador {
                         observacion: null
                     };
                 });
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (rowsAffected > 0) {
@@ -767,7 +768,7 @@ class NotificacionTiempoRealControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 const USUARIO = yield database_1.default.query(`
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1

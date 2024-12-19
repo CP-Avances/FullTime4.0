@@ -100,12 +100,10 @@ export class AutorizacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-
+    this.ip = localStorage.getItem('ip');  
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-      //console.log("IPs Locales del Cliente:", ips);
-    });
+    }); 
 
     if (this.filtroDepa != '' && this.filtroDepa != undefined) {
       this.id_depart = this.data.datosPermiso[0].id_depa;

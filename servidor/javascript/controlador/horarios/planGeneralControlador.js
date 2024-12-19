@@ -109,7 +109,7 @@ class PlanGeneralControlador {
                             observacion: null
                         });
                     }
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     // FINALIZAR TRANSACCIÓN
                     yield database_1.default.query('COMMIT');
                 }
@@ -182,7 +182,7 @@ class PlanGeneralControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 yield client.query('COMMIT'); // Finalizar la transacción
                 res.status(200).json({ message: 'OK', totalResults: parte.length });
             }
@@ -416,7 +416,7 @@ class PlanGeneralControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id}`
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: id_plan });
                 }
@@ -432,7 +432,7 @@ class PlanGeneralControlador {
                             ip_local: ip_local,
                             observacion: `Error al eliminar registro con id ${id}`
                         }));
-                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     }
                     const result = yield database_1.default.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
                     if (result.rowCount === 0) {
@@ -456,7 +456,7 @@ class PlanGeneralControlador {
                             observacion: null,
                         };
                     });
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'OK' });
                 }

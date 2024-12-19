@@ -18,6 +18,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class ColoresEmpresaComponent implements OnInit {
+  ips_locales: any = '';
 
   verFrase: boolean = false;
   ingresarOtro = false;
@@ -56,7 +57,10 @@ export class ColoresEmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerLogo();
     this.VerFormularios();

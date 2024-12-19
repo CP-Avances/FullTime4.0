@@ -20,6 +20,7 @@ import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
 })
 
 export class PlanificacionComidasComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
 
@@ -75,7 +76,10 @@ export class PlanificacionComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     console.log('DATOS RECIBIDOS', this.data);
 

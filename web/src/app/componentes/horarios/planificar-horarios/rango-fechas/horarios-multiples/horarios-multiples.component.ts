@@ -27,6 +27,7 @@ import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-pla
 })
 
 export class HorariosMultiplesComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() seleccionados: any;
   @Input() pagina: any;
@@ -78,12 +79,15 @@ export class HorariosMultiplesComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE USADA PARA MOSTRAR NOTIFICACIONES
     private buscar: BuscarPlanificacionComponent,
     private componente: HorarioMultipleEmpleadoComponent,
-    public validar: ValidacionesService,
+    public validarS: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validarS.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.BuscarHorarios();
     this.LeerDatos();
   }
@@ -1441,8 +1445,8 @@ export class HorariosMultiplesComponent implements OnInit {
   }
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
-    
-    this.fechaInicioFormluxon =form.fechaInicioForm;
+
+    this.fechaInicioFormluxon = form.fechaInicioForm;
     this.fechaFinFormluxon = form.fechaFinalForm;
 
     if (form.horarioForm) {

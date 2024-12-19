@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarFeriadosComponent implements OnInit {
+  ips_locales: any = '';
 
   idFeriado: number;
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
@@ -40,7 +41,10 @@ export class EditarFeriadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ImprimirDatos();
     this.ObtenerFeriados();

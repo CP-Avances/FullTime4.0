@@ -18,6 +18,7 @@ interface Estados {
   styleUrls: ['./estado-vacaciones.component.css']
 })
 export class EstadoVacacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estados[] = [
     { valor: 1, nombre: 'Pendiente' },
@@ -50,7 +51,10 @@ export class EstadoVacacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toformat('yyyy-MM-dd');

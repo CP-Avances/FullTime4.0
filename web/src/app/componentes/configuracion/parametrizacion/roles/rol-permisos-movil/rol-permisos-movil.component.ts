@@ -28,6 +28,8 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RolPermisosMovilComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -125,7 +127,10 @@ export class RolPermisosMovilComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })

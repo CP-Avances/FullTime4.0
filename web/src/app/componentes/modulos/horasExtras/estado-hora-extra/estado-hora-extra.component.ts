@@ -19,6 +19,7 @@ interface Estados {
 })
 
 export class EstadoHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -32,7 +33,7 @@ export class EstadoHoraExtraComponent implements OnInit {
 
   estados: Estados[] = [
     { valor: 1, nombre: 'Pendiente' },
-    { valor: 2, nombre: 'Pre-Autorizado'},
+    { valor: 2, nombre: 'Pre-Autorizado' },
     { valor: 3, nombre: 'Aceptado' },
     { valor: 4, nombre: 'Rechazado' }
   ];
@@ -52,20 +53,22 @@ export class EstadoHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.tiempo();
     this.llenarForm();
   }
 
-  tiempo () {
+  tiempo() {
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
     console.log('fecha Actual', this.FechaActual);
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  llenarForm(){
+  llenarForm() {
     this.HoraExtraForm.patchValue({
       estadoForm: this.data.estado
     });

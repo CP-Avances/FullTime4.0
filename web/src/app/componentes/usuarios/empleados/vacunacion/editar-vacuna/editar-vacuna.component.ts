@@ -18,6 +18,7 @@ import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacu
 })
 
 export class EditarVacunaComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmploy: string;
   dvacuna: any;
@@ -37,7 +38,10 @@ export class EditarVacunaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.idEmploy = this.datos.idEmpleado;
     this.dvacuna = this.datos.vacuna;

@@ -26,6 +26,7 @@ interface Estado {
 })
 
 export class PedidoHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   // TIPOS DE ESTADOS QUE TIENE UNA SOLICITUD DE HORAS EXTRAS
   estados: Estado[] = [
@@ -88,7 +89,10 @@ export class PedidoHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     // OBTENER LA FECHA ACTUAL
     var f = DateTime.now();

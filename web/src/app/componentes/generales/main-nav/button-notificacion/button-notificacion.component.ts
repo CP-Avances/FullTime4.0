@@ -18,6 +18,7 @@ import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar
 })
 
 export class ButtonNotificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   estado: boolean = true;
 
@@ -84,7 +85,10 @@ export class ButtonNotificacionComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarParametro();
     this.VerificarConfiguracion(this.idEmpleadoIngresa);
 

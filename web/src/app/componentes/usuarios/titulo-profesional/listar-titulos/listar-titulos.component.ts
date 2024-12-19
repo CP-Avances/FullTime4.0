@@ -35,6 +35,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class ListarTitulosComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -104,7 +106,10 @@ export class ListarTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();

@@ -109,7 +109,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;

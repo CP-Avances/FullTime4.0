@@ -19,6 +19,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class RegistrarVacacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   calcular = false;
@@ -74,7 +75,10 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toformat('yyyy-MM-dd');

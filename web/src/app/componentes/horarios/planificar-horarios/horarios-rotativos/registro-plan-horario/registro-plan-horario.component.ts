@@ -26,9 +26,10 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistroPlanHorarioComponent implements OnInit {
+  
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
-
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl();
   fechaFinalF = new FormControl();
@@ -67,7 +68,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarHorarios();
     this.BuscarHora();

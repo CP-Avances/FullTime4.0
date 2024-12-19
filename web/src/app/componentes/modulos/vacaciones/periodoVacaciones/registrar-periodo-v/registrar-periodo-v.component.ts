@@ -18,6 +18,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistrarPeriodoVComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
   @Input() pagina: string = '';
@@ -65,7 +66,10 @@ export class RegistrarPeriodoVComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerContrato();

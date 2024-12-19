@@ -46,10 +46,11 @@ export class RegistroDepartamentoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    });
+    }); 
+   
     if (this.data != undefined) {
       this.Habilitar = false;
       this.rest.BuscarDepartamentoSucursal(this.data).subscribe(datos => {

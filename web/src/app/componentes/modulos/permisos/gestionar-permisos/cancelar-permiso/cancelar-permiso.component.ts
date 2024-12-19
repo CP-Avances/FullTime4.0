@@ -17,6 +17,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 })
 
 export class CancelarPermisoComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoIngresa: number;
   nota = 'su solicitud';
@@ -42,7 +43,10 @@ export class CancelarPermisoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerInformacionEmpleado();
     this.ObtenerTiposPermiso();

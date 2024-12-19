@@ -407,7 +407,7 @@ class UsuarioControlador {
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
@@ -471,7 +471,7 @@ class UsuarioControlador {
       const ids_empleados = array.map((empl: any) => empl.id);
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
-      
+
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
@@ -496,7 +496,7 @@ class UsuarioControlador {
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })

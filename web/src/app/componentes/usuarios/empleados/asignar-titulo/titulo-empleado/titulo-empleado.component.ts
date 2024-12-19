@@ -14,6 +14,7 @@ import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.serv
 })
 
 export class TituloEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   cgTitulos: any = [];
   selectTitle: string = '';
@@ -41,7 +42,10 @@ export class TituloEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerTitulos();
   }

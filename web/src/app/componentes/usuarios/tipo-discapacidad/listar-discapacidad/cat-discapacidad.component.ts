@@ -28,6 +28,8 @@ import { MetodosComponent } from '../../../generales/metodoEliminar/metodos.comp
 })
 
 export class CatDiscapacidadComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -99,7 +101,10 @@ export class CatDiscapacidadComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.discapacidades = [];
     this.ObtenerEmpleados(this.idEmpleado);

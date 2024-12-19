@@ -87,7 +87,10 @@ export class VacacionAutorizacionesComponent implements OnInit {
   ngOnInit(): void {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');

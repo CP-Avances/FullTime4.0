@@ -13,6 +13,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class EditarDetalleParametroComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   descripcion = new FormControl('', [Validators.required]);
@@ -40,7 +41,10 @@ export class EditarDetalleParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
       'Guardar.';
     this.MostrarDatos();

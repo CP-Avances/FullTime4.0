@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarCiudadComponent implements OnInit {
+  ips_locales: any = '';
 
   // DATOS CIUDAD-FERIADO
   ciudadFeriados: any = [];
@@ -62,7 +63,10 @@ export class EditarCiudadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerContinentes();
     this.CargarDatos();

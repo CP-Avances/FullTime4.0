@@ -23,6 +23,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class EliminarIndividualComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datosEliminar: any;
 
@@ -59,7 +60,12 @@ export class EliminarIndividualComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip')
+    this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+    
+
   }
 
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS

@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class ConfirmarContraseniaComponent implements OnInit {
+  ips_locales: any = '';
 
   hide1 = true;
   hide2 = true;
@@ -44,7 +45,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA COMPARAR LAS CONTRASEÑAS

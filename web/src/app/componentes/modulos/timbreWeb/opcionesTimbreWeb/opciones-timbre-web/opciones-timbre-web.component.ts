@@ -24,6 +24,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class OpcionesTimbreWebComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -150,7 +151,10 @@ export class OpcionesTimbreWebComponent implements OnInit {
   ngOnInit(): void {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;

@@ -19,6 +19,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarContratoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() contrato: any;
   @Input() pagina: any;
@@ -79,7 +80,10 @@ export class EditarContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;

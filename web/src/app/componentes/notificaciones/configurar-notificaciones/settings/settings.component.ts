@@ -14,6 +14,8 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class SettingsComponent implements OnInit {
+  ips_locales: any = '';
+
 
   btnActualizar: boolean = false;
   btnCrear: boolean = false;
@@ -55,7 +57,10 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.avisos.ObtenerConfiguracionEmpleado(this.data.id_empleado).subscribe(res => {
       this.btnActualizar = true;

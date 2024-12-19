@@ -22,6 +22,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class ListaArchivosComponent implements OnInit {
+  ips_locales: any = '';
 
   hipervinculo: string = environment.url;
   archivosEliminar: any = [];
@@ -55,7 +56,10 @@ export class ListaArchivosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.MostrarArchivos();
   }
 

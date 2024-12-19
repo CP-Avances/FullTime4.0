@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class RegistrarBirthdayComponent implements OnInit {
+  ips_locales: any = '';
 
   archivoForm = new FormControl('');
   mensajeF = new FormControl('', [Validators.required]);
@@ -42,7 +43,10 @@ export class RegistrarBirthdayComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // GUARDAR DATOS DE MENSAJE

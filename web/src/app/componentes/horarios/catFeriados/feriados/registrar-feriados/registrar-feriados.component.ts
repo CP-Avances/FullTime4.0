@@ -20,6 +20,7 @@ import { ListarFeriadosComponent } from '../listar-feriados/listar-feriados.comp
 })
 
 export class RegistrarFeriadosComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   fechaRecuperacionF = new FormControl('');
@@ -60,7 +61,10 @@ export class RegistrarFeriadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerFeriados();
     this.ObtenerContinentes();

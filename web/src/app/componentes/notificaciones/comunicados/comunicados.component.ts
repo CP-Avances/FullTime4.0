@@ -34,6 +34,7 @@ export interface EmpleadoElemento {
 })
 
 export class ComunicadosComponent implements OnInit {
+  ips_locales: any = '';
 
   // FORMULARIO FILTROS DE BUSQUEDA
   codigo = new FormControl('');
@@ -148,7 +149,10 @@ export class ComunicadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;

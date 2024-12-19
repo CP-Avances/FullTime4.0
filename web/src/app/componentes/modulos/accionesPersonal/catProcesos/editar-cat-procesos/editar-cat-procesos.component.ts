@@ -19,6 +19,7 @@ interface Nivel {
 })
 
 export class EditarCatProcesosComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -61,6 +62,9 @@ export class EditarCatProcesosComponent implements OnInit {
     this.ImprimirDatos();
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     //console.log('data ', this.data)
   }
 

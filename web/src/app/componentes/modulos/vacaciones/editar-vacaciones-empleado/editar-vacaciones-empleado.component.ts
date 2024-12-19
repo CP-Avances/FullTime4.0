@@ -19,6 +19,7 @@ import { ListarVacacionesComponent } from 'src/app/componentes/modulos/vacacione
 })
 
 export class EditarVacacionesEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() dato: any;
   @Input() pagina: string = '';
@@ -73,7 +74,9 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     if (this.data) {
       this.dato = this.data || this.dato; // Usa `info` o un nombre de propiedad adecuado
     }

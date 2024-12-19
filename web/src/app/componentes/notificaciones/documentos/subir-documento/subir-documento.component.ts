@@ -2,7 +2,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/documentos.service';
 
 @Component({
@@ -12,6 +12,7 @@ import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/d
 })
 
 export class SubirDocumentoComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   documentoF = new FormControl('', Validators.required);
@@ -32,11 +33,15 @@ export class SubirDocumentoComponent implements OnInit {
     private toastr: ToastrService,
     private rest: DocumentosService,
     public ventana: MatDialogRef<SubirDocumentoComponent>,
+    private validar: ValidacionesService,
+
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.nameFile = '';
   }
 

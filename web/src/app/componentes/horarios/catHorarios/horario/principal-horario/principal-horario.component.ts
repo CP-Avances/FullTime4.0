@@ -37,6 +37,8 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 })
 
 export class PrincipalHorarioComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -128,7 +130,10 @@ export class PrincipalHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.nameFile = '';
     this.ObtenerLogo();

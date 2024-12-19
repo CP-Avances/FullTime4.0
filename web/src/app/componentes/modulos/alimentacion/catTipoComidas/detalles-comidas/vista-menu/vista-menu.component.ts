@@ -21,6 +21,7 @@ import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacio
 })
 
 export class VistaMenuComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idMenu: number;
 
@@ -49,7 +50,10 @@ export class VistaMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarHora();
   }

@@ -17,7 +17,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class EditarSucursalComponent implements OnInit {
-
+  ips_locales: any = '';
   // DATOS PROVINCIAS, CONTINENTES, PAISES Y CIUDADES
   continentes: any = [];
   provincias: any = [];
@@ -66,8 +66,10 @@ export class EditarSucursalComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.ObtenerContinentes();
   }
 

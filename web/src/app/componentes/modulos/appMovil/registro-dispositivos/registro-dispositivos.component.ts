@@ -33,6 +33,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class RegistroDispositivosComponent implements OnInit {
+  ips_locales: any = '';
+
 
   private imagen: any;
 
@@ -116,7 +118,10 @@ export class RegistroDispositivosComponent implements OnInit {
     else {
       this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
       this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 

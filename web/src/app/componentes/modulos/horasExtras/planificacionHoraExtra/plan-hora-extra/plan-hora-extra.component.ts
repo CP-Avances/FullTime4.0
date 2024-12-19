@@ -23,6 +23,7 @@ interface Estado {
 })
 
 export class PlanHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
 
@@ -74,7 +75,10 @@ export class PlanHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');

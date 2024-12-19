@@ -353,7 +353,7 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracionMultiple(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
 
       const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
       const batches = [];
@@ -399,10 +399,11 @@ class NotificacionTiempoRealControlador {
           comunicado_notificacion: comunicado_noti
         }),
         ip,
+        ip_local: ip_local,
         observacion: null
       }));
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       await pool.query('COMMIT'); // Finalizar transacción
 
@@ -531,7 +532,7 @@ class NotificacionTiempoRealControlador {
         };
       });
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
 
       // FINALIZAR TRANSACCION
@@ -909,7 +910,7 @@ class NotificacionTiempoRealControlador {
         ip_local: ip_local,
         observacion: null
       }));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       const USUARIO = await pool.query(
         `

@@ -24,6 +24,7 @@ import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class CrearPedidoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
@@ -161,6 +162,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem("usuario");
     this.ip = localStorage.getItem("ip");
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {

@@ -33,6 +33,8 @@ import { ITableFeriados } from 'src/app/model/reportes.model';
 })
 
 export class ListarFeriadosComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -114,7 +116,10 @@ export class ListarFeriadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();

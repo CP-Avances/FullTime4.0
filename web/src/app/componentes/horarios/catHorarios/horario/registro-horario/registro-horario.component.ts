@@ -18,6 +18,7 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 })
 
 export class RegistroHorarioComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES DE OPCIONES DE REGISTRO DE HORARIO
   isChecked: boolean = false;
@@ -57,7 +58,10 @@ export class RegistroHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // VARAIBLE DE ALMACENAMIENTO DE DATOS DE AUDITORIA

@@ -56,6 +56,8 @@ export interface SolicitudElemento {
 })
 
 export class ListarPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // VARIABLE PARA GUARDAR DATOS DE LISTA DE PLANIFICACIONES
   planificaciones: any = [];
@@ -128,7 +130,10 @@ export class ListarPlanificacionComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.BuscarParametro();
     }

@@ -34,6 +34,7 @@ interface opcionesDiasHoras {
 })
 
 export class PermisosMultiplesComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
 
@@ -144,6 +145,9 @@ export class PermisosMultiplesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -520,7 +524,7 @@ export class PermisosMultiplesComponent implements OnInit {
       var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm').toFormat('HH:mm:ss'));
       var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm').toFormat('HH:mm:ss'));
 
-      console.log("ver inicio: ",  inicio);
+      console.log("ver inicio: ", inicio);
       var resta: any;
 
       // FECHAS EN UN MISMO DIA

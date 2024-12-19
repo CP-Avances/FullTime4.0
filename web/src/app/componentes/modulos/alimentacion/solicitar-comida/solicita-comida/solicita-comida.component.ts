@@ -20,6 +20,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class SolicitaComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -79,7 +80,9 @@ export class SolicitaComidaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');

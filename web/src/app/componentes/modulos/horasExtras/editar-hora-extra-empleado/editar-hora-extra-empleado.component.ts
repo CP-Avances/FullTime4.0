@@ -22,6 +22,7 @@ interface Estado {
 })
 
 export class EditarHoraExtraEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estado[] = [
     { id: 1, nombre: 'Pendiente' },
@@ -80,7 +81,9 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');;
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); ;
 
     this.estados.forEach((obj: any) => {
       if (this.datos.estado === obj.nombre) {

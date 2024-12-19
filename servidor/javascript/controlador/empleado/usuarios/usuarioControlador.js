@@ -352,7 +352,7 @@ class UsuarioControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 if (rowsAffected > 0) {
                     return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }
@@ -423,7 +423,7 @@ class UsuarioControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 if (rowsAffected > 0) {
                     return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }

@@ -23,6 +23,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class EditarSolicitudComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // VALIDACIONES DE LOS CAMPOS DEL FORMULARIO
   fechaPlanificacionF = new FormControl('', Validators.required);
@@ -80,7 +81,10 @@ export class EditarSolicitudComidaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.data.solicitud.id_empleado);
     this.obtenerInformacionEmpleado();
