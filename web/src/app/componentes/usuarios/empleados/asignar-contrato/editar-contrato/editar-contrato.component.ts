@@ -419,6 +419,7 @@ export class EditarContratoComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.archivoForm.reset();

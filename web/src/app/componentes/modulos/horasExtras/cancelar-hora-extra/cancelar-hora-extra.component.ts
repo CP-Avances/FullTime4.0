@@ -43,7 +43,8 @@ export class CancelarHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip'); this.validar.ObtenerIPsLocales().then((ips) => {
+    this.ip = localStorage.getItem('ip'); 
+    this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
 

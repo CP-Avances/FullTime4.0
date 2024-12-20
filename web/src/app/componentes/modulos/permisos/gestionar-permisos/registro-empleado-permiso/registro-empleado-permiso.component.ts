@@ -147,7 +147,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   public datosEmple: any = []
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     }); 
 
@@ -1616,6 +1617,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
+
     formData.append('id', id as string);
     formData.append('codigo', codigo as string);
 

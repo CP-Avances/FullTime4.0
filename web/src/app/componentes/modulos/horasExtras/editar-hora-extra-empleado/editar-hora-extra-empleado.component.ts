@@ -81,7 +81,8 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     }); ;
 
@@ -454,6 +455,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
 
     formData.append('uder_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();

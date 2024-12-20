@@ -1783,6 +1783,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
     formData.append('id', id as string);
     formData.append('codigo', codigo as string);
     formData.append('eliminar', true as any);

@@ -679,6 +679,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       console.log('rees ', res)

@@ -489,6 +489,7 @@ export class PedidoHoraExtraComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();

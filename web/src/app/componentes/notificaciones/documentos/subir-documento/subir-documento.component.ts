@@ -39,7 +39,8 @@ export class SubirDocumentoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     }); 
     this.nameFile = '';
@@ -89,6 +90,7 @@ export class SubirDocumentoComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.CrearArchivo(formData, form.documentoForm).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {

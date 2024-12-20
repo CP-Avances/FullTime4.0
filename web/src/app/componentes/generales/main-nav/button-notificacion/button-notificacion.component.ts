@@ -190,6 +190,8 @@ export class ButtonNotificacionComponent implements OnInit {
   ActualizarVista(data: any) {
     data.append('user_name', this.user_name);
     data.append('ip', this.ip);
+    data.append('ip_local', this.ips_locales);
+
     this.realTime.ActualizarVistaNotificacion(data.id, data).subscribe(res => {
       this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
     });
