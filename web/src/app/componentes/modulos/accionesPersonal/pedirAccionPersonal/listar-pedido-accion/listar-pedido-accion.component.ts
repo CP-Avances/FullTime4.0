@@ -7,7 +7,6 @@ import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
 
 import * as FileSaver from "file-saver";
-import * as xlsx from "xlsx";
 
 
 // LLAMADO DE SERVICIOS
@@ -3611,6 +3610,7 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   generarExcel() {
+    /*
     const workbook = xlsx.utils.book_new();
     const worksheet = xlsx.utils.aoa_to_sheet([]);
 
@@ -3957,7 +3957,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     // AGREGA LA HOJA DE TRABAJO AL LIBRO Y DESCARGA EL ARCHIVO
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Hoja 1');
     xlsx.writeFile(workbook, 'accionDePersonal.xlsx');
-
+*/
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -4130,6 +4130,7 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   ExportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
       this.listaPedidos.map((obj) => {
         return {
@@ -4157,6 +4158,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       wb,
       "PedidosAccionesPersonalEXCEL" + new Date().getTime() + ".xlsx"
     );
+    */
   }
 
   /** ************************************************************************************************* **
@@ -4196,6 +4198,7 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   ExportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
       this.listaPedidos.map((obj: any) => {
         return {
@@ -4217,5 +4220,6 @@ export class ListarPedidoAccionComponent implements OnInit {
       data,
       "PedidosAccionesPersonalCSV" + new Date().getTime() + ".csv"
     );
+    */
   }
 }

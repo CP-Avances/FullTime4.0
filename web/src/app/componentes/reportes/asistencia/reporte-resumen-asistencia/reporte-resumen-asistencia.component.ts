@@ -978,24 +978,28 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:W1");
+    worksheet.mergeCells("B2:W2");
+    worksheet.mergeCells("B3:W3");
+    worksheet.mergeCells("B4:W4");
+    worksheet.mergeCells("B5:W5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Resumen de asistencia';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Resumen de asistencia'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2"].forEach((cell) => {
+    ["B1", "B2", "B3"].forEach((cell) => {
       worksheet.getCell(cell).alignment = {
         horizontal: "center",
         vertical: "middle",
       };
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
+
 
     worksheet.columns = [
       { key: "n", width: 10 },
@@ -1017,10 +1021,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
       { key: "salidaHorario", width: 20 },
       { key: "salida", width: 20 },
       { key: "tiempoAtraso", width: 20 },
-      { key: "tiempoSalidaAnticipada", width: 20 },
-      { key: "alimentacion_asignada", width: 20 },
-      { key: "tiempoAlimentacion", width: 20 },
-      { key: "tiempoLaborado", width: 20 },
+      { key: "tiempoSalidaAnticipada", width: 40 },
+      { key: "alimentacion_asignada", width: 40 },
+      { key: "tiempoAlimentacion", width: 40 },
+      { key: "tiempoLaborado", width: 40 },
     ]
 
     const columnas = [

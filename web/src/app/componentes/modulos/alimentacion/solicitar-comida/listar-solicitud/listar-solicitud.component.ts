@@ -6,7 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from "xlsx";
 import * as FileSaver from "file-saver";
 
 // LLAMADO A COMPONENTES
@@ -611,6 +610,7 @@ export class ListarSolicitudComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
       opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
     )).map((obj: any) => {
@@ -635,6 +635,7 @@ export class ListarSolicitudComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** ** 
@@ -642,6 +643,7 @@ export class ListarSolicitudComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados" ? this.lista_solicitudes_filtradas : (
       opcion == "Servicios de alimentación aprobados" ? this.solicitudesAutorizadas_filtradas : this.solicitudesExpiradas_filtradas
     )).map((obj: any) => {
@@ -656,6 +658,7 @@ export class ListarSolicitudComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, `${opcion}CSV` + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

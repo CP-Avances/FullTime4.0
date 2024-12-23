@@ -9,7 +9,6 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as FileSaver from 'file-saver';
-import * as xlsx from 'xlsx';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -325,10 +324,12 @@ export class VistaElementosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoPermiso);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'TipoPermisos');
     xlsx.writeFile(wb, "TipoPermisos" + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -336,10 +337,12 @@ export class VistaElementosComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoPermiso);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TipoPermisosCSV" + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

@@ -636,15 +636,15 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:L1");
+    worksheet.mergeCells("B2:L2");
+    worksheet.mergeCells("B3:L3");
+    worksheet.mergeCells("B4:L4");
+    worksheet.mergeCells("B5:L5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Timbres Incompletos';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Timbres Incompletos'.toUpperCase();
     worksheet.getCell(
       "B3"
     ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;

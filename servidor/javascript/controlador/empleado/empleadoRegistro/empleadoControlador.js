@@ -2045,41 +2045,27 @@ class EmpleadoControlador {
                                 (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
                                 (CONTRASENA != undefined) && (ROL != undefined)) {
                                 data.fila = ITEM;
-                                data.cedula = CEDULA;
-                                data.apellido = APELLIDO;
-                                data.nombre = NOMBRE;
-                                data.codigo = CODIGO;
-                                data.usuario = USUARIO;
-                                data.contrasena = CONTRASENA;
-                                data.rol = ROL;
-                                data.estado_civil = ESTADO_CIVIL;
-                                data.genero = GENERO;
-                                data.correo = CORREO;
-                                data.fec_nacimiento = FECHA_NACIMIENTO;
-                                data.latitud = LATITUD;
-                                data.longitud = LONGITUD;
-                                data.domicilio = DOMICILIO;
-                                data.telefono = TELEFONO;
-                                data.nacionalidad = NACIONALIDAD;
+                                data.cedula = CEDULA === null || CEDULA === void 0 ? void 0 : CEDULA.trim();
+                                data.apellido = APELLIDO === null || APELLIDO === void 0 ? void 0 : APELLIDO.trim();
+                                data.nombre = NOMBRE === null || NOMBRE === void 0 ? void 0 : NOMBRE.trim();
+                                data.codigo = CODIGO === null || CODIGO === void 0 ? void 0 : CODIGO.trim();
+                                data.usuario = USUARIO === null || USUARIO === void 0 ? void 0 : USUARIO.trim();
+                                data.contrasena = CONTRASENA === null || CONTRASENA === void 0 ? void 0 : CONTRASENA.trim();
+                                data.rol = ROL === null || ROL === void 0 ? void 0 : ROL.trim();
+                                data.estado_civil = ESTADO_CIVIL === null || ESTADO_CIVIL === void 0 ? void 0 : ESTADO_CIVIL.trim();
+                                data.genero = GENERO === null || GENERO === void 0 ? void 0 : GENERO.trim();
+                                data.correo = CORREO === null || CORREO === void 0 ? void 0 : CORREO.trim();
+                                data.fec_nacimiento = FECHA_NACIMIENTO === null || FECHA_NACIMIENTO === void 0 ? void 0 : FECHA_NACIMIENTO.trim();
+                                data.latitud = LATITUD === null || LATITUD === void 0 ? void 0 : LATITUD.trim();
+                                data.longitud = LONGITUD === null || LONGITUD === void 0 ? void 0 : LONGITUD.trim();
+                                data.domicilio = DOMICILIO === null || DOMICILIO === void 0 ? void 0 : DOMICILIO.trim();
+                                data.telefono = TELEFONO === null || TELEFONO === void 0 ? void 0 : TELEFONO.trim();
+                                data.nacionalidad = NACIONALIDAD === null || NACIONALIDAD === void 0 ? void 0 : NACIONALIDAD.trim();
                                 data.observacion = 'no registrado';
-                                console.log('dataaa: ', data);
-                                data.cedula = data.cedula.trim();
-                                data.apellido = data.apellido.trim();
-                                data.nombre = data.nombre.trim();
-                                data.codigo = data.codigo.trim();
-                                data.estado_civil = data.estado_civil.trim();
-                                data.genero = data.genero.trim();
-                                data.correo = data.correo.trim();
-                                data.fec_nacimiento = data.fec_nacimiento.trim();
-                                data.latitud = data.latitud.trim();
-                                data.longitud = data.longitud.trim();
-                                data.domicilio = data.domicilio.trim();
-                                data.telefono = data.telefono.trim();
-                                data.nacionalidad = data.nacionalidad.trim();
-                                data.usuario = data.usuario.trim();
-                                data.contrasena = data.contrasena.trim();
-                                data.rol = data.rol.trim();
-                                console.log('dataaa 1111: ', data);
+                                data.cedula = parseInt(data.cedula);
+                                data.codigo = parseInt(data.codigo);
+                                data.longitud = parseFloat(data.longitud);
+                                data.latitud = parseFloat(data.latitud);
                                 if (regex.test(data.cedula)) {
                                     if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
                                         data.observacion = 'La cédula ingresada no es válida';
@@ -2091,7 +2077,7 @@ class EmpleadoControlador {
                                             }
                                             else {
                                                 if (!valiContra.test(data.contrasena.toString())) {
-                                                    if (data.contrasena.toString().length > 10) {
+                                                    if (data.contrasena.length > 10) {
                                                         data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                     }
                                                     else {
@@ -2111,7 +2097,7 @@ class EmpleadoControlador {
                                                                     // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                                                     if (TELEFONO != undefined) {
                                                                         if (regex.test(data.telefono)) {
-                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                            if (data.telefono.length > 10 || data.telefono.length < 7) {
                                                                                 data.observacion = 'El teléfono ingresado no es válido';
                                                                             }
                                                                         }
@@ -2150,23 +2136,27 @@ class EmpleadoControlador {
                             }
                             else {
                                 data.fila = ITEM;
-                                data.cedula = CEDULA;
-                                data.apellido = APELLIDO;
-                                data.nombre = NOMBRE;
-                                data.codigo = CODIGO;
-                                data.usuario = USUARIO;
-                                data.contrasena = CONTRASENA;
-                                data.rol = ROL;
-                                data.estado_civil = ESTADO_CIVIL;
-                                data.genero = GENERO;
-                                data.correo = CORREO;
-                                data.fec_nacimiento = FECHA_NACIMIENTO;
-                                data.latitud = LATITUD;
-                                data.longitud = LONGITUD;
-                                data.domicilio = DOMICILIO;
-                                data.telefono = TELEFONO;
-                                data.nacionalidad = NACIONALIDAD;
+                                data.cedula = CEDULA === null || CEDULA === void 0 ? void 0 : CEDULA.trim();
+                                data.apellido = APELLIDO === null || APELLIDO === void 0 ? void 0 : APELLIDO.trim();
+                                data.nombre = NOMBRE === null || NOMBRE === void 0 ? void 0 : NOMBRE.trim();
+                                data.codigo = CODIGO === null || CODIGO === void 0 ? void 0 : CODIGO.trim();
+                                data.usuario = USUARIO === null || USUARIO === void 0 ? void 0 : USUARIO.trim();
+                                data.contrasena = CONTRASENA === null || CONTRASENA === void 0 ? void 0 : CONTRASENA.trim();
+                                data.rol = ROL === null || ROL === void 0 ? void 0 : ROL.trim();
+                                data.estado_civil = ESTADO_CIVIL === null || ESTADO_CIVIL === void 0 ? void 0 : ESTADO_CIVIL.trim();
+                                data.genero = GENERO === null || GENERO === void 0 ? void 0 : GENERO.trim();
+                                data.correo = CORREO === null || CORREO === void 0 ? void 0 : CORREO.trim();
+                                data.fec_nacimiento = FECHA_NACIMIENTO === null || FECHA_NACIMIENTO === void 0 ? void 0 : FECHA_NACIMIENTO.trim();
+                                data.latitud = LATITUD === null || LATITUD === void 0 ? void 0 : LATITUD.trim();
+                                data.longitud = LONGITUD === null || LONGITUD === void 0 ? void 0 : LONGITUD.trim();
+                                data.domicilio = DOMICILIO === null || DOMICILIO === void 0 ? void 0 : DOMICILIO.trim();
+                                data.telefono = TELEFONO === null || TELEFONO === void 0 ? void 0 : TELEFONO.trim();
+                                data.nacionalidad = NACIONALIDAD === null || NACIONALIDAD === void 0 ? void 0 : NACIONALIDAD.trim();
                                 data.observacion = 'no registrado';
+                                data.cedula = parseInt(data.cedula);
+                                data.codigo = parseInt(data.codigo);
+                                data.longitud = parseFloat(data.longitud);
+                                data.latitud = parseFloat(data.latitud);
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';
@@ -2267,7 +2257,7 @@ class EmpleadoControlador {
                                                                                     if (TELEFONO != undefined) {
                                                                                         const regex = /^[0-9]+$/;
                                                                                         if (regex.test(data.telefono)) {
-                                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                                            if (data.telefono.length > 10 || data.telefono.length < 7) {
                                                                                                 data.observacion = 'El teléfono ingresado no es válido';
                                                                                             }
                                                                                         }
@@ -2305,22 +2295,6 @@ class EmpleadoControlador {
                                     data.observacion = 'Cédula no registrada';
                                 }
                                 else {
-                                    data.cedula = data.cedula.trim();
-                                    data.apellido = data.apellido.trim();
-                                    data.nombre = data.nombre.trim();
-                                    data.codigo = data.codigo.trim();
-                                    data.estado_civil = data.estado_civil.trim();
-                                    data.genero = data.genero.trim();
-                                    data.correo = data.correo.trim();
-                                    data.fec_nacimiento = data.fec_nacimiento.trim();
-                                    data.latitud = data.latitud.trim();
-                                    data.longitud = data.longitud.trim();
-                                    data.domicilio = data.domicilio.trim();
-                                    data.telefono = data.telefono.trim();
-                                    data.nacionalidad = data.nacionalidad.trim();
-                                    data.usuario = data.usuario.trim();
-                                    data.contrasena = data.contrasena.trim();
-                                    data.rol = data.rol.trim();
                                     // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                                     const rege = /^[0-9]+$/;
                                     if (rege.test(data.cedula)) {

@@ -5,7 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -791,7 +790,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
   /** GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS */
 
- async  PDF_Vacio(action = 'open', id_seleccionado: any, form: any) {
+  async PDF_Vacio(action = 'open', id_seleccionado: any, form: any) {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.GenerarSinRegstros(id_seleccionado, form);
     switch (action) {
@@ -930,6 +929,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
    * ****************************************************************************************************/
 
   exportToExcel(id_empleado: number, form, fechasTotales) {
+    /*
     var j = 0;
     for (var i = 0; i <= this.datosEmpleado.length - 1; i++) {
       if (this.datosEmpleado[i].codigo === id_empleado) {
@@ -1083,6 +1083,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wst, 'Timbres');
     xlsx.writeFile(wb, "Timbres Entradas-Salidas - " + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + '.xlsx');
+  */
   }
 
 }

@@ -7,7 +7,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
 import * as FileSaver from "file-saver";
-import * as xlsx from "xlsx";
 
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
@@ -862,6 +861,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
       opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
     )).map((obj: any) => {
@@ -886,6 +886,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -893,6 +894,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
       opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
     )).map((obj: any) => {
@@ -908,6 +910,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, `${opcion}CSV` + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

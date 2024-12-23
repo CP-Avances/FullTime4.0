@@ -45,4 +45,15 @@ export class ProcesoService {
     return this.http.post(`${environment.url}/proceso/xmlDownload`, data);
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
+    console.log('enro aqui ',formData)
+    return this.http.post<any>(environment.url + '/proceso/upload/revision', formData);
+  }
+
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA   **USADO
+  RegistrarNivelesPlantilla(data: any) {
+    return this.http.post<any>(environment.url + '/proceso/registrarNiveles', data);
+  }
+
 }

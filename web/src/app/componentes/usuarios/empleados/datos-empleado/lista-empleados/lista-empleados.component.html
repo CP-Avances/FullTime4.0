@@ -56,26 +56,25 @@
                             </form>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                    <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto">
-                        <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
-                            href="{{link}}">
-                            <br>
-                            Descargar plantilla usuarios
-                        </a>
-                    </div>
-                    <div *ngIf="DataEmpleados" class="d-flex flex-wrap justify-content-center m-auto"
-                        style="text-align: center; justify-content: center;">
-                        <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                            matTooltipPosition="right" matTooltip="Guardar registro multiple.">
-                            Registrar
-                        </button>
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-center"
+                            style="text-align: center; justify-content: center; margin: auto;">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{link}}">
+                                <br>
+                                Descargar plantilla usuarios
+                            </a>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="DataEmpleados" id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
                     </div>
                 </div>
-    
         </mat-card>
     </div>
 </div>
@@ -190,7 +189,7 @@
                     matTooltip="Descargar Lista de Empleados en formato EXCEL.">
                     <p>XLSL</p>
                 </i>
-                <i (click)="ExportToCVS(2)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                <i (click)="ExportToCSV(2)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Empleados en formato CSV.">
                     <p>CSV</p>
                 </i>
@@ -337,7 +336,7 @@
                     matTooltip="Descargar Lista de Empleados en formato EXCEL.">
                     <p>XLSL</p>
                 </i>
-                <i (click)="ExportToCVS(1)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                <i (click)="ExportToCSV(1)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Empleados en formato CSV.">
                     <p>CSV</p>
                 </i>

@@ -661,43 +661,35 @@ class ContratoEmpleadoControlador {
                     if (rowNumber === 1) return;
                     // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                     const ITEM = row.getCell(headers['ITEM']).value;
-                    const CEDULA = row.getCell(headers['CEDULA']).value;
-                    const PAIS = row.getCell(headers['PAIS']).value;
-                    const REGIMEN_LABORAL = row.getCell(headers['REGIMEN_LABORAL']).value;
-                    const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
-                    const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value;
-                    const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value;
-                    const CONTROLAR_ASISTENCIA = row.getCell(headers['CONTROLAR_ASISTENCIA']).value;
-                    const CONTROLAR_VACACIONES = row.getCell(headers['CONTROLAR_VACACIONES']).value;
+                    const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+                    const PAIS = row.getCell(headers['PAIS']).value?.toString();
+                    const REGIMEN_LABORAL = row.getCell(headers['REGIMEN_LABORAL']).value?.toString();
+                    const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value?.toString();
+                    const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value?.toString();
+                    const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value?.toString();
+                    const CONTROLAR_ASISTENCIA = row.getCell(headers['CONTROLAR_ASISTENCIA']).value?.toString();
+                    const CONTROLAR_VACACIONES = row.getCell(headers['CONTROLAR_VACACIONES']).value?.toString();
 
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
                         (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
                         (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined)) {
                         data.fila = ITEM;
-                        data.pais = PAIS;
-                        data.cedula = CEDULA;
-                        data.regimen_la = REGIMEN_LABORAL;
-                        data.fecha_desde = FECHA_DESDE;
-                        data.fecha_hasta = FECHA_HASTA;
+                        data.pais = PAIS?.trim();
+                        data.cedula = CEDULA?.trim();
+                        data.regimen_la = REGIMEN_LABORAL?.trim();
+                        data.fecha_desde = FECHA_DESDE?.trim();
+                        data.fecha_hasta = FECHA_HASTA?.trim();
+                        data.modalida_la = MODALIDAD_LABORAL?.trim();
+                        data.control_asis = CONTROLAR_ASISTENCIA?.trim();
+                        data.control_vaca = CONTROLAR_VACACIONES?.trim();
                         data.observacion = 'no registrado';
-                        data.modalida_la = MODALIDAD_LABORAL;
-                        data.control_asis = CONTROLAR_ASISTENCIA;
-                        data.control_vaca = CONTROLAR_VACACIONES;
 
-                        data.cedula = data.cedula.trim();
-                        data.pais = data.pais.trim();
-                        data.regimen_la = data.regimen_la.trim();
-                        data.modalida_la = data.modalida_la.trim();
-                        data.fecha_desde = data.fecha_desde.trim();
-                        data.fecha_hasta = data.fecha_hasta.trim();
-                        data.control_asis = data.control_asis.trim();
-                        data.control_vaca = data.control_vaca.trim();
 
                         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
-                            if (data.cedula.toString().length != 10) {
+                            if (data.cedula.length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
                             } else {
                                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
@@ -717,15 +709,15 @@ class ContratoEmpleadoControlador {
                         listContratos.push(data);
                     } else {
                         data.fila = ITEM;
-                        data.pais = PAIS;
-                        data.cedula = CEDULA;
-                        data.regimen_la = REGIMEN_LABORAL;
-                        data.modalida_la = MODALIDAD_LABORAL;
-                        data.fecha_desde = FECHA_DESDE;
+                        data.pais = PAIS?.trim();
+                        data.cedula = CEDULA?.trim();
+                        data.regimen_la = REGIMEN_LABORAL?.trim();
+                        data.modalida_la = MODALIDAD_LABORAL?.trim();
+                        data.fecha_desde = FECHA_DESDE?.trim();
+                        data.fecha_hasta = FECHA_HASTA?.trim();
+                        data.control_asis = CONTROLAR_ASISTENCIA?.trim();
+                        data.control_vaca = CONTROLAR_VACACIONES?.trim();
                         data.observacion = 'no registrado';
-                        data.fecha_hasta = FECHA_HASTA;
-                        data.control_asis = CONTROLAR_ASISTENCIA;
-                        data.control_vaca = CONTROLAR_VACACIONES;
 
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
@@ -766,19 +758,10 @@ class ContratoEmpleadoControlador {
                         }
                         else {
 
-                            data.cedula = data.cedula.trim();
-                            data.pais = data.pais.trim();
-                            data.regimen_la = data.regimen_la.trim();
-                            data.modalida_la = data.modalida_la.trim();
-                            data.fecha_desde = data.fecha_desde.trim();
-                            data.fecha_hasta = data.fecha_hasta.trim();
-                            data.control_asis = data.control_asis.trim();
-                            data.control_vaca = data.control_vaca.trim();
-
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {
-                                if (data.cedula.toString().length != 10) {
+                                if (data.cedula.length != 10) {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 } else {
                                     // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO

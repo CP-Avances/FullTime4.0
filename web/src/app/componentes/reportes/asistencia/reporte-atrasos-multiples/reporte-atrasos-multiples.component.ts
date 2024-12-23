@@ -748,7 +748,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
- 
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -798,18 +798,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:P1");
+    worksheet.mergeCells("B2:P2");
+    worksheet.mergeCells("B3:P3");
+    worksheet.mergeCells("B4:P4");
+    worksheet.mergeCells("B5:P5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Atrasos';
-
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Atrasos'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
+    
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2"].forEach((cell) => {
+    ["B1", "B2", "B3"].forEach((cell) => {
       worksheet.getCell(cell).alignment = {
         horizontal: "center",
         vertical: "middle",

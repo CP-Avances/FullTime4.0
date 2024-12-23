@@ -401,22 +401,22 @@ class RelojesControlador {
                         if (rowNumber === 1) return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const ESTABLECIMIENTO = row.getCell(headers['ESTABLECIMIENTO']).value;
-                        const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
-                        const NOMBRE_DISPOSITIVO = row.getCell(headers['NOMBRE_DISPOSITIVO']).value;
-                        const CODIGO = row.getCell(headers['CODIGO']).value;
-                        const DIRECCION_IP = row.getCell(headers['DIRECCION_IP']).value;
-                        const PUERTO = row.getCell(headers['PUERTO']).value;
-                        const TIPO_CONEXION = row.getCell(headers['TIPO_CONEXION']).value;
-                        const TEMPERATURA = row.getCell(headers['TEMPERATURA']).value;
-                        const MARCA = row.getCell(headers['MARCA']).value;
-                        const MODELO = row.getCell(headers['MODELO']).value;
-                        const ID_FABRICANTE = row.getCell(headers['ID_FABRICANTE']).value;
-                        const FABRICANTE = row.getCell(headers['FABRICANTE']).value;
-                        const NUMERO_SERIE = row.getCell(headers['NUMERO_SERIE']).value;
-                        const DIRECCION_MAC = row.getCell(headers['DIRECCION_MAC']).value;
-                        const CONTRASENA = row.getCell(headers['CONTRASENA']).value;
-                        const ZONA_HORARIA = row.getCell(headers['ZONA_HORARIA']).value;
+                        const ESTABLECIMIENTO = row.getCell(headers['ESTABLECIMIENTO']).value?.toString();
+                        const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO'])?.toString();
+                        const NOMBRE_DISPOSITIVO = row.getCell(headers['NOMBRE_DISPOSITIVO'])?.toString();
+                        const CODIGO = row.getCell(headers['CODIGO']).value?.toString();
+                        const DIRECCION_IP = row.getCell(headers['DIRECCION_IP']).value?.toString();
+                        const PUERTO = row.getCell(headers['PUERTO']).value?.toString();
+                        const TIPO_CONEXION = row.getCell(headers['TIPO_CONEXION']).value?.toString();
+                        const TEMPERATURA = row.getCell(headers['TEMPERATURA']).value?.toString();
+                        const MARCA = row.getCell(headers['MARCA']).value?.toString();
+                        const MODELO = row.getCell(headers['MODELO']).value?.toString();
+                        const ID_FABRICANTE = row.getCell(headers['ID_FABRICANTE']).value?.toString();
+                        const FABRICANTE = row.getCell(headers['FABRICANTE']).value?.toString();
+                        const NUMERO_SERIE = row.getCell(headers['NUMERO_SERIE']).value?.toString();
+                        const DIRECCION_MAC = row.getCell(headers['DIRECCION_MAC']).value?.toString();
+                        const CONTRASENA = row.getCell(headers['CONTRASENA']).value?.toString();
+                        const ZONA_HORARIA = row.getCell(headers['ZONA_HORARIA']).value?.toString();
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
                             (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
@@ -429,22 +429,22 @@ class RelojesControlador {
                             (ZONA_HORARIA != undefined && ZONA_HORARIA != '')
                         ) {
                             data.fila = ITEM;
-                            data.establecimiento = ESTABLECIMIENTO;
-                            data.departamento = DEPARTAMENTO;
-                            data.nombre_dispo = NOMBRE_DISPOSITIVO;
-                            data.codigo = CODIGO;
-                            data.direccion_ip = DIRECCION_IP;
-                            data.puerto = PUERTO;
-                            data.tipo_conexion = TIPO_CONEXION;
-                            data.temperatura = TEMPERATURA;
-                            data.marca = MARCA;
-                            data.modelo = MODELO;
-                            data.id_fabricante = ID_FABRICANTE;
-                            data.fabricante = FABRICANTE;
-                            data.numero_serie = NUMERO_SERIE;
-                            data.direccion_mac = DIRECCION_MAC;
-                            data.contrasena = CONTRASENA;
-                            data.zona_horaria = ZONA_HORARIA;
+                            data.establecimiento = ESTABLECIMIENTO.trim();
+                            data.departamento = DEPARTAMENTO.trim();
+                            data.nombre_dispo = NOMBRE_DISPOSITIVO.trim();
+                            data.codigo = CODIGO.trim();
+                            data.direccion_ip = DIRECCION_IP.trim();
+                            data.puerto = PUERTO.trim();
+                            data.tipo_conexion = TIPO_CONEXION.trim();
+                            data.temperatura = TEMPERATURA.trim();
+                            data.marca = MARCA.trim();
+                            data.modelo = MODELO.trim();
+                            data.id_fabricante = ID_FABRICANTE.trim();
+                            data.fabricante = FABRICANTE.trim();
+                            data.numero_serie = NUMERO_SERIE.trim();
+                            data.direccion_mac = DIRECCION_MAC.trim();
+                            data.contrasena = CONTRASENA.trim();
+                            data.zona_horaria = ZONA_HORARIA.trim();
                             data.observacion = 'no registrado';
 
                             // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
@@ -472,45 +472,33 @@ class RelojesControlador {
                                 data.observacion = '1';
                             }
 
-                            data.establecimiento = data.establecimiento.trim();
-                            data.departamento = data.departamento.trim();
-                            data.nombre_dispo = data.nombre_dispo.trim();
-                            data.codigo = data.codigo.trim();
-                            data.direccion_ip = data.direccion_ip.trim();
-                            data.puerto = data.puerto.trim();
-                            data.tipo_conexion = data.tipo_conexion.trim();
-                            data.temperatura = data.temperatura.trim();
-                            data.marca = data.marca.trim();
-                            data.modelo = data.modelo.trim();
-                            data.id_fabricante = data.id_fabricante();
-                            data.fabricante = data.fabricante();
-                            data.numero_serie = data.numero_serie();
-                            data.direccion_mac = data.direccion_mac.trim();
-                            data.contrasena = data.contrasena.trim();
-                            data.zona_horaria = data.zona_horaria.trim();
+                           
 
                             listDispositivos.push(data);
 
                         }
                         else {
                             data.fila = ITEM;
-                            data.establecimiento = ESTABLECIMIENTO;
-                            data.departamento = DEPARTAMENTO;
-                            data.nombre_dispo = NOMBRE_DISPOSITIVO;
-                            data.codigo = CODIGO;
-                            data.direccion_ip = DIRECCION_IP;
-                            data.puerto = PUERTO;
-                            data.tipo_conexion = TIPO_CONEXION;
-                            data.temperatura = TEMPERATURA;
-                            data.marca = MARCA;
-                            data.modelo = MODELO;
-                            data.id_fabricante = ID_FABRICANTE;
-                            data.fabricante = FABRICANTE;
-                            data.numero_serie = NUMERO_SERIE;
-                            data.direccion_mac = DIRECCION_MAC;
-                            data.contrasena = CONTRASENA;
-                            data.zona_horaria = ZONA_HORARIA;
+                            data.establecimiento = ESTABLECIMIENTO?.trim();
+                            data.departamento = DEPARTAMENTO?.trim();
+                            data.nombre_dispo = NOMBRE_DISPOSITIVO?.trim();
+                            data.codigo = CODIGO?.trim();
+                            data.direccion_ip = DIRECCION_IP?.trim();
+                            data.puerto = PUERTO?.trim();
+                            data.tipo_conexion = TIPO_CONEXION?.trim();
+                            data.temperatura = TEMPERATURA?.trim();
+                            data.marca = MARCA?.trim();
+                            data.modelo = MODELO?.trim();
+                            data.id_fabricante = ID_FABRICANTE?.trim();
+                            data.fabricante = FABRICANTE?.trim();
+                            data.numero_serie = NUMERO_SERIE?.trim();
+                            data.direccion_mac = DIRECCION_MAC?.trim();
+                            data.contrasena = CONTRASENA?.trim();
+                            data.zona_horaria = ZONA_HORARIA?.trim();
                             data.observacion = 'no registrado';
+
+                            data.puerto = parseFloat(data.puerto)
+                            data.numero_serie = parseFloat(data.numero_serie)
 
                             if (data.fila == '' || data.fila == undefined) {
                                 data.fila = 'error';
@@ -609,23 +597,6 @@ class RelojesControlador {
                                     }
                                 }
                             }
-
-                            data.establecimiento = data.establecimiento.trim();
-                            data.departamento = data.departamento.trim();
-                            data.nombre_dispo = data.nombre_dispo.trim();
-                            data.codigo = data.codigo.trim();
-                            data.direccion_ip = data.direccion_ip.trim();
-                            data.puerto = data.puerto.trim();
-                            data.tipo_conexion = data.tipo_conexion.trim();
-                            data.temperatura = data.temperatura.trim();
-                            data.marca = data.marca.trim();
-                            data.modelo = data.modelo.trim();
-                            data.id_fabricante = data.id_fabricante();
-                            data.fabricante = data.fabricante();
-                            data.numero_serie = data.numero_serie();
-                            data.direccion_mac = data.direccion_mac.trim();
-                            data.contrasena = data.contrasena.trim();
-                            data.zona_horaria = data.zona_horaria.trim();
                             
                             listDispositivos.push(data);
 

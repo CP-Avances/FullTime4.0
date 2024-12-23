@@ -6,7 +6,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 
@@ -885,24 +884,28 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:V1");
+    worksheet.mergeCells("B2:V2");
+    worksheet.mergeCells("B3:V3");
+    worksheet.mergeCells("B4:V4");
+    worksheet.mergeCells("B5:V5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Tiempo Laborado';
-
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Tiempo Laborado'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["B1", "B2"].forEach((cell) => {
+
+    ["B1", "B2", "B3"].forEach((cell) => {
       worksheet.getCell(cell).alignment = {
         horizontal: "center",
         vertical: "middle",
       };
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
+
 
     worksheet.columns = [
       { key: "n", width: 10 },
@@ -923,10 +926,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       { key: "timbreFinAlimentación", width: 20 },
       { key: "horarioSalida", width: 20 },
       { key: "timbreSalida", width: 20 },
-      { key: "timbrePlanificado", width: 20 },
-      { key: "timbrePlanificadoMinutos", width: 20 },
-      { key: "tiempoLaborado", width: 20 },
-      { key: "tiempoLaboradoMinutos", width: 20 },
+      { key: "timbrePlanificado", width: 30 },
+      { key: "timbrePlanificadoMinutos", width: 30 },
+      { key: "tiempoLaborado", width: 30 },
+      { key: "tiempoLaboradoMinutos", width: 30 },
     ]
 
     const columnas = [

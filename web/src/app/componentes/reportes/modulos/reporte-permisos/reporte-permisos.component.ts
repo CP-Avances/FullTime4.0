@@ -7,7 +7,6 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 // LIBRERIA PARA GENERAR ARCHIVOS
-import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -759,6 +758,7 @@ export class ReportePermisosComponent implements OnInit {
    * ****************************************************************************************************/
 
   exportToExcel(id_empleado: any, form: any) {
+    /*
     var totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
 
@@ -911,14 +911,8 @@ export class ReportePermisosComponent implements OnInit {
     else {
       xlsx.writeFile(wb, "Permisos - " + DateTime.fromISO(form.inicioForm, 'yyyy-MM-dd').toFormat('dd/MM/yyyy') + ' - ' + DateTime.fromFormat(form.finalForm, 'yyyy-MM-dd').toFormat('dd/MM/yyyy') + '.xlsx');
     }
+      */
   }
-
-
-
-
-
-
-
 
 
 

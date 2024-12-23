@@ -859,39 +859,39 @@ class DepartamentoControlador {
             if (rowNumber === 1) return;
             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
             const ITEM = row.getCell(headers['ITEM']).value;
-            const NIVEL = row.getCell(headers['NIVEL']).value;
-            const SUCURSAL = row.getCell(headers['SUCURSAL']).value;
-            const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
-            const DEPARTAMENTO_SUPERIOR = row.getCell(headers['DEPARTAMENTO_SUPERIOR']).value;
-            const SUCURSAL_DEPARTAMENTO_SUPERIOR = row.getCell(headers['SUCURSAL_DEPARTAMENTO_SUPERIOR']).value;
+            const NIVEL = row.getCell(headers['NIVEL']).value?.toString();
+            const SUCURSAL = row.getCell(headers['SUCURSAL']).value?.toString();
+            const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value?.toString();
+            const DEPARTAMENTO_SUPERIOR = row.getCell(headers['DEPARTAMENTO_SUPERIOR']).value?.toString();
+            const SUCURSAL_DEPARTAMENTO_SUPERIOR = row.getCell(headers['SUCURSAL_DEPARTAMENTO_SUPERIOR']).value?.toString();
 
             if (ITEM != undefined && SUCURSAL != undefined &&
               DEPARTAMENTO != undefined && NIVEL != undefined &&
               DEPARTAMENTO_SUPERIOR != undefined && SUCURSAL_DEPARTAMENTO_SUPERIOR != undefined) {
               data.fila = ITEM;
-              data.sucursal = SUCURSAL;
-              data.departamento = DEPARTAMENTO;
-              data.nivel = NIVEL;
-              data.depa_superior = DEPARTAMENTO_SUPERIOR;
-              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR;
+              data.sucursal = SUCURSAL?.trim();
+              data.departamento = DEPARTAMENTO?.trim();
+              data.nivel = NIVEL?.trim();
+              data.depa_superior = DEPARTAMENTO_SUPERIOR?.trim();
+              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR?.trim();
               data.observacion = 'no registrada';
 
-              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-              data.sucursal = data.sucursal.trim();
-              data.departamento = data.departamento.trim();
-              data.nivel = data.nivel.trim();
-              data.depa_superior = data.depa_superior.trim();
-              data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
+              data.nivel = parseInt(data.nivel)
 
               listNivelesDep.push(data);
             } else {
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
               data.fila = ITEM;
-              data.sucursal = SUCURSAL;
-              data.departamento = DEPARTAMENTO;
-              data.nivel = NIVEL;
-              data.depa_superior = DEPARTAMENTO_SUPERIOR;
-              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR;
+              data.sucursal = SUCURSAL?.trim();
+              data.departamento = DEPARTAMENTO?.trim();
+              data.nivel = NIVEL?.trim();
+              data.depa_superior = DEPARTAMENTO_SUPERIOR?.trim();
+              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR?.trim();
               data.observacion = 'no registrada';
+
+              data.nivel = parseInt(data.nivel)
+
               if (data.fila == '' || data.fila == undefined) {
                 data.fila = 'error';
                 mensaje = 'error'
@@ -916,13 +916,6 @@ class DepartamentoControlador {
                 data.sucursal_depa_superior = 'No registrado';
                 data.observacion = 'Sucursal superior no registrada';
               }
-            
-               //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-               data.sucursal = data.sucursal.trim();
-               data.departamento = data.departamento.trim();
-               data.nivel = data.nivel.trim();
-               data.depa_superior = data.depa_superior.trim();
-               data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
 
               listNivelesDep.push(data);
             }

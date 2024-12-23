@@ -467,45 +467,37 @@ class EmpleadoCargosControlador {
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.eachRow((row, rowNumber) => {
+                        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const CEDULA = row.getCell(headers['CEDULA']).value;
-                        const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
-                        const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value;
-                        const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value;
-                        const SUCURSAL = row.getCell(headers['SUCURSAL']).value;
-                        const SUELDO = row.getCell(headers['SUELDO']).value;
-                        const CARGO = row.getCell(headers['CARGO']).value;
-                        const HORA_TRABAJA = row.getCell(headers['HORA_TRABAJA']).value;
-                        const JEFE = row.getCell(headers['JEFE']).value;
+                        const CEDULA = (_a = row.getCell(headers['CEDULA']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                        const DEPARTAMENTO = (_b = row.getCell(headers['DEPARTAMENTO']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                        const FECHA_DESDE = (_c = row.getCell(headers['FECHA_DESDE']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                        const FECHA_HASTA = (_d = row.getCell(headers['FECHA_HASTA']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                        const SUCURSAL = (_e = row.getCell(headers['SUCURSAL']).value) === null || _e === void 0 ? void 0 : _e.toString();
+                        const SUELDO = (_f = row.getCell(headers['SUELDO']).value) === null || _f === void 0 ? void 0 : _f.toString();
+                        const CARGO = (_g = row.getCell(headers['CARGO']).value) === null || _g === void 0 ? void 0 : _g.toString();
+                        const HORA_TRABAJA = (_h = row.getCell(headers['HORA_TRABAJA']).value) === null || _h === void 0 ? void 0 : _h.toString();
+                        const JEFE = (_j = row.getCell(headers['JEFE']).value) === null || _j === void 0 ? void 0 : _j.toString();
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
                             (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
                             (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
                             (JEFE != undefined)) {
                             data.fila = ITEM;
-                            data.cargo = CARGO;
-                            data.cedula = CEDULA;
-                            data.sueldo = SUELDO;
-                            data.sucursal = SUCURSAL;
-                            data.fecha_desde = FECHA_DESDE;
-                            data.fecha_hasta = FECHA_HASTA;
+                            data.cargo = CARGO === null || CARGO === void 0 ? void 0 : CARGO.trim();
+                            data.cedula = CEDULA === null || CEDULA === void 0 ? void 0 : CEDULA.trim();
+                            data.sueldo = SUELDO === null || SUELDO === void 0 ? void 0 : SUELDO.trim();
+                            data.sucursal = SUCURSAL === null || SUCURSAL === void 0 ? void 0 : SUCURSAL.trim();
+                            data.fecha_desde = FECHA_DESDE === null || FECHA_DESDE === void 0 ? void 0 : FECHA_DESDE.trim();
+                            data.fecha_hasta = FECHA_HASTA === null || FECHA_HASTA === void 0 ? void 0 : FECHA_HASTA.trim();
+                            data.admini_depa = JEFE === null || JEFE === void 0 ? void 0 : JEFE.trim();
+                            data.hora_trabaja = HORA_TRABAJA === null || HORA_TRABAJA === void 0 ? void 0 : HORA_TRABAJA.trim();
+                            data.departamento = DEPARTAMENTO === null || DEPARTAMENTO === void 0 ? void 0 : DEPARTAMENTO.trim();
                             data.observacion = 'no registrado';
-                            data.admini_depa = JEFE;
-                            data.hora_trabaja = HORA_TRABAJA;
-                            data.departamento = DEPARTAMENTO;
-                            data.cargo = data.cargo.trim();
-                            data.cedula = data.cedula.trim();
-                            data.sueldo = data.sueldo.trim();
-                            data.sucursal = data.sucursal.trim();
-                            data.fecha_desde = data.fecha_desde.trim();
-                            data.fecha_hasta = data.fecha_hasta.trim();
-                            data.admini_depa = data.admini_depa.trim();
-                            data.hora_trabaja = data.hora_trabaja.trim();
-                            data.departamento = data.departamento.trim();
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
                             if (rege.test(data.cedula)) {
@@ -548,16 +540,16 @@ class EmpleadoCargosControlador {
                         }
                         else {
                             data.fila = ITEM;
-                            data.cargo = CARGO;
-                            data.cedula = CEDULA;
-                            data.sueldo = SUELDO;
-                            data.sucursal = SUCURSAL;
-                            data.fecha_desde = FECHA_DESDE;
-                            data.fecha_hasta = FECHA_HASTA;
+                            data.cargo = CARGO === null || CARGO === void 0 ? void 0 : CARGO.trim();
+                            data.cedula = CEDULA === null || CEDULA === void 0 ? void 0 : CEDULA.trim();
+                            data.sueldo = SUELDO === null || SUELDO === void 0 ? void 0 : SUELDO.trim();
+                            data.sucursal = SUCURSAL === null || SUCURSAL === void 0 ? void 0 : SUCURSAL.trim();
+                            data.fecha_desde = FECHA_DESDE === null || FECHA_DESDE === void 0 ? void 0 : FECHA_DESDE.trim();
+                            data.fecha_hasta = FECHA_HASTA === null || FECHA_HASTA === void 0 ? void 0 : FECHA_HASTA.trim();
+                            data.admini_depa = JEFE === null || JEFE === void 0 ? void 0 : JEFE.trim();
+                            data.hora_trabaja = HORA_TRABAJA === null || HORA_TRABAJA === void 0 ? void 0 : HORA_TRABAJA.trim();
+                            data.departamento = DEPARTAMENTO === null || DEPARTAMENTO === void 0 ? void 0 : DEPARTAMENTO.trim();
                             data.observacion = 'no registrado';
-                            data.admini_depa = JEFE;
-                            data.hora_trabaja = HORA_TRABAJA;
-                            data.departamento = DEPARTAMENTO;
                             if (data.fila == '' || data.fila == undefined) {
                                 data.fila = 'error';
                                 mensaje = 'error';
@@ -599,15 +591,6 @@ class EmpleadoCargosControlador {
                                 data.observacion = 'Cédula no registrado';
                             }
                             else {
-                                data.cargo = data.cargo.trim();
-                                data.cedula = data.cedula.trim();
-                                data.sueldo = data.sueldo.trim();
-                                data.sucursal = data.sucursal.trim();
-                                data.fecha_desde = data.fecha_desde.trim();
-                                data.fecha_hasta = data.fecha_hasta.trim();
-                                data.admini_depa = data.admini_depa.trim();
-                                data.hora_trabaja = data.hora_trabaja.trim();
-                                data.departamento = data.departamento.trim();
                                 // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                                 const rege = /^[0-9]+$/;
                                 if (rege.test(data.cedula)) {

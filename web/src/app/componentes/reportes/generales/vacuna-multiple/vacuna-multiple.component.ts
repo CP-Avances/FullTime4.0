@@ -6,7 +6,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 // IMPORTAR SERVICIOS
@@ -640,46 +639,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.EstructurarDatosExcel(this.data_pdf)
-    );
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-  }
-
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let c = 0;
-    array.forEach((selec) => {
-      selec.empleados.forEach((empl: any) => {
-        empl.vacunas.forEach((vac: any) => {
-          c = c + 1;
-          let ele = {
-            'N°': c,
-            Cédula: empl.cedula,
-            Código: empl.codigo,
-            Empleado: empl.apellido + ' ' + empl.nombre,
-            Género: empl.genero == 1 ? 'M' : 'F',
-            Ciudad: empl.ciudad,
-            Sucursal: empl.sucursal,
-            Régimen: empl.regimen,
-            Departamento: empl.departamento,
-            Cargo: empl.cargo,
-            Correo: empl.correo,
-            Carnet: vac.carnet?.length ? 'Si' : 'No',
-            Vacuna: vac.tipo_vacuna,
-            Fecha: vac.fecha.split('T')[0],
-            Descripción: vac.descripcion,
-          };
-          nuevo.push(ele);
-        });
-      });
-    });
-
-    return nuevo;
-  }
 
   async generarExcel() {
     let datos: any[] = [];
@@ -720,15 +679,15 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
-    worksheet.mergeCells("B1:K1");
-    worksheet.mergeCells("B2:K2");
-    worksheet.mergeCells("B3:K3");
-    worksheet.mergeCells("B4:K4");
-    worksheet.mergeCells("B5:K5");
+    worksheet.mergeCells("B1:O1");
+    worksheet.mergeCells("B2:O2");
+    worksheet.mergeCells("B3:O3");
+    worksheet.mergeCells("B4:O4");
+    worksheet.mergeCells("B5:O5");
 
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
-    worksheet.getCell("B2").value = 'Lista de Vacunas';
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Vacunas'.toUpperCase();
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
