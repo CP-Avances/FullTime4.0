@@ -27,7 +27,7 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="CargarPlantillaGeneral($event)" type="file"
+                                <input (change)="FileChange($event)" type="file"
                                     [formControl]="archivoForm" id="file1"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -35,7 +35,8 @@
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
-                                <label for="file1" matSuffix matTooltipPosition="right" *ngIf="mostrarbtnsubir"
+                                <label for="file1" matSuffix matTooltipPosition="right" 
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 65px;  padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir nueva plantilla
@@ -45,7 +46,7 @@
 
                     </div>
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-center m-auto"
+                        <div *ngIf="!Datos_procesos" class="d-flex flex-wrap justify-content-center m-auto"
                             style="text-align: center; justify-content: center;">
                             <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
@@ -55,7 +56,7 @@
                         </div>
                         <div  class="d-flex flex-wrap justify-content-center m-auto"
                             style="text-align: center; justify-content: center;">
-                            <button id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                            <button *ngIf="Datos_procesos && messajeExcel != 'error'" id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
                                 Registrar
                             </button>
@@ -75,7 +76,7 @@
                 <thead class="thead-light">
                     <tr style="text-align: center;">
                         <th scope="col">Nombre</th>
-                        <th scope="col">Nivel</th>
+                        
                         <th scope="col">Proceso superior</th>
                         <th scope="col">Acción</th>
                     </tr>
@@ -104,7 +105,7 @@
                     <tr
                         *ngFor="let proceso of procesos | filtrosNombres:buscarNombre.value | padre:buscarPadre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>{{proceso.nombre}}</td>
-                        <td>{{proceso.nivel}}</td>
+                        
                         <td>{{proceso.proc_padre}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(proceso)" id="accion" matSuffix

@@ -533,15 +533,15 @@ class EmpleadoCargosControlador {
           if (rowNumber === 1) return;
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const CEDULA = row.getCell(headers['CEDULA']).value;
-          const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
-          const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value;
-          const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value;
-          const SUCURSAL = row.getCell(headers['SUCURSAL']).value;
-          const SUELDO = row.getCell(headers['SUELDO']).value;
-          const CARGO = row.getCell(headers['CARGO']).value;
-          const HORA_TRABAJA = row.getCell(headers['HORA_TRABAJA']).value;
-          const JEFE = row.getCell(headers['JEFE']).value;
+          const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+          const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value?.toString();
+          const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value?.toString();
+          const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value?.toString();
+          const SUCURSAL = row.getCell(headers['SUCURSAL']).value?.toString();
+          const SUELDO = row.getCell(headers['SUELDO']).value?.toString();
+          const CARGO = row.getCell(headers['CARGO']).value?.toString();
+          const HORA_TRABAJA = row.getCell(headers['HORA_TRABAJA']).value?.toString();
+          const JEFE = row.getCell(headers['JEFE']).value?.toString();
           // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
           if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
             (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
@@ -549,26 +549,16 @@ class EmpleadoCargosControlador {
             (JEFE != undefined)) {
 
             data.fila = ITEM;
-            data.cargo = CARGO;
-            data.cedula = CEDULA;
-            data.sueldo = SUELDO;
-            data.sucursal = SUCURSAL;
-            data.fecha_desde = FECHA_DESDE;
-            data.fecha_hasta = FECHA_HASTA;
+            data.cargo = CARGO?.trim();
+            data.cedula = CEDULA?.trim();
+            data.sueldo = SUELDO?.trim();
+            data.sucursal = SUCURSAL?.trim();
+            data.fecha_desde = FECHA_DESDE?.trim();
+            data.fecha_hasta = FECHA_HASTA?.trim();
+            data.admini_depa = JEFE?.trim();
+            data.hora_trabaja = HORA_TRABAJA?.trim();
+            data.departamento = DEPARTAMENTO?.trim();
             data.observacion = 'no registrado';
-            data.admini_depa = JEFE;
-            data.hora_trabaja = HORA_TRABAJA;
-            data.departamento = DEPARTAMENTO;
-
-            data.cargo = data.cargo.trim();
-            data.cedula = data.cedula.trim();
-            data.sueldo = data.sueldo.trim();
-            data.sucursal = data.sucursal.trim();
-            data.fecha_desde = data.fecha_desde.trim();
-            data.fecha_hasta = data.fecha_hasta.trim();
-            data.admini_depa = data.admini_depa.trim();
-            data.hora_trabaja = data.hora_trabaja.trim();
-            data.departamento = data.departamento.trim();
 
             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
             const rege = /^[0-9]+$/;
@@ -614,16 +604,16 @@ class EmpleadoCargosControlador {
           }
           else {
             data.fila = ITEM;
-            data.cargo = CARGO;
-            data.cedula = CEDULA;
-            data.sueldo = SUELDO;
-            data.sucursal = SUCURSAL;
-            data.fecha_desde = FECHA_DESDE;
-            data.fecha_hasta = FECHA_HASTA;
+            data.cargo = CARGO?.trim();
+            data.cedula = CEDULA?.trim();
+            data.sueldo = SUELDO?.trim();
+            data.sucursal = SUCURSAL?.trim();
+            data.fecha_desde = FECHA_DESDE?.trim();
+            data.fecha_hasta = FECHA_HASTA?.trim();
+            data.admini_depa = JEFE?.trim();
+            data.hora_trabaja = HORA_TRABAJA?.trim();
+            data.departamento = DEPARTAMENTO?.trim();
             data.observacion = 'no registrado';
-            data.admini_depa = JEFE;
-            data.hora_trabaja = HORA_TRABAJA;
-            data.departamento = DEPARTAMENTO;
 
             if (data.fila == '' || data.fila == undefined) {
               data.fila = 'error';
@@ -667,16 +657,6 @@ class EmpleadoCargosControlador {
               data.observacion = 'Cédula no registrado';
             }
             else {
-
-              data.cargo = data.cargo.trim();
-              data.cedula = data.cedula.trim();
-              data.sueldo = data.sueldo.trim();
-              data.sucursal = data.sucursal.trim();
-              data.fecha_desde = data.fecha_desde.trim();
-              data.fecha_hasta = data.fecha_hasta.trim();
-              data.admini_depa = data.admini_depa.trim();
-              data.hora_trabaja = data.hora_trabaja.trim();
-              data.departamento = data.departamento.trim();
 
               // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
               const rege = /^[0-9]+$/;

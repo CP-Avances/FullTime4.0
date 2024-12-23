@@ -383,7 +383,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
       const data = {
         plantilla: this.listDepartamentosCorrectos,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       }
       this.rest.subirArchivoExcel(data).subscribe({
         next: (response) => {

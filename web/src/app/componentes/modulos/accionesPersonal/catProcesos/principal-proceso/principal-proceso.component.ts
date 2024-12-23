@@ -220,8 +220,11 @@ export class PrincipalProcesoComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
+  DataFeriados: any;
+  messajeExcel: string = '';
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.numero_paginaMul = 1;
     this.tamanio_paginaMul = 5;
@@ -242,22 +245,22 @@ export class PrincipalProcesoComponent implements OnInit {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
+
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
+
       this.nameFile = '';
     }
-
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
-
   }
 
-  DataFeriados: any;
-  messajeExcel: string = '';
+
+  
   // METODO PARA LEER DATOS DE PLANTILLA
   CargarPlantillaGeneral(element: any) {
     if (element.target.files && element.target.files[0]) {
@@ -287,15 +290,62 @@ export class PrincipalProcesoComponent implements OnInit {
     this.LimpiarCamposPlantilla();
   }
 
-   // METODO PARA VERIFICAR DATOS DE PLANTILLA
-   VerificarPlantilla() {
-
+  // METODO PARA VALIDAR DATOS DE PLANTILLAS
+  Datos_procesos: any
+  listaProcesosCorrectas: any = [];
+  // METODO PARA VERIFICAR DATOS DE PLANTILLA
+  VerificarPlantilla() {
+    this.listaProcesosCorrectas = [];
     let formData = new FormData();
+    
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+        this.Datos_procesos = res.data;
+        this.messajeExcel = res.message;
+
+        console.log('listado de procesos: ',this.Datos_procesos)
+
+    //   this.Datos_procesos.sort((a: any, b: any) => {
+    //     if (a.observacion !== 'ok' && b.observacion === 'ok') {
+    //       return -1;
+    //     }
+    //     if (a.observacion === 'ok' && b.observacion !== 'ok') {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   });
+    //   if (this.messajeExcel == 'error') {
+    //     this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+    //       timeOut: 4500,
+    //     });
+    //     this.mostrarbtnsubir = false;
+    //   }
+    //   else if (this.messajeExcel == 'no_existe') {
+    //     this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+    //       timeOut: 4500,
+    //     });
+    //     this.mostrarbtnsubir = false;
+    //   }
+    //   else {
+    //     this.Datos_procesos.forEach((item: any) => {
+    //       if (item.observacion.toLowerCase() == 'ok') {
+    //         this.listaProcesosCorrectas.push(item);
+    //       }
+    //     });
+    //     this.listaProcesosCorrectas = this.listaProcesosCorrectas.length;
+    //   }
+    // }, error => {
+    //   this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+    //     timeOut: 4000,
+    //   });
+    });
     
   }
+  
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
     // this.numero_paginaH = 1;
@@ -318,6 +368,7 @@ export class PrincipalProcesoComponent implements OnInit {
           this.RegistrarFeriados();
         }
       });
+      
   }
   // METODO PARA REGISTRAR DATOS
   listFeriadosCorrectos: any = [];

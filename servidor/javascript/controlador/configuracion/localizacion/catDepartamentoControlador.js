@@ -757,42 +757,40 @@ class DepartamentoControlador {
                         }
                         // LECTURA DE LOS DATOS DE LA PLANTILLA
                         plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c, _d, _e;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const NIVEL = row.getCell(headers['NIVEL']).value;
-                            const SUCURSAL = row.getCell(headers['SUCURSAL']).value;
-                            const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value;
-                            const DEPARTAMENTO_SUPERIOR = row.getCell(headers['DEPARTAMENTO_SUPERIOR']).value;
-                            const SUCURSAL_DEPARTAMENTO_SUPERIOR = row.getCell(headers['SUCURSAL_DEPARTAMENTO_SUPERIOR']).value;
+                            const NIVEL = (_a = row.getCell(headers['NIVEL']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                            const SUCURSAL = (_b = row.getCell(headers['SUCURSAL']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                            const DEPARTAMENTO = (_c = row.getCell(headers['DEPARTAMENTO']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                            const DEPARTAMENTO_SUPERIOR = (_d = row.getCell(headers['DEPARTAMENTO_SUPERIOR']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                            const SUCURSAL_DEPARTAMENTO_SUPERIOR = (_e = row.getCell(headers['SUCURSAL_DEPARTAMENTO_SUPERIOR']).value) === null || _e === void 0 ? void 0 : _e.toString();
                             if (ITEM != undefined && SUCURSAL != undefined &&
                                 DEPARTAMENTO != undefined && NIVEL != undefined &&
                                 DEPARTAMENTO_SUPERIOR != undefined && SUCURSAL_DEPARTAMENTO_SUPERIOR != undefined) {
                                 data.fila = ITEM;
-                                data.sucursal = SUCURSAL;
-                                data.departamento = DEPARTAMENTO;
-                                data.nivel = NIVEL;
-                                data.depa_superior = DEPARTAMENTO_SUPERIOR;
-                                data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR;
+                                data.sucursal = SUCURSAL === null || SUCURSAL === void 0 ? void 0 : SUCURSAL.trim();
+                                data.departamento = DEPARTAMENTO === null || DEPARTAMENTO === void 0 ? void 0 : DEPARTAMENTO.trim();
+                                data.nivel = NIVEL === null || NIVEL === void 0 ? void 0 : NIVEL.trim();
+                                data.depa_superior = DEPARTAMENTO_SUPERIOR === null || DEPARTAMENTO_SUPERIOR === void 0 ? void 0 : DEPARTAMENTO_SUPERIOR.trim();
+                                data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR === null || SUCURSAL_DEPARTAMENTO_SUPERIOR === void 0 ? void 0 : SUCURSAL_DEPARTAMENTO_SUPERIOR.trim();
                                 data.observacion = 'no registrada';
-                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.sucursal = data.sucursal.trim();
-                                data.departamento = data.departamento.trim();
-                                data.nivel = data.nivel.trim();
-                                data.depa_superior = data.depa_superior.trim();
-                                data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
+                                data.nivel = parseInt(data.nivel);
                                 listNivelesDep.push(data);
                             }
                             else {
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.fila = ITEM;
-                                data.sucursal = SUCURSAL;
-                                data.departamento = DEPARTAMENTO;
-                                data.nivel = NIVEL;
-                                data.depa_superior = DEPARTAMENTO_SUPERIOR;
-                                data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR;
+                                data.sucursal = SUCURSAL === null || SUCURSAL === void 0 ? void 0 : SUCURSAL.trim();
+                                data.departamento = DEPARTAMENTO === null || DEPARTAMENTO === void 0 ? void 0 : DEPARTAMENTO.trim();
+                                data.nivel = NIVEL === null || NIVEL === void 0 ? void 0 : NIVEL.trim();
+                                data.depa_superior = DEPARTAMENTO_SUPERIOR === null || DEPARTAMENTO_SUPERIOR === void 0 ? void 0 : DEPARTAMENTO_SUPERIOR.trim();
+                                data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR === null || SUCURSAL_DEPARTAMENTO_SUPERIOR === void 0 ? void 0 : SUCURSAL_DEPARTAMENTO_SUPERIOR.trim();
                                 data.observacion = 'no registrada';
+                                data.nivel = parseInt(data.nivel);
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';
@@ -817,12 +815,6 @@ class DepartamentoControlador {
                                     data.sucursal_depa_superior = 'No registrado';
                                     data.observacion = 'Sucursal superior no registrada';
                                 }
-                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.sucursal = data.sucursal.trim();
-                                data.departamento = data.departamento.trim();
-                                data.nivel = data.nivel.trim();
-                                data.depa_superior = data.depa_superior.trim();
-                                data.sucursal_depa_superior = data.sucursal_depa_superior.trim();
                                 listNivelesDep.push(data);
                             }
                             data = {};
@@ -1176,23 +1168,6 @@ class DepartamentoControlador {
             }
             else {
                 return res.status(404).json({ text: 'No se encuentran registros' });
-            }
-        });
-    }
-    ListarDepartamentosRegimen(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const DEPARTAMENTOS = yield database_1.default.query(`
-      SELECT d.id, d.nombre 
-      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c, ed_departamentos AS d 
-      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_departamento = d.id AND r.id = $1 
-      GROUP BY d.id, d.nombre
-      `, [id]);
-            if (DEPARTAMENTOS.rowCount != 0) {
-                res.jsonp(DEPARTAMENTOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
             }
         });
     }

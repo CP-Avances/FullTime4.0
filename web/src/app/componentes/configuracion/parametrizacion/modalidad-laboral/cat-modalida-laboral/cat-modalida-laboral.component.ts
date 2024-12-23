@@ -268,6 +268,8 @@ export class CatModalidaLaboralComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    console.log('datossss: ',formData)
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
