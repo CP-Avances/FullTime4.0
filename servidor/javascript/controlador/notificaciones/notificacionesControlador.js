@@ -951,7 +951,6 @@ class NotificacionTiempoRealControlador {
                 const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`;
                 const response = yield database_1.default.query(query);
                 const notificacion = response.rows;
-                console.log("ver notificacion: ", notificacion);
                 return res.status(200).jsonp(notificacion);
             }
             catch (error) {
