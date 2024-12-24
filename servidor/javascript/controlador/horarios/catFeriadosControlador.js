@@ -405,14 +405,15 @@ class FeriadosControlador {
                         return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
                     plantilla.eachRow((row, rowNumber) => {
+                        var _a, _b, _c;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const FECHA = row.getCell(headers['FECHA']).value;
-                        const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value;
-                        const FECHA_RECUPERACION = row.getCell(headers['FECHA_RECUPERACION']).value;
+                        const FECHA = (_a = row.getCell(headers['FECHA']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                        const DESCRIPCION = (_b = row.getCell(headers['DESCRIPCION']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                        const FECHA_RECUPERACION = (_c = row.getCell(headers['FECHA_RECUPERACION']).value) === null || _c === void 0 ? void 0 : _c.toString();
                         if ((ITEM != undefined && ITEM != '') &&
                             (FECHA != undefined) && (FECHA != '') &&
                             (DESCRIPCION != undefined) && (DESCRIPCION != '') &&
@@ -485,14 +486,15 @@ class FeriadosControlador {
                         return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
                     plantilla_feriafoCiudades.eachRow((row, rowNumber) => {
+                        var _a, _b, _c;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const PROVINCIA = row.getCell(headers['PROVINCIA']).value;
-                        const CIUDAD = row.getCell(headers['CIUDAD']).value;
-                        const FERIADO = row.getCell(headers['FERIADO']).value;
+                        const PROVINCIA = (_a = row.getCell(headers['PROVINCIA']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                        const CIUDAD = (_b = row.getCell(headers['CIUDAD']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                        const FERIADO = (_c = row.getCell(headers['FERIADO']).value) === null || _c === void 0 ? void 0 : _c.toString();
                         if ((ITEM != undefined && ITEM != '') &&
                             (PROVINCIA != undefined) && (PROVINCIA != '') &&
                             (CIUDAD != undefined) && (CIUDAD != '') &&
@@ -503,9 +505,9 @@ class FeriadosControlador {
                             data_fC.feriado = FERIADO;
                             data_fC.observacion = 'registrado';
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                            data.provincia = data.provincia.trim();
-                            data.ciudad = data.ciudad.trim();
-                            data.feriado = data.feriado.trim();
+                            data_fC.provincia = data_fC.provincia.trim();
+                            data_fC.ciudad = data_fC.ciudad.trim();
+                            data_fC.feriado = data_fC.feriado.trim();
                             listFeriados_ciudades.push(data_fC);
                         }
                         else {
@@ -531,9 +533,9 @@ class FeriadosControlador {
                                 data_fC.observacion = 'Feriado no registrado';
                             }
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                            data.provincia = data.provincia.trim();
-                            data.ciudad = data.ciudad.trim();
-                            data.feriado = data.feriado.trim();
+                            data_fC.provincia = data_fC.provincia.trim();
+                            data_fC.ciudad = data_fC.ciudad.trim();
+                            data_fC.feriado = data_fC.feriado.trim();
                             listFeriados_ciudades.push(data_fC);
                         }
                         data_fC = {};

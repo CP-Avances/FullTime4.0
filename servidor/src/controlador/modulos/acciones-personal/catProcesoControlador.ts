@@ -333,7 +333,36 @@ class ProcesoControlador {
             // VALIDACINES DE LOS DATOS DE LA PLANTILLA
             listaProcesos.forEach(async (item: any) => {
                 if (item.observacion == 'no registrada') {
-                    
+                  const VERIFICAR_PROCESO = await pool.query(
+                    `
+                    SELECT * FROM map_cat_procesos 
+                    WHERE UPPER(nombre) = UPPER($1)
+                    `
+                    , [item.nombre]);
+    
+                  if (VERIFICAR_PROCESO.rowCount === 0) {
+                    const VERIFICAR_PROCESO_PADRE = await pool.query(
+                      `
+                      SELECT * FROM map_cat_procesos 
+                      WHERE UPPER(nombre) = UPPER($1)
+                      `
+                      , [item.proceso_padre]);
+
+                      if (VERIFICAR_PROCESO_PADRE.rowCount === 0) {
+                        item.observacion = 'ok'
+                      }else{
+                        console.log('data proceso padre: ',VERIFICAR_PROCESO_PADRE.rows[0]);
+                        const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
+                        if(procesoPadre == item.proceso){
+                          item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                        }else{
+                          item.observacion = 'ok'
+                        }
+                      }
+
+                  }else{
+                    item.observacion = 'Ya existe un proceso con ese nombre'
+                  }
                 }
             });
 

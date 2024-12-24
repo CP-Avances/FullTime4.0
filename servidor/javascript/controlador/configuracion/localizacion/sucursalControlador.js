@@ -262,13 +262,14 @@ class SucursalControlador {
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.eachRow((row, rowNumber) => __awaiter(this, void 0, void 0, function* () {
+                        var _a, _b;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const NOMBRE = row.getCell(headers['NOMBRE']).value;
-                        const CIUDAD = row.getCell(headers['CIUDAD']).value;
+                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString();
+                        const CIUDAD = (_b = row.getCell(headers['CIUDAD']).value) === null || _b === void 0 ? void 0 : _b.toString();
                         const dato = {
                             ITEM: ITEM,
                             NOMBRE: NOMBRE,
@@ -277,6 +278,7 @@ class SucursalControlador {
                         data.fila = ITEM;
                         data.nom_sucursal = NOMBRE;
                         data.ciudad = CIUDAD;
+                        console.log('dataaaaaaaaaaaaaa: ', data);
                         if ((data.fila != undefined && data.fila != '') &&
                             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
                             (data.ciudad != undefined && data.ciudad != '')) {
@@ -305,6 +307,7 @@ class SucursalControlador {
                                     //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                     data.nom_sucursal = data.nom_sucursal.trim();
                                     data.ciudad = data.ciudad.trim();
+                                    console.log('dataaa 010101010101: ', data);
                                     listSucursales.push(data);
                                 }
                                 else {
@@ -315,6 +318,7 @@ class SucursalControlador {
                                     //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                     data.nom_sucursal = data.nom_sucursal.trim();
                                     data.ciudad = data.ciudad.trim();
+                                    console.log('dataaa 000000000: ', data);
                                     listSucursales.push(data);
                                 }
                             }
@@ -329,6 +333,7 @@ class SucursalControlador {
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.nom_sucursal = data.nom_sucursal.trim();
                                 data.ciudad = data.ciudad.trim();
+                                console.log('dataaa 111111111: ', data);
                                 listSucursales.push(data);
                             }
                         }
@@ -354,6 +359,7 @@ class SucursalControlador {
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                             data.nom_sucursal = data.nom_sucursal.trim();
                             data.ciudad = data.ciudad.trim();
+                            console.log('dataaa 222222: ', data);
                             listSucursales.push(data);
                         }
                         data = {};

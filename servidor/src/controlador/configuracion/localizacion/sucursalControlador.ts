@@ -289,8 +289,8 @@ class SucursalControlador {
 
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const NOMBRE = row.getCell(headers['NOMBRE']).value;
-          const CIUDAD = row.getCell(headers['CIUDAD']).value;
+          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString();
+          const CIUDAD = row.getCell(headers['CIUDAD']).value?.toString();
 
           const dato = {
             ITEM: ITEM,
@@ -301,6 +301,8 @@ class SucursalControlador {
           data.fila = ITEM;
           data.nom_sucursal = NOMBRE;
           data.ciudad = CIUDAD;
+
+          console.log('dataaaaaaaaaaaaaa: ',data);
 
           if ((data.fila != undefined && data.fila != '') &&
             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
@@ -340,6 +342,8 @@ class SucursalControlador {
                 data.nom_sucursal = data.nom_sucursal.trim();
                 data.ciudad = data.ciudad.trim();
 
+                console.log('dataaa 010101010101: ',data);
+
                 listSucursales.push(data);
               } else {
                 data.fila = ITEM
@@ -350,6 +354,8 @@ class SucursalControlador {
                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                 data.nom_sucursal = data.nom_sucursal.trim();
                 data.ciudad = data.ciudad.trim();
+
+                console.log('dataaa 000000000: ',data);
 
                 listSucursales.push(data);
               }
@@ -366,6 +372,8 @@ class SucursalControlador {
               //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
               data.nom_sucursal = data.nom_sucursal.trim();
               data.ciudad = data.ciudad.trim();
+
+              console.log('dataaa 111111111: ',data);
 
               listSucursales.push(data);
             }
@@ -396,6 +404,8 @@ class SucursalControlador {
             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
             data.nom_sucursal = data.nom_sucursal.trim();
             data.ciudad = data.ciudad.trim();
+
+            console.log('dataaa 222222: ',data);
 
             listSucursales.push(data);
           }
