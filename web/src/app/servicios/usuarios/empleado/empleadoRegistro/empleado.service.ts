@@ -313,9 +313,6 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
   }
 
-  BuscarDepartamentoEmpleado(datos: any) {
-    return this.http.post(`${environment.url}/empleado/buscarDepartamento`, datos);
-  }
 
 
   // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO

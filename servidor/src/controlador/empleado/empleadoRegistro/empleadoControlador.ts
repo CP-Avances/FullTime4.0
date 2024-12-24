@@ -1331,22 +1331,7 @@ class EmpleadoControlador {
     }
   }
 
-  // BUSQUEDA INFORMACION DEPARTAMENTOS EMPLEADO
-  public async ObtenerDepartamentoEmpleado(req: Request, res: Response): Promise<any> {
-    const { id_emple, id_cargo } = req.body;
-    const DEPARTAMENTO = await pool.query(
-      `
-      SELECT * FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND
-      id_cargo = $2
-      `
-      , [id_emple, id_cargo]);
-    if (DEPARTAMENTO.rowCount != 0) {
-      return res.jsonp(DEPARTAMENTO.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }
+
 
   // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarEmpleado(req: Request, res: Response) {

@@ -106,8 +106,6 @@ class EmpleadoRutas {
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
         this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
 
-        // INFORMACION TITULO PROFESIONALES
-        this.router.post('/buscarDepartamento', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerDepartamentoEmpleado);
 
         // INFORMACION DE LA IMAGEN
         this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);

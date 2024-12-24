@@ -9,8 +9,6 @@ class AuditoriaRutas {
         this.configuracion();
     }
     configuracion(): void {
-        this.router.post('/auditar', TokenValidation, AUDITORIA_CONTROLADOR.BuscarDatosAuditoria);
-        this.router.post('/auditarportabla', TokenValidation, AUDITORIA_CONTROLADOR.BuscarDatosAuditoriaporTablas);
         this.router.post('/auditarportablaempaquetados', TokenValidation, AUDITORIA_CONTROLADOR.BuscarDatosAuditoriaporTablasEmpaquetados);
     }
 }

@@ -332,32 +332,6 @@ class EmpleadoCargosControlador {
     }
   }
 
-  public async EncontrarIdCargoActual(req: Request, res: Response): Promise<any> {
-    const { id_empleado } = req.params;
-    const CARGO = await pool.query(
-      `
-      SELECT ec.id AS max, ec.hora_trabaja 
-      FROM contrato_cargo_vigente AS da, eu_empleado_cargos AS ec
-      WHERE ec.id = da.id_cargo AND da.id_empleado = $1
-      `
-      ,
-      [id_empleado]);
-    if (CARGO.rowCount != 0 && CARGO.rows[0]['max'] != null) {
-      return res.jsonp(CARGO.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-
-
-
-
-
-
-
-
 
   public async BuscarTipoDepartamento(req: Request, res: Response) {
     const id = req.params.id;
