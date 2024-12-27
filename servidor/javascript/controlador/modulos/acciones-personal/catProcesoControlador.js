@@ -258,7 +258,7 @@ class ProcesoControlador {
                                 data.proceso = PROCESO;
                                 data.nivel = NIVEL;
                                 data.proceso_padre = PROCESO_PADRE;
-                                data.observacion = 'no registrada';
+                                data.observacion = 'no registrado';
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.proceso = data.proceso.trim();
                                 listaProcesos.push(data);
@@ -268,7 +268,7 @@ class ProcesoControlador {
                                 data.proceso = PROCESO;
                                 data.nivel = NIVEL;
                                 data.proceso_padre = PROCESO_PADRE;
-                                data.observacion = 'no registrada';
+                                data.observacion = 'no registrado';
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';
@@ -302,8 +302,8 @@ class ProcesoControlador {
                         }
                     });
                     // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-                    listaProcesos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                        if (item.observacion == 'no registrada') {
+                    listaProcesos.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrado') {
                             const VERIFICAR_PROCESO = yield database_1.default.query(`
                     SELECT * FROM map_cat_procesos 
                     WHERE UPPER(nombre) = UPPER($1)
@@ -313,17 +313,28 @@ class ProcesoControlador {
                       SELECT * FROM map_cat_procesos 
                       WHERE UPPER(nombre) = UPPER($1)
                       `, [item.proceso_padre]);
-                                if (VERIFICAR_PROCESO_PADRE.rowCount === 0) {
-                                    item.observacion = 'ok';
-                                }
-                                else {
-                                    console.log('data proceso padre: ', VERIFICAR_PROCESO_PADRE.rows[0]);
+                                if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
                                     const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre;
                                     if (procesoPadre == item.proceso) {
                                         item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos';
                                     }
+                                }
+                                if (item.observacion == 'no registrado') {
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES
+                                    if (duplicados.find((p) => (p.proceso.toLowerCase() === item.proceso.toLowerCase())
+                                    //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
+                                    ) == undefined) {
+                                        duplicados.push(item);
+                                    }
                                     else {
-                                        item.observacion = 'ok';
+                                        item.observacion = '1';
+                                    }
+                                    if (item.observacion == 'no registrado') {
+                                        const cruzado = listaProcesos.slice(0, index).find((p) => (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
+                                            p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()));
+                                        if (cruzado) {
+                                            item.observacion = 'registro cruzado';
+                                        }
                                     }
                                 }
                             }
@@ -347,6 +358,9 @@ class ProcesoControlador {
                         listaProcesos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                             if (item.observacion == '1') {
                                 item.observacion = 'Registro duplicado';
+                            }
+                            else if (item.observacion == 'no registrado') {
+                                item.observacion = 'ok';
                             }
                             // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                             if (typeof item.fila === 'number' && !isNaN(item.fila)) {

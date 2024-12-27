@@ -280,7 +280,7 @@ class ProcesoControlador {
                         data.proceso = PROCESO;
                         data.nivel = NIVEL;
                         data.proceso_padre= PROCESO_PADRE;
-                        data.observacion = 'no registrada';
+                        data.observacion = 'no registrado';
 
                          //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                         data.proceso = data.proceso.trim();
@@ -292,7 +292,7 @@ class ProcesoControlador {
                         data.proceso = PROCESO;
                         data.nivel = NIVEL;
                         data.proceso_padre = PROCESO_PADRE;
-                        data.observacion = 'no registrada';
+                        data.observacion = 'no registrado';
 
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
@@ -331,8 +331,8 @@ class ProcesoControlador {
                 }
             });
             // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-            listaProcesos.forEach(async (item: any) => {
-                if (item.observacion == 'no registrada') {
+            listaProcesos.forEach(async (item: any, index: number) => {
+                if (item.observacion == 'no registrado') {
                   const VERIFICAR_PROCESO = await pool.query(
                     `
                     SELECT * FROM map_cat_procesos 
@@ -348,16 +348,38 @@ class ProcesoControlador {
                       `
                       , [item.proceso_padre]);
 
-                      if (VERIFICAR_PROCESO_PADRE.rowCount === 0) {
-                        item.observacion = 'ok'
-                      }else{
-                        console.log('data proceso padre: ',VERIFICAR_PROCESO_PADRE.rows[0]);
+                      if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
                         const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
                         if(procesoPadre == item.proceso){
                           item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
-                        }else{
-                          item.observacion = 'ok'
                         }
+                      }
+
+                      if(item.observacion == 'no registrado'){
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
+                        if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
+                          //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
+                      ) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
+
+                        if(item.observacion == 'no registrado'){
+                          const cruzado = listaProcesos.slice(0, index).find((p: any) => 
+                            (
+                              p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
+                              p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
+                            )
+                          );
+
+                          if (cruzado) {
+                            item.observacion = 'registro cruzado';
+                          } 
+                            
+
+                        }
+                        
                       }
 
                   }else{
@@ -383,6 +405,8 @@ class ProcesoControlador {
                 listaProcesos.forEach(async (item: any) => {
                     if (item.observacion == '1') {
                         item.observacion = 'Registro duplicado'
+                    }else if(item.observacion == 'no registrado'){
+                      item.observacion = 'ok'
                     }
 
                     // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.

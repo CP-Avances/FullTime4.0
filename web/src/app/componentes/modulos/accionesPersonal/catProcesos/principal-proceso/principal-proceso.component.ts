@@ -216,6 +216,12 @@ export class PrincipalProcesoComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
+   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+   ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   mostrarbtnsubir: boolean = false;
   DataFeriados: any;
@@ -305,39 +311,39 @@ export class PrincipalProcesoComponent implements OnInit {
 
         console.log('listado de procesos: ',this.Datos_procesos)
 
-    //   this.Datos_procesos.sort((a: any, b: any) => {
-    //     if (a.observacion !== 'ok' && b.observacion === 'ok') {
-    //       return -1;
-    //     }
-    //     if (a.observacion === 'ok' && b.observacion !== 'ok') {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   });
-    //   if (this.messajeExcel == 'error') {
-    //     this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
-    //       timeOut: 4500,
-    //     });
-    //     this.mostrarbtnsubir = false;
-    //   }
-    //   else if (this.messajeExcel == 'no_existe') {
-    //     this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
-    //       timeOut: 4500,
-    //     });
-    //     this.mostrarbtnsubir = false;
-    //   }
-    //   else {
-    //     this.Datos_procesos.forEach((item: any) => {
-    //       if (item.observacion.toLowerCase() == 'ok') {
-    //         this.listaProcesosCorrectas.push(item);
-    //       }
-    //     });
-    //     this.listaProcesosCorrectas = this.listaProcesosCorrectas.length;
-    //   }
-    // }, error => {
-    //   this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
-    //     timeOut: 4000,
-    //   });
+      this.Datos_procesos.sort((a: any, b: any) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_procesos.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaProcesosCorrectas.push(item);
+          }
+        });
+        this.listaProcesosCorrectas = this.listaProcesosCorrectas.length;
+      }
+    }, error => {
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
     });
     
   }
@@ -361,18 +367,45 @@ export class PrincipalProcesoComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.RegistrarFeriados();
+          this.RegistrarProcesos();
         }
       });
       
   }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  EstiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (arrayObservacion[0] == 'Modalidad Laboral ') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+
+  colorTexto: string = '';
+  EstiloTextoCelda(texto: string): string {
+    texto = texto.toString()
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
   // METODO PARA REGISTRAR DATOS
-  listFeriadosCorrectos: any = [];
-  listaFerediadCiudadCorrectos: any = [];
-  RegistrarFeriados() {
-    if (this.listFeriadosCorrectos?.length > 0) {
+  RegistrarProcesos() {
+    if (this.listaProcesosCorrectas?.length > 0) {
       const data = {
-        plantilla: this.listFeriadosCorrectos,
+        plantilla: this.listaProcesosCorrectas,
         user_name: this.user_name,
         ip: this.ip
       }
