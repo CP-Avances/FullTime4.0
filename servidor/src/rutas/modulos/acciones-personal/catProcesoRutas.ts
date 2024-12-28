@@ -35,7 +35,7 @@ class ProcesoRutas {
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], PROCESO_CONTROLADOR.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
-        this.router.post('/cargar_plantilla/', TokenValidation,PROCESO_CONTROLADOR.CargarPlantilla);
+        this.router.post('/cargar_plantilla', TokenValidation,PROCESO_CONTROLADOR.CargarPlantilla);
     }
 }
 

@@ -52,8 +52,8 @@ export class ProcesoService {
   }
 
   // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA   **USADO
-  RegistrarNivelesPlantilla(data: any) {
-    return this.http.post<any>(environment.url + '/proceso/registrarNiveles', data);
+  RegistrarPlantilla(data: any) {
+    return this.http.post<any>(environment.url + '/proceso/cargar_plantilla', data);
   }
 
 }

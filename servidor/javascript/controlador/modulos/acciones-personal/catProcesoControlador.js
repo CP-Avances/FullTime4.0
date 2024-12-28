@@ -333,13 +333,13 @@ class ProcesoControlador {
                                         const cruzado = listaProcesos.slice(0, index).find((p) => (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
                                             p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()));
                                         if (cruzado) {
-                                            item.observacion = 'registro cruzado';
+                                            item.observacion = 'Registro cruzado';
                                         }
                                     }
                                 }
                             }
                             else {
-                                item.observacion = 'Ya existe un proceso con ese nombre';
+                                item.observacion = 'Ya existe el proceso en el sistema';
                             }
                         }
                     }));
@@ -392,6 +392,36 @@ class ProcesoControlador {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
+                const { proceso, nivel, proceso_padre } = data;
+                console.log('proceso: ', proceso);
+                console.log('proceso_padre: ', proceso_padre);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          `, [proceso, proceso_padre]);
+                    const [procesos] = response.rows;
+                    console.log('response: ', response);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(procesos),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
             if (error) {
                 return res.status(500).jsonp({ message: 'error' });

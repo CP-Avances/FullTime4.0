@@ -1,5 +1,6 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
@@ -374,7 +375,7 @@ class ProcesoControlador {
                           );
 
                           if (cruzado) {
-                            item.observacion = 'registro cruzado';
+                            item.observacion = 'Registro cruzado';
                           } 
                             
 
@@ -383,7 +384,7 @@ class ProcesoControlador {
                       }
 
                   }else{
-                    item.observacion = 'Ya existe un proceso con ese nombre'
+                    item.observacion = 'Ya existe el proceso en el sistema'
                   }
                 }
             });
@@ -441,8 +442,47 @@ class ProcesoControlador {
     let error: boolean = false;
 
     for (const data of plantilla) {
-        
+      const { proceso, nivel, proceso_padre } = data;
+
+      console.log('proceso: ',proceso)
+      console.log('proceso_padre: ',proceso_padre)
+
+      try {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          `
+          , [proceso, proceso_padre]);
+
+        const [procesos] = response.rows;
+
+        console.log('response: ',response)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_procesos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(procesos),
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
     }
+
     if (error) {
         return res.status(500).jsonp({ message: 'error' });
     }
