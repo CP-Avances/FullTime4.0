@@ -1,6 +1,20 @@
 import ACCION_PERSONAL_CONTROLADOR from '../../../controlador/modulos/acciones-personal/accionPersonalControlador';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import multer from 'multer';
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+
+const upload = multer({ storage: storage });
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -49,6 +63,10 @@ class DepartamentoRutas {
         this.router.get('/pedido/informacion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarPedidoAccion);
         this.router.get('/lista/procesos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarProcesosRecursivos);
 
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], ACCION_PERSONAL_CONTROLADOR.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        this.router.post('/cargar_plantilla', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CargarPlantilla);
     }
 }
 

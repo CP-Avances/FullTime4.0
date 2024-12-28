@@ -1,4 +1,5 @@
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
@@ -6,6 +7,8 @@ import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import pool from '../../../database';
 import path from 'path';
+import Excel from 'exceljs';
+import fs from 'fs';
 
 class AccionPersonalControlador {
 
@@ -761,6 +764,275 @@ class AccionPersonalControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros' });
         }
     }
+
+
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+  public async RevisarDatos(req: Request, res: Response): Promise<any> {
+    try {
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+        const workbook = new Excel.Workbook();
+        await workbook.xlsx.readFile(ruta);
+        let verificador = ObtenerIndicePlantilla(workbook, 'PROCESOS');
+        if (verificador === false) {
+            return res.jsonp({ message: 'no_existe', data: undefined });
+        }
+        else {
+            const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+            const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+            let data: any = {
+                fila: '',
+                proceso: '',
+                nivel: '',
+                proceso_padre: '',
+                observacion: ''
+            };
+            var listaProcesos: any = [];
+            var duplicados: any = [];
+            var mensaje: string = 'correcto';
+
+            if (plantilla) {
+                // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                const headerRow = plantilla.getRow(1);
+                const headers: any = {};
+                // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                headerRow.eachCell((cell: any, colNumber) => {
+                    headers[cell.value.toString().toUpperCase()] = colNumber;
+                });
+                // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                if (!headers['ITEM'] || !headers['PROCESO'] || !headers['NIVEL'] || !headers['PROCESO_PADRE']
+                ) {
+                    return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                }
+
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla.eachRow((row, rowNumber) => {
+                    // SALTAR LA FILA DE LAS CABECERAS
+                    if (rowNumber === 1) return;
+                    // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                    const ITEM = row.getCell(headers['ITEM']).value;
+                    const PROCESO = row.getCell(headers['PROCESO']).value;
+                    const NIVEL = row.getCell(headers['NIVEL']).value;
+                    const PROCESO_PADRE = row.getCell(headers['PROCESO_PADRE']).value;
+
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (PROCESO != undefined && PROCESO != '') &&
+                        (NIVEL != undefined && NIVEL != '') &&
+                        (PROCESO_PADRE != undefined && PROCESO_PADRE != '') ) {
+
+                        data.fila = ITEM;
+                        data.proceso = PROCESO;
+                        data.nivel = NIVEL;
+                        data.proceso_padre= PROCESO_PADRE;
+                        data.observacion = 'no registrado';
+
+                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.proceso = data.proceso.trim();
+
+                        listaProcesos.push(data);
+
+                    } else {
+                        data.fila = ITEM;
+                        data.proceso = PROCESO;
+                        data.nivel = NIVEL;
+                        data.proceso_padre = PROCESO_PADRE;
+                        data.observacion = 'no registrado';
+
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
+
+                        if (PROCESO == undefined) {
+                            data.proceso = 'No registrado';
+                            data.observacion = 'Proceso ' + data.observacion;
+                        }
+
+                        if (NIVEL == undefined) {
+                          data.nivel = 'No registrado';
+                          data.observacion = 'Nivel ' + data.observacion;
+                        }
+
+                        if (PROCESO_PADRE == undefined) {
+                          data.proceso_padre = 'No registrado';
+                          data.observacion = 'Proceso padre ' + data.observacion;
+                        }
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.proceso = data.proceso.trim();
+
+                        listaProcesos.push(data);
+                    }
+                    data = {};
+                });
+            }
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
+            // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+            listaProcesos.forEach(async (item: any, index: number) => {
+                if (item.observacion == 'no registrado') {
+                  const VERIFICAR_PROCESO = await pool.query(
+                    `
+                    SELECT * FROM map_cat_procesos 
+                    WHERE UPPER(nombre) = UPPER($1)
+                    `
+                    , [item.nombre]);
+    
+                  if (VERIFICAR_PROCESO.rowCount === 0) {
+                    const VERIFICAR_PROCESO_PADRE = await pool.query(
+                      `
+                      SELECT * FROM map_cat_procesos 
+                      WHERE UPPER(nombre) = UPPER($1)
+                      `
+                      , [item.proceso_padre]);
+
+                      if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
+                        const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
+                        if(procesoPadre == item.proceso){
+                          item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                        }
+                      }
+
+                      if(item.observacion == 'no registrado'){
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
+                        if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
+                          //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
+                      ) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
+
+                        if(item.observacion == 'no registrado'){
+                          const cruzado = listaProcesos.slice(0, index).find((p: any) => 
+                            (
+                              p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
+                              p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
+                            )
+                          );
+
+                          if (cruzado) {
+                            item.observacion = 'Registro cruzado';
+                          } 
+                            
+
+                        }
+                        
+                      }
+
+                  }else{
+                    item.observacion = 'Ya existe el proceso en el sistema'
+                  }
+                }
+            });
+
+            setTimeout(() => {
+                listaProcesos.sort((a: any, b: any) => {
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // SON IGUALES
+                });
+
+                var filaDuplicada: number = 0;
+
+                listaProcesos.forEach(async (item: any) => {
+                    if (item.observacion == '1') {
+                        item.observacion = 'Registro duplicado'
+                    }else if(item.observacion == 'no registrado'){
+                      item.observacion = 'ok'
+                    }
+
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                        if (item.fila == filaDuplicada) {
+                            mensaje = 'error';
+                        }
+                    } else {
+                        return mensaje = 'error';
+                    }
+
+                    filaDuplicada = item.fila;
+
+                });
+
+                if (mensaje == 'error') {
+                    listaProcesos = undefined;
+                }
+                return res.jsonp({ message: mensaje, data: listaProcesos });
+            }, 1000)
+        }
+
+    } catch (error) {
+        return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+    }
+}
+
+  // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+  public async CargarPlantilla(req: Request, res: Response) {
+    const { plantilla, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+
+    for (const data of plantilla) {
+      const { proceso, nivel, proceso_padre } = data;
+
+      console.log('proceso: ',proceso)
+      console.log('proceso_padre: ',proceso_padre)
+
+      try {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          `
+          , [proceso, proceso_padre]);
+
+        const [procesos] = response.rows;
+
+        console.log('response: ',response)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_procesos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(procesos),
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
+    }
+
+    if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+    }
+    return res.status(200).jsonp({ message: 'ok' });
+  }
 
 }
 

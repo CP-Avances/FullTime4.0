@@ -132,6 +132,8 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA LIMPIAR CAMPOS DE BUSQUEDA
   LimpiarCampoBuscar() {
+    this.Datos_procesos = null;
+    this.messajeExcel = '';
     this.buscarNombre.reset();
     this.buscarNivel.reset();
     this.buscarPadre.reset();
@@ -224,7 +226,6 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   mostrarbtnsubir: boolean = false;
-  DataFeriados: any;
   messajeExcel: string = '';
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {

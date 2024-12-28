@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const accionPersonalControlador_1 = __importDefault(require("../../../controlador/modulos/acciones-personal/accionPersonalControlador"));
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const multer_1 = __importDefault(require("multer"));
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 class DepartamentoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -43,6 +55,10 @@ class DepartamentoRutas {
         this.router.get('/pedidos/ciudad/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarDatosCiudades);
         this.router.get('/pedido/informacion/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarPedidoAccion);
         this.router.get('/lista/procesos/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarProcesosRecursivos);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], accionPersonalControlador_1.default.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        this.router.post('/cargar_plantilla', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CargarPlantilla);
     }
 }
 const ACCION_PERSONAL_RUTAS = new DepartamentoRutas();

@@ -1,9 +1,9 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
@@ -26,6 +26,8 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 export class ListarTipoAccionComponent implements OnInit {
 
+  archivoForm = new FormControl('', Validators.required);
+
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -37,6 +39,18 @@ export class ListarTipoAccionComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+   // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
+   nameFile: string;
+   archivoSubido: Array<File>;
+ 
+   tamanio_paginaMul: number = 5;
+   numero_paginaMul: number = 1;
+
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+   
+   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+    hipervinculo: string = environment.url
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
@@ -192,6 +206,75 @@ export class ListarTipoAccionComponent implements OnInit {
     this.ver_datos = true;
     this.accion_id = id;
   }
+
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  mostrarbtnsubir: boolean = false;
+  messajeExcel: string = '';
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
+  FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.VerificarPlantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
+        timeOut: 6000,
+      });
+
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  // METODO PARA VALIDAR DATOS DE PLANTILLAS
+  TipoAccion_personal: any;
+  listaTipoAccionesCorrectas: any = [];
+  listaTipoAccionesCorrectasCont: number;
+  // METODO PARA VERIFICAR DATOS DE PLANTILLA
+  VerificarPlantilla() {
+    this.listaTipoAccionesCorrectas = [];
+    let formData = new FormData();
+    
+    for (let i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    
+    
+  }
+    // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+    ConfirmarRegistroMultiple() {
+      const mensaje = 'registro';
+      this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+        .subscribe((confirmado: Boolean) => {
+          if (confirmado) {
+            //this.RegistrarProcesos();
+          }
+        });
+        
+    }
+
 
   /******************************************************************************************************
  *                                         METODO PARA EXPORTAR A PDF
