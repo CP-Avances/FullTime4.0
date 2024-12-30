@@ -274,19 +274,13 @@ class TiposCargosControlador {
                                 data.tipo_cargo = CARGO;
                                 data.observacion = 'no registrado';
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.fila.trim();
-                                data.tipo_cargo.trim();
-                                data.observacion.trim();
+                                data.tipo_cargo = data.tipo_cargo.trim();
                                 listCargos.push(data);
                             }
                             else {
                                 data.fila = ITEM;
                                 data.tipo_cargo = CARGO;
                                 data.observacion = 'no registrado';
-                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.fila.trim();
-                                data.tipo_cargo.trim();
-                                data.observacion.trim();
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';
@@ -295,6 +289,8 @@ class TiposCargosControlador {
                                     data.tipo_cargo = 'No registrado';
                                     data.observacion = 'Cargo ' + data.observacion;
                                 }
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.tipo_cargo = data.tipo_cargo.trim();
                                 listCargos.push(data);
                             }
                             data = {};

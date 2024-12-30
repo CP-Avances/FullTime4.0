@@ -274,7 +274,6 @@ class ModalidaLaboralControlador {
                         let ITEM = row.getCell(headers['ITEM']).value;
                         let MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
 
-
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
                             (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
@@ -284,9 +283,8 @@ class ModalidaLaboralControlador {
                             data.observacion = 'no registrada';
                             
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                            data.fila;
-                            data.modalida_laboral.trim();
-                            data.observacion.trim();
+                            data.modalida_laboral = data.modalida_laboral.trim();
+                            data.observacion = data.observacion.trim();
 
                             listModalidad.push(data);
                         } else {
@@ -306,9 +304,8 @@ class ModalidaLaboralControlador {
 
 
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                            data.fila;
-                            data.modalida_laboral.trim();
-                            data.observacion.trim();
+                            data.modalida_laboral = data.modalida_laboral.trim();
+                            data.observacion = data.observacion.trim();
 
                             listModalidad.push(data);
                         }

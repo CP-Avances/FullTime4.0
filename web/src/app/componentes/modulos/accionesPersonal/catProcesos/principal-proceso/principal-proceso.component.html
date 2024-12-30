@@ -54,9 +54,9 @@
                                 <br> Descargar plantilla
                             </a>
                         </div>
-                        <div  class="d-flex flex-wrap justify-content-center m-auto"
-                            style="text-align: center; justify-content: center;">
-                            <button *ngIf="Datos_procesos && messajeExcel != 'error'" id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                        <div  class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="Datos_procesos && messajeExcel != 'error'" id="descargar" 
+                                class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
                                 Registrar
                             </button>
@@ -68,7 +68,7 @@
 
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_procesos">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">LISTA DE PROCESOS</div>
         <div class="table-responsive">
@@ -147,3 +147,69 @@
         </div>
     </div>
 </div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_procesos && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_procesos && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Proceso</th>
+                        <th scope="col">Nivel</th>
+                        <th scope="col">Proceso padre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let pro of Datos_procesos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{pro.fila}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="EstiloCelda(pro.observacion)"></div>
+                                {{pro.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.proceso)" style="font-size: 12px;">
+                            {{pro.proceso}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.nivel)" style="font-size: 12px;">
+                            {{pro.nivel}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.proceso_padre)" style="font-size: 12px;">
+                            {{pro.proceso_padre}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{listaProcesosCorrectasCont}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_procesos.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+

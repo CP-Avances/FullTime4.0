@@ -258,9 +258,8 @@ class ModalidaLaboralControlador {
                                 data.modalida_laboral = MODALIDAD_LABORAL;
                                 data.observacion = 'no registrada';
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.fila;
-                                data.modalida_laboral.trim();
-                                data.observacion.trim();
+                                data.modalida_laboral = data.modalida_laboral.trim();
+                                data.observacion = data.observacion.trim();
                                 listModalidad.push(data);
                             }
                             else {
@@ -276,9 +275,8 @@ class ModalidaLaboralControlador {
                                     data.observacion = 'Modalidad Laboral ' + data.observacion;
                                 }
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.fila;
-                                data.modalida_laboral.trim();
-                                data.observacion.trim();
+                                data.modalida_laboral = data.modalida_laboral.trim();
+                                data.observacion = data.observacion.trim();
                                 listModalidad.push(data);
                             }
                             data = {};

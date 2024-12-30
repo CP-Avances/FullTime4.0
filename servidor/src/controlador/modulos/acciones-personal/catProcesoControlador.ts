@@ -1,5 +1,6 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
@@ -280,7 +281,7 @@ class ProcesoControlador {
                         data.proceso = PROCESO;
                         data.nivel = NIVEL;
                         data.proceso_padre= PROCESO_PADRE;
-                        data.observacion = 'no registrada';
+                        data.observacion = 'no registrado';
 
                          //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                         data.proceso = data.proceso.trim();
@@ -292,7 +293,7 @@ class ProcesoControlador {
                         data.proceso = PROCESO;
                         data.nivel = NIVEL;
                         data.proceso_padre = PROCESO_PADRE;
-                        data.observacion = 'no registrada';
+                        data.observacion = 'no registrado';
 
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
@@ -331,9 +332,60 @@ class ProcesoControlador {
                 }
             });
             // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-            listaProcesos.forEach(async (item: any) => {
-                if (item.observacion == 'no registrada') {
-                    
+            listaProcesos.forEach(async (item: any, index: number) => {
+                if (item.observacion == 'no registrado') {
+                  const VERIFICAR_PROCESO = await pool.query(
+                    `
+                    SELECT * FROM map_cat_procesos 
+                    WHERE UPPER(nombre) = UPPER($1)
+                    `
+                    , [item.nombre]);
+    
+                  if (VERIFICAR_PROCESO.rowCount === 0) {
+                    const VERIFICAR_PROCESO_PADRE = await pool.query(
+                      `
+                      SELECT * FROM map_cat_procesos 
+                      WHERE UPPER(nombre) = UPPER($1)
+                      `
+                      , [item.proceso_padre]);
+
+                      if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
+                        const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
+                        if(procesoPadre == item.proceso){
+                          item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                        }
+                      }
+
+                      if(item.observacion == 'no registrado'){
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
+                        if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
+                          //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
+                      ) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
+
+                        if(item.observacion == 'no registrado'){
+                          const cruzado = listaProcesos.slice(0, index).find((p: any) => 
+                            (
+                              p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
+                              p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
+                            )
+                          );
+
+                          if (cruzado) {
+                            item.observacion = 'Registro cruzado';
+                          } 
+                            
+
+                        }
+                        
+                      }
+
+                  }else{
+                    item.observacion = 'Ya existe el proceso en el sistema'
+                  }
                 }
             });
 
@@ -354,6 +406,8 @@ class ProcesoControlador {
                 listaProcesos.forEach(async (item: any) => {
                     if (item.observacion == '1') {
                         item.observacion = 'Registro duplicado'
+                    }else if(item.observacion == 'no registrado'){
+                      item.observacion = 'ok'
                     }
 
                     // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
@@ -388,8 +442,47 @@ class ProcesoControlador {
     let error: boolean = false;
 
     for (const data of plantilla) {
-        
+      const { proceso, nivel, proceso_padre } = data;
+
+      console.log('proceso: ',proceso)
+      console.log('proceso_padre: ',proceso_padre)
+
+      try {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          `
+          , [proceso, proceso_padre]);
+
+        const [procesos] = response.rows;
+
+        console.log('response: ',response)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_procesos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(procesos),
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
     }
+
     if (error) {
         return res.status(500).jsonp({ message: 'error' });
     }

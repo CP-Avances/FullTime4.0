@@ -288,8 +288,6 @@ class TituloControlador {
                 data.titulo = NOMBRE;
                 data.nivel = NIVEL
 
-                data.observacion = 'Ya existe en el sistema';
-
                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                 data.titulo = data.titulo.trim();
                 data.nivel = data.nivel.trim();

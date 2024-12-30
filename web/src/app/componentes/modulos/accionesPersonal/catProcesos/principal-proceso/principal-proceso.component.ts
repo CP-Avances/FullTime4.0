@@ -136,6 +136,8 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA LIMPIAR CAMPOS DE BUSQUEDA
   LimpiarCampoBuscar() {
+    this.Datos_procesos = null;
+    this.messajeExcel = '';
     this.buscarNombre.reset();
     this.buscarNivel.reset();
     this.buscarPadre.reset();
@@ -220,9 +222,14 @@ export class PrincipalProcesoComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
+   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+   ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   mostrarbtnsubir: boolean = false;
-  DataFeriados: any;
   messajeExcel: string = '';
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
@@ -293,6 +300,7 @@ export class PrincipalProcesoComponent implements OnInit {
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
   Datos_procesos: any
   listaProcesosCorrectas: any = [];
+  listaProcesosCorrectasCont: number;
   // METODO PARA VERIFICAR DATOS DE PLANTILLA
   VerificarPlantilla() {
     this.listaProcesosCorrectas = [];
@@ -309,39 +317,39 @@ export class PrincipalProcesoComponent implements OnInit {
 
         console.log('listado de procesos: ',this.Datos_procesos)
 
-    //   this.Datos_procesos.sort((a: any, b: any) => {
-    //     if (a.observacion !== 'ok' && b.observacion === 'ok') {
-    //       return -1;
-    //     }
-    //     if (a.observacion === 'ok' && b.observacion !== 'ok') {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   });
-    //   if (this.messajeExcel == 'error') {
-    //     this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
-    //       timeOut: 4500,
-    //     });
-    //     this.mostrarbtnsubir = false;
-    //   }
-    //   else if (this.messajeExcel == 'no_existe') {
-    //     this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
-    //       timeOut: 4500,
-    //     });
-    //     this.mostrarbtnsubir = false;
-    //   }
-    //   else {
-    //     this.Datos_procesos.forEach((item: any) => {
-    //       if (item.observacion.toLowerCase() == 'ok') {
-    //         this.listaProcesosCorrectas.push(item);
-    //       }
-    //     });
-    //     this.listaProcesosCorrectas = this.listaProcesosCorrectas.length;
-    //   }
-    // }, error => {
-    //   this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
-    //     timeOut: 4000,
-    //   });
+      this.Datos_procesos.sort((a: any, b: any) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_procesos.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaProcesosCorrectas.push(item);
+          }
+        });
+        this.listaProcesosCorrectasCont = this.listaProcesosCorrectas.length;
+      }
+    }, error => {
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
     });
     
   }
@@ -365,40 +373,70 @@ export class PrincipalProcesoComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.RegistrarFeriados();
+          this.RegistrarProcesos();
         }
       });
       
   }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  EstiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe el proceso en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion  == 'Registro cruzado' ||
+      observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+    ) {
+      return 'rgb(238, 21, 242)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+
+  colorTexto: string = '';
+  EstiloTextoCelda(texto: string): string {
+    texto = texto.toString()
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
   // METODO PARA REGISTRAR DATOS
-  listFeriadosCorrectos: any = [];
-  listaFerediadCiudadCorrectos: any = [];
-  RegistrarFeriados() {
-    if (this.listFeriadosCorrectos?.length > 0) {
+  RegistrarProcesos() {
+    console.log('listaProcesosCorrectas: ',this.listaProcesosCorrectas.length)
+    if (this.listaProcesosCorrectas?.length > 0) {
       const data = {
-        plantilla: this.listFeriadosCorrectos,
+        plantilla: this.listaProcesosCorrectas,
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales
       }
-      // this.rest.Crear_feriados(data).subscribe({
-      //   next: (response) => {
-      //     this.toastr.success('Plantilla de Feriados importada.', 'Operación exitosa.', {
-      //       timeOut: 5000,
-      //     });
-      //     if (this.listaFerediadCiudadCorrectos?.length > 0) {
-      //       setTimeout(() => {
-      //         //this.Crear_feriado_ciudad();
-      //       }, 500);
-      //     }
-      //     this.LimpiarCampos();
-      //   },
-      //   error: (error) => {
-      //     this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
-      //       timeOut: 4000,
-      //     });
-      //     this.archivoForm.reset();
-      //   }
-      // });
+      this.rest.RegistrarPlantilla(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaProcesosCorrectas?.length > 0) {
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 500);
+          }
+          this.LimpiarCampos();
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
