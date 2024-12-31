@@ -2529,7 +2529,7 @@ class EmpleadoControlador {
                     const id_rol = yield database_1.default.query(`
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `, [rol.toUpperCase()]);
-                    console.log('Estado civil manual: ', id_estado_civil);
+                    //console.log('Estado civil manual: ', id_estado_civil);
                     /*console.log('codigo: ', codigo)
                     console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
                     console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimiento, ' estado civil: ', id_estado_civil);

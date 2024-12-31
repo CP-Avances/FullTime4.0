@@ -2826,7 +2826,7 @@ class EmpleadoControlador {
           `
           , [rol.toUpperCase()]);
 
-        console.log('Estado civil manual: ', id_estado_civil);
+        //console.log('Estado civil manual: ', id_estado_civil);
 
         /*console.log('codigo: ', codigo)
         console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
