@@ -93,7 +93,7 @@ export class RealTimeService {
    ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
-  // METODO PARA ENVIO DE CORREO DE COMUNICADOS    **USADO
+  // METODO PARA ENVIO DE CORREO DE COMUNICADOS    **USADO-
   EnviarCorreoComunicado(datos: any) {
     return this.http.post<any>(`${environment.url}/noti-real-time/mail-comunicado`, datos);
   }
