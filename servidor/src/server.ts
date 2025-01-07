@@ -287,16 +287,20 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
+import { atrasos } from './libs/sendAtraso';
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
  ** **************************************************************************************************** **/
 
- // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
+// METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
 
+//atrasos();
 // LLAMA AL MEODO DE CUMPLEAÑOS
 cumpleanios();
+
+
 
 // LLAMA AL METODO DE AVISOS DE VACACIONES
 //beforeFiveDays();

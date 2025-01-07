@@ -267,6 +267,7 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
+//atrasos();
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendBirthday_1.cumpleanios)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES
