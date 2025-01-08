@@ -262,12 +262,15 @@ const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const sendBirthday_1 = require("./libs/sendBirthday");
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
+const sendAtraso_1 = require("./libs/sendAtraso");
+const sendAtrasoDepartamento_1 = require("./libs/sendAtrasoDepartamento");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-//atrasos();
+(0, sendAtraso_1.atrasos)();
+(0, sendAtrasoDepartamento_1.atrasosDepartamentos)();
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendBirthday_1.cumpleanios)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES

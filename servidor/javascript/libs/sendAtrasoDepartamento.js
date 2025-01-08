@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasos = exports.ImportarPDF = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosDepartamentos = exports.ImportarPDF = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
@@ -68,186 +68,189 @@ const ImportarPDF = function () {
     });
 };
 exports.ImportarPDF = ImportarPDF;
-const atrasos = function () {
+const atrasosDepartamentos = function () {
     return __awaiter(this, void 0, void 0, function* () {
+        let separador = path_1.default.sep;
         //setInterval(async () => {
-        console.log("ejecutando reporte de atrasos ");
         let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
-        let arreglo_procesar = [];
-        informacion.forEach((obj) => {
-            var _a;
-            arreglo_procesar.push({
-                id: (_a = obj.id) !== null && _a !== void 0 ? _a : obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
-                nombre: obj.nombre,
-                apellido: obj.apellido,
-                codigo: obj.codigo,
-                cedula: obj.cedula,
-                correo: obj.correo,
-                genero: obj.genero,
-                id_cargo: obj.id_cargo,
-                id_contrato: obj.id_contrato,
-                sucursal: obj.name_suc,
-                id_suc: obj.id_suc,
-                id_regimen: obj.id_regimen,
-                id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                ciudad: obj.ciudad,
-                regimen: obj.name_regimen,
-                departamento: obj.name_dep,
-                cargo: obj.name_cargo,
-                hora_trabaja: obj.hora_trabaja,
-                rol: obj.name_rol,
-                userid: obj.userid,
-                app_habilita: obj.app_habilita,
-                web_habilita: obj.web_habilita,
-                comunicado_mail: obj.comunicado_mail,
-                comunicado_noti: obj.comunicado_notificacion
-            });
-        });
-        let seleccionados = [{ nombre: 'Empleados' }];
-        seleccionados[0].empleados = arreglo_procesar;
-        let datos = seleccionados;
-        let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
-            suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)('2024/12/01', '2024/12/28', o.id);
-                return o;
-            })));
-            return suc;
-        })));
-        let nuevo = n.map((e) => {
-            e.empleados = e.empleados.filter((a) => { return a.atrasos.length > 0; });
-            return e;
-        }).filter(e => { return e.empleados.length > 0; });
-        //console.log("ver datos del reporte general: ", nuevo)
-        if (nuevo.length != 0) {
-            const pdfMake = yield (0, exports.ImportarPDF)();
-            // DEFINIR INFORMACIÓN
-            const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
-            resultado.map((obj) => {
-                return obj;
-            });
-            const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
-            const file_name = yield database_1.default.query(`
-           SELECT nombre, logo FROM e_empresa 
-           `)
-                .then((result) => {
-                return result.rows[0];
-            });
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
-            let logo = 'data:image/jpeg;base64,' + codificado;
-            const EMPRESA = yield database_1.default.query(`
-           SELECT * FROM e_empresa 
-           `);
-            let p_color = EMPRESA.rows[0].color_principal;
-            let s_color = EMPRESA.rows[0].color_secundario;
-            let frase = EMPRESA.rows[0].marca_agua;
-            let nombre = EMPRESA.rows[0].nombre;
-            let formato_fecha = 'dd/MM/yyyy';
-            let formato_hora = 'HH:mm:ss';
-            let idioma_fechas = 'es';
-            let dia_abreviado = 'ddd';
-            let dia_completo = 'dddd';
-            let definicionDocumento = {
-                pageSize: 'A4',
-                pageOrientation: 'portrait',
-                pageMargins: [40, 50, 40, 50],
-                watermark: { text: frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-                footer: function (currentPage, pageCount, fecha) {
-                    const f = new Date();
-                    const fechaFormateada = f.toISOString().split('T')[0];
-                    const time = f.toTimeString().split(' ')[0];
-                    return {
-                        margin: 10,
-                        columns: [
-                            { text: `Fecha: ${fechaFormateada} Hora: ${time}`, opacity: 0.3 },
-                            {
-                                text: [
-                                    {
-                                        text: `© Pag ${currentPage} de ${pageCount}`,
-                                        alignment: 'right',
-                                        opacity: 0.3
-                                    }
-                                ],
-                            }
-                        ],
-                        fontSize: 10
-                    };
-                },
-                content: [
-                    { image: logo, width: 100, margin: [10, -25, 0, 5] },
-                    { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                    { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-                    { text: 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas), bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
-                    ...resultado
-                ],
-                styles: {
-                    derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color, alignment: 'left' },
-                    tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color },
-                    tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: s_color },
-                    centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color, margin: [0, 5, 0, 0] },
-                    itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color },
-                    itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
-                    itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-                    itemsTableDerecha: { fontSize: 8, alignment: 'right' },
-                    itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: s_color },
-                    itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
-                    itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
-                    tableMargin: { margin: [0, 0, 0, 0] },
-                    tableMarginCabecera: { margin: [0, 15, 0, 0] },
-                    tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
-                    tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
-                }
-            };
-            // Crear el PDF y obtener el buffer de manera asíncrona
-            const pdfDocGenerator = pdfMake.createPdf(definicionDocumento);
-            // Obtener el buffer del PDF generado
-            const pdfBuffer = yield new Promise((resolve, reject) => {
-                pdfDocGenerator.getBuffer((buffer) => {
-                    if (buffer) {
-                        resolve(Buffer.from(buffer));
-                    }
-                    else {
-                        reject(new Error('Error al generar el buffer del PDF'));
-                    }
+        let departamentos = yield database_1.default.query(`
+            SELECT * FROM ed_departamentos
+            `).then((result) => { return result.rows; });
+        departamentos.forEach((depa) => __awaiter(this, void 0, void 0, function* () {
+            let departamento = depa.nombre;
+            let gerencia = [];
+            gerencia = informacion.filter((item) => item.name_dep === departamento && item.id_suc === depa.id_sucursal);
+            console.log("ver cantidad en el departamento de " + departamento + ' ', gerencia.length);
+            let arreglo_procesar = [];
+            gerencia.forEach((obj) => {
+                var _a;
+                arreglo_procesar.push({
+                    id: (_a = obj.id) !== null && _a !== void 0 ? _a : obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
+                    nombre: obj.nombre,
+                    apellido: obj.apellido,
+                    codigo: obj.codigo,
+                    cedula: obj.cedula,
+                    correo: obj.correo,
+                    genero: obj.genero,
+                    id_cargo: obj.id_cargo,
+                    id_contrato: obj.id_contrato,
+                    sucursal: obj.name_suc,
+                    id_suc: obj.id_suc,
+                    id_regimen: obj.id_regimen,
+                    id_depa: obj.id_depa,
+                    id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                    ciudad: obj.ciudad,
+                    regimen: obj.name_regimen,
+                    departamento: obj.name_dep,
+                    cargo: obj.name_cargo,
+                    hora_trabaja: obj.hora_trabaja,
+                    rol: obj.name_rol,
+                    userid: obj.userid,
+                    app_habilita: obj.app_habilita,
+                    web_habilita: obj.web_habilita,
+                    comunicado_mail: obj.comunicado_mail,
+                    comunicado_noti: obj.comunicado_notificacion
                 });
             });
-            // OBTENER RUTAS
-            const ruta_logo = (0, accesoCarpetas_1.ObtenerRutaLogos)();
-            // OBTENER FECHA Y HORA
-            const date = new Date();
-            const hora = date.getHours();
-            const minutos = date.getMinutes();
-            const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_abreviado, idioma_fechas);
-            const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
-            // VERIFICAR HORA DE ENVIO
-            const PARAMETRO_HORA = yield database_1.default.query(`
-                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 40
-                `);
-            if (PARAMETRO_HORA.rowCount != 0) {
-                console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
-                if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                    const PARAMETRO_CORREO = yield database_1.default.query(`
-                        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 44
-                        `);
-                    if (PARAMETRO_CORREO.rowCount != 0) {
-                        const correo = PARAMETRO_CORREO.rows[0].descripcion;
-                        console.log("ver correo de reporte general: ", PARAMETRO_CORREO.rows[0].descripcion);
+            let seleccionados = [{ nombre: 'Empleados' }];
+            seleccionados[0].empleados = arreglo_procesar;
+            let datos = seleccionados;
+            let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
+                suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)('2024/12/01', '2024/12/31', o.id);
+                    return o;
+                })));
+                return suc;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((a) => { return a.atrasos.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            console.log("ver atrasos del departamento " + departamento, nuevo);
+            if (nuevo.length != 0) {
+                const pdfMake = yield (0, exports.ImportarPDF)();
+                // DEFINIR INFORMACIÓN
+                const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
+                resultado.map((obj) => {
+                    return obj;
+                });
+                const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
+                const file_name = yield database_1.default.query(`
+               SELECT nombre, logo FROM e_empresa 
+               `)
+                    .then((result) => {
+                    return result.rows[0];
+                });
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
+                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+                let logo = 'data:image/jpeg;base64,' + codificado;
+                const EMPRESA = yield database_1.default.query(`
+               SELECT * FROM e_empresa 
+               `);
+                let p_color = EMPRESA.rows[0].color_principal;
+                let s_color = EMPRESA.rows[0].color_secundario;
+                let frase = EMPRESA.rows[0].marca_agua;
+                let nombre = EMPRESA.rows[0].nombre;
+                let formato_fecha = 'dd/MM/yyyy';
+                let formato_hora = 'HH:mm:ss';
+                let idioma_fechas = 'es';
+                let dia_abreviado = 'ddd';
+                let dia_completo = 'dddd';
+                let definicionDocumento = {
+                    pageSize: 'A4',
+                    pageOrientation: 'portrait',
+                    pageMargins: [40, 50, 40, 50],
+                    watermark: { text: frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+                    footer: function (currentPage, pageCount, fecha) {
+                        const f = new Date();
+                        const fechaFormateada = f.toISOString().split('T')[0];
+                        const time = f.toTimeString().split(' ')[0];
+                        return {
+                            margin: 10,
+                            columns: [
+                                { text: `Fecha: ${fechaFormateada} Hora: ${time}`, opacity: 0.3 },
+                                {
+                                    text: [
+                                        {
+                                            text: `© Pag ${currentPage} de ${pageCount}`,
+                                            alignment: 'right',
+                                            opacity: 0.3
+                                        }
+                                    ],
+                                }
+                            ],
+                            fontSize: 10
+                        };
+                    },
+                    content: [
+                        { image: logo, width: 100, margin: [10, -25, 0, 5] },
+                        { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
+                        { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                        { text: 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas), bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+                        ...resultado
+                    ],
+                    styles: {
+                        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color, alignment: 'left' },
+                        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color },
+                        tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: s_color },
+                        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color, margin: [0, 5, 0, 0] },
+                        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color },
+                        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
+                        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+                        itemsTableDerecha: { fontSize: 8, alignment: 'right' },
+                        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: s_color },
+                        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
+                        itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
+                        tableMargin: { margin: [0, 0, 0, 0] },
+                        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+                        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+                        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
+                    }
+                };
+                // Crear el PDF y obtener el buffer de manera asíncrona
+                const pdfDocGenerator = pdfMake.createPdf(definicionDocumento);
+                // Obtener el buffer del PDF generado
+                const pdfBuffer = yield new Promise((resolve, reject) => {
+                    pdfDocGenerator.getBuffer((buffer) => {
+                        if (buffer) {
+                            resolve(Buffer.from(buffer));
+                        }
+                        else {
+                            reject(new Error('Error al generar el buffer del PDF'));
+                        }
+                    });
+                });
+                const ruta_logo = (0, accesoCarpetas_1.ObtenerRutaLogos)();
+                // OBTENER FECHA Y HORA
+                const date = new Date();
+                const hora = date.getHours();
+                const minutos = date.getMinutes();
+                const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_abreviado, idioma_fechas);
+                const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+                console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
+                // VERIFICAR HORA DE ENVIO
+                const PARAMETRO_HORA = yield database_1.default.query(`
+                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 40
+                    `);
+                if (PARAMETRO_HORA.rowCount != 0) {
+                    console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
+                    if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
                         const EMPLEADOS = yield database_1.default.query(`
-                                    SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
-                                        ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
-                                        ce.pie_firma, ce.cabecera_firma  
-                                    FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
-                                    WHERE da.correo = $1 AND da.id_suc = s.id
-                                        AND da.estado = 1 AND s.id_empresa = ce.id 
-                                    `, [correo]);
+                                        SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, s.id_empresa, 
+                                            ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
+                                            ce.pie_firma, ce.cabecera_firma  
+                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        WHERE da.id_suc = s.id
+                                            AND da.estado = 1 AND s.id_empresa = ce.id AND da.jefe = true AND da.name_dep = $1 AND da.id_suc = $2
+                                `, [departamento, depa.id_sucursal]);
                         if (EMPLEADOS.rowCount != 0) {
+                            var correos = (0, exports.BuscarCorreos)(EMPLEADOS);
+                            console.log('correos de jefes de departamento de ' + departamento + ' de la sucursal con id: ' + depa.name_suc, correos);
                             var usuarios = (0, exports.PresentarUsuarios)(EMPLEADOS);
                             // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
                             if (EMPLEADOS.rows[0].cabecera_firma === null || EMPLEADOS.rows[0].cabecera_firma === '') {
@@ -260,31 +263,33 @@ const atrasos = function () {
                                 EMPLEADOS.rows[0].pie_firma = 'pie_firma.png';
                             }
                             let data = {
-                                to: correo,
+                                to: correos,
                                 from: EMPLEADOS.rows[0].correo_empresa,
                                 subject: 'Notificación de atraso',
                                 html: `
-                                    <body>
-                                        <div style="text-align: center;">
-                                            <img width="100%" height="100%" src="cid:cabeceraf"/>
-                                        </div>
-                                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                            Mediante el presente correo se adjunta el reporte de atrasos.<br>  
-                                        </p>
-                                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                        <b>Empresa:</b> ${file_name.nombre}<br>
-                                        <b>Asunto:</b> Reporte diario de atrasos <br>
-                                        <b>Fecha de envío:</b> ${fecha} <br> 
-                                        <b>Hora de envío:</b> ${hora_reporte} <br>
-                                        <b>Correo dirigido a:</b> <br> 
-                                        ${usuarios} <br><br>                
-                                        </p>
-                                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                        <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
-                                        </p>
-                                        <img src="cid:pief" width="100%" height="100%"/>
-                                    </body>
-                                    `,
+                                        <body>
+                                            <div style="text-align: center;">
+                                                <img width="100%" height="100%" src="cid:cabeceraf"/>
+                                            </div>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                                Mediante el presente correo se adjunta el reporte de atrasos.<br>  
+                                            </p>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Asunto:</b> Reporte diario de atrasos <br>
+                                            <b>Departamento:</b> ${departamento}<br> 
+                                            <b>Fecha de envío:</b> ${fecha} <br> 
+                                            <b>Hora de envío:</b> ${hora_reporte} <br><br> 
+                                            <b>Correo dirigido a:</b> <br>
+                                            ${usuarios} <br><br>                
+                                            </p>                 
+                                            </p>
+                                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                            <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
+                                            </p>
+                                            <img src="cid:pief" width="100%" height="100%"/>
+                                        </body>
+                                        `,
                                 attachments: [
                                     {
                                         filename: 'cabecera_firma.jpg',
@@ -297,7 +302,7 @@ const atrasos = function () {
                                         cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                     },
                                     {
-                                        filename: 'Atrasos.pdf', // Nombre del archivo adjunto
+                                        filename: 'Atrasos-Departamento.pdf', // Nombre del archivo adjunto
                                         content: pdfBuffer, // El buffer generado por pdfmake
                                         //contentType: 'application/pdf' // T
                                     }
@@ -319,18 +324,15 @@ const atrasos = function () {
                         }
                     }
                     else {
-                        console.log("no se encontro correo");
+                        console.log("la hora no es igual ");
                     }
                 }
-                else {
-                    console.log("la hora no es igual ");
-                }
             }
-        }
+        }));
         //}, 60000);
     });
 };
-exports.atrasos = atrasos;
+exports.atrasosDepartamentos = atrasosDepartamentos;
 // FUNCION PARA BUSCAR CORREOS
 const BuscarCorreos = function (datos) {
     var correos = '';
@@ -592,6 +594,7 @@ exports.FormatearFecha = FormatearFecha;
 const FormatearHora = function (hora, formato) {
     const horaLuxon = luxon_1.DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);
+    ;
     return valor;
 };
 exports.FormatearHora = FormatearHora;

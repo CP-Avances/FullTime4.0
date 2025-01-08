@@ -288,6 +288,8 @@ import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
 import { atrasos } from './libs/sendAtraso';
+import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
  ** **************************************************************************************************** **/
@@ -296,7 +298,11 @@ import { atrasos } from './libs/sendAtraso';
 DesactivarFinContratoEmpleado();
 
 
-//atrasos();
+atrasos();
+atrasosDepartamentos();
+
+
+
 // LLAMA AL MEODO DE CUMPLEAÑOS
 cumpleanios();
 
