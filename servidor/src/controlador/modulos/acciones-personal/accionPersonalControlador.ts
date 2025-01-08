@@ -774,7 +774,7 @@ class AccionPersonalControlador {
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         const workbook = new Excel.Workbook();
         await workbook.xlsx.readFile(ruta);
-        let verificador = ObtenerIndicePlantilla(workbook, 'PROCESOS');
+        let verificador = ObtenerIndicePlantilla(workbook, 'TIPOS_ACCION_PERSONAL');
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
