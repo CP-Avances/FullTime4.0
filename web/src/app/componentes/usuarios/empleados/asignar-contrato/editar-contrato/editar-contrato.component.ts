@@ -54,7 +54,7 @@ export class EditarContratoComponent implements OnInit {
   documentoF = new FormControl('');
   contratoF = new FormControl('', Validators.minLength(3));
   seleccion = new FormControl('');
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public ContratoForm = new FormGroup({
@@ -80,10 +80,10 @@ export class EditarContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;

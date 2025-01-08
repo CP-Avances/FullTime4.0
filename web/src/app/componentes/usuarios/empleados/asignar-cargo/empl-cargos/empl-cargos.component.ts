@@ -54,7 +54,7 @@ export class EmplCargosComponent implements OnInit {
   personalF = new FormControl(false);
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
   jefeF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO

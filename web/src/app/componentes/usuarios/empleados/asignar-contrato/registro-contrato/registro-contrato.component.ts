@@ -52,7 +52,7 @@ export class RegistroContratoComponent implements OnInit {
   idRegimenF = new FormControl('', Validators.required);
   documentoF = new FormControl('');
   contratoF = new FormControl('', Validators.minLength(3));
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({

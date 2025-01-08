@@ -54,7 +54,7 @@ export class EditarCargoComponent implements OnInit {
   idSucursal = new FormControl('', [Validators.required]);
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
   jefeF = new FormControl();
   administraF = new FormControl();
   personalF = new FormControl(false);
@@ -91,10 +91,10 @@ export class EditarCargoComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
