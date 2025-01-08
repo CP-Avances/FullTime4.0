@@ -23,6 +23,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class EditarSolicitudComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // VALIDACIONES DE LOS CAMPOS DEL FORMULARIO
   fechaPlanificacionF = new FormControl('', Validators.required);
@@ -80,7 +81,10 @@ export class EditarSolicitudComidaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.data.solicitud.id_empleado);
     this.obtenerInformacionEmpleado();
@@ -301,7 +305,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       extra: form.extraForm,
       id_departamento: this.solInfo.id_dep,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restPlan.ActualizarSolicitudComida(datosPlanComida).subscribe(alimentacion => {
 
@@ -405,7 +409,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {

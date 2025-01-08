@@ -54,17 +54,8 @@ class DepartamentoRutas {
         // METODO PARA ACTUALIZAR DATOS DE CORREO  **USADO
         this.router.put('/credenciales/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.EditarPassword);
 
-
-
-
-
-        // METODO PARA ACTUALIZAR USO DE ACCIONES  ** SE ELIMINO
-        this.router.put('/acciones-timbre', TokenValidation, EMPRESA_CONTROLADOR.ActualizarAccionesTimbres);
         // METODO PARA BUSCAR DATOS DE EMPRESA
         this.router.get('/', TokenValidation, EMPRESA_CONTROLADOR.ListarEmpresa);
-
-
-
 
         // CONSULTA USADA EN MODULO DE ALMUERZOS 
         this.router.get('/logo/codificados/:id_empresa', EMPRESA_CONTROLADOR.ConvertirImagenBase64);

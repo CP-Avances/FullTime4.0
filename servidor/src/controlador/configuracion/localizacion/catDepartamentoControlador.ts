@@ -1320,24 +1320,6 @@ class DepartamentoControlador {
     }
   }
 
-  public async ListarDepartamentosRegimen(req: Request, res: Response) {
-    const id = req.params.id;
-    const DEPARTAMENTOS = await pool.query(
-      `
-      SELECT d.id, d.nombre 
-      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c, ed_departamentos AS d 
-      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_departamento = d.id AND r.id = $1 
-      GROUP BY d.id, d.nombre
-      `
-      , [id]);
-    if (DEPARTAMENTOS.rowCount != 0) {
-      res.jsonp(DEPARTAMENTOS.rows);
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
-    }
-  }
-
 }
 
 export const DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();

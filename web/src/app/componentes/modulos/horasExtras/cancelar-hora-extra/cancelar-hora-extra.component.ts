@@ -16,6 +16,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class CancelarHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -42,7 +43,10 @@ export class CancelarHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); 
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
@@ -107,7 +111,7 @@ export class CancelarHoraExtraComponent implements OnInit {
   aceptarAdvertencia() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restHE.EliminarHoraExtra(this.data.id, this.data.documento, datos).subscribe(res => {
       console.log('advertencia', res);
@@ -253,16 +257,15 @@ export class CancelarHoraExtraComponent implements OnInit {
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones: any = [];
     //Ciclo por cada elemento del catalogo
-    horaExtra.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.fullname == elemento.fullname) == undefined)
-      {
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }

@@ -26,6 +26,8 @@ export interface Feriado {
 })
 
 export class ListarCiudadFeriadosComponent implements OnInit {
+  ips_locales: any = '';
+
 
   @Input() idFeriado: number;
   @Input() pagina_: string;
@@ -56,7 +58,10 @@ export class ListarCiudadFeriadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarParametro();
     this.ListarCiudadesFeriados(this.idFeriado);
@@ -138,7 +143,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     else {
       const data = {
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       };
 
       datos.forEach((obj: any) => {
@@ -160,7 +165,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   Eliminar(id_ciudad_asignada: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.restF.EliminarRegistro(id_ciudad_asignada, data).subscribe(res => {

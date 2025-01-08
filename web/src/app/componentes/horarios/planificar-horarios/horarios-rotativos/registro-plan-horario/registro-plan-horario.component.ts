@@ -26,9 +26,10 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistroPlanHorarioComponent implements OnInit {
+  
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
-
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl();
   fechaFinalF = new FormControl();
@@ -67,7 +68,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarHorarios();
     this.BuscarHora();
@@ -1064,7 +1068,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.lista_eliminar.forEach((eliminar: any) => {
       let plan_fecha = {
@@ -1196,7 +1200,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {

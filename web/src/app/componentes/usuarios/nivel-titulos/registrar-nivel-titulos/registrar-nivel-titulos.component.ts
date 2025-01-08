@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class RegistrarNivelTitulosComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -34,6 +35,9 @@ export class RegistrarNivelTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip')
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
@@ -41,7 +45,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();

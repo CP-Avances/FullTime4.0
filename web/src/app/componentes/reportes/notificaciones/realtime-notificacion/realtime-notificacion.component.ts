@@ -31,6 +31,7 @@ export interface NotiRealtime {
 })
 
 export class RealtimeNotificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
@@ -58,7 +59,10 @@ export class RealtimeNotificacionComponent implements OnInit {
   ngOnInit(): void {
     this.id_loggin = parseInt(localStorage.getItem("empleado") as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.ObtenerNotificaciones(this.id_loggin);
   }
 
@@ -131,7 +135,7 @@ export class RealtimeNotificacionComponent implements OnInit {
   CambiarVistaNotificacion(id_realtime: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.realtime.ActualizarVistaNotificacion(id_realtime, datos).subscribe(res => {
     });

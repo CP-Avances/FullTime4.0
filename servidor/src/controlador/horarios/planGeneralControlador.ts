@@ -175,7 +175,7 @@ class PlanGeneralControlador {
                         observacion: null
                     })
                 }
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCIÓN
 
                 await pool.query('COMMIT');
@@ -262,7 +262,7 @@ class PlanGeneralControlador {
                 ip_local: ip_local,
                 observacion: null
             }));
-            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+            await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
             await client.query('COMMIT');  // Finalizar la transacción
             res.status(200).json({ message: 'OK', totalResults: parte.length });
@@ -451,7 +451,7 @@ class PlanGeneralControlador {
                     ip_local: ip_local,
                     observacion: `Error al eliminar registro con id ${id}`
                 }));
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: id_plan });
             } else {
@@ -468,7 +468,7 @@ class PlanGeneralControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id}`
                     }));
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 }
 
                 const result = await pool.query(`DELETE FROM eu_asistencia_general WHERE id = ANY($1::int[])`, [id_plan]);
@@ -503,7 +503,7 @@ class PlanGeneralControlador {
                         observacion: null,
                     };
                 });
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 await pool.query('COMMIT');
                 return res.jsonp({ message: 'OK' });
 

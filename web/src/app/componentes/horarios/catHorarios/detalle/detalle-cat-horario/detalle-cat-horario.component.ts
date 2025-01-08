@@ -22,6 +22,8 @@ const OPTIONS_HORARIOS = [
 })
 
 export class DetalleCatHorarioComponent implements OnInit {
+  ips_locales: any = '';
+
 
   segundo: boolean = false;
   tercero: boolean = false;
@@ -68,7 +70,10 @@ export class DetalleCatHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.VerEmpresa();
     this.ListarDetalles(this.data.datosHorario.id);
@@ -151,7 +156,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       min_antes: 0,
       min_despues: 0,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);

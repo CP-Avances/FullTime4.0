@@ -15,6 +15,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -23,6 +24,7 @@ import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 })
 
 export class RegistrarTimbreComponent implements OnInit {
+  ips_locales: any = '';
 
   // PARA MANEJAR LA IMAGEN CAPTURADA
   private trigger: Subject<void> = new Subject<void>();
@@ -91,13 +93,17 @@ export class RegistrarTimbreComponent implements OnInit {
     public restU: EmpleadoUbicacionService,
     public restF: FuncionesService,
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
+    public validar: ValidacionesService,
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.ObtenerZonaHoraria();
     this.VerificarCamara();
     this.VerificarFunciones();
@@ -495,7 +501,7 @@ export class RegistrarTimbreComponent implements OnInit {
       id_reloj: 98,
       latitud: this.latitud,
       accion: this.accionF,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       user_name: this.user_name,
     }
     console.log('data timbre.... ', this.dataTimbre)

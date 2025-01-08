@@ -407,7 +407,7 @@ class UsuarioControlador {
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
@@ -471,7 +471,7 @@ class UsuarioControlador {
       const ids_empleados = array.map((empl: any) => empl.id);
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
-      
+
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
@@ -496,7 +496,7 @@ class UsuarioControlador {
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
@@ -779,27 +779,6 @@ class UsuarioControlador {
    ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
    ** ************************************************************************************************** */
 
-  // BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACION USUARIO - DEPARTAMENTO
-  public async BuscarUsuarioSucursal(req: Request, res: Response) {
-    const { id_empleado } = req.body;
-    const USUARIOS = await pool.query(
-      `
-      SELECT DISTINCT d.id_sucursal
-      FROM eu_usuario_departamento AS ud
-      JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
-      WHERE id_empleado = $1
-      `,
-      [id_empleado]
-    );
-    if (USUARIOS.rowCount != 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-
   // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
@@ -852,24 +831,6 @@ class UsuarioControlador {
       INNER JOIN e_sucursales AS s ON d.id_sucursal = s.id
       WHERE id_empleado = $1
       ORDER BY ud.id ASC
-      `
-      , [id_empleado]
-    );
-    if (USUARIOS.rowCount != 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.jsonp(null);
-    }
-  }
-
-  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
-  public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
-    const { id_empleado } = req.body;
-    const USUARIOS = await pool.query(
-      `
-      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
-      AND principal = true
       `
       , [id_empleado]
     );

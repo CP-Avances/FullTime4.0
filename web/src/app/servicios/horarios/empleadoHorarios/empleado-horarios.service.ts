@@ -54,16 +54,6 @@ export class EmpleadoHorariosService {
     return this.http.post<any>(`${environment.url}/empleadoHorario/horario-comida-horas-dias-diferentes`, datos);
   }
 
-
-
-
-
-
-
-
-  
-
-
   //Horarios Empleado
   ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {
     return this.http.post(`${environment.url}/empleadoHorario/fechas_horario/${codigo}`, data)

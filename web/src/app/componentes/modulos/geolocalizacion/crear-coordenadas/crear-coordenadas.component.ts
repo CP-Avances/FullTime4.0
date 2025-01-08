@@ -9,6 +9,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { EmpleadoUbicacionService } from 'src/app/servicios/modulos/empleadoUbicacion/empleado-ubicacion.service';
 
 import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-crear-coordenadas',
@@ -17,6 +18,7 @@ import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacio
 })
 
 export class CrearCoordenadasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -40,11 +42,15 @@ export class CrearCoordenadasComponent implements OnInit {
     public restP: ParametrosService,
     public ventanap: MatDialogRef<CrearCoordenadasComponent>,
     public ventanas: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ConsultarCoordenadas();
     this.BuscarParametro();
@@ -83,7 +89,7 @@ export class CrearCoordenadasComponent implements OnInit {
         longitud: form.longitudForm,
         descripcion: form.descripcionForm,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.RegistrarCoordenadas(datos).subscribe(response => {
         this.toastr.success('Ubicación registrada exitosamente.',

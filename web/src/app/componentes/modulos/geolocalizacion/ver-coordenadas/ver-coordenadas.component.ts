@@ -39,6 +39,7 @@ export interface EmpleadoElemento {
 })
 
 export class VerCoordenadasComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idUbicacion: number;
 
@@ -157,7 +158,10 @@ export class VerCoordenadasComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); 
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -244,7 +248,7 @@ export class VerCoordenadasComponent implements OnInit {
   EliminarRegistro(id_emplu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_emplu]
     }
     this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
@@ -729,7 +733,7 @@ export class VerCoordenadasComponent implements OnInit {
         id_empl: arrayIds,
         id_ubicacion: this.idUbicacion,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
         this.cont = this.cont + 1;
@@ -809,23 +813,23 @@ export class VerCoordenadasComponent implements OnInit {
 
   // METODO PARA ELIMNAR REGISTROS DE UBICACION
   Remover() {
-    
+
     if (this.selectionUno.selected.length > 0) {
 
       const ids: number[] = this.selectionUno.selected.map((obj: any) => obj.id_emplu).filter((id) => id !== undefined);
 
       const datos = {
         user_name: this.user_name,
-        ip: this.ip, 
+        ip: this.ip, ip_local: this.ips_locales,
         ids: ids
       };
-      this.restU.EliminarCoordenadasUsuario( datos).subscribe(res => {
+      this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
         this.ConsultarDatos();
         this.toastr.error('Registros removidos de la lista.', '', {
           timeOut: 6000,
         });
       });
-      
+
       this.HabilitarSeleccion();
       this.selectionUno.clear();
     }

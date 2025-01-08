@@ -24,6 +24,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class OpcionesTimbreWebComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -150,7 +151,10 @@ export class OpcionesTimbreWebComponent implements OnInit {
   ngOnInit(): void {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -658,7 +662,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     var infoActualizar = {
       id_empleado: '',
@@ -666,7 +670,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     if (

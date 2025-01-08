@@ -21,6 +21,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class EditarPlanComidasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VALIDACIONES DE CAMPOS DE FORMULARIO
   observacionF = new FormControl('', [Validators.required, Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{4,48}")]);
@@ -74,7 +75,10 @@ export class EditarPlanComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerServicios();
     this.CargarDatos();
@@ -257,7 +261,7 @@ export class EditarPlanComidasComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.VerificarDuplicidadIndividual(form, datosPlanComida);
   }
@@ -298,7 +302,7 @@ export class EditarPlanComidasComponent implements OnInit {
   PlanificacionIndividual(form, datosPlanComida) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // METODO PARA ELIMINAR PLANIFICACIÓN ANTERIOR
     this.restPlan.EliminarPlanComida(this.data.solicitud.id, this.data.solicitud.id_empleado, datos)
@@ -331,7 +335,7 @@ export class EditarPlanComidasComponent implements OnInit {
             consumido: false,
             fecha: '',
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
 
           // LECTURA DE DATOS DE USUARIO
@@ -382,7 +386,7 @@ export class EditarPlanComidasComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.LeerCorreos(this.leer_dato);
     this.VerificarDuplicidadMultiple(form, datosPlanComida);
@@ -495,7 +499,7 @@ export class EditarPlanComidasComponent implements OnInit {
   EliminarPlanificacion(form: any, datosPlanComida: any, empleados_planificados: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (empleados_planificados.length != 0) {
       this.contar_eliminar = 0;
@@ -548,7 +552,7 @@ export class EditarPlanComidasComponent implements OnInit {
         hora_fin: form.horaFinForm,
         consumido: false,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       // LEER DATOS DE CADA USUARIOS
@@ -646,7 +650,7 @@ export class EditarPlanComidasComponent implements OnInit {
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPlan.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

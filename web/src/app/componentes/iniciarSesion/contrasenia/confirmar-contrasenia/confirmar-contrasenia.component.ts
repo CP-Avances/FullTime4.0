@@ -5,6 +5,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Md5 } from 'ts-md5';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-confirmar-contrasenia',
@@ -13,6 +14,7 @@ import { Md5 } from 'ts-md5';
 })
 
 export class ConfirmarContraseniaComponent implements OnInit {
+  ips_locales: any = '';
 
   hide1 = true;
   hide2 = true;
@@ -35,6 +37,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
     private toastr: ToastrService,
     public router: Router,
     public location: Location,
+    public validar: ValidacionesService,
   ) {
     var urlToken = this.location.prepareExternalUrl(this.location.path());
     this.token = urlToken.slice(1).split("/")[1];
@@ -42,7 +45,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA COMPARAR LAS CONTRASEÑAS
@@ -65,7 +71,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
       token: this.token,
       contrasena: clave,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restLogin.ActualizarContrasenia(data).subscribe(res => {
       this.mensaje = res;

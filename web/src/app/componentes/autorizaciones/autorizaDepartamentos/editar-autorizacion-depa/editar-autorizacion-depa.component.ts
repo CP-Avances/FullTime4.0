@@ -2,7 +2,7 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
@@ -15,6 +15,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 })
 
 export class EditarAutorizacionDepaComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -52,6 +53,8 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     private toastr: ToastrService,
     private rest: EmpleadoService,
     public ventana: MatDialogRef<EditarAutorizacionDepaComponent>,
+    public validar: ValidacionesService,
+
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string);
@@ -59,7 +62,11 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+    
 
     this.ObtenerAutorizaciones();
     this.BuscarSucursales();
@@ -152,7 +159,7 @@ export class EditarAutorizacionDepaComponent implements OnInit {
       estado: false,
       id: this.datoEmpleado.datosAuto.id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     if (form.autorizarForm == 'noautorizar') {

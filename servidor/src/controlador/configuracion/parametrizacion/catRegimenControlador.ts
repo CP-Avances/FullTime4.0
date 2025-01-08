@@ -754,26 +754,7 @@ class RegimenControlador {
     }
   }
 
-  public async ListarRegimenSucursal(
-    req: Request,
-    res: Response
-  ): Promise<any> {
-    const { id } = req.params;
-    const REGIMEN = await pool.query(
-      `
-      SELECT r.id, r.descripcion 
-      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c 
-      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_sucursal = $1
-      GROUP BY r.id, r.descripcion
-      `
-      , [id]
-    );
-    if (REGIMEN.rowCount != 0) {
-      return res.jsonp(REGIMEN.rows);
-    } else {
-      return res.status(404).jsonp({ text: "No se encuentran registros." });
-    }
-  }
+
 }
 
 const REGIMEN_CONTROLADOR = new RegimenControlador();

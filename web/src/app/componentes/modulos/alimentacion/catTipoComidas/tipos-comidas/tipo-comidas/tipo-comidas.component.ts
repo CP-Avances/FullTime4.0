@@ -5,6 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
 import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-tipo-comidas',
@@ -13,6 +14,7 @@ import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacio
 })
 
 export class TipoComidasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -39,11 +41,15 @@ export class TipoComidasComponent implements OnInit {
     private toastr: ToastrService,
     public ventana: MatDialogRef<TipoComidasComponent>,
     public restPlan: PlanComidasService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerServicios();
     this.servicios[this.servicios.length] = { nombre: "OTRO" };
@@ -83,7 +89,7 @@ export class TipoComidasComponent implements OnInit {
       hora_inicio: form.horaInicioForm,
       hora_fin: form.horaFinForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (form.tipoForm === '') {
       this.toastr.info('Por favor seleccionar un tipo de servicio.', '', {
@@ -146,7 +152,7 @@ export class TipoComidasComponent implements OnInit {
       let tipo_servicio = {
         nombre: form.servicioForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.restPlan.CrearTipoComidas(tipo_servicio).subscribe(res => {
         datos.tipo_comida = res.id;

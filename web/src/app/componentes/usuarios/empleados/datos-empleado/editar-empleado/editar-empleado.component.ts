@@ -19,6 +19,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 })
 
 export class EditarEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   nacionalidades: any = [];
   private idNacionalidad: number;
@@ -59,7 +60,10 @@ export class EditarEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.CargarRoles();
     this.VerificarFormulario();
@@ -233,7 +237,7 @@ export class EditarEmpleadoComponent implements OnInit {
       estado: form2.estadoForm,
       codigo: form1.codigoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOLA VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -271,7 +275,7 @@ export class EditarEmpleadoComponent implements OnInit {
       id_rol: form3.rolForm,
       estado: estado_user,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.user.ActualizarDatos(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -316,7 +320,7 @@ export class EditarEmpleadoComponent implements OnInit {
         valor: codigo,
         id: 1,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })

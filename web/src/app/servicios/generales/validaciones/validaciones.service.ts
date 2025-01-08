@@ -38,24 +38,6 @@ export class ValidacionesService {
     }
   }
 
-  // REDIRECCIONAMIENTO A LA PAGINA PRINCIPAL DEL EMPLEADO
-  RedireccionarHomeEmpleado(error: any) {
-    const { access, message, url, title } = error;
-    if (access === false) {
-      this.toastr.info(message + ' ' + url, title, {
-        timeOut: 6000,
-        positionClass: 'toast-top-center',
-
-      })
-        .onTap.subscribe(items => {
-          if (url) {
-            window.open(`https://${url}`, "_blank");
-          }
-        });
-      this.router.navigate(['/estadisticas']);
-    }
-  }
-
   // REDIRECCIONAMIENTO AL HOME DE LA RUTA ACTUAL
   RedireccionarMixto(error: any) {
     const { access, message, url, title } = error;

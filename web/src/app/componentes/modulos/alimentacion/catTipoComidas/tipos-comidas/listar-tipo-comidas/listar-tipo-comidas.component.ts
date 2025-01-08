@@ -33,6 +33,8 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 export class ListarTipoComidasComponent implements OnInit {
 
+  ips_locales: any = '';
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
   tipoF = new FormControl('', [Validators.minLength(1)]);
@@ -96,6 +98,9 @@ export class ListarTipoComidasComponent implements OnInit {
     else {
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
+      this.validar.ObtenerIPsLocales().then((ips) => {
+        this.ips_locales = ips;
+      });
 
       this.ObtenerEmpleados(this.idEmpleado);
       this.BuscarHora();
@@ -219,7 +224,7 @@ export class ListarTipoComidasComponent implements OnInit {
   Eliminar(id_tipo: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
 
@@ -262,7 +267,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** ********************************************************************************************** **/
 
 
-   async GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {

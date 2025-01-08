@@ -4,6 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-birthday',
@@ -12,6 +13,7 @@ import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birth
 })
 
 export class EditarBirthdayComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -36,12 +38,16 @@ export class EditarBirthdayComponent implements OnInit {
     private restB: BirthdayService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarBirthdayComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.ImprimirDatos();
   }
 
@@ -61,7 +67,7 @@ export class EditarBirthdayComponent implements OnInit {
       titulo: form.tituloForm,
       link: form.linkForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     if (form.imagenForm != undefined && form.imagenForm != '' && form.imagenForm != 'null') {
       this.VerificarArchivo(dataMensaje);
@@ -125,6 +131,8 @@ export class EditarBirthdayComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
+
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,

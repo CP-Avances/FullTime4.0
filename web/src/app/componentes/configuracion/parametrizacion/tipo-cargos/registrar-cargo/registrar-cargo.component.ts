@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class RegistrarCargoComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -33,7 +34,10 @@ export class RegistrarCargoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -46,7 +50,7 @@ export class RegistrarCargoComponent implements OnInit {
     let tipoCargo = {
       cargo: form.cargo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.cargos_.CrearCargo(tipoCargo).subscribe(response => {
       if (response.status == '200') {

@@ -93,6 +93,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerEmpleadoComponent implements OnInit, AfterViewInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -185,7 +187,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
@@ -605,7 +610,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               lat: res.latlng.lat,
               lng: res.latlng.lng,
               user_name: this.user_name,
-              ip: this.ip,
+              ip: this.ip, ip_local: this.ips_locales,
             }
             this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), datos).subscribe(respuesta => {
               this.toastr.success(respuesta.message);
@@ -674,6 +679,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       console.log('rees ', res)
@@ -736,7 +742,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarTituloEmpleado(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
@@ -777,7 +783,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarDiscapacidad(id_discapacidad: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
@@ -871,7 +877,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarVacuna(datos: any) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet, data).subscribe(res => {
@@ -1015,7 +1021,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let eliminar = {
       id: dataContrato.id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restEmpleado.EliminarContrato(eliminar).subscribe({
       next: (res: any) => {
@@ -1194,7 +1200,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           user_name: this.user_name,
           id_cargo: data.datos.id_cargo,
           estado: false,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         }
         this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
           this.ControlarActualizacion();
@@ -1209,7 +1215,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       user_name: this.user_name,
       id_cargo: datos.id,
       estado: estado,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
       this.VerificarAsignaciones(datos, estado);
@@ -1234,7 +1240,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       personal: true,
       administra: datos.jefe,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     let principal_false = 0;
@@ -1302,7 +1308,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restU.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });
@@ -1331,7 +1337,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const data = {
       id: dataCargo,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restCargo.EliminarCargo(data).subscribe({
       next: (res: any) => {
@@ -2544,7 +2550,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
@@ -2577,7 +2583,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.plan_hora.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -2767,7 +2773,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
@@ -2823,7 +2829,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlanComidas.EnviarMensajePlanComida(mensaje).subscribe(res => {
     })
@@ -2909,7 +2915,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarProceso(id_plan: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -2975,7 +2981,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   EliminarAutorizacion(id_auto: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.restAutoridad.EliminarRegistro(id_auto, datos).subscribe(res => {

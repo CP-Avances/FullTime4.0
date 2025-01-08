@@ -22,7 +22,6 @@ import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
 import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
-import { Console } from "console";
 
 @Component({
   selector: "app-listar-regimen",
@@ -31,6 +30,8 @@ import { Console } from "console";
 })
 
 export class ListarRegimenComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -96,7 +97,10 @@ export class ListarRegimenComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
@@ -721,7 +725,7 @@ export class ListarRegimenComponent implements OnInit {
   Eliminar(id_regimen: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_regimen, datos).subscribe((res: any) => {
       if (res.message === 'error') {

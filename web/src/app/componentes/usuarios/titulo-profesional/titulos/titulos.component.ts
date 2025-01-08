@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class TitulosComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   nombreNivel = new FormControl('', Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{3,48}"))
@@ -47,7 +48,10 @@ export class TitulosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerNivelesTitulo();
     this.niveles[this.niveles.length] = { nombre: "OTRO" };
@@ -104,7 +108,7 @@ export class TitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreNivelForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();
@@ -126,7 +130,7 @@ export class TitulosComponent implements OnInit {
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     // METODO PARA VALIDAR DUPLICADOS
     let verificar = {

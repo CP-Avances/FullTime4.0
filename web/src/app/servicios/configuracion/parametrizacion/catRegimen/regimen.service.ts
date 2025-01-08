@@ -56,11 +56,6 @@ export class RegimenService {
     return this.http.get(`${environment.url}/regimenLaboral/pais-regimen/${nombre}`);
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/regimenLaboral/xmlDownload`, data);
-  }
-
   /** ** *************************************************************************************** **
    ** ** **                        CONSULTA PERIODOS DE VACACIONES                            ** **
    ** ** *************************************************************************************** **/
@@ -119,7 +114,5 @@ export class RegimenService {
     return this.http.request('delete', url, httpOtions);
   }
   
-  ConsultarRegimenSucursal(id: number) {
-    return this.http.get(`${environment.url}/regimenLaboral/sucursal-regimen/${id}`);
-  }
+ 
 }

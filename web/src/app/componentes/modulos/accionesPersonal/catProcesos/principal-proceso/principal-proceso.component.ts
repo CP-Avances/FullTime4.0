@@ -28,6 +28,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 })
 
 export class PrincipalProcesoComponent implements OnInit {
+  ips_locales: any = '';
 
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarNivel = new FormControl('');
@@ -76,7 +77,10 @@ export class PrincipalProcesoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.habilitarAccion === false) {
       let mensaje = {
@@ -179,7 +183,7 @@ export class PrincipalProcesoComponent implements OnInit {
   Eliminar(id_proceso: number) {
     let datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarProceso(id_proceso, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -412,7 +416,7 @@ export class PrincipalProcesoComponent implements OnInit {
       const data = {
         plantilla: this.listaProcesosCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.RegistrarPlantilla(data).subscribe({
         next: (response: any) => {

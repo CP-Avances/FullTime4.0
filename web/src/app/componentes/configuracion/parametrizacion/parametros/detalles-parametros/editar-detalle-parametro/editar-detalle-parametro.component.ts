@@ -3,7 +3,7 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
@@ -13,6 +13,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class EditarDetalleParametroComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   descripcion = new FormControl('', [Validators.required]);
@@ -34,12 +35,16 @@ export class EditarDetalleParametroComponent implements OnInit {
     private rest: ParametrosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarDetalleParametroComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
       'Guardar.';
     this.MostrarDatos();
@@ -71,7 +76,7 @@ export class EditarDetalleParametroComponent implements OnInit {
       descripcion: form.descripcionForm,
       observacion: this.observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.rest.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

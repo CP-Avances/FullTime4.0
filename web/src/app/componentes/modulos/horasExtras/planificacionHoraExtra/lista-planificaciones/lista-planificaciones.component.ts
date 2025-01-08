@@ -44,6 +44,7 @@ export interface PlanificacionHE {
 })
 
 export class ListaPlanificacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   // ITEMS DE PAGINACION DE LA LISTA DE PLANIFICACIONES
   tamanio_pagina: number = 5;
@@ -108,7 +109,10 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip'); 
+      this.validar.ObtenerIPsLocales().then((ips) => {
+        this.ips_locales = ips;
+      });
 
       var f = DateTime.now();
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
@@ -197,7 +201,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   ObtenerEmpleadosPlanificacion(id: any, accion: any, lista_empleados: any, icono: any, editar: any, eliminar: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.planEmpleados = res;
@@ -276,7 +280,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   VerificarPlanificacion(id: number, accion: any, editar: any, eliminar: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.lista_empleados = true;
@@ -314,7 +318,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     // LECTURA DE DATOS DE USUARIO
@@ -382,7 +386,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     datos.map((obj: any) => {
@@ -498,7 +502,7 @@ export class ListaPlanificacionesComponent implements OnInit {
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restPlan.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

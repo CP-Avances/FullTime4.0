@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-settings',
@@ -13,6 +14,8 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class SettingsComponent implements OnInit {
+  ips_locales: any = '';
+
 
   btnActualizar: boolean = false;
   btnCrear: boolean = false;
@@ -35,6 +38,7 @@ export class SettingsComponent implements OnInit {
     public ventana: MatDialogRef<SettingsComponent>,
     public formBuilder: FormBuilder,
     private funciones: MainNavService,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.formGroup = formBuilder.group({
@@ -53,7 +57,10 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.avisos.ObtenerConfiguracionEmpleado(this.data.id_empleado).subscribe(res => {
       this.btnActualizar = true;
@@ -89,7 +96,7 @@ export class SettingsComponent implements OnInit {
       comunicado_mail: form.comunicadoMail,
       comunicado_noti: form.comunicadoNoti,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.avisos.IngresarConfigNotiEmpleado(data).subscribe(res => {
       this.ventana.close();
@@ -113,7 +120,7 @@ export class SettingsComponent implements OnInit {
       comunicado_mail: form.comunicadoMail,
       comunicado_noti: form.comunicadoNoti,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.avisos.ActualizarConfigNotiEmpl(this.data.id_empleado, data).subscribe(res => {
       this.ventana.close();

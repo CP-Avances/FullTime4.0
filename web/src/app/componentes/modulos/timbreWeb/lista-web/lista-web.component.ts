@@ -24,6 +24,7 @@ import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asi
 })
 
 export class ListaWebComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoLogueado: any;
 
@@ -232,7 +233,10 @@ export class ListaWebComponent implements OnInit {
     else {
       this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
 
@@ -1024,7 +1028,7 @@ export class ListaWebComponent implements OnInit {
       array: seleccionados,
       web_habilita: seleccionados[0].web_habilita,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.informacion.ActualizarEstadoTimbreWeb(datos).subscribe(res => {
       this.toastr.success(res.message)

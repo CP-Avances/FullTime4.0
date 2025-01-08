@@ -1149,22 +1149,6 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA INFORMACION DEPARTAMENTOS EMPLEADO
-    ObtenerDepartamentoEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_emple, id_cargo } = req.body;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT * FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND
-      id_cargo = $2
-      `, [id_emple, id_cargo]);
-            if (DEPARTAMENTO.rowCount != 0) {
-                return res.jsonp(DEPARTAMENTO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        });
-    }
     // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2545,7 +2529,7 @@ class EmpleadoControlador {
                     const id_rol = yield database_1.default.query(`
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `, [rol.toUpperCase()]);
-                    console.log('Estado civil manual: ', id_estado_civil);
+                    //console.log('Estado civil manual: ', id_estado_civil);
                     /*console.log('codigo: ', codigo)
                     console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
                     console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimiento, ' estado civil: ', id_estado_civil);

@@ -25,6 +25,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerHorarioDetalleComponent implements OnInit {
+  ips_locales: any = '';
+
   @Input() idHorario: number;
   @Input() pagina: string;
 
@@ -57,7 +59,10 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarDatosHorario(this.idHorario);
     this.BuscarHora();
@@ -451,7 +456,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     const datos = {
       hora_trabajo: horasT,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.ActualizarHorasTrabaja(id, datos).subscribe(res => {
       this.datosHorario = res;
@@ -534,7 +539,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restD.EliminarRegistro(id_detalle, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -582,7 +587,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.contador = 0;
     this.ingresar = 0;

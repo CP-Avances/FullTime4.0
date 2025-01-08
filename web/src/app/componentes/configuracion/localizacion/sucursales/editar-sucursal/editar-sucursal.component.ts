@@ -4,7 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
@@ -17,7 +17,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class EditarSucursalComponent implements OnInit {
-
+  ips_locales: any = '';
   // DATOS PROVINCIAS, CONTINENTES, PAISES Y CIUDADES
   continentes: any = [];
   provincias: any = [];
@@ -60,13 +60,16 @@ export class EditarSucursalComponent implements OnInit {
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarSucursalComponent>,
     public restSucursal: SucursalService,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.ObtenerContinentes();
   }
 
@@ -230,7 +233,7 @@ export class EditarSucursalComponent implements OnInit {
         nombre: form.sucursalNombreForm,
         id_ciudad: ciudad_id,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       // VERIFICAR SI EL NOMBRE DEL REGISTRO FUE CAMBIADO

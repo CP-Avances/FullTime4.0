@@ -79,23 +79,7 @@ export class EmplCargosService {
   BuscarIDCargo(id: number) {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/${id}`);
   }
-
-  BuscarIDCargoActual(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargoActual/${id}`);
-  }
-
-  ObtenerCargoDepartamento(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-departamento/${id}`);
-  }
-
-  ObtenerCargoSucursal(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-sucursal/${id}`);
-  }
-
-  ObtenerCargoRegimen(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-regimen/${id}`);
-  }
-
+  
   // METODO PARA VERIFICAR DATOS DE PLANTILLA DE CARGOS  **USADO
   RevisarFormato(formData: any) {
     return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);

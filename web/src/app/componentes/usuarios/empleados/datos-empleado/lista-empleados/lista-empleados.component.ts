@@ -38,6 +38,7 @@ import { EmpleadoElemento } from 'src/app/model/empleado.model';
 })
 
 export class ListaEmpleadosComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -126,7 +127,10 @@ export class ListaEmpleadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -317,7 +321,7 @@ export class ListaEmpleadosComponent implements OnInit {
             const datos = {
               arrayIdsEmpleados: EmpleadosSeleccionados.map((obj: any) => obj.id),
               user_name: this.user_name,
-              ip: this.ip
+              ip: this.ip, ip_local: this.ips_locales
             }
 
             let res: { message: string | undefined; } = { message: undefined };
@@ -667,7 +671,7 @@ export class ListaEmpleadosComponent implements OnInit {
       const datos = {
         plantilla: this.listUsuariosCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         this.rest.SubirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
@@ -1217,7 +1221,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const datos = {
       empleados: empleadosSeleccionados,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS

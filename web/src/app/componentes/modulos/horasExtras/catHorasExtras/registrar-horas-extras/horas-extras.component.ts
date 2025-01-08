@@ -34,6 +34,7 @@ interface Dia {
 })
 
 export class HorasExtrasComponent implements OnInit {
+  ips_locales: any = '';
 
   recaPorcentaje = new FormControl('', Validators.required);
   tipoDescuento = new FormControl('', Validators.required);
@@ -87,7 +88,10 @@ export class HorasExtrasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.primeroFormGroup = this._formBuilder.group({
       descripcionForm: this.descripcion,
@@ -125,7 +129,7 @@ export class HorasExtrasComponent implements OnInit {
       incl_almuerzo: form2.inclAlmuerzoForm,
       tipo_funcion: form2.tipoFuncionForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.postHoraExtraRest(dataHoraExtra)

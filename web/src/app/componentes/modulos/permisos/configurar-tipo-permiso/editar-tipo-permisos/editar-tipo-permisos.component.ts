@@ -31,6 +31,7 @@ interface opcionesDiasHoras {
 })
 
 export class EditarTipoPermisosComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -78,8 +79,11 @@ export class EditarTipoPermisosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ValidarFormulario();
     this.CargarDatosPermiso();
@@ -341,7 +345,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_negar: form3.correo_negarForm,
       correo_legalizar: form3.correo_legalizarForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     if (this.tipoPermiso.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {

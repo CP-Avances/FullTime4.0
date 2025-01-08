@@ -14,6 +14,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class EditarTimbreComponent implements OnInit {
+  ips_locales: any = '';
 
   datosTimbre: any;
   teclaFuncionF: any;
@@ -59,7 +60,10 @@ export class EditarTimbreComponent implements OnInit {
   ngOnInit() {
     this.LeerDatosTimbre();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   /** **************************************************************************************** **
@@ -165,7 +169,7 @@ export class EditarTimbreComponent implements OnInit {
       observacion: this.simbolo_ + formTimbre.ObservacionForm,
       fecha: this.datosTimbre.fecha_hora_timbre_validado,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any = res

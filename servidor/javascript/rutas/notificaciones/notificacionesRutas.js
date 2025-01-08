@@ -29,7 +29,6 @@ class NotificacionTiempoRealRutas {
         this.router.put('/config/noti-put/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ActualizarConfigEmpleado);
         this.router.put('/config/noti-put-multiple/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ActualizarConfigEmpleadoMultiple);
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
-        this.router.post('/mail-comunicado-movil/:id_empresa/', notificacionesControlador_1.default.EnviarCorreoComunicadoMovil);
         this.router.post('/noti-comunicado-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneral);
         this.router.post('/noti-comunicado-multiplador-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneralMultiple);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

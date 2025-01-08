@@ -17,6 +17,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 })
 
 export class CancelarPermisoComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoIngresa: number;
   nota = 'su solicitud';
@@ -42,7 +43,10 @@ export class CancelarPermisoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerInformacionEmpleado();
     this.ObtenerTiposPermiso();
@@ -123,7 +127,7 @@ export class CancelarPermisoComponent implements OnInit {
       doc: this.data.info.documento,
       codigo: this.data.info.codigo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restP.EliminarPermiso(datos).subscribe((res: any) => {
@@ -310,7 +314,7 @@ export class CancelarPermisoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

@@ -353,7 +353,7 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracionMultiple(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
 
       const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
       const batches = [];
@@ -399,10 +399,11 @@ class NotificacionTiempoRealControlador {
           comunicado_notificacion: comunicado_noti
         }),
         ip,
+        ip_local: ip_local,
         observacion: null
       }));
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       await pool.query('COMMIT'); // Finalizar transacción
 
@@ -531,7 +532,7 @@ class NotificacionTiempoRealControlador {
         };
       });
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
 
       // FINALIZAR TRANSACCION
@@ -600,106 +601,6 @@ class NotificacionTiempoRealControlador {
     }
     else {
       return res.status(404).jsonp({ text: 'Registro no encontrado' });
-    }
-  }
-
-  /** ******************************************************************************************** ** 
-   ** **                      METODOS PARA ENVIOS DE COMUNICADOS                                ** ** 
-   ** ******************************************************************************************** **/
-
-
-
-
-
-  // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL  -- verificar si se requiere estado
-  public async EnviarCorreoComunicadoMovil(req: Request, res: Response) {
-
-    var tiempo = fechaHora();
-    var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
-    var hora = await FormatearHora(tiempo.hora);
-
-    // OBTENER RUTA DE LOGOS
-    let separador = path.sep;
-    const path_folder = ObtenerRutaLogos();
-
-    var datos = await Credenciales(parseInt(req.params.id_empresa));
-
-    const { id_envia, correo, mensaje, asunto } = req.body;
-
-    if (datos === 'ok') {
-
-      const USUARIO_ENVIA = await pool.query(
-        `
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          e.name_cargo AS cargo, e.name_dep AS departamento
-        FROM informacion_general AS e
-        WHERE e.id = $1
-        `
-        ,
-        [id_envia]);
-
-      let data = {
-        to: correo,
-        from: email,
-        subject: asunto,
-        html:
-          `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar el siguiente comunicado: <br>  
-            </p>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-              <b>Empresa:</b> ${nombre}<br>
-              <b>Asunto:</b> ${asunto} <br>
-              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-              <b>Generado mediante:</b> Aplicación Móvil <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br>                   
-              <b>Mensaje:</b> ${mensaje} <br><br>
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
-        `
-        ,
-        attachments: [
-          {
-            filename: 'cabecera_firma.jpg',
-            path: `${path_folder}${separador}${cabecera_firma}`,
-            cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
-          },
-          {
-            filename: 'pie_firma.jpg',
-            path: `${path_folder}${separador}${pie_firma}`,
-            cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
-          }]
-      };
-
-      var corr = enviarMail(servidor, parseInt(puerto));
-      corr.sendMail(data, function (error: any, info: any) {
-        if (error) {
-          corr.close();
-          console.log('Email error: ' + error);
-          return res.jsonp({ message: 'error' });
-        } else {
-          corr.close();
-          console.log('Email sent: ' + info.response);
-          return res.jsonp({ message: 'ok' });
-        }
-      });
-
-    }
-    else {
-      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -795,6 +696,7 @@ class NotificacionTiempoRealControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
+  
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
@@ -909,7 +811,7 @@ class NotificacionTiempoRealControlador {
         ip_local: ip_local,
         observacion: null
       }));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       const USUARIO = await pool.query(
         `
@@ -1105,7 +1007,6 @@ class NotificacionTiempoRealControlador {
       const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`
       const response: QueryResult = await pool.query(query);
       const notificacion: any[] = response.rows;
-      console.log("ver notificacion: ", notificacion)
       return res.status(200).jsonp(notificacion);
     } catch (error) {
       console.log(error);

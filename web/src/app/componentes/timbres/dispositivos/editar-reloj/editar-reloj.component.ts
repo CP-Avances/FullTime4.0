@@ -21,6 +21,7 @@ import { map, Observable, startWith } from 'rxjs';
 })
 
 export class EditarRelojComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idReloj: number;
   @Input() pagina: string;
@@ -79,7 +80,10 @@ export class EditarRelojComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.FiltrarSucursales();
     this.ValidarFormulario();
     this.LeerZonasHorarias();
@@ -234,7 +238,7 @@ export class EditarRelojComponent implements OnInit {
       formato_gmt_dispositivo: gmt,
       zona_horaria_dispositivo: nombre,
       user_name: this.user_name,
-      user_ip: this.ip,
+      user_ip: this.ip, ip_local: this.ips_locales,
     };
     /*console.log('form2 ', form2.zonaForm)
     console.log(`Nombre: ${nombre}`);

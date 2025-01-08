@@ -18,6 +18,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistrarPeriodoVComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
   @Input() pagina: string = '';
@@ -65,7 +66,10 @@ export class RegistrarPeriodoVComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerContrato();
@@ -134,7 +138,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       min_vacaciones: form.minVacacionForm,
       id_empleado: this.empleados[0].id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {

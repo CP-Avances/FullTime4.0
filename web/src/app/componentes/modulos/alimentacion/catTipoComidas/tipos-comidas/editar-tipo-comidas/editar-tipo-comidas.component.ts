@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
 import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/catTipoComidas/tipo-comidas.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-tipo-comidas',
@@ -13,6 +14,7 @@ import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacio
 })
 
 export class EditarTipoComidasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -39,12 +41,16 @@ export class EditarTipoComidasComponent implements OnInit {
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarTipoComidasComponent>,
     public restPlan: PlanComidasService,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerServicios();
     this.servicios[this.servicios.length] = { nombre: "OTRO" };
@@ -84,7 +90,7 @@ export class EditarTipoComidasComponent implements OnInit {
       hora_inicio: form.horaInicioForm,
       hora_fin: form.horaFinForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (form.tipoForm === undefined) {
       this.RegistrarServicio(form, datosTipoComida);
@@ -147,7 +153,7 @@ export class EditarTipoComidasComponent implements OnInit {
       let tipo_servicio = {
         nombre: form.servicioForm,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restPlan.CrearTipoComidas(tipo_servicio).subscribe(res => {
         datos.tipo_comida = res.id;

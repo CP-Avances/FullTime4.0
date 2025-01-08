@@ -19,6 +19,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarContratoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() contrato: any;
   @Input() pagina: any;
@@ -79,7 +80,10 @@ export class EditarContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;
@@ -233,7 +237,7 @@ export class EditarContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.CrearTiposContrato(tipo_contrato).subscribe(res => {
         datos.id_tipo_contrato = res.id;
@@ -270,7 +274,7 @@ export class EditarContratoComponent implements OnInit {
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -348,7 +352,7 @@ export class EditarContratoComponent implements OnInit {
         documento: this.contrato.documento,
         id: parseInt(this.contrato.id),
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
@@ -415,6 +419,7 @@ export class EditarContratoComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.archivoForm.reset();

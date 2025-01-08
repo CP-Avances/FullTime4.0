@@ -24,6 +24,7 @@ import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class CrearPedidoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
@@ -161,6 +162,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem("usuario");
     this.ip = localStorage.getItem("ip");
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
@@ -476,7 +480,7 @@ export class CrearPedidoAccionComponent implements OnInit {
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
               user_name: this.user_name,
-              ip: this.ip,
+              ip: this.ip, ip_local: this.ips_locales,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -585,7 +589,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
@@ -622,7 +626,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       let cargo = {
         descripcion: form2.otroCargoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS

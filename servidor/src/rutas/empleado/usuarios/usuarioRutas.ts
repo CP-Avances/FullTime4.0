@@ -47,16 +47,12 @@ class UsuarioRutas {
         this.router.get('/lista-app-movil-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovilGeneral);
         // METODO PARA APP_HABILITA
         this.router.get('/movil/acceso/activo/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.accesoMovil);
-        // METODO PARA BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACIONES USUARIO - DEPARTAMENTO
-        this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
         // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS    **USADO
         this.router.post('/usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioDepartamento);
         // METODO PARA BUSCAR DATOS DE USUARIO - DEPARTAMENTOS - ASIGNACION DE INFORMACION **USADO
         this.router.post('/buscar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioDepartamento);
         // METODO PARA OBTENER IDS DE USUARIO MEDIANTE DEPARTAMENTO VIGENTE **USADO
         this.router.post('/buscar-ids-usuarios-departamento', TokenValidation, USUARIO_CONTROLADOR.ObtenerIdUsuariosDepartamento);
-        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO    **USADO             
-        this.router.post('/buscar-asignacion-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
         // METODO BUSCAR TODAS LAS ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO    
         this.router.post('/buscar-todas-asignacion-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarAsignacionesUsuario);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO   **USADO

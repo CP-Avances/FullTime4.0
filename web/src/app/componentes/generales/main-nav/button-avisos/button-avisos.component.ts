@@ -14,6 +14,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 })
 
 export class ButtonAvisosComponent implements OnInit {
+  ips_locales: any = '';
 
   estado: boolean = true;
 
@@ -83,7 +84,10 @@ export class ButtonAvisosComponent implements OnInit {
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarParametro();
   }
 
@@ -166,7 +170,7 @@ export class ButtonAvisosComponent implements OnInit {
     const datos = {
       visto: true,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.aviso.ActualizarVistaAvisos(data.id, datos).subscribe(res => {
       this.LeerAvisos(this.formato_fecha, this.formato_hora);

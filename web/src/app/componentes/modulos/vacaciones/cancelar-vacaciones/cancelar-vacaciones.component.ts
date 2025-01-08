@@ -15,6 +15,8 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class CancelarVacacionesComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -40,7 +42,10 @@ export class CancelarVacacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
@@ -91,7 +96,7 @@ export class CancelarVacacionesComponent implements OnInit {
   aceptarAdvertencia() {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restV.EliminarVacacion(this.data.id, datos).subscribe(res => {
@@ -210,7 +215,7 @@ export class CancelarVacacionesComponent implements OnInit {
       mensaje: 'Ha eliminado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

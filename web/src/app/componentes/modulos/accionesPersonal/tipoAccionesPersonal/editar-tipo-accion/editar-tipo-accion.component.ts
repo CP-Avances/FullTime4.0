@@ -14,6 +14,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class EditarTipoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
   @Input() pagina: any;
@@ -63,7 +64,10 @@ export class EditarTipoAccionComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;
@@ -97,7 +101,7 @@ export class EditarTipoAccionComponent implements OnInit {
       tipo_situacion_propuesta: this.selec3,
       id: this.data.id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -234,7 +238,7 @@ export class EditarTipoAccionComponent implements OnInit {
       let tipo = {
         descripcion: form.otroTipoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }

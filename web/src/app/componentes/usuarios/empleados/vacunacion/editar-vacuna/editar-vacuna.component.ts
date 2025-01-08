@@ -18,6 +18,7 @@ import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacu
 })
 
 export class EditarVacunaComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmploy: string;
   dvacuna: any;
@@ -37,7 +38,10 @@ export class EditarVacunaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.idEmploy = this.datos.idEmpleado;
     this.dvacuna = this.datos.vacuna;
@@ -107,7 +111,7 @@ export class EditarVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     // VERIFICAR SI EL REGISTRO ES SIMILAR AL EXISTENTE
     if (vacuna.fecha === this.dvacuna.fecha && vacuna.id_tipo_vacuna === this.dvacuna.id_vacuna) {
@@ -158,7 +162,7 @@ export class EditarVacunaComponent implements OnInit {
         documento: this.dvacuna.carnet,
         id: parseInt(this.dvacuna.id),
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.GuardarDatos(datos);
       this.restVacuna.EliminarArchivo(eliminar).subscribe(res => {
@@ -241,6 +245,8 @@ export class EditarVacunaComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
+
 
     this.restVacuna.SubirDocumento(formData, this.dvacuna.id, this.idEmploy).subscribe(res => {
       this.archivoF.reset();

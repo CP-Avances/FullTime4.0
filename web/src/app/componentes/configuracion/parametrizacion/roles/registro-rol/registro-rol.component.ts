@@ -15,6 +15,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RegistroRolComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -44,7 +45,10 @@ export class RegistroRolComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerRoles();
   }
@@ -58,7 +62,7 @@ export class RegistroRolComponent implements OnInit {
     let rol = {
       nombre: form.descripcionForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.data_nueva = rol;
 

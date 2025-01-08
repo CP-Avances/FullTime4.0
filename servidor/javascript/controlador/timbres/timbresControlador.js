@@ -494,7 +494,7 @@ class TimbresControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // Confirmar la transacción
                 yield client.query('COMMIT');
                 res.status(200).json({ message: 'Registro guardado.' });
@@ -802,7 +802,7 @@ class TimbresControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Sin duplicados' });
             }
@@ -956,7 +956,7 @@ class TimbresControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 //console.log('opciones ', opciones)
@@ -1039,7 +1039,7 @@ class TimbresControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id_empleado}`
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }
@@ -1055,7 +1055,7 @@ class TimbresControlador {
                             ip_local: ip_local,
                             observacion: `Error al eliminar registro con id ${id_empleado}`
                         }));
-                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     }
                     yield database_1.default.query(`
                 DELETE FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)
@@ -1070,7 +1070,7 @@ class TimbresControlador {
                         ip_local: ip_local,
                         observacion: null
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
                 }
@@ -1116,7 +1116,7 @@ class TimbresControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Sin duplicados' });
             }
@@ -1205,7 +1205,7 @@ class TimbresControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 //console.log('opciones ', opciones)
@@ -1290,7 +1290,7 @@ class TimbresControlador {
                         ip_local: ip_local,
                         observacion: `Error al eliminar registro con id ${id_empleado}`
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
@@ -1307,7 +1307,7 @@ class TimbresControlador {
                             ip_local: ip_local,
                             observacion: `Error al eliminar registro con id ${id_empleado}`
                         }));
-                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                        yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     }
                     yield database_1.default.query(`
                 DELETE FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)
@@ -1322,7 +1322,7 @@ class TimbresControlador {
                         ip_local: ip_local,
                         observacion: null
                     }));
-                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                    yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                     yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'Se ha eliminado ' + idsEncontrados.length + ' registros.' });
                 }

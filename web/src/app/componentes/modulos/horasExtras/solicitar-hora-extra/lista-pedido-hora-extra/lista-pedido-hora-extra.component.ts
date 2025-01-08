@@ -42,6 +42,7 @@ export interface HoraExtraElemento {
 })
 
 export class ListaPedidoHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   horas_extras: any = [];
 
@@ -116,6 +117,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     else {
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
+      this.validar.ObtenerIPsLocales().then((ips) => {
+        this.ips_locales = ips;
+      });
 
       this.BuscarParametro();
       this.ObtenerEmpleados(this.idEmpleado);
@@ -659,7 +663,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       let h = {
         hora: EmpleadosSeleccionados[i].num_hora,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.restHE.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id, h).subscribe(res => {
         console.log(res);

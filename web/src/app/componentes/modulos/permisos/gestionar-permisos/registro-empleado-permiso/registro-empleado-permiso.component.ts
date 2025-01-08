@@ -36,6 +36,7 @@ interface opcionesDiasHoras {
 })
 
 export class RegistroEmpleadoPermisoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() solicita_permiso: any;
 
@@ -146,7 +147,10 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   public datosEmple: any = []
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.datos = this.solicita_permiso[0];
     var f = DateTime.now();
@@ -1500,7 +1504,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       estado: 1,
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       subir_documento: subirDocumento,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
@@ -1613,6 +1617,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
+
     formData.append('id', id as string);
     formData.append('codigo', codigo as string);
 
@@ -1659,7 +1665,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     //console.log('this.departamento: ', newAutorizaciones);
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
@@ -1840,7 +1846,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

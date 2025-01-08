@@ -704,67 +704,6 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR USO DE ACCIONES
-    public async ActualizarAccionesTimbres(req: Request, res: Response): Promise<Response> {
-        try {
-            const { id, bool_acciones, user_name, ip, ip_local } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            // CONSULTAR DATOS ORIGINALES
-            const datosOriginales = await pool.query(
-                `
-                SELECT acciones_timbres FROM e_empresa WHERE id = $1
-                `
-                , [id]);
-
-            if (datosOriginales.rows.length === 0) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
-                });
-
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'error' });
-            }
-
-            await pool.query(
-                `
-                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
-                `
-                , [bool_acciones, id]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_empresa',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                datosNuevos: `{"acciones_timbres": "${bool_acciones}"}`,
-                ip: ip,
-                ip_local: ip_local,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.status(200).jsonp({
-                message: 'Empresa actualizada exitosamente.',
-                title: 'Ingrese nuevamente al sistema.'
-            });
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ error });
-        }
-    }
 
     // METODO PARA LISTAR EMPRESA
     public async ListarEmpresa(req: Request, res: Response) {

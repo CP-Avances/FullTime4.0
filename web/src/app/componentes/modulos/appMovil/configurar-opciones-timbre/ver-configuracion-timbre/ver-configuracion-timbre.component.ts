@@ -24,6 +24,8 @@ import { ConfigurarOpcionesTimbresComponent } from '../configurar-opciones-timbr
 })
 
 export class VerConfiguracionTimbreComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -75,7 +77,10 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('ver info ', this.informacion)
     this.ObtenerEmpleados(this.idEmpleadoLogueado);
     this.RevisarEmpleados();
@@ -225,7 +230,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
   EliminarDetalle(id_opcion: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_opcion]
     };
     console.log('ver datos ', datos)
@@ -260,7 +265,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       id: '',
     };
     this.ingresar = false;
@@ -269,7 +274,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
       const ids: number[] = this.selectionUsuario.selected.map((obj: any) => obj.id).filter((id) => id !== undefined);
       const data = {
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
         ids: ids,
       };
 

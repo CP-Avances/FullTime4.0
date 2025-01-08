@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-crear-timbre',
@@ -16,6 +17,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class CrearTimbreComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   teclaFuncionF = new FormControl('');
@@ -72,6 +74,7 @@ export class CrearTimbreComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any, // MANEJO DE DATOS ENTRE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -79,7 +82,10 @@ export class CrearTimbreComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.data.length === undefined) {
       this.nombre = this.data.name_empleado;
@@ -158,7 +164,7 @@ export class CrearTimbreComponent implements OnInit {
       accion: form.accionForm,
       documento: this.documentoBase64,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (this.data.length === undefined) {
       timbre.id_empleado = this.data.id;

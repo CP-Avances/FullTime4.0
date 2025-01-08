@@ -11,6 +11,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-contrato',
@@ -19,6 +20,8 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 })
 
 export class RegistroContratoComponent implements OnInit {
+
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
   @Input() pagina: any;
@@ -71,11 +74,15 @@ export class RegistroContratoComponent implements OnInit {
     public restCargo: EmplCargosService,
     public ventana: VerEmpleadoComponent,
     public pais: ProvinciaService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('dato ', this.datoEmpleado);
     this.ObtenerPaises();
     this.ObtenerEmpleados();
@@ -178,7 +185,7 @@ export class RegistroContratoComponent implements OnInit {
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -208,7 +215,7 @@ export class RegistroContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       // VERIFICAR DUPLICIDAD DE MODALIDAD LABORAL
       let modalidad = {
@@ -316,7 +323,7 @@ export class RegistroContratoComponent implements OnInit {
       user_name: this.user_name,
       id_cargo: this.cargo_id,
       estado: false,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (this.cargo_id != 0) {
       this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
@@ -361,6 +368,7 @@ export class RegistroContratoComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento guardado.', {

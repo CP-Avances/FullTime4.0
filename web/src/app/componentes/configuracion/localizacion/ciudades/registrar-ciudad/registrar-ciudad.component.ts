@@ -16,6 +16,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class RegistrarCiudadComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   nombreContinenteF = new FormControl('', Validators.required);
@@ -58,8 +59,10 @@ export class RegistrarCiudadComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.ObtenerContinentes();
   }
 
@@ -189,7 +192,7 @@ export class RegistrarCiudadComponent implements OnInit {
         descripcion: form.nombreForm,
         id_provincia: provinciaId,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       // VERIFICAR SI CIUDAD --- NO EXISTE REGISTRO
       if (this.ciudades.length === 0) {

@@ -25,6 +25,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class ListarTipoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   archivoForm = new FormControl('', Validators.required);
 
@@ -77,7 +78,10 @@ export class ListarTipoAccionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     if (this.habilitarAccion === false) {
       let mensaje = {
@@ -142,7 +146,7 @@ export class ListarTipoAccionComponent implements OnInit {
   Eliminar(id_accion: number) {
     let datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
       if (res.message === 'error') {

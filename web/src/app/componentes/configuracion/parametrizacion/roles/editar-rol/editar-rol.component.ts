@@ -15,6 +15,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class EditarRolComponent implements OnInit {
+  ips_locales: any = '';
 
   salir: boolean = false;
 
@@ -40,7 +41,10 @@ export class EditarRolComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.nuevoRolForm.setValue({
       descripcionForm: this.data.datosRol.nombre,
@@ -58,7 +62,7 @@ export class EditarRolComponent implements OnInit {
       id: this.data.datosRol.id,
       nombre: form.descripcionForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.data_nueva = dataRol;
     this.rest.ListarRolesActualiza(this.data.datosRol.id).subscribe(response => {

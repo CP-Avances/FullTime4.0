@@ -352,7 +352,7 @@ class UsuarioControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 if (rowsAffected > 0) {
                     return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }
@@ -423,7 +423,7 @@ class UsuarioControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 if (rowsAffected > 0) {
                     return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
                 }
@@ -669,24 +669,6 @@ class UsuarioControlador {
     /** ************************************************************************************************** **
      ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
      ** ************************************************************************************************** */
-    // BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACION USUARIO - DEPARTAMENTO
-    BuscarUsuarioSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.body;
-            const USUARIOS = yield database_1.default.query(`
-      SELECT DISTINCT d.id_sucursal
-      FROM eu_usuario_departamento AS ud
-      JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
-      WHERE id_empleado = $1
-      `, [id_empleado]);
-            if (USUARIOS.rowCount != 0) {
-                return res.jsonp(USUARIOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
     CrearUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -733,22 +715,6 @@ class UsuarioControlador {
       INNER JOIN e_sucursales AS s ON d.id_sucursal = s.id
       WHERE id_empleado = $1
       ORDER BY ud.id ASC
-      `, [id_empleado]);
-            if (USUARIOS.rowCount != 0) {
-                return res.jsonp(USUARIOS.rows);
-            }
-            else {
-                return res.jsonp(null);
-            }
-        });
-    }
-    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
-    BuscarAsignacionUsuarioDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.body;
-            const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
-      AND principal = true
       `, [id_empleado]);
             if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);

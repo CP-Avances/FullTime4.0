@@ -56,6 +56,8 @@ export interface SolicitudElemento {
 })
 
 export class ListarPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // VARIABLE PARA GUARDAR DATOS DE LISTA DE PLANIFICACIONES
   planificaciones: any = [];
@@ -128,7 +130,10 @@ export class ListarPlanificacionComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.BuscarParametro();
     }
@@ -272,7 +277,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // LECTURA DE DATOS DE USUARIO
@@ -348,7 +353,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
@@ -498,7 +503,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     var usuario = '';
@@ -606,7 +611,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
@@ -686,7 +691,7 @@ export class ListarPlanificacionComponent implements OnInit {
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restC.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

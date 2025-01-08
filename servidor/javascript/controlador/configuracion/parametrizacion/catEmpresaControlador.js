@@ -619,59 +619,6 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR USO DE ACCIONES
-    ActualizarAccionesTimbres(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id, bool_acciones, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ORIGINALES
-                const datosOriginales = yield database_1.default.query(`
-                SELECT acciones_timbres FROM e_empresa WHERE id = $1
-                `, [id]);
-                if (datosOriginales.rows.length === 0) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_empresa',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
-                    });
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-                yield database_1.default.query(`
-                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
-                `, [bool_acciones, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                    datosNuevos: `{"acciones_timbres": "${bool_acciones}"}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({
-                    message: 'Empresa actualizada exitosamente.',
-                    title: 'Ingrese nuevamente al sistema.'
-                });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ error });
-            }
-        });
-    }
     // METODO PARA LISTAR EMPRESA
     ListarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

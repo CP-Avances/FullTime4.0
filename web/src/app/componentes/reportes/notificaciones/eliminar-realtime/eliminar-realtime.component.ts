@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-eliminar-realtime',
@@ -12,6 +13,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class EliminarRealtimeComponent implements OnInit {
+  ips_locales: any = '';
 
   ids: any = [];
   contenidoSolicitudes: boolean = false;
@@ -26,12 +28,16 @@ export class EliminarRealtimeComponent implements OnInit {
     private realtime: RealTimeService,
     private restAvisos: TimbresService,
     public ventana: MatDialogRef<EliminarRealtimeComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public Notificaciones: any,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.MostrarInformacion();
   }
@@ -57,13 +63,13 @@ export class EliminarRealtimeComponent implements OnInit {
     const datos = {
       arregloNotificaciones: this.ids,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     const datosAvisos = {
       arregloAvisos: this.ids,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     // ELIMINACION DE NOTIFICACIONES DE AVISOS
     if (this.Notificaciones.opcion === 1) {

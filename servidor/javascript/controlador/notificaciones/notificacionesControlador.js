@@ -310,7 +310,7 @@ class NotificacionTiempoRealControlador {
     CrearConfiguracionMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
                 const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
                 const batches = [];
                 for (let i = 0; i < id_empleado.length; i += batchSize) {
@@ -351,9 +351,10 @@ class NotificacionTiempoRealControlador {
                         comunicado_notificacion: comunicado_noti
                     }),
                     ip,
+                    ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 yield database_1.default.query('COMMIT'); // Finalizar transacción
                 res.jsonp({ message: 'Configuración guardada exitosamente' });
             }
@@ -452,7 +453,7 @@ class NotificacionTiempoRealControlador {
                         observacion: null
                     };
                 });
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (rowsAffected > 0) {
@@ -513,90 +514,6 @@ class NotificacionTiempoRealControlador {
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado' });
-            }
-        });
-    }
-    /** ******************************************************************************************** **
-     ** **                      METODOS PARA ENVIOS DE COMUNICADOS                                ** **
-     ** ******************************************************************************************** **/
-    // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL  -- verificar si se requiere estado
-    EnviarCorreoComunicadoMovil(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var tiempo = (0, settingsMail_1.fechaHora)();
-            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
-            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            // OBTENER RUTA DE LOGOS
-            let separador = path_1.default.sep;
-            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
-            var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
-            const { id_envia, correo, mensaje, asunto } = req.body;
-            if (datos === 'ok') {
-                const USUARIO_ENVIA = yield database_1.default.query(`
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          e.name_cargo AS cargo, e.name_dep AS departamento
-        FROM informacion_general AS e
-        WHERE e.id = $1
-        `, [id_envia]);
-                let data = {
-                    to: correo,
-                    from: settingsMail_1.email,
-                    subject: asunto,
-                    html: `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar el siguiente comunicado: <br>  
-            </p>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-              <b>Empresa:</b> ${settingsMail_1.nombre}<br>
-              <b>Asunto:</b> ${asunto} <br>
-              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-              <b>Generado mediante:</b> Aplicación Móvil <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br>                   
-              <b>Mensaje:</b> ${mensaje} <br><br>
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
-        `,
-                    attachments: [
-                        {
-                            filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
-                            cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
-                        },
-                        {
-                            filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
-                            cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
-                        }
-                    ]
-                };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
-                corr.sendMail(data, function (error, info) {
-                    if (error) {
-                        corr.close();
-                        console.log('Email error: ' + error);
-                        return res.jsonp({ message: 'error' });
-                    }
-                    else {
-                        corr.close();
-                        console.log('Email sent: ' + info.response);
-                        return res.jsonp({ message: 'ok' });
-                    }
-                });
-            }
-            else {
-                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -767,7 +684,7 @@ class NotificacionTiempoRealControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
-                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+                yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 const USUARIO = yield database_1.default.query(`
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
@@ -950,7 +867,6 @@ class NotificacionTiempoRealControlador {
                 const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`;
                 const response = yield database_1.default.query(query);
                 const notificacion = response.rows;
-                console.log("ver notificacion: ", notificacion);
                 return res.status(200).jsonp(notificacion);
             }
             catch (error) {

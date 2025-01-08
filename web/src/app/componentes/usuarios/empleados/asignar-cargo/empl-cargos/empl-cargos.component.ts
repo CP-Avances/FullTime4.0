@@ -22,6 +22,7 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 })
 
 export class EmplCargosComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
 
@@ -92,6 +93,9 @@ export class EmplCargosComponent implements OnInit {
     this.idEmpleado = this.datoEmpleado.idEmpleado;
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -232,7 +236,7 @@ export class EmplCargosComponent implements OnInit {
       cargo: form.tipoForm,
       jefe: form.jefeForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -292,7 +296,7 @@ export class EmplCargosComponent implements OnInit {
       let tipo_cargo = {
         cargo: form.cargoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.cargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -433,7 +437,7 @@ export class EmplCargosComponent implements OnInit {
       personal: form.personalForm,
       administra: form.administraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.usuario.RegistrarUsuarioDepartamento(datos).subscribe(res => {
     });
@@ -448,7 +452,7 @@ export class EmplCargosComponent implements OnInit {
       personal: form.personalForm,
       administra: form.administraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
@@ -459,7 +463,7 @@ export class EmplCargosComponent implements OnInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });
@@ -488,7 +492,7 @@ export class EmplCargosComponent implements OnInit {
       user_name: this.user_name,
       id_cargo: this.cargo_id,
       estado: false,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (this.cargo_id != 0) {
       this.cargos.EditarEstadoCargo(valores).subscribe(data => {

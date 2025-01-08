@@ -34,6 +34,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class VistaRolesComponent implements OnInit {
+  ips_locales: any = '';
 
   private imagen: any;
 
@@ -90,7 +91,10 @@ export class VistaRolesComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();
@@ -705,7 +709,7 @@ export class VistaRolesComponent implements OnInit {
   Eliminar(rol: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRoles(rol.id, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -745,7 +749,7 @@ export class VistaRolesComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

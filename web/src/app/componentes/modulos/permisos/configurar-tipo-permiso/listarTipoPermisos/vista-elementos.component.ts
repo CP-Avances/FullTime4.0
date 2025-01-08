@@ -25,6 +25,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class VistaElementosComponent implements OnInit {
+  ips_locales: any = '';
 
   tipoPermiso: any = [];
   filtroDescripcion = '';
@@ -77,7 +78,10 @@ export class VistaElementosComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerTipoPermiso();
@@ -140,7 +144,7 @@ export class VistaElementosComponent implements OnInit {
   Eliminar(id_permiso: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {

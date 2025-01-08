@@ -28,6 +28,8 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class ListarCoordenadasComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -89,7 +91,10 @@ export class ListarCoordenadasComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
       this.ObtenerCoordenadas();
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerLogo();
@@ -195,7 +200,7 @@ export class ListarCoordenadasComponent implements OnInit {
   Eliminar(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restU.EliminarCoordenadas(id, datos).subscribe((res: any) => {
       if (res.message === 'false') {

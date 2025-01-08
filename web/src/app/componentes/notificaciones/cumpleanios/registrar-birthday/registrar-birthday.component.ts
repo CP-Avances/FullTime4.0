@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
 import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-birthday',
@@ -12,6 +13,7 @@ import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birth
 })
 
 export class RegistrarBirthdayComponent implements OnInit {
+  ips_locales: any = '';
 
   archivoForm = new FormControl('');
   mensajeF = new FormControl('', [Validators.required]);
@@ -35,12 +37,16 @@ export class RegistrarBirthdayComponent implements OnInit {
   constructor(
     private toastr: ToastrService,
     private restB: BirthdayService,
-    public ventana: MatDialogRef<RegistrarBirthdayComponent>
+    public ventana: MatDialogRef<RegistrarBirthdayComponent>,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // GUARDAR DATOS DE MENSAJE
@@ -51,7 +57,7 @@ export class RegistrarBirthdayComponent implements OnInit {
       titulo: form.tituloForm,
       link: form.linkForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
       this.SubirRespaldo(res[0].id)
@@ -114,6 +120,8 @@ export class RegistrarBirthdayComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
+
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,

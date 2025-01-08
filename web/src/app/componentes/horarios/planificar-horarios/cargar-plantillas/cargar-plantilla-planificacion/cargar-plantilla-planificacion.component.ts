@@ -11,6 +11,7 @@ import { DateTime } from 'luxon';
 //IMPORTAR SERVICIOS
 import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
 import { ToastrService } from 'ngx-toastr';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
@@ -25,6 +26,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class CargarPlantillaPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datosSeleccionados: any;
   usuarios: any;
@@ -70,11 +72,15 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     private toastr: ToastrService,
     private restP: PlanificacionHorariaService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 
@@ -297,7 +303,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     const datos = {
       planificacionHoraria: this.planificacionesCorrectas,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.restP.RegistrarPlanificacionHoraria(datos).subscribe((res: any) => {

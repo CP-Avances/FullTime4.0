@@ -21,6 +21,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RegistroComponent implements OnInit {
+  ips_locales: any = '';
 
   empleadoGuardado: any = [];
   nacionalidades: any = [];
@@ -56,7 +57,10 @@ export class RegistroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.CargarRoles();
     this.VerificarCodigo();
@@ -194,7 +198,7 @@ export class RegistroComponent implements OnInit {
       codigo: form1.codigoForm,
       estado: 1,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -230,7 +234,7 @@ export class RegistroComponent implements OnInit {
       id_rol: form3.rolForm,
       estado: true,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -263,7 +267,7 @@ export class RegistroComponent implements OnInit {
         valor: codigo,
         id: 1,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })

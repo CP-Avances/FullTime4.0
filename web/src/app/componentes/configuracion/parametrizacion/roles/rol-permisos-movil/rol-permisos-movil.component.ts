@@ -28,6 +28,8 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RolPermisosMovilComponent implements OnInit {
+  ips_locales: any = '';
+
   private imagen: any;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
@@ -118,13 +120,17 @@ export class RolPermisosMovilComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
+    
   ) {
   }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -528,7 +534,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip,
+                    ip: this.ip, ip_local: this.ips_locales,
                   }
                   this.contador = this.contador + 1;
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -568,7 +574,7 @@ export class RolPermisosMovilComponent implements OnInit {
             id_accion: null,
             movil: this.plataforma,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
@@ -657,7 +663,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip,
+                    ip: this.ip, ip_local: this.ips_locales,
                   }
                   this.contador = this.contador + 1;
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -698,7 +704,7 @@ export class RolPermisosMovilComponent implements OnInit {
             id_accion: null,
             movil: this.plataforma,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
             this.contador = this.contador + 1;
@@ -806,7 +812,7 @@ export class RolPermisosMovilComponent implements OnInit {
       var buscarPagina = {
         id: datos.id,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.contador = this.contador + 1;
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(

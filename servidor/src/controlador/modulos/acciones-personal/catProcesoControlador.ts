@@ -267,9 +267,9 @@ class ProcesoControlador {
                     if (rowNumber === 1) return;
                     // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                     const ITEM = row.getCell(headers['ITEM']).value;
-                    const PROCESO = row.getCell(headers['PROCESO']).value;
+                    const PROCESO = row.getCell(headers['PROCESO']).value?.toString().trim();
                     const NIVEL = row.getCell(headers['NIVEL']).value;
-                    const PROCESO_PADRE = row.getCell(headers['PROCESO_PADRE']).value;
+                    const PROCESO_PADRE = row.getCell(headers['PROCESO_PADRE']).value?.toString().trim();
 
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
@@ -342,46 +342,68 @@ class ProcesoControlador {
                     , [item.nombre]);
     
                   if (VERIFICAR_PROCESO.rowCount === 0) {
-                    const VERIFICAR_PROCESO_PADRE = await pool.query(
-                      `
-                      SELECT * FROM map_cat_procesos 
-                      WHERE UPPER(nombre) = UPPER($1)
-                      `
-                      , [item.proceso_padre]);
 
-                      if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
-                        const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
-                        if(procesoPadre == item.proceso){
-                          item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                    if(item.nombre.toUpperCase() !== item.proceso_padre.toUpperCase()){
+
+                      const VERIFICAR_PROCESO_PADRE = await pool.query(
+                        `
+                        SELECT * FROM map_cat_procesos 
+                        WHERE UPPER(nombre) = UPPER($1)
+                        `
+                        , [item.proceso_padre]);
+  
+                        var existe_proceso_padre: boolean = false
+                        if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
+                          existe_proceso_padre = true
+                          const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
+                          if(procesoPadre == item.proceso){
+                            item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                          }
+                        }else{
+                          existe_proceso_padre = false
                         }
-                      }
-
-                      if(item.observacion == 'no registrado'){
-                        // DISCRIMINACION DE ELEMENTOS IGUALES
-                        if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
-                          //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
-                      ) == undefined) {
-                            duplicados.push(item);
-                        } else {
-                            item.observacion = '1';
-                        }
-
+  
                         if(item.observacion == 'no registrado'){
-                          const cruzado = listaProcesos.slice(0, index).find((p: any) => 
-                            (
-                              p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
-                              p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
-                            )
-                          );
+                          // DISCRIMINACION DE ELEMENTOS IGUALES
+                          if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
+                            //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
+                          ) == undefined) {
+                              duplicados.push(item);
+                          } else {
+                              item.observacion = '1';
+                          }
+  
+                          if(item.observacion == 'no registrado'){
+                            const cruzado = listaProcesos.slice(0, index).find((p: any) => 
+                              (
+                                p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
+                                p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
+                              )
+                            );
+  
+                            if (cruzado) {
+                              item.observacion = 'Registro cruzado';
+                            }else{
+                              const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
+                                  otroIndex !== index && item.proceso_padre === obj.proceso
+                              );
 
-                          if (cruzado) {
-                            item.observacion = 'Registro cruzado';
-                          } 
-                            
+                              if(!existe_proceso_padre){
+                                if(!hayCoincidencia){
+                                  item.observacion = 'Proceso padre no existe en el archivo como proceso';
+                                }
+                              }
+                              
 
+                            }
+  
+                          }
+                          
                         }
-                        
-                      }
+
+                    }else{
+                      item.observacion = 'No se puede registrar proceso y proceso padre iguales'
+                    }
 
                   }else{
                     item.observacion = 'Ya existe el proceso en el sistema'

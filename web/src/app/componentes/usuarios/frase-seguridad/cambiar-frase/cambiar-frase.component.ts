@@ -9,6 +9,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Router } from '@angular/router';
 import { use } from 'echarts';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ import { use } from 'echarts';
 })
 
 export class CambiarFraseComponent implements OnInit {
+  ips_locales: any = '';
 
   usuario: string; // VARIABLE DE ALMACENAMIENTO DE ID DE USUARIO
   datosUser: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE USUARIO
@@ -42,13 +44,17 @@ export class CambiarFraseComponent implements OnInit {
     public router: Router,
     private restUser: UsuarioService,
     private toastr: ToastrService,
+    public validar: ValidacionesService,
   ) {
     this.usuario = localStorage.getItem('empleado') as string;
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA COMPARAR FRASE ACTUAL CON LA INGRESADA POR EL USUARIO
@@ -78,7 +84,7 @@ export class CambiarFraseComponent implements OnInit {
       frase: form.nFrase,
       id_empleado: parseInt(this.usuario),
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restUser.ActualizarFrase(data).subscribe(data => {
       this.toastr.success('Frase ingresada exitosamente.', '', {

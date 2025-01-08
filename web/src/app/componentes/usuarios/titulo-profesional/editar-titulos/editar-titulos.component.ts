@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class EditarTitulosComponent implements OnInit {
+  ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   nombre = new FormControl('', [Validators.required, Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{3,48}")]);
@@ -49,6 +50,9 @@ export class EditarTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerNivelesTitulo();
     this.ImprimirDatos();
@@ -83,7 +87,7 @@ export class EditarTitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreNivelForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();
@@ -106,7 +110,7 @@ export class EditarTitulosComponent implements OnInit {
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
     if ((titulo.nombre).toUpperCase() === (this.data.nombre).toUpperCase() && titulo.id_nivel === this.idNivel[0].id) {

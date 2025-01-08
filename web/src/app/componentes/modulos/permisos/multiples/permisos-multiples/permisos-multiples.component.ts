@@ -34,6 +34,7 @@ interface opcionesDiasHoras {
 })
 
 export class PermisosMultiplesComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
 
@@ -144,6 +145,9 @@ export class PermisosMultiplesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -520,7 +524,7 @@ export class PermisosMultiplesComponent implements OnInit {
       var inicio = Duration.fromISOTime(DateTime.fromFormat(form.horaSalidaForm, 'HH:mm').toFormat('HH:mm:ss'));
       var fin = Duration.fromISOTime(DateTime.fromFormat(form.horasIngresoForm, 'HH:mm').toFormat('HH:mm:ss'));
 
-      console.log("ver inicio: ",  inicio);
+      console.log("ver inicio: ", inicio);
       var resta: any;
 
       // FECHAS EN UN MISMO DIA
@@ -1788,6 +1792,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {
       this.archivoForm.reset();
@@ -1888,7 +1893,7 @@ export class PermisosMultiplesComponent implements OnInit {
         hora_numero: 0,
         id_peri_vacacion: 0,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
         subir_documento: subirDocumento,
       }
 
@@ -2086,7 +2091,7 @@ export class PermisosMultiplesComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     })
@@ -2166,7 +2171,7 @@ export class PermisosMultiplesComponent implements OnInit {
         mensaje: 'Se ha realizado un solicitud múltiple de permisos. Por favor revisar solicitudes pendientes de aprobación. Para mayor información revisar su correo.',
         tipo: 7,  // ES EL TIPO DE NOTIFICACION - PERMISOS MULTIPLES
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
         this.realTime.RecibirNuevosAvisos(res.respuesta);
