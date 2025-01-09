@@ -25,210 +25,222 @@ export const ImportarPDF = async function () {
 
 
 export const atrasosDepartamentos = async function () {
-    let separador = path.sep;
     //setInterval(async () => {
-
-    let informacion = await pool.query(
+    const date = new Date();
+    const hora = date.getHours();
+    const minutos = date.getMinutes();
+    const PARAMETRO_HORA = await pool.query(
         `
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
+            `
+    );
+
+    if (PARAMETRO_HORA.rowCount != 0) {
+        console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
+        if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
+            console.log("ejecutando reporte de atrasos de departamento")
+            let informacion = await pool.query(
+                `
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
-        , [1]
-    ).then((result: any) => { return result.rows });
+                , [1]
+            ).then((result: any) => { return result.rows });
 
-    let departamentos = await pool.query(
-        `
+            let departamentos = await pool.query(
+                `
             SELECT * FROM ed_departamentos
             `).then((result: any) => { return result.rows });
 
-    departamentos.forEach(async (depa: any) => {
-        let departamento = depa.nombre;
+            departamentos.forEach(async (depa: any) => {
+                let departamento = depa.nombre;
 
-        let gerencia = []
-        gerencia = informacion.filter((item: any) => item.name_dep === departamento && item.id_suc === depa.id_sucursal);
+                let gerencia = []
+                gerencia = informacion.filter((item: any) => item.name_dep === departamento && item.id_suc === depa.id_sucursal);
 
-        console.log("ver cantidad en el departamento de " + departamento + ' ', gerencia.length)
-        let arreglo_procesar: any = [];
-        gerencia.forEach((obj: any) => {
-            arreglo_procesar.push({
-                id: obj.id ?? obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
-                nombre: obj.nombre,
-                apellido: obj.apellido,
-                codigo: obj.codigo,
-                cedula: obj.cedula,
-                correo: obj.correo,
-                genero: obj.genero,
-                id_cargo: obj.id_cargo,
-                id_contrato: obj.id_contrato,
-                sucursal: obj.name_suc,
-                id_suc: obj.id_suc,
-                id_regimen: obj.id_regimen,
-                id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                ciudad: obj.ciudad,
-                regimen: obj.name_regimen,
-                departamento: obj.name_dep,
-                cargo: obj.name_cargo,
-                hora_trabaja: obj.hora_trabaja,
-                rol: obj.name_rol,
-                userid: obj.userid,
-                app_habilita: obj.app_habilita,
-                web_habilita: obj.web_habilita,
-                comunicado_mail: obj.comunicado_mail,
-                comunicado_noti: obj.comunicado_notificacion
-            })
-        })
+                let arreglo_procesar: any = [];
+                gerencia.forEach((obj: any) => {
+                    arreglo_procesar.push({
+                        id: obj.id ?? obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
+                        nombre: obj.nombre,
+                        apellido: obj.apellido,
+                        codigo: obj.codigo,
+                        cedula: obj.cedula,
+                        correo: obj.correo,
+                        genero: obj.genero,
+                        id_cargo: obj.id_cargo,
+                        id_contrato: obj.id_contrato,
+                        sucursal: obj.name_suc,
+                        id_suc: obj.id_suc,
+                        id_regimen: obj.id_regimen,
+                        id_depa: obj.id_depa,
+                        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                        ciudad: obj.ciudad,
+                        regimen: obj.name_regimen,
+                        departamento: obj.name_dep,
+                        cargo: obj.name_cargo,
+                        hora_trabaja: obj.hora_trabaja,
+                        rol: obj.name_rol,
+                        userid: obj.userid,
+                        app_habilita: obj.app_habilita,
+                        web_habilita: obj.web_habilita,
+                        comunicado_mail: obj.comunicado_mail,
+                        comunicado_noti: obj.comunicado_notificacion
+                    })
+                })
 
-        let seleccionados: any = [{ nombre: 'Empleados' }];
-        seleccionados[0].empleados = arreglo_procesar;
-        let datos: any[] = seleccionados;
+                let seleccionados: any = [{ nombre: 'Empleados' }];
+                seleccionados[0].empleados = arreglo_procesar;
+                let datos: any[] = seleccionados;
 
-        let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
-            suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                o.atrasos = await BuscarAtrasos('2024/12/01', '2024/12/31', o.id);
-                return o;
-            }));
-            return suc;
-        }));
+                let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
+                    suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
+                        o.atrasos = await BuscarAtrasos('2024/12/01', '2024/12/31', o.id);
+                        return o;
+                    }));
+                    return suc;
+                }));
 
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((a: any) => { return a.atrasos.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
-        console.log("ver atrasos del departamento " + departamento, nuevo)
+                let nuevo = n.map((e: any) => {
+                    e.empleados = e.empleados.filter((a: any) => { return a.atrasos.length > 0 })
+                    return e
+                }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length != 0) {
-            const pdfMake = await ImportarPDF();
+                if (nuevo.length != 0) {
+                    const pdfMake = await ImportarPDF();
 
-            // DEFINIR INFORMACIÓN
-            const resultado = await EstructurarDatosPDF(nuevo);
-            resultado.map((obj: any) => {
-                return obj;
-            });
+                    // DEFINIR INFORMACIÓN
+                    const resultado = await EstructurarDatosPDF(nuevo);
+                    resultado.map((obj: any) => {
+                        return obj;
+                    });
 
-            const today = DateTime.now().toFormat('yyyy-MM-dd');
+                    const today = DateTime.now().toFormat('yyyy-MM-dd');
 
-            const file_name = await pool.query(
-                `
+                    const file_name = await pool.query(
+                        `
                SELECT nombre, logo FROM e_empresa 
                `
-            )
-                .then((result: any) => {
-                    return result.rows[0];
-                });
+                    )
+                        .then((result: any) => {
+                            return result.rows[0];
+                        });
 
-            let separador = path.sep;
+                    let separador = path.sep;
 
-            let ruta = ObtenerRutaLogos() + separador + file_name.logo;
+                    let ruta = ObtenerRutaLogos() + separador + file_name.logo;
 
-            const codificado = await ConvertirImagenBase64(ruta);
+                    const codificado = await ConvertirImagenBase64(ruta);
 
-            let logo = 'data:image/jpeg;base64,' + codificado;
+                    let logo = 'data:image/jpeg;base64,' + codificado;
 
-            const EMPRESA = await pool.query(
-                `
+                    const EMPRESA = await pool.query(
+                        `
                SELECT * FROM e_empresa 
                `
-            );
+                    );
 
-            let p_color = EMPRESA.rows[0].color_principal;
-            let s_color = EMPRESA.rows[0].color_secundario;
-            let frase = EMPRESA.rows[0].marca_agua;
-            let nombre = EMPRESA.rows[0].nombre;
-            let formato_fecha: string = 'dd/MM/yyyy';
-            let formato_hora: string = 'HH:mm:ss';
-            let idioma_fechas: string = 'es';
+                    let p_color = EMPRESA.rows[0].color_principal;
+                    let s_color = EMPRESA.rows[0].color_secundario;
+                    let frase = EMPRESA.rows[0].marca_agua;
+                    let nombre = EMPRESA.rows[0].nombre;
 
-            let dia_abreviado: string = 'ddd';
-            let dia_completo: string = 'dddd'
 
-            let definicionDocumento = {
-                pageSize: 'A4',
-                pageOrientation: 'portrait',
-                pageMargins: [40, 50, 40, 50],
-                watermark: { text: frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-                footer: function (currentPage: any, pageCount: any, fecha: any) {
-                    const f = new Date();
-                    const fechaFormateada = f.toISOString().split('T')[0];
-                    const time = f.toTimeString().split(' ')[0];
-                    return {
-                        margin: 10,
-                        columns: [
-                            { text: `Fecha: ${fechaFormateada} Hora: ${time}`, opacity: 0.3 },
-                            {
-                                text: [
+                    const FORMATO_FECHA = await pool.query(
+                        `
+                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
+                `
+                    );
+                    const FORMATO_HORA = await pool.query(
+                        `
+                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 2
+                `
+                    );
+
+                    let formato_fecha: string = FORMATO_FECHA.rows[0].descripcion;
+                    let formato_hora: string = FORMATO_HORA.rows[0].descripcion;
+                    let idioma_fechas: string = 'es';
+
+                    let dia_abreviado: string = 'ddd';
+                    let dia_completo: string = 'dddd'
+
+                    let definicionDocumento = {
+                        pageSize: 'A4',
+                        pageOrientation: 'portrait',
+                        pageMargins: [40, 50, 40, 50],
+                        watermark: { text: frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+                        footer: function (currentPage: any, pageCount: any, fecha: any) {
+                            const f = new Date();
+                            const fechaFormateada = f.toISOString().split('T')[0];
+                            const time = f.toTimeString().split(' ')[0];
+                            return {
+                                margin: 10,
+                                columns: [
+                                    { text: `Fecha: ${fechaFormateada} Hora: ${time}`, opacity: 0.3 },
                                     {
-                                        text: `© Pag ${currentPage} de ${pageCount}`,
-                                        alignment: 'right',
-                                        opacity: 0.3
+                                        text: [
+                                            {
+                                                text: `© Pag ${currentPage} de ${pageCount}`,
+                                                alignment: 'right',
+                                                opacity: 0.3
+                                            }
+                                        ],
                                     }
                                 ],
-                            }
+                                fontSize: 10
+                            };
+                        },
+                        content: [
+                            { image: logo, width: 100, margin: [10, -25, 0, 5] },
+                            { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
+                            { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                            { text: 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas), bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+                            ...resultado
                         ],
-                        fontSize: 10
-                    };
-                },
-                content: [
-                    { image: logo, width: 100, margin: [10, -25, 0, 5] },
-                    { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                    { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-                    { text: 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas), bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
-                    ...resultado
-                ],
-                styles: {
-                    derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color, alignment: 'left' },
-                    tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color },
-                    tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: s_color },
-                    centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color, margin: [0, 5, 0, 0] },
-                    itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color },
-                    itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
-                    itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-                    itemsTableDerecha: { fontSize: 8, alignment: 'right' },
-                    itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: s_color },
-                    itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
-                    itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
-                    tableMargin: { margin: [0, 0, 0, 0] },
-                    tableMarginCabecera: { margin: [0, 15, 0, 0] },
-                    tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
-                    tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
-                }
-            }
-
-            // Crear el PDF y obtener el buffer de manera asíncrona
-            const pdfDocGenerator = pdfMake.createPdf(definicionDocumento);
-            // Obtener el buffer del PDF generado
-            const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
-                pdfDocGenerator.getBuffer((buffer: any) => {
-                    if (buffer) {
-                        resolve(Buffer.from(buffer));
-                    } else {
-                        reject(new Error('Error al generar el buffer del PDF'));
+                        styles: {
+                            derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color, alignment: 'left' },
+                            tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color },
+                            tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: s_color },
+                            centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: p_color, margin: [0, 5, 0, 0] },
+                            itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: s_color },
+                            itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
+                            itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+                            itemsTableDerecha: { fontSize: 8, alignment: 'right' },
+                            itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: s_color },
+                            itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
+                            itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
+                            tableMargin: { margin: [0, 0, 0, 0] },
+                            tableMarginCabecera: { margin: [0, 15, 0, 0] },
+                            tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+                            tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
+                        }
                     }
-                });
-            });
 
-            const ruta_logo = ObtenerRutaLogos();
-            // OBTENER FECHA Y HORA
-            const date = new Date();
-            const hora = date.getHours();
-            const minutos = date.getMinutes();
-            const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_abreviado, idioma_fechas)
-             const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
-            // VERIFICAR HORA DE ENVIO
-            const PARAMETRO_HORA = await pool.query(
-                `
-                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 40
-                    `
-            );
+                    // Crear el PDF y obtener el buffer de manera asíncrona
+                    const pdfDocGenerator = pdfMake.createPdf(definicionDocumento);
+                    // Obtener el buffer del PDF generado
+                    const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+                        pdfDocGenerator.getBuffer((buffer: any) => {
+                            if (buffer) {
+                                resolve(Buffer.from(buffer));
+                            } else {
+                                reject(new Error('Error al generar el buffer del PDF'));
+                            }
+                        });
+                    });
 
-            if (PARAMETRO_HORA.rowCount != 0) {
-                console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
-                if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
+                    const ruta_logo = ObtenerRutaLogos();
+                    // OBTENER FECHA Y HORA
+
+                    const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
+                    const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+                    console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
+                    // VERIFICAR HORA DE ENVIO
+
                     const EMPLEADOS = await pool.query(
                         `
-                                        SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, s.id_empresa, 
+                                        SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
                                         FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
@@ -239,7 +251,7 @@ export const atrasosDepartamentos = async function () {
 
                     if (EMPLEADOS.rowCount != 0) {
                         var correos = BuscarCorreos(EMPLEADOS);
-                        console.log('correos de jefes de departamento de ' + departamento + ' de la sucursal con id: ' + depa.name_suc, correos)
+                        console.log('correos de jefes de departamento de ' + departamento + ' de la sucursal con id: ' + depa.id_sucursal, correos)
                         var usuarios = PresentarUsuarios(EMPLEADOS);
 
                         // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
@@ -258,7 +270,7 @@ export const atrasosDepartamentos = async function () {
                         let data = {
                             to: correos,
                             from: EMPLEADOS.rows[0].correo_empresa,
-                            subject: 'Notificación de atraso',
+                            subject: 'REPORTE DIARIO DE ATRASOS POR DEPARTAMENTO',
                             html:
                                 `
                                         <body>
@@ -270,14 +282,13 @@ export const atrasosDepartamentos = async function () {
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
-                                            <b>Asunto:</b> Reporte diario de atrasos <br>
+                                            <b>Asunto:</b> REPORTE DIARIO DE ATRASOS <br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br><br> 
                                             <b>Correo dirigido a:</b> <br>
                                             ${usuarios} <br><br>                
                                             </p>                 
-                                            </p>
                                             <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                                             <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
                                             </p>
@@ -319,14 +330,13 @@ export const atrasosDepartamentos = async function () {
                         });
                     }
 
-                } else {
-                    console.log("la hora no es igual ")
-                }
-            }
 
+
+                }
+            })
 
         }
-    })
+    }
     //}, 60000);
 }
 
@@ -350,7 +360,7 @@ export const BuscarCorreos = function (datos: any) {
 export const PresentarUsuarios = function (datos: any) {
     var nombres: string = '';
     datos.rows.forEach((obj: any) => {
-        nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - '+ obj.name_cargo + '<br>';
+        nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - ' + obj.name_cargo + '<br>';
     })
 
 
@@ -513,7 +523,7 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
                             { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                             { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
                             { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                       
+
                             {},
                             {},
                             {},

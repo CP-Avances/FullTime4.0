@@ -1,9 +1,9 @@
-import { ObtenerRutaBirthday, ObtenerRutaLogos } from './accesoCarpetas';
+import { ObtenerRutaLogos } from './accesoCarpetas';
 import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
 import { DateTime } from 'luxon';
-import { BuscarAtrasos } from '../controlador/reportes/reportesAtrasosControlador';
+import { BuscarFaltas } from '../controlador/reportes/reportesFaltasControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
 
 
@@ -24,7 +24,7 @@ export const ImportarPDF = async function () {
 }
 
 
-export const atrasos = async function () {
+export const faltas = async function () {
     //setInterval(async () => {
     // VERIFICAR HORA DE ENVIO
     const date = new Date();
@@ -38,7 +38,7 @@ export const atrasos = async function () {
 
     if (PARAMETRO_HORA.rowCount != 0) {
 
-        
+
         console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
         if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
             console.log("ejecutando reporte de atrasos general")
@@ -91,7 +91,7 @@ export const atrasos = async function () {
 
             let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
                 suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                    o.atrasos = await BuscarAtrasos('2024/12/01', '2024/12/28', o.id);
+                    o.atrasos = await BuscarFaltas('2024/12/01', '2024/12/28', o.id);
                     return o;
                 }));
                 return suc;
@@ -189,7 +189,7 @@ export const atrasos = async function () {
                     content: [
                         { image: logo, width: 100, margin: [10, -25, 0, 5] },
                         { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                        { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                        { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                         { text: 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas), bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                         ...resultado
                     ],
@@ -376,44 +376,27 @@ export const PresentarUsuarios = function (datos: any) {
 }
 
 export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<any>> {
-    let formato_fecha: string = 'dd/MM/yyyy';
-    let formato_hora: string = 'HH:mm:ss';
+    let totalFaltasEmpleado: number = 0;
+
+    const FORMATO_FECHA = await pool.query(
+        `
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
+        `
+    );
+  
+    let formato_fecha: string = FORMATO_FECHA.rows[0].descripcion;
     let idioma_fechas: string = 'es';
-
     let dia_abreviado: string = 'ddd';
-    let dia_completo: string = 'dddd';
-
-    let totalTiempoEmpleado: number = 0;
-    let totalTiempo = 0;
-    let resumen = '';
     let general: any = [];
     let n: any = []
     let c = 0;
-    let toleranciaP = '';
 
-    const PARAMETRO_TOLERANCIA = await pool.query(
-        `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 3
-        `
-    );
-
-
-    if (PARAMETRO_TOLERANCIA.rowCount != 0) {
-        toleranciaP = PARAMETRO_TOLERANCIA.rows[0].descripcion;
-    }
     data.forEach((selec: any) => {
         // CONTAR REGISTROS
         let arr_reg = selec.empleados.map((o: any) => { return o.atrasos.length });
         let reg = SumarRegistros(arr_reg);
         // CONTAR MINUTOS DE ATRASOS
-        totalTiempo = 0;
-        selec.empleados.forEach((o: any) => {
-            o.atrasos.map((a: any) => {
-                const minutos_ = SegundosAMinutosConDecimales(Number(a.diferencia));
-                totalTiempo += Number(minutos_);
-                return totalTiempo;
-            })
-        })
+       
         // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
         let descripcion = '';
         let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -426,8 +409,7 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
         let informacion = {
             sucursal: selec.sucursal,
             nombre: opcion,
-            formato_general: MinutosAHorasMinutosSegundos(Number(totalTiempo.toFixed(2))),
-            formato_decimal: totalTiempo.toFixed(2),
+            faltas: reg
         }
         general.push(informacion);
         // CABECERA PRINCIPAL
@@ -506,77 +488,43 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
             });
             // ENCERAR VARIABLES
             c = 0;
-            totalTiempoEmpleado = 0;
+            totalFaltasEmpleado = 0;
             n.push({
                 style: 'tableMargin',
                 table: {
-                    widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
-                    headerRows: 2,
+                    widths: ['*', '*'],
+                    headerRows: 1,
                     body: [
                         [
-                            { rowSpan: 2, text: 'N°', style: 'centrado' },
-                            { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                            {},
-                            { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                            {},
-                            { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                            { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                            {}
+                            { text: 'N°', style: 'tableHeader' },
+                            { text: 'FECHA', style: 'tableHeader' },
                         ],
-                        [
-                            {},
-                            { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                            { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                            { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                            { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-
-                            {},
-                            {},
-                            {},
-                        ],
-                        ...empl.atrasos.map((usu: any) => {
-                            // FORMATEAR FECHAS
-                            const fechaHorario = FormatearFecha(usu.fecha_hora_horario.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                            const fechaTimbre = FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                            const horaHorario = FormatearHora(usu.fecha_hora_horario.split(' ')[1], formato_hora);
-                            const horaTimbre = FormatearHora(usu.fecha_hora_timbre.split(' ')[1], formato_hora);
-                            var tolerancia = '00:00:00';
-
-
-                            if (toleranciaP !== '1') {
-                                tolerancia = MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                            }
-                            const minutos = SegundosAMinutosConDecimales(Number(usu.diferencia));
-                            const tiempo = MinutosAHorasMinutosSegundos(minutos);
-                            totalTiempoEmpleado += Number(minutos);
-                            c = c + 1
+                        ...empl.faltas.map((usu: any) => {
+                            const fecha = FormatearFecha(usu.fecha_horario, formato_fecha, dia_abreviado,idioma_fechas);
+                            totalFaltasEmpleado++;
+                            c = c + 1;
                             return [
                                 { style: 'itemsTableCentrado', text: c },
-                                { style: 'itemsTableCentrado', text: fechaHorario },
-                                { style: 'itemsTableCentrado', text: horaHorario },
-                                { style: 'itemsTableCentrado', text: fechaTimbre },
-                                { style: 'itemsTableCentrado', text: horaTimbre },
-                                { style: 'itemsTableCentrado', text: tolerancia },
-                                { style: 'itemsTableCentrado', text: tiempo },
-                                { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
+                                { style: 'itemsTableCentrado', text: fecha },
                             ];
                         }),
-
+                        [
+                            { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                            { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
+                        ],
                     ],
                 },
                 layout: {
                     fillColor: function (rowIndex: any) {
-                        return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                    }
-                }
+                        return rowIndex % 2 === 0 ? '#E5E7E9' : null;
+                    },
+                },
             });
         })
     })
     // RESUMEN TOTALES DE REGISTROS
     return n;
 }
-
-
 
 export const SumarRegistros = function (array: any[]) {
     let valor = 0;
@@ -585,23 +533,6 @@ export const SumarRegistros = function (array: any[]) {
     }
     return valor;
 }
-
-export const SegundosAMinutosConDecimales = function (segundos: number) {
-    return Number((segundos / 60).toFixed(2));
-}
-
-export const MinutosAHorasMinutosSegundos = function (minutos: number) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10) ? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10) ? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10) ? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-}
-
-
 
 export const FormatearFecha = function (fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;

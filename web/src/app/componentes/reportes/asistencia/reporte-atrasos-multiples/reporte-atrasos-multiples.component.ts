@@ -321,6 +321,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf = []
     this.reportesAtrasos.ReporteAtrasos(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
+      console.log("ver datos del reporte de atrasos: ", this.data_pdf)
       if (this.tolerancia !== '1') {
         this.FiltrarTolerancia();
       }
@@ -442,6 +443,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     data.forEach((selec: any) => {
       // CONTAR REGISTROS
       let arr_reg = selec.empleados.map((o: any) => { return o.atrasos.length });
+      console.log("ver los atrasos de los empleados: ", arr_reg);
       let reg = this.validar.SumarRegistros(arr_reg);
       // CONTAR MINUTOS DE ATRASOS
       totalTiempo = 0;
@@ -810,7 +812,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     worksheet.getCell(
       "B3"
     ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
-    
+
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2", "B3"].forEach((cell) => {
       worksheet.getCell(cell).alignment = {
