@@ -287,9 +287,11 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
-import { atrasos } from './libs/sendAtraso';
-import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
-import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+import {  atrasosDiarios,atrasosSemanal } from './libs/sendAtraso';
+//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+
+import {  faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -298,11 +300,11 @@ import { atrasosIndividual } from './libs/sendAtrasoIndividual';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
-//
 setInterval(async () => {
-    atrasos();
-    atrasosDepartamentos();
-    atrasosIndividual();
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
 }, 2700000);
 
 

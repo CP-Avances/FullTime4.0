@@ -271,18 +271,19 @@ const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAtraso_1 = require("./libs/sendAtraso");
-const sendAtrasoDepartamento_1 = require("./libs/sendAtrasoDepartamento");
-const sendAtrasoIndividual_1 = require("./libs/sendAtrasoIndividual");
+//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+const sendFaltas_1 = require("./libs/sendFaltas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-//
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    (0, sendAtraso_1.atrasos)();
-    (0, sendAtrasoDepartamento_1.atrasosDepartamentos)();
-    (0, sendAtrasoIndividual_1.atrasosIndividual)();
+    (0, sendAtraso_1.atrasosDiarios)();
+    (0, sendAtraso_1.atrasosSemanal)();
+    (0, sendFaltas_1.faltasDiarios)();
+    (0, sendFaltas_1.faltasSemanal)();
 }), 2700000);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 // LLAMA AL METODO DE AVISOS DE VACACIONES

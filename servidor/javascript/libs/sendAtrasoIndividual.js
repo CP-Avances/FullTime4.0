@@ -213,7 +213,7 @@ const atrasosIndividual = function () {
                                         <b>Fecha:</b> ${fecha} <br>       
                                         <b>Horario:</b> ${fechaHora} <br>
                                         <b>Timbre:</b> ${fechaTimbre} <br>
-                                        <b>tolerancia:</b> ${item.atrasos[0].tolerancia} <br>
+                                        <b>Tolerancia:</b> ${item.atrasos[0].tolerancia} <br>
                                         </p>
                                         <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                                         <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
