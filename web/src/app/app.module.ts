@@ -276,9 +276,9 @@ import { ListaNotificacionComponent } from './componentes/notificaciones/configu
 import { SubirDocumentoComponent } from './componentes/notificaciones/documentos/subir-documento/subir-documento.component';
 import { VerDocumentosComponent } from './componentes/notificaciones/documentos/ver-documentos/ver-documentos.component';
 import { ListaArchivosComponent } from './componentes/notificaciones/documentos/lista-archivos/lista-archivos.component';
-import { RegistrarBirthdayComponent } from './componentes/notificaciones/cumpleanios/registrar-birthday/registrar-birthday.component';
-import { EditarBirthdayComponent } from './componentes/notificaciones/cumpleanios/editar-birthday/editar-birthday.component';
-import { VerBirthdayComponent } from './componentes/notificaciones/cumpleanios/ver-birthday/ver-birthday.component';
+import { RegistrarBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/registrar-birthday/registrar-birthday.component';
+import { EditarBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/editar-birthday/editar-birthday.component';
+import { VerBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/ver-birthday/ver-birthday.component';
 import { ComunicadosComponent } from './componentes/notificaciones/comunicados/comunicados.component';
 import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
@@ -286,6 +286,11 @@ import { EliminarRealtimeComponent } from './componentes/reportes/notificaciones
 import { ButtonNotificacionComponent } from './componentes/generales/main-nav/button-notificacion/button-notificacion.component';
 import { ButtonAvisosComponent } from './componentes/generales/main-nav/button-avisos/button-avisos.component';
 import { ButtonOpcionesComponent } from './componentes/generales/main-nav/button-opciones/button-opciones.component';
+import { MensajesNotificacionesComponent } from './componentes/notificaciones/configurar-mensajes/mensajes-notificaciones/mensajes-notificaciones.component';
+import { VerAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/ver-aniversario/ver-aniversario.component';
+import { RegistrarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/registrar-aniversario/registrar-aniversario.component';
+import { EditarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/editar-aniversario/editar-aniversario.component';
+
 // REPORTE
 import { ReportesModule } from './componentes/reportes/reportes.module';
 import { ConfigReportFirmasHorasExtrasComponent } from './componentes/reportes/configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
@@ -555,7 +560,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     VerTimbreComponent,
     VerImagenComponent,
 
-
     SettingsComponent,
     ConfiguracionNotificacionComponent,
     ListaNotificacionComponent,
@@ -572,6 +576,10 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     ButtonNotificacionComponent,
     ButtonAvisosComponent,
     ButtonOpcionesComponent,
+    MensajesNotificacionesComponent,
+    VerAniversarioComponent,
+    RegistrarAniversarioComponent,
+    EditarAniversarioComponent,
 
     ConfigReportFirmasHorasExtrasComponent,
     ConfigEmpleadosComponent,
@@ -591,7 +599,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-
 
   ],
 

@@ -1,5 +1,5 @@
-import BIRTHDAY_CONTROLADOR from '../../controlador/notificaciones/birthdayControlador';
-import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
+import MENSAJES_NOTIFICACIONES_CONTROLADOR from '../../controlador/notificaciones/mensajesNotificacionesControlador';
+import { ObtenerRutaMensajeNotificacion } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
 import { DateTime } from 'luxon';
 import { Router } from 'express';
@@ -8,7 +8,7 @@ import multer from 'multer';
 const storage = multer.diskStorage({
 
     destination: function (req, file, cb) {
-        cb(null, ObtenerRutaBirthday())
+        cb(null, ObtenerRutaMensajeNotificacion())
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-class BirthdayRutas {
+class MensajesNotificacionesRutas {
     public router: Router = Router();
 
     constructor() {
@@ -33,18 +33,18 @@ class BirthdayRutas {
     configuracion(): void {
 
         // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS    **USADO
-        this.router.get('/:id_empresa', TokenValidation, BIRTHDAY_CONTROLADOR.MensajeEmpresa);
+        this.router.get('/:id_empresa', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.MensajeEmpresa);
         // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS   **USADO
-        this.router.post('/', TokenValidation, BIRTHDAY_CONTROLADOR.CrearMensajeBirthday);
+        this.router.post('/', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.CrearMensajeNotificacion);
         // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   **USADO
-        this.router.put('/:id_empresa/uploadImage', [TokenValidation, upload.single('uploads')], BIRTHDAY_CONTROLADOR.CrearImagenCumpleanios);
+        this.router.put('/:id_empresa/uploadImage', [TokenValidation, upload.single('uploads')], MENSAJES_NOTIFICACIONES_CONTROLADOR.CrearImagenNotificacion);
         // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS    **USADO FRONT
-        this.router.get('/img/:imagen', BIRTHDAY_CONTROLADOR.ObtenerImagen);
+        this.router.get('/img/:imagen', MENSAJES_NOTIFICACIONES_CONTROLADOR.ObtenerImagen);
         // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS   **USADO
-        this.router.put('/editar/:id', TokenValidation, BIRTHDAY_CONTROLADOR.EditarMensajeBirthday);
+        this.router.put('/editar/:id', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.EditarMensajeBirthday);
     }
 }
 
-const BIRTHDAY_RUTAS = new BirthdayRutas();
+const MENSAJES_NOTIFICACIONES_RUTAS = new MensajesNotificacionesRutas();
 
-export default BIRTHDAY_RUTAS.router;
+export default MENSAJES_NOTIFICACIONES_RUTAS.router;

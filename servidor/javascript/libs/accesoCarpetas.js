@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaMensajeNotificacion = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
@@ -153,14 +153,14 @@ const ObtenerRutaDocumento = function () {
     return ruta + separador + 'documentacion';
 };
 exports.ObtenerRutaDocumento = ObtenerRutaDocumento;
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE CUMPLEANIO
-const ObtenerRutaBirthday = function () {
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE MENSAJES DE NOTIFICACIONES
+const ObtenerRutaMensajeNotificacion = function () {
     let ruta = '';
     let separador = path_1.default.sep;
     ruta = path_1.default.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'cumpleanios';
+    return ruta + separador + 'mensajes_notificaciones';
 };
-exports.ObtenerRutaBirthday = ObtenerRutaBirthday;
+exports.ObtenerRutaMensajeNotificacion = ObtenerRutaMensajeNotificacion;
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE LOGOS DE EMPRESA
 const ObtenerRutaLogos = function () {
     let ruta = '';

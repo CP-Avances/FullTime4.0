@@ -1,4 +1,4 @@
-import { ObtenerRutaBirthday, ObtenerRutaLogos } from './accesoCarpetas';
+import { ObtenerRutaLogos } from './accesoCarpetas';
 import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
@@ -355,10 +355,10 @@ export const BuscarCorreos = function (datos: any) {
 export const PresentarUsuarios = function (datos: any) {
     var nombres: string = '';
     datos.rows.forEach((obj: any) => {
-        nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - '+ obj.name_cargo + '<br>';
+        nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - ' + obj.name_cargo + '<br>';
     })
     var usuarios = nombres
-       
+
     return usuarios;
 }
 

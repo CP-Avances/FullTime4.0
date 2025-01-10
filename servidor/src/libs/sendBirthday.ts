@@ -1,4 +1,4 @@
-import { ObtenerRutaBirthday, ObtenerRutaLogos } from './accesoCarpetas';
+import { ObtenerRutaMensajeNotificacion, ObtenerRutaLogos } from './accesoCarpetas';
 import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
@@ -11,7 +11,7 @@ export const cumpleanios = function () {
         // OBTENER RUTAS
         let separador = path.sep;
         const ruta_logo = ObtenerRutaLogos();
-        const ruta_cumpleanios = ObtenerRutaBirthday();
+        const ruta_cumpleanios = ObtenerRutaMensajeNotificacion();
         // OBTENER FECHA Y HORA
         const date = new Date();
         const hora = date.getHours();
@@ -34,10 +34,11 @@ export const cumpleanios = function () {
                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, s.id_empresa, 
                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                             ce.pie_firma, ce.cabecera_firma, m.asunto, m.mensaje, m.imagen, m.link  
-                        FROM informacion_general AS da, e_sucursales AS s, e_message_birthday AS m,
+                        FROM informacion_general AS da, e_sucursales AS s, e_message_notificaciones AS m,
                             e_empresa AS ce 
                         WHERE CAST(da.fecha_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_suc = s.id
-                            AND da.estado = 1 AND s.id_empresa = ce.id AND m.id_empresa = ce.id
+                            AND da.estado = 1 AND s.id_empresa = ce.id AND m.id_empresa = ce.id 
+                            AND m.tipo_notificacion = 'cumpleanios'
                         `
                         , [fecha]);
 
@@ -54,7 +55,7 @@ export const cumpleanios = function () {
                             `
                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;"></p>
                             `;
-                        if (EMPLEADOS.rows[0].link != null) {
+                        if (EMPLEADOS.rows[0].link != null && EMPLEADOS.rows[0].link != '') {
                             message_url =
                                 `
                                 <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; text-align: center;">
@@ -111,17 +112,17 @@ export const cumpleanios = function () {
                             ,
                             attachments: [
                                 {
-                                    filename: 'cabecera_firma.jpg',
+                                    filename: 'cabecera_firma',
                                     path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].cabecera_firma}`,
                                     cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                 },
                                 {
-                                    filename: 'pie_firma.jpg',
+                                    filename: 'pie_firma',
                                     path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].pie_firma}`,
                                     cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                 },
                                 {
-                                    filename: 'birthday1.jpg',
+                                    filename: 'birthday',
                                     path: `${ruta_cumpleanios}${separador}${EMPLEADOS.rows[0].imagen}`,
                                     cid: 'cumple' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                 }

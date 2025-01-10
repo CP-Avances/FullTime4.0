@@ -481,7 +481,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Configurar Notificaciones', url: '/configurarNotificaciones', color: true, ver: true },
           { name: 'Documentos', url: '/archivos', color: true, ver: true },
-          { name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true },
+          { name: 'Mensajes Notificaciones', url: '/mensaje_notificaciones', color: true, ver: true },
           { name: 'Comunicados', url: '/comunicados', color: true, ver: true },
         ]
       },

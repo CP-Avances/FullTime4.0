@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 
-import { RegistrarBirthdayComponent } from '../../../notificaciones/cumpleanios/registrar-birthday/registrar-birthday.component';
-import { EditarBirthdayComponent } from '../../../notificaciones/cumpleanios/editar-birthday/editar-birthday.component';
+import { RegistrarBirthdayComponent } from '../registrar-birthday/registrar-birthday.component';
+import { EditarBirthdayComponent } from '../editar-birthday/editar-birthday.component';
 
-import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
+import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/mensajesNotificaciones/mensajes-notificaciones.service';
 
 @Component({
   selector: 'app-ver-birthday',
@@ -20,7 +20,7 @@ export class VerBirthdayComponent implements OnInit {
   cumple: any = [];
 
   constructor(
-    private restB: BirthdayService,
+    private restB: MensajesNotificacionesService,
     private ventana: MatDialog
   ) { }
 
@@ -31,9 +31,16 @@ export class VerBirthdayComponent implements OnInit {
   // METODO PARA BUSCAR MENSAJE DE CUMPLEAÑOS
   ObtenerMensajeCumple() {
     let id_empresa = parseInt(localStorage.getItem('empresa') as string);
-    this.restB.VerMensajeCumpleanios(id_empresa).subscribe(res => {
-      this.cumple = res;
-      this.HabilitarBtn = false;
+    this.restB.VerMensajeNotificaciones(id_empresa).subscribe(res => {
+      //console.log('ver cumple ', res)
+      let datos: any = res;
+      this.cumple = datos.filter((item: any) => item.tipo_notificacion === 'cumpleanios');
+      if (this.cumple != 0) {
+        this.HabilitarBtn = false;
+      }
+      else {
+        this.HabilitarBtn = true;
+      }
     }, error => {
       this.HabilitarBtn = true;
     });

@@ -3,16 +3,17 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/mensajesNotificaciones/mensajes-notificaciones.service';
 
 @Component({
-  selector: 'app-registrar-birthday',
-  templateUrl: './registrar-birthday.component.html',
-  styleUrls: ['./registrar-birthday.component.css']
+  selector: 'app-registrar-aniversario',
+  templateUrl: './registrar-aniversario.component.html',
+  styleUrl: './registrar-aniversario.component.css'
 })
 
-export class RegistrarBirthdayComponent implements OnInit {
+export class RegistrarAniversarioComponent implements OnInit {
+
   ips_locales: any = '';
 
   archivoForm = new FormControl('');
@@ -36,30 +37,32 @@ export class RegistrarBirthdayComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
-    private restB: BirthdayService,
-    public ventana: MatDialogRef<RegistrarBirthdayComponent>,
+    private restB: MensajesNotificacionesService,
+    public ventana: MatDialogRef<RegistrarAniversarioComponent>,
     public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // GUARDAR DATOS DE MENSAJE
-  InsertarMensajeBirthday(form: any) {
+  InsertarMensajeAniversario(form: any) {
     let dataMensaje = {
       id_empresa: this.id_empresa,
       mensaje: form.mensajeForm,
       titulo: form.tituloForm,
       link: form.linkForm,
+      tipo: 'aniversario',
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
-    this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
+    this.restB.CrearMensajeNotificaciones(dataMensaje).subscribe(res => {
       this.SubirRespaldo(res[0].id)
       this.ventana.close(true);
     })
@@ -122,7 +125,7 @@ export class RegistrarBirthdayComponent implements OnInit {
     formData.append('ip', this.ip as string);
     formData.append('ip_local', this.ips_locales);
 
-    this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
+    this.restB.SubirImagenNotificaciones(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,
       });

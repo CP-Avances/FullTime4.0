@@ -43,7 +43,7 @@ class MensajesNotificacionesControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo) VALUES ($1, $2, $3, $4, $5) RETURNING *
+                INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo_notificacion) VALUES ($1, $2, $3, $4, $5) RETURNING *
                 `, [id_empresa, titulo, mensaje, link, tipo]);
                 const [notificacion] = response.rows;
                 // AUDITORIA
@@ -52,7 +52,7 @@ class MensajesNotificacionesControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empresa: ${id_empresa}, titulo: ${titulo}, mensaje: ${mensaje}, url: ${link}, tipo: ${tipo}}`,
+                    datosNuevos: `{id_empresa: ${id_empresa}, titulo: ${titulo}, mensaje: ${mensaje}, url: ${link}, tipo_notificacion: ${tipo}}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null

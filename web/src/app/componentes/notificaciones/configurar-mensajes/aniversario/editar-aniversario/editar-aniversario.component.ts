@@ -3,16 +3,17 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { BirthdayService } from 'src/app/servicios/notificaciones/birthday/birthday.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/mensajesNotificaciones/mensajes-notificaciones.service';
 
 @Component({
-  selector: 'app-editar-birthday',
-  templateUrl: './editar-birthday.component.html',
-  styleUrls: ['./editar-birthday.component.css']
+  selector: 'app-editar-aniversario',
+  templateUrl: './editar-aniversario.component.html',
+  styleUrl: './editar-aniversario.component.css'
 })
 
-export class EditarBirthdayComponent implements OnInit {
+export class EditarAniversarioComponent implements OnInit {
+
   ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
@@ -35,19 +36,19 @@ export class EditarBirthdayComponent implements OnInit {
   id_empresa: number = parseInt(localStorage.getItem('empresa') as string);
 
   constructor(
-    private restB: BirthdayService,
+    private restB: MensajesNotificacionesService,
     private toastr: ToastrService,
-    public ventana: MatDialogRef<EditarBirthdayComponent>,
+    public ventana: MatDialogRef<EditarAniversarioComponent>,
     public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.ImprimirDatos();
   }
 
@@ -60,20 +61,22 @@ export class EditarBirthdayComponent implements OnInit {
     })
   }
 
-  // ACTUALIZAR DATOS DE CUMPLEAÑOS
-  ModificarMensajeBirthday(form: any) {
+  // ACTUALIZAR DATOS DE ANIVERSARIO
+  ModificarMensajeAniversario(form: any) {
     let dataMensaje = {
       mensaje: form.mensajeForm,
       titulo: form.tituloForm,
       link: form.linkForm,
+      tipo: 'aniversario',
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     if (form.imagenForm != undefined && form.imagenForm != '' && form.imagenForm != 'null') {
       this.VerificarArchivo(dataMensaje);
     }
     else {
-      this.restB.EditarMensajeCumpleanios(this.data.id, dataMensaje).subscribe(res => {
+      this.restB.EditarMensajeNotificaciones(this.data.id, dataMensaje).subscribe(res => {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
@@ -133,7 +136,7 @@ export class EditarBirthdayComponent implements OnInit {
     formData.append('ip', this.ip as string);
     formData.append('ip_local', this.ips_locales);
 
-    this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
+    this.restB.SubirImagenNotificaciones(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,
       });
@@ -145,7 +148,7 @@ export class EditarBirthdayComponent implements OnInit {
   // METODO PARA VERIFICAR TAMAÑO DEL ARCHIVO
   VerificarArchivo(data: any) {
     if (this.archivoSubido[0].size <= 2e+6) {
-      this.restB.EditarMensajeCumpleanios(this.data.id, data).subscribe(res => {
+      this.restB.EditarMensajeNotificaciones(this.data.id, data).subscribe(res => {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
@@ -160,6 +163,5 @@ export class EditarBirthdayComponent implements OnInit {
       });
     }
   }
+
 }
-
-

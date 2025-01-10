@@ -13,7 +13,7 @@ const indexRutas_1 = __importDefault(require("./rutas/indexRutas"));
 const catProvinciaRutas_1 = __importDefault(require("./rutas/configuracion/localizacion/catProvinciaRutas"));
 const ciudadesRutas_1 = __importDefault(require("./rutas/configuracion/localizacion/ciudadesRutas"));
 const catEmpresaRutas_1 = __importDefault(require("./rutas/configuracion/parametrizacion/catEmpresaRutas"));
-const birthdayRutas_1 = __importDefault(require("./rutas/notificaciones/birthdayRutas"));
+const mensajesNotificacionesRutas_1 = __importDefault(require("./rutas/notificaciones/mensajesNotificacionesRutas"));
 const documentosRutas_1 = __importDefault(require("./rutas/documentos/documentosRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/configuracion/parametrizacion/parametrosRutas"));
 const catRolesRutas_1 = __importDefault(require("./rutas/configuracion/parametrizacion/catRolesRutas"));
@@ -150,7 +150,7 @@ class Servidor {
         this.app.use(`/${ruta}/discapacidades`, catDiscapacidadRutas_1.default);
         this.app.use(`/${ruta}/vacunasTipos`, catVacunasRutas_1.default);
         this.app.use(`/${ruta}/archivosCargados`, documentosRutas_1.default);
-        this.app.use(`/${ruta}/birthday`, birthdayRutas_1.default);
+        this.app.use(`/${ruta}/mensajes_notificaciones`, mensajesNotificacionesRutas_1.default);
         // EMPLEADOS
         this.app.use(`/${ruta}/empleado`, empleadoRutas_1.default);
         this.app.use(`/${ruta}/usuarios`, usuarioRutas_1.default);
