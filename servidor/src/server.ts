@@ -287,8 +287,11 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
-import { atrasos } from './libs/sendAtraso';
-import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+import {  atrasosDiarios,atrasosSemanal } from './libs/sendAtraso';
+//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+
+import {  faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -297,14 +300,15 @@ import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
-
-atrasos();
-atrasosDepartamentos();
-
+setInterval(async () => {
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
+}, 2700000);
 
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
-cumpleanios();
 
 
 
@@ -320,4 +324,4 @@ cumpleanios();
 // ----------// conteoPermisos();
 
 
-//generarTimbres('1', '2023-11-01', '2023-11-02');
+//generarTimbres('1', '2023-11-01', '2023-11-02');//

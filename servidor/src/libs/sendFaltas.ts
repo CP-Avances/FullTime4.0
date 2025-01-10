@@ -3,11 +3,10 @@ import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
 import { DateTime } from 'luxon';
-import { BuscarAtrasos } from '../controlador/reportes/reportesAtrasosControlador';
+import { BuscarFaltas } from '../controlador/reportes/reportesFaltasControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
 
 
-// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
 
 /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
@@ -24,47 +23,41 @@ export const ImportarPDF = async function () {
 }
 
 
-export const atrasosSemanal = async function () {
+export const faltasSemanal = async function () {
     const date = new Date(); // Fecha actual
     const dia = date.getDay();
     // Crear una copia del objeto Date antes de modificarlo
     const dateAntes = new Date(date);
-    dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
+    dateAntes.setDate(dateAntes.getDate() - 8); // Restar 7 días a la copia
 
     const fecha = date.toJSON().split("T")[0]; // Fecha actual
     const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
-    
+
     const PARAMETRO_HORA = await pool.query(
         `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 15
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 22
         `);
 
     if (PARAMETRO_HORA.rowCount != 0) {
         console.log("ver Parametro semanal: ", PARAMETRO_HORA.rows[0].descripcion)
         if (dia === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
 
-            atrasos(fechaSemanaAntes, fecha, true);
-            atrasosDepartamentos(fechaSemanaAntes, fecha, true);
+            faltas(fechaSemanaAntes, fecha, true);
+            faltasDepartamentos(fechaSemanaAntes, fecha, true);
         }
     }
 }
 
-export const atrasosDiarios = async function () {
+export const faltasDiarios = async function () {
     const date = new Date();
     const fecha = date.toJSON().slice(4).split("T")[0];
-    atrasos(fecha, fecha, false);
-    atrasosDepartamentos(fecha, fecha, false);
-    atrasosIndividual(fecha, fecha);
+    faltas(fecha, fecha, false);
+    faltasDepartamentos(fecha, fecha, false);
+    faltasIndividual(fecha, fecha);
 
 }
 
-
-
-export const atrasos = async function (desde: any, hasta: any, semanal: any) {
-    console.log('ver desde: ', desde);
-    console.log('ver hasta: ', hasta);
-
-    //setInterval(async () => {
+export const faltas = async function (desde: any, hasta: any, semanal: any) {
     // VERIFICAR HORA DE ENVIO
     const date = new Date();
     const hora = date.getHours();
@@ -80,9 +73,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
 
         console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
         if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-            console.log("ejecutando reporte de atrasos general")
-
-            console.log("ejecutando reporte de atrasos ")
+            console.log("ejecutando reporte de faltas ")
             let informacion = await pool.query(
                 `
             SELECT * FROM informacion_general AS ig
@@ -130,18 +121,18 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
 
             let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
                 suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                    o.atrasos = await BuscarAtrasos(desde, hasta, o.id);
+                    o.faltas = await BuscarFaltas(desde, hasta, o.id);
                     return o;
                 }));
                 return suc;
             }));
 
             let nuevo = n.map((e: any) => {
-                e.empleados = e.empleados.filter((a: any) => { return a.atrasos.length > 0 })
+                e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
                 return e
             }).filter(e => { return e.empleados.length > 0 })
 
-            console.log("ver datos del reporte general: ", nuevo)
+            //console.log("ver datos del reporte general: ", nuevo)
 
             if (nuevo.length != 0) {
                 const pdfMake = await ImportarPDF();
@@ -201,15 +192,12 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                 let dia_completo: string = 'dddd'
 
                 let periodo = 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-                let asunto = 'REPORTE DIARIO DE ATRASOS';
+                let asunto = 'REPORTE DIARIO DE FALTAS';
 
                 if (semanal == true) {
                     periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                    asunto = 'REPORTE SEMANAL DE ATRASOS';
+                    asunto = 'REPORTE SEMANAL DE FALTAS';
                 }
-
-
-
                 let definicionDocumento = {
                     pageSize: 'A4',
                     pageOrientation: 'portrait',
@@ -239,7 +227,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                     content: [
                         { image: logo, width: 100, margin: [10, -25, 0, 5] },
                         { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                        { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                        { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                         { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                         ...resultado
                     ],
@@ -294,8 +282,12 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                 );
 
 
-                if (PARAMETRO_CORREO.rowCount != 0) {
 
+
+
+
+
+                if (PARAMETRO_CORREO.rowCount != 0) {
                     const correos = PARAMETRO_CORREO.rows;
                     correos.forEach(async (itemCorreo: any) => {
                         const correo = itemCorreo.descripcion
@@ -339,7 +331,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de atrasos.<br>  
+                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -368,7 +360,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                         cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                     },
                                     {
-                                        filename: 'Atrasos.pdf', // Nombre del archivo adjunto
+                                        filename: 'Faltas.pdf', // Nombre del archivo adjunto
                                         content: pdfBuffer, // El buffer generado por pdfmake
                                         //contentType: 'application/pdf' // T
 
@@ -389,10 +381,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                 }
                             });
                         }
-
-
                     })
-
                 } else {
                     console.log("no se encontro correo")
                 }
@@ -401,10 +390,10 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
 
         }
     }
-    //}, 60000);
 }
 
-export const atrasosDepartamentos = async function (desde: any, hasta: any, semanal: any) {
+
+export const faltasDepartamentos = async function (desde: any, hasta: any, semanal: any) {
     //setInterval(async () => {
     const date = new Date();
     const hora = date.getHours();
@@ -418,7 +407,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
     if (PARAMETRO_HORA.rowCount != 0) {
         console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
         if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-            console.log("ejecutando reporte de atrasos de departamento")
+            console.log("ejecutando reporte de faltas de departamento")
             let informacion = await pool.query(
                 `
             SELECT * FROM informacion_general AS ig
@@ -476,14 +465,14 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
                 let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
                     suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                        o.atrasos = await BuscarAtrasos('2024-12-01', '2024-12-31', o.id);
+                        o.faltas = await BuscarFaltas(desde, hasta, o.id);
                         return o;
                     }));
                     return suc;
                 }));
 
                 let nuevo = n.map((e: any) => {
-                    e.empleados = e.empleados.filter((a: any) => { return a.atrasos.length > 0 })
+                    e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
                     return e
                 }).filter(e => { return e.empleados.length > 0 })
 
@@ -500,8 +489,8 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
                     const file_name = await pool.query(
                         `
-               SELECT nombre, logo FROM e_empresa 
-               `
+                       SELECT nombre, logo FROM e_empresa 
+                    `
                     )
                         .then((result: any) => {
                             return result.rows[0];
@@ -546,11 +535,11 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                     let dia_completo: string = 'dddd'
 
                     let periodo = 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-                    let asunto = 'REPORTE DIARIO DE ATRASOS DEL DEPARTAMENTO DE ' + departamento;
+                    let asunto = 'REPORTE DIARIO DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
 
                     if (semanal == true) {
                         periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                        asunto = 'REPORTE SEMANAL DE ATRASOS DEL DEPARTAMENTO DE ' + departamento;
+                        asunto = 'REPORTE SEMANAL DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
                     }
 
 
@@ -584,7 +573,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                         content: [
                             { image: logo, width: 100, margin: [10, -25, 0, 5] },
                             { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                            { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                            { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                             { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                             ...resultado
                         ],
@@ -668,7 +657,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de atrasos.<br>  
+                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -698,7 +687,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                                     cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                 },
                                 {
-                                    filename: 'Atrasos-Departamento.pdf', // Nombre del archivo adjunto
+                                    filename: 'Faltas-Departamento.pdf', // Nombre del archivo adjunto
                                     content: pdfBuffer, // El buffer generado por pdfmake
                                     //contentType: 'application/pdf' // T
 
@@ -719,9 +708,6 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                             }
                         });
                     }
-
-
-
                 }
             })
 
@@ -729,7 +715,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
     }
 }
 
-export const atrasosIndividual = async function (desde: any, hasta: any) {
+export const faltasIndividual = async function (desde: any, hasta: any) {
     //setInterval(async () => {
 
     const date = new Date();
@@ -744,7 +730,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
     if (PARAMETRO_HORA.rowCount != 0) {
         console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
         if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-            console.log("ejecutando reporte de atrasos individuales")
+            console.log("ejecutando reporte de faltas individuales")
             let informacion = await pool.query(
                 `
             SELECT * FROM informacion_general AS ig
@@ -792,14 +778,14 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
 
             let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
                 suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                    o.atrasos = await BuscarAtrasos(desde, hasta, o.id);
+                    o.faltas = await BuscarFaltas(desde, hasta, o.id);
                     return o;
                 }));
                 return suc;
             }));
 
             let nuevo = n.map((e: any) => {
-                e.empleados = e.empleados.filter((a: any) => { return a.atrasos.length > 0 })
+                e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
                 return e
             }).filter(e => { return e.empleados.length > 0 })
 
@@ -868,7 +854,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
 
             /// for each
             arregloEmpleados.forEach((item: any) => {
-                let dateTimeHorario = DateTime.fromSQL(item.atrasos[0].fecha_hora_horario);
+                let dateTimeHorario = DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
                 let isoStringHorario = dateTimeHorario.toISO();
 
                 let fechaHora = ''
@@ -877,7 +863,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                     fechaHora = FormatearFecha(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
                 }
 
-                const dateTimeTimbre = DateTime.fromSQL(item.atrasos[0].fecha_hora_timbre);
+                const dateTimeTimbre = DateTime.fromSQL(item.faltas[0].fecha_hora_timbre);
                 const isoStringTimbre = dateTimeTimbre.toISO();
 
                 let fechaTimbre = ''
@@ -890,7 +876,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                 let data = {
                     to: item.correo,
                     from: Empre.rows[0].correo_empresa,
-                    subject: 'NOTIFICACIÓN DE ATRASO',
+                    subject: 'NOTIFICACIÓN DE FALTA',
                     html:
                         `
                                     <body>
@@ -898,22 +884,20 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                                             <img width="100%" height="100%" src="cid:cabeceraf"/>
                                         </div>
                                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                            El presente correo es para informarle que se ha registrado un atraso en su marcación.<br>  
+                                            El presente correo es para informarle que se ha registrado una inasistencia.<br>  
                                         </p>
                                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                         <b>Empresa:</b> ${file_name.nombre}<br>
-                                        <b>Asunto:</b> NOTIFICACIÓN DE ATRASO <br>
+                                        <b>Asunto:</b> NOTIFICACIÓN DE FALTA <br>
                                         <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
                                         <b>Cargo:</b> ${item.cargo} <br> 
                                         <b>Departamento:</b>${item.departamento}<br>
                                         <b>Fecha de envío:</b> ${fecha} <br> 
                                         <b>Hora de envío:</b> ${hora_reporte} <br>       
                                         <b>Notificación:</b><br>
-                                            Queremos informarle que el sistema ha registrado un atraso correspondiente a su marcación de entrada.<br>  
+                                            Queremos informarle que el sistema ha registrado su inasistencia.<br>  
                                         <b>Fecha:</b> ${fecha} <br>       
-                                        <b>Horario:</b> ${fechaHora} <br>
-                                        <b>Timbre:</b> ${fechaTimbre} <br>
-                                        <b>Tolerancia:</b> ${item.atrasos[0].tolerancia} <br>
+                                        <b>Observaciones:</b> Sin registro de marcaciones.<br>
                                         </p>
                                         <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                                         <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
@@ -978,49 +962,31 @@ export const PresentarUsuarios = function (datos: any) {
         nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - ' + obj.name_cargo + '<br>';
     })
     var usuarios = nombres
-
     return usuarios;
 }
 
 export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<any>> {
-    let formato_fecha: string = 'dd/MM/yyyy';
-    let formato_hora: string = 'HH:mm:ss';
-    let idioma_fechas: string = 'es';
+    console.log(" ver datos del reporte de faltas: ", data);
+    let totalFaltasEmpleado: number = 0;
 
-    let dia_abreviado: string = 'ddd';
-    let dia_completo: string = 'dddd';
-
-    let totalTiempoEmpleado: number = 0;
-    let totalTiempo = 0;
-    let resumen = '';
-    let general: any = [];
-    let n: any = []
-    let c = 0;
-    let toleranciaP = '';
-
-    const PARAMETRO_TOLERANCIA = await pool.query(
+    const FORMATO_FECHA = await pool.query(
         `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 3
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
         `
     );
 
+    let formato_fecha: string = FORMATO_FECHA.rows[0].descripcion;
+    let idioma_fechas: string = 'es';
+    let dia_abreviado: string = 'ddd';
+    let general: any = [];
+    let n: any = []
+    let c = 0;
 
-    if (PARAMETRO_TOLERANCIA.rowCount != 0) {
-        toleranciaP = PARAMETRO_TOLERANCIA.rows[0].descripcion;
-    }
     data.forEach((selec: any) => {
         // CONTAR REGISTROS
-        let arr_reg = selec.empleados.map((o: any) => { return o.atrasos.length });
+        let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length });
         let reg = SumarRegistros(arr_reg);
-        // CONTAR MINUTOS DE ATRASOS
-        totalTiempo = 0;
-        selec.empleados.forEach((o: any) => {
-            o.atrasos.map((a: any) => {
-                const minutos_ = SegundosAMinutosConDecimales(Number(a.diferencia));
-                totalTiempo += Number(minutos_);
-                return totalTiempo;
-            })
-        })
+
         // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
         let descripcion = '';
         let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -1033,8 +999,7 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
         let informacion = {
             sucursal: selec.sucursal,
             nombre: opcion,
-            formato_general: MinutosAHorasMinutosSegundos(Number(totalTiempo.toFixed(2))),
-            formato_decimal: totalTiempo.toFixed(2),
+            faltas: reg
         }
         general.push(informacion);
         // CABECERA PRINCIPAL
@@ -1113,77 +1078,43 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
             });
             // ENCERAR VARIABLES
             c = 0;
-            totalTiempoEmpleado = 0;
+            totalFaltasEmpleado = 0;
             n.push({
                 style: 'tableMargin',
                 table: {
-                    widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
-                    headerRows: 2,
+                    widths: ['*', '*'],
+                    headerRows: 1,
                     body: [
                         [
-                            { rowSpan: 2, text: 'N°', style: 'centrado' },
-                            { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                            {},
-                            { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                            {},
-                            { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                            { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                            {}
+                            { text: 'N°', style: 'tableHeader' },
+                            { text: 'FECHA', style: 'tableHeader' },
                         ],
-                        [
-                            {},
-                            { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                            { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                            { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                            { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-
-                            {},
-                            {},
-                            {},
-                        ],
-                        ...empl.atrasos.map((usu: any) => {
-                            // FORMATEAR FECHAS
-                            const fechaHorario = FormatearFecha(usu.fecha_hora_horario.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                            const fechaTimbre = FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                            const horaHorario = FormatearHora(usu.fecha_hora_horario.split(' ')[1], formato_hora);
-                            const horaTimbre = FormatearHora(usu.fecha_hora_timbre.split(' ')[1], formato_hora);
-                            var tolerancia = '00:00:00';
-
-
-                            if (toleranciaP !== '1') {
-                                tolerancia = MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
-                            }
-                            const minutos = SegundosAMinutosConDecimales(Number(usu.diferencia));
-                            const tiempo = MinutosAHorasMinutosSegundos(minutos);
-                            totalTiempoEmpleado += Number(minutos);
-                            c = c + 1
+                        ...empl.faltas.map((usu: any) => {
+                            const fecha = FormatearFecha(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
+                            totalFaltasEmpleado++;
+                            c = c + 1;
                             return [
                                 { style: 'itemsTableCentrado', text: c },
-                                { style: 'itemsTableCentrado', text: fechaHorario },
-                                { style: 'itemsTableCentrado', text: horaHorario },
-                                { style: 'itemsTableCentrado', text: fechaTimbre },
-                                { style: 'itemsTableCentrado', text: horaTimbre },
-                                { style: 'itemsTableCentrado', text: tolerancia },
-                                { style: 'itemsTableCentrado', text: tiempo },
-                                { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
+                                { style: 'itemsTableCentrado', text: fecha },
                             ];
                         }),
-
+                        [
+                            { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                            { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
+                        ],
                     ],
                 },
                 layout: {
                     fillColor: function (rowIndex: any) {
-                        return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                    }
-                }
+                        return rowIndex % 2 === 0 ? '#E5E7E9' : null;
+                    },
+                },
             });
         })
     })
     // RESUMEN TOTALES DE REGISTROS
     return n;
 }
-
-
 
 export const SumarRegistros = function (array: any[]) {
     let valor = 0;
@@ -1192,23 +1123,6 @@ export const SumarRegistros = function (array: any[]) {
     }
     return valor;
 }
-
-export const SegundosAMinutosConDecimales = function (segundos: number) {
-    return Number((segundos / 60).toFixed(2));
-}
-
-export const MinutosAHorasMinutosSegundos = function (minutos: number) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10) ? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10) ? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10) ? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-}
-
-
 
 export const FormatearFecha = function (fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;

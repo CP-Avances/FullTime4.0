@@ -45,15 +45,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosIndividual = exports.atrasosDepartamentos = exports.atrasos = exports.atrasosDiarios = exports.atrasosSemanal = exports.ImportarPDF = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.faltasIndividual = exports.faltasDepartamentos = exports.faltas = exports.faltasDiarios = exports.faltasSemanal = exports.ImportarPDF = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 const luxon_1 = require("luxon");
-const reportesAtrasosControlador_1 = require("../controlador/reportes/reportesAtrasosControlador");
+const reportesFaltasControlador_1 = require("../controlador/reportes/reportesFaltasControlador");
 const ImagenCodificacion_1 = require("./ImagenCodificacion");
-// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
 /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
    ** ********************************************************************************* **/
@@ -68,43 +67,40 @@ const ImportarPDF = function () {
     });
 };
 exports.ImportarPDF = ImportarPDF;
-const atrasosSemanal = function () {
+const faltasSemanal = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date(); // Fecha actual
         const dia = date.getDay();
         // Crear una copia del objeto Date antes de modificarlo
         const dateAntes = new Date(date);
-        dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
+        dateAntes.setDate(dateAntes.getDate() - 8); // Restar 7 días a la copia
         const fecha = date.toJSON().split("T")[0]; // Fecha actual
         const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
         const PARAMETRO_HORA = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 15
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 22
         `);
         if (PARAMETRO_HORA.rowCount != 0) {
             console.log("ver Parametro semanal: ", PARAMETRO_HORA.rows[0].descripcion);
             if (dia === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                (0, exports.atrasos)(fechaSemanaAntes, fecha, true);
-                (0, exports.atrasosDepartamentos)(fechaSemanaAntes, fecha, true);
+                (0, exports.faltas)(fechaSemanaAntes, fecha, true);
+                (0, exports.faltasDepartamentos)(fechaSemanaAntes, fecha, true);
             }
         }
     });
 };
-exports.atrasosSemanal = atrasosSemanal;
-const atrasosDiarios = function () {
+exports.faltasSemanal = faltasSemanal;
+const faltasDiarios = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date();
         const fecha = date.toJSON().slice(4).split("T")[0];
-        (0, exports.atrasos)(fecha, fecha, false);
-        (0, exports.atrasosDepartamentos)(fecha, fecha, false);
-        (0, exports.atrasosIndividual)(fecha, fecha);
+        (0, exports.faltas)(fecha, fecha, false);
+        (0, exports.faltasDepartamentos)(fecha, fecha, false);
+        (0, exports.faltasIndividual)(fecha, fecha);
     });
 };
-exports.atrasosDiarios = atrasosDiarios;
-const atrasos = function (desde, hasta, semanal) {
+exports.faltasDiarios = faltasDiarios;
+const faltas = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('ver desde: ', desde);
-        console.log('ver hasta: ', hasta);
-        //setInterval(async () => {
         // VERIFICAR HORA DE ENVIO
         const date = new Date();
         const hora = date.getHours();
@@ -115,8 +111,7 @@ const atrasos = function (desde, hasta, semanal) {
         if (PARAMETRO_HORA.rowCount != 0) {
             console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
             if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                console.log("ejecutando reporte de atrasos general");
-                console.log("ejecutando reporte de atrasos ");
+                console.log("ejecutando reporte de faltas ");
                 let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -158,16 +153,16 @@ const atrasos = function (desde, hasta, semanal) {
                 let datos = seleccionados;
                 let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                     suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)(desde, hasta, o.id);
+                        o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
                         return o;
                     })));
                     return suc;
                 })));
                 let nuevo = n.map((e) => {
-                    e.empleados = e.empleados.filter((a) => { return a.atrasos.length > 0; });
+                    e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
                     return e;
                 }).filter(e => { return e.empleados.length > 0; });
-                console.log("ver datos del reporte general: ", nuevo);
+                //console.log("ver datos del reporte general: ", nuevo)
                 if (nuevo.length != 0) {
                     const pdfMake = yield (0, exports.ImportarPDF)();
                     // DEFINIR INFORMACIÓN
@@ -205,10 +200,10 @@ const atrasos = function (desde, hasta, semanal) {
                     let dia_abreviado = 'ddd';
                     let dia_completo = 'dddd';
                     let periodo = 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-                    let asunto = 'REPORTE DIARIO DE ATRASOS';
+                    let asunto = 'REPORTE DIARIO DE FALTAS';
                     if (semanal == true) {
                         periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                        asunto = 'REPORTE SEMANAL DE ATRASOS';
+                        asunto = 'REPORTE SEMANAL DE FALTAS';
                     }
                     let definicionDocumento = {
                         pageSize: 'A4',
@@ -239,7 +234,7 @@ const atrasos = function (desde, hasta, semanal) {
                         content: [
                             { image: logo, width: 100, margin: [10, -25, 0, 5] },
                             { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                            { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                            { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                             { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                             ...resultado
                         ],
@@ -318,7 +313,7 @@ const atrasos = function (desde, hasta, semanal) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de atrasos.<br>  
+                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -346,7 +341,7 @@ const atrasos = function (desde, hasta, semanal) {
                                             cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                         },
                                         {
-                                            filename: 'Atrasos.pdf', // Nombre del archivo adjunto
+                                            filename: 'Faltas.pdf', // Nombre del archivo adjunto
                                             content: pdfBuffer, // El buffer generado por pdfmake
                                             //contentType: 'application/pdf' // T
                                         }
@@ -374,11 +369,10 @@ const atrasos = function (desde, hasta, semanal) {
                 }
             }
         }
-        //}, 60000);
     });
 };
-exports.atrasos = atrasos;
-const atrasosDepartamentos = function (desde, hasta, semanal) {
+exports.faltas = faltas;
+const faltasDepartamentos = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
         //setInterval(async () => {
         const date = new Date();
@@ -390,7 +384,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
         if (PARAMETRO_HORA.rowCount != 0) {
             console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
             if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                console.log("ejecutando reporte de atrasos de departamento");
+                console.log("ejecutando reporte de faltas de departamento");
                 let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -439,13 +433,13 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                     let datos = seleccionados;
                     let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                         suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                            o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)('2024-12-01', '2024-12-31', o.id);
+                            o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
                             return o;
                         })));
                         return suc;
                     })));
                     let nuevo = n.map((e) => {
-                        e.empleados = e.empleados.filter((a) => { return a.atrasos.length > 0; });
+                        e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
                         return e;
                     }).filter(e => { return e.empleados.length > 0; });
                     if (nuevo.length != 0) {
@@ -457,8 +451,8 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                         });
                         const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
                         const file_name = yield database_1.default.query(`
-               SELECT nombre, logo FROM e_empresa 
-               `)
+                       SELECT nombre, logo FROM e_empresa 
+                    `)
                             .then((result) => {
                             return result.rows[0];
                         });
@@ -485,10 +479,10 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                         let dia_abreviado = 'ddd';
                         let dia_completo = 'dddd';
                         let periodo = 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-                        let asunto = 'REPORTE DIARIO DE ATRASOS DEL DEPARTAMENTO DE ' + departamento;
+                        let asunto = 'REPORTE DIARIO DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
                         if (semanal == true) {
                             periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                            asunto = 'REPORTE SEMANAL DE ATRASOS DEL DEPARTAMENTO DE ' + departamento;
+                            asunto = 'REPORTE SEMANAL DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
                         }
                         let definicionDocumento = {
                             pageSize: 'A4',
@@ -519,7 +513,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                             content: [
                                 { image: logo, width: 100, margin: [10, -25, 0, 5] },
                                 { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                                { text: `ATRASOS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                                { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                                 { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                                 ...resultado
                             ],
@@ -592,7 +586,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de atrasos.<br>  
+                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -621,7 +615,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                                         cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                     },
                                     {
-                                        filename: 'Atrasos-Departamento.pdf', // Nombre del archivo adjunto
+                                        filename: 'Faltas-Departamento.pdf', // Nombre del archivo adjunto
                                         content: pdfBuffer, // El buffer generado por pdfmake
                                         //contentType: 'application/pdf' // T
                                     }
@@ -647,8 +641,8 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
         }
     });
 };
-exports.atrasosDepartamentos = atrasosDepartamentos;
-const atrasosIndividual = function (desde, hasta) {
+exports.faltasDepartamentos = faltasDepartamentos;
+const faltasIndividual = function (desde, hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         //setInterval(async () => {
         const date = new Date();
@@ -660,7 +654,7 @@ const atrasosIndividual = function (desde, hasta) {
         if (PARAMETRO_HORA.rowCount != 0) {
             console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
             if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                console.log("ejecutando reporte de atrasos individuales");
+                console.log("ejecutando reporte de faltas individuales");
                 let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -702,13 +696,13 @@ const atrasosIndividual = function (desde, hasta) {
                 let datos = seleccionados;
                 let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                     suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)(desde, hasta, o.id);
+                        o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
                         return o;
                     })));
                     return suc;
                 })));
                 let nuevo = n.map((e) => {
-                    e.empleados = e.empleados.filter((a) => { return a.atrasos.length > 0; });
+                    e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
                     return e;
                 }).filter(e => { return e.empleados.length > 0; });
                 // ARREGLO DE EMPLEADOS
@@ -755,14 +749,14 @@ const atrasosIndividual = function (desde, hasta) {
                 }
                 /// for each
                 arregloEmpleados.forEach((item) => {
-                    let dateTimeHorario = luxon_1.DateTime.fromSQL(item.atrasos[0].fecha_hora_horario);
+                    let dateTimeHorario = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
                     let isoStringHorario = dateTimeHorario.toISO();
                     let fechaHora = '';
                     if (isoStringHorario) {
                         let horaHorario = (0, exports.FormatearHora)(luxon_1.DateTime.fromISO(isoStringHorario).toFormat('HH:mm:ss'), formato_hora);
                         fechaHora = (0, exports.FormatearFecha)(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
                     }
-                    const dateTimeTimbre = luxon_1.DateTime.fromSQL(item.atrasos[0].fecha_hora_timbre);
+                    const dateTimeTimbre = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_timbre);
                     const isoStringTimbre = dateTimeTimbre.toISO();
                     let fechaTimbre = '';
                     if (isoStringTimbre) {
@@ -772,29 +766,27 @@ const atrasosIndividual = function (desde, hasta) {
                     let data = {
                         to: item.correo,
                         from: Empre.rows[0].correo_empresa,
-                        subject: 'NOTIFICACIÓN DE ATRASO',
+                        subject: 'NOTIFICACIÓN DE FALTA',
                         html: `
                                     <body>
                                         <div style="text-align: center;">
                                             <img width="100%" height="100%" src="cid:cabeceraf"/>
                                         </div>
                                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                            El presente correo es para informarle que se ha registrado un atraso en su marcación.<br>  
+                                            El presente correo es para informarle que se ha registrado una inasistencia.<br>  
                                         </p>
                                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                         <b>Empresa:</b> ${file_name.nombre}<br>
-                                        <b>Asunto:</b> NOTIFICACIÓN DE ATRASO <br>
+                                        <b>Asunto:</b> NOTIFICACIÓN DE FALTA <br>
                                         <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
                                         <b>Cargo:</b> ${item.cargo} <br> 
                                         <b>Departamento:</b>${item.departamento}<br>
                                         <b>Fecha de envío:</b> ${fecha} <br> 
                                         <b>Hora de envío:</b> ${hora_reporte} <br>       
                                         <b>Notificación:</b><br>
-                                            Queremos informarle que el sistema ha registrado un atraso correspondiente a su marcación de entrada.<br>  
+                                            Queremos informarle que el sistema ha registrado su inasistencia.<br>  
                                         <b>Fecha:</b> ${fecha} <br>       
-                                        <b>Horario:</b> ${fechaHora} <br>
-                                        <b>Timbre:</b> ${fechaTimbre} <br>
-                                        <b>Tolerancia:</b> ${item.atrasos[0].tolerancia} <br>
+                                        <b>Observaciones:</b> Sin registro de marcaciones.<br>
                                         </p>
                                         <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                                         <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
@@ -833,7 +825,7 @@ const atrasosIndividual = function (desde, hasta) {
         }
     });
 };
-exports.atrasosIndividual = atrasosIndividual;
+exports.faltasIndividual = faltasIndividual;
 // FUNCION PARA BUSCAR CORREOS
 const BuscarCorreos = function (datos) {
     var correos = '';
@@ -860,37 +852,21 @@ const PresentarUsuarios = function (datos) {
 exports.PresentarUsuarios = PresentarUsuarios;
 const EstructurarDatosPDF = function (data) {
     return __awaiter(this, void 0, void 0, function* () {
-        let formato_fecha = 'dd/MM/yyyy';
-        let formato_hora = 'HH:mm:ss';
+        console.log(" ver datos del reporte de faltas: ", data);
+        let totalFaltasEmpleado = 0;
+        const FORMATO_FECHA = yield database_1.default.query(`
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
+        `);
+        let formato_fecha = FORMATO_FECHA.rows[0].descripcion;
         let idioma_fechas = 'es';
         let dia_abreviado = 'ddd';
-        let dia_completo = 'dddd';
-        let totalTiempoEmpleado = 0;
-        let totalTiempo = 0;
-        let resumen = '';
         let general = [];
         let n = [];
         let c = 0;
-        let toleranciaP = '';
-        const PARAMETRO_TOLERANCIA = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 3
-        `);
-        if (PARAMETRO_TOLERANCIA.rowCount != 0) {
-            toleranciaP = PARAMETRO_TOLERANCIA.rows[0].descripcion;
-        }
         data.forEach((selec) => {
             // CONTAR REGISTROS
-            let arr_reg = selec.empleados.map((o) => { return o.atrasos.length; });
+            let arr_reg = selec.empleados.map((o) => { return o.faltas.length; });
             let reg = (0, exports.SumarRegistros)(arr_reg);
-            // CONTAR MINUTOS DE ATRASOS
-            totalTiempo = 0;
-            selec.empleados.forEach((o) => {
-                o.atrasos.map((a) => {
-                    const minutos_ = (0, exports.SegundosAMinutosConDecimales)(Number(a.diferencia));
-                    totalTiempo += Number(minutos_);
-                    return totalTiempo;
-                });
-            });
             // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
             let descripcion = '';
             let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -901,8 +877,7 @@ const EstructurarDatosPDF = function (data) {
             let informacion = {
                 sucursal: selec.sucursal,
                 nombre: opcion,
-                formato_general: (0, exports.MinutosAHorasMinutosSegundos)(Number(totalTiempo.toFixed(2))),
-                formato_decimal: totalTiempo.toFixed(2),
+                faltas: reg
             };
             general.push(informacion);
             // CABECERA PRINCIPAL
@@ -981,65 +956,37 @@ const EstructurarDatosPDF = function (data) {
                 });
                 // ENCERAR VARIABLES
                 c = 0;
-                totalTiempoEmpleado = 0;
+                totalFaltasEmpleado = 0;
                 n.push({
                     style: 'tableMargin',
                     table: {
-                        widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
-                        headerRows: 2,
+                        widths: ['*', '*'],
+                        headerRows: 1,
                         body: [
                             [
-                                { rowSpan: 2, text: 'N°', style: 'centrado' },
-                                { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                                {},
-                                { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
-                                {},
-                                { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                                { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                                {}
+                                { text: 'N°', style: 'tableHeader' },
+                                { text: 'FECHA', style: 'tableHeader' },
                             ],
-                            [
-                                {},
-                                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                                { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                                { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
-                                { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                                {},
-                                {},
-                                {},
-                            ],
-                            ...empl.atrasos.map((usu) => {
-                                // FORMATEAR FECHAS
-                                const fechaHorario = (0, exports.FormatearFecha)(usu.fecha_hora_horario.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                                const fechaTimbre = (0, exports.FormatearFecha)(usu.fecha_hora_timbre.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
-                                const horaHorario = (0, exports.FormatearHora)(usu.fecha_hora_horario.split(' ')[1], formato_hora);
-                                const horaTimbre = (0, exports.FormatearHora)(usu.fecha_hora_timbre.split(' ')[1], formato_hora);
-                                var tolerancia = '00:00:00';
-                                if (toleranciaP !== '1') {
-                                    tolerancia = (0, exports.MinutosAHorasMinutosSegundos)(Number(usu.tolerancia));
-                                }
-                                const minutos = (0, exports.SegundosAMinutosConDecimales)(Number(usu.diferencia));
-                                const tiempo = (0, exports.MinutosAHorasMinutosSegundos)(minutos);
-                                totalTiempoEmpleado += Number(minutos);
+                            ...empl.faltas.map((usu) => {
+                                const fecha = (0, exports.FormatearFecha)(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
+                                totalFaltasEmpleado++;
                                 c = c + 1;
                                 return [
                                     { style: 'itemsTableCentrado', text: c },
-                                    { style: 'itemsTableCentrado', text: fechaHorario },
-                                    { style: 'itemsTableCentrado', text: horaHorario },
-                                    { style: 'itemsTableCentrado', text: fechaTimbre },
-                                    { style: 'itemsTableCentrado', text: horaTimbre },
-                                    { style: 'itemsTableCentrado', text: tolerancia },
-                                    { style: 'itemsTableCentrado', text: tiempo },
-                                    { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
+                                    { style: 'itemsTableCentrado', text: fecha },
                                 ];
                             }),
+                            [
+                                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                                { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
+                            ],
                         ],
                     },
                     layout: {
                         fillColor: function (rowIndex) {
-                            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                        }
-                    }
+                            return rowIndex % 2 === 0 ? '#E5E7E9' : null;
+                        },
+                    },
                 });
             });
         });
@@ -1056,21 +1003,6 @@ const SumarRegistros = function (array) {
     return valor;
 };
 exports.SumarRegistros = SumarRegistros;
-const SegundosAMinutosConDecimales = function (segundos) {
-    return Number((segundos / 60).toFixed(2));
-};
-exports.SegundosAMinutosConDecimales = SegundosAMinutosConDecimales;
-const MinutosAHorasMinutosSegundos = function (minutos) {
-    let seconds = minutos * 60;
-    let hour = Math.floor(seconds / 3600);
-    hour = (hour < 10) ? '0' + hour : hour;
-    let minute = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10) ? '0' + minute : minute;
-    let second = Number((seconds % 60).toFixed(0));
-    second = (second < 10) ? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-};
-exports.MinutosAHorasMinutosSegundos = MinutosAHorasMinutosSegundos;
 const FormatearFecha = function (fecha, formato, dia, idioma) {
     let valor;
     // PARSEAR LA FECHA CON LUXON
