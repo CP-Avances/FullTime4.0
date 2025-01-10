@@ -439,7 +439,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                     let datos = seleccionados;
                     let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                         suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                            o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)('2024-12-01', '2024-12-31', o.id);
+                            o.atrasos = yield (0, reportesAtrasosControlador_1.BuscarAtrasos)(desde, hasta, o.id);
                             return o;
                         })));
                         return suc;

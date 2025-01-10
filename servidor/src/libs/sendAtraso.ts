@@ -476,7 +476,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
                 let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
                     suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                        o.atrasos = await BuscarAtrasos('2024-12-01', '2024-12-31', o.id);
+                        o.atrasos = await BuscarAtrasos(desde, hasta, o.id);
                         return o;
                     }));
                     return suc;
