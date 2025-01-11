@@ -142,7 +142,7 @@ export class ReporteAuditoriaComponent implements OnInit {
         { nombre: "Provincias", tabla: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "Ciudades", tabla: "e_ciudades", modulo: "", disponibilidad: true },
         { nombre: "Empresa", tabla: "e_empresa", modulo: "", disponibilidad: true },
-        { nombre: "Mensaje de Cumpleaños", tabla: "e_message_birthday", modulo: "", disponibilidad: true },
+        { nombre: "Mensaje de Notificaciones", tabla: "e_message_notificaciones", modulo: "", disponibilidad: true },
         { nombre: "Documentacion", tabla: "e_documentacion", modulo: "", disponibilidad: true },
         { nombre: "Detalles de Parámetros", tabla: "ep_detalle_parametro", modulo: "", disponibilidad: true },
         { nombre: "Roles", tabla: "ero_cat_roles", modulo: "", disponibilidad: true },

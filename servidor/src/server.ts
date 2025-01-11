@@ -10,7 +10,7 @@ import indexRutas from './rutas/indexRutas';
 import PROVINCIA_RUTA from './rutas/configuracion/localizacion/catProvinciaRutas';
 import CIUDAD_RUTAS from './rutas/configuracion/localizacion/ciudadesRutas';
 import EMPRESA_RUTAS from './rutas/configuracion/parametrizacion/catEmpresaRutas';
-import BIRTHDAY_RUTAS from './rutas/notificaciones/birthdayRutas';
+import MENSAJES_NOTIFICACIONES_RUTAS from './rutas/notificaciones/mensajesNotificacionesRutas';
 import DOCUMENTOS_RUTAS from './rutas/documentos/documentosRutas';
 import PARAMETROS_RUTAS from './rutas/configuracion/parametrizacion/parametrosRutas';
 import ROLES_RUTAS from './rutas/configuracion/parametrizacion/catRolesRutas';
@@ -160,7 +160,7 @@ class Servidor {
         this.app.use(`/${ruta}/discapacidades`, DISCAPACIDADES_RUTAS);
         this.app.use(`/${ruta}/vacunasTipos`, TIPO_VACUNAS_RUTAS);
         this.app.use(`/${ruta}/archivosCargados`, DOCUMENTOS_RUTAS);
-        this.app.use(`/${ruta}/birthday`, BIRTHDAY_RUTAS);
+        this.app.use(`/${ruta}/mensajes_notificaciones`, MENSAJES_NOTIFICACIONES_RUTAS);
         // EMPLEADOS
         this.app.use(`/${ruta}/empleado`, EMPLEADO_RUTAS);
         this.app.use(`/${ruta}/usuarios`, USUARIO_RUTA);
@@ -287,16 +287,30 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
+import {  atrasosDiarios,atrasosSemanal } from './libs/sendAtraso';
+//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
+//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+
+import {  faltasDiarios, faltasSemanal } from './libs/sendFaltas';
+
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
  ** **************************************************************************************************** **/
 
- // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
+// METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
+
+setInterval(async () => {
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
+}, 2700000);
 
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
-cumpleanios();
+
+
 
 // LLAMA AL METODO DE AVISOS DE VACACIONES
 //beforeFiveDays();
@@ -310,4 +324,4 @@ cumpleanios();
 // ----------// conteoPermisos();
 
 
-//generarTimbres('1', '2023-11-01', '2023-11-02');
+//generarTimbres('1', '2023-11-01', '2023-11-02');//

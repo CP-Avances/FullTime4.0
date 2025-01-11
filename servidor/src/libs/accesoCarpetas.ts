@@ -132,12 +132,12 @@ export const ObtenerRutaDocumento = function () {
     return ruta + separador + 'documentacion';
 }
 
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE CUMPLEANIO
-export const ObtenerRutaBirthday = function () {
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE MENSAJES DE NOTIFICACIONES
+export const ObtenerRutaMensajeNotificacion = function () {
     let ruta = '';
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'cumpleanios';
+    return ruta + separador + 'mensajes_notificaciones';
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE LOGOS DE EMPRESA

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuscarFaltas = void 0;
 const database_1 = __importDefault(require("../../database"));
 class FaltasControlador {
     // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
@@ -21,7 +22,7 @@ class FaltasControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.faltas = yield BuscarFaltas(desde, hasta, o.id);
+                    o.faltas = yield (0, exports.BuscarFaltas)(desde, hasta, o.id);
                     return o;
                 })));
                 return obj;
@@ -52,5 +53,6 @@ const BuscarFaltas = function (fec_inicio, fec_final, id_empleado) {
         });
     });
 };
+exports.BuscarFaltas = BuscarFaltas;
 const FALTAS_CONTROLADOR = new FaltasControlador();
 exports.default = FALTAS_CONTROLADOR;

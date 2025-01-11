@@ -16,7 +16,7 @@ export class EditarDetalleParametroComponent implements OnInit {
   ips_locales: any = '';
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  descripcion = new FormControl('', [Validators.required]);
+  descripcion = new FormControl('');
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
@@ -26,6 +26,10 @@ export class EditarDetalleParametroComponent implements OnInit {
   nota: string = '';
   especificacion: string = '';
   observacion: string = '';
+
+  texto: boolean = false;
+  hora: boolean = false;
+  numeros: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -41,24 +45,66 @@ export class EditarDetalleParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
+    this.descripcion.setValidators([Validators.required]);
+    this.descripcion.updateValueAndValidity();
     this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
       'Guardar.';
     this.MostrarDatos();
-    if (this.data.parametros.id_tipo === 4) {
-      this.especificacion = 'Rango de perímetro en metros.';
-      this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
+    // PARAMETROS QUE REQUIEREN INGRESO DE NUMEROS
+    if (this.data.parametros.id_tipo === 4 || this.data.parametros.id_tipo === 6) {
+      this.numeros = true;
+      // PARAMETRO TOLERANCIA UBICACION
+      if (this.data.parametros.id_tipo === 4) {
+        this.especificacion = 'Rango de perímetro en metros.';
+        this.observacion = 'Perímetro de ubicación permitido para realizar marcaciones (metros).';
+      }
+      // PARAMETRO DISPOSITIVOS MOVILES
+      else if (this.data.parametros.id_tipo === 6) {
+        this.especificacion = 'Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres en la aplicación móvil.';
+        this.observacion = 'Número de dispositivos móviles en los que el usuario podrá iniciar sesión en la aplicación móvil.';
+      }
     }
-    // PARAMETRO DISPOSITIVOS MOVILES
-    else if (this.data.parametros.id === 6) {
-      this.especificacion = 'Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres en la aplicación móvil.';
-      this.observacion = 'Número de dispositivos móviles en los que el usuario podrá iniciar sesión en la aplicación móvil.';
+    // PARAMETROS DE REGISTRO DE HORA PARA ENVIO DE NOTIFICACIONES POR CORREO ELECTRONICO
+    else if (this.data.parametros.id_tipo === 9 || this.data.parametros.id_tipo === 11 || this.data.parametros.id_tipo === 14 ||
+      this.data.parametros.id_tipo === 18 || this.data.parametros.id_tipo === 21 || this.data.parametros.id_tipo === 25
+    ) {
+      this.hora = true;
+      this.especificacion = 'Registrar la hora en la que se enviará la notificación (formato de 24 horas).';
+
+      // OBSERVACION DEL PARAMETRO DE HORA DE ENVIO DE NOTIFICACIONES
+      if (this.data.parametros.id_tipo === 9) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por cumpleaños.';
+      }
+      else if (this.data.parametros.id_tipo === 11) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por atrasos diarios del personal.';
+      }
+      else if (this.data.parametros.id_tipo === 14) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por atrasos semanales del personal.';
+      }
+      else if (this.data.parametros.id_tipo === 18) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por faltas diarias del personal.';
+      }
+      else if (this.data.parametros.id_tipo === 21) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por faltas semanales del personal.';
+      }
+      else if (this.data.parametros.id_tipo === 25) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por aniversarios.';
+      }
+    }
+    else if (this.data.parametros.id_tipo === 12 || this.data.parametros.id_tipo === 16 ||
+      this.data.parametros.id_tipo === 19 || this.data.parametros.id_tipo === 23
+    ) {
+      this.texto = true;
+      this.descripcion.setValidators([Validators.required, Validators.email]);
+      this.descripcion.updateValueAndValidity();
     }
     else {
       this.especificacion = '';
+      this.texto = true;
     }
   }
 
@@ -76,7 +122,8 @@ export class EditarDetalleParametroComponent implements OnInit {
       descripcion: form.descripcionForm,
       observacion: this.observacion,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     this.rest.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

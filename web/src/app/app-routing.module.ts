@@ -85,7 +85,7 @@ import { ConfigurarOpcionesTimbresComponent } from './componentes/modulos/appMov
 import { ListaNotificacionComponent } from './componentes/notificaciones/configurar-notificaciones/multiple/lista-empleados/listaNotificacion.component';
 import { VerDocumentosComponent } from './componentes/notificaciones/documentos/ver-documentos/ver-documentos.component';
 import { ListaArchivosComponent } from './componentes/notificaciones/documentos/lista-archivos/lista-archivos.component';
-import { VerBirthdayComponent } from './componentes/notificaciones/cumpleanios/ver-birthday/ver-birthday.component';
+import { MensajesNotificacionesComponent } from './componentes/notificaciones/configurar-mensajes/mensajes-notificaciones/mensajes-notificaciones.component';
 import { ComunicadosComponent } from './componentes/notificaciones/comunicados/comunicados.component';
 import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
@@ -245,7 +245,7 @@ const routes: Routes = [
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'archivos', component: VerDocumentosComponent, canActivate: [AuthGuard] },
   { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard] },
-  { path: 'cumpleanios', component: VerBirthdayComponent, canActivate: [AuthGuard] },
+ { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
   { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard] },
   { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard] },
   { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard] },

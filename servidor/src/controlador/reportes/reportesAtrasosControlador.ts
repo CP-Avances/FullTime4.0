@@ -6,6 +6,7 @@ class ReportesAtrasosControlador {
     // METODO DE BUSQUEDA DE DATOS DE ATRASOS    **USADO
     public async ReporteAtrasos(req: Request, res: Response) {
         let { desde, hasta } = req.params;
+        console.log("ver desde: " , desde);
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
             suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
@@ -29,7 +30,7 @@ class ReportesAtrasosControlador {
 
 
 // FUNCION DE BUSQUEDA DE REGISTROS DE ATRASOS
-const BuscarAtrasos = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
+export const BuscarAtrasos = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),

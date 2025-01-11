@@ -28,7 +28,7 @@ class FaltasControlador {
 }
 
 // FUNCION DE BUSQUEDA DE REGISTROS DE FALTAS
-const BuscarFaltas = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
+export const BuscarFaltas = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
         SELECT id_empleado, CAST(fecha_horario AS VARCHAR)

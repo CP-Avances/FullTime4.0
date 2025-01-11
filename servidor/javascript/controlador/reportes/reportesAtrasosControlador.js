@@ -12,16 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuscarAtrasos = void 0;
 const database_1 = __importDefault(require("../../database"));
 class ReportesAtrasosControlador {
     // METODO DE BUSQUEDA DE DATOS DE ATRASOS    **USADO
     ReporteAtrasos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
+            console.log("ver desde: ", desde);
             let datos = req.body;
             let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                 suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.atrasos = yield BuscarAtrasos(desde, hasta, o.id);
+                    o.atrasos = yield (0, exports.BuscarAtrasos)(desde, hasta, o.id);
                     return o;
                 })));
                 return suc;
@@ -54,5 +56,6 @@ const BuscarAtrasos = function (fec_inicio, fec_final, id_empleado) {
         });
     });
 };
+exports.BuscarAtrasos = BuscarAtrasos;
 const REPORTES_ATRASOS_CONTROLADOR = new ReportesAtrasosControlador();
 exports.default = REPORTES_ATRASOS_CONTROLADOR;
