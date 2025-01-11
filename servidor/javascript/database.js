@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const pg_pool_1 = __importDefault(require("pg-pool"));
 const pool = new pg_pool_1.default({
     user: 'postgres',
-    host: 'localhost', //'186.4.226.49',
+    host: '192.168.0.148',
     port: 5432,
     database: 'fulltime4_prueba4',
     password: '12345'

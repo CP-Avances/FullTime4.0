@@ -3,7 +3,7 @@ import Pool from 'pg-pool';
 
 const pool = new Pool({
   user: 'postgres',
-  host: 'localhost', //'186.4.226.49',
+  host: '192.168.0.148',
   port: 5432,
   database: 'fulltime4_prueba4',
   password: '12345'

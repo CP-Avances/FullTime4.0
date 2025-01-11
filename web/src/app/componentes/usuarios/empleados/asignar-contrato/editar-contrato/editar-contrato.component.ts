@@ -54,7 +54,7 @@ export class EditarContratoComponent implements OnInit {
   documentoF = new FormControl('');
   contratoF = new FormControl('', Validators.minLength(3));
   seleccion = new FormControl('');
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public ContratoForm = new FormGroup({

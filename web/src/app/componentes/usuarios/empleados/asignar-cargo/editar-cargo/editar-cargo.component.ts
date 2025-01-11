@@ -54,7 +54,7 @@ export class EditarCargoComponent implements OnInit {
   idSucursal = new FormControl('', [Validators.required]);
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
   jefeF = new FormControl();
   administraF = new FormControl();
   personalF = new FormControl(false);

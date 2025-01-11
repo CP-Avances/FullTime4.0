@@ -72,18 +72,16 @@ class AccionPersonalControlador {
     public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion,
-                tipo_situacion_propuesta, user_name, ip, ip_local } = req.body;
+            const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal, tipo_permiso, 
-                    tipo_vacacion, tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
+                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
                 `
-                , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+                , [id_tipo, descripcion, base_legal]);
 
             const [datos] = response.rows;
 
@@ -97,9 +95,7 @@ class AccionPersonalControlador {
                     datosNuevos:
                         `
                         {
-                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                            "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                            "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
                         }
                         `
                     ,
@@ -291,8 +287,7 @@ class AccionPersonalControlador {
     public async ListarTipoAccionPersonal(req: Request, res: Response) {
         const ACCION = await pool.query(
             `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE tap.id = dtap.id_tipo_accion_personal
             `
@@ -324,8 +319,7 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const ACCION = await pool.query(
             `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
             `
@@ -340,8 +334,7 @@ class AccionPersonalControlador {
 
     public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta,
-                id, user_name, ip, ip_local } = req.body;
+            const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -373,9 +366,9 @@ class AccionPersonalControlador {
             await pool.query(
                 `
                 UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
-                    tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7
+                     WHERE id = $4
                 `
-                , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
+                , [id_tipo, descripcion, base_legal, id]);
 
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -386,9 +379,7 @@ class AccionPersonalControlador {
                 datosNuevos:
                     `
                     {
-                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                        "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}"
                     }
                     `
                 ,
@@ -985,23 +976,71 @@ class AccionPersonalControlador {
   public async CargarPlantilla(req: Request, res: Response) {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
+    var listaProcesosInsertados: any = [];
 
-    for (const data of plantilla) {
-      const { proceso, nivel, proceso_padre } = data;
+    for(const item of plantilla){
+        const { proceso, nivel, proceso_padre } = item;
+        console.log('proceso: ',proceso)
 
+        try {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+              `
+              INSERT INTO map_cat_procesos (nombre) VALUES ($1) RETURNING *
+              `
+              , [proceso]);
+    
+            const [procesos] = response.rows;
+    
+            console.log('response: ',response)
+            var datoProce = {
+                id: response.rows,
+                proceso: proceso
+            }
+
+            listaProcesosInsertados.push(datoProce)
+    
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(procesos),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+    
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            error = true;
+          }
+
+    }
+
+    for (const data of listaProcesosInsertados) {
+      const { id, proceso } = data;
+
+      console.log('id: ',id)
       console.log('proceso: ',proceso)
-      console.log('proceso_padre: ',proceso_padre)
+      
 
       try {
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-
         const response: QueryResult = await pool.query(
           `
-          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          UPDATE map_cat_procesos SET proceso_padre = $1 WHERE id = $2
           `
-          , [proceso, proceso_padre]);
+          , [id, id]);
 
         const [procesos] = response.rows;
 
