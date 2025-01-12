@@ -220,7 +220,6 @@ class ProcesoControlador {
                     let data = {
                         fila: '',
                         proceso: '',
-                        nivel: '',
                         proceso_padre: '',
                         observacion: ''
                     };
@@ -236,7 +235,7 @@ class ProcesoControlador {
                             headers[cell.value.toString().toUpperCase()] = colNumber;
                         });
                         // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                        if (!headers['ITEM'] || !headers['PROCESO'] || !headers['NIVEL'] || !headers['PROCESO_PADRE']) {
+                        if (!headers['ITEM'] || !headers['DESCRIPCION'] || !headers['PROCESO_PADRE']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -247,17 +246,14 @@ class ProcesoControlador {
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const PROCESO = (_a = row.getCell(headers['PROCESO']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
-                            const NIVEL = row.getCell(headers['NIVEL']).value;
+                            const PROCESO = (_a = row.getCell(headers['DESCRIPCION']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
                             const PROCESO_PADRE = (_b = row.getCell(headers['PROCESO_PADRE']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (PROCESO != undefined && PROCESO != '') &&
-                                (NIVEL != undefined && NIVEL != '') &&
                                 (PROCESO_PADRE != undefined && PROCESO_PADRE != '')) {
                                 data.fila = ITEM;
                                 data.proceso = PROCESO;
-                                data.nivel = NIVEL;
                                 data.proceso_padre = PROCESO_PADRE;
                                 data.observacion = 'no registrado';
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
@@ -267,7 +263,6 @@ class ProcesoControlador {
                             else {
                                 data.fila = ITEM;
                                 data.proceso = PROCESO;
-                                data.nivel = NIVEL;
                                 data.proceso_padre = PROCESO_PADRE;
                                 data.observacion = 'no registrado';
                                 if (data.fila == '' || data.fila == undefined) {
@@ -277,10 +272,6 @@ class ProcesoControlador {
                                 if (PROCESO == undefined) {
                                     data.proceso = 'No registrado';
                                     data.observacion = 'Proceso ' + data.observacion;
-                                }
-                                if (NIVEL == undefined) {
-                                    data.nivel = 'No registrado';
-                                    data.observacion = 'Nivel ' + data.observacion;
                                 }
                                 if (PROCESO_PADRE == undefined) {
                                     data.proceso_padre = 'No registrado';
@@ -310,7 +301,7 @@ class ProcesoControlador {
                     WHERE UPPER(nombre) = UPPER($1)
                     `, [item.nombre]);
                             if (VERIFICAR_PROCESO.rowCount === 0) {
-                                if (item.nombre.toUpperCase() !== item.proceso_padre.toUpperCase()) {
+                                if (item.proceso.toUpperCase() !== item.proceso_padre.toUpperCase()) {
                                     const VERIFICAR_PROCESO_PADRE = yield database_1.default.query(`
                         SELECT * FROM map_cat_procesos 
                         WHERE UPPER(nombre) = UPPER($1)
@@ -338,15 +329,16 @@ class ProcesoControlador {
                                         }
                                         if (item.observacion == 'no registrado') {
                                             const cruzado = listaProcesos.slice(0, index).find((p) => (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
-                                                p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()));
+                                                p.proceso_padre.toLowerCase() === item.proceso.toLowerCase() &&
+                                                p.observacion === 'no registrado' && item.observacion === 'no registrado'));
                                             if (cruzado) {
                                                 item.observacion = 'Registro cruzado';
                                             }
                                             else {
-                                                const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre === obj.proceso);
-                                                if (!existe_proceso_padre) {
+                                                if (existe_proceso_padre == false) {
+                                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre === obj.proceso);
                                                     if (!hayCoincidencia) {
-                                                        item.observacion = 'Proceso padre no existe en el archivo como proceso';
+                                                        item.observacion = 'Proceso padre no existe en el archivo como proceso.';
                                                     }
                                                 }
                                             }
@@ -410,18 +402,15 @@ class ProcesoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
-            for (const data of plantilla) {
-                const { proceso, nivel, proceso_padre } = data;
-                console.log('proceso: ', proceso);
-                console.log('proceso_padre: ', proceso_padre);
+            for (const item of plantilla) {
+                const { proceso } = item;
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
           INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-          `, [proceso, proceso_padre]);
+          `, [proceso, null]);
                     const [procesos] = response.rows;
-                    console.log('response: ', response);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'map_cat_procesos',
@@ -441,6 +430,78 @@ class ProcesoControlador {
                     yield database_1.default.query('ROLLBACK');
                     error = true;
                 }
+            }
+            for (const data of plantilla) {
+                const { proceso, proceso_padre } = data;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const select = yield database_1.default.query(`
+          SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
+          `, [proceso_padre]);
+                const [res] = select.rows;
+                if (select.rowCount > 0) {
+                    console.log('select.rowCount: ', select.rows[0].id);
+                    const response = yield database_1.default.query(`
+            UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
+            `, [select.rows[0].id, proceso]);
+                    const [procesos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(procesos),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                }
+                else {
+                    const respo = yield database_1.default.query(`
+            INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+            `, [proceso_padre, null]);
+                    const [proce] = respo.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(proce),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    const response = yield database_1.default.query(`
+            UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
+            `, [respo.rows[0].id, proceso]);
+                    const [procesos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(procesos),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                }
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'map_cat_procesos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(res),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
             }
             if (error) {
                 return res.status(500).jsonp({ message: 'error' });

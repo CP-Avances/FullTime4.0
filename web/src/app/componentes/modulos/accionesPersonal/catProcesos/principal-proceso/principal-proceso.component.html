@@ -9,7 +9,7 @@
                     <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarProceso()">
                         Crear proceso
                     </button>
-                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -167,7 +167,6 @@
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
                         <th scope="col">Proceso</th>
-                        <th scope="col">Nivel</th>
                         <th scope="col">Proceso padre</th>
                     </tr>
                 </thead>
@@ -185,9 +184,6 @@
                         </td>
                         <td [style.color]="EstiloTextoCelda(pro.proceso)" style="font-size: 12px;">
                             {{pro.proceso}}
-                        </td>
-                        <td [style.color]="EstiloTextoCelda(pro.nivel)" style="font-size: 12px;">
-                            {{pro.nivel}}
                         </td>
                         <td [style.color]="EstiloTextoCelda(pro.proceso_padre)" style="font-size: 12px;">
                             {{pro.proceso_padre}}
