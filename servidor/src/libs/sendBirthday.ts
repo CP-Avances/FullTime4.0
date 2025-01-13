@@ -24,7 +24,7 @@ export const cumpleanios = function () {
             `
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 9
             `);
-
+        
         if (PARAMETRO_HORA.rowCount != 0) {
             console.log("ver Parametro semanal: ", PARAMETRO_HORA.rows[0].descripcion)
             if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
@@ -153,8 +153,6 @@ export const cumpleanios = function () {
                         }
                     }
                 }
-
-
             }
         }
 

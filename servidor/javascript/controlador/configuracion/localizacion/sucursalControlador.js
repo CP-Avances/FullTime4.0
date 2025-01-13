@@ -268,8 +268,8 @@ class SucursalControlador {
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString();
-                        const CIUDAD = (_b = row.getCell(headers['CIUDAD']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                        const CIUDAD = (_b = row.getCell(headers['CIUDAD']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
                         const dato = {
                             ITEM: ITEM,
                             NOMBRE: NOMBRE,

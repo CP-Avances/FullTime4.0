@@ -30,10 +30,10 @@ export const faltasSemanal = async function () {
     const dia = date.getDay();
     // Crear una copia del objeto Date antes de modificarlo
     const dateAntes = new Date(date);
-    dateAntes.setDate(dateAntes.getDate() - 8); 
+    dateAntes.setDate(dateAntes.getDate() - 8);
 
-    const dataActual = new  Date(date);
-    dataActual.setDate(dateAntes.getDate() - 1); 
+    const dataActual = new Date(date);
+    dataActual.setDate(dateAntes.getDate() - 1);
 
 
     const fechaDiaActual = dataActual.toJSON().split("T")[0]; // Fecha actual

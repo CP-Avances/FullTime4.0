@@ -289,8 +289,8 @@ class SucursalControlador {
 
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString();
-          const CIUDAD = row.getCell(headers['CIUDAD']).value?.toString();
+          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
+          const CIUDAD = row.getCell(headers['CIUDAD']).value?.toString().trim();
 
           const dato = {
             ITEM: ITEM,

@@ -765,7 +765,7 @@ class AccionPersonalControlador {
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         const workbook = new Excel.Workbook();
         await workbook.xlsx.readFile(ruta);
-        let verificador = ObtenerIndicePlantilla(workbook, 'PROCESOS');
+        let verificador = ObtenerIndicePlantilla(workbook, 'TIPOS_ACCION_PERSONAL');
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
@@ -976,23 +976,71 @@ class AccionPersonalControlador {
   public async CargarPlantilla(req: Request, res: Response) {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
+    var listaProcesosInsertados: any = [];
 
-    for (const data of plantilla) {
-      const { proceso, nivel, proceso_padre } = data;
+    for(const item of plantilla){
+        const { proceso, nivel, proceso_padre } = item;
+        console.log('proceso: ',proceso)
 
+        try {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+              `
+              INSERT INTO map_cat_procesos (nombre) VALUES ($1) RETURNING *
+              `
+              , [proceso]);
+    
+            const [procesos] = response.rows;
+    
+            console.log('response: ',response)
+            var datoProce = {
+                id: response.rows,
+                proceso: proceso
+            }
+
+            listaProcesosInsertados.push(datoProce)
+    
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(procesos),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+    
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            error = true;
+          }
+
+    }
+
+    for (const data of listaProcesosInsertados) {
+      const { id, proceso } = data;
+
+      console.log('id: ',id)
       console.log('proceso: ',proceso)
-      console.log('proceso_padre: ',proceso_padre)
+      
 
       try {
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-
         const response: QueryResult = await pool.query(
           `
-          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+          UPDATE map_cat_procesos SET proceso_padre = $1 WHERE id = $2
           `
-          , [proceso, proceso_padre]);
+          , [id, id]);
 
         const [procesos] = response.rows;
 

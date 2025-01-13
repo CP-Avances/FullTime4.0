@@ -25,21 +25,21 @@
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                         <button mat-button type="button" class="btn-sm"
                             [ngStyle]="{'font-size.px':12, 'background-color':formatoA, 'color':'white'}"
-                            (click)="GuardarDatos(1)">
+                            (click)="GuardarDatos(1, '')">
                             Formato americano: DD/MM/YYYY
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                         <button mat-button type="button" class="btn-sm"
                             [ngStyle]="{'font-size.px':12, 'background-color':formatoI, 'color':'white'}"
-                            (click)="GuardarDatos(2)">
+                            (click)="GuardarDatos(2, '')">
                             Formato inglés: MM/DD/YYYY
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                         <button mat-button type="button" class="btn-sm"
                             [ngStyle]="{'font-size.px':12, 'background-color':formatoE, 'color':'white'}"
-                            (click)="GuardarDatos(3)">
+                            (click)="GuardarDatos(3, '')">
                             Formato estándar: YYYY-MM-DD
                         </button>
                     </div>
@@ -50,14 +50,14 @@
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                         <button mat-button type="button" class="btn-sm"
                             [ngStyle]="{'font-size.px':12, 'background-color':formato12, 'color':'white'}"
-                            (click)="GuardarDatos(4)">
+                            (click)="GuardarDatos(4, '')">
                             Formato de 12 horas
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                         <button mat-button type="button" class="btn-sm"
                             [ngStyle]="{'font-size.px':12, 'background-color':formato24, 'color':'white'}"
-                            style="font-size: 12px;" (click)="GuardarDatos(5)">
+                            style="font-size: 12px;" (click)="GuardarDatos(5, '')">
                             Formato de 24 horas
                         </button>
                     </div>
@@ -168,6 +168,67 @@
                         </div>
                     </mat-radio-group>
                 </form>
+
+                <!-- CONTENIDO DE SELECCION DE DIAS -->
+                <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px;" *ngIf="seleccionar_dia">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':lunes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Lunes')">
+                                    LUNES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':martes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Martes')">
+                                    MARTES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':miercoles, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Miércoles')">
+                                    MIÉRCOLES
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':jueves, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Jueves')">
+                                    JUEVES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':viernes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Viernes')">
+                                    VIERNES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':sabado, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Sábado')">
+                                    SÁBADO
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':domingo, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Domingo')">
+                                    DOMINGO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
                 <div class="row" *ngIf="laboral_calendario">

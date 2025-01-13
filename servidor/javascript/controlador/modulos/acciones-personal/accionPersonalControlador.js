@@ -690,7 +690,7 @@ class AccionPersonalControlador {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 const workbook = new exceljs_1.default.Workbook();
                 yield workbook.xlsx.readFile(ruta);
-                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'PROCESOS');
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TIPOS_ACCION_PERSONAL');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
@@ -871,16 +871,53 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
-            for (const data of plantilla) {
-                const { proceso, nivel, proceso_padre } = data;
+            var listaProcesosInsertados = [];
+            for (const item of plantilla) {
+                const { proceso, nivel, proceso_padre } = item;
                 console.log('proceso: ', proceso);
-                console.log('proceso_padre: ', proceso_padre);
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
-          INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-          `, [proceso, proceso_padre]);
+              INSERT INTO map_cat_procesos (nombre) VALUES ($1) RETURNING *
+              `, [proceso]);
+                    const [procesos] = response.rows;
+                    console.log('response: ', response);
+                    var datoProce = {
+                        id: response.rows,
+                        proceso: proceso
+                    };
+                    listaProcesosInsertados.push(datoProce);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(procesos),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            for (const data of listaProcesosInsertados) {
+                const { id, proceso } = data;
+                console.log('id: ', id);
+                console.log('proceso: ', proceso);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+          UPDATE map_cat_procesos SET proceso_padre = $1 WHERE id = $2
+          `, [id, id]);
                     const [procesos] = response.rows;
                     console.log('response: ', response);
                     // AUDITORIA

@@ -300,12 +300,12 @@ import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
-//setInterval(async () => {
-//atrasosDiarios();
-atrasosSemanal();
-//faltasDiarios();
-//faltasSemanal();
-//}, 2700000);
+setInterval(async () => {
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
+}, 2700000);
 
 
 // LLAMA AL MEODO DE CUMPLEAÑOS

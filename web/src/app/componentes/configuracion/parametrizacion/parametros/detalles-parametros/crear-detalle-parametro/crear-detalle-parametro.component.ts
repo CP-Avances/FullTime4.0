@@ -96,8 +96,8 @@ export class CrearDetalleParametroComponent implements OnInit {
         this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por aniversarios.';
       }
     }
-    else if (this.data.parametros.id === 12 || this.data.parametros.id === 16 || this.data.parametros.id === 19 ||
-      this.data.parametros.id === 23
+    else if (this.data.parametros.id === 12 || this.data.parametros.id === 16 ||
+      this.data.parametros.id === 19 || this.data.parametros.id === 23
     ) {
       this.texto = true;
       this.descripcion.setValidators([Validators.required, Validators.email]);

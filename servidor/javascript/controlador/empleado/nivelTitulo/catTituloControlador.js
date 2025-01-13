@@ -221,13 +221,14 @@ class TituloControlador {
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.eachRow((row, rowNumber) => __awaiter(this, void 0, void 0, function* () {
+                        var _a, _b;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const NOMBRE = row.getCell(headers['NOMBRE']).value;
-                        const NIVEL = row.getCell(headers['NIVEL']).value;
+                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                        const NIVEL = (_b = row.getCell(headers['NIVEL']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
                         const dato = {
                             ITEM: ITEM,
                             NOMBRE: NOMBRE,
@@ -259,18 +260,16 @@ class TituloControlador {
                                         data.observacion = 'ok';
                                         duplicados.push(dato);
                                     }
-                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                    data.titulo = data.titulo.trim();
-                                    data.nivel = data.nivel.trim();
+                                    console.log('titulo 00: ', data.titulo);
+                                    console.log('nivel 00: ', data.nivel);
                                     listTitulosProfesionales.push(data);
                                 }
                                 else {
                                     data.fila = ITEM;
                                     data.titulo = NOMBRE;
                                     data.nivel = NIVEL;
-                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                    data.titulo = data.titulo.trim();
-                                    data.nivel = data.nivel.trim();
+                                    console.log('titulo 11: ', data.titulo);
+                                    console.log('nivel 11: ', data.nivel);
                                     listTitulosProfesionales.push(data);
                                 }
                             }
@@ -283,9 +282,8 @@ class TituloControlador {
                                     data.observacion = 'Nivel no registrado';
                                 }
                                 data.observacion = 'Nivel no existe en el sistema';
-                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.titulo = data.titulo.trim();
-                                data.nivel = data.nivel.trim();
+                                console.log('titulo 22: ', data.titulo);
+                                console.log('nivel 22: ', data.nivel);
                                 listTitulosProfesionales.push(data);
                             }
                         }
@@ -308,9 +306,8 @@ class TituloControlador {
                             if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
                                 data.observacion = 'Título y Nivel no registrado';
                             }
-                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                            data.titulo = data.titulo.trim();
-                            data.nivel = data.nivel.trim();
+                            console.log('titulo 33: ', data.titulo);
+                            console.log('nivel 33: ', data.nivel);
                             listTitulosProfesionales.push(data);
                         }
                         data = {};

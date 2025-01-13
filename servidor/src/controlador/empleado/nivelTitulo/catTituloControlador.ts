@@ -238,8 +238,8 @@ class TituloControlador {
           if (rowNumber === 1) return;
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const NOMBRE = row.getCell(headers['NOMBRE']).value;
-          const NIVEL = row.getCell(headers['NIVEL']).value;
+          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
+          const NIVEL = row.getCell(headers['NIVEL']).value?.toString().trim();
           const dato = {
             ITEM: ITEM,
             NOMBRE: NOMBRE,
@@ -248,6 +248,8 @@ class TituloControlador {
           data.fila = ITEM
           data.titulo = NOMBRE;
           data.nivel = NIVEL;
+
+
 
           if ((data.fila != undefined && data.fila != '') &&
             (data.titulo != undefined && data.titulo != '') &&
@@ -278,9 +280,8 @@ class TituloControlador {
                   duplicados.push(dato);
                 }
 
-                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                data.titulo = data.titulo.trim();
-                data.nivel = data.nivel.trim();
+                console.log('titulo 00: ',data.titulo);
+                console.log('nivel 00: ',data.nivel);
 
                 listTitulosProfesionales.push(data);
               } else {
@@ -288,9 +289,8 @@ class TituloControlador {
                 data.titulo = NOMBRE;
                 data.nivel = NIVEL
 
-                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                data.titulo = data.titulo.trim();
-                data.nivel = data.nivel.trim();
+                console.log('titulo 11: ',data.titulo);
+                console.log('nivel 11: ',data.nivel);
 
                 listTitulosProfesionales.push(data);
               }
@@ -305,9 +305,8 @@ class TituloControlador {
               }
               data.observacion = 'Nivel no existe en el sistema'
 
-              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-              data.titulo = data.titulo.trim();
-              data.nivel = data.nivel.trim();
+              console.log('titulo 22: ',data.titulo);
+              console.log('nivel 22: ',data.nivel);
 
               listTitulosProfesionales.push(data);
             }
@@ -336,9 +335,8 @@ class TituloControlador {
               data.observacion = 'Título y Nivel no registrado';
             }
 
-            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-            data.titulo = data.titulo.trim();
-            data.nivel = data.nivel.trim();
+            console.log('titulo 33: ',data.titulo);
+            console.log('nivel 33: ',data.nivel);
 
             listTitulosProfesionales.push(data);
           }

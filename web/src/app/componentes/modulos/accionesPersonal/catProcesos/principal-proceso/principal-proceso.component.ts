@@ -135,19 +135,16 @@ export class PrincipalProcesoComponent implements OnInit {
   }
 
   // METODO PARA LIMPIAR CAMPOS DE BUSQUEDA
-  LimpiarCampoBuscar() {
+  LimpiarCampos() {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
     this.Datos_procesos = null;
     this.messajeExcel = '';
     this.buscarNombre.reset();
     this.buscarNivel.reset();
     this.buscarPadre.reset();
     this.ObtenerProcesos();
-  }
-
-  LimpiarCampos() {
-    this.archivoSubido = [];
-    this.nameFile = '';
-    this.archivoForm.reset();
   }
   
 
@@ -276,7 +273,9 @@ export class PrincipalProcesoComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
+      
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
         } else {
@@ -315,17 +314,6 @@ export class PrincipalProcesoComponent implements OnInit {
         this.Datos_procesos = res.data;
         this.messajeExcel = res.message;
 
-        console.log('listado de procesos: ',this.Datos_procesos)
-
-      this.Datos_procesos.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -339,6 +327,17 @@ export class PrincipalProcesoComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+
+        this.Datos_procesos.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
         this.Datos_procesos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaProcesosCorrectas.push(item);

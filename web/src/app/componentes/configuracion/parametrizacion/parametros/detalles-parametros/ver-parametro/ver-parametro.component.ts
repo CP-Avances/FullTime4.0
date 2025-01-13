@@ -27,6 +27,14 @@ export class VerParametroComponent implements OnInit {
   formatoA: string = 'rgb(80, 87, 97)';
   formatoI: string = 'rgb(80, 87, 97)';
   formatoE: string = 'rgb(80, 87, 97)';
+  // DIAS DE LA SEMANA
+  lunes: string = 'rgb(80, 87, 97)';
+  martes: string = 'rgb(80, 87, 97)';
+  miercoles: string = 'rgb(80, 87, 97)';
+  jueves: string = 'rgb(80, 87, 97)';
+  viernes: string = 'rgb(80, 87, 97)';
+  sabado: string = 'rgb(80, 87, 97)';
+  domingo: string = 'rgb(80, 87, 97)';
 
   @Input() idParametro: string;
 
@@ -60,6 +68,8 @@ export class VerParametroComponent implements OnInit {
   kardex: boolean = false;
   // PARAMETRO FORMATO LABORAL - CALENDARIO
   laboral_calendario: boolean = false;
+  // PARAMETRO SELECCIONAR DIA
+  seleccionar_dia: boolean = false;
   // IDENTIFICADOR DE HORAS
   horas: boolean = false;
 
@@ -222,6 +232,7 @@ export class VerParametroComponent implements OnInit {
     }
     // DIA DE ENVIO DE REPORTE DE ATRASOS SEMANAL
     if (this.idParametro === '15') {
+      this.seleccionar_dia = true;
       this.nota_parametro =
         `
         NOTA: Seleccionar día en el que se enviará la notificación semanal con el reporte de atrasos 
@@ -285,7 +296,7 @@ export class VerParametroComponent implements OnInit {
     }
     // DIA DE ENVIO DE REPORTE DE FALTAS SEMANAL
     if (this.idParametro === '22') {
-      this.horas = true;
+      this.seleccionar_dia = true;
       this.nota_parametro =
         `
         NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de faltas de los 
@@ -357,8 +368,8 @@ export class VerParametroComponent implements OnInit {
     // PARAMETROS PARA INGRESAR DETALLE
     if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '9' ||
       this.idParametro === '11' || this.idParametro === '12' || this.idParametro === '14' ||
-      this.idParametro === '15' || this.idParametro === '16' || this.idParametro === '18' ||
-      this.idParametro === '19' || this.idParametro === '21' || this.idParametro === '22' ||
+      this.idParametro === '16' || this.idParametro === '18' ||
+      this.idParametro === '19' || this.idParametro === '21' ||
       this.idParametro === '23' || this.idParametro === '25' || this.idParametro === '100') {
       this.ver_editar = true;
       this.ver_detalles = true;
@@ -421,6 +432,34 @@ export class VerParametroComponent implements OnInit {
         this.formatoE = '#4194F0';
         this.formatoI = 'rgb(80, 87, 97)';
         this.formatoA = 'rgb(80, 87, 97)';
+      }
+      if (this.datosDetalle[0].descripcion === 'Lunes') {
+        this.CambiarColores();
+        this.lunes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Martes') {
+        this.CambiarColores();
+        this.martes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Miércoles') {
+        this.CambiarColores();
+        this.miercoles = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Jueves') {
+        this.CambiarColores();
+        this.jueves = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Viernes') {
+        this.CambiarColores();
+        this.viernes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Sábado') {
+        this.CambiarColores();
+        this.sabado = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Domingo') {
+        this.CambiarColores();
+        this.domingo = '#4194F0';
       }
 
       if (this.idParametro === '3') {
@@ -601,7 +640,7 @@ export class VerParametroComponent implements OnInit {
    ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** **
    ** ******************************************************************************************* **/
 
-  GuardarDatos(seleccion: number) {
+  GuardarDatos(seleccion: number, dia: string) {
     let formato = '';
     let observacion = '';
     if (seleccion === 1) {
@@ -624,6 +663,10 @@ export class VerParametroComponent implements OnInit {
       formato = 'HH:mm:ss';
       observacion = 'Formato de 24 horas';
     }
+    else if (seleccion === 6) {
+      formato = dia;
+    }
+
     this.RegistrarValores(formato, observacion);
   }
 
@@ -795,5 +838,17 @@ export class VerParametroComponent implements OnInit {
     this.formulario.reset();
   }
 
+  /** ******************************************************************************************* **
+   ** **                        COLORES DEFAULT DE DIAS DE LA SEMANA                           ** **
+   ** ******************************************************************************************* **/
+  CambiarColores() {
+    this.lunes = 'rgb(80, 87, 97)';
+    this.martes = 'rgb(80, 87, 97)';
+    this.miercoles = 'rgb(80, 87, 97)';
+    this.jueves = 'rgb(80, 87, 97)';
+    this.viernes = 'rgb(80, 87, 97)';
+    this.sabado = 'rgb(80, 87, 97)';
+    this.domingo = 'rgb(80, 87, 97)';
+  }
 
 }
