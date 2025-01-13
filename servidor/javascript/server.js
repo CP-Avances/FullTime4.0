@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -271,20 +262,17 @@ const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAtraso_1 = require("./libs/sendAtraso");
-//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
-//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
-const sendFaltas_1 = require("./libs/sendFaltas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    (0, sendAtraso_1.atrasosDiarios)();
-    (0, sendAtraso_1.atrasosSemanal)();
-    (0, sendFaltas_1.faltasDiarios)();
-    (0, sendFaltas_1.faltasSemanal)();
-}), 2700000);
+//setInterval(async () => {
+//atrasosDiarios();
+(0, sendAtraso_1.atrasosSemanal)();
+//faltasDiarios();
+//faltasSemanal();
+//}, 2700000);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 // LLAMA AL METODO DE AVISOS DE VACACIONES
 //beforeFiveDays();
