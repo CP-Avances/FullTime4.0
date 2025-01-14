@@ -155,6 +155,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
             timbre_especial: res.timbre_especial,
             timbre_foto: res.timbre_foto,
             timbre_ubicacion_desconocida: res.timbre_ubicacion_desconocida,
+            opcional_obligatorio: res.opcional_obligatorio,
             n: numero++
           };
         });

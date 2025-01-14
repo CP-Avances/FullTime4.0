@@ -58,7 +58,6 @@ export class RegistrarTimbreComponent implements OnInit {
   // VARIABLE DE SELECCION DE OPCION
   boton_abierto: boolean = false;
   ver_timbrar: boolean = true;
-  ver_camara: boolean = false;
 
   // VARIABLES DE ALMACENMAIENTO DE COORDENADAS
   latitud: number;
@@ -100,10 +99,10 @@ export class RegistrarTimbreComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.ObtenerZonaHoraria();
     this.VerificarCamara();
     this.VerificarFunciones();
@@ -300,6 +299,9 @@ export class RegistrarTimbreComponent implements OnInit {
   capturar_segundos: boolean = false;
   foto: boolean = false;
   especial: boolean = false;
+  foto_obligatorio: boolean = false;
+  opcional: boolean = false;
+
   BuscarParametros() {
     let datos: any = [];
     let detalles = { parametros: '4, 7, 2, 5' };
@@ -343,11 +345,13 @@ export class RegistrarTimbreComponent implements OnInit {
     this.foto = false;
     this.especial = false;
     this.desconocida = false;
+    this.foto_obligatorio = false
     this.restTimbres.BuscarVariasOpcionesMarcacionWeb(buscar).subscribe((a) => {
       //console.log('veificar datos ', a.respuesta);
       this.foto = a.respuesta[0].timbre_foto;
       this.especial = a.respuesta[0].timbre_especial;
       this.desconocida = a.respuesta[0].timbre_ubicacion_desconocida;
+      this.foto_obligatorio = a.respuesta[0].opcional_obligatorio;
     });
   }
 
@@ -456,18 +460,46 @@ export class RegistrarTimbreComponent implements OnInit {
     //console.log('entra2')
     // VERIFICAR USO DE LA CAMARA
     if (this.foto === true) {
-      if (this.existe_camara) {
-        if (this.permisos_camara === true) {
-          this.ver_camara = true;
-          this.ValidarModulo(this.latitud, this.longitud, this.rango);
+
+      console.log("ver valor de this.foto_obligatorio: ", this.foto_obligatorio)
+      if (this.foto_obligatorio) {
+        this.opcional = false;
+
+        if (this.existe_camara) {
+          if (this.permisos_camara === true) {
+            this.ver_camara = true;
+            this.ValidarModulo(this.latitud, this.longitud, this.rango);
+          }
+          else {
+            this.MostrarMensaje('Permisos de cámara no otorgados o denegados.', '');
+          }
         }
         else {
-          this.MostrarMensaje('Permisos de cámara no otorgados o denegados.', '');
+          this.MostrarMensaje('Fotografía es requerida.', 'No se ha encontrado ninguna cámara disponible.');
+        }
+      } else {
+
+        this.opcional = true;
+
+        if (this.existe_camara) {
+          if (this.permisos_camara === true) {
+            //this.ver_camara = true;
+            this.ValidarModulo(this.latitud, this.longitud, this.rango);
+          }
+          else {
+            if (this.ver_camara === true) {
+              this.MostrarMensaje('Permisos de cámara no otorgados o denegados.', '');
+            }else {
+              this.ValidarModulo(this.latitud, this.longitud, this.rango);
+
+            }
+          }
+        }
+        else {
+          this.ValidarModulo(this.latitud, this.longitud, this.rango);
         }
       }
-      else {
-        this.MostrarMensaje('Fotografía es requerida.', 'No se ha encontrado ninguna cámara disponible.');
-      }
+
     }
     else {
       this.ValidarModulo(this.latitud, this.longitud, this.rango);
@@ -717,10 +749,25 @@ export class RegistrarTimbreComponent implements OnInit {
     this.ventana.ver_timbre = false;
   }
 
-  // METODO PARA CERRAR CAMARA
-  CerrarCamara() {
-    // METODO PARA CAPTURAR IMAGEN
-    this.imagenCamara = null;
+
+  private _ver_camara: boolean = false;
+
+  get ver_camara(): boolean {
+    return this._ver_camara;
   }
+
+  set ver_camara(value: boolean) {
+    this._ver_camara = value;
+    if (!value) {
+      this.CerrarCamara();
+    }
+  }
+
+  CerrarCamara() {
+    // Método para cerrar la cámara
+    this.imagenCamara = null;
+    console.log('Cámara cerrada y variable imagenCamara reiniciada');
+  }
+
 
 }

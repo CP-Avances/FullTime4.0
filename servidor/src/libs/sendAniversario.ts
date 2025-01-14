@@ -5,10 +5,12 @@ import path from 'path'
 
 // METODO PARA ENVIAR MENSAJES DE CUMPLEANIOS A UNA HORA DETERMINADA 
 
-export const aniversario = function () {
+export const aniversario = async function () {
+
 
     setInterval(async () => {
         // OBTENER RUTAS
+        console.log("Ejecutando aniversario")
         let separador = path.sep;
         const ruta_logo = ObtenerRutaLogos();
         const ruta_aniversario = ObtenerRutaMensajeNotificacion();
@@ -31,17 +33,17 @@ export const aniversario = function () {
                     SELECT * FROM ep_detalle_parametro WHERE id_parametro = 25
                     `
             );
-    
-    
+
+
             if (PARAMETRO_HORA.rowCount != 0) {
                 if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-    
+
                     const PARAMETRO = await pool.query(
                         `
                         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 24
                         `
                     );
-    
+
                     if (PARAMETRO.rowCount != 0) {
                         if ((PARAMETRO.rows[0].descripcion).toUpperCase() === 'SI') {
                             const EMPLEADOS = await pool.query(
@@ -76,16 +78,16 @@ export const aniversario = function () {
                                         AND (c.fecha_ingreso + INTERVAL '1 year')::DATE = $1;
                                 `
                                 , [fecha]);
-    
+
                             if (EMPLEADOS.rowCount != 0) {
-    
+
                                 var correos = BuscarCorreos(EMPLEADOS);
                                 console.log('correos ', correos)
-    
+
                                 var usuarios = PresentarUsuarios(EMPLEADOS);
-    
+
                                 // ENVIAR MAIL A TODOS LOS QUE NACIERON EN LA FECHA SELECCIONADA
-    
+
                                 let message_url =
                                     `
                                     <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;"></p>
@@ -98,19 +100,19 @@ export const aniversario = function () {
                                         </p>
                                         `
                                 }
-    
+
                                 // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
                                 if (EMPLEADOS.rows[0].cabecera_firma === null || EMPLEADOS.rows[0].cabecera_firma === '') {
                                     // IMAGEN POR DEFECTO
                                     EMPLEADOS.rows[0].cabecera_firma = 'cabecera_firma.png';
                                 }
-    
+
                                 // LEER IMAGEN DE CORREO CONFIGURADA - PIE DE FIRMA
                                 if (EMPLEADOS.rows[0].pie_firma === null || EMPLEADOS.rows[0].pie_firma === '') {
                                     // IMAGEN POR DEFECTO
                                     EMPLEADOS.rows[0].pie_firma = 'pie_firma.png';
                                 }
-    
+
                                 let data = {
                                     to: correos,
                                     from: EMPLEADOS.rows[0].correo_empresa,
@@ -163,7 +165,7 @@ export const aniversario = function () {
                                         }
                                     ]
                                 };
-    
+
                                 var corr = enviarCorreos(EMPLEADOS.rows[0].servidor, parseInt(EMPLEADOS.rows[0].puerto), EMPLEADOS.rows[0].correo_empresa, EMPLEADOS.rows[0].password_correo);
                                 corr.sendMail(data, function (error: any, info: any) {
                                     if (error) {
@@ -176,7 +178,7 @@ export const aniversario = function () {
                                         return 'ok';
                                     }
                                 });
-    
+
                             }
                         }
                     }

@@ -2,7 +2,7 @@
     <div class="mat-elevation-z8" style="background: white;">
 
         <div id="titulo" class="row w-100 m-auto">
-            <div class="col-2 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            <div class="col-2 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                 <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                     matTooltip="Regresar">
                     <i class="fas fa-arrow-left"></i>
@@ -15,7 +15,8 @@
             </div>
             <div class="col-10 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
                 <button *ngIf="!btnCheckHabilitar" class="btn btn-outline-light btn-sm"
-                style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()" matTooltip="Eliminar Múltiple">
+                    style="float: right; margin-right: 10px;" (click)="HabilitarSeleccion()"
+                    matTooltip="Eliminar Múltiple">
                     Eliminación Múltiple
                 </button>
                 <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
@@ -83,7 +84,10 @@
                         <td class="t_horarios">{{ c.n }}</td>
                         <td class="t_horarios">{{ c.codigo }}</td>
                         <td class="t_horarios">{{ c.apellido }} {{c.nombre}} </td>
-                        <td class="t_horarios" *ngIf="c.timbre_foto === true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_foto === true"> 
+                            {{ c.opcional_obligatorio ? 'Obligatorio'
+                            : 'Opcional' }}
+                        </td>
                         <td class="t_horarios" *ngIf="c.timbre_foto === false">No</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === true">SI</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === false">No</td>

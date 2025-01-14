@@ -19,33 +19,35 @@ const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA ENVIAR MENSAJES DE CUMPLEANIOS A UNA HORA DETERMINADA 
 const aniversario = function () {
-    setInterval(() => __awaiter(this, void 0, void 0, function* () {
-        // OBTENER RUTAS
-        let separador = path_1.default.sep;
-        const ruta_logo = (0, accesoCarpetas_1.ObtenerRutaLogos)();
-        const ruta_aniversario = (0, accesoCarpetas_1.ObtenerRutaMensajeNotificacion)();
-        // OBTENER FECHA Y HORA
-        const date = new Date();
-        const hora = date.getHours();
-        const minutos = date.getMinutes();
-        const fecha = date.toJSON().split("T")[0];
-        console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
-        // VERIFICAR HORA DE ENVIO
-        const PARAMETRO_ANIVERSARIO = yield database_1.default.query(`
+    return __awaiter(this, void 0, void 0, function* () {
+        setInterval(() => __awaiter(this, void 0, void 0, function* () {
+            // OBTENER RUTAS
+            console.log("Ejecutando aniversario");
+            let separador = path_1.default.sep;
+            const ruta_logo = (0, accesoCarpetas_1.ObtenerRutaLogos)();
+            const ruta_aniversario = (0, accesoCarpetas_1.ObtenerRutaMensajeNotificacion)();
+            // OBTENER FECHA Y HORA
+            const date = new Date();
+            const hora = date.getHours();
+            const minutos = date.getMinutes();
+            const fecha = date.toJSON().split("T")[0];
+            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
+            // VERIFICAR HORA DE ENVIO
+            const PARAMETRO_ANIVERSARIO = yield database_1.default.query(`
                 SELECT * FROM ep_detalle_parametro WHERE id_parametro = 24
                 `);
-        if ((PARAMETRO_ANIVERSARIO.rows[0].descripcion).toUpperCase() === 'SI') {
-            const PARAMETRO_HORA = yield database_1.default.query(`
+            if ((PARAMETRO_ANIVERSARIO.rows[0].descripcion).toUpperCase() === 'SI') {
+                const PARAMETRO_HORA = yield database_1.default.query(`
                     SELECT * FROM ep_detalle_parametro WHERE id_parametro = 25
                     `);
-            if (PARAMETRO_HORA.rowCount != 0) {
-                if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                    const PARAMETRO = yield database_1.default.query(`
+                if (PARAMETRO_HORA.rowCount != 0) {
+                    if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
+                        const PARAMETRO = yield database_1.default.query(`
                         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 24
                         `);
-                    if (PARAMETRO.rowCount != 0) {
-                        if ((PARAMETRO.rows[0].descripcion).toUpperCase() === 'SI') {
-                            const EMPLEADOS = yield database_1.default.query(`
+                        if (PARAMETRO.rowCount != 0) {
+                            if ((PARAMETRO.rows[0].descripcion).toUpperCase() === 'SI') {
+                                const EMPLEADOS = yield database_1.default.query(`
                                     SELECT 
                                         ig.nombre, 
                                         ig.apellido, 
@@ -75,37 +77,37 @@ const aniversario = function () {
                                         ig.estado = 1
                                         AND (c.fecha_ingreso + INTERVAL '1 year')::DATE = $1;
                                 `, [fecha]);
-                            if (EMPLEADOS.rowCount != 0) {
-                                var correos = (0, exports.BuscarCorreos)(EMPLEADOS);
-                                console.log('correos ', correos);
-                                var usuarios = (0, exports.PresentarUsuarios)(EMPLEADOS);
-                                // ENVIAR MAIL A TODOS LOS QUE NACIERON EN LA FECHA SELECCIONADA
-                                let message_url = `
+                                if (EMPLEADOS.rowCount != 0) {
+                                    var correos = (0, exports.BuscarCorreos)(EMPLEADOS);
+                                    console.log('correos ', correos);
+                                    var usuarios = (0, exports.PresentarUsuarios)(EMPLEADOS);
+                                    // ENVIAR MAIL A TODOS LOS QUE NACIERON EN LA FECHA SELECCIONADA
+                                    let message_url = `
                                     <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;"></p>
                                     `;
-                                if (EMPLEADOS.rows[0].link != null && EMPLEADOS.rows[0].link != '') {
-                                    message_url =
-                                        `
+                                    if (EMPLEADOS.rows[0].link != null && EMPLEADOS.rows[0].link != '') {
+                                        message_url =
+                                            `
                                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; text-align: center;">
                                             <a style="background-color: #199319; color: white; padding: 15px 15px 15px 15px; text-decoration: none;" href="${EMPLEADOS.rows[0].url}">¡ VER FELICITACIONES !</a>
                                         </p>
                                         `;
-                                }
-                                // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
-                                if (EMPLEADOS.rows[0].cabecera_firma === null || EMPLEADOS.rows[0].cabecera_firma === '') {
-                                    // IMAGEN POR DEFECTO
-                                    EMPLEADOS.rows[0].cabecera_firma = 'cabecera_firma.png';
-                                }
-                                // LEER IMAGEN DE CORREO CONFIGURADA - PIE DE FIRMA
-                                if (EMPLEADOS.rows[0].pie_firma === null || EMPLEADOS.rows[0].pie_firma === '') {
-                                    // IMAGEN POR DEFECTO
-                                    EMPLEADOS.rows[0].pie_firma = 'pie_firma.png';
-                                }
-                                let data = {
-                                    to: correos,
-                                    from: EMPLEADOS.rows[0].correo_empresa,
-                                    subject: EMPLEADOS.rows[0].asunto,
-                                    html: `
+                                    }
+                                    // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
+                                    if (EMPLEADOS.rows[0].cabecera_firma === null || EMPLEADOS.rows[0].cabecera_firma === '') {
+                                        // IMAGEN POR DEFECTO
+                                        EMPLEADOS.rows[0].cabecera_firma = 'cabecera_firma.png';
+                                    }
+                                    // LEER IMAGEN DE CORREO CONFIGURADA - PIE DE FIRMA
+                                    if (EMPLEADOS.rows[0].pie_firma === null || EMPLEADOS.rows[0].pie_firma === '') {
+                                        // IMAGEN POR DEFECTO
+                                        EMPLEADOS.rows[0].pie_firma = 'pie_firma.png';
+                                    }
+                                    let data = {
+                                        to: correos,
+                                        from: EMPLEADOS.rows[0].correo_empresa,
+                                        subject: EMPLEADOS.rows[0].asunto,
+                                        html: `
                                         <body>
                                             <div style="text-align: center;">
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
@@ -133,44 +135,45 @@ const aniversario = function () {
                                             <img src="cid:pief" width="100%" height="100%"/>
                                         </body>
                                         `,
-                                    attachments: [
-                                        {
-                                            filename: 'cabecera_firma',
-                                            path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].cabecera_firma}`,
-                                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                                        },
-                                        {
-                                            filename: 'pie_firma',
-                                            path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].pie_firma}`,
-                                            cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                                        },
-                                        {
-                                            filename: 'aniversario',
-                                            path: `${ruta_aniversario}${separador}${EMPLEADOS.rows[0].imagen}`,
-                                            cid: 'aniversario' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                                        attachments: [
+                                            {
+                                                filename: 'cabecera_firma',
+                                                path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].cabecera_firma}`,
+                                                cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                                            },
+                                            {
+                                                filename: 'pie_firma',
+                                                path: `${ruta_logo}${separador}${EMPLEADOS.rows[0].pie_firma}`,
+                                                cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                                            },
+                                            {
+                                                filename: 'aniversario',
+                                                path: `${ruta_aniversario}${separador}${EMPLEADOS.rows[0].imagen}`,
+                                                cid: 'aniversario' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                                            }
+                                        ]
+                                    };
+                                    var corr = (0, settingsMail_1.enviarCorreos)(EMPLEADOS.rows[0].servidor, parseInt(EMPLEADOS.rows[0].puerto), EMPLEADOS.rows[0].correo_empresa, EMPLEADOS.rows[0].password_correo);
+                                    corr.sendMail(data, function (error, info) {
+                                        if (error) {
+                                            corr.close();
+                                            console.log('Email error: ' + error);
+                                            return 'error';
                                         }
-                                    ]
-                                };
-                                var corr = (0, settingsMail_1.enviarCorreos)(EMPLEADOS.rows[0].servidor, parseInt(EMPLEADOS.rows[0].puerto), EMPLEADOS.rows[0].correo_empresa, EMPLEADOS.rows[0].password_correo);
-                                corr.sendMail(data, function (error, info) {
-                                    if (error) {
-                                        corr.close();
-                                        console.log('Email error: ' + error);
-                                        return 'error';
-                                    }
-                                    else {
-                                        corr.close();
-                                        console.log('Email sent: ' + info.response);
-                                        return 'ok';
-                                    }
-                                });
+                                        else {
+                                            corr.close();
+                                            console.log('Email sent: ' + info.response);
+                                            return 'ok';
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }), 2700000);
+        }), 2700000);
+    });
 };
 exports.aniversario = aniversario;
 // FUNCION PARA BUSCAR CORREOS

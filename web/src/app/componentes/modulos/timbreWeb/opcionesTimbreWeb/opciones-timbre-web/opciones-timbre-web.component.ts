@@ -58,6 +58,9 @@ export class OpcionesTimbreWebComponent implements OnInit {
   seleccion_opcion = new FormControl('');
   seleccion_especial = new FormControl('');
   seleccion_ubicacion = new FormControl('');
+
+  seleccion_foto_obligatoria = new FormControl('');
+
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
@@ -590,6 +593,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
     this.seleccion.reset();
+    this.seleccion_foto_obligatoria.reset()
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS
@@ -648,17 +652,20 @@ export class OpcionesTimbreWebComponent implements OnInit {
     }
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
+    this.seleccion_foto_obligatoria.reset()
     this.seleccion_ubicacion.reset();
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   contador: number = 0;
   RegistrarMultiple(data: any) {
+    console.log("ver seleccion_foto: ", this.seleccion_foto.value)
     
     this.contador = 0;
     var info = {
       id_empleado: '',
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
@@ -667,6 +674,8 @@ export class OpcionesTimbreWebComponent implements OnInit {
     var infoActualizar = {
       id_empleado: '',
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
+
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
@@ -738,8 +747,12 @@ export class OpcionesTimbreWebComponent implements OnInit {
       informacion.timbre_especial = false;
     }
     if (this.seleccion_foto.value === null) {
-      informacion.timbre_foto = false;
+      informacion.timbre_foto_ = false;
     }
+    if (this.seleccion_foto_obligatoria.value === null) {
+      informacion.timbre_foto_obligatoria = false;
+    }
+    
     if (this.seleccion_ubicacion.value === null) {
       informacion.timbre_ubicacion_desconocida = false;
     }

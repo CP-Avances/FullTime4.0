@@ -278,8 +278,6 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 
-import { cumpleanios } from './libs/sendBirthday';
-
 import { beforeFiveDays, beforeTwoDays, Peri_Vacacion_Automatico } from './libs/avisoVacaciones';
 
 import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
@@ -288,9 +286,8 @@ import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
 import { atrasosDiarios, atrasosSemanal } from './libs/sendAtraso';
-//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
-//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
-
+import { aniversario } from './libs/sendAniversario';
+import { cumpleanios } from './libs/sendBirthday';
 import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 
 /** **************************************************************************************************** **
@@ -306,6 +303,10 @@ setInterval(async () => {
     faltasDiarios();
     faltasSemanal();
 }, 2700000);
+
+aniversario();
+cumpleanios();
+
 
 
 // LLAMA AL MEODO DE CUMPLEAÑOS

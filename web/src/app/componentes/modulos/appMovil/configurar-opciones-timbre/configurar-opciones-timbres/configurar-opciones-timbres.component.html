@@ -209,6 +209,16 @@
                             <label id="textoradiobtn">No</label>
                         </mat-radio-button>
                     </mat-radio-group>
+                    <div class="mt-3" *ngIf="seleccion_foto.value">
+                        <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_foto_obligatoria">
+                            <mat-radio-button class="example-radio-button" [value]="true">
+                                <label id="textoradiobtn">Obligatorio</label>
+                            </mat-radio-button>
+                            <mat-radio-button class="example-radio-button" [value]="false">
+                                <label id="textoradiobtn">Opcional</label>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
                 </div>
                 <div class="col-md">
                     <span id="fuente">TIMBRE ESPECIAL</span>

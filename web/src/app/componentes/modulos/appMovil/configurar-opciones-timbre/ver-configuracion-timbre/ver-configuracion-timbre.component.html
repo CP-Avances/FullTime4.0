@@ -87,7 +87,10 @@
                         <td class="t_horarios">{{ c.apellido }} {{c.nombre}} </td>
                         <td class="t_horarios" *ngIf="c.timbre_internet === true">SI</td>
                         <td class="t_horarios" *ngIf="c.timbre_internet === false">No</td>
-                        <td class="t_horarios" *ngIf="c.timbre_foto === true">SI</td>
+                        <td class="t_horarios" *ngIf="c.timbre_foto === true">
+                            {{ c.opcional_obligatorio ? 'Obligatorio'
+                            : 'Opcional' }}
+                        </td>
                         <td class="t_horarios" *ngIf="c.timbre_foto === false">No</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === true">SI</td>
                         <td class="t_horarios" *ngIf="c.timbre_especial === false">No</td>

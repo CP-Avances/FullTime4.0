@@ -59,6 +59,9 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   seleccion_internet = new FormControl('');
   seleccion_especial = new FormControl('');
   seleccion_ubicacion = new FormControl('');
+
+  seleccion_foto_obligatoria = new FormControl('');
+
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
@@ -592,6 +595,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.seleccion_ubicacion.reset();
     this.seleccion_foto.reset();
     this.seleccion.reset();
+    this.seleccion_foto_obligatoria.reset()
+
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS
@@ -652,6 +657,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     this.seleccion_internet.reset();
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
+    this.seleccion_foto_obligatoria.reset()
+
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
@@ -662,6 +669,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       id_empleado: '',
       timbre_internet: this.seleccion_internet.value,
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
@@ -672,6 +680,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       id_empleado: '',
       timbre_internet: this.seleccion_internet.value,
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
+
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
@@ -750,6 +760,10 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
     if (this.seleccion_foto.value === null) {
       informacion.timbre_foto = false;
     }
+    if (this.seleccion_foto_obligatoria.value === null) {
+      informacion.timbre_foto_obligatoria = false;
+    }
+    
     if (this.seleccion_internet.value === null) {
       informacion.timbre_internet = true;
     }

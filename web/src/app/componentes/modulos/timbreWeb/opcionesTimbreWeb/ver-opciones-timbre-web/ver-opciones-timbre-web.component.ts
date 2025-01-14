@@ -150,12 +150,14 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
         .filter((info: any) => a.respuesta.some((res: any) => info.id === res.id_empleado)) // FILTRAR LOS QUE ESTAN EN AMBOS ARRAYS
         .map((info: any) => {
           const res = a.respuesta.find((res: any) => res.id_empleado === info.id); // ENCONTRAR LOS DATOS CORRESPONDIENTES
+          
           return {
             ...info,
             // COMBINAR CON LA INFORMACION DE LA CONFIGURACION
             timbre_especial: res.timbre_especial,
             timbre_foto: res.timbre_foto,
             timbre_ubicacion_desconocida: res.timbre_ubicacion_desconocida,
+            opcional_obligatorio: res.opcional_obligatorio,
             n: numero++
           };
         });

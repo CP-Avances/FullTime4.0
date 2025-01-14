@@ -271,8 +271,8 @@ const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAtraso_1 = require("./libs/sendAtraso");
-//import { atrasosDepartamentos } from './libs/sendAtrasoDepartamento';
-//import { atrasosIndividual } from './libs/sendAtrasoIndividual';
+const sendAniversario_1 = require("./libs/sendAniversario");
+const sendBirthday_1 = require("./libs/sendBirthday");
 const sendFaltas_1 = require("./libs/sendFaltas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
@@ -285,6 +285,8 @@ setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
     (0, sendFaltas_1.faltasDiarios)();
     (0, sendFaltas_1.faltasSemanal)();
 }), 2700000);
+(0, sendAniversario_1.aniversario)();
+(0, sendBirthday_1.cumpleanios)();
 // LLAMA AL MEODO DE CUMPLEAÑOS
 // LLAMA AL METODO DE AVISOS DE VACACIONES
 //beforeFiveDays();
