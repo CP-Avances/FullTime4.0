@@ -240,81 +240,29 @@ class TituloControlador {
           const ITEM = row.getCell(headers['ITEM']).value;
           const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
           const NIVEL = row.getCell(headers['NIVEL']).value?.toString().trim();
+
           const dato = {
             ITEM: ITEM,
             NOMBRE: NOMBRE,
             NIVEL: NIVEL,
           }
+
           data.fila = ITEM
           data.titulo = NOMBRE;
           data.nivel = NIVEL;
-
-
+          data.observacion = 'no registrado';
 
           if ((data.fila != undefined && data.fila != '') &&
             (data.titulo != undefined && data.titulo != '') &&
             (data.nivel != undefined && data.nivel != '')) {
-            // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-            const existe_nivel = await pool.query(
-              `
-              SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-              `
-              , [NIVEL]);
-            var id_nivel = existe_nivel.rows[0];
-            if (id_nivel != undefined && id_nivel != '') {
-              // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
-              const VERIFICAR_Titulos = await pool.query(
-                `
-                SELECT * FROM et_titulos
-                WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
-                `
-                , [NOMBRE, id_nivel.id]);
-              if (VERIFICAR_Titulos.rowCount == 0) {
-                data.fila = ITEM
-                data.titulo = NOMBRE;
-                data.nivel = NIVEL
-
-                if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === data.titulo.toLowerCase() &&
-                  p.NIVEL.toLowerCase() === data.nivel.toLowerCase()) == undefined) {
-                  data.observacion = 'ok';
-                  duplicados.push(dato);
-                }
-
-                console.log('titulo 00: ',data.titulo);
-                console.log('nivel 00: ',data.nivel);
-
-                listTitulosProfesionales.push(data);
-              } else {
-                data.fila = ITEM
-                data.titulo = NOMBRE;
-                data.nivel = NIVEL
-
-                console.log('titulo 11: ',data.titulo);
-                console.log('nivel 11: ',data.nivel);
-
-                listTitulosProfesionales.push(data);
-              }
-            } else {
-              data.fila = ITEM
-              data.titulo = NOMBRE;
-              data.nivel = NIVEL;
-
-              if (data.nivel == '' || data.nivel == undefined) {
-                data.nivel = 'No registrado';
-                data.observacion = 'Nivel no registrado';
-              }
-              data.observacion = 'Nivel no existe en el sistema'
-
-              console.log('titulo 22: ',data.titulo);
-              console.log('nivel 22: ',data.nivel);
-
-              listTitulosProfesionales.push(data);
-            }
+            
+            listTitulosProfesionales.push(data);
 
           } else {
             data.fila = ITEM
             data.titulo = NOMBRE;
             data.nivel = NIVEL;
+            data.observacion = 'no registrado';
 
             if (data.fila == '' || data.fila == undefined) {
               data.fila = 'error';
@@ -335,9 +283,6 @@ class TituloControlador {
               data.observacion = 'Título y Nivel no registrado';
             }
 
-            console.log('titulo 33: ',data.titulo);
-            console.log('nivel 33: ',data.nivel);
-
             listTitulosProfesionales.push(data);
           }
           data = {};
@@ -351,6 +296,51 @@ class TituloControlador {
           fs.unlinkSync(ruta);
         }
       });
+
+      listTitulosProfesionales.forEach(async (item: any, index: number) => {
+        if (item.observacion == 'no registrado') {
+          // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
+          const existe_nivel = await pool.query(
+            `
+            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+            `
+            , [item.nivel]);
+
+          var id_nivel = existe_nivel.rows[0];
+          if (id_nivel != undefined && id_nivel != '') {
+            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
+            const VERIFICAR_Titulos = await pool.query(
+              `
+              SELECT * FROM et_titulos
+              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
+              `
+              , [item.titulo, id_nivel.id]);
+
+              
+            if (VERIFICAR_Titulos.rowCount == 0) {
+
+              if (duplicados.find((p: any) => p.titulo.toLowerCase() === item.titulo.toLowerCase() &&
+                p.nivel.toLowerCase() === item.nivel.toLowerCase()) == undefined) {
+                item.observacion = 'ok';
+                duplicados.push(item);
+              }else{
+                
+                  item.observacion = '1';
+              }
+
+            } else {
+              
+              item.observacion = 'Ya existe en el sistema'
+              
+            }
+
+          } else {
+            item.observacion = 'Nivel no existe en el sistema'
+          }
+        }
+
+      })
+
 
       setTimeout(() => {
         listTitulosProfesionales.sort((a: any, b: any) => {
@@ -367,7 +357,7 @@ class TituloControlador {
         var filaDuplicada: number = 0;
 
         listTitulosProfesionales.forEach((item: any) => {
-          if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
+          if (item.observacion == '1') {
             item.observacion = 'Registro duplicado'
           }
 
