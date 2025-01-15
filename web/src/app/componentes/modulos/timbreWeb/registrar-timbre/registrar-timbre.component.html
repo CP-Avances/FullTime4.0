@@ -80,7 +80,7 @@
     <div class="row" *ngIf="ver_informacion">
         <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
 
-            <div  *ngIf="opcional && existe_camara" >
+            <div  *ngIf="opcional && existe_camara && foto" >
                 <mat-slide-toggle [(ngModel)]="ver_camara" color="primary">
                     Mostrar cámara
                 </mat-slide-toggle>

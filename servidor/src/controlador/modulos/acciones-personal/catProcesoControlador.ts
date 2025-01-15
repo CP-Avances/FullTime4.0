@@ -334,7 +334,7 @@ class ProcesoControlador {
                     SELECT * FROM map_cat_procesos 
                     WHERE UPPER(nombre) = UPPER($1)
                     `
-                    , [item.nombre]);
+                    , [item.proceso]);
 
                   if (VERIFICAR_PROCESO.rowCount === 0) {
                     if(item.proceso.toUpperCase() !== item.proceso_padre.toUpperCase()){

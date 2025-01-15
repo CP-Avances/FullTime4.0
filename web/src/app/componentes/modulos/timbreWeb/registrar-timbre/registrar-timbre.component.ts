@@ -457,7 +457,6 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS DEL TIMBRE
   InsertarTimbre() {
-    //console.log('entra2')
     // VERIFICAR USO DE LA CAMARA
     if (this.foto === true) {
 
