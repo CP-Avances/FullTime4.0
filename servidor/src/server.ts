@@ -289,6 +289,8 @@ import { atrasosDiarios, atrasosSemanal } from './libs/sendAtraso';
 import { aniversario } from './libs/sendAniversario';
 import { cumpleanios } from './libs/sendBirthday';
 import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
+import { salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
+
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -297,23 +299,25 @@ import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
+/*
 setInterval(async () => {
     atrasosDiarios();
     atrasosSemanal();
     faltasDiarios();
     faltasSemanal();
+    salidasAnticipadasSemanal();
+    salidasAnticipadasDiarios();
 }, 2700000);
+*/
 
-aniversario();
-cumpleanios();
-
-
+atrasosDiarios();
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
-
-
+aniversario();
 
 // LLAMA AL METODO DE AVISOS DE VACACIONES
+cumpleanios();
+
 //beforeFiveDays();
 //beforeTwoDays();
 
@@ -326,3 +330,5 @@ cumpleanios();
 
 
 //generarTimbres('1', '2023-11-01', '2023-11-02');//
+
+export { io };

@@ -557,7 +557,12 @@ class TimbresControlador {
                         let nombre = yield database_1.default.query(`
                             SELECT nombre, apellido FROM eu_empleados WHERE id = $1
                             `, [obj.id_empleado_envia]).then((ele) => {
-                            return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
+                            if (ele.rows.length > 0) {
+                                return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
+                            }
+                            else {
+                                return 'Nombre no encontrado'; // Valor predeterminado si no se encuentra el registro
+                            }
                         });
                         return {
                             id_receives_empl: obj.id_empleado_recibe,

@@ -45,14 +45,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.faltasIndividual = exports.faltasDepartamentos = exports.faltas = exports.faltasDiarios = exports.faltasSemanal = exports.ImportarPDF = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.salidasAnticipadasIndividual = exports.salidasAnticipadasDepartamentos = exports.salidasAnticipadas = exports.salidasAnticipadasDiarios = exports.salidasAnticipadasSemanal = exports.ImportarPDF = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 const luxon_1 = require("luxon");
-const reportesFaltasControlador_1 = require("../controlador/reportes/reportesFaltasControlador");
+const salidaAntesControlador_1 = require("../controlador/reportes/salidaAntesControlador");
 const ImagenCodificacion_1 = require("./ImagenCodificacion");
+// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
 /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
    ** ********************************************************************************* **/
@@ -67,20 +68,18 @@ const ImportarPDF = function () {
     });
 };
 exports.ImportarPDF = ImportarPDF;
-const faltasSemanal = function () {
+const salidasAnticipadasSemanal = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date(); // Fecha actual
         const hora = date.getHours();
         const dia = date.getDay();
         // Crear una copia del objeto Date antes de modificarlo
         const dateAntes = new Date(date);
-        dateAntes.setDate(dateAntes.getDate() - 8);
-        const dataActual = new Date(date);
-        dataActual.setDate(dataActual.getDate() - 1);
-        const fechaDiaActual = dataActual.toJSON().split("T")[0]; // Fecha actual
+        dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
+        const fecha = date.toJSON().split("T")[0]; // Fecha actual
         const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
         const PARAMETRO_SEMANAL = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 20
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 47
         `);
         const diasSemana = [
             "Domingo",
@@ -91,60 +90,63 @@ const faltasSemanal = function () {
             "Viernes",
             "Sábado"
         ];
-        if (PARAMETRO_SEMANAL.rowCount != 0) {
-            console.log("ver Parametro semanal: ", PARAMETRO_SEMANAL.rows[0].descripcion);
-            if ('Si' === PARAMETRO_SEMANAL.rows[0].descripcion) {
-                const PARAMETRO_DIA_SEMANAL = yield database_1.default.query(`
-                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 22                `);
+        if (PARAMETRO_SEMANAL.rows[0].descripcion == 'Si') {
+            const PARAMETRO_DIA_SEMANAL = yield database_1.default.query(`
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 52
+            `);
+            if (PARAMETRO_DIA_SEMANAL.rowCount != 0) {
+                console.log("ver Parametro DIA SEMANAL: ", PARAMETRO_DIA_SEMANAL.rows[0].descripcion);
                 if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
-                    const PARAMETRO_HORA = yield database_1.default.query(`
-                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 21
-                `);
-                    console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
-                    if (PARAMETRO_HORA.rowCount != 0) {
-                        if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                            (0, exports.faltas)(fechaSemanaAntes, fechaDiaActual, true);
-                            (0, exports.faltasDepartamentos)(fechaSemanaAntes, fechaDiaActual, true);
-                        }
+                    const PARAMETRO_HORA_SEMANAL = yield database_1.default.query(`
+                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 51
+                    `);
+                    console.log("ver Parametro hora semanal: ", PARAMETRO_HORA_SEMANAL.rows[0].descripcion);
+                    if (hora === parseInt(PARAMETRO_HORA_SEMANAL.rows[0].descripcion)) {
+                        (0, exports.salidasAnticipadas)(fechaSemanaAntes, fecha, true);
+                        (0, exports.salidasAnticipadasDepartamentos)(fechaSemanaAntes, fecha, true);
                     }
                 }
             }
         }
     });
 };
-exports.faltasSemanal = faltasSemanal;
-const faltasDiarios = function () {
+exports.salidasAnticipadasSemanal = salidasAnticipadasSemanal;
+const salidasAnticipadasDiarios = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date();
-        const hora = date.getHours();
         const fecha = date.toJSON().split("T")[0];
+        const dataActual = new Date(date);
+        dataActual.setDate(dataActual.getDate() - 1);
+        //const fechaDiaActual = dataActual.toJSON().split("T")[0]; // Fecha actual
+        console.log("ver la fecha de hoy: ", fecha);
+        const hora = date.getHours();
+        const minutos = date.getMinutes();
         const PARAMETRO_DIARIO = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 17
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 48
         `);
-        if (PARAMETRO_DIARIO.rowCount != 0) {
-            console.log("ver Parametro semanal: ", PARAMETRO_DIARIO.rows[0].descripcion);
-            if ('Si' === PARAMETRO_DIARIO.rows[0].descripcion) {
-                console.log("ver fecha de envio individual: ", fecha);
-                const PARAMETRO_HORA = yield database_1.default.query(`
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 18
+        if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
+            const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 49
             `);
-                console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion);
-                if (PARAMETRO_HORA.rowCount != 0) {
-                    if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                        (0, exports.faltas)(fecha, fecha, false);
-                        (0, exports.faltasDepartamentos)(fecha, fecha, false);
-                        (0, exports.faltasIndividual)(fecha, fecha);
-                    }
-                }
+            console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
+            if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                (0, exports.salidasAnticipadas)(fecha, fecha, false);
+                (0, exports.salidasAnticipadasDepartamentos)(fecha, fecha, false);
+                (0, exports.salidasAnticipadasIndividual)(fecha, fecha);
+            }
+            else {
+                console.log("hora incorrecta");
             }
         }
     });
 };
-exports.faltasDiarios = faltasDiarios;
-const faltas = function (desde, hasta, semanal) {
+exports.salidasAnticipadasDiarios = salidasAnticipadasDiarios;
+const salidasAnticipadas = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
-        // VERIFICAR HORA DE ENVIO
-        console.log("ejecutando reporte de faltas ");
+        console.log('ver desde: ', desde);
+        console.log('ver hasta: ', hasta);
+        const date = new Date();
+        console.log("ejecutando reporte de salidas anticipadas general");
         let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -186,16 +188,15 @@ const faltas = function (desde, hasta, semanal) {
         let datos = seleccionados;
         let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
             suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
+                o.salidas = yield (0, salidaAntesControlador_1.BuscarSalidasAnticipadas)(desde, hasta, o.id);
                 return o;
             })));
             return suc;
         })));
         let nuevo = n.map((e) => {
-            e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
+            e.empleados = e.empleados.filter((a) => { return a.salidas.length > 0; });
             return e;
         }).filter(e => { return e.empleados.length > 0; });
-        //console.log("ver datos del reporte general: ", nuevo)
         if (nuevo.length != 0) {
             const pdfMake = yield (0, exports.ImportarPDF)();
             // DEFINIR INFORMACIÓN
@@ -203,7 +204,6 @@ const faltas = function (desde, hasta, semanal) {
             resultado.map((obj) => {
                 return obj;
             });
-            const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
             const file_name = yield database_1.default.query(`
            SELECT nombre, logo FROM e_empresa 
            `)
@@ -233,10 +233,10 @@ const faltas = function (desde, hasta, semanal) {
             let dia_abreviado = 'ddd';
             let dia_completo = 'dddd';
             let periodo = 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-            let asunto = 'REPORTE DIARIO DE FALTAS';
+            let asunto = 'REPORTE DIARIO DE SALIDAS ANTICIPADAS';
             if (semanal == true) {
                 periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                asunto = 'REPORTE SEMANAL DE FALTAS';
+                asunto = 'REPORTE SEMANAL DE SALIDAS ANTICIPADAS';
             }
             let definicionDocumento = {
                 pageSize: 'A4',
@@ -267,7 +267,7 @@ const faltas = function (desde, hasta, semanal) {
                 content: [
                     { image: logo, width: 100, margin: [10, -25, 0, 5] },
                     { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                    { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                    { text: `SALIDAS ANTICIPADAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                     { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                     ...resultado
                 ],
@@ -307,14 +307,13 @@ const faltas = function (desde, hasta, semanal) {
             // OBTENER FECHA Y HORA
             const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
             const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-            //PARAMETRO DE CORREO
-            let id_parametro_correo = 19;
+            let id_parametro_correo = 50;
             if (semanal) {
-                id_parametro_correo = 23;
+                id_parametro_correo = 53;
             }
             const PARAMETRO_CORREO = yield database_1.default.query(`
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = $1
-            `, [id_parametro_correo]);
+                        SELECT * FROM ep_detalle_parametro WHERE id_parametro = $1
+                        `, [id_parametro_correo]);
             if (PARAMETRO_CORREO.rowCount != 0) {
                 const correos = PARAMETRO_CORREO.rows;
                 correos.forEach((itemCorreo) => __awaiter(this, void 0, void 0, function* () {
@@ -350,7 +349,7 @@ const faltas = function (desde, hasta, semanal) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
+                                                Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -378,7 +377,7 @@ const faltas = function (desde, hasta, semanal) {
                                     cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                                 },
                                 {
-                                    filename: 'Faltas.pdf', // Nombre del archivo adjunto
+                                    filename: 'Salidas-Anticipadas.pdf', // Nombre del archivo adjunto
                                     content: pdfBuffer, // El buffer generado por pdfmake
                                     //contentType: 'application/pdf' // T
                                 }
@@ -405,14 +404,18 @@ const faltas = function (desde, hasta, semanal) {
             }
         }
         else {
-            console.log("no hay faltas");
+            console.log("no existen registro de salidas anticipadas para este dia");
         }
     });
 };
-exports.faltas = faltas;
-const faltasDepartamentos = function (desde, hasta, semanal) {
+exports.salidasAnticipadas = salidasAnticipadas;
+const salidasAnticipadasDepartamentos = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("ejecutando reporte de faltas de departamento");
+        //setInterval(async () => {
+        const date = new Date();
+        const hora = date.getHours();
+        const minutos = date.getMinutes();
+        console.log("ejecutando reporte de salidas anticipadas de departamento");
         let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -461,13 +464,13 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
             let datos = seleccionados;
             let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                 suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
+                    o.salidas = yield (0, salidaAntesControlador_1.BuscarSalidasAnticipadas)(desde, hasta, o.id);
                     return o;
                 })));
                 return suc;
             })));
             let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
+                e.empleados = e.empleados.filter((a) => { return a.salidas.length > 0; });
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length != 0) {
@@ -479,8 +482,8 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 });
                 const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
                 const file_name = yield database_1.default.query(`
-                       SELECT nombre, logo FROM e_empresa 
-                    `)
+               SELECT nombre, logo FROM e_empresa 
+               `)
                     .then((result) => {
                     return result.rows[0];
                 });
@@ -507,10 +510,10 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 let dia_abreviado = 'ddd';
                 let dia_completo = 'dddd';
                 let periodo = 'FECHA: ' + (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-                let asunto = 'REPORTE DIARIO DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
+                let asunto = 'REPORTE DIARIO DE SALIDAS ANTICIPADAS DEL DEPARTAMENTO DE ' + departamento;
                 if (semanal == true) {
                     periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                    asunto = 'REPORTE SEMANAL DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
+                    asunto = 'REPORTE SEMANAL DE SALIDAS ANTICIPADAS DEL DEPARTAMENTO DE ' + departamento;
                 }
                 let definicionDocumento = {
                     pageSize: 'A4',
@@ -541,7 +544,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                     content: [
                         { image: logo, width: 100, margin: [10, -25, 0, 5] },
                         { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                        { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                        { text: `SALIDAS ANTICIPADAS  - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                         { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                         ...resultado
                     ],
@@ -580,6 +583,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 // OBTENER FECHA Y HORA
                 const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
                 const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+                console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
                 // VERIFICAR HORA DE ENVIO
                 const EMPLEADOS = yield database_1.default.query(`
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
@@ -613,7 +617,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
+                                                Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -642,7 +646,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                                 cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                             },
                             {
-                                filename: 'Faltas-Departamento.pdf', // Nombre del archivo adjunto
+                                filename: 'Salidas-Anticipadas-Departamento.pdf', // Nombre del archivo adjunto
                                 content: pdfBuffer, // El buffer generado por pdfmake
                                 //contentType: 'application/pdf' // T
                             }
@@ -664,15 +668,18 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 }
             }
             else {
-                console.log("no existen faltas en el departamento: ", +departamento);
+                console.log("no existen registros para el departamento: ", departamento);
             }
         }));
     });
 };
-exports.faltasDepartamentos = faltasDepartamentos;
-const faltasIndividual = function (desde, hasta) {
+exports.salidasAnticipadasDepartamentos = salidasAnticipadasDepartamentos;
+const salidasAnticipadasIndividual = function (desde, hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("ejecutando reporte de faltas individuales");
+        const date = new Date();
+        const hora = date.getHours();
+        const minutos = date.getMinutes();
+        console.log("ejecutando reporte de salidas anticipadas individuales");
         let informacion = yield database_1.default.query(`
             SELECT * FROM informacion_general AS ig
             WHERE ig.estado = $1
@@ -707,8 +714,8 @@ const faltasIndividual = function (desde, hasta) {
                 web_habilita: obj.web_habilita,
                 comunicado_mail: obj.comunicado_mail,
                 comunicado_noti: obj.comunicado_notificacion,
-                faltas_notificacion: obj.faltas_notificacion,
-                faltas_mail: obj.faltas_mail,
+                salidas_anticipadas_notificacion: obj.salidas_anticipadas_notificacion,
+                salidas_anticipadas_mail: obj.salidas_anticipadas_mail
             });
         });
         let seleccionados = [{ nombre: 'Empleados' }];
@@ -716,13 +723,13 @@ const faltasIndividual = function (desde, hasta) {
         let datos = seleccionados;
         let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
             suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                o.faltas = yield (0, reportesFaltasControlador_1.BuscarFaltas)(desde, hasta, o.id);
+                o.salidas = yield (0, salidaAntesControlador_1.BuscarSalidasAnticipadas)(desde, hasta, o.id);
                 return o;
             })));
             return suc;
         })));
         let nuevo = n.map((e) => {
-            e.empleados = e.empleados.filter((a) => { return a.faltas.length > 0; });
+            e.empleados = e.empleados.filter((a) => { return a.salidas.length > 0; });
             return e;
         }).filter(e => { return e.empleados.length > 0; });
         if (nuevo.length != 0) {
@@ -750,6 +757,7 @@ const faltasIndividual = function (desde, hasta) {
             });
             const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
             const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
             // VERIFICAR HORA DE ENVIO
             const Empre = yield database_1.default.query(`
                                     SELECT  s.id_empresa, ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
@@ -768,52 +776,56 @@ const faltasIndividual = function (desde, hasta) {
             }
             if (arregloEmpleados.length != 0) {
                 arregloEmpleados.forEach((item) => {
-                    if (item.faltas_mail) {
-                        let dateTimeHorario = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
+                    if (item.salidas_anticipadas_mail) {
+                        let dateTimeHorario = luxon_1.DateTime.fromSQL(item.salidas[0].fecha_hora_horario);
                         let isoStringHorario = dateTimeHorario.toISO();
                         let fechaHora = '';
                         if (isoStringHorario) {
                             let horaHorario = (0, exports.FormatearHora)(luxon_1.DateTime.fromISO(isoStringHorario).toFormat('HH:mm:ss'), formato_hora);
                             fechaHora = (0, exports.FormatearFecha)(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
                         }
-                        const dateTimeTimbre = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_timbre);
+                        const dateTimeTimbre = luxon_1.DateTime.fromSQL(item.salidas[0].fecha_hora_timbre);
                         const isoStringTimbre = dateTimeTimbre.toISO();
                         let fechaTimbre = '';
                         if (isoStringTimbre) {
                             let horaTimbre = (0, exports.FormatearHora)(luxon_1.DateTime.fromISO(isoStringTimbre).toFormat('HH:mm:ss'), formato_hora);
                             fechaTimbre = (0, exports.FormatearFecha)(isoStringTimbre, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaTimbre;
                         }
+                        const minutos = (0, exports.SegundosAMinutosConDecimales)(Number(item.salidas[0].diferencia));
+                        const tiempo = (0, exports.MinutosAHorasMinutosSegundos)(minutos);
                         let data = {
                             to: item.correo,
                             from: Empre.rows[0].correo_empresa,
-                            subject: 'NOTIFICACIÓN DE FALTA',
+                            subject: 'NOTIFICACIÓN DE SALIDAS ANTICIPADAS',
                             html: `
-                                            <body>
-                                                <div style="text-align: center;">
-                                                    <img width="100%" height="100%" src="cid:cabeceraf"/>
-                                                </div>
-                                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                    El presente correo es para informarle que se ha registrado una inasistencia.<br>  
-                                                </p>
-                                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                                <b>Empresa:</b> ${file_name.nombre}<br>
-                                                <b>Asunto:</b> NOTIFICACIÓN DE FALTA <br>
-                                                <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
-                                                <b>Cargo:</b> ${item.cargo} <br> 
-                                                <b>Departamento:</b>${item.departamento}<br>
-                                                <b>Fecha de envío:</b> ${fecha} <br> 
-                                                <b>Hora de envío:</b> ${hora_reporte} <br>       
-                                                <b>Notificación:</b><br>
-                                                    Queremos informarle que el sistema ha registrado su inasistencia.<br>  
-                                                <b>Fecha:</b> ${fecha} <br>       
-                                                <b>Observaciones:</b> Sin registro de marcaciones.<br>
-                                                </p>
-                                                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                                <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
-                                                </p>
-                                                <img src="cid:pief" width="100%" height="100%"/>
-                                            </body>
-                                            `,
+                                        <body>
+                                            <div style="text-align: center;">
+                                                <img width="100%" height="100%" src="cid:cabeceraf"/>
+                                            </div>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                                El presente correo es para informarle que se ha registrado una salida anticipada en su marcación.<br>  
+                                            </p>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Asunto:</b> NOTIFICACIÓN DE SALIDAS ANTICIPADAS <br>
+                                            <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
+                                            <b>Cargo:</b> ${item.cargo} <br> 
+                                            <b>Departamento:</b>${item.departamento}<br>
+                                            <b>Fecha de envío:</b> ${fecha} <br> 
+                                            <b>Hora de envío:</b> ${hora_reporte} <br>       
+                                            <b>Notificación:</b><br>
+                                                Queremos informarle que el sistema ha registrado una salida anticipada.<br>  
+                                            <b>Fecha:</b> ${fecha} <br>       
+                                            <b>Horario:</b> ${fechaHora} <br>
+                                            <b>Timbre:</b> ${fechaTimbre} <br>
+                                            <b>Tiempo total de salida anticipada:</b> ${tiempo} <br>
+                                            </p>
+                                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                            <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
+                                            </p>
+                                            <img src="cid:pief" width="100%" height="100%"/>
+                                        </body>
+                                        `,
                             attachments: [
                                 {
                                     filename: 'cabecera_firma.jpg',
@@ -844,15 +856,15 @@ const faltasIndividual = function (desde, hasta) {
                 });
             }
             else {
-                console.log("no hay empleados con faltas. ");
+                console.log("no hay empleados con salidas anticipadas");
             }
         }
         else {
-            console.log("no hay faltas individuales. ");
+            console.log("no existen datos individuales");
         }
     });
 };
-exports.faltasIndividual = faltasIndividual;
+exports.salidasAnticipadasIndividual = salidasAnticipadasIndividual;
 // FUNCION PARA BUSCAR CORREOS
 const BuscarCorreos = function (datos) {
     var correos = '';
@@ -879,21 +891,30 @@ const PresentarUsuarios = function (datos) {
 exports.PresentarUsuarios = PresentarUsuarios;
 const EstructurarDatosPDF = function (data) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(" ver datos del reporte de faltas: ", data);
-        let totalFaltasEmpleado = 0;
-        const FORMATO_FECHA = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
-        `);
-        let formato_fecha = FORMATO_FECHA.rows[0].descripcion;
+        let formato_fecha = 'dd/MM/yyyy';
+        let formato_hora = 'HH:mm:ss';
         let idioma_fechas = 'es';
         let dia_abreviado = 'ddd';
+        let dia_completo = 'dddd';
+        let totalTiempoEmpleado = 0;
+        let totalTiempo = 0;
+        let resumen = '';
         let general = [];
         let n = [];
         let c = 0;
+        let toleranciaP = '';
         data.forEach((selec) => {
             // CONTAR REGISTROS
-            let arr_reg = selec.empleados.map((o) => { return o.faltas.length; });
+            let arr_reg = selec.empleados.map((o) => { return o.salidas.length; });
             let reg = (0, exports.SumarRegistros)(arr_reg);
+            // CONTAR MINUTOS DE ATRASOS
+            totalTiempo = 0;
+            selec.empleados.forEach((o) => {
+                o.salidas.map((a) => {
+                    const minutos = (0, exports.SegundosAMinutosConDecimales)(Number(a.diferencia));
+                    totalTiempo += Number(minutos);
+                });
+            });
             // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
             let descripcion = '';
             let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -904,7 +925,8 @@ const EstructurarDatosPDF = function (data) {
             let informacion = {
                 sucursal: selec.sucursal,
                 nombre: opcion,
-                faltas: reg
+                formato_general: (0, exports.MinutosAHorasMinutosSegundos)(Number(totalTiempo.toFixed(2))),
+                formato_decimal: totalTiempo.toFixed(2),
             };
             general.push(informacion);
             // CABECERA PRINCIPAL
@@ -983,37 +1005,58 @@ const EstructurarDatosPDF = function (data) {
                 });
                 // ENCERAR VARIABLES
                 c = 0;
-                totalFaltasEmpleado = 0;
+                totalTiempoEmpleado = 0;
                 n.push({
                     style: 'tableMargin',
                     table: {
-                        widths: ['*', '*'],
-                        headerRows: 1,
+                        widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto'],
+                        headerRows: 2,
                         body: [
                             [
-                                { text: 'N°', style: 'tableHeader' },
-                                { text: 'FECHA', style: 'tableHeader' },
+                                { rowSpan: 2, text: 'N°', style: 'centrado' },
+                                { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                                {},
+                                { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                                {},
+                                { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'centrado' },
+                                {}
                             ],
-                            ...empl.faltas.map((usu) => {
-                                const fecha = (0, exports.FormatearFecha)(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
-                                totalFaltasEmpleado++;
+                            [
+                                {},
+                                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                                { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                                { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
+                                { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
+                                {}, {},
+                            ],
+                            ...empl.salidas.map((usu) => {
+                                // FORMATEAR FECHAS
+                                const fechaHorario = (0, exports.FormatearFecha)(usu.fecha_hora_horario.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
+                                const fechaTimbre = (0, exports.FormatearFecha)(usu.fecha_hora_timbre.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
+                                const horaHorario = (0, exports.FormatearHora)(usu.fecha_hora_horario.split(' ')[1], formato_hora);
+                                const horaTimbre = (0, exports.FormatearHora)(usu.fecha_hora_timbre.split(' ')[1], formato_hora);
+                                // CONTABILIZAR MINUTOS
+                                const minutos = (0, exports.SegundosAMinutosConDecimales)(usu.diferencia);
+                                const tiempo = (0, exports.MinutosAHorasMinutosSegundos)(minutos);
+                                totalTiempoEmpleado += Number(minutos);
                                 c = c + 1;
                                 return [
                                     { style: 'itemsTableCentrado', text: c },
-                                    { style: 'itemsTableCentrado', text: fecha },
+                                    { style: 'itemsTableCentrado', text: fechaHorario },
+                                    { style: 'itemsTableCentrado', text: horaHorario },
+                                    { style: 'itemsTableCentrado', text: fechaTimbre },
+                                    { style: 'itemsTableCentrado', text: horaTimbre },
+                                    { style: 'itemsTableCentrado', text: tiempo },
+                                    { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
                                 ];
                             }),
-                            [
-                                { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                                { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
-                            ],
                         ],
                     },
                     layout: {
                         fillColor: function (rowIndex) {
-                            return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-                        },
-                    },
+                            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                        }
+                    }
                 });
             });
         });
@@ -1030,6 +1073,21 @@ const SumarRegistros = function (array) {
     return valor;
 };
 exports.SumarRegistros = SumarRegistros;
+const SegundosAMinutosConDecimales = function (segundos) {
+    return Number((segundos / 60).toFixed(2));
+};
+exports.SegundosAMinutosConDecimales = SegundosAMinutosConDecimales;
+const MinutosAHorasMinutosSegundos = function (minutos) {
+    let seconds = minutos * 60;
+    let hour = Math.floor(seconds / 3600);
+    hour = (hour < 10) ? '0' + hour : hour;
+    let minute = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10) ? '0' + minute : minute;
+    let second = Number((seconds % 60).toFixed(0));
+    second = (second < 10) ? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+};
+exports.MinutosAHorasMinutosSegundos = MinutosAHorasMinutosSegundos;
 const FormatearFecha = function (fecha, formato, dia, idioma) {
     let valor;
     // PARSEAR LA FECHA CON LUXON

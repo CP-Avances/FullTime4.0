@@ -1,17 +1,9 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.io = void 0;
 require('dotenv').config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
@@ -109,7 +101,7 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = (0, http_1.createServer)(this.app);
-        io = require('socket.io')(this.server, {
+        exports.io = io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
@@ -273,26 +265,23 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAtraso_1 = require("./libs/sendAtraso");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
-const sendFaltas_1 = require("./libs/sendFaltas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    (0, sendAtraso_1.atrasosDiarios)();
-    (0, sendAtraso_1.atrasosSemanal)();
-    (0, sendFaltas_1.faltasDiarios)();
-    (0, sendFaltas_1.faltasSemanal)();
-}), 2700000);
-(0, sendAniversario_1.aniversario)();
-(0, sendBirthday_1.cumpleanios)();
+/*
+setInterval(async () => {
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
+    salidasAnticipadasSemanal();
+    salidasAnticipadasDiarios();
+}, 2700000);
+*/
+(0, sendAtraso_1.atrasosDiarios)();
 // LLAMA AL MEODO DE CUMPLEAÑOS
+(0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES
-//beforeFiveDays();
-//beforeTwoDays();
-// LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-//Peri_Vacacion_Automatico();
-//RegistrarAsistenciaByTimbres();
-// ----------// conteoPermisos();
-//generarTimbres('1', '2023-11-01', '2023-11-02');//
+(0, sendBirthday_1.cumpleanios)();

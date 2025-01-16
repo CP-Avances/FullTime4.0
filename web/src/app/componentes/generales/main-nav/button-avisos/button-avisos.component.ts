@@ -6,6 +6,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-button-avisos',
@@ -34,6 +35,7 @@ export class ButtonAvisosComponent implements OnInit {
     private socket: Socket,
     private aviso: TimbresService,
     private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     /** ********************************************************************************** **
      ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
@@ -48,10 +50,13 @@ export class ButtonAvisosComponent implements OnInit {
         if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
-            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
+            console.log("ver res ObtenerUnAviso: ", res)
+
+
+            let fecha = this.validar.DarFormatoFecha(res.fecha_hora.split('T')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
+            res.hora_ = this.validar.FormatearHora(res.fecha_hora.split('T')[1], this.formato_hora);
 
             if (res.tipo != 6) {
               if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
@@ -75,6 +80,8 @@ export class ButtonAvisosComponent implements OnInit {
               this.avisos.pop();
             }
             this.num_timbre_false = this.num_timbre_false + 1;
+
+            this.cdr.detectChanges()
           })
         }
       });
@@ -83,11 +90,12 @@ export class ButtonAvisosComponent implements OnInit {
 
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
+    console.log("ver id_empleado_logueado: ", this.id_empleado_logueado)
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.BuscarParametro();
   }
 

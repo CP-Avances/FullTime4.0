@@ -5,6 +5,11 @@ import path from 'path'
 import { DateTime } from 'luxon';
 import { BuscarAtrasos } from '../controlador/reportes/reportesAtrasosControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
+import { io } from '../server';
+import {
+    fechaHora
+} from '../libs/settingsMail';
+//import { Socket } from 'ngx-socket-io';
 
 
 // METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
@@ -15,6 +20,7 @@ import { ConvertirImagenBase64 } from './ImagenCodificacion';
 
 
 export const ImportarPDF = async function () {
+
     // @ts-ignore
     const pdfMake = await import('../assets/build/pdfmake.js');
     // @ts-ignore
@@ -97,12 +103,11 @@ export const atrasosDiarios = async function () {
         console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion)
 
         if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-            atrasos(fecha, fecha, false);
-            atrasosDepartamentos(fecha, fecha, false);
-            atrasosIndividual(fecha, fecha);
+           // atrasos(fecha, fecha, false);
+            //atrasosDepartamentos(fecha, fecha, false);
+            atrasosIndividual('2025/01/15', '2025/01/15');
         } else {
             console.log("hora incorrecta")
-
         }
     }
 
@@ -803,7 +808,9 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
             app_habilita: obj.app_habilita,
             web_habilita: obj.web_habilita,
             comunicado_mail: obj.comunicado_mail,
-            comunicado_noti: obj.comunicado_notificacion
+            comunicado_noti: obj.comunicado_notificacion,
+            atrasos_notificacion: obj.atrasos_notificacion,
+            atrasos_mail: obj.atrasos_mail
         })
     })
 
@@ -886,35 +893,37 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
 
 
         if (arregloEmpleados.length != 0) {
-            arregloEmpleados.forEach((item: any) => {
-                let dateTimeHorario = DateTime.fromSQL(item.atrasos[0].fecha_hora_horario);
-                let isoStringHorario = dateTimeHorario.toISO();
-
-                let fechaHora = ''
-                if (isoStringHorario) {
-                    let horaHorario = FormatearHora(DateTime.fromISO(isoStringHorario).toFormat('HH:mm:ss'), formato_hora);
-                    fechaHora = FormatearFecha(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
-                }
-
-                const dateTimeTimbre = DateTime.fromSQL(item.atrasos[0].fecha_hora_timbre);
-                const isoStringTimbre = dateTimeTimbre.toISO();
-
-                let fechaTimbre = ''
-                if (isoStringTimbre) {
-                    let horaTimbre = FormatearHora(DateTime.fromISO(isoStringTimbre).toFormat('HH:mm:ss'), formato_hora);
-                    fechaTimbre = FormatearFecha(isoStringTimbre, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaTimbre;
-
-                }
-
+            arregloEmpleados.forEach(async (item: any) => {
                 const minutos = SegundosAMinutosConDecimales(Number(item.atrasos[0].diferencia))
                 const tiempo = MinutosAHorasMinutosSegundos(minutos);
+                if (item.atrasos_mail) {
+                    let dateTimeHorario = DateTime.fromSQL(item.atrasos[0].fecha_hora_horario);
+                    let isoStringHorario = dateTimeHorario.toISO();
 
-                let data = {
-                    to: item.correo,
-                    from: Empre.rows[0].correo_empresa,
-                    subject: 'NOTIFICACIÓN DE ATRASO',
-                    html:
-                        `
+                    let fechaHora = ''
+                    if (isoStringHorario) {
+                        let horaHorario = FormatearHora(DateTime.fromISO(isoStringHorario).toFormat('HH:mm:ss'), formato_hora);
+                        fechaHora = FormatearFecha(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
+                    }
+
+                    const dateTimeTimbre = DateTime.fromSQL(item.atrasos[0].fecha_hora_timbre);
+                    const isoStringTimbre = dateTimeTimbre.toISO();
+
+                    let fechaTimbre = ''
+                    if (isoStringTimbre) {
+                        let horaTimbre = FormatearHora(DateTime.fromISO(isoStringTimbre).toFormat('HH:mm:ss'), formato_hora);
+                        fechaTimbre = FormatearFecha(isoStringTimbre, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaTimbre;
+
+                    }
+
+
+
+                    let data = {
+                        to: item.correo,
+                        from: Empre.rows[0].correo_empresa,
+                        subject: 'NOTIFICACIÓN DE ATRASO',
+                        html:
+                            `
                                         <body>
                                             <div style="text-align: center;">
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
@@ -944,33 +953,64 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                                             <img src="cid:pief" width="100%" height="100%"/>
                                         </body>
                                         `
-                    ,
-                    attachments: [
-                        {
-                            filename: 'cabecera_firma.jpg',
-                            path: `${ruta_logo}${separador}${Empre.rows[0].cabecera_firma}`,
-                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                        },
-                        {
-                            filename: 'pie_firma.jpg',
-                            path: `${ruta_logo}${separador}${Empre.rows[0].pie_firma}`,
-                            cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                        }
-                    ]
-                };
+                        ,
+                        attachments: [
+                            {
+                                filename: 'cabecera_firma.jpg',
+                                path: `${ruta_logo}${separador}${Empre.rows[0].cabecera_firma}`,
+                                cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                            },
+                            {
+                                filename: 'pie_firma.jpg',
+                                path: `${ruta_logo}${separador}${Empre.rows[0].pie_firma}`,
+                                cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                            }
+                        ]
+                    };
 
-                var corr = enviarCorreos(Empre.rows[0].servidor, parseInt(Empre.rows[0].puerto), Empre.rows[0].correo_empresa, Empre.rows[0].password_correo);
-                corr.sendMail(data, function (error: any, info: any) {
-                    if (error) {
-                        corr.close();
-                        console.log('Email error: ' + error);
-                        return 'error';
-                    } else {
-                        corr.close();
-                        console.log('Email sent: ' + info.response);
-                        return 'ok';
-                    }
-                });
+                    var corr = enviarCorreos(Empre.rows[0].servidor, parseInt(Empre.rows[0].puerto), Empre.rows[0].correo_empresa, Empre.rows[0].password_correo);
+                    corr.sendMail(data, function (error: any, info: any) {
+                        if (error) {
+                            corr.close();
+                            console.log('Email error: ' + error);
+                            return 'error';
+                        } else {
+                            corr.close();
+                            console.log('Email sent: ' + info.response);
+                            return 'ok';
+                        }
+                    });
+                } else {
+                    console.log("atrasos_email es false")
+                }
+                let mensaje = {
+                    id_empl_envia: 0,
+                    id_empl_recive: item.id,
+                    descripcion: 'NOTIFICACIÓN DE ATRASO',
+                    mensaje: 'Llego atrasado al trabajo con: ' + tiempo,
+                    tipo: 6
+                }
+
+                if (item.atrasos_notificacion) {
+                    var tiempoN = fechaHora();
+                    let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
+
+                    const response = await pool.query(
+                        `
+                        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
+                        tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+                        `
+                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE ATRASO', 6, 'Llego atrasado al trabajo con: ' + tiempo]);
+
+                    if (response.rows.length != 0) {
+                        console.log("se inserto notificación")
+                    };
+
+                    io.emit('nuevo_aviso',
+                        mensaje);
+
+                }
+
             })
         } else {
             console.log("no hay empleados con atrasos")
