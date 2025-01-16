@@ -121,4 +121,15 @@ export class AccionPersonalService {
   CrearXML(data: any) {
     return this.http.post(`${environment.url}/accionPersonal/xmlDownload`, data);
   }
+
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
+      return this.http.post<any>(environment.url + '/accionPersonal/upload/revision', formData);
+  }
+  
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA   **USADO
+  RegistrarPlantilla(data: any) {
+      return this.http.post<any>(environment.url + '/accionPersonal/cargar_plantilla', data);
+  }
 }

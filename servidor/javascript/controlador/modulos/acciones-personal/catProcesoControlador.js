@@ -55,19 +55,19 @@ class ProcesoControlador {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, nivel, proc_padre, user_name, ip, ip_local } = req.body;
+                const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO map_cat_procesos (nombre, nivel, proceso_padre) VALUES ($1, $2, $3)
-        `, [nombre, nivel, proc_padre]);
+        INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2)
+        `, [nombre, proc_padre]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_cat_procesos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+                    datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
@@ -98,7 +98,7 @@ class ProcesoControlador {
     ActualizarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, nivel, proc_padre, id, user_name, ip, ip_local } = req.body;
+                const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -121,15 +121,15 @@ class ProcesoControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
-        UPDATE map_cat_procesos SET nombre = $1, nivel = $2, proceso_padre = $3 WHERE id = $4
-        `, [nombre, nivel, proc_padre, id]);
+        UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
+        `, [nombre, proc_padre, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_cat_procesos',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+                    datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
@@ -275,7 +275,6 @@ class ProcesoControlador {
                                 }
                                 if (PROCESO_PADRE == undefined) {
                                     data.proceso_padre = 'No registrado';
-                                    data.observacion = 'Proceso padre ' + data.observacion;
                                 }
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.proceso = data.proceso.trim();
@@ -336,9 +335,11 @@ class ProcesoControlador {
                                             }
                                             else {
                                                 if (existe_proceso_padre == false) {
-                                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre === obj.proceso);
-                                                    if (!hayCoincidencia) {
-                                                        item.observacion = 'Proceso padre no existe en el archivo como proceso.';
+                                                    if (item.proceso_padre != 'No registrado') {
+                                                        const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre === obj.proceso);
+                                                        if (!hayCoincidencia) {
+                                                            item.observacion = 'Proceso padre no existe en el archivo como proceso.';
+                                                        }
                                                     }
                                                 }
                                             }
@@ -433,75 +434,77 @@ class ProcesoControlador {
             }
             for (const data of plantilla) {
                 const { proceso, proceso_padre } = data;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const select = yield database_1.default.query(`
+                if (proceso_padre != 'No registrado') {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const select = yield database_1.default.query(`
           SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
           `, [proceso_padre]);
-                const [res] = select.rows;
-                if (select.rowCount > 0) {
-                    console.log('select.rowCount: ', select.rows[0].id);
-                    const response = yield database_1.default.query(`
+                    const [res] = select.rows;
+                    if (select.rowCount > 0) {
+                        console.log('select.rowCount: ', select.rows[0].id);
+                        const response = yield database_1.default.query(`
             UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
             `, [select.rows[0].id, proceso]);
-                    const [procesos] = response.rows;
+                        const [procesos] = response.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_cat_procesos',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(procesos),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                    }
+                    else {
+                        const respo = yield database_1.default.query(`
+              INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+              `, [proceso_padre, null]);
+                        const [proce] = respo.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_cat_procesos',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(proce),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        const response = yield database_1.default.query(`
+              UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
+              `, [respo.rows[0].id, proceso]);
+                        const [procesos] = response.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_cat_procesos',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(procesos),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'map_cat_procesos',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: JSON.stringify(procesos),
+                        datosNuevos: JSON.stringify(res),
                         ip: ip,
                         ip_local: ip_local,
                         observacion: null
                     });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                else {
-                    const respo = yield database_1.default.query(`
-            INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-            `, [proceso_padre, null]);
-                    const [proce] = respo.rows;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_cat_procesos',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(proce),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
-                    const response = yield database_1.default.query(`
-            UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
-            `, [respo.rows[0].id, proceso]);
-                    const [procesos] = response.rows;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_cat_procesos',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(procesos),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
-                }
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_cat_procesos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(res),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
             }
             if (error) {
                 return res.status(500).jsonp({ message: 'error' });

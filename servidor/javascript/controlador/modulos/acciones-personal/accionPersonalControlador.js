@@ -690,7 +690,7 @@ class AccionPersonalControlador {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 const workbook = new exceljs_1.default.Workbook();
                 yield workbook.xlsx.readFile(ruta);
-                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TIPOS_ACCION_PERSONAL');
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_TIPOS_ACCION_PERSONAL');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
@@ -699,9 +699,9 @@ class AccionPersonalControlador {
                     const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                     let data = {
                         fila: '',
-                        proceso: '',
-                        nivel: '',
-                        proceso_padre: '',
+                        tipo_accion_personal: '',
+                        descripcion: '',
+                        base_legal: '',
                         observacion: ''
                     };
                     var listaProcesos = [];
@@ -716,28 +716,29 @@ class AccionPersonalControlador {
                             headers[cell.value.toString().toUpperCase()] = colNumber;
                         });
                         // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                        if (!headers['ITEM'] || !headers['PROCESO'] || !headers['NIVEL'] || !headers['PROCESO_PADRE']) {
+                        if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         // LECTURA DE LOS DATOS DE LA PLANTILLA
                         plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const PROCESO = row.getCell(headers['PROCESO']).value;
-                            const NIVEL = row.getCell(headers['NIVEL']).value;
-                            const PROCESO_PADRE = row.getCell(headers['PROCESO_PADRE']).value;
+                            const TIPO_ACCION_PERSONAL = (_a = row.getCell(headers['TIPO_ACCION_PERSONAL']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                            const DESCRIPCION = (_b = row.getCell(headers['DESCRIPCION']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            const BASE_LEGAL = (_c = row.getCell(headers['BASE_LEGAL']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
-                                (PROCESO != undefined && PROCESO != '') &&
-                                (NIVEL != undefined && NIVEL != '') &&
-                                (PROCESO_PADRE != undefined && PROCESO_PADRE != '')) {
+                                (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
+                                (DESCRIPCION != undefined && DESCRIPCION != '') &&
+                                (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
                                 data.fila = ITEM;
-                                data.proceso = PROCESO;
-                                data.nivel = NIVEL;
-                                data.proceso_padre = PROCESO_PADRE;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
                                 data.observacion = 'no registrado';
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.proceso = data.proceso.trim();
@@ -745,25 +746,24 @@ class AccionPersonalControlador {
                             }
                             else {
                                 data.fila = ITEM;
-                                data.proceso = PROCESO;
-                                data.nivel = NIVEL;
-                                data.proceso_padre = PROCESO_PADRE;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
                                 data.observacion = 'no registrado';
                                 if (data.fila == '' || data.fila == undefined) {
                                     data.fila = 'error';
                                     mensaje = 'error';
                                 }
-                                if (PROCESO == undefined) {
-                                    data.proceso = 'No registrado';
-                                    data.observacion = 'Proceso ' + data.observacion;
+                                if (TIPO_ACCION_PERSONAL == undefined) {
+                                    data.tipo_accion_personal = 'No registrado';
+                                    data.observacion = 'Tipo accion personal ' + data.observacion;
                                 }
-                                if (NIVEL == undefined) {
-                                    data.nivel = 'No registrado';
-                                    data.observacion = 'Nivel ' + data.observacion;
+                                if (DESCRIPCION == undefined) {
+                                    data.descripcion = 'No registrado';
+                                    data.observacion = 'Descripcion ' + data.observacion;
                                 }
-                                if (PROCESO_PADRE == undefined) {
-                                    data.proceso_padre = 'No registrado';
-                                    data.observacion = 'Proceso padre ' + data.observacion;
+                                if (BASE_LEGAL == undefined) {
+                                    data.base_legal = '-';
                                 }
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.proceso = data.proceso.trim();
