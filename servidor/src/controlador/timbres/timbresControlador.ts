@@ -632,14 +632,19 @@ class TimbresControlador {
 
                 if (result.rowCount != 0) {
                     return await Promise.all(result.rows.map(async (obj: any): Promise<any> => {
-
                         let nombre = await pool.query(
                             `
                             SELECT nombre, apellido FROM eu_empleados WHERE id = $1
-                            `
-                            , [obj.id_empleado_envia]).then((ele: any) => {
-                                return ele.rows[0].nombre + ' ' + ele.rows[0].apellido
-                            })
+                            `,
+                            [obj.id_empleado_envia]
+                        ).then((ele: any) => {
+                            if (ele.rows.length > 0) {
+                                return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
+                            } else {
+                                return 'Nombre no encontrado'; // Valor predeterminado si no se encuentra el registro
+                            }
+                        });
+
                         return {
                             id_receives_empl: obj.id_empleado_recibe,
                             descripcion: obj.descripcion,
@@ -650,7 +655,9 @@ class TimbresControlador {
                             visto: obj.visto,
                             tipo: obj.tipo,
                             id: obj.id,
-                        }
+                        };
+
+
                     }));
                 }
                 return []

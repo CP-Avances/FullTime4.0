@@ -3,11 +3,11 @@ import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
 import { DateTime } from 'luxon';
-import { BuscarFaltas } from '../controlador/reportes/reportesFaltasControlador';
+import { BuscarSalidasAnticipadas } from '../controlador/reportes/salidaAntesControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
-import { Console } from 'console';
 
 
+// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
 
 /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
@@ -24,24 +24,20 @@ export const ImportarPDF = async function () {
 }
 
 
-export const faltasSemanal = async function () {
+export const salidasAnticipadasSemanal = async function () {
     const date = new Date(); // Fecha actual
     const hora = date.getHours();
     const dia = date.getDay();
     // Crear una copia del objeto Date antes de modificarlo
     const dateAntes = new Date(date);
-    dateAntes.setDate(dateAntes.getDate() - 8);
+    dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
 
-    const dataActual = new Date(date);
-    dataActual.setDate(dataActual.getDate() - 1);
-
-
-    const fechaDiaActual = dataActual.toJSON().split("T")[0]; // Fecha actual
+    const fecha = date.toJSON().split("T")[0]; // Fecha actual
     const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
 
     const PARAMETRO_SEMANAL = await pool.query(
         `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 20
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 47
         `);
 
     const diasSemana = [
@@ -54,66 +50,79 @@ export const faltasSemanal = async function () {
         "Sábado"
     ];
 
-    if (PARAMETRO_SEMANAL.rowCount != 0) {
-        console.log("ver Parametro semanal: ", PARAMETRO_SEMANAL.rows[0].descripcion);
-        if ('Si' === PARAMETRO_SEMANAL.rows[0].descripcion) {
-            const PARAMETRO_DIA_SEMANAL = await pool.query(
-                `
-                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 22                `);
 
-            if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
-                const PARAMETRO_HORA = await pool.query(
-                    `
-                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 21
-                `);
-
-                console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
-
-                if (PARAMETRO_HORA.rowCount != 0) {
-                    if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                        faltas(fechaSemanaAntes, fechaDiaActual, true);
-                        faltasDepartamentos(fechaSemanaAntes, fechaDiaActual, true);
-                    }
-                }
-            }
-        }
-    }
-}
-
-export const faltasDiarios = async function () {
-    const date = new Date();
-    const hora = date.getHours();
-    const fecha = date.toJSON().split("T")[0];
-    const PARAMETRO_DIARIO = await pool.query(
-        `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 17
-        `);
-
-    if (PARAMETRO_DIARIO.rowCount != 0) {
-        console.log("ver Parametro semanal: ", PARAMETRO_DIARIO.rows[0].descripcion);
-        if ('Si' === PARAMETRO_DIARIO.rows[0].descripcion) {
-            console.log("ver fecha de envio individual: ", fecha)
-            const PARAMETRO_HORA = await pool.query(
-                `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 18
+    if (PARAMETRO_SEMANAL.rows[0].descripcion == 'Si') {
+        const PARAMETRO_DIA_SEMANAL = await pool.query(
+            `
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 52
             `);
 
-            console.log("ver Parametro hora: ", PARAMETRO_HORA.rows[0].descripcion)
+        if (PARAMETRO_DIA_SEMANAL.rowCount != 0) {
+            console.log("ver Parametro DIA SEMANAL: ", PARAMETRO_DIA_SEMANAL.rows[0].descripcion)
+            if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
+                const PARAMETRO_HORA_SEMANAL = await pool.query(
+                    `
+                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 51
+                    `);
 
-            if (PARAMETRO_HORA.rowCount != 0) {
-                if (hora === parseInt(PARAMETRO_HORA.rows[0].descripcion)) {
-                    faltas(fecha, fecha, false);
-                    faltasDepartamentos(fecha, fecha, false);
-                    faltasIndividual(fecha, fecha);
+                console.log("ver Parametro hora semanal: ", PARAMETRO_HORA_SEMANAL.rows[0].descripcion)
+
+                if (hora === parseInt(PARAMETRO_HORA_SEMANAL.rows[0].descripcion)) {
+                    salidasAnticipadas(fechaSemanaAntes, fecha, true);
+                    salidasAnticipadasDepartamentos(fechaSemanaAntes, fecha, true);
                 }
             }
         }
     }
 }
 
-export const faltas = async function (desde: any, hasta: any, semanal: any) {
-    // VERIFICAR HORA DE ENVIO
-    console.log("ejecutando reporte de faltas ")
+export const salidasAnticipadasDiarios = async function () {
+    const date = new Date();
+    const fecha = date.toJSON().split("T")[0];
+
+    const dataActual = new Date(date);
+    dataActual.setDate(dataActual.getDate() - 1);
+
+    //const fechaDiaActual = dataActual.toJSON().split("T")[0]; // Fecha actual
+
+    console.log("ver la fecha de hoy: ", fecha);
+    const hora = date.getHours();
+    const minutos = date.getMinutes();
+
+    const PARAMETRO_DIARIO = await pool.query(
+        `
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 48
+        `);
+
+    if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
+        const PARAMETRO_HORA_DIARIO = await pool.query(
+            `
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 49
+            `);
+
+        console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion)
+
+        if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+            salidasAnticipadas(fecha, fecha, false);
+            salidasAnticipadasDepartamentos(fecha, fecha, false);
+            salidasAnticipadasIndividual(fecha, fecha);
+        } else {
+            console.log("hora incorrecta")
+
+        }
+    }
+
+}
+
+
+
+export const salidasAnticipadas = async function (desde: any, hasta: any, semanal: any) {
+    console.log('ver desde: ', desde);
+    console.log('ver hasta: ', hasta);
+    const date = new Date();
+
+    console.log("ejecutando reporte de salidas anticipadas general")
+
     let informacion = await pool.query(
         `
             SELECT * FROM informacion_general AS ig
@@ -161,18 +170,16 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
 
     let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
         suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-            o.faltas = await BuscarFaltas(desde, hasta, o.id);
+            o.salidas = await BuscarSalidasAnticipadas(desde, hasta, o.id);
             return o;
         }));
         return suc;
     }));
 
     let nuevo = n.map((e: any) => {
-        e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
+        e.empleados = e.empleados.filter((a: any) => { return a.salidas.length > 0 })
         return e
     }).filter(e => { return e.empleados.length > 0 })
-
-    //console.log("ver datos del reporte general: ", nuevo)
 
     if (nuevo.length != 0) {
         const pdfMake = await ImportarPDF();
@@ -183,7 +190,6 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
             return obj;
         });
 
-        const today = DateTime.now().toFormat('yyyy-MM-dd');
 
         const file_name = await pool.query(
             `
@@ -232,12 +238,15 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
         let dia_completo: string = 'dddd'
 
         let periodo = 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-        let asunto = 'REPORTE DIARIO DE FALTAS';
+        let asunto = 'REPORTE DIARIO DE SALIDAS ANTICIPADAS';
 
         if (semanal == true) {
             periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-            asunto = 'REPORTE SEMANAL DE FALTAS';
+            asunto = 'REPORTE SEMANAL DE SALIDAS ANTICIPADAS';
         }
+
+
+
         let definicionDocumento = {
             pageSize: 'A4',
             pageOrientation: 'portrait',
@@ -267,7 +276,7 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
             content: [
                 { image: logo, width: 100, margin: [10, -25, 0, 5] },
                 { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                { text: `SALIDAS ANTICIPADAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                 { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                 ...resultado
             ],
@@ -308,22 +317,26 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
         // OBTENER RUTAS
         const ruta_logo = ObtenerRutaLogos();
         // OBTENER FECHA Y HORA
+
+
         const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
         const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-        //PARAMETRO DE CORREO
-        let id_parametro_correo = 19;
+        let id_parametro_correo = 50;
 
         if (semanal) {
-            id_parametro_correo = 23;
+            id_parametro_correo = 53;
         }
+
 
         const PARAMETRO_CORREO = await pool.query(
             `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = $1
-            `, [id_parametro_correo]
+                        SELECT * FROM ep_detalle_parametro WHERE id_parametro = $1
+                        `, [id_parametro_correo]
         );
 
+
         if (PARAMETRO_CORREO.rowCount != 0) {
+
             const correos = PARAMETRO_CORREO.rows;
             correos.forEach(async (itemCorreo: any) => {
                 const correo = itemCorreo.descripcion
@@ -367,7 +380,7 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
+                                                Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -396,7 +409,7 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
                                 cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                             },
                             {
-                                filename: 'Faltas.pdf', // Nombre del archivo adjunto
+                                filename: 'Salidas-Anticipadas.pdf', // Nombre del archivo adjunto
                                 content: pdfBuffer, // El buffer generado por pdfmake
                                 //contentType: 'application/pdf' // T
 
@@ -417,19 +430,27 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
                         }
                     });
                 }
+
+
             })
+
         } else {
             console.log("no se encontro correo")
         }
+
     } else {
-        console.log("no hay faltas")
+        console.log("no existen registro de salidas anticipadas para este dia")
     }
 }
 
+export const salidasAnticipadasDepartamentos = async function (desde: any, hasta: any, semanal: any) {
+    //setInterval(async () => {
+    const date = new Date();
+    const hora = date.getHours();
+    const minutos = date.getMinutes();
 
-export const faltasDepartamentos = async function (desde: any, hasta: any, semanal: any) {
+    console.log("ejecutando reporte de salidas anticipadas de departamento")
 
-    console.log("ejecutando reporte de faltas de departamento")
     let informacion = await pool.query(
         `
             SELECT * FROM informacion_general AS ig
@@ -487,14 +508,14 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
 
         let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
             suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-                o.faltas = await BuscarFaltas(desde, hasta, o.id);
+                o.salidas = await BuscarSalidasAnticipadas(desde, hasta, o.id);
                 return o;
             }));
             return suc;
         }));
 
         let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
+            e.empleados = e.empleados.filter((a: any) => { return a.salidas.length > 0 })
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
@@ -511,8 +532,8 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
 
             const file_name = await pool.query(
                 `
-                       SELECT nombre, logo FROM e_empresa 
-                    `
+               SELECT nombre, logo FROM e_empresa 
+               `
             )
                 .then((result: any) => {
                     return result.rows[0];
@@ -557,11 +578,11 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
             let dia_completo: string = 'dddd'
 
             let periodo = 'FECHA: ' + FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
-            let asunto = 'REPORTE DIARIO DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
+            let asunto = 'REPORTE DIARIO DE SALIDAS ANTICIPADAS DEL DEPARTAMENTO DE ' + departamento;
 
             if (semanal == true) {
                 periodo = 'PERIODO DEL: ' + desde + " AL " + hasta;
-                asunto = 'REPORTE SEMANAL DE FALTAS DEL DEPARTAMENTO DE ' + departamento;
+                asunto = 'REPORTE SEMANAL DE SALIDAS ANTICIPADAS DEL DEPARTAMENTO DE ' + departamento;
             }
 
 
@@ -595,7 +616,7 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                 content: [
                     { image: logo, width: 100, margin: [10, -25, 0, 5] },
                     { text: nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
-                    { text: `FALTAS - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+                    { text: `SALIDAS ANTICIPADAS  - USUARIOS ACTIVOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
                     { text: periodo, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
                     ...resultado
                 ],
@@ -636,6 +657,7 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
 
             const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
             const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
             // VERIFICAR HORA DE ENVIO
 
             const EMPLEADOS = await pool.query(
@@ -678,7 +700,7 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                                                 <img width="100%" height="100%" src="cid:cabeceraf"/>
                                             </div>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                Mediante el presente correo se adjunta el reporte de faltas.<br>  
+                                                Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
                                             <b>Empresa:</b> ${file_name.nombre}<br>
@@ -708,7 +730,7 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                             cid: 'pief' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
-                            filename: 'Faltas-Departamento.pdf', // Nombre del archivo adjunto
+                            filename: 'Salidas-Anticipadas-Departamento.pdf', // Nombre del archivo adjunto
                             content: pdfBuffer, // El buffer generado por pdfmake
                             //contentType: 'application/pdf' // T
 
@@ -729,18 +751,23 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                     }
                 });
             }
+
+
+
         } else {
-            console.log("no existen faltas en el departamento: ", + departamento)
+            console.log("no existen registros para el departamento: ", departamento)
         }
     })
 
-
-
 }
 
-export const faltasIndividual = async function (desde: any, hasta: any) {
+export const salidasAnticipadasIndividual = async function (desde: any, hasta: any) {
 
-    console.log("ejecutando reporte de faltas individuales")
+    const date = new Date();
+    const hora = date.getHours();
+    const minutos = date.getMinutes();
+
+    console.log("ejecutando reporte de salidas anticipadas individuales")
 
     let informacion = await pool.query(
         `
@@ -780,9 +807,8 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
             web_habilita: obj.web_habilita,
             comunicado_mail: obj.comunicado_mail,
             comunicado_noti: obj.comunicado_notificacion,
-            faltas_notificacion: obj.faltas_notificacion,
-            faltas_mail: obj.faltas_mail,
-
+            salidas_anticipadas_notificacion: obj.salidas_anticipadas_notificacion,
+            salidas_anticipadas_mail: obj.salidas_anticipadas_mail
         })
     })
 
@@ -792,16 +818,18 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
 
     let n: Array<any> = await Promise.all(datos.map(async (suc: any) => {
         suc.empleados = await Promise.all(suc.empleados.map(async (o: any) => {
-            o.faltas = await BuscarFaltas(desde, hasta, o.id);
+            o.salidas = await BuscarSalidasAnticipadas(desde, hasta, o.id);
             return o;
         }));
         return suc;
     }));
 
     let nuevo = n.map((e: any) => {
-        e.empleados = e.empleados.filter((a: any) => { return a.faltas.length > 0 })
+        e.empleados = e.empleados.filter((a: any) => { return a.salidas.length > 0 })
         return e
     }).filter(e => { return e.empleados.length > 0 })
+
+
     if (nuevo.length != 0) {
         let arregloEmpleados = nuevo[0].empleados;
 
@@ -838,6 +866,7 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
 
         const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
         const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
+        console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
         // VERIFICAR HORA DE ENVIO
 
         const Empre = await pool.query(
@@ -847,9 +876,6 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                                     FROM  e_sucursales AS s, e_empresa AS ce 
                                     WHERE  s.id_empresa = ce.id `
         );
-
-
-
 
         // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
         if (Empre.rows[0].cabecera_firma === null || Empre.rows[0].cabecera_firma === '') {
@@ -866,8 +892,8 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
 
         if (arregloEmpleados.length != 0) {
             arregloEmpleados.forEach((item: any) => {
-                if (item.faltas_mail) {
-                    let dateTimeHorario = DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
+                if (item.salidas_anticipadas_mail) {
+                    let dateTimeHorario = DateTime.fromSQL(item.salidas[0].fecha_hora_horario);
                     let isoStringHorario = dateTimeHorario.toISO();
 
                     let fechaHora = ''
@@ -876,7 +902,7 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                         fechaHora = FormatearFecha(isoStringHorario, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaHorario;
                     }
 
-                    const dateTimeTimbre = DateTime.fromSQL(item.faltas[0].fecha_hora_timbre);
+                    const dateTimeTimbre = DateTime.fromSQL(item.salidas[0].fecha_hora_timbre);
                     const isoStringTimbre = dateTimeTimbre.toISO();
 
                     let fechaTimbre = ''
@@ -885,39 +911,43 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                         fechaTimbre = FormatearFecha(isoStringTimbre, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaTimbre;
 
                     }
+                    const minutos = SegundosAMinutosConDecimales(Number(item.salidas[0].diferencia))
+                    const tiempo = MinutosAHorasMinutosSegundos(minutos);
 
                     let data = {
                         to: item.correo,
                         from: Empre.rows[0].correo_empresa,
-                        subject: 'NOTIFICACIÓN DE FALTA',
+                        subject: 'NOTIFICACIÓN DE SALIDAS ANTICIPADAS',
                         html:
                             `
-                                            <body>
-                                                <div style="text-align: center;">
-                                                    <img width="100%" height="100%" src="cid:cabeceraf"/>
-                                                </div>
-                                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                                    El presente correo es para informarle que se ha registrado una inasistencia.<br>  
-                                                </p>
-                                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                                <b>Empresa:</b> ${file_name.nombre}<br>
-                                                <b>Asunto:</b> NOTIFICACIÓN DE FALTA <br>
-                                                <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
-                                                <b>Cargo:</b> ${item.cargo} <br> 
-                                                <b>Departamento:</b>${item.departamento}<br>
-                                                <b>Fecha de envío:</b> ${fecha} <br> 
-                                                <b>Hora de envío:</b> ${hora_reporte} <br>       
-                                                <b>Notificación:</b><br>
-                                                    Queremos informarle que el sistema ha registrado su inasistencia.<br>  
-                                                <b>Fecha:</b> ${fecha} <br>       
-                                                <b>Observaciones:</b> Sin registro de marcaciones.<br>
-                                                </p>
-                                                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                                <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
-                                                </p>
-                                                <img src="cid:pief" width="100%" height="100%"/>
-                                            </body>
-                                            `
+                                        <body>
+                                            <div style="text-align: center;">
+                                                <img width="100%" height="100%" src="cid:cabeceraf"/>
+                                            </div>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                                El presente correo es para informarle que se ha registrado una salida anticipada en su marcación.<br>  
+                                            </p>
+                                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Asunto:</b> NOTIFICACIÓN DE SALIDAS ANTICIPADAS <br>
+                                            <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
+                                            <b>Cargo:</b> ${item.cargo} <br> 
+                                            <b>Departamento:</b>${item.departamento}<br>
+                                            <b>Fecha de envío:</b> ${fecha} <br> 
+                                            <b>Hora de envío:</b> ${hora_reporte} <br>       
+                                            <b>Notificación:</b><br>
+                                                Queremos informarle que el sistema ha registrado una salida anticipada.<br>  
+                                            <b>Fecha:</b> ${fecha} <br>       
+                                            <b>Horario:</b> ${fechaHora} <br>
+                                            <b>Timbre:</b> ${fechaTimbre} <br>
+                                            <b>Tiempo total de salida anticipada:</b> ${tiempo} <br>
+                                            </p>
+                                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                            <b>Este correo es generado automáticamente. Por favor no responda a este mensaje.</b><br>
+                                            </p>
+                                            <img src="cid:pief" width="100%" height="100%"/>
+                                        </body>
+                                        `
                         ,
                         attachments: [
                             {
@@ -932,7 +962,6 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                             }
                         ]
                     };
-
                     var corr = enviarCorreos(Empre.rows[0].servidor, parseInt(Empre.rows[0].puerto), Empre.rows[0].correo_empresa, Empre.rows[0].password_correo);
                     corr.sendMail(data, function (error: any, info: any) {
                         if (error) {
@@ -948,11 +977,15 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                 }
             })
         } else {
-            console.log("no hay empleados con faltas. ")
+            console.log("no hay empleados con salidas anticipadas")
         }
+
     } else {
-        console.log("no hay faltas individuales. ")
+        console.log("no existen datos individuales")
     }
+
+
+
 }
 
 
@@ -980,31 +1013,38 @@ export const PresentarUsuarios = function (datos: any) {
         nombres = nombres + obj.nombre + ' ' + obj.apellido + ' - ' + obj.name_cargo + '<br>';
     })
     var usuarios = nombres
+
     return usuarios;
 }
 
 export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<any>> {
-    console.log(" ver datos del reporte de faltas: ", data);
-    let totalFaltasEmpleado: number = 0;
-
-    const FORMATO_FECHA = await pool.query(
-        `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 1
-        `
-    );
-
-    let formato_fecha: string = FORMATO_FECHA.rows[0].descripcion;
+    let formato_fecha: string = 'dd/MM/yyyy';
+    let formato_hora: string = 'HH:mm:ss';
     let idioma_fechas: string = 'es';
+
     let dia_abreviado: string = 'ddd';
+    let dia_completo: string = 'dddd';
+
+    let totalTiempoEmpleado: number = 0;
+    let totalTiempo = 0;
+    let resumen = '';
     let general: any = [];
     let n: any = []
     let c = 0;
+    let toleranciaP = '';
 
     data.forEach((selec: any) => {
         // CONTAR REGISTROS
-        let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length });
+        let arr_reg = selec.empleados.map((o: any) => { return o.salidas.length });
         let reg = SumarRegistros(arr_reg);
-
+        // CONTAR MINUTOS DE ATRASOS
+        totalTiempo = 0;
+        selec.empleados.forEach((o: any) => {
+            o.salidas.map((a: any) => {
+                const minutos = SegundosAMinutosConDecimales(Number(a.diferencia));
+                totalTiempo += Number(minutos);
+            })
+        })
         // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
         let descripcion = '';
         let establecimiento = 'SUCURSAL: ' + selec.sucursal;
@@ -1017,7 +1057,8 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
         let informacion = {
             sucursal: selec.sucursal,
             nombre: opcion,
-            faltas: reg
+            formato_general: MinutosAHorasMinutosSegundos(Number(totalTiempo.toFixed(2))),
+            formato_decimal: totalTiempo.toFixed(2),
         }
         general.push(informacion);
         // CABECERA PRINCIPAL
@@ -1096,43 +1137,67 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
             });
             // ENCERAR VARIABLES
             c = 0;
-            totalFaltasEmpleado = 0;
+            totalTiempoEmpleado = 0;
             n.push({
                 style: 'tableMargin',
                 table: {
-                    widths: ['*', '*'],
-                    headerRows: 1,
+                    widths: ['auto', '*', 'auto', '*', 'auto', 'auto', 'auto'],
+                    headerRows: 2,
                     body: [
                         [
-                            { text: 'N°', style: 'tableHeader' },
-                            { text: 'FECHA', style: 'tableHeader' },
+                            { rowSpan: 2, text: 'N°', style: 'centrado' },
+                            { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                            {},
+                            { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
+                            {},
+
+                            { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'centrado' },
+                            {}
                         ],
-                        ...empl.faltas.map((usu: any) => {
-                            const fecha = FormatearFecha(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
-                            totalFaltasEmpleado++;
-                            c = c + 1;
+                        [
+                            {},
+                            { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                            { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                            { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
+                            { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
+                            {}, {},
+                        ],
+                        ...empl.salidas.map((usu: any) => {
+                            // FORMATEAR FECHAS
+                            const fechaHorario = FormatearFecha(usu.fecha_hora_horario.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
+                            const fechaTimbre = FormatearFecha(usu.fecha_hora_timbre.split(' ')[0], formato_fecha, dia_abreviado, idioma_fechas);
+                            const horaHorario = FormatearHora(usu.fecha_hora_horario.split(' ')[1], formato_hora);
+                            const horaTimbre = FormatearHora(usu.fecha_hora_timbre.split(' ')[1], formato_hora);
+                            // CONTABILIZAR MINUTOS
+                            const minutos = SegundosAMinutosConDecimales(usu.diferencia);
+                            const tiempo = MinutosAHorasMinutosSegundos(minutos);
+                            totalTiempoEmpleado += Number(minutos);
+                            c = c + 1
                             return [
                                 { style: 'itemsTableCentrado', text: c },
-                                { style: 'itemsTableCentrado', text: fecha },
+                                { style: 'itemsTableCentrado', text: fechaHorario },
+                                { style: 'itemsTableCentrado', text: horaHorario },
+                                { style: 'itemsTableCentrado', text: fechaTimbre },
+                                { style: 'itemsTableCentrado', text: horaTimbre },
+                                { style: 'itemsTableCentrado', text: tiempo },
+                                { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
                             ];
                         }),
-                        [
-                            { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
-                            { style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado },
-                        ],
                     ],
                 },
                 layout: {
                     fillColor: function (rowIndex: any) {
-                        return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-                    },
-                },
+                        return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                    }
+                }
             });
         })
     })
     // RESUMEN TOTALES DE REGISTROS
     return n;
 }
+
+
 
 export const SumarRegistros = function (array: any[]) {
     let valor = 0;
@@ -1141,6 +1206,23 @@ export const SumarRegistros = function (array: any[]) {
     }
     return valor;
 }
+
+export const SegundosAMinutosConDecimales = function (segundos: number) {
+    return Number((segundos / 60).toFixed(2));
+}
+
+export const MinutosAHorasMinutosSegundos = function (minutos: number) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10) ? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10) ? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10) ? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+}
+
+
 
 export const FormatearFecha = function (fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;

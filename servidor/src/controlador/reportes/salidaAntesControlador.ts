@@ -25,8 +25,6 @@ class SalidasAntesControlador {
 
         return res.status(200).jsonp(nuevo)
     }
-
-
 }
 
 const SALIDAS_ANTICIPADAS_CONTROLADOR = new SalidasAntesControlador();
@@ -34,7 +32,7 @@ const SALIDAS_ANTICIPADAS_CONTROLADOR = new SalidasAntesControlador();
 export default SALIDAS_ANTICIPADAS_CONTROLADOR;
 
 // FUNCION DE BUSQUEDA DE SALIDAS ANTICIPADAS    **USADO
-const BuscarSalidasAnticipadas = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
+export const BuscarSalidasAnticipadas = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
         SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR), 

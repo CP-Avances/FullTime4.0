@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuscarSalidasAnticipadas = void 0;
 const database_1 = __importDefault(require("../../database"));
 class SalidasAntesControlador {
     // METODO DE REGISTROS DE SALIDAS ANTICIPADAS     **USADO
@@ -21,7 +22,7 @@ class SalidasAntesControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.salidas = yield BuscarSalidasAnticipadas(desde, hasta, o.id);
+                    o.salidas = yield (0, exports.BuscarSalidasAnticipadas)(desde, hasta, o.id);
                     return o;
                 })));
                 return obj;
@@ -57,3 +58,4 @@ const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, id_empleado) {
         });
     });
 };
+exports.BuscarSalidasAnticipadas = BuscarSalidasAnticipadas;

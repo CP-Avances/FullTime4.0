@@ -313,6 +313,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
+      console.log("ver los datos de la salidas anticipadas: ", this.data_pdf )
       switch (accion) {
         case 'excel': this.generarExcel(); break;
         case 'ver': this.VerDatos(); break;
