@@ -36,18 +36,6 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-                <br>
-                <mat-form-field>
-                    <mat-label>Nivel</mat-label>
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                        matTooltip="Seleccionar el nivel del nuevo proceso">
-                        help_outline</mat-icon>
-                    <mat-select [formControl]="nivel" required>
-                        <mat-option *ngFor="let n of niveles" [value]="n.nombre">
-                            {{n.valor}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
             </div>
         </mat-card-content>
     </form>

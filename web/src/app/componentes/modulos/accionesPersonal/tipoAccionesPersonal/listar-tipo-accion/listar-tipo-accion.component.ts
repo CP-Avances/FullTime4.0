@@ -264,7 +264,13 @@ export class ListarTipoAccionComponent implements OnInit {
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-    
+    this.rest.RevisarFormato(formData).subscribe(res => {
+
+    }, error => {
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+    });
     
   }
     // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL

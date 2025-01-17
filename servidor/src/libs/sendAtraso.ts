@@ -103,9 +103,9 @@ export const atrasosDiarios = async function () {
         console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion)
 
         if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-           // atrasos(fecha, fecha, false);
-            //atrasosDepartamentos(fecha, fecha, false);
-            atrasosIndividual('2025/01/15', '2025/01/15');
+            atrasos(fecha, fecha, false);
+            atrasosDepartamentos(fecha, fecha, false);
+            atrasosIndividual(fecha, fecha);
         } else {
             console.log("hora incorrecta")
         }
@@ -1000,14 +1000,27 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
                         tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
                         `
-                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE ATRASO', 6, 'Llego atrasado al trabajo con: ' + tiempo]);
+                        , [create_at, 1, item.id, 'NOTIFICACIÓN DE ATRASO', 6, 'Llego atrasado al trabajo con: ' + tiempo]);
 
                     if (response.rows.length != 0) {
                         console.log("se inserto notificación")
                     };
 
-                    io.emit('nuevo_aviso',
-                        mensaje);
+                    let x = response.rows[0]
+
+                    let data_llega = {
+                        id: x.id,
+                        create_at: x.fecha_hora,
+                        id_send_empl: 1,
+                        id_receives_empl: x.id_empleado_recibe,
+                        visto: false,
+                        descripcion: x.descripcion,
+                        mensaje: x.mensaje,
+                        tipo: 6,
+                    }
+
+                    io.emit('recibir_aviso', data_llega);
+
 
                 }
 

@@ -52,16 +52,16 @@ class ProcesoControlador {
 
   public async create(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, nivel, proc_padre, user_name, ip, ip_local } = req.body;
+      const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       await pool.query(
         `
-        INSERT INTO map_cat_procesos (nombre, nivel, proceso_padre) VALUES ($1, $2, $3)
+        INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2)
         `
-        , [nombre, nivel, proc_padre]);
+        , [nombre, proc_padre]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -69,7 +69,7 @@ class ProcesoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+        datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
         ip: ip,
         ip_local: ip_local,
         observacion: null
@@ -100,7 +100,7 @@ class ProcesoControlador {
 
   public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, nivel, proc_padre, id, user_name, ip, ip_local } = req.body;
+      const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -129,9 +129,9 @@ class ProcesoControlador {
 
       await pool.query(
         `
-        UPDATE map_cat_procesos SET nombre = $1, nivel = $2, proceso_padre = $3 WHERE id = $4
+        UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
         `
-        , [nombre, nivel, proc_padre, id]);
+        , [nombre, proc_padre, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -139,7 +139,7 @@ class ProcesoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+        datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
         ip: ip,
         ip_local: ip_local,
         observacion: null
@@ -306,7 +306,6 @@ class ProcesoControlador {
 
                         if (PROCESO_PADRE == undefined) {
                           data.proceso_padre = 'No registrado';
-                          data.observacion = 'Proceso padre ' + data.observacion;
                         }
 
                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
@@ -381,13 +380,16 @@ class ProcesoControlador {
 
                               if(existe_proceso_padre == false){
 
-                                const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
-                                  otroIndex !== index && item.proceso_padre === obj.proceso
-                                );
-
-                                if(!hayCoincidencia){
-                                  item.observacion = 'Proceso padre no existe en el archivo como proceso.';
+                                if(item.proceso_padre != 'No registrado'){
+                                  const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
+                                    otroIndex !== index && item.proceso_padre === obj.proceso
+                                  );
+  
+                                  if(!hayCoincidencia){
+                                    item.observacion = 'Proceso padre no existe en el archivo como proceso.';
+                                  }
                                 }
+                                
                               }
                               
                             }
@@ -497,6 +499,8 @@ class ProcesoControlador {
 
     for (const data of plantilla) {
       const {  proceso, proceso_padre } = data;
+
+      if(proceso_padre != 'No registrado'){
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
@@ -532,45 +536,46 @@ class ProcesoControlador {
   
         }else {
 
-          const respo: QueryResult = await pool.query(
-            `
-            INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-            `
-            , [proceso_padre, null]);
-          const [proce] = respo.rows;
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'map_cat_procesos',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(proce),
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
-
-          const response: QueryResult = await pool.query(
-            `
-            UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
-            `
-            , [respo.rows[0].id, proceso]);
+          
+            const respo: QueryResult = await pool.query(
+              `
+              INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
+              `
+              , [proceso_padre, null]);
+            const [proce] = respo.rows;
   
-          const [procesos] = response.rows;
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'map_cat_procesos',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(procesos),
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
-
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proce),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+  
+            const response: QueryResult = await pool.query(
+              `
+              UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
+              `
+              , [respo.rows[0].id, proceso]);
+    
+            const [procesos] = response.rows;
+  
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(procesos),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+          
         }
 
         // AUDITORIA
@@ -585,9 +590,9 @@ class ProcesoControlador {
           observacion: null
         });
 
-        
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
+      }
     }
 
     if (error) {

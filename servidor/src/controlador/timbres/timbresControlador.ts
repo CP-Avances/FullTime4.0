@@ -641,7 +641,7 @@ class TimbresControlador {
                             if (ele.rows.length > 0) {
                                 return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
                             } else {
-                                return 'Nombre no encontrado'; // Valor predeterminado si no se encuentra el registro
+                                return 'Sistema'; // Valor predeterminado si no se encuentra el registro
                             }
                         });
 

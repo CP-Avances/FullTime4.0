@@ -91,13 +91,14 @@ import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas
 import REPORTE_HORA_EXTRA_RUTAS from './rutas/reportes/reporteHoraExtraRutas';
 
 import { createServer, Server } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
-var io: any;
-
+//var io: any;
 class Servidor {
 
     public app: Application;
     public server: Server;
+    public io: SocketIOServer;
 
     constructor() {
         this.app = express();
@@ -105,11 +106,25 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = createServer(this.app);
-        io = require('socket.io')(this.server, {
+        /*
+        this.io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
             }
+        });
+*/
+        this.io = new SocketIOServer(this.server, {
+            cors: {
+                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                methods: ['GET', 'POST'],
+            },
+        });
+        this.io.on('connection', (socket: any) => {
+            // console.log('Cliente conectado:', socket.id);  // Verifica la conexión
+            socket.on('disconnect', () => {
+                console.log('Cliente desconectado:', socket.id);
+            });
         });
 
     }
@@ -233,7 +248,7 @@ class Servidor {
         })
 
 
-        io.on('connection', (socket: any) => {
+        this.io.on('connection', (socket: any) => {
             console.log('Conexion con el socket ', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data: any) => {
                 let data_llega = {
@@ -256,6 +271,8 @@ class Servidor {
             });
 
             socket.on("nuevo_aviso", (data: any) => {
+                console.log('Datos recibidos en "nuevo_aviso":', data);
+
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -289,7 +306,7 @@ import { atrasosDiarios, atrasosSemanal } from './libs/sendAtraso';
 import { aniversario } from './libs/sendAniversario';
 import { cumpleanios } from './libs/sendBirthday';
 import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
-import { salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
+import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
 
 
 /** **************************************************************************************************** **
@@ -299,7 +316,7 @@ import { salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
-/*
+
 setInterval(async () => {
     atrasosDiarios();
     atrasosSemanal();
@@ -308,9 +325,9 @@ setInterval(async () => {
     salidasAnticipadasSemanal();
     salidasAnticipadasDiarios();
 }, 2700000);
-*/
 
-atrasosDiarios();
+export const io = SERVIDOR.io;
+
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 aniversario();
@@ -331,4 +348,3 @@ cumpleanios();
 
 //generarTimbres('1', '2023-11-01', '2023-11-02');//
 
-export { io };

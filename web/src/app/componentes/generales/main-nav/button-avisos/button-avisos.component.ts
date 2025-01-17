@@ -7,6 +7,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { ChangeDetectorRef } from '@angular/core';
+const { DateTime } = require("luxon");
 
 @Component({
   selector: 'app-button-avisos',
@@ -45,9 +46,10 @@ export class ButtonAvisosComponent implements OnInit {
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_aviso', (data: any) => {
-        //console.log('Escuchando aviso', data);
+        console.log('Escuchando aviso', data);
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
         if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
+          console.log("se esjecuta")
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
             console.log("ver res ObtenerUnAviso: ", res)
@@ -56,7 +58,9 @@ export class ButtonAvisosComponent implements OnInit {
             let fecha = this.validar.DarFormatoFecha(res.fecha_hora.split('T')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            res.hora_ = this.validar.FormatearHora(res.fecha_hora.split('T')[1], this.formato_hora);
+
+           
+            res.hora_ = this.validar.FormatearHora( DateTime.fromISO(res.fecha_hora).toFormat("HH:mm:ss"), this.formato_hora);
 
             if (res.tipo != 6) {
               if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {

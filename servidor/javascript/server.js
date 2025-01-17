@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -93,7 +102,8 @@ const auditoriaRutas_1 = __importDefault(require("./rutas/reportes/auditoriaRuta
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const reporteHoraExtraRutas_1 = __importDefault(require("./rutas/reportes/reporteHoraExtraRutas"));
 const http_1 = require("http");
-var io;
+const socket_io_1 = require("socket.io");
+//var io: any;
 class Servidor {
     constructor() {
         this.app = (0, express_1.default)();
@@ -101,11 +111,25 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = (0, http_1.createServer)(this.app);
-        exports.io = io = require('socket.io')(this.server, {
+        /*
+        this.io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
             }
+        });
+*/
+        this.io = new socket_io_1.Server(this.server, {
+            cors: {
+                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                methods: ['GET', 'POST'],
+            },
+        });
+        this.io.on('connection', (socket) => {
+            // console.log('Cliente conectado:', socket.id);  // Verifica la conexión
+            socket.on('disconnect', () => {
+                console.log('Cliente desconectado:', socket.id);
+            });
         });
     }
     configuracion() {
@@ -219,7 +243,7 @@ class Servidor {
             res.header('Access-Control-Allow-Origin', '*');
             next();
         });
-        io.on('connection', (socket) => {
+        this.io.on('connection', (socket) => {
             console.log('Conexion con el socket ', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data) => {
                 let data_llega = {
@@ -241,6 +265,7 @@ class Servidor {
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
+                console.log('Datos recibidos en "nuevo_aviso":', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -265,23 +290,30 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAtraso_1 = require("./libs/sendAtraso");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
+const sendFaltas_1 = require("./libs/sendFaltas");
+const sendSalidasAnticipadas_1 = require("./libs/sendSalidasAnticipadas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-/*
-setInterval(async () => {
-    atrasosDiarios();
-    atrasosSemanal();
-    faltasDiarios();
-    faltasSemanal();
-    salidasAnticipadasSemanal();
-    salidasAnticipadasDiarios();
-}, 2700000);
-*/
-(0, sendAtraso_1.atrasosDiarios)();
+setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+    (0, sendAtraso_1.atrasosDiarios)();
+    (0, sendAtraso_1.atrasosSemanal)();
+    (0, sendFaltas_1.faltasDiarios)();
+    (0, sendFaltas_1.faltasSemanal)();
+    (0, sendSalidasAnticipadas_1.salidasAnticipadasSemanal)();
+    (0, sendSalidasAnticipadas_1.salidasAnticipadasDiarios)();
+}), 2700000);
+exports.io = SERVIDOR.io;
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES
 (0, sendBirthday_1.cumpleanios)();
+//beforeFiveDays();
+//beforeTwoDays();
+// LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
+//Peri_Vacacion_Automatico();
+//RegistrarAsistenciaByTimbres();
+// ----------// conteoPermisos();
+//generarTimbres('1', '2023-11-01', '2023-11-02');//
