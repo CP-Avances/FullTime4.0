@@ -1,11 +1,12 @@
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -14,15 +15,15 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class SettingsComponent implements OnInit {
-  ips_locales: any = '';
-
 
   btnActualizar: boolean = false;
   btnCrear: boolean = false;
+  id_empleado: any;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+  ips_locales: any = '';
 
   formGroup: FormGroup;
 
@@ -35,11 +36,10 @@ export class SettingsComponent implements OnInit {
   constructor(
     private avisos: RealTimeService,
     private toaster: ToastrService,
-    public ventana: MatDialogRef<SettingsComponent>,
     public formBuilder: FormBuilder,
     private funciones: MainNavService,
     public validar: ValidacionesService,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public router: Router,
   ) {
     this.formGroup = formBuilder.group({
       vacaMail: false,
@@ -52,17 +52,28 @@ export class SettingsComponent implements OnInit {
       comidaNoti: false,
       comunicadoMail: false,
       comunicadoNoti: false,
+      atrasosMail: false,
+      atrasosNoti: false,
+      faltasMail: false,
+      faltasNoti: false,
+      salidasAnticipadasMail: false,
+      salidasAnticipadasNoti: false,
     });
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
+    // CODIGO TOMADO DESDE LA RUTA URL
+    var ruta = this.router.url.split('#')[0];
+    var datoEncontrado: string = ruta.split("/")[2];
+    const formatearDato = decodeURIComponent(datoEncontrado);
+    this.id_empleado = this.validar.DesencriptarDato(formatearDato);
 
-    this.avisos.ObtenerConfiguracionEmpleado(this.data.id_empleado).subscribe(res => {
+    this.avisos.ObtenerConfiguracionEmpleado(this.id_empleado).subscribe(res => {
       this.btnActualizar = true;
       this.formGroup.patchValue({
         vacaMail: res[0].vacacion_mail,
@@ -79,12 +90,13 @@ export class SettingsComponent implements OnInit {
     }, error => {
       this.btnCrear = true;
     });
+
   }
 
   // METODO PARA REGISTRAR CONFIGURACION DE NOTIFICACIONES
   CrearConfiguracion(form: any) {
     let data = {
-      id_empleado: this.data.id_empleado,
+      id_empleado: this.id_empleado,
       vaca_mail: form.vacaMail,
       vaca_noti: form.vacaNoti,
       permiso_mail: form.permisoMail,
@@ -95,14 +107,21 @@ export class SettingsComponent implements OnInit {
       comida_noti: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
       comunicado_noti: form.comunicadoNoti,
+      atrasos_mail: form.atrasosMail,
+      atrasos_noti: form.atrasosNoti,
+      faltas_mail: form.faltasMail,
+      faltas_noti: form.faltasNoti,
+      salidas_anticipadas_mail: form.salidasAnticipadasMail,
+      salidas_anticipadas_noti: form.salidasAnticipadasNoti,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     this.avisos.IngresarConfigNotiEmpleado(data).subscribe(res => {
-      this.ventana.close();
       this.toaster.success('Operación exitosa.', 'Configuración Guardada', {
         timeOut: 6000,
       });
+      return this.router.navigate(['/home']);
     });
   }
 
@@ -119,14 +138,22 @@ export class SettingsComponent implements OnInit {
       comida_noti: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
       comunicado_noti: form.comunicadoNoti,
+      atrasos_mail: form.atrasosMail,
+      atrasos_noti: form.atrasosNoti,
+      faltas_mail: form.faltasMail,
+      faltas_noti: form.faltasNoti,
+      salidas_anticipadas_mail: form.salidasAnticipadasMail,
+      salidas_anticipadas_noti: form.salidasAnticipadasNoti,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
-    this.avisos.ActualizarConfigNotiEmpl(this.data.id_empleado, data).subscribe(res => {
-      this.ventana.close();
+    this.avisos.ActualizarConfigNotiEmpl(this.id_empleado, data).subscribe(res => {
       this.toaster.success('Operación exitosa.', 'Configuración Actualizada', {
         timeOut: 6000,
       });
+      return this.router.navigate(['/home']);
     });
+
   }
 }

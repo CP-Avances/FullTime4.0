@@ -91,6 +91,7 @@ import { AdministradorTodasComponent } from './componentes/reportes/notificacion
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
 import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
+import { SettingsComponent } from './componentes/notificaciones/configurar-notificaciones/settings/settings.component';
 // REPORTES  --GENERALES
 import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna-multiple/vacuna-multiple.component';
@@ -245,12 +246,13 @@ const routes: Routes = [
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'archivos', component: VerDocumentosComponent, canActivate: [AuthGuard] },
   { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard] },
- { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
+  { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
   { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard] },
   { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard] },
   { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard] },
   { path: 'lista-notificaciones', component: RealtimeNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'lista-avisos', component: RealtimeAvisosComponent, canActivate: [AuthGuard] },
+  { path: 'configuraciones-alertas/:id', component: SettingsComponent, canActivate: [AuthGuard] },
   { path: 'ver-permiso/:id', component: VerEmpleadoPermisoComponent, canActivate: [AuthGuard] },
   { path: 'ver-vacacion/:id', component: VerVacacionComponent, canActivate: [AuthGuard] },
   { path: 'ver-hora-extra/:id', component: VerPedidoHoraExtraComponent, canActivate: [AuthGuard] },

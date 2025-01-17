@@ -330,7 +330,7 @@ class UbicacionControlador {
                         observacion: null
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                    // Finalizar transacción
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     if (resultadoExistente.rows.length !== 0) {
                         res.jsonp({ message: 'Con duplicados' });
@@ -395,7 +395,7 @@ class UbicacionControlador {
                         observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                     }));
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
                 }

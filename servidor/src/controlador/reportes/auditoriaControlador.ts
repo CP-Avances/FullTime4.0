@@ -127,7 +127,7 @@ class AuditoriaControlador {
                 // Ejecutar la consulta de inserción masiva
                 await pool.query(query, valores);
 
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
 
             } catch (error) {

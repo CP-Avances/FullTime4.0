@@ -2,6 +2,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
+import CryptoJS from 'crypto-js';
 
 @Injectable({
   providedIn: 'root'
@@ -636,6 +637,43 @@ export class ValidacionesService {
       peerConnection.createOffer().then((offer) => peerConnection.setLocalDescription(offer));
     });
   };
+
+
+  /** ********************************************************************************* **
+   ** **                             MANEJO DE DATOS EN URL                          ** **
+   ** ********************************************************************************* **/
+
+  private frase: string = 'CasaPazminoSAOPIS';
+
+  EncriptarDato(data: any): string {
+    try {
+      return CryptoJS.AES.encrypt(data, this.frase).toString();
+    } catch (error) {
+      console.error('Error al encriptar datos', error);
+      return '';
+    }
+  }
+
+  DesencriptarDato(data: string): string {
+    try {
+      console.log('dato ', data)
+      const bytes = CryptoJS.AES.decrypt(data, this.frase);
+      const originalData = bytes.toString(CryptoJS.enc.Utf8);
+
+      if (!originalData) {
+        throw new Error('El dato desencriptado es inválido.');
+      }
+
+      return originalData;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error al desencriptar:', error.message);
+      } else {
+        console.error('Error desconocido:', error);
+      }
+      return '';
+    }
+  }
 
 }
 
