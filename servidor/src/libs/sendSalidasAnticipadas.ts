@@ -5,7 +5,10 @@ import path from 'path'
 import { DateTime } from 'luxon';
 import { BuscarSalidasAnticipadas } from '../controlador/reportes/salidaAntesControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
-
+import {
+    fechaHora
+} from '../libs/settingsMail';
+import { io } from '../server';
 
 // METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
 
@@ -891,7 +894,9 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
 
 
         if (arregloEmpleados.length != 0) {
-            arregloEmpleados.forEach((item: any) => {
+            arregloEmpleados.forEach(async (item: any) => {
+                const minutos = SegundosAMinutosConDecimales(Number(item.salidas[0].diferencia))
+                const tiempo = MinutosAHorasMinutosSegundos(minutos);
                 if (item.salidas_anticipadas_mail) {
                     let dateTimeHorario = DateTime.fromSQL(item.salidas[0].fecha_hora_horario);
                     let isoStringHorario = dateTimeHorario.toISO();
@@ -911,8 +916,7 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                         fechaTimbre = FormatearFecha(isoStringTimbre, formato_fecha, dia_completo, idioma_fechas) + ' ' + horaTimbre;
 
                     }
-                    const minutos = SegundosAMinutosConDecimales(Number(item.salidas[0].diferencia))
-                    const tiempo = MinutosAHorasMinutosSegundos(minutos);
+
 
                     let data = {
                         to: item.correo,
@@ -975,6 +979,40 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                         }
                     });
                 }
+
+
+                if (item.salidas_anticipadas_notificacion) {
+                    var tiempoN = fechaHora();
+                    let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
+
+                    const response = await pool.query(
+                        `
+                        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
+                        tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+                        `
+                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE SALIDAS ANTICIPADAS', 6, 'timpo de salida anticipada: ' + tiempo]);
+
+                    if (response.rows.length != 0) {
+                        console.log("se inserto notificación")
+                    };
+
+                    let x = response.rows[0]
+
+                    let data_llega = {
+                        id: x.id,
+                        create_at: x.fecha_hora,
+                        id_send_empl: 0,
+                        id_receives_empl: x.id_empleado_recibe,
+                        visto: false,
+                        descripcion: x.descripcion,
+                        mensaje: x.mensaje,
+                        tipo: 6,
+                    }
+
+                    io.emit('recibir_aviso', data_llega);
+                }
+
+
             })
         } else {
             console.log("no hay empleados con salidas anticipadas")

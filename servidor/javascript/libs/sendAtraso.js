@@ -130,9 +130,9 @@ const atrasosDiarios = function () {
             `);
             console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
             if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-                // atrasos(fecha, fecha, false);
-                //atrasosDepartamentos(fecha, fecha, false);
-                (0, exports.atrasosIndividual)('2025/01/15', '2025/01/15');
+                (0, exports.atrasos)(fecha, fecha, false);
+                (0, exports.atrasosDepartamentos)(fecha, fecha, false);
+                (0, exports.atrasosIndividual)(fecha, fecha);
             }
             else {
                 console.log("hora incorrecta");
@@ -877,7 +877,18 @@ const atrasosIndividual = function (desde, hasta) {
                             console.log("se inserto notificación");
                         }
                         ;
-                        server_1.io.emit('nuevo_aviso', mensaje);
+                        let x = response.rows[0];
+                        let data_llega = {
+                            id: x.id,
+                            create_at: x.fecha_hora,
+                            id_send_empl: 0,
+                            id_receives_empl: x.id_empleado_recibe,
+                            visto: false,
+                            descripcion: x.descripcion,
+                            mensaje: x.mensaje,
+                            tipo: 6,
+                        };
+                        server_1.io.emit('recibir_aviso', data_llega);
                     }
                 }));
             }

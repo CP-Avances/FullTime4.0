@@ -135,7 +135,8 @@ export class ValidacionesService {
   }
 
   FormatearHora(hora: string, formato: string) {
-    //console.log('hora ', hora, ' formato ', formato)
+    console.log('hora ', hora, ' formato ', formato)
+
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;

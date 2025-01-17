@@ -5,8 +5,10 @@ import path from 'path'
 import { DateTime } from 'luxon';
 import { BuscarFaltas } from '../controlador/reportes/reportesFaltasControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
-import { Console } from 'console';
-
+import { io } from '../server';
+import {
+    fechaHora
+} from '../libs/settingsMail';
 
 
 /** ********************************************************************************* **
@@ -863,9 +865,9 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
             Empre.rows[0].pie_firma = 'pie_firma.png';
         }
 
-
         if (arregloEmpleados.length != 0) {
-            arregloEmpleados.forEach((item: any) => {
+            arregloEmpleados.forEach(async (item: any) => {
+
                 if (item.faltas_mail) {
                     let dateTimeHorario = DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
                     let isoStringHorario = dateTimeHorario.toISO();
@@ -945,11 +947,49 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                             return 'ok';
                         }
                     });
+                } else {
+                    console.log("faltas_email es false")
+                }
+
+
+
+                if (item.faltas_notificacion) {
+                    var tiempoN = fechaHora();
+                    let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
+
+                    const response = await pool.query(
+                        `
+                        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
+                        tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+                        `
+                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE FALTA', 6, 'No se registro timbres en su marcación.']);
+
+                    if (response.rows.length != 0) {
+                        console.log("se inserto notificación")
+                    };
+
+                    let x = response.rows[0]
+
+                    let data_llega = {
+                        id: x.id,
+                        create_at: x.fecha_hora,
+                        id_send_empl: 0,
+                        id_receives_empl: x.id_empleado_recibe,
+                        visto: false,
+                        descripcion: x.descripcion,
+                        mensaje: x.mensaje,
+                        tipo: 6,
+                    }
+
+                    io.emit('recibir_aviso', data_llega);
+
+
                 }
             })
         } else {
             console.log("no hay empleados con faltas. ")
         }
+
     } else {
         console.log("no hay faltas individuales. ")
     }

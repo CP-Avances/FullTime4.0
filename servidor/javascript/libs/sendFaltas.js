@@ -53,6 +53,8 @@ const path_1 = __importDefault(require("path"));
 const luxon_1 = require("luxon");
 const reportesFaltasControlador_1 = require("../controlador/reportes/reportesFaltasControlador");
 const ImagenCodificacion_1 = require("./ImagenCodificacion");
+const server_1 = require("../server");
+const settingsMail_2 = require("../libs/settingsMail");
 /** ********************************************************************************* **
    ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
    ** ********************************************************************************* **/
@@ -767,7 +769,7 @@ const faltasIndividual = function (desde, hasta) {
                 Empre.rows[0].pie_firma = 'pie_firma.png';
             }
             if (arregloEmpleados.length != 0) {
-                arregloEmpleados.forEach((item) => {
+                arregloEmpleados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.faltas_mail) {
                         let dateTimeHorario = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
                         let isoStringHorario = dateTimeHorario.toISO();
@@ -841,7 +843,34 @@ const faltasIndividual = function (desde, hasta) {
                             }
                         });
                     }
-                });
+                    else {
+                        console.log("faltas_email es false");
+                    }
+                    if (item.faltas_notificacion) {
+                        var tiempoN = (0, settingsMail_2.fechaHora)();
+                        let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
+                        const response = yield database_1.default.query(`
+                        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
+                        tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+                        `, [create_at, 0, item.id, 'NOTIFICACIÓN DE FALTA', 6, 'No se registro timbres en su marcación.']);
+                        if (response.rows.length != 0) {
+                            console.log("se inserto notificación");
+                        }
+                        ;
+                        let x = response.rows[0];
+                        let data_llega = {
+                            id: x.id,
+                            create_at: x.fecha_hora,
+                            id_send_empl: 0,
+                            id_receives_empl: x.id_empleado_recibe,
+                            visto: false,
+                            descripcion: x.descripcion,
+                            mensaje: x.mensaje,
+                            tipo: 6,
+                        };
+                        server_1.io.emit('recibir_aviso', data_llega);
+                    }
+                }));
             }
             else {
                 console.log("no hay empleados con faltas. ");
