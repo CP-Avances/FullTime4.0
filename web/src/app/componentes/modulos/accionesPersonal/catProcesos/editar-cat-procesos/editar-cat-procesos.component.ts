@@ -28,25 +28,14 @@ export class EditarCatProcesosComponent implements OnInit {
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   procesoPadre = new FormControl('', Validators.required);
   nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
-  nivel = new FormControl('', Validators.required);
 
   procesos: any = [];
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
-    procesoNivelForm: this.nivel,
     procesoNombreForm: this.nombre,
     procesoPadreForm: this.procesoPadre,
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: '1', nombre: '1' },
-    { valor: '2', nombre: '2' },
-    { valor: '3', nombre: '3' },
-    { valor: '4', nombre: '4' },
-    { valor: '5', nombre: '5' }
-  ];
 
   constructor(
     private rest: ProcesoService,
@@ -72,7 +61,6 @@ export class EditarCatProcesosComponent implements OnInit {
   ImprimirDatos() {
     this.formulario.patchValue({
       procesoNombreForm: this.data.datosP.nombre,
-      procesoNivelForm: String(this.data.datosP.nivel),
     })
     if (this.data.datosP.proc_padre === null) {
       this.procesoPadre.setValue('Ninguno');
@@ -93,7 +81,6 @@ export class EditarCatProcesosComponent implements OnInit {
       let dataProceso = {
         id: this.data.datosP.id,
         nombre: form.procesoNombreForm,
-        nivel: form.procesoNivelForm,
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales
       };
@@ -104,7 +91,6 @@ export class EditarCatProcesosComponent implements OnInit {
         let dataProceso = {
           id: this.data.datosP.id,
           nombre: form.procesoNombreForm,
-          nivel: form.procesoNivelForm,
           proc_padre: procesoPadreId,
           user_name: this.user_name,
           ip: this.ip, ip_local: this.ips_locales

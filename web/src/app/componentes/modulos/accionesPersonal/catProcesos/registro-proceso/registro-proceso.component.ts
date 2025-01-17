@@ -28,7 +28,6 @@ export class RegistroProcesoComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
-  nivel = new FormControl('', Validators.required);
   procesoPadre = new FormControl('', Validators.required);
 
   procesos: any = [];
@@ -36,18 +35,8 @@ export class RegistroProcesoComponent implements OnInit {
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     procesoNombreForm: this.nombre,
-    procesoNivelForm: this.nivel,
     procesoProcesoPadreForm: this.procesoPadre
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: '1', nombre: '1' },
-    { valor: '2', nombre: '2' },
-    { valor: '3', nombre: '3' },
-    { valor: '4', nombre: '4' },
-    { valor: '5', nombre: '5' }
-  ];
 
   constructor(
     private rest: ProcesoService,
@@ -81,7 +70,6 @@ export class RegistroProcesoComponent implements OnInit {
     if (procesoPadreNombre == 0) {
       let dataProceso = {
         nombre: form.procesoNombreForm,
-        nivel: form.procesoNivelForm,
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales
       };
@@ -97,7 +85,6 @@ export class RegistroProcesoComponent implements OnInit {
         procesoPadreId = data[0].id;
         let dataProceso = {
           nombre: form.procesoNombreForm,
-          nivel: form.procesoNivelForm,
           proc_padre: procesoPadreId,
           user_name: this.user_name,
           ip: this.ip, ip_local: this.ips_locales

@@ -145,6 +145,7 @@ export class PrincipalProcesoComponent implements OnInit {
     this.buscarNivel.reset();
     this.buscarPadre.reset();
     this.ObtenerProcesos();
+    this.mostrarbtnsubir = false;
   }
   
 
