@@ -595,7 +595,7 @@ class TimbresControlador {
             SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.fecha_hora, r.tipo, r.visto, 
                 r.id_timbre, r.descripcion, (e.nombre || ' ' || e.apellido) AS empleado 
             FROM ecm_realtime_timbres AS r, eu_empleados AS e 
-            WHERE r.id = $1
+            WHERE r.id = $1 AND e.id = r.id_empleado_envia
             `, [id]);
             if (AVISOS.rowCount != 0) {
                 return res.jsonp(AVISOS.rows[0]);

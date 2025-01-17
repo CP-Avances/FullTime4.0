@@ -990,7 +990,7 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
                         tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
                         `
-                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE SALIDAS ANTICIPADAS', 6, 'timpo de salida anticipada: ' + tiempo]);
+                        , [create_at, 1, item.id, 'NOTIFICACIÓN DE SALIDAS ANTICIPADAS', 6, 'timpo de salida anticipada: ' + tiempo]);
 
                     if (response.rows.length != 0) {
                         console.log("se inserto notificación")
@@ -1001,7 +1001,7 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                     let data_llega = {
                         id: x.id,
                         create_at: x.fecha_hora,
-                        id_send_empl: 0,
+                        id_send_empl: 1,
                         id_receives_empl: x.id_empleado_recibe,
                         visto: false,
                         descripcion: x.descripcion,

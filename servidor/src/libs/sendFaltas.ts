@@ -951,8 +951,6 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                     console.log("faltas_email es false")
                 }
 
-
-
                 if (item.faltas_notificacion) {
                     var tiempoN = fechaHora();
                     let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
@@ -962,7 +960,7 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
                         tipo, mensaje) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
                         `
-                        , [create_at, 0, item.id, 'NOTIFICACIÓN DE FALTA', 6, 'No se registro timbres en su marcación.']);
+                        , [create_at, 1, item.id, 'NOTIFICACIÓN DE FALTA', 6, 'No se registro timbres en su marcación.']);
 
                     if (response.rows.length != 0) {
                         console.log("se inserto notificación")
@@ -973,12 +971,13 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                     let data_llega = {
                         id: x.id,
                         create_at: x.fecha_hora,
-                        id_send_empl: 0,
+                        id_send_empl: 1,
                         id_receives_empl: x.id_empleado_recibe,
                         visto: false,
-                        descripcion: x.descripcion,
-                        mensaje: x.mensaje,
+                        descripcion: x.mensaje,
+                        mensaje: x.descripcion,
                         tipo: 6,
+                        usuario: 'PLATAFORMA WEB'
                     }
 
                     io.emit('recibir_aviso', data_llega);
