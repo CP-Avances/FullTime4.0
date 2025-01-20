@@ -65,6 +65,7 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
+import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 // MODULO  --TIMBRE VIRTUAL
@@ -221,6 +222,8 @@ const routes: Routes = [
   { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard] },
   { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
+  { path: 'IngresarProcesos', component: IngresarProcesosComponent, canActivate: [AuthGuard] },
+  
 
   // MODULO  --GEOLOCALIZACION
   { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard] },

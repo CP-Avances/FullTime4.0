@@ -44,26 +44,6 @@
                         </mat-icon>
                     </mat-form-field>
                 </div>
-                <div class="col-lg">
-                    <label style="padding-top: 10px; position: relative; left:15px; font-size: 14px;">
-                        Tipo:
-                    </label>
-                    <section>
-                        <mat-radio-group aria-label="Select an option" formControlName="tipoForm">
-                            <mat-radio-button (click)="CambiarEstadosPermisos()" value="permiso">
-                                <label id="textoradiobtn">Permiso</label>
-                            </mat-radio-button>
-                            <br>
-                            <mat-radio-button (click)="CambiarEstadosVacaciones()" value="vacacion">
-                                <label id="textoradiobtn">Vacación</label>
-                            </mat-radio-button>
-                            <br>
-                            <mat-radio-button (click)="CambiarEstadosSituacion()" value="propuesta">
-                                <label id="textoradiobtn">Situación propuesta</label>
-                            </mat-radio-button>
-                        </mat-radio-group>
-                    </section>
-                </div>
             </div>
             <div class="row">
                 <div class="col">

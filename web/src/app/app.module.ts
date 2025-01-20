@@ -321,6 +321,7 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
 
 @NgModule({
   declarations: [
@@ -599,6 +600,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
+    IngresarProcesosComponent,
 
   ],
 
