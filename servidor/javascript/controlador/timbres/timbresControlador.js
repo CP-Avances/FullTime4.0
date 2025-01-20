@@ -27,10 +27,11 @@ class TimbresControlador {
                 let contador = 0;
                 if (arregloAvisos.length > 0) {
                     contador = 0;
-                    arregloAvisos.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                    // Usamos un for...of para esperar que las promesas se resuelvan antes de continuar
+                    for (const obj of arregloAvisos) {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                         const [datosOriginales] = consulta.rows;
                         if (!datosOriginales) {
@@ -44,41 +45,35 @@ class TimbresControlador {
                                 ip_local: ip_local,
                                 observacion: `Error al eliminar el registro con id ${obj}. Registro no encontrado.`
                             });
-                            //FINALIZAR TRANSACCION
+                            // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
                             return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                         }
-                        yield database_1.default.query(`
-                        DELETE FROM ecm_realtime_timbres WHERE id = $1
-                        `, [obj])
-                            .then((result) => __awaiter(this, void 0, void 0, function* () {
-                            contador = contador + 1;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'ecm_realtime_timbres',
-                                usuario: user_name,
-                                accion: 'D',
-                                datosOriginales: JSON.stringify(datosOriginales),
-                                datosNuevos: '',
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            //FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            if (contador === arregloAvisos.length) {
-                                return res.jsonp({ message: 'OK' });
-                            }
-                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                        }));
-                    }));
+                        yield database_1.default.query('DELETE FROM ecm_realtime_timbres WHERE id = $1', [obj]);
+                        contador++;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'ecm_realtime_timbres',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    // ENVÍO DE RESPUESTA UNA VEZ QUE SE HAYAN ELIMINADO TODOS LOS AVISOS
+                    return res.jsonp({ message: 'OK', eliminados: contador });
                 }
                 else {
                     return res.jsonp({ message: 'error' });
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCION
+                // REVERTIR TRANSACCION EN CASO DE ERROR
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -631,7 +626,8 @@ class TimbresControlador {
                     visto: obj.visto,
                     id_timbre: obj.id_timbre,
                     empleado: fullname,
-                    id: obj.id
+                    id: obj.id,
+                    mensaje: obj.mensaje
                 };
             })));
             console.log(tim);
