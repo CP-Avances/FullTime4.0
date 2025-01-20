@@ -41,13 +41,14 @@ class ReportesTiempoLaboradoControlador {
 const BuscarTiempoLaborado = function (fec_inicio, fec_final, id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
-            id_empleado, estado_timbre, tipo_accion AS accion, minutos_alimentacion, tipo_dia, id_horario, 
-            estado_origen, tolerancia 
-        FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%' AND id_empleado = $3 
-            AND tipo_accion IN ('E','I/A', 'F/A', 'S') 
-        ORDER BY id_empleado, fecha_hora_horario ASC
+        SELECT CAST(ag.fecha_horario AS VARCHAR), CAST(ag.fecha_hora_horario AS VARCHAR), CAST(ag.fecha_hora_timbre AS VARCHAR),
+            ag.id_empleado, ag.estado_timbre, ag.tipo_accion AS accion, ag.minutos_alimentacion, ag.tipo_dia, ag.id_horario, ec.controlar_asistencia,
+            ag.estado_origen, ag.tolerancia 
+        FROM eu_asistencia_general AS ag, eu_empleado_contratos AS ec
+        WHERE CAST(ag.fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND ag.id_empleado = $3  AND ag.id_empleado = $3 AND ec.id_empleado = ag.id_empleado 
+            AND ag.tipo_accion IN ('E','I/A', 'F/A', 'S') 
+        ORDER BY ag.id_empleado, ag.fecha_hora_horario ASC
         `, [fec_inicio, fec_final, id_empleado])
             .then(res => {
             return res.rows;
@@ -78,7 +79,8 @@ const AgruparTimbres = function agruparTimbresPorClave(timbres) {
                             entrada: timbresAgrupadosFecha[key][i],
                             inicioAlimentacion: timbresAgrupadosFecha[key][i + 1],
                             finAlimentacion: timbresAgrupadosFecha[key][i + 2],
-                            salida: i + 3 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 3] : null
+                            salida: i + 3 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 3] : null,
+                            control: timbresAgrupadosFecha[key][i].controlar_asistencia,
                         });
                     }
                     break;
@@ -89,7 +91,8 @@ const AgruparTimbres = function agruparTimbresPorClave(timbres) {
                             dia: timbresAgrupadosFecha[key][i].tipo_dia,
                             origen: timbresAgrupadosFecha[key][i].estado_origen,
                             entrada: timbresAgrupadosFecha[key][i],
-                            salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null
+                            salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null,
+                            control: timbresAgrupadosFecha[key][i].controlar_asistencia,
                         });
                     }
                     break;
