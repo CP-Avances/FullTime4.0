@@ -297,6 +297,7 @@ const sendSalidasAnticipadas_1 = require("./libs/sendSalidasAnticipadas");
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
+exports.io = SERVIDOR.io;
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
     (0, sendAtraso_1.atrasosDiarios)();
     (0, sendAtraso_1.atrasosSemanal)();
@@ -305,7 +306,6 @@ setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
     (0, sendSalidasAnticipadas_1.salidasAnticipadasSemanal)();
     (0, sendSalidasAnticipadas_1.salidasAnticipadasDiarios)();
 }), 2700000);
-exports.io = SERVIDOR.io;
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES

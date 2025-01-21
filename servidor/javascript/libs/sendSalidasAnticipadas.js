@@ -150,7 +150,7 @@ const salidasAnticipadas = function (desde, hasta, semanal) {
         const date = new Date();
         console.log("ejecutando reporte de salidas anticipadas general");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
@@ -325,7 +325,7 @@ const salidasAnticipadas = function (desde, hasta, semanal) {
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.correo = $1 AND da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `, [correo]);
@@ -419,7 +419,7 @@ const salidasAnticipadasDepartamentos = function (desde, hasta, semanal) {
         const minutos = date.getMinutes();
         console.log("ejecutando reporte de salidas anticipadas de departamento");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
@@ -591,7 +591,7 @@ const salidasAnticipadasDepartamentos = function (desde, hasta, semanal) {
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id AND da.jefe = true AND da.name_dep = $1 AND da.id_suc = $2
                                 `, [departamento, depa.id_sucursal]);
@@ -683,7 +683,7 @@ const salidasAnticipadasIndividual = function (desde, hasta) {
         const minutos = date.getMinutes();
         console.log("ejecutando reporte de salidas anticipadas individuales");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });

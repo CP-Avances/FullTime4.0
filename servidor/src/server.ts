@@ -316,6 +316,8 @@ import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sen
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
+export const io = SERVIDOR.io;
+
 
 setInterval(async () => {
     atrasosDiarios();
@@ -326,7 +328,7 @@ setInterval(async () => {
     salidasAnticipadasDiarios();
 }, 2700000);
 
-export const io = SERVIDOR.io;
+
 
 
 // LLAMA AL MEODO DE CUMPLEAÑOS

@@ -200,6 +200,28 @@
                             </mat-form-field>
                         </div>
                     </div>
+                    
+                    <!--
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text" aria-label="Number" matInput placeholder="Buscar" 
+                                    [matAutocomplete]="auto1" required>
+                                <mat-autocomplete #auto1="matAutocomplete">
+                                    <mat-option *ngFor="let option of filteredOptProv | async" [value]="option.nombre"
+                                        (click)="FiltrarCiudades(formulario.value)">
+                                        {{option.nombre}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de provincias, departamentos o estados del país seleccionado.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    -->
                 </div>
             </form>
 
