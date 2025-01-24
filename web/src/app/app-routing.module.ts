@@ -65,7 +65,10 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
 import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
+
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 // MODULO  --TIMBRE VIRTUAL
@@ -222,6 +225,8 @@ const routes: Routes = [
   { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard] },
   { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
+  { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard]},
+  { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
   { path: 'IngresarProcesos', component: IngresarProcesosComponent, canActivate: [AuthGuard] },
   
 

@@ -5,8 +5,8 @@
 }
 
 mat-form-field {
-    width: 300px;
-    width: 100%;
+    width: 350px;
+    padding: 10px 10px 0px 10px;
 }
 
 #letra {

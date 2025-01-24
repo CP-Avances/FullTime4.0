@@ -335,7 +335,7 @@ class AccionPersonalControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
+                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
                      WHERE id = $4
                 `, [id_tipo, descripcion, base_legal, id]);
                 // INSERTAR REGISTRO DE AUDITORIA

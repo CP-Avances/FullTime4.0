@@ -34,8 +34,8 @@ export class EditarTipoAccionComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
-  baseLegalF = new FormControl('', [Validators.required]);
-  tipoAccionF = new FormControl('');
+  baseLegalF = new FormControl('');
+  tipoAccionF = new FormControl('', [Validators.required]);
   tipoF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
@@ -57,7 +57,6 @@ export class EditarTipoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
-    this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     this.CargarDatos();
   }
 
@@ -103,7 +102,7 @@ export class EditarTipoAccionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     };
-    if (form.tipoAccionForm != undefined) {
+    if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
       this.GuardarInformacion(datosAccion);
     }
     else {
@@ -116,12 +115,12 @@ export class EditarTipoAccionComponent implements OnInit {
   GuardarInformacion(datosAccion: any) {
     this.contador = 0;
     this.tipos_acciones.map((obj: any) => {
-      if (obj.id_tipo === datosAccion.id_tipo) {
+      if (obj.id_tipo_accion_personal === datosAccion.id_tipo) {
         this.contador = this.contador + 1;
       }
     });
     if (this.contador != 0) {
-      this.toastr.error('El tipo de acción de personal seleccionado ya se encuentra registrado.',
+      this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
         'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
@@ -205,13 +204,12 @@ export class EditarTipoAccionComponent implements OnInit {
     this.tipos = [];
     this.rest.ConsultarTipoAccion().subscribe(datos => {
       this.tipos = datos;
-      this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     })
   }
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO_ACCION
-  IngresarTipoAccion(form: any) {
-    if (form.tipoAccionForm === undefined) {
+  IngresarTipoAccion(form: any, descripcion: string) {
+    if (descripcion.toLocaleLowerCase() === 'otro') {
       this.formulario.patchValue({
         otroTipoForm: '',
       });
