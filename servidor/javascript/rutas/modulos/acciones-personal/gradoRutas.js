@@ -26,6 +26,13 @@ class GradoRutas {
     configuracion() {
         // METODO PARA CONSULTAR GRADOS
         this.router.get('/', verificarToken_1.TokenValidation, gradoControlador_1.default.listaGrados);
+        this.router.post('/', verificarToken_1.TokenValidation, gradoControlador_1.default.IngresarGrados);
+        this.router.put('/update', verificarToken_1.TokenValidation, gradoControlador_1.default.EditarGrados);
+        this.router.delete('/delete', verificarToken_1.TokenValidation, gradoControlador_1.default.EliminarGrados);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], gradoControlador_1.default.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        //this.router.post('/cargar_plantilla', TokenValidation, GRADO_CONTROLADOR.CargarPlantilla);
     }
 }
 const GRADO_RUTAS = new GradoRutas();

@@ -26,6 +26,13 @@ class GradoRutas {
     configuracion(): void {
         // METODO PARA CONSULTAR GRADOS
         this.router.get('/', TokenValidation, GRADO_CONTROLADOR.listaGrados);
+        this.router.post('/', TokenValidation, GRADO_CONTROLADOR.IngresarGrados);
+        this.router.put('/update', TokenValidation, GRADO_CONTROLADOR.EditarGrados);
+        this.router.delete('/delete',TokenValidation, GRADO_CONTROLADOR.EliminarGrados)
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        //this.router.post('/cargar_plantilla', TokenValidation, GRADO_CONTROLADOR.CargarPlantilla);
     }
 }
 

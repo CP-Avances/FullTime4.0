@@ -455,7 +455,7 @@ class ProcesoControlador {
     } catch (error) {
         return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
     }
-}
+  }
 
   // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
   public async CargarPlantilla(req: Request, res: Response) {

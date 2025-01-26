@@ -26,6 +26,9 @@ class GrupoOcupacionalRutas {
     configuracion() {
         // METODO PARA CONSULTAR GRUPO OCUPACIONAL
         this.router.get('/', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.listaGrupoOcupacional);
+        this.router.post('/', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.IngresarGrupoOcupacional);
+        this.router.put('/update', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EditarGrupoOcupacional);
+        this.router.delete('/delete', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EliminarGrupoOcupacional);
     }
 }
 const GRUPO_OCUPACIONAL_RUTAS = new GrupoOcupacionalRutas();

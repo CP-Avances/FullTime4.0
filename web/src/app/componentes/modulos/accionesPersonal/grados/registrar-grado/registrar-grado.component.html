@@ -1,1 +1,33 @@
-<p>registrar-grado works!</p>
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR GRADO</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<div style="text-align: center">
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón Guardar.
+                    </span>
+                </div>
+                <mat-form-field>
+                    <mat-label>Grado</mat-label>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="grado"
+                        (keypress)="IngresarSoloLetras($event)" required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar el grado">
+                        help_outline</mat-icon>
+                    <mat-error *ngIf="grado.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button id="btn-raised"  class="btn btn-sm" (click)="InsertarGrado(formulario.value)"
+            [disabled]="!formulario.valid">Guardar</button>
+    </div>
+</div>
