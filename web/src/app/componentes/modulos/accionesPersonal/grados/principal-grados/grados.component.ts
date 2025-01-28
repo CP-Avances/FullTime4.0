@@ -353,12 +353,52 @@ export class GradosComponent implements OnInit {
       });
   }
 
-  RegistrarGrados(){}
+  RegistrarGrados(){
+    console.log('ListaGradosCorrectas: ',this.listaGradosCorrectas.length)
+    if (this.listaGradosCorrectas?.length > 0) {
+      const data = {
+        plantilla: this.listaGradosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales
+      }
+
+      this._grados.RegistrarPlantilla(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaGradosCorrectas?.length > 0) {
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 500);
+          }
+          this.LimpiarCampos();
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
+      
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
+  }
+
+
+
 
   /** ************************************************************************************************** **
      ** **                               METODO PARA EXPORTAR A PDF                                     ** **
      ** ************************************************************************************************** **/
-
 
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();

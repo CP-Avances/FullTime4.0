@@ -23,13 +23,51 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                                <input (change)="FileChange($event)" type="file"
+                                    [formControl]="archivoForm" id="file1"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file1" matSuffix matTooltipPosition="right" 
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px;  padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_gruposOcupacional" class="d-flex flex-wrap justify-content-center m-auto"
+                            style="text-align: center; justify-content: center;">
+                            <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                <br> Descargar plantilla
+                            </a>
+                        </div>
+                        <div  class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'" id="descargar" 
+                                class="btn m-auto" matSuffix matTooltipPosition="right"
+                                matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </mat-card>
         </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_gruposOcupacional">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">LISTA DE GRUPO OCUPACIONAL</div>
         <div class="table-responsive">
@@ -97,6 +135,67 @@
         </div>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
             <p> Reporte de procesos. </p>
+        </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Grupo Ocupacional</th>
+                        <th scope="col">Numero partida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let gra of Datos_gruposOcupacional | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{gra.fila}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="EstiloCelda(gra.observacion)"></div>
+                                {{gra.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(gra.descripcion)" style="font-size: 12px;">
+                            {{gra.descripcion}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(gra.numero_partida)" style="font-size: 12px;">
+                            {{gra.numero_partida}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{listaGrupoOcupaciCorrectasCont}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_gruposOcupacional.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
         </div>
     </div>
 </div>

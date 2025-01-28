@@ -16,14 +16,17 @@ export class CatGradoService {
     return this.http.get(`${environment.url}/grado`);
   }
 
+  // METODO PARA INGRESAR REGISTRO  **USADO
   IngresarGrado(form: any){
     return this.http.post(`${environment.url}/grado`, form)
   }
 
+  // METODO PARA EDITAR REGISTRO  **USADO
   EditarGrado(form: any){
     return this.http.put(`${environment.url}/grado/update`, form)
   }
 
+  // METODO PARA ElIMINAR REGISTRO  **USADO
   ElminarGrado(form: any){
     const httpOtions = {
       body: form
@@ -33,8 +36,12 @@ export class CatGradoService {
 
    // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
    RevisarFormato(formData: any) {
-    console.log('enro aqui ',formData)
     return this.http.post<any>(environment.url + '/grado/upload/revision', formData);
+  }
+
+  // METODO PARA REGISTAR LA PLANTILLA   **USADO
+  RegistrarPlantilla(data: any) {
+    return this.http.post<any>(environment.url + '/grado/cargar_plantilla', data);
   }
 
 }

@@ -20,7 +20,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const exceljs_1 = __importDefault(require("exceljs"));
 class GradoControlador {
-    // METODO PARA BUSCAR LISTA DE GRADOS
+    // METODO PARA BUSCAR LISTA DE GRADOS **USADO 
     listaGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -37,7 +37,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA INSERTAR EL GRADO
+    // METODO PARA INSERTAR EL GRADO **USADO 
     IngresarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { grado, user_name, ip, ip_local } = req.body;
@@ -78,7 +78,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA EDITAR EL GRADO
+    // METODO PARA EDITAR EL GRADO **USADO 
     EditarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, grado, user_name, ip, ip_local } = req.body;
@@ -110,7 +110,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR EL GRADO
+    // METODO PARA ELIMINAR EL GRADO **USADO 
     EliminarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, user_name, ip, ip_local } = req.body;
@@ -143,7 +143,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR  **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -291,6 +291,46 @@ class GradoControlador {
             catch (error) {
                 return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
             }
+        });
+    }
+    // REGISTRAR PLANTILLA GRADO   **USADO 
+    CargarPlantilla(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip, ip_local } = req.body;
+            let error = false;
+            for (const item of plantilla) {
+                const { descripcion } = item;
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+          INSERT INTO map_cat_grado (descripcion) VALUES ($1) RETURNING *
+          `, [descripcion]);
+                    const [gradoIn] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_grado',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(gradoIn),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

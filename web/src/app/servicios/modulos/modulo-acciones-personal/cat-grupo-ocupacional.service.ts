@@ -16,19 +16,32 @@ export class CatGrupoOcupacionalService {
     return this.http.get(`${environment.url}/grupoOcupacional`);
   }
 
+  // METODO PARA INGRESAR REGISTRO  **USADO
   IngresarGrupoOcupacion(form: any){
     return this.http.post(`${environment.url}/grupoOcupacional`, form)
   }
 
+  // METODO PARA EDITAR REGISTRO  **USADO
   EditarGrupoOcupacion(form: any){
     return this.http.put(`${environment.url}/grupoOcupacional/update`, form)
   }
 
+  // METODO PARA ElIMINAR REGISTRO  **USADO
   ElminarGrupoOcupacion(form: any){
     const httpOtions = {
       body: form
     };
     return this.http.delete(`${environment.url}/grupoOcupacional/delete`, httpOtions)
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
+    return this.http.post<any>(environment.url + '/grupoOcupacional/upload/revision', formData);
+  }
+
+  // METODO PARA REGISTAR LA PLANTILLA   **USADO
+  RegistrarPlantilla(data: any) {
+    return this.http.post<any>(environment.url + '/grupoOcupacional/cargar_plantilla', data);
   }
 
 }

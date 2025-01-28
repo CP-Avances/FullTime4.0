@@ -29,6 +29,10 @@ class GrupoOcupacionalRutas {
         this.router.post('/', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.IngresarGrupoOcupacional);
         this.router.put('/update', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EditarGrupoOcupacional);
         this.router.delete('/delete', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EliminarGrupoOcupacional);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], grupoOcupacionalControlador_1.default.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        this.router.post('/cargar_plantilla', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.CargarPlantilla);
     }
 }
 const GRUPO_OCUPACIONAL_RUTAS = new GrupoOcupacionalRutas();
