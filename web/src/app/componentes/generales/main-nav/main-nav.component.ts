@@ -446,7 +446,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
               { name: 'Listar Grados', url: '/listaGrados', color: true, ver: true },
               { name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true },
-              { name: 'Asignar Procesos', url: '/IngresarProcesos', color: true, ver: true },
+              { name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true },
             ]
           },
           {

@@ -321,13 +321,15 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
-import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
 import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
 import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
 import { RegistrarGradoComponent } from './componentes/modulos/accionesPersonal/grados/registrar-grado/registrar-grado.component';
 import { EditarGradoComponent } from './componentes/modulos/accionesPersonal/grados/editar-grado/editar-grado.component';
 import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
 import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
+import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-interfaz/registro-interfaz-proceso.component';
+import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-multiple/registro-multiple-proceso.component';
 
 @NgModule({
   declarations: [
@@ -606,13 +608,15 @@ import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesP
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-    IngresarProcesosComponent,
+    IngresarRegistrosComponent,
     GradosComponent,
     GrupoOcupacionalComponent,
     RegistrarGradoComponent,
     EditarGradoComponent,
     RegistrarGrupoOcupacionalComponent,
     EditarGrupoOcupacionalComponent,
+    RegistroInterfazProcesoComponent,
+    RegistroMultipleProcesoComponent,
 
   ],
 

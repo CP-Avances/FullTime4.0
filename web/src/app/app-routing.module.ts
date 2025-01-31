@@ -67,7 +67,7 @@ import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPerson
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
 import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
 import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
-import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
 
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
@@ -227,7 +227,7 @@ const routes: Routes = [
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard]},
   { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
-  { path: 'IngresarProcesos', component: IngresarProcesosComponent, canActivate: [AuthGuard] },
+  { path: 'IngresarRegistros', component: IngresarRegistrosComponent, canActivate: [AuthGuard] },
   
 
   // MODULO  --GEOLOCALIZACION
