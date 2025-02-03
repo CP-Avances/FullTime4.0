@@ -398,7 +398,7 @@ class ProcesoControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+    // REGISTRAR PLANTILLA PROCESOS    **USADO 
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
@@ -510,6 +510,150 @@ class ProcesoControlador {
                 return res.status(500).jsonp({ message: 'error' });
             }
             return res.status(200).jsonp({ message: 'ok' });
+        });
+    }
+    // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+    RegistrarProcesos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaProcesosEmpleado, user_name, ip, ip_local } = req.body;
+            let error = false;
+            try {
+                for (const item of listaProcesosEmpleado) {
+                    const { id_proceso, id_empleado } = item;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
+           `, [id_proceso, id_empleado]);
+                    const [procesos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(procesos),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (procesos == undefined || procesos == '' || procesos == null) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+           `, [id_empleado]);
+                        const [proceso_activo] = response.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_cat_procesos',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(procesos),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        if (proceso_activo == undefined || proceso_activo == '' || proceso_activo == null) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const responsee = yield database_1.default.query(`
+            INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, true) * RETURNING
+           `, [id_empleado]);
+                            const [proceso_insert] = responsee.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_cat_procesos',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(proceso_insert),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                        else {
+                            console.log('proceso_activo: ', proceso_activo);
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const proceso_update = yield database_1.default.query(`
+              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+              `, [proceso_activo.id]);
+                            const [proceso_UPD] = proceso_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_cat_procesos',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(proceso_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, true) * RETURNING
+              `, [id_proceso, id_empleado]);
+                            const [nuevo_proceso] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_cat_procesos',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(nuevo_proceso),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                    }
+                    else {
+                        console.log('proceso: ', procesos);
+                        if (procesos.estado == false) {
+                            //actualizao a true
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const proceso_update = yield database_1.default.query(`
+              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+              `, [procesos.id]);
+                            const [proceso_UPD] = proceso_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_cat_procesos',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(proceso_update),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                    }
+                }
+            }
+            catch (_a) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+            }
         });
     }
 }

@@ -330,6 +330,10 @@ import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accion
 import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
 import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-interfaz/registro-interfaz-proceso.component';
 import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-multiple/registro-multiple-proceso.component';
+import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/registro-interfaz-grado/registro-interfaz-grado.component';
+import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/registro-multiple-grado/registro-multiple-grado.component';
+import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
+import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
 
 @NgModule({
   declarations: [
@@ -617,6 +621,10 @@ import { RegistroMultipleProcesoComponent } from './componentes/modulos/acciones
     EditarGrupoOcupacionalComponent,
     RegistroInterfazProcesoComponent,
     RegistroMultipleProcesoComponent,
+    RegistroInterfazGradoComponent,
+    RegistroMultipleGradoComponent,
+    RegistroMultipleGrupoComponent,
+    RegistroInterfazGrupoComponent,
 
   ],
 

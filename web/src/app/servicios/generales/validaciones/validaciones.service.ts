@@ -468,26 +468,12 @@ export class ValidacionesService {
         apellido: obj.apellido,
         codigo: obj.codigo,
         cedula: obj.cedula,
-        correo: obj.correo,
-        genero: obj.genero,
         id_cargo: obj.id_cargo,
-        id_contrato: obj.id_contrato,
-        sucursal: obj.name_suc,
         id_suc: obj.id_suc,
         id_regimen: obj.id_regimen,
         id_depa: obj.id_depa,
         id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-        ciudad: obj.ciudad,
-        regimen: obj.name_regimen,
-        departamento: obj.name_dep,
         cargo: obj.name_cargo,
-        hora_trabaja: obj.hora_trabaja,
-        rol: obj.name_rol,
-        userid: obj.userid,
-        app_habilita: obj.app_habilita,
-        web_habilita: obj.web_habilita,
-        comunicado_mail: obj.comunicado_mail,
-        comunicado_noti: obj.comunicado_notificacion
       })
     })
     return arreglo_procesar;

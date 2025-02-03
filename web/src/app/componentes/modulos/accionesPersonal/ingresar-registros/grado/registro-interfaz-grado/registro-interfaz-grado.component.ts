@@ -13,17 +13,16 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
-import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 
 @Component({
-  selector: 'app-registro-interfaz-proceso',
-  templateUrl: './registro-interfaz-proceso.component.html',
-  styleUrl: './registro-interfaz-proceso.component.scss'
+  selector: 'app-registro-interfaz-grado',
+  templateUrl: './registro-interfaz-grado.component.html',
+  styleUrl: './registro-interfaz-grado.component.scss'
 })
-export class RegistroInterfazProcesoComponent {
+export class RegistroInterfazGradoComponent {
 
   listaUsuariosRol: any = []
   
@@ -129,12 +128,12 @@ export class RegistroInterfazProcesoComponent {
     public check: checkOptions[];
     public checkDep: checkOptions[];
   
-    idproceso = new FormControl('', [Validators.required]);
+    idsucursal = new FormControl('', [Validators.required]);
     idDepa = new FormControl('', [Validators.required]);
     nombreRolDepF = new FormControl('', [Validators.required]);
   
     public formularioDep = new FormGroup({
-      proceso: this.idproceso,
+      sucursal: this.idsucursal,
       idDepa: this.idDepa,
       nombreRolDepF: this.nombreRolDepF
     });
@@ -144,7 +143,6 @@ export class RegistroInterfazProcesoComponent {
   
       constructor(
         private asignaciones: AsignacionesService,
-        private restPro: ProcesoService,
         private restSuc: SucursalService,//SERVICIO DE DATOS PARA OBTENER EL LISTADO DE LAS SUCURSALES
         private restDep: DepartamentosService,//SERVICIO DE DATOS PARA OBTENER EL DEPA POR EL ID DE LA SUCURSAL
         private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
@@ -178,18 +176,23 @@ export class RegistroInterfazProcesoComponent {
           this.ObtenerSucursalesPorEmpresa();
         }
       
-        Lprocesos: any;
+        Lsucursales: any;
         ObtenerSucursalesPorEmpresa() {
-          this.Lprocesos = []
-          this.restPro.ConsultarProcesos().subscribe(datos => {
-            this.Lprocesos = datos;
+          this.Lsucursales = []
+          this.restSuc.BuscarSucursalEmpresa(this.idEmpresa).subscribe(datos => {
+            this.Lsucursales = datos;
           });
         }
-
         Ldepatamentos: any;
-        selecctPro(id: any) {
+        selecctSucu(id: any) {
           this.Ldepatamentos = []
-          console.log('proceso selecionado: ',id)
+          if (id) {
+            this.restDep.BuscarDepartamentoSucursal(id).subscribe(datos => {
+              this.Ldepatamentos = datos;
+            }, (error: any) => {
+              this.toastr.error('No se encontraron departamentos en esa sucursal')
+            })
+          }
         }
       
         sucursalForm = new FormControl('', Validators.required);
@@ -672,17 +675,17 @@ export class RegistroInterfazProcesoComponent {
         // METODO PARA EDITAR EL DEPARTAMENTO DEL USUARIO SELECCIONADO
         AbrirEditarDepaUser(datos: any) {
           console.log('datos: ', datos)
-
+          
           if (datos.length > 0) {
             const data = {
-              idproceso: this.formularioDep.get('proceso')?.value,
+              idSucursal: this.formularioDep.get('sucursal')?.value,
               idDepartamento: this.formularioDep.get('idDepa')?.value,
               listaUsuarios: datos
             }
 
             console.log('Datos a enviar: ',data)
 
-            if (data.idproceso == '') {
+            if (data.idSucursal == '') {
               this.toastr.warning('Seleccione la sucursal.', '', {
                 timeOut: 4000,
               });
@@ -691,6 +694,8 @@ export class RegistroInterfazProcesoComponent {
                 timeOut: 4000,
               });
             } else {
+
+              
 
               /*
               this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
@@ -706,6 +711,7 @@ export class RegistroInterfazProcesoComponent {
                 });
               })
               */
+
             }
 
           } else {

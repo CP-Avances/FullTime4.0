@@ -56,4 +56,8 @@ export class ProcesoService {
     return this.http.post<any>(environment.url + '/proceso/cargar_plantilla', data);
   }
 
+  RegistroProcesos(data: any){
+    return this.http.post<any>(environment.url + '/proceso/registrarProcesos', data)
+  }
+
 }
