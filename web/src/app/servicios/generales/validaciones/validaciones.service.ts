@@ -463,7 +463,7 @@ export class ValidacionesService {
     let arreglo_procesar: any = [];
     informacion.forEach((obj: any) => {
       arreglo_procesar.push({
-        id: obj.id ?? obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
+        id: obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
         nombre: obj.nombre,
         apellido: obj.apellido,
         codigo: obj.codigo,

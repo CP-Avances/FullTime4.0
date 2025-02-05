@@ -604,13 +604,13 @@ class ProcesoControlador {
   
   // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
   public async RegistrarProcesos(req: Request, res: Response){
-    const { listaProcesosEmpleado, user_name, ip, ip_local } = req.body;
+    const { id_proceso, listaUsuarios, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-
+    
     try{
-      for (const item of listaProcesosEmpleado){
+      for (const item of listaUsuarios){
 
-        const {id_proceso, id_empleado} = item;
+        const {id} = item;
 
          // INICIAR TRANSACCION
          await pool.query('BEGIN');
@@ -618,7 +618,7 @@ class ProcesoControlador {
            `
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
            `
-           , [id_proceso, id_empleado]);
+           , [id_proceso, id]);
 
          const [procesos] = response.rows;
          // AUDITORIA
@@ -635,6 +635,7 @@ class ProcesoControlador {
          // FINALIZAR TRANSACCION
          await pool.query('COMMIT');
 
+         console.log('procesos: ',procesos)
 
         if (procesos == undefined || procesos == '' || procesos == null) {
 
@@ -644,7 +645,7 @@ class ProcesoControlador {
             `
             SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
            `
-            , [id_empleado]);
+            , [id]);
 
           const [proceso_activo] = response.rows;
           // AUDITORIA
@@ -661,17 +662,20 @@ class ProcesoControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
+          console.log('proceso_activo: ',proceso_activo)
+
           if(proceso_activo == undefined || proceso_activo == '' || proceso_activo == null){
             
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const responsee: QueryResult = await pool.query(
               `
-            INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, true) * RETURNING
-           `
-              , [id_empleado]);
+              INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_proceso, id, true]);
 
             const [proceso_insert] = responsee.rows;
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
               tabla: 'map_cat_procesos',
@@ -686,9 +690,9 @@ class ProcesoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-          } else {
             
-            console.log('proceso_activo: ',proceso_activo)
+
+          } else {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -717,9 +721,9 @@ class ProcesoControlador {
             await pool.query('BEGIN');
             const response: QueryResult = await pool.query(
               `
-               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, true) * RETURNING
+               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_proceso, id_empleado]);
+              , [id_proceso, id, true]);
 
             const [nuevo_proceso] = response.rows;
             // AUDITORIA
@@ -738,7 +742,7 @@ class ProcesoControlador {
           }
 
         }else{
-          console.log('proceso: ',procesos)
+          console.log('proceso: ',procesos.estado)
           if(procesos.estado == false){
             //actualizao a true
             // INICIAR TRANSACCION
@@ -756,7 +760,7 @@ class ProcesoControlador {
               usuario: user_name,
               accion: 'I',
               datosOriginales: '',
-              datosNuevos: JSON.stringify(proceso_update),
+              datosNuevos: JSON.stringify(proceso_UPD),
               ip: ip,
               ip_local: ip_local,
               observacion: null
@@ -766,11 +770,19 @@ class ProcesoControlador {
           }
         }
 
+        
+
       }
+
+      return res.status(200).jsonp({ message: 'Registro de proceso' });
+
     } catch {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       error = true;
+      if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+      }
     }
 
 

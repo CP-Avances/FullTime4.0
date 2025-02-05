@@ -671,29 +671,23 @@ export class RegistroInterfazProcesoComponent {
       
         // METODO PARA EDITAR EL DEPARTAMENTO DEL USUARIO SELECCIONADO
         AbrirEditarDepaUser(datos: any) {
-          console.log('datos: ', datos)
 
           if (datos.length > 0) {
             const data = {
-              idproceso: this.formularioDep.get('proceso')?.value,
-              idDepartamento: this.formularioDep.get('idDepa')?.value,
+              id_proceso: this.formularioDep.get('proceso')?.value,
               listaUsuarios: datos
             }
 
             console.log('Datos a enviar: ',data)
 
-            if (data.idproceso == '') {
-              this.toastr.warning('Seleccione la sucursal.', '', {
-                timeOut: 4000,
-              });
-            } else if (data.idDepartamento == '') {
-              this.toastr.warning('Seleccione el departamento.', '', {
+            if (data.id_proceso == '') {
+              this.toastr.warning('Seleccione el proceso.', '', {
                 timeOut: 4000,
               });
             } else {
 
-              /*
-              this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
+              
+              this.restPro.RegistroProcesos(data).subscribe((res: any) => {
                 this.toastr.success(res.message, '', {
                   timeOut: 4000,
                 });
@@ -705,7 +699,7 @@ export class RegistroInterfazProcesoComponent {
                   timeOut: 4000,
                 });
               })
-              */
+              
             }
 
           } else {
