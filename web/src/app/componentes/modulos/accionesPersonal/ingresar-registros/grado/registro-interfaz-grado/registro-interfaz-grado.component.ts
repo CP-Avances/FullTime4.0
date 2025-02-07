@@ -13,6 +13,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
@@ -143,6 +144,7 @@ export class RegistroInterfazGradoComponent {
   
       constructor(
         private asignaciones: AsignacionesService,
+        private resGrados: CatGradoService,
         private restSuc: SucursalService,//SERVICIO DE DATOS PARA OBTENER EL LISTADO DE LAS SUCURSALES
         private restDep: DepartamentosService,//SERVICIO DE DATOS PARA OBTENER EL DEPA POR EL ID DE LA SUCURSAL
         private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
@@ -176,23 +178,18 @@ export class RegistroInterfazGradoComponent {
           this.ObtenerSucursalesPorEmpresa();
         }
       
-        Lsucursales: any;
+        Lgrados: any;
         ObtenerSucursalesPorEmpresa() {
-          this.Lsucursales = []
-          this.restSuc.BuscarSucursalEmpresa(this.idEmpresa).subscribe(datos => {
-            this.Lsucursales = datos;
+          this.Lgrados = []
+          this.resGrados.ConsultarGrados().subscribe(datos => {
+            this.Lgrados = datos;
           });
         }
+        
         Ldepatamentos: any;
-        selecctSucu(id: any) {
+        selecctGrado(id: any) {
           this.Ldepatamentos = []
-          if (id) {
-            this.restDep.BuscarDepartamentoSucursal(id).subscribe(datos => {
-              this.Ldepatamentos = datos;
-            }, (error: any) => {
-              this.toastr.error('No se encontraron departamentos en esa sucursal')
-            })
-          }
+          console.log('grado selecionado: ',id)
         }
       
         sucursalForm = new FormControl('', Validators.required);
@@ -678,27 +675,19 @@ export class RegistroInterfazGradoComponent {
           
           if (datos.length > 0) {
             const data = {
-              idSucursal: this.formularioDep.get('sucursal')?.value,
-              idDepartamento: this.formularioDep.get('idDepa')?.value,
+              id_grado: this.formularioDep.get('sucursal')?.value,
               listaUsuarios: datos
             }
 
-            console.log('Datos a enviar: ',data)
+            console.log('Datos a enviar grado: ',data)
 
-            if (data.idSucursal == '') {
-              this.toastr.warning('Seleccione la sucursal.', '', {
-                timeOut: 4000,
-              });
-            } else if (data.idDepartamento == '') {
-              this.toastr.warning('Seleccione el departamento.', '', {
+            if (data.id_grado == '') {
+              this.toastr.warning('Seleccione el grado.', '', {
                 timeOut: 4000,
               });
             } else {
 
-              
-
-              /*
-              this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
+              this.resGrados.RegistroGrado(data).subscribe((res: any) => {
                 this.toastr.success(res.message, '', {
                   timeOut: 4000,
                 });
@@ -710,7 +699,7 @@ export class RegistroInterfazGradoComponent {
                   timeOut: 4000,
                 });
               })
-              */
+              
 
             }
 

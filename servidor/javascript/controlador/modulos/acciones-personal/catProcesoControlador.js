@@ -519,16 +519,16 @@ class ProcesoControlador {
             let error = false;
             try {
                 for (const item of listaUsuarios) {
-                    const { id } = item;
+                    const { id_empleado } = item;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
-           `, [id_proceso, id]);
+           `, [id_proceso, id_empleado]);
                     const [procesos] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_cat_procesos',
+                        tabla: 'map_empleado_procesos',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
@@ -545,11 +545,11 @@ class ProcesoControlador {
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
-           `, [id]);
+           `, [id_empleado]);
                         const [proceso_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'map_cat_procesos',
+                            tabla: 'map_empleado_procesos',
                             usuario: user_name,
                             accion: 'I',
                             datosOriginales: '',
@@ -560,17 +560,16 @@ class ProcesoControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                        console.log('proceso_activo: ', proceso_activo);
                         if (proceso_activo == undefined || proceso_activo == '' || proceso_activo == null) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
-              `, [id_proceso, id, true]);
+              `, [id_proceso, id_empleado, true]);
                             const [proceso_insert] = responsee.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_cat_procesos',
+                                tabla: 'map_empleado_procesos',
                                 usuario: user_name,
                                 accion: 'I',
                                 datosOriginales: '',
@@ -591,7 +590,7 @@ class ProcesoControlador {
                             const [proceso_UPD] = proceso_update.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_cat_procesos',
+                                tabla: 'map_empleado_procesos',
                                 usuario: user_name,
                                 accion: 'I',
                                 datosOriginales: '',
@@ -606,11 +605,11 @@ class ProcesoControlador {
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
-              `, [id_proceso, id, true]);
+              `, [id_proceso, id_empleado, true]);
                             const [nuevo_proceso] = response.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_cat_procesos',
+                                tabla: 'map_empleado_procesos',
                                 usuario: user_name,
                                 accion: 'I',
                                 datosOriginales: '',
@@ -635,7 +634,7 @@ class ProcesoControlador {
                             const [proceso_UPD] = proceso_update.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_cat_procesos',
+                                tabla: 'map_empleado_procesos',
                                 usuario: user_name,
                                 accion: 'I',
                                 datosOriginales: '',

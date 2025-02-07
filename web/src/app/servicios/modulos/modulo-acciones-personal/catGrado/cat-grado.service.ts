@@ -44,4 +44,8 @@ export class CatGradoService {
     return this.http.post<any>(environment.url + '/grado/cargar_plantilla', data);
   }
 
+  RegistroGrado(data: any){
+    return this.http.post<any>(environment.url + '/grado/registrarGrados', data)
+  }
+
 }

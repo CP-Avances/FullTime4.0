@@ -333,6 +333,155 @@ class GradoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
+    // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+    RegistrarGrados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
+            let error = false;
+            try {
+                for (const item of listaUsuarios) {
+                    const { id_empleado } = item;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
+           `, [id_grado, id_empleado]);
+                    const [grados] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_empleado_grado',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(grados),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    console.log('grados: ', grados);
+                    if (grados == undefined || grados == '' || grados == null) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+           `, [id_empleado]);
+                        const [grado_activo] = response.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_empleado_grado',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(grado_activo),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        console.log('grado_activo: ', grado_activo);
+                        if (grado_activo == undefined || grado_activo == '' || grado_activo == null) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const responsee = yield database_1.default.query(`
+              INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
+              `, [id_empleado, id_grado, true]);
+                            const [grado_insert] = responsee.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grado_insert),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                        else {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const grado_update = yield database_1.default.query(`
+              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+              `, [grado_activo.id]);
+                            const [grado_UPD] = grado_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grado_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+               INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
+              `, [id_empleado, id_grado, true]);
+                            const [nuevo_grado] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(nuevo_grado),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                    }
+                    else {
+                        console.log('proceso: ', grados.estado);
+                        if (grados.estado == false) {
+                            //actualizao a true
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const proceso_update = yield database_1.default.query(`
+              UPDATE map_empleado_grado SET estado = true WHERE id = $1
+              `, [grados.id]);
+                            const [grado_UPD] = proceso_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grado_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                    }
+                }
+                return res.status(200).jsonp({ message: 'Registro de grados' });
+            }
+            catch (_a) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    return res.status(500).jsonp({ message: 'error' });
+                }
+            }
+        });
+    }
 }
 exports.GRADO_CONTROLADOR = new GradoControlador();
 exports.default = exports.GRADO_CONTROLADOR;

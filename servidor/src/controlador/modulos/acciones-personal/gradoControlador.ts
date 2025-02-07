@@ -391,6 +391,189 @@ class GradoControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
+  // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+  public async  RegistrarGrados(req: Request, res: Response){
+    const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+    
+    try{
+      for (const item of listaUsuarios){
+
+        const {id_empleado} = item;
+
+         // INICIAR TRANSACCION
+         await pool.query('BEGIN');
+         const response: QueryResult = await pool.query(
+           `
+            SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
+           `
+           , [id_grado, id_empleado]);
+
+         const [grados] = response.rows;
+         // AUDITORIA
+         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+           tabla: 'map_empleado_grado',
+           usuario: user_name,
+           accion: 'I',
+           datosOriginales: '',
+           datosNuevos: JSON.stringify(grados),
+           ip: ip,
+           ip_local: ip_local,
+           observacion: null
+         });
+         // FINALIZAR TRANSACCION
+         await pool.query('COMMIT');
+
+         console.log('grados: ',grados)
+
+        if (grados == undefined || grados == '' || grados == null) {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          const response: QueryResult = await pool.query(
+            `
+            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+           `
+            , [id_empleado]);
+
+          const [grado_activo] = response.rows;
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_empleado_grado',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(grado_activo),
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+          console.log('grado_activo: ',grado_activo)
+
+          if(grado_activo == undefined || grado_activo == '' || grado_activo == null){
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const responsee: QueryResult = await pool.query(
+              `
+              INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_empleado, id_grado, true]);
+
+            const [grado_insert] = responsee.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grado_insert),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            
+
+          } else {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const grado_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+              `
+              , [grado_activo.id]);
+
+            const [grado_UPD] = grado_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grado_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+               INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_empleado, id_grado, true]);
+
+            const [nuevo_grado] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(nuevo_grado),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          }
+
+        }else{
+          console.log('proceso: ',grados.estado)
+          if(grados.estado == false){
+            //actualizao a true
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grado SET estado = true WHERE id = $1
+              `
+              , [grados.id]);
+
+            const [grado_UPD] = proceso_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grado_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          }
+        }
+      }
+
+      return res.status(200).jsonp({ message: 'Registro de grados' });
+
+    } catch {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+      }
+    }
+
+
+  }
+
 }
 
 export const GRADO_CONTROLADOR = new GradoControlador();
