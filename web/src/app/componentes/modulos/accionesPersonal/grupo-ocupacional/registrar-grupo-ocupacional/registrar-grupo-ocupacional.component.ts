@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/cat-grupo-ocupacional.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 
 @Component({
   selector: 'app-registrar-grupo-ocupacional',

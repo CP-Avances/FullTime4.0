@@ -316,6 +316,7 @@ class ProcesoControlador {
                     data = {};
                 });
             }
+
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs.access(ruta, fs.constants.F_OK, (err) => {
                 if (err) {
@@ -601,7 +602,6 @@ class ProcesoControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
-  
   // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
   public async RegistrarProcesos(req: Request, res: Response){
     const { id_proceso, listaUsuarios, user_name, ip, ip_local } = req.body;
@@ -634,8 +634,6 @@ class ProcesoControlador {
          });
          // FINALIZAR TRANSACCION
          await pool.query('COMMIT');
-
-         console.log('procesos: ',procesos)
 
         if (procesos == undefined || procesos == '' || procesos == null) {
 
@@ -742,7 +740,30 @@ class ProcesoControlador {
         }else{
           console.log('proceso: ',procesos.estado)
           if(procesos.estado == false){
-            //actualizao a true
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+                SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+              `
+              , [id_empleado]);
+
+            const [proceso_activo1] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_activo1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const proceso_update: QueryResult = await pool.query(
@@ -765,6 +786,30 @@ class ProcesoControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update1: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+              `
+              , [proceso_activo1.id]);
+
+            const [proceso_UPD1] = proceso_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_UPD1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
           }
         }
       }
@@ -780,6 +825,233 @@ class ProcesoControlador {
       }
     }
 
+
+  }
+
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DE EMPLEADOS PROCESOS DENTRO DEL SISTEMA - MENSAJE DE CADA ERROR **USADO
+  public async RevisarPantillaEmpleadoProce(req: Request, res: Response): Promise<any> {
+    
+    try {
+      const documento = req.file?.originalname;
+      let separador = path.sep;
+      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+      const workbook = new Excel.Workbook();
+      await workbook.xlsx.readFile(ruta);
+      let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADO_PROCESOS');
+
+      if (verificador === false) {
+          return res.jsonp({ message: 'no_existe', data: undefined });
+      }else {
+        const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+        const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+        let data: any = {
+            fila: '',
+            nombre: '',
+            apellido: '',
+            cedula: '',
+            proceso: '',
+            observacion: ''
+        };
+        var listaProcesos: any = [];
+        var duplicados: any = [];
+        var mensaje: string = 'correcto';
+
+        if (plantilla) {
+          // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+          const headerRow = plantilla.getRow(1);
+          const headers: any = {};
+          // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+          headerRow.eachCell((cell: any, colNumber) => {
+            headers[cell.value.toString().toUpperCase()] = colNumber;
+          });
+
+          // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+          if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['CEDULA'] || !headers['PROCESOS']
+          ) {
+              return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+          }
+
+          // LECTURA DE LOS DATOS DE LA PLANTILLA
+          plantilla.eachRow((row, rowNumber) => {
+
+            // SALTAR LA FILA DE LAS CABECERAS
+            if (rowNumber === 1) return;
+            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+            const ITEM = row.getCell(headers['ITEM']).value;
+            const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
+            const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString().trim();
+            const CEDULA = row.getCell(headers['CEDULA']).value?.toString().trim();
+            const PROCESOS = row.getCell(headers['PROCESOS']).value?.toString().trim();
+
+            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+            if ((ITEM != undefined && ITEM != '') &&
+              (NOMBRE != undefined && NOMBRE != '') &&
+              (APELLIDO != undefined && APELLIDO != '') &&
+              (CEDULA != undefined && CEDULA != '') &&
+              (PROCESOS != undefined && PROCESOS != '')) {
+
+              data.fila = ITEM;
+              data.nombre = NOMBRE,
+              data.apellido = APELLIDO,
+              data.cedula = CEDULA,
+              data.proceso = PROCESOS,
+              data.observacion = 'no registrado';
+
+              listaProcesos.push(data);
+
+            } else { 
+
+              data.fila = ITEM;
+              data.nombre = NOMBRE,
+              data.apellido = APELLIDO,
+              data.cedula = CEDULA,
+              data.proceso = PROCESOS,
+              data.observacion = 'no registrado';
+
+              if (data.fila == '' || data.fila == undefined) {
+                data.fila = 'error';
+                mensaje = 'error'
+              }
+
+              if (NOMBRE == undefined) {
+                data.nombre = '-';
+              }
+
+              if (APELLIDO == undefined) {
+                data.apellido = '-';
+              }
+
+              if (CEDULA == undefined) {
+                data.cedula = 'No registrado';
+                data.observacion = 'Cedula ' + data.observacion;
+              }
+
+              if (PROCESOS == undefined) {
+                data.proceso = 'No registrado';
+                data.observacion = 'Proceso ' + data.observacion;
+              }
+
+              listaProcesos.push(data);
+            }
+
+            data = {};
+
+          });
+        }
+
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+          if (err) {
+          } else {
+              // ELIMINAR DEL SERVIDOR
+              fs.unlinkSync(ruta);
+          }
+        });
+
+        // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+        listaProcesos.forEach(async (item: any, index: number) => {
+          if (item.observacion == 'no registrado') {
+            const VERIFICAR_IDEMPLEADO = await pool.query(
+              `
+              SELECT id FROM eu_empleados WHERE cedula = $1
+              `
+              , [item.cedula.trim()]);
+
+            if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
+              console.log('VERIFICAR_IDEMPLEADO.rows[0]: ',VERIFICAR_IDEMPLEADO.rows[0])
+              let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id
+
+              const VERIFICAR_IDPROCESO = await pool.query(
+                `
+                SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
+                `
+                , [item.proceso.trim()]);
+
+              if (VERIFICAR_IDPROCESO.rows[0] != undefined) {
+
+                let id_proceso = VERIFICAR_IDPROCESO.rows[0].id
+
+                const response: QueryResult = await pool.query(
+                  `
+                   SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2 and estado = true
+                  `
+                  , [id_proceso, id_empleado]);
+       
+                const [procesos_emple] = response.rows;
+
+                if (procesos_emple != undefined || procesos_emple != '' || procesos_emple != null) {
+                  item.observacion = 'Ya existe un registro activo con este usuario y proceso'
+                }else{
+                  if (item.observacion == 'no registrado') {
+                    // DISCRIMINACION DE ELEMENTOS IGUALES
+                    if (duplicados.find((p: any) => (p.cedula.trim() === item.cedula.trim())
+                    ) == undefined) {
+                      duplicados.push(item);
+                    } else {
+                      item.observacion = '1';
+                    }
+                  }
+                }
+
+              }else{
+                item.observacion = 'Proceso ingresado no esta registrado en el sistema'
+              }
+
+            } else {
+              item.observacion = 'La cedula ingresada no esta registrada en el sistema'
+            }
+
+          }
+        });
+
+        setTimeout(() => {
+          listaProcesos.sort((a: any, b: any) => {
+            // COMPARA LOS NUMEROS DE LOS OBJETOS
+            if (a.fila < b.fila) {
+              return -1;
+            }
+            if (a.fila > b.fila) {
+              return 1;
+            }
+            return 0; // SON IGUALES
+          });
+
+          var filaDuplicada: number = 0;
+
+          listaProcesos.forEach(async (item: any) => {
+            if (item.observacion == '1') {
+              item.observacion = 'Registro duplicado'
+            } else if (item.observacion == 'no registrado') {
+              item.observacion = 'ok'
+            }
+
+            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+              // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+
+              if (item.fila == filaDuplicada) {
+                mensaje = 'error';
+              }
+            } else {
+              return mensaje = 'error';
+            }
+
+            filaDuplicada = item.fila;
+
+          });
+
+          if (mensaje == 'error') {
+            listaProcesos = undefined;
+          }
+
+          return res.jsonp({ message: mensaje, data: listaProcesos });
+        }, 1000)
+
+      }
+
+    }catch (error) {
+      return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+    }
 
   }
 

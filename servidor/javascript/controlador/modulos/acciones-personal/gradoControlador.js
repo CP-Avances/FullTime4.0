@@ -447,7 +447,25 @@ class GradoControlador {
                     else {
                         console.log('proceso: ', grados.estado);
                         if (grados.estado == false) {
-                            //actualizao a true
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+           `, [id_empleado]);
+                            const [grado_activo1] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grado_activo1),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const proceso_update = yield database_1.default.query(`
@@ -461,6 +479,25 @@ class GradoControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(grado_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const proceso_update1 = yield database_1.default.query(`
+              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+              `, [grado_activo1.id]);
+                            const [grado_UPD1] = proceso_update1.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grado',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grado_UPD1),
                                 ip: ip,
                                 ip_local: ip_local,
                                 observacion: null

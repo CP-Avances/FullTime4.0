@@ -44,4 +44,8 @@ export class CatGrupoOcupacionalService {
     return this.http.post<any>(environment.url + '/grupoOcupacional/cargar_plantilla', data);
   }
 
+  RegistroGrupo(data: any){
+    return this.http.post<any>(environment.url + '/grupoOcupacional/registrarGrupo', data)
+  }
+
 }

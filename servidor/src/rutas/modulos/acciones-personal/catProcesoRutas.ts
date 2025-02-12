@@ -38,6 +38,8 @@ class ProcesoRutas {
         this.router.post('/cargar_plantilla', TokenValidation,PROCESO_CONTROLADOR.CargarPlantilla);
         // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ
         this.router.post('/registrarProcesos', TokenValidation, PROCESO_CONTROLADOR.RegistrarProcesos);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision_epleadoProceso', [TokenValidation, upload.single('uploads')], PROCESO_CONTROLADOR.RevisarPantillaEmpleadoProce);
     }
 }
 

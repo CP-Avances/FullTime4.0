@@ -11,7 +11,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { ToastrService } from 'ngx-toastr';
-import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/cat-grupo-ocupacional.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { RegistrarGrupoOcupacionalComponent } from '../registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
 import { EditarGrupoOcupacionalComponent } from '../editar-grupo-ocupacional/editar-grupo-ocupacional.component';
 

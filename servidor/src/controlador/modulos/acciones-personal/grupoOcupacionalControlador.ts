@@ -405,6 +405,238 @@ class GrupoOcupacionalControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
+  // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+  public async  RegistrarGrupo(req: Request, res: Response){
+    const { id_grupo, listaUsuarios, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+    
+    try{
+      for (const item of listaUsuarios){
+
+        const {id_empleado} = item;
+
+         // INICIAR TRANSACCION
+         await pool.query('BEGIN');
+         const response: QueryResult = await pool.query(
+           `
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
+           `
+           , [id_grupo, id_empleado]);
+
+         const [grupo] = response.rows;
+         // AUDITORIA
+         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+           tabla: 'map_empleado_grupo_ocupacional',
+           usuario: user_name,
+           accion: 'I',
+           datosOriginales: '',
+           datosNuevos: JSON.stringify(grupo),
+           ip: ip,
+           ip_local: ip_local,
+           observacion: null
+         });
+         // FINALIZAR TRANSACCION
+         await pool.query('COMMIT');
+
+         console.log('grupo: ',grupo)
+
+        if (grupo == undefined || grupo == '' || grupo == null) {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          const response: QueryResult = await pool.query(
+            `
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+           `
+            , [id_empleado]);
+
+          const [grupo_activo] = response.rows;
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_empleado_grupo_ocupacional',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(grupo_activo),
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+          console.log('grado_activo: ',grupo_activo)
+
+          if(grupo_activo == undefined || grupo_activo == '' || grupo_activo == null){
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const responsee: QueryResult = await pool.query(
+              `
+              INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_empleado, id_grupo, true]);
+
+            const [grupo_insert] = responsee.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grupo_insert),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            
+
+          } else {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const grupo_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+              `
+              , [grupo_activo.id]);
+
+            const [grupo_UPD] = grupo_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grupo_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+               INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_empleado, id_grupo, true]);
+
+            const [nuevo_grupo] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(nuevo_grupo),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          }
+
+        }else{
+          console.log('proceso: ',grupo.estado)
+          if(grupo.estado == false){
+            //actualizao a true
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+                SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+              `
+              , [id_empleado]);
+
+            const [grupo_activo1] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grupo_activo1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const grupo_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+              `
+              , [grupo.id]);
+
+            const [grup_UPD] = grupo_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grup_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const grupo_update_false: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+              `
+              , [grupo_activo1.id]);
+
+            const [grupo_UPD] = grupo_update_false.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grupo_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+          }
+        }
+      }
+
+      return res.status(200).jsonp({ message: 'Registro de grupo ocupacional' });
+
+    } catch {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+      }
+    }
+
+
+  }
+
+
 }
 
 export const GRUPO_OCUPACIONAL_CONTROLADOR = new GrupoOcupacionalControlador();

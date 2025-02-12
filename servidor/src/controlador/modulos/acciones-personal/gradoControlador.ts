@@ -533,7 +533,30 @@ class GradoControlador {
         }else{
           console.log('proceso: ',grados.estado)
           if(grados.estado == false){
-            //actualizao a true
+            
+            // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          const response: QueryResult = await pool.query(
+            `
+            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+           `
+            , [id_empleado]);
+
+          const [grado_activo1] = response.rows;
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_empleado_grado',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(grado_activo1),
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const proceso_update: QueryResult = await pool.query(
@@ -556,6 +579,31 @@ class GradoControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update1: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+              `
+              , [grado_activo1.id]);
+
+            const [grado_UPD1] = proceso_update1.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grado_UPD1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
           }
         }
       }

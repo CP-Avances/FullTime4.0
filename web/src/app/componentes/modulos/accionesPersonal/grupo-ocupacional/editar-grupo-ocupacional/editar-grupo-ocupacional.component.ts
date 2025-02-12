@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/cat-grupo-ocupacional.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 

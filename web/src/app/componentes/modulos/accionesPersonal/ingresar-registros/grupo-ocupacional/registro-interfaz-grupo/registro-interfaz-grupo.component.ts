@@ -13,6 +13,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
@@ -85,7 +86,7 @@ export class RegistroInterfazGrupoComponent {
     regimenDep: any = [];
     cargosDep: any = [];
   
-    lissucursale: any = [];
+    lisGrupoOcupaciona: any = [];
   
     selectionSucDep = new SelectionModel<ITableEmpleados>(true, []);
     selectionRolDep = new SelectionModel<ITableEmpleados>(true, []);
@@ -143,6 +144,7 @@ export class RegistroInterfazGrupoComponent {
   
       constructor(
         private asignaciones: AsignacionesService,
+        private resGrupo: CatGrupoOcupacionalService,
         private restSuc: SucursalService,//SERVICIO DE DATOS PARA OBTENER EL LISTADO DE LAS SUCURSALES
         private restDep: DepartamentosService,//SERVICIO DE DATOS PARA OBTENER EL DEPA POR EL ID DE LA SUCURSAL
         private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
@@ -172,7 +174,7 @@ export class RegistroInterfazGrupoComponent {
           })
       
           this.BuscarInformacionGeneralDepa();
-          this.ObtenerSucursales();
+          this.ObtenerGrupoOcupacional();
           this.ObtenerSucursalesPorEmpresa();
         }
       
@@ -184,15 +186,8 @@ export class RegistroInterfazGrupoComponent {
           });
         }
         Ldepatamentos: any;
-        selecctSucu(id: any) {
+        selecctGrupo(id: any) {
           this.Ldepatamentos = []
-          if (id) {
-            this.restDep.BuscarDepartamentoSucursal(id).subscribe(datos => {
-              this.Ldepatamentos = datos;
-            }, (error: any) => {
-              this.toastr.error('No se encontraron departamentos en esa sucursal')
-            })
-          }
         }
       
         sucursalForm = new FormControl('', Validators.required);
@@ -205,10 +200,11 @@ export class RegistroInterfazGrupoComponent {
             return this.sucursal.filter((sucursal: any) => sucursal.nombre.toLowerCase().includes(filterValue));
           }
         }
-        // METODO PARA BUSCAR SUCURSALES
-        ObtenerSucursales() {
-          this.restSuc.BuscarSucursal().subscribe(res => {
-            this.lissucursale = res;
+      
+        // METODO PARA BUSCAR GRUPO OCUPACIONAL
+        ObtenerGrupoOcupacional() {
+          this.resGrupo.ConsultarGrupoOcupacion().subscribe(res => {
+            this.lisGrupoOcupaciona = res;
             this.filteredOptions = this.sucursalForm.valueChanges
               .pipe(
                 startWith(''),
@@ -677,20 +673,16 @@ export class RegistroInterfazGrupoComponent {
           console.log('datos: ', datos)
           if (datos.length > 0) {
             const data = {
-              idSucursal: this.formularioDep.get('sucursal')?.value,
-              idDepartamento: this.formularioDep.get('idDepa')?.value,
+              id_grupo: this.formularioDep.get('sucursal')?.value,
               listaUsuarios: datos
             }
-            if (data.idSucursal == '') {
-              this.toastr.warning('Seleccione la sucursal.', '', {
-                timeOut: 4000,
-              });
-            } else if (data.idDepartamento == '') {
-              this.toastr.warning('Seleccione el departamento.', '', {
+            if (data.id_grupo == '') {
+              this.toastr.warning('Seleccione el grupo ocupacional.', '', {
                 timeOut: 4000,
               });
             } else {
-              this.restDep.ActualizarUserDepa(data).subscribe((res: any) => {
+              
+              this.resGrupo.RegistroGrupo(data).subscribe((res: any) => {
                 this.toastr.success(res.message, '', {
                   timeOut: 4000,
                 });
@@ -702,6 +694,7 @@ export class RegistroInterfazGrupoComponent {
                   timeOut: 4000,
                 });
               })
+                
             }
           } else {
             this.toastr.warning('Seleccione usuarios para actualizar.', '', {

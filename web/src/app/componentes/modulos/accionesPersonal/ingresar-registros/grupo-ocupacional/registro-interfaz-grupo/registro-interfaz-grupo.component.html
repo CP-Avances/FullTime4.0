@@ -190,38 +190,24 @@
                 <div class="col-12 col-md-6">
                     <div class="container d-flex flex-wrap justify-content-center">
                         <mat-form-field>
-                            <mat-label>Seleccionar la sucursal</mat-label>
+                            <mat-label>Seleccionar el grupo ocupacional</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Lista de sucursales.">
                                 help_outline</mat-icon>
                             <mat-select [formControl]="idsucursal" required
-                                (selectionChange)="selecctSucu($event.value);">
-                                <mat-option *ngFor="let suc of Lsucursales" [value]="suc.id">
-                                    {{suc.nombre}}
+                                (selectionChange)="selecctGrupo($event.value);">
+                                <mat-option *ngFor="let grup of lisGrupoOcupaciona" [value]="grup.id">
+                                    {{grup.descripcion}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="container d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Seleccionar el departamento</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Lista de departamentos.">
-                                help_outline</mat-icon>
-                            <mat-select [formControl]="idDepa" required>
-                                <mat-option *ngFor="let dep of Ldepatamentos" [value]="dep.id">
-                                    {{dep.nombre}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                </div>
+    
             </div>
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                 <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltroDep(0, 'e')">
-                    Actualizar Departamento
+                    Registrar Grupo Ocupacional
                 </button>
             </div>
 
