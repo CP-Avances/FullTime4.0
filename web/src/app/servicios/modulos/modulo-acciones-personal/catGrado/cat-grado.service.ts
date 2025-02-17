@@ -48,4 +48,14 @@ export class CatGradoService {
     return this.http.post<any>(environment.url + '/grado/registrarGrados', data)
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormatoEmpleGrado(formData: any) {
+    return this.http.post<any>(environment.url + '/grado/upload/revision_epleadoGrado', formData);
+  }
+
+  RegistrarPlantillaEmpleGrado(data: any) {
+    console.log('data a enviar: ', data)
+    return this.http.post<any>(environment.url + '/grado/cargar_plantilla/registro_epleadoGrado', data)
+  }
+
 }

@@ -67,6 +67,10 @@ export class IngresarRegistrosComponent {
 
   // METODO PARA ACTIVAR EL REGISTRO POR INTERFAZ O MULTIPLE
   PantallaRegistros(pantalla: any, tipo_registro: string) {
+    this.listadoUsuariosProceso = false;
+    this.listadoUsuariosGrado = false;
+    this.listadoUsuariosGrupoOcupa = false;
+
     if (pantalla == 'proceso') {
       if (tipo_registro == 'interfaz') {
         this.MostrarListaProcesos = false;
@@ -138,7 +142,28 @@ export class IngresarRegistrosComponent {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  VerUsuarioAsignado(datos: any) {
+
+  listadoUsuariosProceso: boolean = false;
+  listadoUsuariosGrado: boolean = false;
+  listadoUsuariosGrupoOcupa: boolean = false;
+
+  dataList: any;
+  VerUsuarioAsignado(datos: any, tipo: string) {
+    this.dataList = datos
+    if(tipo == 'procesos'){
+      this.listadoUsuariosProceso = true;
+      this.listadoUsuariosGrado = false;
+      this.listadoUsuariosGrupoOcupa = false;
+    }else if(tipo == 'grado'){
+      this.listadoUsuariosProceso = false;
+      this.listadoUsuariosGrado = true;
+      this.listadoUsuariosGrupoOcupa = false;
+    }else if(tipo == 'grupo'){
+      this.listadoUsuariosProceso = false;
+      this.listadoUsuariosGrado = false;
+      this.listadoUsuariosGrupoOcupa = true;
+    }
+    
   }
 
   // METODO PARA LIMPIAR FORMULARIO

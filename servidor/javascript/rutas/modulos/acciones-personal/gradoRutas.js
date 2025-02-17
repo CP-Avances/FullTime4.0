@@ -33,8 +33,12 @@ class GradoRutas {
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], gradoControlador_1.default.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla', verificarToken_1.TokenValidation, gradoControlador_1.default.CargarPlantilla);
-        // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ
+        // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ  **USADO
         this.router.post('/registrarGrados', verificarToken_1.TokenValidation, gradoControlador_1.default.RegistrarGrados);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision_epleadoGrado', [verificarToken_1.TokenValidation, upload.single('uploads')], gradoControlador_1.default.RevisarPantillaEmpleadoGrado);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
+        this.router.post('/cargar_plantilla/registro_epleadoGrado', verificarToken_1.TokenValidation, gradoControlador_1.default.RegistrarEmpleadoGrado);
     }
 }
 const GRADO_RUTAS = new GradoRutas();

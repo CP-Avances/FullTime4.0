@@ -240,6 +240,7 @@ import { EditarTipoAccionComponent } from './componentes/modulos/accionesPersona
 import { VerTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/ver-tipo-accion/ver-tipo-accion.component';
 import { EditarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/editar-pedido-accion/editar-pedido-accion.component';
 import { VerPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/ver-pedido-accion/ver-pedido-accion.component';
+
 // MODULO  --GEOLOCALIZACION
 import { CrearCoordenadasComponent } from './componentes/modulos/geolocalizacion/crear-coordenadas/crear-coordenadas.component';
 import { EditarCoordenadasComponent } from './componentes/modulos/geolocalizacion/editar-coordenadas/editar-coordenadas.component';
@@ -334,6 +335,9 @@ import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPe
 import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/registro-multiple-grado/registro-multiple-grado.component';
 import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
 import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
+import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/empleado-proceso/empleado-proceso.component';
+import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/empleado-grado/empleado-grado.component';
+import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/empleado-grupo/empleado-grupo.component';
 
 @NgModule({
   declarations: [
@@ -543,6 +547,7 @@ import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPe
     VerTipoAccionComponent,
     EditarPedidoAccionComponent,
     VerPedidoAccionComponent,
+    EmpleadoProcesoComponent,
 
     CrearCoordenadasComponent,
     EditarCoordenadasComponent,
@@ -625,6 +630,9 @@ import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPe
     RegistroMultipleGradoComponent,
     RegistroMultipleGrupoComponent,
     RegistroInterfazGrupoComponent,
+    EmpleadoProcesoComponent,
+    EmpleadoGradoComponent,
+    EmpleadoGrupoComponent,
 
   ],
 
@@ -693,7 +701,7 @@ import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPe
     HorarioMultipleEmpleadoComponent,
     PermisosMultiplesEmpleadosComponent,
   ],
-  exports: [CommonModule, TimbreMultipleComponent],
+  exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 
   bootstrap: [AppComponent]
 

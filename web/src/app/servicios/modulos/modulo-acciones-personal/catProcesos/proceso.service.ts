@@ -61,8 +61,12 @@ export class ProcesoService {
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
   RevisarFormatoEMPLEPROCESO(formData: any) {
-    console.log('entro aqui ',formData)
     return this.http.post<any>(environment.url + '/proceso/upload/revision_epleadoProceso', formData);
+  }
+
+  RegistrarPlantillaEmpleProce(data: any){
+    console.log('data a enviar: ',data)
+    return this.http.post<any>(environment.url + '/proceso/cargar_plantilla/registro_epleadoProceso', data)
   }
   
 }

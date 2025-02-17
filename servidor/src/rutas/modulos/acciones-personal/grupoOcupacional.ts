@@ -35,6 +35,11 @@ class GrupoOcupacionalRutas {
         this.router.post('/cargar_plantilla', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.CargarPlantilla);
         // METODO PARA GUARDAR GRUPO MACIVOS POR INTERFAZ
         this.router.post('/registrarGrupo', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.RegistrarGrupo);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision_empleadoGrupoOcupacional', [TokenValidation, upload.single('uploads')], GRUPO_OCUPACIONAL_CONTROLADOR.RevisarPantillaEmpleadoGrupoOcu);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
+        this.router.post('/cargar_plantilla/registro_empleadoGrupoOcupacional', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.RegistrarEmpleadoGrupoOcu);
+
     }
 }
 

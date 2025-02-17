@@ -35,7 +35,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="MostrarListaProcesos">
-            <div class="mat-elevation-z8" style="background: white;">
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosProceso">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm ">
@@ -73,7 +73,7 @@
                                 <td class="justify-content-center">
                                     <i matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar a pantalla de información de usuarios vinculados a este registro."
-                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s)">
+                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s, 'procesos')">
                                         <p>Ver</p>
                                     </i>
                                 </td>
@@ -84,6 +84,10 @@
                 <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+            </div>
+
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="listadoUsuariosProceso">
+                <app-empleado-proceso [data]="dataList"></app-empleado-proceso>
             </div>
         </div>
 
@@ -107,7 +111,7 @@
             <div class="row">
                 <div class="col-md">
                     <div id="titulo">
-                        <span>GRUPO OCUPACIONAL</span>
+                        <span>GRADOS</span>
                     </div>
                     <mat-card class="example-card mat-elevation-z9">
                         <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
@@ -116,10 +120,10 @@
                                 Mostrar registros
                             </button>
                             <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'interfaz')">
-                                Registrar procesos
+                                Registrar grados
                             </button>
                             <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'multiple')">
-                                Registro multiple de proceso
+                                Registro multiple de grados
                             </button>
                         </div>
                     </mat-card>
@@ -128,7 +132,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="MostrarListaGrado">
-            <div class="mat-elevation-z8" style="background: white;">
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosGrado">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm ">
@@ -166,7 +170,7 @@
                                 <td class="justify-content-center">
                                     <i matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar a pantalla de información de usuarios vinculados a este registro."
-                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s)">
+                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s, 'grado')">
                                         <p>Ver</p>
                                     </i>
                                 </td>
@@ -178,6 +182,9 @@
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
             </div>
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="listadoUsuariosGrado">
+                <app-empleado-grado [data]="dataList"></app-empleado-grado>
+            </div>
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="RegistroInterfazGrado">
@@ -188,12 +195,6 @@
             <app-registro-multiple-grado></app-registro-multiple-grado>
         </div>
 
-        <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-        <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="RegistroMultipleGrado">
-            <app-definicion-plantilla>
-            </app-definicion-plantilla>
-        </div>
-
     </mat-tab>
 
 
@@ -201,7 +202,7 @@
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
-            <h6 id="items" (click)="LimpiarCampos()">&nbsp; Registrar Grupo Ocupacional</h6>
+            <h6 id="items" (click)="LimpiarCampos()">&nbsp; Asignar Grupo Ocupacional</h6>
         </ng-template>
 
         <div class="container" style="padding-bottom: 15px; padding-top: 10px;">
@@ -217,10 +218,10 @@
                                 Mostrar registros
                             </button>
                             <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'interfaz')">
-                                Registrar procesos
+                                Registrar grupo ocupacional
                             </button>
                             <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'multiple')">
-                                Registro multiple de proceso
+                                Registro multiple de grupo ocupacional
                             </button>
                         </div>
                     </mat-card>
@@ -229,7 +230,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="MostrarListaGrupoOcupacional">
-            <div class="mat-elevation-z8" style="background: white;">
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosGrupoOcupa">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm ">
@@ -267,7 +268,7 @@
                                 <td class="justify-content-center">
                                     <i matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar a pantalla de información de usuarios vinculados a este registro."
-                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s)">
+                                        class="fas fa-eye" id="t-ver" (click)="VerUsuarioAsignado(s, 'grupo')">
                                         <p>Ver</p>
                                     </i>
                                 </td>
@@ -279,6 +280,9 @@
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
             </div>
+            <div class="mat-elevation-z8" style="background: white;" *ngIf="listadoUsuariosGrupoOcupa">
+                <app-empleado-grupo [data]="dataList"></app-empleado-grupo>
+            </div>
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="RegistroInterfazGrupoOcupacional">
@@ -289,10 +293,6 @@
            <app-registro-multiple-grupo></app-registro-multiple-grupo>
         </div>
 
-        <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-        <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="RegistroMultipleGrupoOcupacional">
-            <app-definicion-plantilla>
-            </app-definicion-plantilla>
-        </div>
-
     </mat-tab>
+
+</mat-tab-group>

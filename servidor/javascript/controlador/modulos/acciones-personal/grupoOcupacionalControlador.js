@@ -537,6 +537,399 @@ class GrupoOcupacionalControlador {
             }
         });
     }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DE EMPLEADOS PROCESOS DENTRO DEL SISTEMA - MENSAJE DE CADA ERROR **USADO
+    RevisarPantillaEmpleadoGrupoOcu(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'EMPLEADO_GRUPO_OCUPACIONAL');
+                if (verificador === false) {
+                    return res.jsonp({ message: 'no_existe', data: undefined });
+                }
+                else {
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+                    let data = {
+                        fila: '',
+                        nombre: '',
+                        apellido: '',
+                        cedula: '',
+                        grupo_ocupacional: '',
+                        observacion: ''
+                    };
+                    var listaGrupoOcupacional = [];
+                    var duplicados = [];
+                    var mensaje = 'correcto';
+                    if (plantilla) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['CEDULA'] || !headers['GRUPO_OCUPACIONAL']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                        }
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c, _d;
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                            const APELLIDO = (_b = row.getCell(headers['APELLIDO']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            const CEDULA = (_c = row.getCell(headers['CEDULA']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
+                            const GRUPO_OCUPACIONAL = (_d = row.getCell(headers['GRUPO_OCUPACIONAL']).value) === null || _d === void 0 ? void 0 : _d.toString().trim();
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (NOMBRE != undefined && NOMBRE != '') &&
+                                (APELLIDO != undefined && APELLIDO != '') &&
+                                (CEDULA != undefined && CEDULA != '') &&
+                                (GRUPO_OCUPACIONAL != undefined && GRUPO_OCUPACIONAL != '')) {
+                                data.fila = ITEM;
+                                data.nombre = NOMBRE,
+                                    data.apellido = APELLIDO,
+                                    data.cedula = CEDULA,
+                                    data.grupo_ocupacional = GRUPO_OCUPACIONAL,
+                                    data.observacion = 'no registrado';
+                                listaGrupoOcupacional.push(data);
+                            }
+                            else {
+                                data.fila = ITEM;
+                                data.nombre = NOMBRE,
+                                    data.apellido = APELLIDO,
+                                    data.cedula = CEDULA,
+                                    data.grupo_ocupacional = GRUPO_OCUPACIONAL,
+                                    data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (NOMBRE == undefined) {
+                                    data.nombre = '-';
+                                }
+                                if (APELLIDO == undefined) {
+                                    data.apellido = '-';
+                                }
+                                if (CEDULA == undefined) {
+                                    data.cedula = 'No registrado';
+                                    data.observacion = 'Cedula ' + data.observacion;
+                                }
+                                if (GRUPO_OCUPACIONAL == undefined) {
+                                    data.grupo_ocupacional = 'No registrado';
+                                    data.observacion = 'Grupo Ocupacional ' + data.observacion;
+                                }
+                                listaGrupoOcupacional.push(data);
+                            }
+                            data = {};
+                        });
+                    }
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
+                    // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                    listaGrupoOcupacional.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrado') {
+                            const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
+              SELECT id FROM eu_empleados WHERE cedula = $1
+              `, [item.cedula.trim()]);
+                            if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
+                                let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
+                                const VERIFICAR_IDGRUPOOCU = yield database_1.default.query(`
+                SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
+                `, [item.grupo_ocupacional.trim()]);
+                                if (VERIFICAR_IDGRUPOOCU.rows[0] != undefined) {
+                                    let id_grupoOcupa = VERIFICAR_IDGRUPOOCU.rows[0].id;
+                                    const response = yield database_1.default.query(`
+                   SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
+                  `, [id_grupoOcupa, id_empleado]);
+                                    const [gupoOcu_emple] = response.rows;
+                                    console.log('procesos_emple: ', gupoOcu_emple);
+                                    if (gupoOcu_emple != undefined && gupoOcu_emple != '' && gupoOcu_emple != null) {
+                                        item.observacion = 'Ya existe un registro activo con este usuario y grupo Ocupacional';
+                                    }
+                                    else {
+                                        if (item.observacion == 'no registrado') {
+                                            // DISCRIMINACION DE ELEMENTOS IGUALES
+                                            if (duplicados.find((p) => (p.cedula.trim() === item.cedula.trim())) == undefined) {
+                                                duplicados.push(item);
+                                            }
+                                            else {
+                                                item.observacion = '1';
+                                            }
+                                        }
+                                    }
+                                }
+                                else {
+                                    item.observacion = 'Grupo Ocupacional no esta registrado en el sistema';
+                                }
+                            }
+                            else {
+                                item.observacion = 'La cedula ingresada no esta registrada en el sistema';
+                            }
+                        }
+                    }));
+                    setTimeout(() => {
+                        listaGrupoOcupacional.sort((a, b) => {
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
+                            if (a.fila < b.fila) {
+                                return -1;
+                            }
+                            if (a.fila > b.fila) {
+                                return 1;
+                            }
+                            return 0; // SON IGUALES
+                        });
+                        var filaDuplicada = 0;
+                        listaGrupoOcupacional.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
+                            }
+                            else if (item.observacion == 'no registrado') {
+                                item.observacion = 'ok';
+                            }
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                                if (item.fila == filaDuplicada) {
+                                    mensaje = 'error';
+                                }
+                            }
+                            else {
+                                return mensaje = 'error';
+                            }
+                            filaDuplicada = item.fila;
+                        }));
+                        if (mensaje == 'error') {
+                            listaGrupoOcupacional = undefined;
+                        }
+                        return res.jsonp({ message: mensaje, data: listaGrupoOcupacional });
+                    }, 1000);
+                }
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+            }
+        });
+    }
+    // METODO PARA REGISTRAR EMPLEADOS GRUPO POR MEDIO DE PLANTILLA
+    RegistrarEmpleadoGrupoOcu(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip, ip_local } = req.body;
+            let error = false;
+            console.log('id_empleado: ', plantilla);
+            try {
+                for (const item of plantilla) {
+                    const { cedula, grupo_ocupacional } = item;
+                    yield database_1.default.query('BEGIN');
+                    const VERIFICAR_IDGRUPO = yield database_1.default.query(`
+          SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
+          `, [grupo_ocupacional]);
+                    console.log('VERIFICAR_IDGRUPO.rows[0].id: ', VERIFICAR_IDGRUPO.rows[0].id);
+                    const id_grupo_ocupacional = VERIFICAR_IDGRUPO.rows[0].id;
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    yield database_1.default.query('BEGIN');
+                    const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `, [cedula.trim()]);
+                    const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
+           `, [id_grupo_ocupacional, id_empleado]);
+                    const [Gupo_Ocupacionales] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_empleado_grupo_ocupacional',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(Gupo_Ocupacionales),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (Gupo_Ocupacionales == undefined || Gupo_Ocupacionales == '' || Gupo_Ocupacionales == null) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const response = yield database_1.default.query(`
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+           `, [id_empleado]);
+                        const [grupo_activo] = response.rows;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_empleado_grupo_ocupacional',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(grupo_activo),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        if (grupo_activo == undefined || grupo_activo == '' || grupo_activo == null) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const responsee = yield database_1.default.query(`
+              INSERT INTO map_empleado_grupo_ocupacional (id_grupo_ocupacional, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+              `, [id_grupo_ocupacional, id_empleado, true]);
+                            const [grupo_insert] = responsee.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grupo_ocupacional',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grupo_insert),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                        else {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const grupo_update = yield database_1.default.query(`
+              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+              `, [grupo_activo.id]);
+                            const [proceso_UPD] = grupo_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grupo_ocupacional',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(proceso_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+               INSERT INTO map_empleado_grupo_ocupacional (id_grupo_ocupacional, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+              `, [id_grupo_ocupacional, id_empleado, true]);
+                            const [nuevo_grupo] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grupo_ocupacional',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(nuevo_grupo),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                        }
+                    }
+                    else {
+                        console.log('Gupo_Ocupacionales: ', Gupo_Ocupacionales.estado);
+                        if (Gupo_Ocupacionales.estado == false) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+                SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+              `, [id_empleado]);
+                            const [grupo_activo1] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_procesos',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grupo_activo1),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            console.log('grupo_ocupacional: ', Gupo_Ocupacionales.id);
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const grupo_update = yield database_1.default.query(`
+              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+              `, [Gupo_Ocupacionales.id]);
+                            const [grupoOcu_UPD] = grupo_update.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_empleado_grupo_ocupacional',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(grupoOcu_UPD),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            if (grupo_activo1 != undefined) {
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const grupo_update1 = yield database_1.default.query(`
+              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+              `, [grupo_activo1.id]);
+                                const [grupo_UPD1] = grupo_update1.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grupo_ocupacional',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grupo_UPD1),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                            }
+                        }
+                    }
+                }
+                return res.status(200).jsonp({ message: 'Registro de grupo ocuapcional' });
+            }
+            catch (_a) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    return res.status(500).jsonp({ message: 'error' });
+                }
+            }
+        });
+    }
 }
 exports.GRUPO_OCUPACIONAL_CONTROLADOR = new GrupoOcupacionalControlador();
 exports.default = exports.GRUPO_OCUPACIONAL_CONTROLADOR;

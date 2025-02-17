@@ -16,11 +16,11 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class RegistroMultipleProcesoComponent {
 
-   // VARIABLES PARA AUDITORIA
-   user_name: string | null;
-   ip: string | null;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
-   ips_locales: any = '';
+  ips_locales: any = '';
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -185,12 +185,12 @@ export class RegistroMultipleProcesoComponent {
        return 'rgb(156, 214, 255)';
      } else if (observacion == 'ok') {
        return 'rgb(159, 221, 154)';
-     } else if (observacion == 'Ya existe el proceso en el sistema') {
+     } else if (observacion == 'Ya existe un registro activo con este usuario y proceso') {
        return 'rgb(239, 203, 106)';
-     } else if (observacion  == 'Registro cruzado' ||
-       observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+     } else if (observacion  == 'La cedula ingresada no esta registrada en el sistema' ||
+       observacion == 'Proceso ingresado no esta registrado en el sistema'
      ) {
-       return 'rgb(238, 21, 242)';
+       return 'rgb(255, 192, 203)';
      } else {
        return 'rgb(242, 21, 21)';
      }
@@ -216,7 +216,7 @@ export class RegistroMultipleProcesoComponent {
          user_name: this.user_name,
          ip: this.ip, ip_local: this.ips_locales
        }
-       this.rest.RegistrarPlantilla(data).subscribe({
+       this.rest.RegistrarPlantillaEmpleProce(data).subscribe({
          next: (response: any) => {
            this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
              timeOut: 5000,

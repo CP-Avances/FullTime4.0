@@ -48,4 +48,14 @@ export class CatGrupoOcupacionalService {
     return this.http.post<any>(environment.url + '/grupoOcupacional/registrarGrupo', data)
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormatoEmpleGrupoOcu(formData: any) {
+    return this.http.post<any>(environment.url + '/grupoOcupacional/upload/revision_empleadoGrupoOcupacional', formData);
+  }
+
+  RegistrarPlantillaEmpleGrupoOcu(data: any) {
+    console.log('data a enviar: ', data)
+    return this.http.post<any>(environment.url + '/grupoOcupacional/cargar_plantilla/registro_empleadoGrupoOcupacional', data)
+  }
+
 }

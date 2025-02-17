@@ -33,8 +33,12 @@ class GradoRutas {
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla', TokenValidation, GRADO_CONTROLADOR.CargarPlantilla);
-        // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ
+        // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ  **USADO
         this.router.post('/registrarGrados', TokenValidation, GRADO_CONTROLADOR.RegistrarGrados);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision_epleadoGrado', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarPantillaEmpleadoGrado);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
+        this.router.post('/cargar_plantilla/registro_epleadoGrado', TokenValidation, GRADO_CONTROLADOR.RegistrarEmpleadoGrado);
     }
 }
 

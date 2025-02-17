@@ -40,6 +40,8 @@ class ProcesoRutas {
         this.router.post('/registrarProcesos', TokenValidation, PROCESO_CONTROLADOR.RegistrarProcesos);
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision_epleadoProceso', [TokenValidation, upload.single('uploads')], PROCESO_CONTROLADOR.RevisarPantillaEmpleadoProce);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
+        this.router.post('/cargar_plantilla/registro_epleadoProceso', TokenValidation, PROCESO_CONTROLADOR.RegistrarEmpleadoProceso);
     }
 }
 

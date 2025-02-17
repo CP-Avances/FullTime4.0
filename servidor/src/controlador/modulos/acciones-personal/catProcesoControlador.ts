@@ -958,7 +958,7 @@ class ProcesoControlador {
               , [item.cedula.trim()]);
 
             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
-              console.log('VERIFICAR_IDEMPLEADO.rows[0]: ',VERIFICAR_IDEMPLEADO.rows[0])
+              
               let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id
 
               const VERIFICAR_IDPROCESO = await pool.query(
@@ -978,8 +978,9 @@ class ProcesoControlador {
                   , [id_proceso, id_empleado]);
        
                 const [procesos_emple] = response.rows;
+                  console.log('procesos_emple: ',procesos_emple);
 
-                if (procesos_emple != undefined || procesos_emple != '' || procesos_emple != null) {
+                if (procesos_emple != undefined && procesos_emple != '' && procesos_emple != null) {
                   item.observacion = 'Ya existe un registro activo con este usuario y proceso'
                 }else{
                   if (item.observacion == 'no registrado') {
@@ -1051,6 +1052,257 @@ class ProcesoControlador {
 
     }catch (error) {
       return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+    }
+
+  }
+
+  // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA
+  public async RegistrarEmpleadoProceso(req: Request, res: Response): Promise<any>{
+    const { plantilla, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+    
+    console.log('id_empleado: ',plantilla)
+
+    try {
+      for (const item of plantilla) {
+
+        const { cedula, proceso } = item;
+
+        await pool.query('BEGIN');
+        const VERIFICAR_IDPROCESO = await pool.query(
+          `
+          SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
+          `
+          , [proceso]);
+          console.log('VERIFICAR_IDPROCESO.rows[0].id: ',VERIFICAR_IDPROCESO.rows[0].id)
+
+        const id_proceso = VERIFICAR_IDPROCESO.rows[0].id;
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+        await pool.query('BEGIN');
+        const VERIFICAR_IDEMPLEADO = await pool.query(
+          `
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `
+          , [cedula.trim()]);
+
+        const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+        const response: QueryResult = await pool.query(
+           `
+            SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
+           `
+           , [id_proceso, id_empleado]);
+
+         const [procesos] = response.rows;
+         // AUDITORIA
+         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+           tabla: 'map_empleado_procesos',
+           usuario: user_name,
+           accion: 'I',
+           datosOriginales: '',
+           datosNuevos: JSON.stringify(procesos),
+           ip: ip,
+           ip_local: ip_local,
+           observacion: null
+         });
+         // FINALIZAR TRANSACCION
+         await pool.query('COMMIT');
+
+        if (procesos == undefined || procesos == '' || procesos == null) {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          const response: QueryResult = await pool.query(
+            `
+            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+           `
+            , [id_empleado]);
+
+          const [proceso_activo] = response.rows;
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_empleado_procesos',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(procesos),
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+          if(proceso_activo == undefined || proceso_activo == '' || proceso_activo == null){
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const responsee: QueryResult = await pool.query(
+              `
+              INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_proceso, id_empleado, true]);
+
+            const [proceso_insert] = responsee.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_insert),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            
+
+          } else {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+              `
+              , [proceso_activo.id]);
+
+            const [proceso_UPD] = proceso_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+              `
+              , [id_proceso, id_empleado, true]);
+
+            const [nuevo_proceso] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(nuevo_proceso),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+          }
+
+        }else{
+          console.log('proceso: ',procesos.estado)
+          if(procesos.estado == false){
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
+                SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+              `
+              , [id_empleado]);
+
+            const [proceso_activo1] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_activo1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+              `
+              , [procesos.id]);
+
+            const [proceso_UPD] = proceso_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_UPD),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const proceso_update1: QueryResult = await pool.query(
+              `
+              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+              `
+              , [proceso_activo1.id]);
+
+            const [proceso_UPD1] = proceso_update.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_procesos',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(proceso_UPD1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+          }
+        }
+      }
+
+      return res.status(200).jsonp({ message: 'Registro de proceso' });
+
+    } catch {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+      }
     }
 
   }
