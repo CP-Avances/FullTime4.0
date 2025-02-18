@@ -12,6 +12,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { PageEvent } from '@angular/material/paginator';
+import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-empleado-proceso',
@@ -47,6 +49,12 @@ export class EmpleadoProcesoComponent {
   // VARIABLE PARA SELECCION MULTIPLE USUARIOS
   usuariosSeleccionados = new SelectionModel<any>(true, []);
 
+  //VARIABLE PARA MOSTRAR EL COMPONENTE DE INFORMACION DE PROCESO DEL EMPLEADO Y OCULTAR LA TABLA
+  infoEmpleProceso: boolean = false
+  nombreUsuarioSelect: string = ''
+  idEmpleadoSelec: any;
+  listaEmpleProce: any = []
+
   constructor(
     public departamentoService: DepartamentosService,
     public sucursal: SucursalService,
@@ -55,6 +63,7 @@ export class EmpleadoProcesoComponent {
     public toastr: ToastrService,
     private usuario: UsuarioService,
     public validar: ValidacionesService,
+    private rest: EmpleadoProcesosService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -69,6 +78,7 @@ export class EmpleadoProcesoComponent {
     console.log('dataList: ',this.data)
     this.name_sucursal = this.data.nombre
     this.BuscarUsuariosSucursal();
+    this.infoEmpleProceso = false;
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
@@ -152,7 +162,55 @@ export class EmpleadoProcesoComponent {
   }
 
   Visualizar(valor: any){
+    this.listaEmpleProce = []
+    this.rest.ObtenerProcesoUsuario(valor.id).subscribe({
+      next: (respuesta: any) => {
+        if(respuesta.status == 200){
+          this.nombreUsuarioSelect = valor.apellido +' '+ valor.nombre
+          this.idEmpleadoSelec = valor.id
+          this.listaEmpleProce = respuesta.procesos
+          this.infoEmpleProceso = true;
+        }else{
+          this.infoEmpleProceso = false;
+        }
+      },error: (err: any) => {
+        this.listaEmpleProce = []
+        console.log('err: ',err)
+        this.infoEmpleProceso = false;
+        this.toastr.warning(err.error.text, 'Advertencia.', {
+          timeOut: 4500,
+        });
+      },
+    })
+  }
 
+  AbrirVentanaEditar(pro){
+
+  }
+
+  ConfirmarDelete(pro){
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarRegistro(pro);
+        }
+      });
+  }
+  EliminarRegistro(data: any){
+    console.log('data: ',data)
+    this.rest.EliminarRegistro(data.id, data).subscribe({
+      next: (respuesta: any) => {
+        this.Visualizar(this.idEmpleadoSelec)
+        this.toastr.success(respuesta.message, 'Correcto.', {
+          timeOut: 4500,
+        });
+      },error: (err: any) => {
+        this.toastr.error(err.error.message, 'Error.', {
+          timeOut: 4500,
+        });
+      },
+    })
   }
 
 }
