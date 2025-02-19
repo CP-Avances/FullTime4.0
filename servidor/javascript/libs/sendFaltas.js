@@ -666,7 +666,6 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 }
             }
             else {
-                console.log("no existen faltas en el departamento: ", +departamento);
             }
         }));
     });

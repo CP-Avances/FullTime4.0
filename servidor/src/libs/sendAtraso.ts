@@ -757,7 +757,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
 
         } else {
-            console.log("no existen registros para el departamento: ", departamento)
+            //console.log("no existen registros para el departamento: ", departamento)
         }
     })
 
@@ -983,14 +983,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                 } else {
                     console.log("atrasos_email es false")
                 }
-                let mensaje = {
-                    id_empl_envia: 0,
-                    id_empl_recive: item.id,
-                    descripcion: 'NOTIFICACIÓN DE ATRASO',
-                    mensaje: 'Llego atrasado al trabajo con: ' + tiempo,
-                    tipo: 6
-                }
-
+                
                 if (item.atrasos_notificacion) {
                     var tiempoN = fechaHora();
                     let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
@@ -1017,6 +1010,8 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                         descripcion: x.descripcion,
                         mensaje: x.mensaje,
                         tipo: 6,
+                        usuario: 'PLATAFORMA WEB'
+
                     }
 
                     io.emit('recibir_aviso', data_llega);

@@ -876,6 +876,7 @@ const salidasAnticipadasIndividual = function (desde, hasta) {
                             descripcion: x.descripcion,
                             mensaje: x.mensaje,
                             tipo: 6,
+                            usuario: 'PLATAFORMA WEB'
                         };
                         server_1.io.emit('recibir_aviso', data_llega);
                     }

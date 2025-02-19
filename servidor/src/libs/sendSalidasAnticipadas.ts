@@ -1007,6 +1007,8 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                         descripcion: x.descripcion,
                         mensaje: x.mensaje,
                         tipo: 6,
+                        usuario: 'PLATAFORMA WEB'
+
                     }
 
                     io.emit('recibir_aviso', data_llega);

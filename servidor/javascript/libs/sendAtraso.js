@@ -670,7 +670,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                 }
             }
             else {
-                console.log("no existen registros para el departamento: ", departamento);
+                //console.log("no existen registros para el departamento: ", departamento)
             }
         }));
     });
@@ -859,13 +859,6 @@ const atrasosIndividual = function (desde, hasta) {
                     else {
                         console.log("atrasos_email es false");
                     }
-                    let mensaje = {
-                        id_empl_envia: 0,
-                        id_empl_recive: item.id,
-                        descripcion: 'NOTIFICACIÓN DE ATRASO',
-                        mensaje: 'Llego atrasado al trabajo con: ' + tiempo,
-                        tipo: 6
-                    };
                     if (item.atrasos_notificacion) {
                         var tiempoN = (0, settingsMail_2.fechaHora)();
                         let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
@@ -887,6 +880,7 @@ const atrasosIndividual = function (desde, hasta) {
                             descripcion: x.descripcion,
                             mensaje: x.mensaje,
                             tipo: 6,
+                            usuario: 'PLATAFORMA WEB'
                         };
                         server_1.io.emit('recibir_aviso', data_llega);
                     }

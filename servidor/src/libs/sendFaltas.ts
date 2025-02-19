@@ -732,12 +732,8 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                 });
             }
         } else {
-            console.log("no existen faltas en el departamento: ", + departamento)
         }
     })
-
-
-
 }
 
 export const faltasIndividual = async function (desde: any, hasta: any) {
