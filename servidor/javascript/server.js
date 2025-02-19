@@ -61,6 +61,7 @@ const datosGeneralesRutas_1 = __importDefault(require("./rutas/datosGenerales/da
 const graficasRutas_1 = __importDefault(require("./rutas/graficas/graficasRutas"));
 const licencias_1 = __importDefault(require("./utils/licencias"));
 const funcionRutas_1 = __importDefault(require("./rutas/funciones/funcionRutas"));
+const catGeneroRutas_1 = __importDefault(require("./rutas/empleado/generos/catGeneroRutas"));
 // CON MODULOS
 const notificacionesRutas_1 = __importDefault(require("./rutas/notificaciones/notificacionesRutas"));
 const autorizacionesRutas_1 = __importDefault(require("./rutas/autorizaciones/autorizacionesRutas"));
@@ -190,6 +191,7 @@ class Servidor {
         this.app.use(`/${ruta}/generalidades`, datosGeneralesRutas_1.default);
         this.app.use(`/${ruta}/notificacionSistema`, reportesNotificacionRutas_1.default);
         this.app.use(`/${ruta}/metricas`, graficasRutas_1.default);
+        this.app.use(`/${ruta}/generos`, catGeneroRutas_1.default);
         // CON MODULOS
         this.app.use(`/${ruta}/autorizaciones`, autorizacionesRutas_1.default);
         this.app.use(`/${ruta}/noti-real-time`, notificacionesRutas_1.default);

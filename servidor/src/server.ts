@@ -49,6 +49,7 @@ import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
 import FUNCIONES_RUTAS from './rutas/funciones/funcionRutas';
+import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
 // CON MODULOS
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
 import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
@@ -190,6 +191,8 @@ class Servidor {
         this.app.use(`/${ruta}/generalidades`, DATOS_GENERALES_RUTAS);
         this.app.use(`/${ruta}/notificacionSistema`, NOTIFICACION_RUTAS);
         this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
+        this.app.use(`/${ruta}/generos`, GENERO_RUTAS);
+
         // CON MODULOS
         this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
         this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);

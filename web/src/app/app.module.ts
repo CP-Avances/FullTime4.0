@@ -321,6 +321,9 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
 
 @NgModule({
   declarations: [
@@ -599,6 +602,9 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
+    RegistrarGeneroComponent,
+    EditarGeneroComponent,
+    ListarGeneroComponent,
 
   ],
 

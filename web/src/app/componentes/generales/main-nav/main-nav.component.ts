@@ -248,6 +248,8 @@ export class MainNavComponent implements OnInit {
         icono: 'account_circle',
         children: [
           { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
+          { name: 'Generos', url: '/genero', color: true, ver: true },
+
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
           { name: 'Tipo Discapacidad', url: '/discapacidades', color: true, ver: true },
