@@ -10,13 +10,16 @@ import * as xml2js from 'xml2js';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { MatDialog } from '@angular/material/dialog';
+import { RegistrarGeneroComponent } from '../registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from '../editar-genero/editar-genero.component';
 
 @Component({
   selector: 'app-listar-genero',
   standalone: false,
 
   templateUrl: './listar-genero.component.html',
-  styleUrl: './listar-genero.component.scss'
+  styleUrl: './listar-genero.component.css'
 })
 export class ListarGeneroComponent {
 
@@ -54,6 +57,7 @@ export class ListarGeneroComponent {
     public restEmpre: EmpresaService,
     public restE: EmpleadoService,
     public restG: GenerosService,
+    public ventana: MatDialog,
 
 
 
@@ -63,7 +67,10 @@ export class ListarGeneroComponent {
   }
 
   generoF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
-
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    generoForm: this.generoF,
+  });
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -71,7 +78,7 @@ export class ListarGeneroComponent {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    //this.ListarProvincias();
+    this.ListarGeneros()
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
@@ -144,12 +151,30 @@ export class ListarGeneroComponent {
   }
 
   AbrirVentanaRegistrarGenero() {
+    this.ventana.open(RegistrarGeneroComponent, { width: '550px' }).afterClosed().subscribe(item => {
+      this.ListarGeneros();
+    });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionGeneros.clear();
+    this.generosEliminar = [];
+  }
 
+
+  AbrirVentanaEditarGenero(datosSeleccionados: any) {
+    this.ventana.open(EditarGeneroComponent, { width: '400px', data: datosSeleccionados })
+      .afterClosed().subscribe(items => {
+        this.ListarGeneros();
+      });
   }
 
 
   LimpiarCampos() {
-
+    this.formulario.setValue({
+      generoForm: '',
+    });
+    this.ListarGeneros();
   }
 
   ConfirmarDeleteMultiple() {

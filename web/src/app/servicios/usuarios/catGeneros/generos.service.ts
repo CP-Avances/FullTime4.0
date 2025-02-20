@@ -16,4 +16,25 @@ export class GenerosService {
    ListarGeneros() {
     return this.http.get(`${environment.url}/generos/`);
   }
+
+  // METODO PARA BUSCAR NIVEL POR SU NOMBRE   **USADO
+  BuscarGenero(genero: string) {
+    return this.http.get<any>(`${environment.url}/generos/buscar/${genero}`);
+  }
+
+  // METODO PARA REGISTRAR GENERO   **USADO
+  RegistrarGenero(data: any) {
+    return this.http.post<any>(`${environment.url}/generos`, data);
+  }
+
+
+  // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
+  ActualizarUnGenero(datos: any) {
+    return this.http.put(`${environment.url}/generos`, datos);
+  }
+
+
+
+
+
 }
