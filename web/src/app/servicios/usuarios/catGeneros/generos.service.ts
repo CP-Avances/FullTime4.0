@@ -33,8 +33,13 @@ export class GenerosService {
     return this.http.put(`${environment.url}/generos`, datos);
   }
 
-
-
-
+    // ELIMIAR REGISTRO   **USADO
+    EliminarGenero(id: any, datos: any) {
+      const url = `${environment.url}/generos/eliminar/${id}`;
+      const httpOtions = {
+        body: datos
+      };
+      return this.http.request('delete', url, httpOtions).pipe(catchError(id));
+    }
 
 }

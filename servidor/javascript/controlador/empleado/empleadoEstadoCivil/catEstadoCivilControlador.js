@@ -12,18 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GENERO_CONTROLADOR = void 0;
+exports.ESTADO_CIVIL_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../../database"));
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-class GeneroControlador {
+class EstadoCivilControlador {
     // LISTA DE GENEROS
-    ListarGeneros(req, res) {
+    ListarEstadosCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const GENEROS = yield database_1.default.query(`
-      SELECT * FROM e_genero  ORDER BY genero ASC
+            const ESTADOS = yield database_1.default.query(`
+      SELECT * FROM e_estado_civil  ORDER BY estado_civil ASC
       `);
-            if (GENEROS.rowCount != 0) {
-                return res.jsonp(GENEROS.rows);
+            if (ESTADOS.rowCount != 0) {
+                return res.jsonp(ESTADOS.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -31,14 +31,14 @@ class GeneroControlador {
         });
     }
     // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
-    ObtenerGenero(req, res) {
+    ObtenerEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { genero } = req.params;
-            const unGenero = yield database_1.default.query(`
-      SELECT * FROM e_genero WHERE UPPER(genero) = $1
-      `, [genero]);
-            if (unGenero.rowCount != 0) {
-                return res.jsonp(unGenero.rows);
+            const { estado } = req.params;
+            const unEstado = yield database_1.default.query(`
+      SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1
+      `, [estado]);
+            if (unEstado.rowCount != 0) {
+                return res.jsonp(unEstado.rows);
             }
             else {
                 res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -46,19 +46,19 @@ class GeneroControlador {
         });
     }
     // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
-    CrearGenero(req, res) {
+    CrearEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { genero, user_name, ip, ip_local } = req.body;
+                const { estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO e_genero (genero) VALUES ($1) RETURNING *
-        `, [genero]);
+        INSERT INTO e_estado_civil (estado_civil) VALUES ($1) RETURNING *
+        `, [estado]);
                 const [nivel] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_genero',
+                    tabla: 'e_estado_civil',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -79,41 +79,41 @@ class GeneroControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
+                return res.status(500).jsonp({ message: 'Error al registrar el estado civil.' });
             }
         });
     }
-    ActualizarGenero(req, res) {
+    ActualizarEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { genero, id, user_name, ip, ip_local } = req.body;
+                const { estado, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
+                const rol = yield database_1.default.query(`SELECT * FROM e_estado_civil WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_genero',
+                        tabla: 'e_estado_civil',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
                         ip_local: ip_local,
-                        observacion: `Error al actualizar el genero con id ${id}. Registro no encontrado.`
+                        observacion: `Error al actualizar el estado civil con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE e_genero SET genero = $1 WHERE id = $2 RETURNING *
-        `, [genero, id]);
+        UPDATE e_estado_civil SET estado_civil = $1 WHERE id = $2 RETURNING *
+        `, [estado, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_genero',
+                    tabla: 'e_estado_civil',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
@@ -135,7 +135,7 @@ class GeneroControlador {
         });
     }
     // METODO PARA ELIMINAR REGISTROS   **USADO
-    EliminarGenero(req, res) {
+    EliminarEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_name, ip, ip_local } = req.body;
@@ -143,11 +143,11 @@ class GeneroControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM e_estado_civil WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_genero',
+                        tabla: 'e_estado_civil',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
@@ -161,11 +161,11 @@ class GeneroControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-        DELETE FROM e_genero WHERE id = $1
+        DELETE FROM e_estado_civil WHERE id = $1
         `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_genero',
+                    tabla: 'e_estado_civil',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
@@ -186,5 +186,5 @@ class GeneroControlador {
         });
     }
 }
-exports.GENERO_CONTROLADOR = new GeneroControlador();
-exports.default = exports.GENERO_CONTROLADOR;
+exports.ESTADO_CIVIL_CONTROLADOR = new EstadoCivilControlador();
+exports.default = exports.ESTADO_CIVIL_CONTROLADOR;

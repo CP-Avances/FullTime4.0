@@ -144,6 +144,7 @@ import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-ma
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
 import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
 
 const routes: Routes = [
 
@@ -180,6 +181,7 @@ const routes: Routes = [
   // USUARIOS
   { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard] },
   { path: 'genero', component: ListarGeneroComponent, canActivate: [AuthGuard] },
+  { path: 'estado-civil', component: ListarEstadoCivilComponent, canActivate: [AuthGuard] },
 
   { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard] },
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard] },

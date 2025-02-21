@@ -249,6 +249,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
           { name: 'Generos', url: '/genero', color: true, ver: true },
+          { name: 'Estados Civil', url: '/estado-civil', color: true, ver: true },
 
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },

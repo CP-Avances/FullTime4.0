@@ -4,7 +4,7 @@
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-            REGISTRAR GENERO
+            MODIFICAR ESTADO CIVIL
         </span>
     </div>
     <div class="col-2 col-md-2 mb-2 mb-md-0">
@@ -21,18 +21,18 @@
         </div>
         <div class="d-flex flex-wrap justify-content-center">
             <mat-form-field>
-                <mat-label>Género</mat-label>
-                <input matInput placeholder="Femenino" [formControl]="generoI" (keypress)="IngresarSoloLetras($event)"
-                    required>
+                <mat-label>Estado Civil</mat-label>
+                <input matInput placeholder="Ej: Casado/a" [formControl]="estadoF"
+                    (keypress)="IngresarSoloLetras($event)" required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Ingresar genero.">
+                    matTooltip="Modificar el estado civil.">
                     help_outline
                 </mat-icon>
             </mat-form-field>
         </div>
     </div>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
-        <button id="btn-raised" class="btn btn-sm" (click)="InsertarGenero(formulario.value)"
+        <button id="btn-raised" class="btn btn-sm" (click)="ActualizarTitulo(formulario.value)"
             [disabled]="!formulario.valid" value="Guardar">
             Guardar
         </button>

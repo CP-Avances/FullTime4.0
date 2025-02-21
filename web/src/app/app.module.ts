@@ -324,6 +324,9 @@ import { GraficasService } from './servicios/graficas/graficas.service';
 import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
 import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
 import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
+import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
 
 @NgModule({
   declarations: [
@@ -605,6 +608,9 @@ import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar
     RegistrarGeneroComponent,
     EditarGeneroComponent,
     ListarGeneroComponent,
+    ListarEstadoCivilComponent,
+    RegistrarEstadoCivilComponent,
+    EditarEstadoCivilComponent,
 
   ],
 

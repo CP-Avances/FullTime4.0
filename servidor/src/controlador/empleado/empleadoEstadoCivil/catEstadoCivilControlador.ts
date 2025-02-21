@@ -3,19 +3,19 @@ import pool from '../../../database';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { QueryResult } from 'pg';
 
-class GeneroControlador {
+class EstadoCivilControlador {
 
   // LISTA DE GENEROS
 
-  public async ListarGeneros(req: Request, res: Response) {
-    const GENEROS = await pool.query(
+  public async ListarEstadosCivil(req: Request, res: Response) {
+    const ESTADOS = await pool.query(
       `
-      SELECT * FROM e_genero  ORDER BY genero ASC
+      SELECT * FROM e_estado_civil  ORDER BY estado_civil ASC
       `
     );
 
-    if (GENEROS.rowCount != 0) {
-      return res.jsonp(GENEROS.rows)
+    if (ESTADOS.rowCount != 0) {
+      return res.jsonp(ESTADOS.rows)
     }
     else {
       return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -23,16 +23,16 @@ class GeneroControlador {
   }
 
   // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
-  public async ObtenerGenero(req: Request, res: Response): Promise<any> {
-    const { genero } = req.params;
-    const unGenero = await pool.query(
+  public async ObtenerEstadoCivil(req: Request, res: Response): Promise<any> {
+    const { estado } = req.params;
+    const unEstado = await pool.query(
       `
-      SELECT * FROM e_genero WHERE UPPER(genero) = $1
+      SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1
       `
-      , [genero]);
+      , [estado]);
 
-    if (unGenero.rowCount != 0) {
-      return res.jsonp(unGenero.rows)
+    if (unEstado.rowCount != 0) {
+      return res.jsonp(unEstado.rows)
     }
     else {
       res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -41,24 +41,24 @@ class GeneroControlador {
 
 
   // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
-  public async CrearGenero(req: Request, res: Response): Promise<Response> {
+  public async CrearEstadoCivil(req: Request, res: Response): Promise<Response> {
     try {
-      const { genero, user_name, ip, ip_local } = req.body;
+      const { estado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO e_genero (genero) VALUES ($1) RETURNING *
+        INSERT INTO e_estado_civil (estado_civil) VALUES ($1) RETURNING *
         `
-        , [genero]);
+        , [estado]);
 
       const [nivel] = response.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'e_genero',
+        tabla: 'e_estado_civil',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -81,33 +81,33 @@ class GeneroControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
+      return res.status(500).jsonp({ message: 'Error al registrar el estado civil.' });
     }
   }
 
 
-  public async ActualizarGenero(req: Request, res: Response): Promise<Response> {
+  public async ActualizarEstadoCivil(req: Request, res: Response): Promise<Response> {
     try {
-      const { genero, id, user_name, ip, ip_local } = req.body;
+      const { estado, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
+      const rol = await pool.query(`SELECT * FROM e_estado_civil WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'e_genero',
+          tabla: 'e_estado_civil',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
           ip_local: ip_local,
-          observacion: `Error al actualizar el genero con id ${id}. Registro no encontrado.`
+          observacion: `Error al actualizar el estado civil con id ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -117,13 +117,13 @@ class GeneroControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE e_genero SET genero = $1 WHERE id = $2 RETURNING *
+        UPDATE e_estado_civil SET estado_civil = $1 WHERE id = $2 RETURNING *
         `
-        , [genero, id]);
+        , [estado, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'e_genero',
+        tabla: 'e_estado_civil',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -148,7 +148,7 @@ class GeneroControlador {
 
 
   // METODO PARA ELIMINAR REGISTROS   **USADO
-  public async EliminarGenero(req: Request, res: Response): Promise<Response> {
+  public async EliminarEstadoCivil(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
@@ -157,12 +157,12 @@ class GeneroControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
+      const consulta = await pool.query(`SELECT * FROM e_estado_civil WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'e_genero',
+          tabla: 'e_estado_civil',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -178,13 +178,13 @@ class GeneroControlador {
       }
       await pool.query(
         `
-        DELETE FROM e_genero WHERE id = $1
+        DELETE FROM e_estado_civil WHERE id = $1
         `
         , [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'e_genero',
+        tabla: 'e_estado_civil',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -206,5 +206,5 @@ class GeneroControlador {
   }
 }
 
-export const GENERO_CONTROLADOR = new GeneroControlador();
-export default GENERO_CONTROLADOR;
+export const ESTADO_CIVIL_CONTROLADOR = new EstadoCivilControlador();
+export default ESTADO_CIVIL_CONTROLADOR;

@@ -3,6 +3,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
+import { ToastrService } from 'ngx-toastr';
+import { DateTime } from 'luxon';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -13,7 +15,8 @@ import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.se
 import { MatDialog } from '@angular/material/dialog';
 import { RegistrarGeneroComponent } from '../registrar-genero/registrar-genero.component';
 import { EditarGeneroComponent } from '../editar-genero/editar-genero.component';
-
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-listar-genero',
   standalone: false,
@@ -58,6 +61,8 @@ export class ListarGeneroComponent {
     public restE: EmpleadoService,
     public restG: GenerosService,
     public ventana: MatDialog,
+    private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
+    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
 
 
 
@@ -78,7 +83,7 @@ export class ListarGeneroComponent {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    this.ListarGeneros()
+    this.ListarGeneros();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
@@ -178,8 +183,63 @@ export class ListarGeneroComponent {
   }
 
   ConfirmarDeleteMultiple() {
-
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.generosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.generosEliminar = [];
+            this.selectionGeneros.clear();
+            this.ListarGeneros();
+          } else {
+            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/nivelTitulos']);
+        }
+      });
   }
+
+
+    // METODO DE ELIMINACION MULTIPLE
+    contador: number = 0;
+    ingresar: boolean = false;
+    EliminarMultiple() {
+      const data = {
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales
+      };
+      this.ingresar = false;
+      this.contador = 0;
+      this.generosEliminar = this.selectionGeneros.selected;
+      this.generosEliminar.forEach((datos: any) => {
+        this.generos = this.generos.filter(item => item.id !== datos.id);
+        this.contador = this.contador + 1;
+        this.restG.EliminarGenero(datos.id, data).subscribe((res: any) => {
+          if (res.message === 'error') {
+            this.toastr.error('Existen datos relacionados con ' + datos.genero + '.', 'No fue posible eliminar.', {
+              timeOut: 6000,
+            });
+            this.contador = this.contador - 1;
+          } else {
+            if (!this.ingresar) {
+              this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+                timeOut: 6000,
+              });
+              this.ingresar = true;
+            }
+            this.ListarGeneros();
+          }
+        });
+      }
+      )
+    }
+  
 
 
   ManejarPagina(e: PageEvent) {
@@ -231,7 +291,44 @@ export class ListarGeneroComponent {
 
   ConfirmarDelete(datos: any) {
 
+        this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+          .subscribe((confirmado: Boolean) => {
+            if (confirmado) {
+              this.Eliminar(datos.id);
+              this.activar_seleccion = true;
+              this.plan_multiple = false;
+              this.plan_multiple_ = false;
+              this.generosEliminar = [];
+              this.selectionGeneros.clear();
+              this.ListarGeneros();
+            } else {
+              this.router.navigate(['/nivelTitulos']);
+            }
+          });
   }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_nivel: number) {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    };
+    this.restG.EliminarGenero(id_nivel, data).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListarGeneros();
+      }
+    });
+  }
+
+
+  
 
 
 
@@ -251,7 +348,7 @@ export class ListarGeneroComponent {
         pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download('Generos' + '.pdf');
+        pdfMake.createPdf(documentDefinition).download('Géneros' + '.pdf');
         break;
 
       default:
@@ -262,11 +359,206 @@ export class ListarGeneroComponent {
 
 
   DefinirInformacionPDF() {
-
+  return {
+      // ENCABEZADO DE LA PAGINA
+      watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+      header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      // PIE DE LA PAGINA
+      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var f = DateTime.now();
+        fecha = f.toFormat('yyyy-MM-dd');
+        hora = f.toFormat('HH:mm:ss');
+        return {
+          margin: 10,
+          columns: [
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
+            {
+              text: [
+                {
+                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  alignment: 'right', opacity: 0.3
+                }
+              ],
+            }
+          ],
+          fontSize: 10
+        }
+      },
+      content: [
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE GÉNEROS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        this.PresentarDataPDF(),
+      ],
+      styles: {
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTableD: { fontSize: 8, alignment: 'center' },
+        itemsTable: { fontSize: 8 },
+        tableMargin: { margin: [0, 5, 0, 0] },
+      }
+    };
   }
 
-  async generarExcelProvincias() {
+
+  PresentarDataPDF() {
+    return {
+      columns: [
+        { width: '*', text: '' },
+        {
+          width: 'auto',
+          style: 'tableMargin',
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'GENERO', style: 'tableHeader' },
+              ],
+              ...this.generos.map((obj: any) => {
+                return [
+                  { text: obj.id, style: 'itemsTableD' },
+                  { text: obj.genero, style: 'itemsTable' },
+                ];
+              })
+            ]
+          },
+          // ESTILO DE COLORES FORMATO ZEBRA
+          layout: {
+            fillColor: function (i: any) {
+              return (i % 2 === 0) ? '#CCD1D1' : null;
+            }
+          }
+        },
+        { width: '*', text: '' },
+      ]
+    };
   }
+
+
+  async generarExcelGeneros() {
+ this.OrdenarDatos(this.generos);
+
+    const generos: any[] = [];
+    this.generos.forEach((nivel: any, index: number) => {
+      generos.push([
+        index + 1,
+        nivel.id,
+        nivel.genero,
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Género");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Géneros".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 20 },
+      { key: "codigo", width: 30 },
+      { key: "genero", width: 40 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "GENERO", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "NivelesTitulosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: generos,
+    });
+
+
+    const numeroFilas = generos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "GenerosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+  OrdenarDatos(array: any) {
+    function compare(a: any, b: any) {
+      if (a.id < b.id) {
+        return -1;
+      }
+      if (a.id > b.id) {
+        return 1;
+      }
+      return 0;
+    }
+    array.sort(compare);
+  }
+
 
 
 
@@ -277,7 +569,7 @@ export class ListarGeneroComponent {
   ExportToCSV() {
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('ProvinciasCSV');
+    const worksheet = workbook.addWorksheet('GénerosCSV');
     //  Agregar encabezados dinámicos basados en las claves del primer objeto
     const keys = Object.keys(this.generos[0] || {}); // Obtener las claves
     worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
@@ -288,7 +580,7 @@ export class ListarGeneroComponent {
 
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
-      FileSaver.saveAs(data, "ProvinciasCSV.csv");
+      FileSaver.saveAs(data, "GénerosCSV.csv");
     });
 
   }
@@ -301,20 +593,19 @@ export class ListarGeneroComponent {
   data: any = [];
   exportToXML() {
     var objeto: any;
-    var arregloProvincias: any = [];
+    var arregloGeneros: any = [];
     this.generos.forEach((obj: any) => {
       objeto = {
-        provincia: {
+        genero: {
           "$": { "id": obj.id },
-          nombre: obj.nombre,
-          pais: obj.pais
+          genero: obj.genero,
         },
       };
-      arregloProvincias.push(objeto);
+      arregloGeneros.push(objeto);
     });
 
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Provincias' });
-    const xml = xmlBuilder.buildObject(arregloProvincias);
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Géneros' });
+    const xml = xmlBuilder.buildObject(arregloGeneros);
 
     if (xml === undefined) {
       return;
@@ -334,9 +625,12 @@ export class ListarGeneroComponent {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = 'Provincias.xml';
+    a.download = 'Géneros.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
+
+
+  
 
 }
