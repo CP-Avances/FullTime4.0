@@ -70,7 +70,6 @@
         </mat-paginator>
     </div>
 
-
     <!--  **************************** INFORMACION DE EMPLEADO PROCESO *********************************  -->
     <div style="padding-bottom: 10px;" *ngIf="infoEmpleProceso">
         <div class="d-flex bd-highlight" id="titulo">
@@ -97,7 +96,7 @@
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
-                                class="fas fa-pencil" id="t-edit" >
+                                class="fas fa-pen" id="t-editar" (click)="AbrirVentanaEditar(pro)">
                                 <p>Editar</p>
                             </i>
                             <i matSuffix matTooltipPosition="right"

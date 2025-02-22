@@ -338,6 +338,7 @@ import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPe
 import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/empleado-proceso/empleado-proceso.component';
 import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/empleado-grado/empleado-grado.component';
 import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/empleado-grupo/empleado-grupo.component';
+import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/editar-registro/editar-registro.component';
 
 @NgModule({
   declarations: [
@@ -633,6 +634,7 @@ import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/i
     EmpleadoProcesoComponent,
     EmpleadoGradoComponent,
     EmpleadoGrupoComponent,
+    EditarRegistroComponent,
 
   ],
 

@@ -37,6 +37,22 @@ class GradoControlador {
             }
         });
     }
+    // METODO PARA BUSCAR EL GRADO POR EL ID DEL EMPLEADO **USADO 
+    GradoByEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            console.log('req.params: ', req.params);
+            const EMPLEADO_GRADO = yield database_1.default.query(`
+      SELECT eg.id, eg.id_grado, eg.estado, cg.descripcion AS grado 
+      FROM map_empleado_grado AS eg, map_cat_grado AS cg
+      WHERE eg.id_empleado = $1 AND eg.id_grado = cg.id
+      `, [id_empleado]);
+            if (EMPLEADO_GRADO.rowCount != 0) {
+                return res.status(200).jsonp({ grados: EMPLEADO_GRADO.rows, text: 'correcto', status: 200 });
+            }
+            res.status(404).jsonp({ grados: undefined, text: 'Registro no encontrado.', status: 400 });
+        });
+    }
     // METODO PARA INSERTAR EL GRADO **USADO 
     IngresarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -140,6 +156,58 @@ class GradoControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al eliminar el grado' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR EL GRADO POR EMPLEADO **USADO 
+    EliminarEmpleGrado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { user_name, ip, ip_local } = req.body;
+                const id = req.params.id;
+                console.log('id: ', id);
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const proceso = yield database_1.default.query('SELECT * FROM map_empleado_grado WHERE id = $1', [id]);
+                const [datosOriginales] = proceso.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_empleado_grado',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar proceso con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM map_empleado_grado WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'map_empleado_grado',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
             }
         });
     }

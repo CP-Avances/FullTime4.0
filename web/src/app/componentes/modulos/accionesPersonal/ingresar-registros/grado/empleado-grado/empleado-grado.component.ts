@@ -4,12 +4,15 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { EditarRegistroComponent } from '../../editar-registro/editar-registro.component';
 
 @Component({
   selector: 'app-empleado-grado',
@@ -43,6 +46,13 @@ export class EmpleadoGradoComponent {
   
     // VARIABLE PARA SELECCION MULTIPLE USUARIOS
     usuariosSeleccionados = new SelectionModel<any>(true, []);
+
+    //VARIABLE PARA MOSTRAR EL COMPONENTE DE INFORMACION DE GRADO DEL EMPLEADO Y OCULTAR LA TABLA
+    infoEmpleGrado: boolean = false
+    nombreUsuarioSelect: string = ''
+    idEmpleadoSelec: any;
+    listaEmpleGrado: any = []
+    listaGrados: any = []
   
     constructor(
       public departamentoService: DepartamentosService,
@@ -52,6 +62,7 @@ export class EmpleadoGradoComponent {
       public toastr: ToastrService,
       private usuario: UsuarioService,
       public validar: ValidacionesService,
+      private rest: CatGradoService
     ) {
       this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -66,6 +77,16 @@ export class EmpleadoGradoComponent {
       console.log('dataList: ',this.data)
       this.name_sucursal = this.data.nombre
       this.BuscarUsuariosSucursal();
+      this.OptenerListGrados();
+    }
+
+    OptenerListGrados(){
+      this.listaGrados = []
+      this.rest.ConsultarGrados().subscribe({
+        next:(respuesta: any) => {
+          this.listaGrados = respuesta
+        }
+      })
     }
   
     // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
@@ -149,6 +170,73 @@ export class EmpleadoGradoComponent {
     }
   
     Visualizar(valor: any){
-  
+    this.listaEmpleGrado = []
+    this.rest.ObtenerGradoUsuario(valor.id).subscribe({
+      next: (respuesta: any) => {
+        if (respuesta.status == 200) {
+
+          console.log('respuesta: ', respuesta)
+
+          this.nombreUsuarioSelect = valor.apellido + ' ' + valor.nombre
+          this.idEmpleadoSelec = valor.id
+          this.listaEmpleGrado = respuesta.grados
+          this.infoEmpleGrado = true;
+        } else {
+          this.infoEmpleGrado = false;
+        }
+      }, error: (err: any) => {
+        this.listaEmpleGrado = []
+        console.log('err: ', err)
+        this.infoEmpleGrado = false;
+        this.toastr.warning(err.error.text, 'Advertencia.', {
+          timeOut: 4500,
+        });
+      },
+    })
+  }
+
+  AbrirVentanaEditar(pro: any) {
+    const datos = {
+      tipo: 'grados',
+      info: pro,
+      listAccion: this.listaGrados
     }
+
+    this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          //this.ngOnInit();
+        }
+      });
+  }
+
+  ConfirmarDelete(gra: any) {
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarRegistro(gra);
+        }
+      });
+  }
+
+  EliminarRegistro(grado: any) {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+      ip_local: this.ips_locales
+    }
+    this.rest.EliminarGradoEmple(grado.id, data).subscribe({
+      next: (respuesta: any) => {
+        this.toastr.success(respuesta.message, 'Correcto.', {
+          timeOut: 4500,
+        });
+      },error: (err: any) => {
+        this.toastr.error(err.error.message, 'Error.', {
+          timeOut: 4500,
+        });
+     },
+   })
+
+  }
 }

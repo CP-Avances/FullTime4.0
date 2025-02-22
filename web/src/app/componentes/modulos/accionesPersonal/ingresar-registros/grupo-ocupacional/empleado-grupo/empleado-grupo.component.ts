@@ -4,12 +4,15 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { EditarRegistroComponent } from '../../editar-registro/editar-registro.component';
 
 @Component({
   selector: 'app-empleado-grupo',
@@ -44,6 +47,13 @@ export class EmpleadoGrupoComponent {
   
     // VARIABLE PARA SELECCION MULTIPLE USUARIOS
     usuariosSeleccionados = new SelectionModel<any>(true, []);
+
+    //VARIABLE PARA MOSTRAR EL COMPONENTE DE INFORMACION DE PROCESO DEL EMPLEADO Y OCULTAR LA TABLA
+    infoEmpleGrupo: boolean = false
+    nombreUsuarioSelect: string = ''
+    idEmpleadoSelec: any;
+    listaEmpleGrupo: any = []
+    listaGrupo: any = []
   
     constructor(
       public departamentoService: DepartamentosService,
@@ -53,6 +63,7 @@ export class EmpleadoGrupoComponent {
       public toastr: ToastrService,
       private usuario: UsuarioService,
       public validar: ValidacionesService,
+      private rest: CatGrupoOcupacionalService
     ) {
       this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -66,7 +77,18 @@ export class EmpleadoGrupoComponent {
   
       console.log('dataList: ',this.data)
       this.name_sucursal = this.data.nombre
+      this.infoEmpleGrupo = false;
       this.BuscarUsuariosSucursal();
+      this.OptenerListGrupo();
+    }
+
+    OptenerListGrupo(){
+      this.listaGrupo = []
+      this.rest.ConsultarGrupoOcupacion().subscribe({
+        next:(respuesta: any) => {
+          this.listaGrupo = respuesta
+        }
+      })
     }
   
     // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
@@ -105,6 +127,51 @@ export class EmpleadoGrupoComponent {
       this.tamanio_pagina_a = e.pageSize;
       this.numero_pagina_a = e.pageIndex + 1;
     }
+
+    AbrirVentanaEditar(gru: any){
+        const datos = {
+          tipo: 'grupo',
+          info: gru,
+          listAccion: this.listaGrupo
+        }
+    
+        this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()
+          .subscribe((confirmado: Boolean) => {
+            if (confirmado) {
+              this.ngOnInit();
+            }
+          });
+      }
+    
+      ConfirmarDelete(gru: any){
+        const mensaje = 'eliminar';
+        this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+          .subscribe((confirmado: Boolean) => {
+            if (confirmado) {
+              this.EliminarRegistro(gru);
+            }
+          });
+      }
+      
+      EliminarRegistro(grup: any){
+        const data = {
+          user_name: this.user_name,
+          ip: this.ip,
+          ip_local: this.ips_locales
+        }
+        this.rest.EliminarGrupoOcupaEmple(grup.id, data).subscribe({
+           next: (respuesta: any) => {
+             this.toastr.success(respuesta.message, 'Correcto.', {
+               timeOut: 4500,
+             });
+           },error: (err: any) => {
+             this.toastr.error(err.error.message, 'Error.', {
+               timeOut: 4500,
+             });
+          },
+        })
+      }
+    
   
     // // METODO DE GUARDADO EN UNA LISTA LOS ELEMENTOS SELECCIONADOS
     selectionAsignados = new SelectionModel<ITableEmpleados>(true, []);
@@ -149,8 +216,27 @@ export class EmpleadoGrupoComponent {
       return `${this.usuariosSeleccionados.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
     }
   
-    Visualizar(valor: any){
-  
-    }
+  Visualizar(valor: any) {
+    this.listaEmpleGrupo = []
+    this.rest.ObtenerGrupoUsuario(valor.id).subscribe({
+      next: (respuesta: any) => {
+        if (respuesta.status == 200) {
+          this.nombreUsuarioSelect = valor.apellido + ' ' + valor.nombre
+          this.idEmpleadoSelec = valor.id
+          this.listaEmpleGrupo = respuesta.grupo
+          this.infoEmpleGrupo = true;
+        } else {
+          this.infoEmpleGrupo = false;
+        }
+      }, error: (err: any) => {
+        this.listaEmpleGrupo = []
+        console.log('err: ', err)
+        this.infoEmpleGrupo = false;
+        this.toastr.warning(err.error.text, 'Advertencia.', {
+          timeOut: 4500,
+        });
+      },
+    })
+  }
 
 }

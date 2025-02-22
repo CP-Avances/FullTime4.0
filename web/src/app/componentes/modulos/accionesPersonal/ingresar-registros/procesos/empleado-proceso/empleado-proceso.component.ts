@@ -14,6 +14,8 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { PageEvent } from '@angular/material/paginator';
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { EditarRegistroComponent } from '../../editar-registro/editar-registro.component';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 @Component({
   selector: 'app-empleado-proceso',
@@ -54,6 +56,7 @@ export class EmpleadoProcesoComponent {
   nombreUsuarioSelect: string = ''
   idEmpleadoSelec: any;
   listaEmpleProce: any = []
+  listaProcesos: any = []
 
   constructor(
     public departamentoService: DepartamentosService,
@@ -63,7 +66,8 @@ export class EmpleadoProcesoComponent {
     public toastr: ToastrService,
     private usuario: UsuarioService,
     public validar: ValidacionesService,
-    private rest: EmpleadoProcesosService
+    private rest: EmpleadoProcesosService,
+    private restPro: ProcesoService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -79,6 +83,16 @@ export class EmpleadoProcesoComponent {
     this.name_sucursal = this.data.nombre
     this.BuscarUsuariosSucursal();
     this.infoEmpleProceso = false;
+    this.OptenerListProcesos();
+  }
+
+  OptenerListProcesos(){
+    this.listaProcesos = []
+    this.restPro.ConsultarProcesos().subscribe({
+      next:(respuesta: any) => {
+        this.listaProcesos = respuesta
+      }
+    })
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
@@ -184,8 +198,19 @@ export class EmpleadoProcesoComponent {
     })
   }
 
-  AbrirVentanaEditar(pro){
+  AbrirVentanaEditar(pro: any){
+    const datos = {
+      tipo: 'proceso',
+      info: pro,
+      listAccion: this.listaProcesos
+    }
 
+    this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.ngOnInit();
+        }
+      });
   }
 
   ConfirmarDelete(pro){
@@ -201,7 +226,6 @@ export class EmpleadoProcesoComponent {
     console.log('data: ',data)
     this.rest.EliminarRegistro(data.id, data).subscribe({
       next: (respuesta: any) => {
-        this.Visualizar(this.idEmpleadoSelec)
         this.toastr.success(respuesta.message, 'Correcto.', {
           timeOut: 4500,
         });

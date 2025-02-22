@@ -220,7 +220,6 @@ class ProcesoControlador {
     };
   }
 
-
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     try {

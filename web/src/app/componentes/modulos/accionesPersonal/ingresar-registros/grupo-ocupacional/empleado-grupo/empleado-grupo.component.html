@@ -1,6 +1,6 @@
 <div class="mat-elevation-z8" style="background: white;" style="padding-bottom: 5px;">
     <!--  **************************** LISTA DE USUARIOS QUE PERTENECEN A UNA SUCURSAL *********************************  -->
-    <div style="padding-bottom: 10px;">
+    <div style="padding-bottom: 10px;" *ngIf="!infoEmpleGrupo">
         <div class="d-flex bd-highlight" id="titulo">
             <div class="w-100 bd-highlight">
                 <span>Usuarios que pertenecen a {{name_sucursal}}</span>
@@ -11,13 +11,13 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th>
+                        <!-- <th>
                             <mat-checkbox (change)="$event ? masterToggleU() : null"
                                 [checked]="usuariosSeleccionados.hasValue() && isAllSelectedU()"
                                 [indeterminate]="usuariosSeleccionados.hasValue() && !isAllSelectedU()"
                                 [aria-label]="checkboxLabelU()">
                             </mat-checkbox>
-                        </th>
+                        </th> -->
                         <th scope="col">Rol</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Departamento</th>
@@ -26,7 +26,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td></td>
+                        <!-- <td></td> -->
                         <td>
                             <mat-form-field class="input-tables">
                                 <input matInput placeholder="Buscar" type="text" [formControl]="rol">
@@ -46,12 +46,12 @@
                     </tr>
                     <tr
                         *ngFor="let u of usuarios | roles: rol.value | nombreCompleto: nombre.value | departamento: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
-                        <td>
+                        <!-- <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? usuariosSeleccionados.toggle(u) : null"
                                 [checked]="usuariosSeleccionados.isSelected(u)" [aria-label]="checkboxLabelU(u)">
                             </mat-checkbox>
-                        </td>
+                        </td> -->
                         <td>{{u.name_rol}}</td>
                         <td>{{u.apellido}} {{u.nombre}} </td>
                         <td>{{u.name_dep}}</td>
@@ -67,6 +67,49 @@
             </table>
         </div>
         <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina_p"
+            [pageSizeOptions]="pageSizeOptions_p" (page)="ManejarPaginaPrincipal($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+    <!--  **************************** INFORMACION DE EMPLEADO PROCESO *********************************  -->
+    <div style="padding-bottom: 10px;" *ngIf="infoEmpleGrupo">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <span>{{nombreUsuarioSelect.toLocaleUpperCase()}}</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Id</th>
+                        <th scope="col">Grupo Ocupacional</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let gru of listaEmpleGrupo | paginate: tamanio_pagina_p:numero_pagina_p">
+                        <td>{{gru.id}}</td>
+                        <td>{{gru.grupo.toLocaleUpperCase()}} </td>
+                        <td>{{gru.estado ? 'ACTIVO' : 'INACTIVO'}}</td>
+                        <td class="justify-content-center">
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                class="fas fa-pen" id="t-editar" (click)="AbrirVentanaEditar(gru)">
+                                <p>Editar</p>
+                            </i>
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                class="fas fa-trash" id="t-ver" (click)="ConfirmarDelete(gru)">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaEmpleGrupo.length" [pageSize]="tamanio_pagina_p"
             [pageSizeOptions]="pageSizeOptions_p" (page)="ManejarPaginaPrincipal($event)" showFirstLastButtons>
         </mat-paginator>
     </div>

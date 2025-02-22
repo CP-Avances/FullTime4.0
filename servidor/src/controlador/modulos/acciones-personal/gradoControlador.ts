@@ -31,6 +31,26 @@ class GradoControlador {
 
   }
 
+  // METODO PARA BUSCAR EL GRADO POR EL ID DEL EMPLEADO **USADO 
+  public async GradoByEmple(req: Request, res: Response) {
+    const { id_empleado } = req.params;
+
+    console.log('req.params: ',req.params)
+
+    const EMPLEADO_GRADO = await pool.query(
+      `
+      SELECT eg.id, eg.id_grado, eg.estado, cg.descripcion AS grado 
+      FROM map_empleado_grado AS eg, map_cat_grado AS cg
+      WHERE eg.id_empleado = $1 AND eg.id_grado = cg.id
+      `
+      , [id_empleado]);
+    if (EMPLEADO_GRADO.rowCount != 0) {
+      return res.status(200).jsonp({grados: EMPLEADO_GRADO.rows, text: 'correcto', status: 200})
+    }
+
+    res.status(404).jsonp({grados: undefined, text: 'Registro no encontrado.', status: 400 });
+  }
+
   // METODO PARA INSERTAR EL GRADO **USADO 
   public async IngresarGrados(req: Request, res: Response) {
 
@@ -168,6 +188,65 @@ class GradoControlador {
       res.status(500).jsonp({ message: 'Error al eliminar el grado'});
     }
 
+  }
+
+  // METODO PARA ELIMINAR EL GRADO POR EMPLEADO **USADO 
+  public async EliminarEmpleGrado(req: Request, res: Response){
+    try {
+      const { user_name, ip, ip_local } = req.body;
+      const id = req.params.id;
+
+      console.log('id: ',id);
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const proceso = await pool.query('SELECT * FROM map_empleado_grado WHERE id = $1', [id]);
+      const [datosOriginales] = proceso.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_empleado_grado',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al eliminar proceso con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM map_empleado_grado WHERE id = $1
+        `, [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'map_empleado_grado',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.status(200).jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+    }
   }
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR  **USADO

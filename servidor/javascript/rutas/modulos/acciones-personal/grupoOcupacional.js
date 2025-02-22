@@ -26,9 +26,12 @@ class GrupoOcupacionalRutas {
     configuracion() {
         // METODO PARA CONSULTAR GRUPO OCUPACIONAL
         this.router.get('/', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.listaGrupoOcupacional);
+        this.router.get('/infoGrupo/:id_empleado', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.GrupoOcupacionalByEmple);
         this.router.post('/', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.IngresarGrupoOcupacional);
         this.router.put('/update', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EditarGrupoOcupacional);
         this.router.delete('/delete', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EliminarGrupoOcupacional);
+        // METODO PARA ELIMINAR EL GRUPO OCUPACIONAL POR EMPLEADO **USADO
+        this.router.delete('/deleteGrupoOcupacional/:id', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EliminarEmpleGrupoOcupacional);
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], grupoOcupacionalControlador_1.default.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO

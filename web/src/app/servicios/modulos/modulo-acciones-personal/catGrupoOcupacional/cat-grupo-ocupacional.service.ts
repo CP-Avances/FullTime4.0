@@ -16,6 +16,12 @@ export class CatGrupoOcupacionalService {
     return this.http.get(`${environment.url}/grupoOcupacional`);
   }
 
+  // METODO PARA OBTENER GRUPO OCUPACIONAL DEL USUARIO   **USADO
+  ObtenerGrupoUsuario(id_empl: number) {
+    console.log('id_empleado: ',id_empl)
+    return this.http.get<any>(`${environment.url}/grupoOcupacional/infoGrupo/${id_empl}`);
+  }
+
   // METODO PARA INGRESAR REGISTRO  **USADO
   IngresarGrupoOcupacion(form: any){
     return this.http.post(`${environment.url}/grupoOcupacional`, form)
@@ -32,6 +38,16 @@ export class CatGrupoOcupacionalService {
       body: form
     };
     return this.http.delete(`${environment.url}/grupoOcupacional/delete`, httpOtions)
+  }
+
+  // METODO PARA ELIMINAR GRUPO OCUPACIONAL POR EMPLEADO **USADO
+  EliminarGrupoOcupaEmple(id: number, datos: any){
+    console.log('enviar id: ',id);
+    const url = `${environment.url}/grupoOcupacional/deleteGrupoOcupacional/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO

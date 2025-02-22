@@ -11,9 +11,15 @@ export class CatGradoService {
       private http: HttpClient,
     ) { }
 
-  // catalogo de Grado
+  // catalogo de Grado **USADO
   ConsultarGrados() {
     return this.http.get(`${environment.url}/grado`);
+  }
+
+   // METODO PARA OBTENER GRADO DEL USUARIO   **USADO
+   ObtenerGradoUsuario(id_empl: number) {
+    console.log('id_empleado: ',id_empl)
+    return this.http.get<any>(`${environment.url}/grado/infoGrado/${id_empl}`);
   }
 
   // METODO PARA INGRESAR REGISTRO  **USADO
@@ -33,6 +39,16 @@ export class CatGradoService {
     };
     return this.http.delete(`${environment.url}/grado/delete`, httpOtions)
   }
+
+    // METODO PARA ELIMINAR GRADO POR EMPLEADO **USADO
+    EliminarGradoEmple(id: number, datos: any){
+      console.log('enviar id: ',id);
+      const url = `${environment.url}/grado/deleteGradoEmple/${id}`;
+      const httpOtions = {
+        body: datos
+      };
+      return this.http.request('delete', url, httpOtions);
+    }
 
    // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
    RevisarFormato(formData: any) {
