@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
@@ -52,6 +54,8 @@ export class EditarEmpleadoComponent implements OnInit {
     public ventana: MatDialogRef<EditarEmpleadoComponent>,
     public validar: ValidacionesService,
     public loginService: LoginService,
+    public generoS: GenerosService,
+    public estadoS: EstadoCivilService,
     @Inject(MAT_DIALOG_DATA) public empleado: any
   ) {
     this.idEmpleado = this.empleado.id;
@@ -60,14 +64,16 @@ export class EditarEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.CargarRoles();
     this.VerificarFormulario();
     this.ObtenerNacionalidades();
+    this.ObtenerEstadoCivil();
+    this.ObtenerGeneros();
     this.VerificarCodigo();
   }
 
@@ -98,10 +104,10 @@ export class EditarEmpleadoComponent implements OnInit {
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
-      estadoCivilForm: ['', Validators.required],
+      estadoCivilForm: [0, Validators.required],
       domicilioForm: [''],
       telefonoForm: [''],
-      generoForm: ['', Validators.required],
+      generoForm: [0, Validators.required],
       estadoForm: ['', Validators.required],
     });
     this.terceroFormGroup = this._formBuilder.group({
@@ -119,6 +125,37 @@ export class EditarEmpleadoComponent implements OnInit {
         startWith(''),
         map((value: any) => this._filter(value))
       );
+    });
+  }
+
+estados_civil: any = []
+  // METODO PARA LISTAR NACIONALIDADES
+  ObtenerEstadoCivil() {
+    this.estadoS.ListarEstadoCivil().subscribe(res => {
+      this.estados_civil = res;
+      this.ObtenerEmpleado();
+      /*
+      this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
+        startWith(''),
+        map((value: any) => this._filter(value))
+      );
+      */
+    });
+  }
+
+  // METODO PARA LISTAR NACIONALIDADES
+  generos: any = []
+
+  ObtenerGeneros() {
+    this.generoS.ListarGeneros().subscribe(res => {
+      this.generos = res;
+      this.ObtenerEmpleado();
+      /*
+      this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
+        startWith(''),
+        map((value: any) => this._filter(value))
+      );
+      */
     });
   }
 

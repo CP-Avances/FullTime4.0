@@ -74,7 +74,7 @@ export class EditarEstadoCivilComponent {
       ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
-    if ((estado.estado).toUpperCase() === (this.data.genero).toUpperCase()) {
+    if ((estado.estado).toUpperCase() === (this.data.estado_civil).toUpperCase()) {
       this.AlmacenarTitulo(estado);
     }
     else {

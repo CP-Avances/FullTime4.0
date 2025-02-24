@@ -167,8 +167,8 @@ export class ListarEstadoCivilComponent {
       this.activar_seleccion = true;
       this.plan_multiple = false;
       this.plan_multiple_ = false;
-      this.selectionGeneros.clear();
-      this.generosEliminar = [];
+      this.selectionEstadosCivil.clear();
+      this.estadosCivilEliminar = [];
     }
   
   
@@ -191,13 +191,13 @@ export class ListarEstadoCivilComponent {
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
-            if (this.generosEliminar.length != 0) {
+            if (this.estadosCivilEliminar.length != 0) {
               this.EliminarMultiple();
               this.activar_seleccion = true;
               this.plan_multiple = false;
               this.plan_multiple_ = false;
-              this.generosEliminar = [];
-              this.selectionGeneros.clear();
+              this.estadosCivilEliminar = [];
+              this.selectionEstadosCivil.clear();
               this.ListarEstadoCivil();
             } else {
               this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
@@ -221,13 +221,13 @@ export class ListarEstadoCivilComponent {
         };
         this.ingresar = false;
         this.contador = 0;
-        this.generosEliminar = this.selectionGeneros.selected;
-        this.generosEliminar.forEach((datos: any) => {
+        this.estadosCivilEliminar = this.selectionEstadosCivil.selected;
+        this.estadosCivilEliminar.forEach((datos: any) => {
           this.estadosCivil = this.estadosCivil.filter(item => item.id !== datos.id);
           this.contador = this.contador + 1;
           this.restEC.EliminarEstadoCivil(datos.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
-              this.toastr.error('Existen datos relacionados con ' + datos.genero + '.', 'No fue posible eliminar.', {
+              this.toastr.error('Existen datos relacionados con ' + datos.estado_civil + '.', 'No fue posible eliminar.', {
                 timeOut: 6000,
               });
               this.contador = this.contador - 1;
@@ -267,21 +267,21 @@ export class ListarEstadoCivilComponent {
     activar_seleccion: boolean = true;
     seleccion_vacia: boolean = true;
   
-    selectionGeneros = new SelectionModel<any>(true, []);
+    selectionEstadosCivil = new SelectionModel<any>(true, []);
   
-    generosEliminar: any = []
+    estadosCivilEliminar: any = []
   
     // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
     isAllSelectedPag() {
-      const numSelected = this.selectionGeneros.selected.length;
+      const numSelected = this.selectionEstadosCivil.selected.length;
       return numSelected === this.estadosCivil.length
     }
   
     // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
     masterTogglePag() {
       this.isAllSelectedPag() ?
-        this.selectionGeneros.clear() :
-        this.estadosCivil.forEach((row: any) => this.selectionGeneros.select(row));
+        this.selectionEstadosCivil.clear() :
+        this.estadosCivil.forEach((row: any) => this.selectionEstadosCivil.select(row));
     }
   
     // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -289,8 +289,8 @@ export class ListarEstadoCivilComponent {
       if (!row) {
         return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
       }
-      this.generosEliminar = this.selectionGeneros.selected;
-      return `${this.selectionGeneros.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+      this.estadosCivilEliminar = this.selectionEstadosCivil.selected;
+      return `${this.selectionEstadosCivil.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
     }
   
   
@@ -303,11 +303,11 @@ export class ListarEstadoCivilComponent {
                 this.activar_seleccion = true;
                 this.plan_multiple = false;
                 this.plan_multiple_ = false;
-                this.generosEliminar = [];
-                this.selectionGeneros.clear();
+                this.estadosCivilEliminar = [];
+                this.selectionEstadosCivil.clear();
                 this.ListarEstadoCivil();
               } else {
-                this.router.navigate(['/nivelTitulos']);
+                this.router.navigate(['/estado-civil']);
               }
             });
     }
@@ -332,11 +332,6 @@ export class ListarEstadoCivilComponent {
       });
     }
   
-  
-    
-  
-  
-  
     IngresarSoloLetras(e: any) {
       return this.validar.IngresarSoloLetras(e);
     }
@@ -353,7 +348,7 @@ export class ListarEstadoCivilComponent {
           pdfMake.createPdf(documentDefinition).print();
           break;
         case "download":
-          pdfMake.createPdf(documentDefinition).download('Géneros' + '.pdf');
+          pdfMake.createPdf(documentDefinition).download('Estados_Civil' + '.pdf');
           break;
   
         default:
@@ -392,7 +387,7 @@ export class ListarEstadoCivilComponent {
         content: [
           { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
           { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-          { text: 'LISTA DE GÉNEROS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+          { text: 'LISTA DE ESTADOS CIVIL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
           this.PresentarDataPDF(),
         ],
         styles: {
@@ -417,12 +412,12 @@ export class ListarEstadoCivilComponent {
               body: [
                 [
                   { text: 'CÓDIGO', style: 'tableHeader' },
-                  { text: 'GENERO', style: 'tableHeader' },
+                  { text: 'ESTADO CIVIL', style: 'tableHeader' },
                 ],
                 ...this.estadosCivil.map((obj: any) => {
                   return [
                     { text: obj.id, style: 'itemsTableD' },
-                    { text: obj.genero, style: 'itemsTable' },
+                    { text: obj.estado_civil, style: 'itemsTable' },
                   ];
                 })
               ]
@@ -448,12 +443,12 @@ export class ListarEstadoCivilComponent {
         generos.push([
           index + 1,
           nivel.id,
-          nivel.genero,
+          nivel.estado_civil,
         ]);
       });
   
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Género");
+      const worksheet = workbook.addWorksheet("Estado Civil");
   
   
       console.log("ver logo. ", this.logo)
@@ -476,7 +471,7 @@ export class ListarEstadoCivilComponent {
   
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
       worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
-      worksheet.getCell("B2").value = "Lista de Géneros".toUpperCase();
+      worksheet.getCell("B2").value = "Lista de Estados Civil".toUpperCase();
   
       // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
       ["B1", "B2"].forEach((cell) => {
@@ -491,14 +486,14 @@ export class ListarEstadoCivilComponent {
       worksheet.columns = [
         { key: "n", width: 20 },
         { key: "codigo", width: 30 },
-        { key: "genero", width: 40 },
+        { key: "estado", width: 40 },
       ];
   
   
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
         { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
-        { name: "GENERO", totalsRowLabel: "", filterButton: true },
+        { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
       ];
   
       worksheet.addTable({
@@ -535,7 +530,7 @@ export class ListarEstadoCivilComponent {
       try {
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: "application/octet-stream" });
-        FileSaver.saveAs(blob, "GenerosEXCEL.xlsx");
+        FileSaver.saveAs(blob, "EstadoCivilEXCEL.xlsx");
       } catch (error) {
         console.error("Error al generar el archivo Excel:", error);
       }
@@ -574,7 +569,7 @@ export class ListarEstadoCivilComponent {
     ExportToCSV() {
   
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('GénerosCSV');
+      const worksheet = workbook.addWorksheet('EstadosCivilCSV');
       //  Agregar encabezados dinámicos basados en las claves del primer objeto
       const keys = Object.keys(this.estadosCivil[0] || {}); // Obtener las claves
       worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
@@ -585,7 +580,7 @@ export class ListarEstadoCivilComponent {
   
       workbook.csv.writeBuffer().then((buffer) => {
         const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
-        FileSaver.saveAs(data, "GénerosCSV.csv");
+        FileSaver.saveAs(data, "EstadosCivilCSV.csv");
       });
   
     }
@@ -601,15 +596,15 @@ export class ListarEstadoCivilComponent {
       var arregloGeneros: any = [];
       this.estadosCivil.forEach((obj: any) => {
         objeto = {
-          genero: {
+          estado_civil: {
             "$": { "id": obj.id },
-            genero: obj.genero,
+            estado_civil: obj.estado_civil,
           },
         };
         arregloGeneros.push(objeto);
       });
   
-      const xmlBuilder = new xml2js.Builder({ rootName: 'Géneros' });
+      const xmlBuilder = new xml2js.Builder({ rootName: 'Estados_Civil' });
       const xml = xmlBuilder.buildObject(arregloGeneros);
   
       if (xml === undefined) {
@@ -630,7 +625,7 @@ export class ListarEstadoCivilComponent {
   
       const a = document.createElement('a');
       a.href = xmlUrl;
-      a.download = 'Géneros.xml';
+      a.download = 'Estado_civil.xml';
       // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
       a.click();
     }

@@ -47,8 +47,8 @@
                                 library_add_check
                             </mat-icon>
                             <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                                [checked]="selectionGeneros.hasValue() && isAllSelectedPag()"
-                                [indeterminate]="selectionGeneros.hasValue() && !isAllSelectedPag()"
+                                [checked]="selectionEstadosCivil.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionEstadosCivil.hasValue() && !isAllSelectedPag()"
                                 [aria-label]="checkboxLabelPag()">
                             </mat-checkbox>
                         </th>
@@ -72,11 +72,11 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let ec of estadosCivil | filtroGenero: generoF.value  | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let ec of estadosCivil | filtroEstadoCivil: generoF.value  | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionGeneros .toggle(ec) : null"
-                                [checked]="selectionGeneros.isSelected(ec)" [aria-label]="checkboxLabelPag(ec)">
+                                (change)="$event ? selectionEstadosCivil .toggle(ec) : null"
+                                [checked]="selectionEstadosCivil.isSelected(ec)" [aria-label]="checkboxLabelPag(ec)">
                             </mat-checkbox>
                         </td>
                         <td>{{ec.estado_civil}}</td>

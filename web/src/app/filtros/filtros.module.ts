@@ -28,6 +28,7 @@ import { TipoPipe } from './tipoServicio/tipo.pipe';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { FiltroGeneroPipe } from './filtroGenero/filtro-genero.pipe';
+import { FiltroEstadoCivilPipe } from './filtroEstadoCivil/filtro-estado-civil.pipe';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { FiltroGeneroPipe } from './filtroGenero/filtro-genero.pipe';
     RolesPipe,
     PadrePipe,
     TipoPipe,
-    FiltroGeneroPipe
+    FiltroGeneroPipe,
+    FiltroEstadoCivilPipe
   ],
   exports: [
     OrdenarAsignacionesPipe,
@@ -85,7 +87,8 @@ import { FiltroGeneroPipe } from './filtroGenero/filtro-genero.pipe';
     RolesPipe,
     PadrePipe,
     TipoPipe,
-    FiltroGeneroPipe
+    FiltroGeneroPipe,
+    FiltroEstadoCivilPipe
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

@@ -152,11 +152,9 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-select required formControlName="estadoCivilForm">
-                                    <mat-option [value]="1">Soltero/a</mat-option>
-                                    <mat-option [value]="2">Unión de Hecho</mat-option>
-                                    <mat-option [value]="3">Casado/a</mat-option>
-                                    <mat-option [value]="4">Divorciado/a</mat-option>
-                                    <mat-option [value]="5">Viudo/a</mat-option>
+                                    <mat-option *ngFor="let ec of estados_civil" [value]="ec.id">
+                                        {{ec.estado_civil}}
+                                    </mat-option>
                                 </mat-select>
                             </mat-form-field>
                             <mat-form-field>
@@ -166,8 +164,10 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-select required formControlName="generoForm">
-                                    <mat-option [value]="1">Masculino</mat-option>
-                                    <mat-option [value]="2">Femenino</mat-option>
+                                    <mat-option *ngFor="let g of generos" [value]="g.id">
+                                        {{g.genero}}
+                                    </mat-option>
+
                                 </mat-select>
                             </mat-form-field>
                         </div>

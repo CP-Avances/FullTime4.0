@@ -302,7 +302,7 @@ export class ListarGeneroComponent {
               this.selectionGeneros.clear();
               this.ListarGeneros();
             } else {
-              this.router.navigate(['/nivelTitulos']);
+              this.router.navigate(['/genero']);
             }
           });
   }
