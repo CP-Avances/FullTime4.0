@@ -1,8 +1,12 @@
 import { Component, Inject, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 @Component({
   selector: 'app-editar-registro',
@@ -10,6 +14,13 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
   styleUrl: './editar-registro.component.scss'
 })
 export class EditarRegistroComponent {
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+  ips_locales: any = '';
+  idEmpleado: number;
+  name_sucursal: string = '';
 
   @Input() dato: any;
   tipoAccionPersonal: string = ''
@@ -29,18 +40,33 @@ export class EditarRegistroComponent {
     {value: false, item: 'INACTIVO'}
   ]
 
+  id: any
+  id_empleado: any
+
   constructor(
     private validar: ValidacionesService,
     public ventana: MatDialogRef<EditarRegistroComponent>,
+    private restPr: ProcesoService,
+    private restGra: CatGradoService,
+    private restGrupo: CatGrupoOcupacionalService,
+    public toastr: ToastrService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+
     this.listadoAccion = []
     this.tipoAccionPersonal = this.data.tipo.toLocaleUpperCase();
     this.listadoAccion = this.data.listAccion;
     this.infoAccion = this.data.info;
     this.LlenarFormulario() 
+    this.id = this.data.info.id
+    this.id_empleado = this.data.id_empleado
     console.log('data edit: ',this.data)
   }
 
@@ -76,6 +102,46 @@ export class EditarRegistroComponent {
   }
 
   Confirmar(): void {
+    const data = {
+      id_empleado: this.id_empleado,
+      id: this.id, 
+      id_accion: this.formulario.value.idlistForm, 
+      estado: this.formulario.value.estadoForm, 
+      user_name: this.user_name, 
+      ip: this.ip, 
+      ip_local: this.ips_locales
+    }
+    if(this.tipoAccionPersonal == 'PROCESO'){
+      this.restPr.ActualizarProcesoEmple(data).subscribe({ 
+        next: (value: any) => {
+          this.toastr.success(value.message, 'Correcto.', {
+            timeOut: 4500,
+          });
+        },error: (err) => {
+          console.log('err: ',err)
+        },
+      })
+    }else if(this.tipoAccionPersonal == 'GRADOS'){
+      this.restGra.ActualizarGradoEmple(data).subscribe({ 
+        next: (value: any) => {
+          this.toastr.success(value.message, 'Correcto.', {
+            timeOut: 4500,
+          });
+        },error: (err) => {
+          console.log('err: ',err)
+        },
+      })
+    }else{
+      this.restGrupo.ActualizarGrupoEmple(data).subscribe({ 
+        next: (value: any) => {
+          this.toastr.success(value.message, 'Correcto.', {
+            timeOut: 4500,
+          });
+        },error: (err) => {
+          console.log('err: ',err)
+        },
+      })
+    }
     this.ventana.close(true);
   }
 

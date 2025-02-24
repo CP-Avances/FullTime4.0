@@ -1201,6 +1201,49 @@ class GrupoOcupacionalControlador {
 
   }
 
+  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+  public async EditarRegistroGrupoEmple(req: Request, res: Response): Promise<any> {
+    try {
+
+      const {id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+
+      if (estado == true) {
+        // CONSULTAR DATOSORIGINALES
+        const grupo = await pool.query(
+          `
+          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
+          `
+          , [id_empleado]);
+        const [grupo_] = grupo.rows;
+
+        if (grupo_ != undefined || grupo_ != null) {
+          await pool.query(
+            `
+            UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
+            `
+            , [false, grupo_.id]);
+        }
+
+        await pool.query(
+          `
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+            `
+          , [id_accion, estado, id]);
+
+      } else {
+        await pool.query(
+          `
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+            `
+          , [id_accion, estado, id]);
+      }
+
+      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+
+    } catch (error) {
+      return res.status(500).jsonp({ message: error });
+    }
+  }
 
 }
 

@@ -199,7 +199,8 @@ export class EmpleadoGradoComponent {
     const datos = {
       tipo: 'grados',
       info: pro,
-      listAccion: this.listaGrados
+      listAccion: this.listaGrados,
+      id_empleado: this.idEmpleadoSelec
     }
 
     this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()

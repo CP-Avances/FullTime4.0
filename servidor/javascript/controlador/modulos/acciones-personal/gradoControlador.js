@@ -977,6 +977,38 @@ class GradoControlador {
             }
         });
     }
+    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+    EditarRegistroGradoEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+                if (estado == true) {
+                    // CONSULTAR DATOSORIGINALES
+                    const grado = yield database_1.default.query(`
+          SELECT * FROM map_empleado_grado WHERE id_empleado = $1 AND estado = true
+          `, [id_empleado]);
+                    const [grado_] = grado.rows;
+                    if (grado_ != undefined || grado_ != null) {
+                        yield database_1.default.query(`
+              UPDATE map_empleado_grado SET estado = $1 WHERE id = $2
+              `, [false, grado_.id]);
+                    }
+                    yield database_1.default.query(`
+            UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
+            `, [id_accion, estado, id]);
+                }
+                else {
+                    yield database_1.default.query(`
+            UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
+            `, [id_accion, estado, id]);
+                }
+                return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
 }
 exports.GRADO_CONTROLADOR = new GradoControlador();
 exports.default = exports.GRADO_CONTROLADOR;

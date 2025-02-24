@@ -42,6 +42,8 @@ class ProcesoRutas {
         this.router.post('/upload/revision_epleadoProceso', [verificarToken_1.TokenValidation, upload.single('uploads')], catProcesoControlador_1.default.RevisarPantillaEmpleadoProce);
         // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/registro_epleadoProceso', verificarToken_1.TokenValidation, catProcesoControlador_1.default.RegistrarEmpleadoProceso);
+        // METODO PARA ACTUALIZAR EL PROCESO   **USADO
+        this.router.post('/actualizacionProceso', verificarToken_1.TokenValidation, catProcesoControlador_1.default.EditarRegistroProcesoEmple);
     }
 }
 const PROCESO_RUTAS = new ProcesoRutas();

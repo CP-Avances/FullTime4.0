@@ -74,4 +74,9 @@ export class CatGradoService {
     return this.http.post<any>(environment.url + '/grado/cargar_plantilla/registro_epleadoGrado', data)
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  ActualizarGradoEmple(formData: any) {
+    return this.http.post<any>(environment.url + '/grado/actualizacionGrado', formData);
+  }
+
 }

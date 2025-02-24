@@ -1086,6 +1086,42 @@ class ProcesoControlador {
             }
         });
     }
+    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+    EditarRegistroProcesoEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+                console.log('id_empleado', id_empleado);
+                console.log('id', id);
+                console.log('id_accion', id_accion);
+                console.log('estado', estado);
+                if (estado == true) {
+                    // CONSULTAR DATOSORIGINALES
+                    const proceso = yield database_1.default.query(`
+        SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
+        `, [id_empleado]);
+                    const [proceso_] = proceso.rows;
+                    if (proceso_ != undefined || proceso_ != null) {
+                        yield database_1.default.query(`
+            UPDATE map_empleado_procesos SET estado = $1 WHERE id = $2
+            `, [false, proceso_.id]);
+                    }
+                    yield database_1.default.query(`
+          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
+                }
+                else {
+                    yield database_1.default.query(`
+          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
+                }
+                return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
 }
 exports.PROCESOS_CONTROLADOR = new ProcesoControlador();
 exports.default = exports.PROCESOS_CONTROLADOR;

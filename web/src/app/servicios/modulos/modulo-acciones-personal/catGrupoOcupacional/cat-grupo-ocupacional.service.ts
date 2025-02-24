@@ -74,4 +74,9 @@ export class CatGrupoOcupacionalService {
     return this.http.post<any>(environment.url + '/grupoOcupacional/cargar_plantilla/registro_empleadoGrupoOcupacional', data)
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  ActualizarGrupoEmple(formData: any) {
+    return this.http.post<any>(environment.url + '/grupoOcupacional/actualizacionGrupo', formData);
+  }
+
 }

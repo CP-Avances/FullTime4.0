@@ -68,5 +68,10 @@ export class ProcesoService {
     console.log('data a enviar: ',data)
     return this.http.post<any>(environment.url + '/proceso/cargar_plantilla/registro_epleadoProceso', data)
   }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  ActualizarProcesoEmple(formData: any) {
+    return this.http.post<any>(environment.url + '/proceso/actualizacionProceso', formData);
+  }
   
 }

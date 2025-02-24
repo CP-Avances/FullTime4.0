@@ -1185,6 +1185,50 @@ class GradoControlador {
   
   }
 
+  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+  public async EditarRegistroGradoEmple(req: Request, res: Response): Promise<any> {
+    try {
+
+      const {id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+
+      if (estado == true) {
+        // CONSULTAR DATOSORIGINALES
+        const grado = await pool.query(
+          `
+          SELECT * FROM map_empleado_grado WHERE id_empleado = $1 AND estado = true
+          `
+          , [id_empleado]);
+        const [grado_] = grado.rows;
+
+        if (grado_ != undefined || grado_ != null) {
+          await pool.query(
+            `
+              UPDATE map_empleado_grado SET estado = $1 WHERE id = $2
+              `
+            , [false, grado_.id]);
+        }
+
+        await pool.query(
+          `
+            UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
+            `
+          , [id_accion, estado, id]);
+
+      } else {
+        await pool.query(
+          `
+            UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
+            `
+          , [id_accion, estado, id]);
+      }
+
+      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+
+    } catch (error) {
+      return res.status(500).jsonp({ message: error });
+    }
+  }
+
 }
 
 export const GRADO_CONTROLADOR = new GradoControlador();

@@ -202,7 +202,8 @@ export class EmpleadoProcesoComponent {
     const datos = {
       tipo: 'proceso',
       info: pro,
-      listAccion: this.listaProcesos
+      listAccion: this.listaProcesos,
+      id_empleado: this.idEmpleadoSelec
     }
 
     this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()

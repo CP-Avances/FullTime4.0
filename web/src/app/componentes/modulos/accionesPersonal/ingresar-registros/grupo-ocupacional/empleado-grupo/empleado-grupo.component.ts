@@ -157,7 +157,8 @@ export class EmpleadoGrupoComponent {
         const data = {
           user_name: this.user_name,
           ip: this.ip,
-          ip_local: this.ips_locales
+          ip_local: this.ips_locales,
+          id_empleado: this.idEmpleadoSelec
         }
         this.rest.EliminarGrupoOcupaEmple(grup.id, data).subscribe({
            next: (respuesta: any) => {

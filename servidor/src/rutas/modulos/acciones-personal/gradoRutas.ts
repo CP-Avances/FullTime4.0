@@ -42,6 +42,8 @@ class GradoRutas {
         this.router.post('/upload/revision_epleadoGrado', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarPantillaEmpleadoGrado);
         // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/registro_epleadoGrado', TokenValidation, GRADO_CONTROLADOR.RegistrarEmpleadoGrado);
+        // METODO PARA ACTUALIZAR EL GRADO   **USADO
+        this.router.post('/actualizacionGrado', TokenValidation, GRADO_CONTROLADOR.EditarRegistroGradoEmple);
     }
 }
 

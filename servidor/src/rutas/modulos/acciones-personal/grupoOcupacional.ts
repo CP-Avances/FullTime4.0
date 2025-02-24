@@ -42,7 +42,8 @@ class GrupoOcupacionalRutas {
         this.router.post('/upload/revision_empleadoGrupoOcupacional', [TokenValidation, upload.single('uploads')], GRUPO_OCUPACIONAL_CONTROLADOR.RevisarPantillaEmpleadoGrupoOcu);
         // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/registro_empleadoGrupoOcupacional', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.RegistrarEmpleadoGrupoOcu);
-
+        // METODO PARA ACTUALIZAR EL GRUPO   **USADO
+        this.router.post('/actualizacionGrupo', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EditarRegistroGrupoEmple);
     }
 }
 

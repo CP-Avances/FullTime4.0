@@ -42,6 +42,8 @@ class GrupoOcupacionalRutas {
         this.router.post('/upload/revision_empleadoGrupoOcupacional', [verificarToken_1.TokenValidation, upload.single('uploads')], grupoOcupacionalControlador_1.default.RevisarPantillaEmpleadoGrupoOcu);
         // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/cargar_plantilla/registro_empleadoGrupoOcupacional', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.RegistrarEmpleadoGrupoOcu);
+        // METODO PARA ACTUALIZAR EL GRUPO   **USADO
+        this.router.post('/actualizacionGrupo', verificarToken_1.TokenValidation, grupoOcupacionalControlador_1.default.EditarRegistroGrupoEmple);
     }
 }
 const GRUPO_OCUPACIONAL_RUTAS = new GrupoOcupacionalRutas();
