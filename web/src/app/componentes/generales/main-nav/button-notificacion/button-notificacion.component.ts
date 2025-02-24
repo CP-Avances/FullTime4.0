@@ -238,6 +238,6 @@ export class ButtonNotificacionComponent implements OnInit {
   // METODO PARA CONFIGURAR NOTIFICACIONES
   ConfigurarNotificaciones() {
     const id_empleado = parseInt(localStorage.getItem('empleado') as string);
-    this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });
+    this.ventana.open(SettingsComponent, { width: '900px', data: { id_empleado } });
   }
 }

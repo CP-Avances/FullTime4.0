@@ -85,6 +85,8 @@ const alimentacionRutas_1 = __importDefault(require("./rutas/reportes/alimentaci
 const catProcesoRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/catProcesoRutas"));
 const empleProcesosRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/empleProcesosRutas"));
 const accionPersonalRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/accionPersonalRutas"));
+const gradoRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/gradoRutas"));
+const grupoOcupacional_1 = __importDefault(require("./rutas/modulos/acciones-personal/grupoOcupacional"));
 // MODULO GEOLOCALIZACION
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/modulos/geolocalizacion/emplUbicacionRutas"));
 // MODULO RELOJ VIRTUAL
@@ -213,6 +215,8 @@ class Servidor {
         this.app.use(`/${ruta}/proceso`, catProcesoRutas_1.default);
         this.app.use(`/${ruta}/empleadoProcesos`, empleProcesosRutas_1.default);
         this.app.use(`/${ruta}/accionPersonal`, accionPersonalRutas_1.default);
+        this.app.use(`/${ruta}/grado`, gradoRutas_1.default);
+        this.app.use(`/${ruta}/grupoOcupacional`, grupoOcupacional_1.default);
         // MODULO ALIMENTACION
         this.app.use(`/${ruta}/tipoComidas`, catTipoComidasRuta_1.default);
         this.app.use(`/${ruta}/planComidas`, planComidasRutas_1.default);

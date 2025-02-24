@@ -73,6 +73,9 @@ import ALIMENTACION_RUTAS from './rutas/reportes/alimentacionRutas';
 import PROCESO_RUTA from './rutas/modulos/acciones-personal/catProcesoRutas';
 import EMPLEADO_PROCESO_RUTAS from './rutas/modulos/acciones-personal/empleProcesosRutas';
 import ACCION_PERSONAL_RUTAS from './rutas/modulos/acciones-personal/accionPersonalRutas';
+import GRADO_RUTAS from './rutas/modulos/acciones-personal/gradoRutas';
+import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcupacional';
+
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
 // MODULO RELOJ VIRTUAL
@@ -214,6 +217,9 @@ class Servidor {
         this.app.use(`/${ruta}/proceso`, PROCESO_RUTA);
         this.app.use(`/${ruta}/empleadoProcesos`, EMPLEADO_PROCESO_RUTAS);
         this.app.use(`/${ruta}/accionPersonal`, ACCION_PERSONAL_RUTAS);
+        this.app.use(`/${ruta}/grado`, GRADO_RUTAS);
+        this.app.use(`/${ruta}/grupoOcupacional`, GRUPO_OCUPACIONAL_RUTAS);
+
         // MODULO ALIMENTACION
         this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
         this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);

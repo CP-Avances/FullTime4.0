@@ -65,6 +65,10 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
+
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 // MODULO  --TIMBRE VIRTUAL
@@ -91,6 +95,7 @@ import { AdministradorTodasComponent } from './componentes/reportes/notificacion
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
 import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
+import { SettingsComponent } from './componentes/notificaciones/configurar-notificaciones/settings/settings.component';
 // REPORTES  --GENERALES
 import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna-multiple/vacuna-multiple.component';
@@ -225,6 +230,10 @@ const routes: Routes = [
   { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard] },
   { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
+  { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard]},
+  { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
+  { path: 'IngresarRegistros', component: IngresarRegistrosComponent, canActivate: [AuthGuard] },
+  
 
   // MODULO  --GEOLOCALIZACION
   { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard] },
@@ -250,12 +259,13 @@ const routes: Routes = [
   { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'archivos', component: VerDocumentosComponent, canActivate: [AuthGuard] },
   { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard] },
- { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
+  { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
   { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard] },
   { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard] },
   { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard] },
   { path: 'lista-notificaciones', component: RealtimeNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'lista-avisos', component: RealtimeAvisosComponent, canActivate: [AuthGuard] },
+  { path: 'configuraciones-alertas/:id', component: SettingsComponent, canActivate: [AuthGuard] },
   { path: 'ver-permiso/:id', component: VerEmpleadoPermisoComponent, canActivate: [AuthGuard] },
   { path: 'ver-vacacion/:id', component: VerVacacionComponent, canActivate: [AuthGuard] },
   { path: 'ver-hora-extra/:id', component: VerPedidoHoraExtraComponent, canActivate: [AuthGuard] },

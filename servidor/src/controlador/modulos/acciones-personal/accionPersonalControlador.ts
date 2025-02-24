@@ -365,7 +365,7 @@ class AccionPersonalControlador {
 
             await pool.query(
                 `
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
+                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
                      WHERE id = $4
                 `
                 , [id_tipo, descripcion, base_legal, id]);
@@ -765,13 +765,14 @@ class AccionPersonalControlador {
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         const workbook = new Excel.Workbook();
         await workbook.xlsx.readFile(ruta);
-        let verificador = ObtenerIndicePlantilla(workbook, 'DETALLE_TIPOS_ACCION_PERSONAL');
+        let verificador = ObtenerIndicePlantilla(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
         else {
             const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
             const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+
             let data: any = {
                 fila: '',
                 tipo_accion_personal: '',
@@ -779,7 +780,8 @@ class AccionPersonalControlador {
                 base_legal: '',
                 observacion: ''
             };
-            var listaProcesos: any = [];
+
+            var listaAccionPersonal: any = [];
             var duplicados: any = [];
             var mensaje: string = 'correcto';
 
@@ -819,10 +821,7 @@ class AccionPersonalControlador {
                         data.base_legal = BASE_LEGAL;
                         data.observacion = 'no registrado';
 
-                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                        data.proceso = data.proceso.trim();
-
-                        listaProcesos.push(data);
+                        listaAccionPersonal.push(data);
 
                     } else {
                         data.fila = ITEM;
@@ -850,10 +849,7 @@ class AccionPersonalControlador {
                           data.base_legal= '-';
                         }
 
-                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                        data.proceso = data.proceso.trim();
-
-                        listaProcesos.push(data);
+                        listaAccionPersonal.push(data);
                     }
                     data = {};
                 });
@@ -866,66 +862,46 @@ class AccionPersonalControlador {
                     fs.unlinkSync(ruta);
                 }
             });
+
             // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-            listaProcesos.forEach(async (item: any, index: number) => {
+            listaAccionPersonal.forEach(async (item: any, index: number) => {
                 if (item.observacion == 'no registrado') {
-                  const VERIFICAR_PROCESO = await pool.query(
+                  const VERIFICAR_TIPO_ACCION = await pool.query(
                     `
-                    SELECT * FROM map_cat_procesos 
-                    WHERE UPPER(nombre) = UPPER($1)
+                    SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
                     `
-                    , [item.nombre]);
+                    , [item.tipo_accion_personal]);
     
-                  if (VERIFICAR_PROCESO.rowCount === 0) {
-                    const VERIFICAR_PROCESO_PADRE = await pool.query(
-                      `
-                      SELECT * FROM map_cat_procesos 
-                      WHERE UPPER(nombre) = UPPER($1)
-                      `
-                      , [item.proceso_padre]);
+                  if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
+                    item.observacion = 'No existe el tipo de accion en el sistema'
+                  }else{
 
-                      if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
-                        const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
-                        if(procesoPadre == item.proceso){
-                          item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
-                        }
-                      }
-
-                      if(item.observacion == 'no registrado'){
+                    const VERIFICAR_ACCION = await pool.query(
+                        `
+                        SELECT * FROM map_detalle_tipo_accion_personal
+                        WHERE id_tipo_accion_personal = $1
+                        `
+                        , [VERIFICAR_TIPO_ACCION.rows[0].id]);
+                       
+                    if (VERIFICAR_ACCION.rowCount === 0) {
+                        
                         // DISCRIMINACION DE ELEMENTOS IGUALES
-                        if (duplicados.find((p: any) => (p.proceso.toLowerCase() === item.proceso.toLowerCase()) 
-                          //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
-                      ) == undefined) {
+                        if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
                             duplicados.push(item);
                         } else {
                             item.observacion = '1';
                         }
-
-                        if(item.observacion == 'no registrado'){
-                          const cruzado = listaProcesos.slice(0, index).find((p: any) => 
-                            (
-                              p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
-                              p.proceso_padre.toLowerCase() === item.proceso.toLowerCase()
-                            )
-                          );
-
-                          if (cruzado) {
-                            item.observacion = 'Registro cruzado';
-                          } 
-                            
-
-                        }
-                        
-                      }
-
-                  }else{
-                    item.observacion = 'Ya existe el proceso en el sistema'
+                    }else{
+                        item.observacion = 'Ya existe el detalle de la accion personal en el sistema'  
+                    }
+  
                   }
                 }
             });
 
             setTimeout(() => {
-                listaProcesos.sort((a: any, b: any) => {
+                listaAccionPersonal.sort((a: any, b: any) => {
                     // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
@@ -938,7 +914,7 @@ class AccionPersonalControlador {
 
                 var filaDuplicada: number = 0;
 
-                listaProcesos.forEach(async (item: any) => {
+                listaAccionPersonal.forEach(async (item: any) => {
                     if (item.observacion == '1') {
                         item.observacion = 'Registro duplicado'
                     }else if(item.observacion == 'no registrado'){
@@ -960,9 +936,9 @@ class AccionPersonalControlador {
                 });
 
                 if (mensaje == 'error') {
-                    listaProcesos = undefined;
+                    listaAccionPersonal = undefined;
                 }
-                return res.jsonp({ message: mensaje, data: listaProcesos });
+                return res.jsonp({ message: mensaje, data: listaAccionPersonal });
             }, 1000)
         }
 
@@ -978,8 +954,8 @@ class AccionPersonalControlador {
     var listaProcesosInsertados: any = [];
 
     for(const item of plantilla){
-        const { proceso, nivel, proceso_padre } = item;
-        console.log('proceso: ',proceso)
+        const { tipo_accion_personal, descripcion, base_legal } = item;
+        console.log('items: ',item)
 
         try {
 
@@ -988,27 +964,48 @@ class AccionPersonalControlador {
     
             const response: QueryResult = await pool.query(
               `
-              INSERT INTO map_cat_procesos (nombre) VALUES ($1) RETURNING *
+              SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
               `
-              , [proceso]);
+              , [tipo_accion_personal]);
     
-            const [procesos] = response.rows;
+            const [tipo_acciones] = response.rows;
     
             console.log('response: ',response)
-            var datoProce = {
-                id: response.rows,
-                proceso: proceso
-            }
 
-            listaProcesosInsertados.push(datoProce)
-    
+              // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response_accion: QueryResult = await pool.query(
+          `
+          INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
+          `
+          , [response.rows[0].id, descripcion, base_legal ]);
+        const [detalleAccion] = response_accion.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+             tabla: 'map_detalle_tipo_accion_personal',
+             usuario: user_name,
+             accion: 'I',
+             datosOriginales: '',
+             datosNuevos: JSON.stringify(detalleAccion),
+             ip: ip,
+             ip_local: ip_local,
+             observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_cat_procesos',
+              tabla: 'map_tipo_accion_personal',
               usuario: user_name,
               accion: 'I',
               datosOriginales: '',
-              datosNuevos: JSON.stringify(procesos),
+              datosNuevos: JSON.stringify(tipo_acciones),
               ip: ip,
               ip_local: ip_local,
               observacion: null
@@ -1016,54 +1013,17 @@ class AccionPersonalControlador {
     
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+
+
+
+
           } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             error = true;
           }
 
-    }
-
-    for (const data of listaProcesosInsertados) {
-      const { id, proceso } = data;
-
-      console.log('id: ',id)
-      console.log('proceso: ',proceso)
-      
-
-      try {
-
-        // INICIAR TRANSACCION
-        await pool.query('BEGIN');
-        const response: QueryResult = await pool.query(
-          `
-          UPDATE map_cat_procesos SET proceso_padre = $1 WHERE id = $2
-          `
-          , [id, id]);
-
-        const [procesos] = response.rows;
-
-        console.log('response: ',response)
-
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_procesos',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: JSON.stringify(procesos),
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-      } catch (error) {
-        // REVERTIR TRANSACCION
-        await pool.query('ROLLBACK');
-        error = true;
-      }
     }
 
     if (error) {

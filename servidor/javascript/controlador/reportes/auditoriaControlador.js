@@ -43,7 +43,7 @@ class AuditoriaControlador {
                     yield database_1.default.query('BEGIN');
                     // Ejecutar la consulta de inserción masiva
                     yield database_1.default.query(query, valores);
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }
                 catch (error) {

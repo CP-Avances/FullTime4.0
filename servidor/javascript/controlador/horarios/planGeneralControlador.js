@@ -110,7 +110,7 @@ class PlanGeneralControlador {
                         });
                     }
                     yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                    // FINALIZAR TRANSACCIÓN
+                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }
                 catch (error) {

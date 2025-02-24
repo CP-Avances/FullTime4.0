@@ -47,7 +47,6 @@ export class ProcesoService {
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
   RevisarFormato(formData: any) {
-    console.log('enro aqui ',formData)
     return this.http.post<any>(environment.url + '/proceso/upload/revision', formData);
   }
 
@@ -56,4 +55,23 @@ export class ProcesoService {
     return this.http.post<any>(environment.url + '/proceso/cargar_plantilla', data);
   }
 
+  RegistroProcesos(data: any){
+    return this.http.post<any>(environment.url + '/proceso/registrarProcesos', data)
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormatoEMPLEPROCESO(formData: any) {
+    return this.http.post<any>(environment.url + '/proceso/upload/revision_epleadoProceso', formData);
+  }
+
+  RegistrarPlantillaEmpleProce(data: any){
+    console.log('data a enviar: ',data)
+    return this.http.post<any>(environment.url + '/proceso/cargar_plantilla/registro_epleadoProceso', data)
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  ActualizarProcesoEmple(formData: any) {
+    return this.http.post<any>(environment.url + '/proceso/actualizacionProceso', formData);
+  }
+  
 }

@@ -128,18 +128,13 @@ export class EditarEmpleadoComponent implements OnInit {
     });
   }
 
-estados_civil: any = []
+  estados_civil: any = []
   // METODO PARA LISTAR NACIONALIDADES
   ObtenerEstadoCivil() {
     this.estadoS.ListarEstadoCivil().subscribe(res => {
       this.estados_civil = res;
       this.ObtenerEmpleado();
-      /*
-      this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
-        startWith(''),
-        map((value: any) => this._filter(value))
-      );
-      */
+
     });
   }
 
@@ -150,12 +145,7 @@ estados_civil: any = []
     this.generoS.ListarGeneros().subscribe(res => {
       this.generos = res;
       this.ObtenerEmpleado();
-      /*
-      this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
-        startWith(''),
-        map((value: any) => this._filter(value))
-      );
-      */
+
     });
   }
 

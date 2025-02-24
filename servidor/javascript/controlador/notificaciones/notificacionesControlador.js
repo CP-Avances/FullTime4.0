@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NOTIFICACION_TIEMPO_REAL_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class NotificacionTiempoRealControlador {
     // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
     EliminarMultiplesNotificaciones(req, res) {
@@ -86,7 +86,6 @@ class NotificacionTiempoRealControlador {
     ObtenerConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_empleado = req.params.id;
-            console.log("ver id_empleado", id_empleado);
             if (id_empleado != 'NaN') {
                 const CONFIG_NOTI = yield database_1.default.query(`
         SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
@@ -110,8 +109,8 @@ class NotificacionTiempoRealControlador {
                 const { id_empleado } = req.body;
                 if (id_empleado) {
                     const CONFIG_NOTI = yield database_1.default.query(`
-        SELECT * FROM eu_configurar_alertas WHERE id_empleado = ANY($1::int[])
-        `, [id_empleado]);
+          SELECT * FROM eu_configurar_alertas WHERE id_empleado = ANY($1::int[])
+          `, [id_empleado]);
                     if (CONFIG_NOTI.rowCount != 0) {
                         return res.jsonp({ message: 'OK', respuesta: CONFIG_NOTI.rows });
                     }
@@ -272,17 +271,19 @@ class NotificacionTiempoRealControlador {
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
-          permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
-        comunicado_notificacion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
+          permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, 
+          comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, 
+          faltas_notificacion, salidas_anticipadas_mail, salidas_anticipadas_notificacion)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
         `, [id_empleado, vaca_mail, vaca_noti,
                     permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-                    comunicado_mail, comunicado_noti]);
+                    comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail, faltas_noti,
+                    salidas_anticipadas_mail, salidas_anticipadas_noti]);
                 const [datosNuevos] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -310,7 +311,7 @@ class NotificacionTiempoRealControlador {
     CrearConfiguracionMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, user_name, ip, ip_local } = req.body;
                 const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
                 const batches = [];
                 for (let i = 0; i < id_empleado.length; i += batchSize) {
@@ -320,18 +321,26 @@ class NotificacionTiempoRealControlador {
                 yield database_1.default.query('BEGIN');
                 for (const batch of batches) {
                     const valores = batch
-                        .map((id) => `(${id}, ${vaca_mail}, ${vaca_noti}, ${permiso_mail}, ${permiso_noti}, 
-                ${hora_extra_mail}, ${hora_extra_noti}, ${comida_mail}, ${comida_noti}, 
-                ${comunicado_mail}, ${comunicado_noti})`)
+                        .map((id) => `
+              (${id}, ${vaca_mail}, ${vaca_noti}, ${permiso_mail}, ${permiso_noti}, 
+              ${hora_extra_mail}, ${hora_extra_noti}, ${comida_mail}, ${comida_noti}, 
+              ${comunicado_mail}, ${comunicado_noti}, ${atrasos_noti}, ${faltas_mail}, ${faltas_noti},
+          ${salidas_anticipadas_mail}, ${salidas_anticipadas_noti})
+            `)
                         .join(', ');
-                    // Ejecutar la inserción en cada lote
-                    yield database_1.default.query(`INSERT INTO eu_configurar_alertas (
-                id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
-                permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail,
-                comida_notificacion, comunicado_mail, comunicado_notificacion
-            ) VALUES ${valores}`);
+                    // EJECUTAR LA INSERCION EN CADA LOTE
+                    yield database_1.default.query(`
+          INSERT INTO eu_configurar_alertas 
+            (
+              id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
+              permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail,
+              comida_notificacion, comunicado_mail, comunicado_notificacion,
+              atrasos_notificacion, faltas_mail, faltas_notificacion, salidas_anticipadas_mail, 
+              salidas_anticipadas_notificacion
+            ) VALUES ${valores}
+          `);
                 }
-                // Generar datos para la auditoría
+                // GENERAR DATOS PARA LA AUDITORIA
                 const auditoria = id_empleado.map((id) => ({
                     tabla: 'eu_configurar_alertas',
                     usuario: user_name,
@@ -348,19 +357,24 @@ class NotificacionTiempoRealControlador {
                         comida_mail: comida_mail,
                         comida_notificacion: comida_noti,
                         comunicado_mail: comunicado_mail,
-                        comunicado_notificacion: comunicado_noti
+                        comunicado_notificacion: comunicado_noti,
+                        atrasos_notificacion: atrasos_noti,
+                        faltas_mail: faltas_mail,
+                        faltas_notificacion: faltas_noti,
+                        salidas_anticipadas_mail: salidas_anticipadas_mail,
+                        salidas_anticipadas_notificacion: salidas_anticipadas_noti
                     }),
                     ip,
                     ip_local: ip_local,
                     observacion: null
                 }));
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                yield database_1.default.query('COMMIT'); // Finalizar transacción
+                yield database_1.default.query('COMMIT'); // FINALIZAR TRANSACCION
                 res.jsonp({ message: 'Configuración guardada exitosamente' });
             }
             catch (error) {
                 console.error('Error en CrearConfiguracion:', error);
-                yield database_1.default.query('ROLLBACK'); // Revertir transacción en caso de error
+                yield database_1.default.query('ROLLBACK'); // REVERTIR TRANSACCION EN CASO DE ERROR
                 res.status(500).jsonp({ message: 'Error al guardar la configuración.' });
             }
         });
@@ -369,7 +383,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, user_name, ip, ip_local } = req.body;
                 const id_empleado = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -394,10 +408,13 @@ class NotificacionTiempoRealControlador {
                 const actualizacion = yield database_1.default.query(`
         UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
           permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
-          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-        WHERE id_empleado = $11 RETURNING *
+          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10, 
+          atrasos_mail = $11, atrasos_notificacion = $12, faltas_mail = $13, faltas_notificacion = $14,
+          salidas_anticipadas_mail = $15, salidas_anticipadas_notificacion = $16
+        WHERE id_empleado = $17 RETURNING *
         `, [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail,
+                    faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, id_empleado]);
                 const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -424,7 +441,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleadoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -434,14 +451,17 @@ class NotificacionTiempoRealControlador {
                 const actualizacion = yield database_1.default.query(`
         UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
           permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
-          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-        WHERE id_empleado = ANY($11::int[]) 
+          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10,
+          atrasos_mail = $11, atrasos_notificacion = $12, faltas_mail = $13, faltas_notificacion = $14,
+          salidas_anticipadas_mail = $15, salidas_anticipadas_notificacion = $16
+        WHERE id_empleado = ANY($17::int[])
         `, [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail,
+                    faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, id_empleado]);
                 rowsAffected = actualizacion.rowCount || 0;
                 const auditoria = datosOriginales.map((item) => {
                     // Crear una copia del objeto item para modificarlo
-                    const itemModificado = Object.assign(Object.assign({}, item), { vacacion_mail: vaca_mail, vacacion_notificacion: vaca_noti, permiso_mail: permiso_mail, permiso_notificacion: permiso_noti, hora_extra_mail: hora_extra_mail, hora_extra_notificacion: hora_extra_noti, comida_mail: comida_mail, comida_notificacion: comida_noti, comunicado_mail: comunicado_mail, comunicado_notificacion: comunicado_noti }); // Cambiar los valores deseados
+                    const itemModificado = Object.assign(Object.assign({}, item), { vacacion_mail: vaca_mail, vacacion_notificacion: vaca_noti, permiso_mail: permiso_mail, permiso_notificacion: permiso_noti, hora_extra_mail: hora_extra_mail, hora_extra_notificacion: hora_extra_noti, comida_mail: comida_mail, comida_notificacion: comida_noti, comunicado_mail: comunicado_mail, comunicado_notificacion: comunicado_noti, atrasos_mail: atrasos_mail, atrasos_notificacion: atrasos_noti, faltas_mail: faltas_mail, faltas_notificacion: faltas_noti, salidas_anticipadas_mail: salidas_anticipadas_mail, salidas_anticipadas_noti: salidas_anticipadas_noti }); // Cambiar los valores deseados
                     return {
                         tabla: 'eu_configurar_alertas',
                         usuario: user_name,

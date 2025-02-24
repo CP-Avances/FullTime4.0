@@ -134,6 +134,12 @@ export class ListarTipoAccionComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1;
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   // METODO PARA OBTENER TIPOS DE ACCIONES
   tipo_acciones: any = [];
   ObtenerTipoAccionesPersonal() {
@@ -176,6 +182,12 @@ export class ListarTipoAccionComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
+    this.Datos_tipoAccion_personal = null;
+    this.messajeExcel = '';
+    this.mostrarbtnsubir = false;
     this.BuscarTipoAccionForm.setValue({
       nombreForm: '',
     });
@@ -251,7 +263,7 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
-  TipoAccion_personal: any;
+  Datos_tipoAccion_personal: any;
   listaTipoAccionesCorrectas: any = [];
   listaTipoAccionesCorrectasCont: number;
   // METODO PARA VERIFICAR DATOS DE PLANTILLA
@@ -265,7 +277,40 @@ export class ListarTipoAccionComponent implements OnInit {
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
+      this.Datos_tipoAccion_personal = res.data;
+        this.messajeExcel = res.message;
 
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+
+        this.Datos_tipoAccion_personal.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
+        this.Datos_tipoAccion_personal.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaTipoAccionesCorrectas.push(item);
+          }
+        });
+        this.listaTipoAccionesCorrectasCont = this.listaTipoAccionesCorrectas.length;
+      }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
@@ -279,11 +324,81 @@ export class ListarTipoAccionComponent implements OnInit {
       this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
-            //this.RegistrarProcesos();
+            this.RegistrarAcciones();
           }
         });
         
     }
+
+    // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  EstiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe el detalle de la accion personal en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion  == 'Registro cruzado' ||
+      observacion == 'No existe el tipo de accion en el sistema'
+    ) {
+      return 'rgb(238, 21, 242)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+
+  colorTexto: string = '';
+  EstiloTextoCelda(texto: string): string {
+    texto = texto.toString()
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
+   // METODO PARA REGISTRAR DATOS
+   RegistrarAcciones() {
+    console.log('listaProcesosCorrectas: ',this.listaTipoAccionesCorrectas.length)
+    if (this.listaTipoAccionesCorrectas?.length > 0) {
+      const data = {
+        plantilla: this.listaTipoAccionesCorrectas,
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales
+      }
+      this.rest.RegistrarPlantilla(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Tipo de accion personal importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaTipoAccionesCorrectas?.length > 0) {
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 500);
+          }
+          this.LimpiarCampos();
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
+
+  }
 
 
   /******************************************************************************************************

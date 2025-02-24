@@ -104,15 +104,16 @@ class EmpleadoProcesoControlador {
     BuscarProcesoUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
-            const HORARIO_CARGO = yield database_1.default.query(`
+            console.log('req.params: ', req.params);
+            const EMPLEADO_PROCESOS = yield database_1.default.query(`
       SELECT ep.id, ep.id_proceso, ep.estado, cp.nombre AS proceso 
       FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
       WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `, [id_empleado]);
-            if (HORARIO_CARGO.rowCount != 0) {
-                return res.jsonp(HORARIO_CARGO.rows);
+            if (EMPLEADO_PROCESOS.rowCount != 0) {
+                return res.status(200).jsonp({ procesos: EMPLEADO_PROCESOS.rows, text: 'correcto', status: 200 });
             }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            res.status(404).jsonp({ Procesos: undefined, text: 'Registro no encontrado.', status: 400 });
         });
     }
     EliminarRegistros(req, res) {
@@ -156,7 +157,7 @@ class EmpleadoProcesoControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                return res.status(200).jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION

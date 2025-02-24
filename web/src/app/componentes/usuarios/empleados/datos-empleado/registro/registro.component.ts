@@ -13,6 +13,8 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 
 @Component({
   selector: 'app-registro',
@@ -53,19 +55,24 @@ export class RegistroComponent implements OnInit {
     private _formBuilder: FormBuilder,
     public validar: ValidacionesService,
     public ventana: MatDialog,
+    public generoS: GenerosService,
+    public estadoS: EstadoCivilService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.CargarRoles();
     this.VerificarCodigo();
     this.AsignarFormulario();
     this.ObtenerNacionalidades();
+    this.ObtenerEstadoCivil()
+    this.ObtenerGeneros();
+
   }
 
   // METODO DE FILTRACION DE DATOS DE NACIONALIDAD
@@ -324,6 +331,24 @@ export class RegistroComponent implements OnInit {
     this.segundoFormGroup.reset();
     this.terceroFormGroup.reset();
   }
+
+  estados_civil: any = []
+  // METODO PARA LISTAR NACIONALIDADES
+  ObtenerEstadoCivil() {
+    this.estadoS.ListarEstadoCivil().subscribe(res => {
+      this.estados_civil = res;
+    });
+  }
+
+  // METODO PARA LISTAR NACIONALIDADES
+  generos: any = []
+
+  ObtenerGeneros() {
+    this.generoS.ListarGeneros().subscribe(res => {
+      this.generos = res;
+    });
+  }
+
 
 }
 

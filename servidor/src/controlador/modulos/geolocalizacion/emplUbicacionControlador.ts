@@ -366,7 +366,7 @@ class UbicacionControlador {
                     observacion: null
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                // Finalizar transacción
+                // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
 
                 if (resultadoExistente.rows.length !== 0) {
@@ -439,7 +439,7 @@ class UbicacionControlador {
                     observacion: `Error al eliminar ubicación con id: ${id_empleado}`
                 }));
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Ningún registro encontrado para eliminar.', idsNoEncontrados: ids });
             } else {

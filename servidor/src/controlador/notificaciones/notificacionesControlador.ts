@@ -1,15 +1,14 @@
-import { Request, Response } from 'express';
-import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 }
   from '../../libs/settingsMail';
-
+import { Request, Response } from 'express';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
-import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 class NotificacionTiempoRealControlador {
 
@@ -91,8 +90,6 @@ class NotificacionTiempoRealControlador {
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
 
-
-    console.log("ver id_empleado", id_empleado)
     if (id_empleado != 'NaN') {
       const CONFIG_NOTI = await pool.query(
         `
@@ -109,6 +106,7 @@ class NotificacionTiempoRealControlador {
       res.status(404).jsonp({ text: 'Sin registros encontrados.' });
     }
   }
+
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES   **USADO
   public async ObtenerConfigMultipleEmpleado(req: Request, res: Response): Promise<any> {
     try {
@@ -117,8 +115,8 @@ class NotificacionTiempoRealControlador {
       if (id_empleado) {
         const CONFIG_NOTI = await pool.query(
           `
-        SELECT * FROM eu_configurar_alertas WHERE id_empleado = ANY($1::int[])
-        `
+          SELECT * FROM eu_configurar_alertas WHERE id_empleado = ANY($1::int[])
+          `
           , [id_empleado]);
         if (CONFIG_NOTI.rowCount != 0) {
           return res.jsonp({ message: 'OK', respuesta: CONFIG_NOTI.rows });
@@ -134,9 +132,6 @@ class NotificacionTiempoRealControlador {
       return res.status(500).jsonp({ message: 'Error interno del servidor' });
     }
   }
-
-
-
 
   // METODO PARA CREAR NOTIFICACIONES
   public async CrearNotificacion(req: Request, res: Response): Promise<Response> {
@@ -308,7 +303,9 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti,
+        atrasos_mail, atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti,
+        user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -316,13 +313,15 @@ class NotificacionTiempoRealControlador {
       const response = await pool.query(
         `
         INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
-          permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
-        comunicado_notificacion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
+          permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, 
+          comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, 
+          faltas_notificacion, salidas_anticipadas_mail, salidas_anticipadas_notificacion)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
         `
         , [id_empleado, vaca_mail, vaca_noti,
           permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-          comunicado_mail, comunicado_noti]);
+          comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail, faltas_noti,
+          salidas_anticipadas_mail, salidas_anticipadas_noti]);
 
       const [datosNuevos] = response.rows;
 
@@ -353,7 +352,9 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracionMultiple(req: Request, res: Response): Promise<void> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti,
+        atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti,
+        user_name, ip, ip_local } = req.body;
 
       const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de la base de datos)
       const batches = [];
@@ -364,22 +365,31 @@ class NotificacionTiempoRealControlador {
       await pool.query('BEGIN');
       for (const batch of batches) {
         const valores = batch
-          .map((id: number) => `(${id}, ${vaca_mail}, ${vaca_noti}, ${permiso_mail}, ${permiso_noti}, 
-                ${hora_extra_mail}, ${hora_extra_noti}, ${comida_mail}, ${comida_noti}, 
-                ${comunicado_mail}, ${comunicado_noti})`)
+          .map((id: number) =>
+            `
+              (${id}, ${vaca_mail}, ${vaca_noti}, ${permiso_mail}, ${permiso_noti}, 
+              ${hora_extra_mail}, ${hora_extra_noti}, ${comida_mail}, ${comida_noti}, 
+              ${comunicado_mail}, ${comunicado_noti}, ${atrasos_noti}, ${faltas_mail}, ${faltas_noti},
+          ${salidas_anticipadas_mail}, ${salidas_anticipadas_noti})
+            `)
           .join(', ');
 
-        // Ejecutar la inserción en cada lote
+        // EJECUTAR LA INSERCION EN CADA LOTE
         await pool.query(
-          `INSERT INTO eu_configurar_alertas (
-                id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
-                permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail,
-                comida_notificacion, comunicado_mail, comunicado_notificacion
-            ) VALUES ${valores}`
+          `
+          INSERT INTO eu_configurar_alertas 
+            (
+              id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
+              permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail,
+              comida_notificacion, comunicado_mail, comunicado_notificacion,
+              atrasos_notificacion, faltas_mail, faltas_notificacion, salidas_anticipadas_mail, 
+              salidas_anticipadas_notificacion
+            ) VALUES ${valores}
+          `
         );
       }
 
-      // Generar datos para la auditoría
+      // GENERAR DATOS PARA LA AUDITORIA
       const auditoria = id_empleado.map((id: number) => ({
         tabla: 'eu_configurar_alertas',
         usuario: user_name,
@@ -396,7 +406,12 @@ class NotificacionTiempoRealControlador {
           comida_mail: comida_mail,
           comida_notificacion: comida_noti,
           comunicado_mail: comunicado_mail,
-          comunicado_notificacion: comunicado_noti
+          comunicado_notificacion: comunicado_noti,
+          atrasos_notificacion: atrasos_noti,
+          faltas_mail: faltas_mail,
+          faltas_notificacion: faltas_noti,
+          salidas_anticipadas_mail: salidas_anticipadas_mail,
+          salidas_anticipadas_notificacion: salidas_anticipadas_noti
         }),
         ip,
         ip_local: ip_local,
@@ -405,14 +420,14 @@ class NotificacionTiempoRealControlador {
 
       await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
-      await pool.query('COMMIT'); // Finalizar transacción
+      await pool.query('COMMIT'); // FINALIZAR TRANSACCION
 
       res.jsonp({ message: 'Configuración guardada exitosamente' });
 
 
     } catch (error) {
       console.error('Error en CrearConfiguracion:', error);
-      await pool.query('ROLLBACK'); // Revertir transacción en caso de error
+      await pool.query('ROLLBACK'); // REVERTIR TRANSACCION EN CASO DE ERROR
       res.status(500).jsonp({ message: 'Error al guardar la configuración.' });
     }
   }
@@ -422,7 +437,9 @@ class NotificacionTiempoRealControlador {
   public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<Response> {
     try {
       const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail,
+        atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti,
+        user_name, ip, ip_local } = req.body;
       const id_empleado = req.params.id;
 
       // INICIAR TRANSACCION
@@ -453,12 +470,15 @@ class NotificacionTiempoRealControlador {
         `
         UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
           permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
-          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-        WHERE id_empleado = $11 RETURNING *
+          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10, 
+          atrasos_mail = $11, atrasos_notificacion = $12, faltas_mail = $13, faltas_notificacion = $14,
+          salidas_anticipadas_mail = $15, salidas_anticipadas_notificacion = $16
+        WHERE id_empleado = $17 RETURNING *
         `
         ,
         [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-          comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+          comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail,
+          faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, id_empleado]);
 
       const [datosNuevos] = actualizacion.rows;
 
@@ -489,7 +509,9 @@ class NotificacionTiempoRealControlador {
   public async ActualizarConfigEmpleadoMultiple(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip, ip_local } = req.body;
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail,
+        atrasos_noti, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti,
+        user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -503,12 +525,15 @@ class NotificacionTiempoRealControlador {
         `
         UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
           permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
-          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-        WHERE id_empleado = ANY($11::int[]) 
+          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10,
+          atrasos_mail = $11, atrasos_notificacion = $12, faltas_mail = $13, faltas_notificacion = $14,
+          salidas_anticipadas_mail = $15, salidas_anticipadas_notificacion = $16
+        WHERE id_empleado = ANY($17::int[])
         `
         ,
         [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-          comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+          comida_mail, comida_noti, comunicado_mail, comunicado_noti, atrasos_mail, atrasos_noti, faltas_mail,
+          faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_noti, id_empleado]);
 
       rowsAffected = actualizacion.rowCount || 0;
 
@@ -517,7 +542,10 @@ class NotificacionTiempoRealControlador {
         const itemModificado = {
           ...item, vacacion_mail: vaca_mail, vacacion_notificacion: vaca_noti, permiso_mail: permiso_mail,
           permiso_notificacion: permiso_noti, hora_extra_mail: hora_extra_mail, hora_extra_notificacion: hora_extra_noti, comida_mail: comida_mail,
-          comida_notificacion: comida_noti, comunicado_mail: comunicado_mail, comunicado_notificacion: comunicado_noti
+          comida_notificacion: comida_noti, comunicado_mail: comunicado_mail, comunicado_notificacion: comunicado_noti,
+          atrasos_mail: atrasos_mail, atrasos_notificacion: atrasos_noti, faltas_mail: faltas_mail,
+          faltas_notificacion: faltas_noti, salidas_anticipadas_mail: salidas_anticipadas_mail, 
+          salidas_anticipadas_noti: salidas_anticipadas_noti,
         }; // Cambiar los valores deseados
 
         return {
@@ -696,7 +724,7 @@ class NotificacionTiempoRealControlador {
       res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
-  
+
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;

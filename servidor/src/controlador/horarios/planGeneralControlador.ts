@@ -176,7 +176,7 @@ class PlanGeneralControlador {
                     })
                 }
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                // FINALIZAR TRANSACCIÓN
+                // FINALIZAR TRANSACCION
 
                 await pool.query('COMMIT');
             } catch (error) {
