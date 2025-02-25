@@ -127,14 +127,16 @@ export class ListaEmpleadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    
+    this.ValidarCedula('1727193848');
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -1145,7 +1147,7 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
-  
+
 
   ExportToCSV(numero: any) {
     if (numero === 1) {
@@ -1248,6 +1250,38 @@ export class ListaEmpleadosComponent implements OnInit {
       }) : this.toastr.info('No ha seleccionado usuarios.', '', {
         timeOut: 6000,
       });
+  }
+
+
+  ValidarCedula(cedula: string) {
+    console.log("entra a validar Cedula")
+    const inputElement =cedula
+
+    const cad: string = inputElement;
+    let total: number = 0;
+    const longitud: number = cad.length;
+    const longcheck: number = longitud - 1;
+
+    if (cad !== "" && longitud === 10) {
+      for (let i = 0; i < longcheck; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num)) return;
+
+        if (i % 2 === 0) {
+          num *= 2;
+          if (num > 9) num -= 9;
+        }
+        total += num;
+      }
+
+      total = total % 10 ? 10 - (total % 10) : 0;
+
+      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+        console.log("Cédula Válida")
+      } else {
+        console.log("Cédula Inválida")
+      }
+    }
   }
 
 }
