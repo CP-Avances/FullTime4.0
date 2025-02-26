@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
+import { error } from 'console';
 
 // AYUDA PARA CREAR LOS NIVELES
 interface Nivel {
@@ -110,7 +111,11 @@ export class EditarCatProcesosComponent implements OnInit {
       this.ObtenerProcesos();
       this.LimpiarCampos();
       this.CerrarVentana();
-    }, error => { });
+    }, error => {
+      this.toastr.error(error.error.message, 'Registro.', {
+        timeOut: 6000,
+      });
+     });
   }
 
   // METODO PARA LIMPIAR FORMULARIO
