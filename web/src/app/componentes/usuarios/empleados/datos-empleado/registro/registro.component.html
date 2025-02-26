@@ -62,7 +62,10 @@
                     </div>
 
                     <div class="row">
+                        
                         <div class="col-12 col-md-6">
+                            <br>
+                            <br>
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
                                 <input matInput type="text" formControlName="codigoForm" [readonly]="escritura"
@@ -73,20 +76,57 @@
                                 </mat-icon>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <mat-form-field>
-                                <mat-label>Cédula</mat-label>
-                                <input matInput type="text" placeholder="1788300293" maxlength="10"
-                                    formControlName="cedulaForm"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    (keypress)="IngresarSoloNumeros($event)" required
-                                    (input)="LlenarCodigo(primeroFormGroup.value)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
+                        
+                        <div class="col-12 col-md-6" style="margin-top: 9px;">
+                            <mat-radio-group aria-label="Select an option" [value]="identificacion" style="display: flex;" required >
+                                <div>
+                                    <mat-radio-button (change)="CambiarIdentificacion($event)" value="Cedula">
+                                        Cedula
+                                    </mat-radio-button>
+                                </div>
+                                <div>
+                                    <mat-radio-button (change)="CambiarIdentificacion($event)" value="Pasaporte">
+                                        Pasaporte
+                                    </mat-radio-button>
+                                </div>
+                        
+                            </mat-radio-group> 
+                            <div  *ngIf="identificacion=='Cedula'">
+                                <mat-form-field>
+                                    <mat-label>Cédula</mat-label>
+                                    <input matInput type="text" placeholder="1788300293" maxlength="10"
+                                        formControlName="cedulaForm"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        (keypress)="IngresarSoloNumeros($event)" required
+                                        (input)="LlenarCodigo(primeroFormGroup.value); ValidarCedula(primeroFormGroup.value) ">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="!cedulaValida">
+                                        <mat-icon>error</mat-icon> Cédula incorrecta
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+    
+                            <div *ngIf="identificacion=='Pasaporte'" >
+                                <mat-form-field>
+                                    <mat-label>Pasaporte</mat-label>
+                                    <input matInput type="text" placeholder="pasaporte" maxlength="10"
+                                        formControlName="cedulaForm"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        (keypress)="IngresarSoloNumeros($event)" required
+                                        (input)="LlenarCodigo(primeroFormGroup.value)">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
+
+                        
+
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6">

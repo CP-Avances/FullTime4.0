@@ -1,5 +1,5 @@
 // SECCION DE LIBRERIAS
-import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, FormControl, FormsModule  } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr'
@@ -7,6 +7,8 @@ import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Md5 } from 'ts-md5/dist/md5';
+import { MatRadioChange } from '@angular/material/radio';
+import { ChangeDetectorRef } from '@angular/core';
 
 // SECCION DE SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -57,7 +59,11 @@ export class RegistroComponent implements OnInit {
     public ventana: MatDialog,
     public generoS: GenerosService,
     public estadoS: EstadoCivilService,
-  ) { }
+    private cdRef: ChangeDetectorRef
+  ) { 
+   
+  }
+   identificacion ="Cedula"
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -296,6 +302,7 @@ export class RegistroComponent implements OnInit {
 
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
+  
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
@@ -316,6 +323,7 @@ export class RegistroComponent implements OnInit {
 
   // METODO PARA COLOCAR EL CODIGO SIMILAR AL CAMPO CEDULA
   LlenarCodigo(form1: any) {
+    
     if (this.cedula) {
       let codigo: number = form1.cedulaForm;
       this.primeroFormGroup.patchValue({
@@ -347,6 +355,51 @@ export class RegistroComponent implements OnInit {
     this.generoS.ListarGeneros().subscribe(res => {
       this.generos = res;
     });
+  }
+
+  
+
+  CambiarIdentificacion(ob: MatRadioChange){
+    this.identificacion=ob.value;
+  }
+
+  cedulaValida:boolean=false;
+  ValidarCedula(cedula: any) {
+    console.log("entra a validar Cedula", cedula)
+    const inputElement =cedula.cedulaForm;
+
+    const cad: string = inputElement;
+    let total: number = 0;
+    const longitud: number = cad.length;
+    const longcheck: number = longitud - 1;
+
+    if (cad !== "" && longitud === 10) {
+      for (let i = 0; i < longcheck; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num)) return;
+
+        if (i % 2 === 0) {
+          num *= 2;
+          if (num > 9) num -= 9;
+        }
+        total += num;
+      }
+
+      total = total % 10 ? 10 - (total % 10) : 0;
+
+      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+        this.cedulaValida=true;
+      
+
+        console.log("Cédula Válida")
+      } else {
+        this.cedulaValida=false;
+        this.cdRef.detectChanges();
+        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true }); // Cédula inválida
+        console.log("Cédula Inválida")
+      }
+    }
+
   }
 
 

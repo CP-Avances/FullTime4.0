@@ -200,46 +200,46 @@ export class ListarGeneroComponent {
             })
           }
         } else {
-          this.router.navigate(['/nivelTitulos']);
+          this.router.navigate(['/estado-civil']);
         }
       });
   }
 
 
-    // METODO DE ELIMINACION MULTIPLE
-    contador: number = 0;
-    ingresar: boolean = false;
-    EliminarMultiple() {
-      const data = {
-        user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
-      };
-      this.ingresar = false;
-      this.contador = 0;
-      this.generosEliminar = this.selectionGeneros.selected;
-      this.generosEliminar.forEach((datos: any) => {
-        this.generos = this.generos.filter(item => item.id !== datos.id);
-        this.contador = this.contador + 1;
-        this.restG.EliminarGenero(datos.id, data).subscribe((res: any) => {
-          if (res.message === 'error') {
-            this.toastr.error('Existen datos relacionados con ' + datos.genero + '.', 'No fue posible eliminar.', {
+  // METODO DE ELIMINACION MULTIPLE
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.generosEliminar = this.selectionGeneros.selected;
+    this.generosEliminar.forEach((datos: any) => {
+      this.generos = this.generos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.restG.EliminarGenero(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.genero + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
-            this.contador = this.contador - 1;
-          } else {
-            if (!this.ingresar) {
-              this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-                timeOut: 6000,
-              });
-              this.ingresar = true;
-            }
-            this.ListarGeneros();
+            this.ingresar = true;
           }
-        });
-      }
-      )
+          this.ListarGeneros();
+        }
+      });
     }
-  
+    )
+  }
+
 
 
   ManejarPagina(e: PageEvent) {
@@ -291,20 +291,20 @@ export class ListarGeneroComponent {
 
   ConfirmarDelete(datos: any) {
 
-        this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-          .subscribe((confirmado: Boolean) => {
-            if (confirmado) {
-              this.Eliminar(datos.id);
-              this.activar_seleccion = true;
-              this.plan_multiple = false;
-              this.plan_multiple_ = false;
-              this.generosEliminar = [];
-              this.selectionGeneros.clear();
-              this.ListarGeneros();
-            } else {
-              this.router.navigate(['/genero']);
-            }
-          });
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.generosEliminar = [];
+          this.selectionGeneros.clear();
+          this.ListarGeneros();
+        } else {
+          this.router.navigate(['/genero']);
+        }
+      });
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
@@ -328,7 +328,7 @@ export class ListarGeneroComponent {
   }
 
 
-  
+
 
 
 
@@ -359,7 +359,7 @@ export class ListarGeneroComponent {
 
 
   DefinirInformacionPDF() {
-  return {
+    return {
       // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -436,7 +436,7 @@ export class ListarGeneroComponent {
 
 
   async generarExcelGeneros() {
- this.OrdenarDatos(this.generos);
+    this.OrdenarDatos(this.generos);
 
     const generos: any[] = [];
     this.generos.forEach((nivel: any, index: number) => {
@@ -631,6 +631,6 @@ export class ListarGeneroComponent {
   }
 
 
-  
+
 
 }
