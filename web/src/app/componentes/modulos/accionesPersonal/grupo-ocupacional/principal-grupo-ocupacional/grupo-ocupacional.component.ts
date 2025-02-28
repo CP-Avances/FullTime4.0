@@ -136,6 +136,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     this._GrupoOp.ConsultarGrupoOcupacion().subscribe({
       next: (respuesta: any) => {
         this.ListGrupoOcupacional = respuesta
+        console.log('this.ListGrupoOcupacional: ',this.ListGrupoOcupacional);
       }, error: (err) => {
         this.toastr.error(err.error.message, 'Erro server', {
           timeOut: 6000,
@@ -446,8 +447,8 @@ export class GrupoOcupacionalComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Procesos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
-        this.presentarDataPDFProcesos(),
+        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        this.presentarDataPDFGrupoOcu(),
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -457,7 +458,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     };
   }
 
-  presentarDataPDFProcesos() {
+  presentarDataPDFGrupoOcu() {
     return {
       columns: [
         { width: '*', text: '' },
@@ -468,12 +469,14 @@ export class GrupoOcupacionalComponent implements OnInit {
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },
-                { text: 'Descripcion', style: 'tableHeader' },
+                { text: 'Grupo', style: 'tableHeader' },
+                { text: 'Numero partida', style: 'tableHeader' },
               ],
               ...this.ListGrupoOcupacional.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.descripcion, style: 'itemsTable' },
+                  { text: obj.numero_partida, style: 'itemsTable'}
                 ];
               })
             ]
@@ -528,9 +531,8 @@ export class GrupoOcupacionalComponent implements OnInit {
       objeto = {
         "proceso": {
           '@id': obj.id,
-          "nombre": obj.nombre,
-          "nivel": obj.nivel,
-          "proceso_superior": obj.proc_padre,
+          "descripcion": obj.descripcion,
+          "numero_partida": obj.numero_partida,
         }
       }
       arregloGrados.push(objeto)

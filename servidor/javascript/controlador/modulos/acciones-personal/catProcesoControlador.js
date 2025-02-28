@@ -341,7 +341,7 @@ class ProcesoControlador {
                                         existe_proceso_padre = true;
                                         const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre;
                                         if (procesoPadre == item.proceso) {
-                                            item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos';
+                                            item.observacion = 'Procesos mal definidos';
                                         }
                                     }
                                     else {
@@ -362,7 +362,7 @@ class ProcesoControlador {
                                                 p.proceso_padre.toLowerCase() === item.proceso.toLowerCase() &&
                                                 p.observacion === 'no registrado' && item.observacion === 'no registrado'));
                                             if (cruzado) {
-                                                item.observacion = 'Registro cruzado';
+                                                item.observacion = 'Procesos mal definidos (plantilla)';
                                             }
                                             else {
                                                 if (existe_proceso_padre == false) {

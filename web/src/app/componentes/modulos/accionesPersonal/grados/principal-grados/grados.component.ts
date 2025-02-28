@@ -443,8 +443,8 @@ export class GradosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Procesos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
-        this.presentarDataPDFProcesos(),
+        { text: 'Lista de Grados', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        this.presentarDataPDFGrados(),
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -454,7 +454,7 @@ export class GradosComponent implements OnInit {
     };
   }
 
-  presentarDataPDFProcesos() {
+  presentarDataPDFGrados() {
     return {
       columns: [
         { width: '*', text: '' },
@@ -465,7 +465,7 @@ export class GradosComponent implements OnInit {
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },
-                { text: 'Descripcion', style: 'tableHeader' },
+                { text: 'Grado', style: 'tableHeader' },
               ],
               ...this.ListGrados.map((obj: any) => {
                 return [

@@ -376,10 +376,12 @@ export class PrincipalProcesoComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe el proceso en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'Registro cruzado' ||
+    } else if (observacion  == 'Registro cruzado' || observacion == 'Proceso padre no existe en el archivo como proceso.' ||
       observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
     ) {
       return 'rgb(238, 21, 242)';
+    }else if(observacion == 'Procesos mal definidos (plantilla)' || observacion == 'Procesos mal definidos'){
+      return 'rgb(232, 137, 207)';
     } else {
       return 'rgb(242, 21, 21)';
     }

@@ -165,6 +165,7 @@ export class EmpleadoGrupoComponent {
              this.toastr.success(respuesta.message, 'Correcto.', {
                timeOut: 4500,
              });
+             this.ngOnInit();
            },error: (err: any) => {
              this.toastr.error(err.error.message, 'Error.', {
                timeOut: 4500,
