@@ -575,6 +575,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
 
     if (!this.MAP) {
+      console.log("Ingresa 1");
       // INICIALIZAR EL MAPA SOLO SI NO ESTA YA INICIALIZADO
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
@@ -584,6 +585,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
     } else {
+      console.log("Ingresa 2");
       // SOLO ACTUALIZAR LA VISTA DEL MAPA SI YA ESTA INICIALIZADO
       this.MAP.setView([latitud, longitud], zoom);
     }
@@ -627,8 +629,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
   }
 
+  /*
   // METODO EDICION DE REGISTRO DE EMPLEADO
-  AbirVentanaEditarEmpleado(dataEmpley: any) {
+  AbrirVentanaEditarEmpleado(dataEmpley: any) {
     this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
       .afterClosed().subscribe(result => {
         if (result) {
@@ -636,6 +639,27 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         }
       })
   }
+      */
+
+  editar_empleado: boolean = false;
+  pagina_empleado: any ="";
+  empleado_editar: any=[];
+  ver_empleado: boolean=true;
+
+  AbirVentanaEditarEmpleado(datoEmpleado: any){
+    this.ver_empleado=false;
+    this.editar_empleado=true;
+    this.empleado_editar=datoEmpleado;
+    this.pagina_empleado='ver-empleado';
+  }
+
+
+
+
+
+
+
+  
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *

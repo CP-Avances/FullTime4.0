@@ -164,7 +164,7 @@ export class RegistroProvinciaComponent implements OnInit {
         this.toastr.success("Registro guardado exitosamente.", "", {
           timeOut: 6000,
         });
-        this.LimpiarCampos();
+        this.CerrarVentana();
       },
       (error) => {
         this.toastr.error("Ups!!! algo salio mal.", "Ups!!! algo salio mal.", {

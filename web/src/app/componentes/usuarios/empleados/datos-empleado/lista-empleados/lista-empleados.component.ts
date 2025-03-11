@@ -135,7 +135,6 @@ export class ListaEmpleadosComponent implements OnInit {
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
-    
     this.ValidarCedula('1727193848');
 
     this.GetEmpleados();
@@ -526,7 +525,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
+      if (this.datosCodigo[0].automatico === true) {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -542,19 +541,20 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-          this.numero_paginaMul = 1;
-          this.tamanio_paginaMul = 5;
-          this.VerificarPlantillaManual();
-        } else {
-          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
-            timeOut: 6000,
-          });
-          this.archivoForm.reset();
-          this.nameFile = '';
-          this.LimpiarCampos();
-          this.mostrarbtnsubir = false;
-        }
+     
+          if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+            this.numero_paginaMul = 1;
+            this.tamanio_paginaMul = 5;
+            this.VerificarPlantillaManual();
+          } else {
+            this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
+              timeOut: 6000,
+            });
+            this.archivoForm.reset();
+            this.nameFile = '';
+            this.LimpiarCampos();
+            this.mostrarbtnsubir = false;
+          }
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
@@ -1255,7 +1255,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   ValidarCedula(cedula: string) {
     console.log("entra a validar Cedula")
-    const inputElement =cedula
+    const inputElement = cedula
 
     const cad: string = inputElement;
     let total: number = 0;

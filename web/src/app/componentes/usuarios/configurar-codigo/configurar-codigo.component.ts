@@ -70,6 +70,7 @@ export class ConfigurarCodigoComponent implements OnInit {
         this.CrearAutomatico(form);
       }
       else {
+        console.log('llamado a actualizar manual')
         this.CrearManualCedula();
       }
     });

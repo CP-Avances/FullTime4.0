@@ -345,6 +345,9 @@ import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal
 import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/empleado-grado/empleado-grado.component';
 import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/empleado-grupo/empleado-grupo.component';
 import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/editar-registro/editar-registro.component';
+import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
+import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
 
 @NgModule({
   declarations: [
@@ -647,6 +650,9 @@ import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/
     EmpleadoGradoComponent,
     EmpleadoGrupoComponent,
     EditarRegistroComponent,
+    EditarNacionalidadComponent,
+    ListarNacionalidadComponent,
+    RegistrarNacionalidadComponent,
 
   ],
 

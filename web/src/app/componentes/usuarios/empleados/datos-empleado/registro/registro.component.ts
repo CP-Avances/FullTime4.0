@@ -145,10 +145,19 @@ export class RegistroComponent implements OnInit {
         this.escritura = true;
       }
       else if (this.datosCodigo.cedula === true) {
-        this.cedula = true;
-        this.escritura = true;
+        console.log("this.identificacion", this.identificacion)
+        if(this.identificacion == 'Pasaporte')
+        {
+          this.escritura = false;
+          this.cedula = false;
+        }else{
+          this.cedula = true;
+          this.escritura = true;
+        }
+    
       }
       else {
+        
         this.escritura = false;
 
       }
@@ -389,8 +398,6 @@ export class RegistroComponent implements OnInit {
 
       if (parseInt(cad.charAt(longitud - 1), 10) === total) {
         this.cedulaValida=true;
-      
-
         console.log("Cédula Válida")
       } else {
         this.cedulaValida=false;
@@ -399,6 +406,13 @@ export class RegistroComponent implements OnInit {
         console.log("Cédula Inválida")
       }
     }
+
+  }
+
+
+  pasaporteValida:boolean=false;
+  ValidarPasaporte(pasaporte:any){
+    
 
   }
 

@@ -235,4 +235,8 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             this.ConfigurarMultiple(form);
         }
     }
+
+
+    
+
 }
