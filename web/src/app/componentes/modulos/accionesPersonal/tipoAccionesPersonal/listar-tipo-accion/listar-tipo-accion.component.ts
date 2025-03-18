@@ -8,7 +8,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
+import ExcelJS, { FillPattern } from "exceljs";
+import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import { FillPatterns } from 'exceljs';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -17,6 +20,9 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { auto } from '@popperjs/core';
+
+(ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
 
 @Component({
   selector: 'app-listar-tipo-accion',
@@ -62,6 +68,12 @@ export class ListarTipoAccionComponent implements OnInit {
   });
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+  private fillAzul!: FillPatterns;
+  private fontTitulo!: Partial<ExcelJS.Font>;
+  private imagen: any;
 
   constructor(
     public restEmpre: EmpresaService,
@@ -505,14 +517,334 @@ export class ListarTipoAccionComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-  exportToExcel() {
-    /*
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'TipoPermisos');
-    xlsx.writeFile(wb, "TipoAccionesPersonalEXCEL" + new Date().getTime() + '.xlsx');
-    */
+  async exportToExcel() {  
+      var f = DateTime.now();
+      let fecha = f.toFormat('yyyy-MM-dd');
+      let hora = f.toFormat('HH:mm:ss');
+  
+      let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
+
+      console.log('this.tipo_acciones: ',this.tipo_acciones);
+  
+      const tipo_acciones_perso: any[] = [];
+      this.tipo_acciones.forEach((accion: any, index: number) => {
+    
+        tipo_acciones_perso.push([
+          index + 1,
+          accion.nombre,
+          accion.descripcion,
+          accion.base_legal
+        ]);
+      });
+  
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Tipos accion personal");
+  
+  
+      console.log("ver logo. ", this.logo)
+      this.imagen = workbook.addImage({
+        base64: this.logo,
+        extension: "png",
+      });
+  
+      worksheet.addImage(this.imagen, {
+        tl: { col: 0, row: 0 },
+        ext: { width: 250, height: 100 },
+      });
+
+      //APLICAR ESTILOS DE WIDTH (ANCHO) A LA COLUMNAS
+      worksheet.getColumn('A').width = 2;
+      worksheet.getColumn('B').width = 10;
+      worksheet.getColumn('C').width = 10;
+      worksheet.getColumn('D').width = 10;
+      worksheet.getColumn('F').width = 10;
+      worksheet.getColumn('G').width = 10;
+      worksheet.getColumn('H').width = 2;
+      worksheet.getColumn('I').width = 1;
+      worksheet.getColumn('J').width = 10;
+      worksheet.getColumn('P').width = 2;
+
+      worksheet.getRow(1).height = 70;
+      worksheet.getRow(2).height = 13;
+      worksheet.getRow(3).height = 40;
+      worksheet.getRow(5).height = 40;
+      worksheet.getRow(6).height = 40;
+      worksheet.getRow(7).height = 40;
+      worksheet.getRow(8).height = 30;
+      worksheet.getRow(10).height = 40;
+      worksheet.getRow(11).height = 40;
+      worksheet.getRow(12).height = 15;
+      worksheet.getRow(21).height = 14;
+      worksheet.getRow(22).height = 40;
+      worksheet.getRow(23).height = 180;
+
+      // COMBINAR CELDAS
+      worksheet.mergeCells("A1:J5");
+      worksheet.mergeCells("K1:P1");
+      worksheet.mergeCells("K2:P2");
+      worksheet.mergeCells("K3:L3");
+      worksheet.mergeCells("M3:P3");
+      worksheet.mergeCells("K4:P4");
+      worksheet.mergeCells("K5:P5");
+      worksheet.mergeCells("A6:H6");
+      worksheet.mergeCells("I6:P6");
+      worksheet.mergeCells("A7:H7");
+      worksheet.mergeCells("I7:P7");
+      worksheet.mergeCells("A8:D9");
+      worksheet.mergeCells("E8:H9");
+      worksheet.mergeCells("I8:P8");
+      worksheet.mergeCells("I9:L9");
+      worksheet.mergeCells("M9:P9");
+      worksheet.mergeCells("A10:D10");
+      worksheet.mergeCells("E10:H10");
+      worksheet.mergeCells("I10:L10");
+      worksheet.mergeCells("M10:P10");
+      worksheet.mergeCells("A11:P11");
+
+      // COMBINAR CELDAS PARA LOS CHECKBOX
+      worksheet.mergeCells("A12:P12");
+      worksheet.mergeCells("A13:A19");
+      worksheet.mergeCells("P13:P19");
+      worksheet.mergeCells("A21:P21");
+      worksheet.mergeCells("A22:P22");
+
+      worksheet.mergeCells("B13:C13");
+      worksheet.mergeCells("B14:C14");
+      worksheet.mergeCells("B15:C15");
+      worksheet.mergeCells("B16:C16");
+      worksheet.mergeCells("B17:C17");
+      worksheet.mergeCells("B18:C18");
+
+      worksheet.mergeCells("E13:F13");
+      worksheet.mergeCells("E14:F14");
+      worksheet.mergeCells("E15:F15");
+      worksheet.mergeCells("E16:F16");
+      worksheet.mergeCells("E17:F17");
+      worksheet.mergeCells("E18:F18");
+
+      worksheet.mergeCells("J13:K13");
+      worksheet.mergeCells("J14:K14");
+      worksheet.mergeCells("J15:K15");
+      worksheet.mergeCells("J16:K16");
+      worksheet.mergeCells("J17:K17");
+      worksheet.mergeCells("J18:K18");
+
+      worksheet.mergeCells("M13:N13");
+      worksheet.mergeCells("M14:N14");
+      worksheet.mergeCells("M15:O15");
+      worksheet.mergeCells("M16:O16");
+      worksheet.mergeCells("M17:O17");
+      worksheet.mergeCells("M18:O18");
+
+      worksheet.mergeCells("B19:F19");
+      worksheet.mergeCells("G19:O19");
+
+      worksheet.mergeCells("H20:I20");
+      worksheet.mergeCells("M20:P20");
+
+      worksheet.mergeCells("A23:P23");
+
+
+      
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      //worksheet.getCell("K1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+      worksheet.getCell("K1").value = "Acción de Personal".toUpperCase();
+      worksheet.getCell("K3").value = "Nro.";
+      worksheet.getCell("K4").value = "Fecha de elaboración".toUpperCase();
+      worksheet.getCell("A6").value = "apellidos".toUpperCase();
+      worksheet.getCell("I6").value = "nombres".toUpperCase();
+      worksheet.getCell("A8").value = "documento de identificación".toUpperCase();
+      worksheet.getCell("E8").value = "nro. de identifiación".toUpperCase();
+      worksheet.getCell("I8").value = "rige:".toUpperCase();
+      worksheet.getCell("I9").value = "Desde ".toUpperCase()+"(dd-mm-aaaa)"
+      worksheet.getCell("M9").value = "Hasta ".toUpperCase()+"(dd-mm-aaaa)(cuando aplica)"
+      worksheet.getCell("A11").value = "Escoja una opción (según lo estipulado en el artículo 21 del Reglamento General a la Ley Orgánica del Servicio Público)"
+      
+      
+      worksheet.getCell("B13").value = "ingreso".toUpperCase()
+      worksheet.getCell("B14").value = "reingreso".toUpperCase()
+      worksheet.getCell("B15").value = "restitución".toUpperCase()
+      worksheet.getCell("B16").value = "reintegro".toUpperCase()
+      worksheet.getCell("B17").value = "ascenso".toUpperCase()
+      worksheet.getCell("B18").value = "traslado".toUpperCase()
+
+      worksheet.getCell("E13").value = "traspaso".toUpperCase()
+      worksheet.getCell("E14").value = "cambio administrativo".toUpperCase()
+      worksheet.getCell("E15").value = "itercambio voluntario".toUpperCase()
+      worksheet.getCell("E16").value = "licencia".toUpperCase()
+      worksheet.getCell("E17").value = "comisión de servicios".toUpperCase()
+      worksheet.getCell("E18").value = "sanciones".toUpperCase()
+
+      worksheet.getCell("J13").value = "incremento rmu".toUpperCase()
+      worksheet.getCell("J14").value = "subrogación".toUpperCase()
+      worksheet.getCell("J15").value = "encargo".toUpperCase()
+      worksheet.getCell("J16").value = "cesación de funciones".toUpperCase()
+      worksheet.getCell("J17").value = "destitución".toUpperCase()
+      worksheet.getCell("J18").value = "vacaciones".toUpperCase()
+
+      worksheet.getCell("M13").value = "revisión clasi. puesto".toUpperCase()
+      worksheet.getCell("M14").value = "otro (detallar)".toUpperCase()
+
+      worksheet.getCell("B19").value = "EN CASO DE REQUERIR ESPECIFICACIÓN DE LO SELECCIONADO:s".toUpperCase()
+      worksheet.getCell("B20").value = " * PRESENTÓ LA DECLARACIÓN JURADA (número 2 del art. 3 RLOSEP) "
+      worksheet.getCell("H20").value = " SI "
+      worksheet.getCell("K20").value = " NO APLICA "
+      worksheet.getCell("B22").value = "   MOTIVACIÓN: (adjuntar anexo si lo posee) "
+
+
+      // Definir la validación de datos (lista desplegable)
+      worksheet.getCell("D13").dataValidation = {
+        type: "list",
+        allowBlank: true,
+        formulae: ["✔", "✘"], // Opciones: Marcado (✔) o No marcado (✘)
+      };
+
+
+
+      //DAMOS EL ESTILO DE BORDES A LAS CELDAS
+      const borderStyle: Partial<ExcelJS.Borders> = {
+        top: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
+        left: { style: "thin", color: { argb: "000000" } }, // Borde izquierdo negro
+        bottom: { style: "thin", color: { argb: "000000" } }, // Borde inferior negro
+        right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+      };
+
+      const borderRightStyle: Partial<ExcelJS.Borders> = {
+        right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+      };
+
+      const borderbottomStyle: Partial<ExcelJS.Borders> = {
+        bottom: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+      };
+
+      //DAMOS EL ESTILO DE BACKGROUND COLOR A LAS CELDAS
+      const backgroundColorStyle: ExcelJS.FillPattern  = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "F2F1EC" }, // Amarillo (puedes cambiarlo por otro color)
+      };
+
+      const backgroundColorStyleWhite: ExcelJS.FillPattern  = {
+        type: "pattern",
+        pattern: "solid",
+        bgColor: { argb: "FFFFFF" },
+        fgColor: { argb: "FFFFFF" }, // BLANCO (puedes cambiarlo por otro color)
+      };
+
+      const totalFilas = 23; // Empieza en la fila 6 (donde comienza la tabla)
+      const totalColumnas = 16; // Número de columnas en la tabla
+
+      for (let i = 0; i <= totalFilas; i++) {
+        for (let j = 1; j <= totalColumnas; j++) {
+          const cell = worksheet.getRow(i).getCell(j);
+
+          if(i <= 11 || i == 22 || i == 23){
+            cell.border = borderStyle; // Aplicar bordes negros
+          }else if(i >= 12 && i <= 21 && j == 16){
+            cell.border = borderRightStyle
+          }else if(i >= 15 && i <= 18 && j >= 13 && j <= 15){
+            cell.border = borderbottomStyle
+          }
+
+          if(i == 19 && j >= 7 && j <= 15){
+            cell.border = borderbottomStyle
+          }
+          
+          if((i == 1 && j >= 11) || 
+            (i == 3 && (j >= 11 && j < 13)) || 
+            (i == 4 && j >= 11) || (i == 6) ||  
+            (i >= 8 && i <= 9) || (i == 11) ||
+            (i == 22) ||
+            (i == 20 && j >= 2 && j<= 12)
+          ){
+            cell.fill = backgroundColorStyle; // Aplicar color de fondo
+          }
+
+          if(i >= 13 && i <= 19){
+            cell.fill = backgroundColorStyleWhite
+          }
+
+          if (i === 0) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else {
+            cell.alignment = {
+              vertical: "middle",
+              //horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+            };
+          }
+          
+        }
+      }
+      
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["A1", "K1", "K3", "K4", "A6", "I6", "A8", "A9", "E8", "E9", "I8", "I9", "M9", "A11"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        if(cell == 'K1'){
+          worksheet.getCell(cell).font = { bold: true, size: 18 };
+        }else if(cell == "A8" || cell == 'A9' ||
+                cell == "K3" || cell == 'K4' || 
+                cell == 'A6' || cell == 'I6' || 
+                cell == 'I8' || cell == 'I9' ||
+                cell == 'E8' || cell == 'E9' ||
+                cell == 'M9' || cell == "A11"
+              ){
+          console.log('cell: ',cell);
+          worksheet.getCell(cell).font = { bold: true, size: 10 };
+        }
+          
+      });
+
+      worksheet.getCell('A1').alignment = {
+          horizontal: "center",
+          vertical: "middle",
+      };
+  
+  
+      const columnas = [
+        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+        { name: "NOMBRE", totalsRowLabel: "Total:", filterButton: true },
+        { name: "DESCRIPCION", totalsRowLabel: "Total:", filterButton: true },
+        { name: "BASE LEGAL", totalsRowLabel: "Total:", filterButton: true },
+      ];
+      console.log("ver tipo_acciones_perso", tipo_acciones_perso);
+      console.log("Columnas:", columnas);
+  
+      worksheet.addTable({
+        name: "Tipo accion personal",
+        ref: "A30",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium16",
+          showRowStripes: true,
+        },
+        columns: columnas,
+        rows: tipo_acciones_perso,
+      });
+  
+      try {
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/octet-stream" });
+        FileSaver.saveAs(blob, "tipo_acciones_personal.xlsx");
+      } catch (error) {
+        console.error("Error al generar el archivo Excel:", error);
+      }
   }
+
+    private obtenerAlineacionHorizontalEmpleados(
+      j: number
+    ): "left" | "center" | "right" {
+      if (j === 1 || j === 9 || j === 10 || j === 11) {
+        return "center";
+      } else {
+        return "left";
+      }
+    }
 
   /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
