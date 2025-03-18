@@ -280,8 +280,9 @@
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">GÉNERO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Régimen Laboral</th>
@@ -294,10 +295,11 @@
                             <tr *ngFor="let e of arr_emp | paginate:tamanio_pagina:numero_pagina">
                                 <td class="t_horarios">{{ e.n }}</td>
                                 <td class="t_horarios">{{ e.cedula }}</td>
-                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
                                 <td class="t_horarios">{{ e.codigo }}</td>
-                                <td class="t_horarios">{{ e.sucursal }}</td>
+                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
+                                <td class="t_horarios">{{ e.genero }}</td>
                                 <td class="t_horarios">{{ e.ciudad }}</td>
+                                <td class="t_horarios">{{ e.sucursal }}</td>
                                 <td class="t_horarios">{{ e.regimen }}</td>
                                 <td class="t_horarios">{{ e.departamento }}</td>
                                 <td class="t_horarios">{{ e.cargo }}</td>

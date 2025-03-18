@@ -85,6 +85,9 @@ import { EditarVacunaComponent } from '../../vacunacion/editar-vacuna/editar-vac
 import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+
 
 @Component({
   selector: 'app-ver-empleado',
@@ -153,6 +156,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     public restDocumentos: DocumentosService, // SERVICIO DE DOCUMENTOS
     public restAutoridad: AutorizaDepartamentoService, // SERVICIO DATOS JEFES
     public restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public restGenero: GenerosService,
+    public restEstadoCivil: EstadoCivilService,
     public restPermiso: PermisosService, // SERVICIO DATOS PERMISOS
     public restEmpresa: EmpresaService, // SERVICIO DATOS EMPRESA
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACIÓN
@@ -203,6 +208,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
         this.VerAccionContrasena();
         this.ObtenerNacionalidades();
+        this.ObtenerGeneros();
+        this.ObtenerEstadosCiviles();
         this.VerFuncionalidades();
         this.LeerDatosIniciales();
         this.VerEmpresa();
@@ -573,34 +580,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       longitud = -78.4875258;
       zoom = 7;
     }
-
-    if (!this.MAP) {
-      console.log("Ingresa 1");
-      // INICIALIZAR EL MAPA SOLO SI NO ESTA YA INICIALIZADO
+  
+    setTimeout(() => {
+      if (this.MAP) {
+        this.MAP.remove();
+        this.MAP = null;
+      }
+  
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
         zoom: zoom
       });
+  
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
-    } else {
-      console.log("Ingresa 2");
-      // SOLO ACTUALIZAR LA VISTA DEL MAPA SI YA ESTA INICIALIZADO
-      this.MAP.setView([latitud, longitud], zoom);
-    }
-
-    // LIMPIAR MARCADORES EXISTENTES
-    if (this.MARKER) {
-      this.MAP.removeLayer(this.MARKER);
-    }
-
-    // CREAR UN NUEVO MARCADOR Y AGREGARLO AL MAPA
-    this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
-
-    // ACTUALIZAR EL POPUP DEL MARCADOR
-    this.MARKER.bindPopup(empleado).openPopup();
+  
+      if (this.MARKER) {
+        this.MAP.removeLayer(this.MARKER);
+      }
+  
+      this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
+      this.MARKER.bindPopup(empleado).openPopup();
+    }, 100); 
   }
+  
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
@@ -3124,8 +3128,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   DefinirInformacionPDF() {
-    let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].estado_civil - 1];
-    let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
+    let estadoCivil : any;
+    let genero : any;
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
     this.nacionalidades.forEach((element: any) => {
@@ -3133,6 +3137,18 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         nacionalidad = element.nombre;
       }
     });
+    this.generos.forEach((element:any)=>{
+      if(this.empleadoUno[0].genero == element.id){
+        genero=element.genero;
+      }
+    });
+    this.estadosCiviles.forEach((element:any)=>{
+      if(this.empleadoUno[0].estado_civil == element.id){
+        estadoCivil=element.estado_civil;
+      }
+    });
+
+    
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3531,7 +3547,26 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   DefinirInfoHistoricoPDF() {
-    const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido
+    const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido;
+      let estadoCivil : any;
+      let genero : any;
+      let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
+      let nacionalidad: any;
+      this.nacionalidades.forEach((element: any) => {
+        if (this.empleadoUno[0].id_nacionalidad == element.id) {
+          nacionalidad = element.nombre;
+        }
+      });
+      this.generos.forEach((element:any)=>{
+        if(this.empleadoUno[0].genero == element.id){
+          genero=element.genero;
+        }
+      });
+      this.estadosCiviles.forEach((element:any)=>{
+        if(this.empleadoUno[0].estado_civil == element.id){
+          estadoCivil=element.estado_civil;
+        }
+      });
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -3560,7 +3595,37 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: 'HISTÓRICO', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
-        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: nombre_usuario, bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 10] },
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  text: [
+                    'CI: ' + this.empleadoUno[0].cedula + '\n',
+                    'Nacionalidad: ' + nacionalidad + '\n',
+                    'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                    'Estado civil: ' + estadoCivil + '\n',
+                    'Género: ' + genero + '\n',
+                  ],
+                  style: 'item'
+                },
+                {
+                  text: [
+                    'Código: ' + this.empleadoUno[0].codigo + '\n',
+                    'Teléfono: ' + this.empleadoUno[0].telefono + '\n',
+                    'Estado: ' + estado + '\n',
+                    'Domicilio: ' + this.empleadoUno[0].domicilio + '\n',
+                  ],
+                  style: 'item'
+                },
+              ]
+            ]
+          },
+          layout: 'noBorders', // Esto elimina los bordes de la tabla
+          alignment: 'left', // Alinea la tabla a la izquierda
+        },
         this.PresentarDataPDFContratosCargo(),
       ],
       styles: {
@@ -3729,15 +3794,27 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-      let genero = this.GeneroSelect[obj.genero - 1];
-      let estado = this.EstadoSelect[obj.estado - 1];
+      let estadoCivil : any;
+      let genero : any;
+      let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
-        if (obj.id_nacionalidad == element.id) {
+        if (this.empleadoUno[0].id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
       });
+      this.generos.forEach((element:any)=>{
+        if(this.empleadoUno[0].genero == element.id){
+          genero=element.genero;
+        }
+      });
+      this.estadosCiviles.forEach((element:any)=>{
+        if(this.empleadoUno[0].estado_civil == element.id){
+          estadoCivil=element.estado_civil;
+        }
+      });
+
+
       objeto = {
         'Codigo': obj.codigo,
         "Apellido": obj.apellido,
@@ -4376,8 +4453,21 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Unión de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
-  GeneroSelect: any = ['Masculino', 'Femenino'];
+  generos: any=[];
+  ObtenerGeneros(){
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
+
+  estadosCiviles: any=[];
+  ObtenerEstadosCiviles(){
+    this.restEstadoCivil.ListarEstadoCivil().subscribe(datos => {
+      this.estadosCiviles = datos;
+    })
+
+  }
+
   EstadoSelect: any = ['Activo', 'Inactivo'];
 
   urlxml: string;
@@ -4386,13 +4476,23 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let objeto: any;
     let arregloEmpleado: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-      let genero = this.GeneroSelect[obj.genero - 1];
-      let estado = this.EstadoSelect[obj.estado - 1];
+      let estadoCivil : any;
+      let genero : any;
+      let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
-        if (obj.id_nacionalidad == element.id) {
+        if (this.empleadoUno[0].id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
+        }
+      });
+      this.generos.forEach((element:any)=>{
+        if(this.empleadoUno[0].genero == element.id){
+          genero=element.genero;
+        }
+      });
+      this.estadosCiviles.forEach((element:any)=>{
+        if(this.empleadoUno[0].estado_civil == element.id){
+          estadoCivil=element.estado_civil;
         }
       });
 

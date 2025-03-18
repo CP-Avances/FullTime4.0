@@ -66,24 +66,24 @@ export class EditarGeneroComponent {
 
 
 
-  // METODO PARA ACTUALIZAR TITULO
+  // MÉTODO PARA ACTUALIZAR GÉNERO
   ActualizarTitulo(form: any) {
+    let nombreGenero = form.GeneroForm.trim();
+    let generoFormateado = nombreGenero.charAt(0).toUpperCase() + nombreGenero.slice(1).toLowerCase();
+
     let genero = {
       id: this.data.id,
-      genero: form.GeneroForm,
+      genero: generoFormateado,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
-    if ((genero.genero).toUpperCase() === (this.data.genero).toUpperCase()) {
+
+    if (generoFormateado === this.data.genero) {
       this.AlmacenarTitulo(genero);
-    }
-    else {
-      // METODO PARA VALIDAR DUPLICADOS
-        
-      
-      this.generoS.BuscarGenero((genero.genero).toUpperCase()).subscribe(response => {
-        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+    } else {
+      this.generoS.BuscarGenero(generoFormateado).subscribe(response => {
+        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
           timeOut: 3000,
         });
       }, vacio => {
@@ -92,9 +92,7 @@ export class EditarGeneroComponent {
     }
   }
 
-
-
-  // METODO PARA ALMACENAR DATOS TITULO EN EL SISTEMA
+  // MÉTODO PARA ALMACENAR DATOS DEL GÉNERO ACTUALIZADO EN LA BASE DE DATOS
   AlmacenarTitulo(titulo: any) {
     this.generoS.ActualizarUnGenero(titulo).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {

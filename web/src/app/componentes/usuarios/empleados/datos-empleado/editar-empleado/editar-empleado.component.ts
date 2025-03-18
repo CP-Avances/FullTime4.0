@@ -418,13 +418,25 @@ export class EditarEmpleadoComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   Cancelar(opcion: any) {
     this.componentev.ver_empleado = true;
+    
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_empleado = false;
+      
       if (opcion === 2) {
         this.componentev.VerEmpleado(this.componentev.formato_fecha);
-         var empleado=this.componentev.empleadoUno[0].nombre + ' ' + this.componentev.empleadoUno[0].apellido
-          this.componentev.MapGeolocalizar(this.componentev.empleadoUno[0].latitud, this.componentev.empleadoUno[0].longitud, empleado)
-        
+  
+        setTimeout(() => {
+          const divMapa = document.getElementById('geolocalizacion');
+  
+          if (divMapa) {
+            var empleado = this.componentev.empleadoUno[0].nombre + ' ' + this.componentev.empleadoUno[0].apellido;
+            this.componentev.MapGeolocalizar(
+              this.componentev.empleadoUno[0].latitud,
+              this.componentev.empleadoUno[0].longitud,
+              empleado
+            );
+          } 
+        }, 200);
       }
     }
   }

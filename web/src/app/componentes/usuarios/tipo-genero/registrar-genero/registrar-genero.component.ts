@@ -43,19 +43,21 @@ export class RegistrarGeneroComponent {
 
   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarGenero(form: any) {
+    let nombreGenero = form.generoForm.trim();
+    let generoFormateado = nombreGenero.charAt(0).toUpperCase() + nombreGenero.slice(1).toLowerCase();
+  
     let genero = {
-      genero: form.generoForm,
+      genero: generoFormateado,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    // VERIIFCAR DUPLICIDAD
-    let nombre_genero = (genero.genero).toUpperCase();
-    this.genero.BuscarGenero(nombre_genero).subscribe(response => {
-      this.toastr.warning('El genero ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+  
+    this.genero.BuscarGenero(generoFormateado).subscribe(response => {
+      this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups!!! Algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {
-      // GUARDAR DATOS EN EL SISTEMA
       this.GuardarDatos(genero);
     });
   }

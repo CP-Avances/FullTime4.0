@@ -18,6 +18,8 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -149,10 +151,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
     private restP: ParametrosService,
+    private restGenero: GenerosService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.ObtenerGeneros();
   }
 
   ngOnInit(): void {
@@ -491,13 +495,16 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
       // PRESENTACION DE LA INFORMACION
       let arr_emp: any = [];
-      selec.empleados.forEach((empl: any) => {
-        arr_emp.push(empl)
-      });
 
-      arr_emp.sort(function (a: any, b: any) {
-        return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
+      selec.empleados.forEach((empl: any) => {
+      let generoObj = this.generos.find((g: any) => g.id == empl.genero);
+      let nombreGenero = generoObj ? generoObj.genero : "No especificado"; 
+
+      arr_emp.push({
+        ...empl, 
+        genero: nombreGenero 
       });
+    });
 
       n.push({
         style: 'tableMargin',
@@ -524,7 +531,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
                 { style: 'itemsTable', text: usu.cedula },
                 { style: 'itemsTableCentrado', text: usu.codigo },
                 { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
+                { style: 'itemsTableCentrado', text: usu.genero},
                 { style: 'itemsTable', text: usu.ciudad },
                 { style: 'itemsTable', text: usu.sucursal },
                 { style: 'itemsTable', text: usu.regimen },
@@ -549,18 +556,34 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
+
     this.data_pdf.forEach((empl) => {
       empl.empleados.map((usu: any) => {
+        console.log("ID de género en empleado:", usu.genero);
+        
+        let generoObj = this.generos.find((g: any) => g.id == usu.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        console.log("Nombre encontrado para el ID:", nombreGenero);
+
         datos.push([
           n++,
           usu.cedula,
           usu.codigo,
           usu.apellido,
           usu.nombre,
-          usu.genero == 1 ? 'M' : 'F',
+          nombreGenero,
           usu.ciudad,
           usu.sucursal,
           usu.regimen,
@@ -691,7 +714,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     let n = 0;
     this.data_pdf.forEach((selec: any) => {
       selec.empleados.forEach((e: any) => {
-        this.arr_emp.push(e);
+        let generoObj = this.generos.find((g: any) => g.id == e.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+        this.arr_emp.push({
+          ...e, 
+          genero: nombreGenero 
+        });
       })
     });
     this.arr_emp.sort(function (a: any, b: any) {
