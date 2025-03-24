@@ -229,11 +229,12 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
+                        <th scope="col">Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp |  paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
@@ -244,6 +245,7 @@
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
+                        <td>{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -282,12 +284,15 @@
                                 <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">USUARIO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">GÉNERO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">NACIONALIDAD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
                                 <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Régimen Laboral</th>
                                 <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ROL</th>
                                 <th class="t_horarios" scope="col" colspan="2">CORREO</th>
                             </tr>
                         </thead>
@@ -297,12 +302,15 @@
                                 <td class="t_horarios">{{ e.cedula }}</td>
                                 <td class="t_horarios">{{ e.codigo }}</td>
                                 <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
+                                <td class="t_horarios">{{ e.usuario }}</td>
                                 <td class="t_horarios">{{ e.genero }}</td>
+                                <td class="t_horarios">{{ e.nacionalidad }}</td>
                                 <td class="t_horarios">{{ e.ciudad }}</td>
                                 <td class="t_horarios">{{ e.sucursal }}</td>
                                 <td class="t_horarios">{{ e.regimen }}</td>
                                 <td class="t_horarios">{{ e.departamento }}</td>
                                 <td class="t_horarios">{{ e.cargo }}</td>
+                                <td class="t_horarios">{{ e.rol }}</td>
                                 <td class="t_horarios">{{ e.correo }}</td>
                             </tr>
                         </tbody>

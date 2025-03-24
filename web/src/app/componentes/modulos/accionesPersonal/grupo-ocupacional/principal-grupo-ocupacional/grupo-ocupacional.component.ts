@@ -409,7 +409,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('GrupoOcupacional.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -446,7 +446,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Procesos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'Lista de Grupos Ocupacionales', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
         this.presentarDataPDFProcesos(),
       ],
       styles: {

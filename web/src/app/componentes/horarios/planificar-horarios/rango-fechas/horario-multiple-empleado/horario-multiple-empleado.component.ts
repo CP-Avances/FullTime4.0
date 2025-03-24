@@ -49,6 +49,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   // FILTROS SUCURSALES
@@ -67,6 +68,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.restR.filtroNombreReg };
+
+  //FILTRO ROL
+  get filtroRolEmp() { return this.restR.filtroRolEmp };
+
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_dep: false,
@@ -162,24 +167,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     })
   }
 
-
-  /* 
-  ObtenerProvincias(pais: any) {
-    this.roles = [];
-    this.restP.BuscarProvinciaPais(pais).subscribe(datos => {
-      this.provincias = datos;
-      this.filteredOptProv = this.idProvinciaF.valueChanges
-        .pipe(
-          startWith(''),
-          map((value: any) => this._filterProvincia(value))
-        );
-    }, error => {
-      this.toastr.info('El País seleccionado no tiene Provincias, Departamentos o Estados registrados.', '', {
-        timeOut: 6000,
-      })
-    })
-  }
-  */
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
@@ -290,6 +277,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       case 5: this.restR.setFiltroNombreEmp(e); break;
       case 6: this.restR.setFiltroNombreSuc(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -587,12 +575,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.cedula.reset();
       this.nombre_emp.reset();
       this.nombre_suc.reset();
+      this.nombre_rol.reset();
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.Filtrar('', 3);
       this.Filtrar('', 4);
       this.Filtrar('', 5);
       this.Filtrar('', 6);
+      this.Filtrar('', 8);
     }
   }
 

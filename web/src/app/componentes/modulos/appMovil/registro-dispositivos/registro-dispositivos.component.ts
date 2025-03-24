@@ -603,10 +603,8 @@ export class RegistroDispositivosComponent implements OnInit {
     let count: number = 0;
     this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
-        "dispositivo_moviles": {
-          '@id': count++,
-          "nombre": obj.nombre,
-          "codigo": obj.codigo,
+        "dispositivo": {
+          "$": { "codigo": obj.codigo },
           "cedula": obj.cedula,
           "id_dispositivo": obj.id_dispositivo,
           "modelo_dispositivo": obj.modelo_dispositivo,

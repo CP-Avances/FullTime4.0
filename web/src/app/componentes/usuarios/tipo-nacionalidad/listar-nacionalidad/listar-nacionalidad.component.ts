@@ -346,7 +346,7 @@ async GenerarPdf(action = "open") {
       pdfMake.createPdf(documentDefinition).print();
       break;
     case "download":
-      pdfMake.createPdf(documentDefinition).download('Géneros' + '.pdf');
+      pdfMake.createPdf(documentDefinition).download('Nacionalidades' + '.pdf');
       break;
 
     default:
@@ -385,7 +385,7 @@ DefinirInformacionPDF() {
     content: [
       { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
       { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-      { text: 'LISTA DE GÉNEROS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+      { text: 'LISTA DE NACIONALIDADES', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
       this.PresentarDataPDF(),
     ],
     styles: {
@@ -410,12 +410,12 @@ PresentarDataPDF() {
           body: [
             [
               { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'GENERO', style: 'tableHeader' },
+              { text: 'NACIONALIDAD', style: 'tableHeader' },
             ],
             ...this.nacionalidades.map((obj: any) => {
               return [
                 { text: obj.id, style: 'itemsTableD' },
-                { text: obj.nacionalidad, style: 'itemsTable' },
+                { text: obj.nombre, style: 'itemsTable' },
               ];
             })
           ]
@@ -441,7 +441,7 @@ async generarExcelNacionalidades() {
     nacionalidades.push([
       index + 1,
       nivel.id,
-      nivel.nacionalidad,
+      nivel.nombre,
     ]);
   });
 
@@ -469,7 +469,7 @@ async generarExcelNacionalidades() {
 
   // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
   worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
-  worksheet.getCell("B2").value = "Lista de Géneros".toUpperCase();
+  worksheet.getCell("B2").value = "Lista de Nacionalidades".toUpperCase();
 
   // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
   ["B1", "B2"].forEach((cell) => {
@@ -491,7 +491,7 @@ async generarExcelNacionalidades() {
   const columnas = [
     { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
     { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
-    { name: "GENERO", totalsRowLabel: "", filterButton: true },
+    { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
   ];
 
   worksheet.addTable({
@@ -528,7 +528,7 @@ async generarExcelNacionalidades() {
   try {
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
-    FileSaver.saveAs(blob, "GenerosEXCEL.xlsx");
+    FileSaver.saveAs(blob, "NacionalidadEXCEL.xlsx");
   } catch (error) {
     console.error("Error al generar el archivo Excel:", error);
   }
@@ -567,7 +567,7 @@ OrdenarDatos(array: any) {
 ExportToCSV() {
 
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('GénerosCSV');
+  const worksheet = workbook.addWorksheet('NacionalidadCSV');
   //  Agregar encabezados dinámicos basados en las claves del primer objeto
   const keys = Object.keys(this.nacionalidades[0] || {}); // Obtener las claves
   worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
@@ -578,7 +578,7 @@ ExportToCSV() {
 
   workbook.csv.writeBuffer().then((buffer) => {
     const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "GénerosCSV.csv");
+    FileSaver.saveAs(data, "NacionalidadCSV.csv");
   });
 
 }
@@ -591,19 +591,19 @@ urlxml: string;
 data: any = [];
 exportToXML() {
   var objeto: any;
-  var arregloGeneros: any = [];
+  var arregloNacionalidades: any = [];
   this.nacionalidades.forEach((obj: any) => {
     objeto = {
       nacionalidad: {
         "$": { "id": obj.id },
-        nacionalidad: obj.nacionalidad,
+        nacionalidad: obj.nombre,
       },
     };
-    arregloGeneros.push(objeto);
+    arregloNacionalidades.push(objeto);
   });
 
   const xmlBuilder = new xml2js.Builder({ rootName: 'Géneros' });
-  const xml = xmlBuilder.buildObject(arregloGeneros);
+  const xml = xmlBuilder.buildObject(arregloNacionalidades);
 
   if (xml === undefined) {
     return;
@@ -623,13 +623,9 @@ exportToXML() {
 
   const a = document.createElement('a');
   a.href = xmlUrl;
-  a.download = 'Géneros.xml';
+  a.download = 'Nacionalidad.xml';
   // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
   a.click();
 }
-
-
-
-
 }
 

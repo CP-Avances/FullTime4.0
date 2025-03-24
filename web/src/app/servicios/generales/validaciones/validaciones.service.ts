@@ -470,6 +470,8 @@ export class ValidacionesService {
         cedula: obj.cedula,
         correo: obj.correo,
         genero: obj.genero,
+        id_nacionalidad: obj.id_nacionalidad,
+        usuario: obj.usuario,
         id_cargo: obj.id_cargo,
         id_contrato: obj.id_contrato,
         sucursal: obj.name_suc,

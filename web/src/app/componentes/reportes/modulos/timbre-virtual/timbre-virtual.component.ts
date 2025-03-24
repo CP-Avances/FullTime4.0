@@ -116,6 +116,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   constructor(
     private reporteService: ReportesService,
@@ -968,7 +969,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             n: n,
             cedula: usu.cedula,
             codigo: usu.codigo,
-            empleado: usu.apellido + ' ' + usu.apellido.nombre,
+            empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,
             departamento: usu.departamento,

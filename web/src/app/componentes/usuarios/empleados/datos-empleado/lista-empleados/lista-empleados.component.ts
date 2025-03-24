@@ -27,6 +27,8 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
 (ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
@@ -118,6 +120,8 @@ export class ListaEmpleadosComponent implements OnInit {
     private funciones: MainNavService,
     private asignaciones: AsignacionesService,
     private datosGenerales: DatosGeneralesService,
+    private restGenero: GenerosService,
+    private restEstadosCiviles: EstadoCivilService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -144,6 +148,8 @@ export class ListaEmpleadosComponent implements OnInit {
     this.DescargarPlantilla();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ObtenerGeneros();
+    this.ObtenerEstadosCiviles();
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -797,6 +803,7 @@ export class ListaEmpleadosComponent implements OnInit {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 40],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
@@ -833,9 +840,8 @@ export class ListaEmpleadosComponent implements OnInit {
     };
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Unión de Hecho',];
-  GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
+
   PresentarDataPDFEmpleados(numero: any) {
     if (numero === 1) {
       var arreglo = this.empleado
@@ -849,12 +855,12 @@ export class ListaEmpleadosComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Apellido', style: 'tableHeader' },
                 { text: 'Cedula', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
@@ -866,8 +872,6 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...arreglo.map((obj: any) => {
-                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-                var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad: any;
                 this.nacionalidades.forEach((element: any) => {
@@ -875,10 +879,25 @@ export class ListaEmpleadosComponent implements OnInit {
                     nacionalidad = element.nombre;
                   }
                 });
+                
+                let genero: any;
+                this.generos.forEach((element: any) => {
+                  if (obj.genero == element.id) {
+                    genero = element.genero;
+                  }
+                });
+
+                let estadoCivil:any;
+                this.estadosCiviles.forEach((element: any) => {
+                  if (obj.estado_civil == element.id) {
+                    estadoCivil = element.estado_civil;
+                  }
+                });
+
+
                 return [
                   { text: obj.codigo, style: 'itemsTableD' },
-                  { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.apellido, style: 'itemsTable' },
+                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD'  },
                   { text: obj.cedula, style: 'itemsTableD' },
                   { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
@@ -896,7 +915,12 @@ export class ListaEmpleadosComponent implements OnInit {
           layout: {
             fillColor: function (i: any) {
               return (i % 2 === 0) ? '#CCD1D1' : null;
-            }
+            },
+            paddingLeft: function () { return 2; }, // Reduce margen izquierdo
+            paddingRight: function () { return 2; }, // Reduce margen derecho
+            paddingTop: function () { return 1; }, // Reduce margen superior
+            paddingBottom: function () { return 1; }, // Reduce margen inferior
+            columnGap: 2 // Ajusta espacio entre columnas
           }
         },
         { width: '*', text: '' },
@@ -907,7 +931,22 @@ export class ListaEmpleadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
-  async generarExcelEmpleados(numero: any) {
+  
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+   estadosCiviles: any=[];
+   ObtenerEstadosCiviles(){
+     this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
+       this.estadosCiviles = datos;
+     })
+   }
+  
+   async generarExcelEmpleados(numero: any) {
 
     //const { usuarios, empresa, id_empresa } = datos;
     if (numero === 1) {
@@ -931,6 +970,18 @@ export class ListaEmpleadosComponent implements OnInit {
           nacionalidad = element.nombre;
         }
       });
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (usuario.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (usuario.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
+        }
+      });
       empleados.push([
         index + 1,
         usuario.codigo,
@@ -938,8 +989,8 @@ export class ListaEmpleadosComponent implements OnInit {
         usuario.apellido,
         usuario.nombre,
         usuario.fecha_nacimiento.split("T")[0],
-        this.EstadoCivilSelect[usuario.estado_civil - 1],
-        this.GeneroSelect[usuario.genero - 1],
+        estadoCivil,
+        genero,
         usuario.correo,
         this.EstadoSelect[usuario.estado - 1],
         usuario.domicilio,
@@ -1090,13 +1141,23 @@ export class ListaEmpleadosComponent implements OnInit {
     var objeto: any;
     var arregloEmpleado: any = [];
     arreglo.forEach((obj: any) => {
-      var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-      var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
+        }
+      });
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (obj.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (obj.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
       objeto = {
@@ -1186,6 +1247,18 @@ export class ListaEmpleadosComponent implements OnInit {
           nacionalidad = element.nombre;
         }
       });
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (obj.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (obj.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
+        }
+      });
 
       worksheet.addRow({
         codigo: obj.codigo,
@@ -1193,8 +1266,8 @@ export class ListaEmpleadosComponent implements OnInit {
         apellido: obj.apellido,
         nombre: obj.nombre,
         fecha_nacimiento: obj.fecha_nacimiento.split("T")[0],
-        estado_civil: this.EstadoCivilSelect[obj.estado_civil - 1],
-        genero: this.GeneroSelect[obj.genero - 1],
+        estado_civil: estadoCivil,
+        genero: genero,
         correo: obj.correo,
         estado: this.EstadoSelect[obj.estado - 1],
         domicilio: obj.domicilio,

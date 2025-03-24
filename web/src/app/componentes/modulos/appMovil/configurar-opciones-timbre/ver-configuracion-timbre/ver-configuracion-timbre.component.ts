@@ -16,6 +16,9 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ConfigurarOpcionesTimbresComponent } from '../configurar-opciones-timbres/configurar-opciones-timbres.component';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+
+
 
 @Component({
   selector: 'app-ver-configuracion-timbre',
@@ -71,6 +74,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     public validar: ValidacionesService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
+    private restGenero: GenerosService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -86,6 +90,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
     this.RevisarEmpleados();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ObtenerGeneros();
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -441,12 +446,19 @@ export class VerConfiguracionTimbreComponent implements OnInit {
                 { rowSpan: 1, text: 'TIMBRE UBICACIÓN DESCONOCIDA', style: 'tableHeader' },
               ],
               ...this.configuracion.map((obj: any) => {
+                let genero: any;
+                this.generos.forEach((element: any) => {
+                  if (obj.genero == element.id) {
+                    genero = element.genero;
+                  }
+                });
+
                 return [
                   { style: 'itemsTableCentrado', text: obj.n },
                   { style: 'itemsTable', text: obj.cedula },
                   { style: 'itemsTableCentrado', text: obj.codigo },
                   { style: 'itemsTable', text: obj.apellido + ' ' + obj.nombre },
-                  { style: 'itemsTableCentrado', text: obj.genero == 1 ? 'M' : 'F' },
+                  { style: 'itemsTableCentrado', text: genero },
                   { style: 'itemsTable', text: obj.ciudad },
                   { style: 'itemsTable', text: obj.sucursal },
                   { style: 'itemsTable', text: obj.regimen },
@@ -476,18 +488,32 @@ export class VerConfiguracionTimbreComponent implements OnInit {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
 
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
     this.configuracion.map((usu: any) => {
+
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (usu.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+
       datos.push([
         n++,
         usu.cedula,
         usu.codigo,
         usu.apellido,
         usu.nombre,
-        usu.genero == 1 ? 'M' : 'F',
+        genero,
         usu.ciudad,
         usu.sucursal,
         usu.regimen,
