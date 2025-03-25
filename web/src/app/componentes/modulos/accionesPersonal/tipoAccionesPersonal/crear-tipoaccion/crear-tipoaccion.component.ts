@@ -86,31 +86,44 @@ export class CrearTipoaccionComponent implements OnInit {
   // METODO PARA GUARDAR DATOS
   contador: number = 0;
   GuardarInformacion(datosAccion: any) {
-    this.contador = 0;
-    this.tipos_acciones.map((obj: any) => {
-      if (obj.id_tipo_accion_personal === datosAccion.id_tipo) {
-        this.contador = this.contador + 1;
-      }
-    });
-
-    if (this.contador != 0) {
-      this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
+    
+    this.rest.IngresarTipoAccionPersonal(datosAccion).subscribe(response => {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+        timeOut: 6000,
+      })
+      this.CerrarVentana(2, response.id);
+    }, error => {
+      this.toastr.error('Revisar los datos',
         'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
-    } else {
-      this.rest.IngresarTipoAccionPersonal(datosAccion).subscribe(response => {
-        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-          timeOut: 6000,
-        })
-        this.CerrarVentana(2, response.id);
-      }, error => {
-        this.toastr.error('Revisar los datos',
-          'Ups!!! algo salio mal.', {
-          timeOut: 6000,
-        })
-      });
-    }
+    });
+
+    // ESTA PARTE VALIDA SI YA EXISTE UN REGIATRO 
+    // this.contador = 0;
+    // this.tipos_acciones.map((obj: any) => {
+    //   if (obj.id_tipo_accion_personal === datosAccion.id_tipo) {
+    //     this.contador = this.contador + 1;
+    //   }
+    // });
+    // if (this.contador != 0) {
+    //   this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
+    //     'Ups!!! algo salio mal.', {
+    //     timeOut: 6000,
+    //   })
+    // } else {
+    //   this.rest.IngresarTipoAccionPersonal(datosAccion).subscribe(response => {
+    //     this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+    //       timeOut: 6000,
+    //     })
+    //     this.CerrarVentana(2, response.id);
+    //   }, error => {
+    //     this.toastr.error('Revisar los datos',
+    //       'Ups!!! algo salio mal.', {
+    //       timeOut: 6000,
+    //     })
+    //   });
+    // }
   }
 
   // METODO PARA CAMBIAR ESTADO PERMISO

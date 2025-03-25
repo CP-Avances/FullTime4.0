@@ -877,24 +877,24 @@ class AccionPersonalControlador {
                     item.observacion = 'No existe el tipo de accion en el sistema'
                   }else{
 
-                    const VERIFICAR_ACCION = await pool.query(
-                        `
-                        SELECT * FROM map_detalle_tipo_accion_personal
-                        WHERE id_tipo_accion_personal = $1
-                        `
-                        , [VERIFICAR_TIPO_ACCION.rows[0].id]);
+                    // const VERIFICAR_ACCION = await pool.query(
+                    //     `
+                    //     SELECT * FROM map_detalle_tipo_accion_personal
+                    //     WHERE id_tipo_accion_personal = $1
+                    //     `
+                    //     , [VERIFICAR_TIPO_ACCION.rows[0].id]);
                        
-                    if (VERIFICAR_ACCION.rowCount === 0) {
+                    // if (VERIFICAR_ACCION.rowCount === 0) {
                         
-                        // DISCRIMINACION DE ELEMENTOS IGUALES
-                        if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
-                            duplicados.push(item);
-                        } else {
-                            item.observacion = '1';
-                        }
-                    }else{
-                        item.observacion = 'Ya existe el detalle de la accion personal en el sistema'  
-                    }
+                    //     // DISCRIMINACION DE ELEMENTOS IGUALES
+                    //     if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
+                    //         duplicados.push(item);
+                    //     } else {
+                    //         item.observacion = '1';
+                    //     }
+                    // }else{
+                    //     item.observacion = 'Ya existe el detalle de la accion personal en el sistema'  
+                    // }
   
                   }
                 }

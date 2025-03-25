@@ -67,6 +67,7 @@ export class RegistroProcesoComponent implements OnInit {
   InsertarProceso(form: any) {
     var procesoPadreId: any;
     var procesoPadreNombre = form.procesoProcesoPadreForm;
+    console.log('procesoPadreNombre: ',procesoPadreNombre);
     if (procesoPadreNombre == 0) {
       let dataProceso = {
         nombre: form.procesoNombreForm,
@@ -75,11 +76,16 @@ export class RegistroProcesoComponent implements OnInit {
       };
       this.rest.postProcesoRest(dataProceso)
         .subscribe(response => {
+          console.log('response: ',response);
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
           this.LimpiarCampos();
-        }, error => { });
+        }, error => { 
+          this.toastr.error(error.error.message, 'Registro.', {
+            timeOut: 6000,
+          });
+        });
     } else {
       this.rest.getIdProcesoPadre(procesoPadreNombre).subscribe(data => {
         procesoPadreId = data[0].id;
@@ -90,12 +96,18 @@ export class RegistroProcesoComponent implements OnInit {
           ip: this.ip, ip_local: this.ips_locales
         };
         this.rest.postProcesoRest(dataProceso)
-          .subscribe(response => {
-            this.toastr.success('Operacion exitosa.', 'Proceso guardado.', {
-              timeOut: 6000,
-            });
-            this.LimpiarCampos();
-          }, error => { });;
+        .subscribe(response => {
+          console.log('response: ',response);
+          this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+          this.LimpiarCampos();
+        }, error => { 
+          console.log('error.message: ',error.error.message)
+          this.toastr.error(error.error.message, 'Registro.', {
+            timeOut: 6000,
+          });
+        });
       });
     }
   }
