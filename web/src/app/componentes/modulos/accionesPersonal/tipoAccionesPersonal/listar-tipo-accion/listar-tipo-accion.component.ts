@@ -600,10 +600,18 @@ export class ListarTipoAccionComponent implements OnInit {
       worksheet.getRow(80).height = 40;
       worksheet.getRow(81).height = 80;
       worksheet.getRow(82).height = 80;
-      worksheet.getRow(87).height = 80;
+      worksheet.getRow(87).height = 100;
       worksheet.getRow(88).height = 20;
       worksheet.getRow(89).height = 70;
       worksheet.getRow(90).height = 20;
+      worksheet.getRow(91).height = 60;
+      worksheet.getRow(92).height = 50;
+      worksheet.getRow(94).height = 50;
+      worksheet.getRow(100).height = 70;
+      worksheet.getRow(101).height = 70;
+      worksheet.getRow(102).height = 30;
+      worksheet.getRow(108).height = 70;
+      worksheet.getRow(109).height = 50;
 
 
       // COMBINAR CELDAS
@@ -805,6 +813,23 @@ export class ListarTipoAccionComponent implements OnInit {
       worksheet.mergeCells("A88:P88");
       worksheet.mergeCells("A89:P89");
       worksheet.mergeCells("L90:P90");
+      worksheet.mergeCells("A91:P91");
+
+      worksheet.mergeCells("C93:E93");
+      worksheet.mergeCells("A94:P94");
+      worksheet.mergeCells("D95:F95");
+      worksheet.mergeCells("K95:M95");
+      worksheet.mergeCells("A96:P96");
+      worksheet.mergeCells("D97:F97");
+      worksheet.mergeCells("D98:F98");
+      worksheet.mergeCells("D99:F99");
+      worksheet.mergeCells("F101:K101");
+      worksheet.mergeCells("F102:K102");
+      worksheet.mergeCells("G104:K104");
+      worksheet.mergeCells("G105:K105");
+      worksheet.mergeCells("A107:P107");
+      worksheet.mergeCells("A109:H109");
+      worksheet.mergeCells("I109:P109");
       
   
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
@@ -930,7 +955,17 @@ export class ListarTipoAccionComponent implements OnInit {
       worksheet.getCell("L85").value = "PUESTO:"
 
       worksheet.getCell("A89").value = "** USO EXCLUSIVO PARA TALENTO HUMANO"
-
+      worksheet.getCell("A91").value = "REGISTRO DE NOTIFICACIÓN AL SERVIDOR PÚBLICO DE LA ACCIÓN DE PERSONAL (primer inciso del art. 22 RGLOSEP, art. 101 COA , art. 66 y 126 ERJAFE) "
+      worksheet.getCell("C93").value = "COMUNICACIÓN ELECTRÓNICA:"
+      worksheet.getCell("C95").value = "FECHA:"
+      worksheet.getCell("J95").value = "HORA:"
+      worksheet.getCell("C97").value = "** MEDIO:"
+      worksheet.getCell("F102").value = "FIRMA DEL RESPONSABLE QUE NOTIFICÓ"
+      worksheet.getCell("F104").value = "NOMBRE:"
+      worksheet.getCell("F105").value = "PUESTO:"
+      worksheet.getCell("A107").value = "** Si la comunicación fue electrónica se deberá colocar el medio por el cual se notificó al servidor; así como, el número del documento."
+      worksheet.getCell("A109").value = " Elaborado por el Ministerio del Trabajo  "
+      worksheet.getCell("I109").value = " Fecha de actualización de formato: 2024-08-23    /    Versión: 01.1    /    Página 1 de 2    "
 
       // Definir la validación de datos (lista desplegable)
       worksheet.getCell("D13").dataValidation = {
@@ -985,7 +1020,7 @@ export class ListarTipoAccionComponent implements OnInit {
         fgColor: { argb: "FFFFFF" }, // BLANCO (puedes cambiarlo por otro color)
       };
 
-      const totalFilas = 99; // Empieza en la fila 6 (donde comienza la tabla)
+      const totalFilas = 110; // Empieza en la fila 6 (donde comienza la tabla)
       const totalColumnas = 16; // Número de columnas en la tabla
 
       for (let i = 0; i <= totalFilas; i++) {
@@ -993,7 +1028,12 @@ export class ListarTipoAccionComponent implements OnInit {
           const cell = worksheet.getRow(i).getCell(j);
 
           if(i <= 11 || i == 22 || i == 23 || i == 24 || i == 25 || i == 45 || i == 55 || i == 64 ||
-            i == 65 || i == 66 || i == 67 || i == 79 || i == 80
+            i == 65 || i == 66 || i == 67 || i == 79 || i == 80 || i == 91 || (i == 13 && j == 4) ||
+            (i == 14 && j == 4) || (i == 15 && j == 4) || (i == 16 && j == 4) || (i == 17 && j == 4) ||
+            (i == 18 && j == 4) || (i == 13 && j == 8) || (i == 14 && j == 8) || (i == 15 && j == 8) || 
+            (i == 16 && j == 8) || (i == 17 && j == 8) || (i == 18 && j == 8) || (i == 13 && j == 12) || 
+            (i == 14 && j == 12) || (i == 15 && j == 12) || (i == 16 && j == 12) || (i == 17 && j == 12) || 
+            (i == 18 && j == 12) || (i == 13 && j == 15) || (i == 14 && j == 15)
           ){
             cell.border = borderStyle; // Aplicar bordes negros
           }else if((i >= 12 && i <= 21 && j == 16) || (i >= 26 && i <= 44) || (i >= 46 && i <= 54 && j == 16) ||
@@ -1051,6 +1091,31 @@ export class ListarTipoAccionComponent implements OnInit {
                 cell.border = borderbottomStyle
               }
             }
+          }else if(i >= 88 && i <= 90 && (j == 16)){
+              cell.border = borderRightStyle
+          }else if(i >= 92 && i <= 109){
+
+            if(i == 95 && ((j >= 4 && j <= 6) || (j >= 11 && j <= 13))){
+              cell.border = borderbottomStyle
+            }else if((i >= 97 && i <= 99) && (j >= 4 && j <= 6)){
+              cell.border = borderbottomStyle
+            }else if(i == 101 && (j >= 7 && j <= 11)){
+              cell.border = borderbottomStyle
+            }else if((i == 104 || i == 105) && (j >= 7 && j <= 11)){
+              cell.border = borderbottomStyle
+            }else if(i == 108){
+              cell.border = borderbottomStyle
+            }else if(i == 109){
+              if(j == 16){
+                
+              }else{
+                cell.border = borderbottomStyle
+              }
+            }
+
+            if (j == 16){
+              cell.border = borderRightStyle
+            }
           }
           
           if((i == 1 && j >= 11) || 
@@ -1062,13 +1127,14 @@ export class ListarTipoAccionComponent implements OnInit {
             (i == 24) ||
             (i == 26) || (i == 28) || (i == 30) || (i == 32) || (i == 34) || 
             (i == 36) || (i == 38) || (i == 40) || (i == 42) || (i == 45) || (i == 55) ||
-            (i == 65) || (i == 67) || (i == 80)
+            (i == 65) || (i == 67) || (i == 80) || (i == 91)
           ){
             cell.fill = backgroundColorStyle; // Aplicar color de fondo
           }
 
           if((i >= 13 && i <= 19) || (i >= 46 && i <= 54) ||
-            (i >= 57 && i <= 64) || (i >= 68 && i <= 78) || (i >= 81 && i <= 92)
+            (i >= 57 && i <= 64) || (i >= 68 && i <= 78) || (i >= 81 && i <= 90) ||
+            (i >= 92 && i <= 109)
           ){
             cell.fill = backgroundColorStyleWhite
           }
@@ -1092,7 +1158,8 @@ export class ListarTipoAccionComponent implements OnInit {
         "A30", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A40", "I40", "A42", "I42", "A44", "I44", 
         "A45", "B47", "I47", "B48","B49", "E49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "A59", "A60",
         "A61", "I59", "I60", "I61", "A63", "I63", "A65", "A67", "I67", "B71", "B72", "B73", "B73", "B74", "J71", "J72", "J73", 
-        "J75", "K74", "A80", "F80", "L80", "B83", "B84", "B85", "L83", "L84", "L85", "F83", "F84", "F85", "A89"
+        "J75", "K74", "A80", "F80", "L80", "B83", "B84", "B85", "L83", "L84", "L85", "F83", "F84", "F85", "A89", "A91",
+        "C93", "C95", "C97", "J95", "F102", "F104", "F105", "A107", "A109", "I109"
       ].forEach((cell) => {
         if (
           cell != 'B13' && cell != 'B14' && cell != 'B15' && cell != 'B16' && cell != 'B17' && cell != 'B18' &&
@@ -1127,7 +1194,8 @@ export class ListarTipoAccionComponent implements OnInit {
                 cell == "I47" || cell == "B51" || cell == 'B53' || cell == "F53" || 
                 cell == 'K53' || cell == "A55" || cell == 'A56' || cell == "I56" || 
                 cell == 'A65' || cell == "A67" || cell == 'I67' || cell == "A80" ||
-                cell == 'F80' || cell == "L80"
+                cell == 'F80' || cell == "L80" || cell == 'A91' || cell == "A107" ||
+                cell == 'F102'
               ){
           worksheet.getCell(cell).font = { bold: true, size: 9 };
         }else{
@@ -1142,7 +1210,9 @@ export class ListarTipoAccionComponent implements OnInit {
           cell == 'J73' || cell == 'J75' || cell == 'B83' ||
           cell == 'B84' || cell == 'B85' || cell == 'F83' ||
           cell == 'F84' || cell == 'F85' || cell == 'L83' ||
-          cell == 'L84' || cell == 'L85'
+          cell == 'L84' || cell == 'L85' || cell == 'C93' ||
+          cell == 'C95' || cell == 'J95' || cell == 'C97' || 
+          cell == 'F104' || cell == 'F105'
         ){
           worksheet.getCell(cell).alignment = {
             horizontal: "right",
@@ -1152,14 +1222,14 @@ export class ListarTipoAccionComponent implements OnInit {
           worksheet.getCell(cell).font = { bold: true, size: 9 };
         } 
 
-        if(cell == "A63"){
+        if(cell == "A63" || cell == "A109"){
           worksheet.getCell(cell).alignment = {
             horizontal: "center",
             vertical: "middle",
           };
 
           worksheet.getCell(cell).font = { bold: true, size: 7 };
-        }else if(cell == "I63"){
+        }else if(cell == "I63" || cell == "I109"){
           worksheet.getCell(cell).alignment = {
             horizontal: "left",
             vertical: "middle",
@@ -1178,33 +1248,7 @@ export class ListarTipoAccionComponent implements OnInit {
 
       });
 
-      worksheet.getCell('A1').alignment = {
-          horizontal: "center",
-          vertical: "middle",
-      };
-  
-  
-      const columnas = [
-        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "NOMBRE", totalsRowLabel: "Total:", filterButton: true },
-        { name: "DESCRIPCION", totalsRowLabel: "Total:", filterButton: true },
-        { name: "BASE LEGAL", totalsRowLabel: "Total:", filterButton: true },
-      ];
       console.log("ver tipo_acciones_perso", tipo_acciones_perso);
-      console.log("Columnas:", columnas);
-  
-      worksheet.addTable({
-        name: "Tipo accion personal",
-        ref: "A100",
-        headerRow: true,
-        totalsRow: false,
-        style: {
-          theme: "TableStyleMedium16",
-          showRowStripes: true,
-        },
-        columns: columnas,
-        rows: tipo_acciones_perso,
-      });
   
       try {
         const buffer = await workbook.xlsx.writeBuffer();
