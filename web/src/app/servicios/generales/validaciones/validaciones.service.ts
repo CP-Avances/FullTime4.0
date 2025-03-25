@@ -470,6 +470,8 @@ export class ValidacionesService {
         cedula: obj.cedula,
         correo: obj.correo,
         genero: obj.genero,
+        id_nacionalidad: obj.id_nacionalidad,
+        usuario: obj.usuario,
         id_cargo: obj.id_cargo,
         id_contrato: obj.id_contrato,
         sucursal: obj.name_suc,
@@ -487,7 +489,8 @@ export class ValidacionesService {
         app_habilita: obj.app_habilita,
         web_habilita: obj.web_habilita,
         comunicado_mail: obj.comunicado_mail,
-        comunicado_noti: obj.comunicado_notificacion
+        comunicado_noti: obj.comunicado_notificacion,
+        id_empleado: obj.id_empleado
       })
     })
     return arreglo_procesar;

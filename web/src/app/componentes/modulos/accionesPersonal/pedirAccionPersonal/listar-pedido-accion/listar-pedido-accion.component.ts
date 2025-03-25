@@ -3996,7 +3996,7 @@ export class ListarPedidoAccionComponent implements OnInit {
         pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.createPdf(documentDefinition).download('PedidosAccionPersonal.pdf');
         break;
       default:
         pdfMake.createPdf(documentDefinition).open();

@@ -83,6 +83,16 @@ export class EmpleadoService {
     return this.http.get<any>(`${environment.url}/nacionalidades`)
   }
 
+  //METODO PARA OBTENER LISTA DE GENERO
+  BuscarGeneros() {
+    return this.http.get<any>(`${environment.url}/generos`);
+  }
+
+  //METODO PARA OBTENER LISTA DE ESTADOS CIVILES
+  BuscarEstadoCivil() {
+    return this.http.get<any>(`${environment.url}/estados-civiles`);
+  }
+
   // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO
   ListarEmpleadosActivos() {
     const headers = new HttpHeaders({

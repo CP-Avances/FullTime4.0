@@ -34,6 +34,7 @@ export class ListaNotificacionComponent implements OnInit {
     nombre_suc = new FormControl('', [Validators.minLength(2)]);
     nombre_reg = new FormControl('', [Validators.minLength(2)]);
     nombre_carg = new FormControl('', [Validators.minLength(2)]);
+    nombre_rol = new FormControl('', [Validators.minLength(2)]);
     seleccion = new FormControl('');
 
     public _booleanOptions: FormCriteriosBusqueda = {
@@ -107,6 +108,7 @@ export class ListaNotificacionComponent implements OnInit {
     get filtroNombreEmp() { return this.restR.filtroNombreEmp };
     get filtroCodigo() { return this.restR.filtroCodigo };
     get filtroCedula() { return this.restR.filtroCedula };
+    get filtroRolEmp() { return this.restR.filtroRolEmp};
 
     // FILTRO CARGO
     get filtroNombreCarg() { return this.restR.filtroNombreCarg }
@@ -270,6 +272,7 @@ export class ListaNotificacionComponent implements OnInit {
             case 5: this.restR.setFiltroCedula(e); break;
             case 6: this.restR.setFiltroNombreEmp(e); break;
             case 7: this.restR.setFiltroNombreReg(e); break;
+            case 8: this.restR.setFiltroRolEmp(e); break;
             default:
                 break;
         }
@@ -570,6 +573,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.cedula.reset();
             this.nombre_emp.reset();
             this.nombre_suc.reset();
+            this.nombre_rol.reset();
             this.selectionDep.clear();
             this.selectionCarg.clear();
             this.selectionSuc.clear();
@@ -578,6 +582,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.Filtrar('', 4)
             this.Filtrar('', 5)
             this.Filtrar('', 6)
+            this.Filtrar('', 8);
         }
     }
 

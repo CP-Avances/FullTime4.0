@@ -294,7 +294,7 @@ export class PrincipalProcesoComponent implements OnInit {
         timeOut: 6000,
       });
     }
-    this.LimpiarCamposPlantilla();
+    this.LimpiarCampos();
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
@@ -354,19 +354,6 @@ export class PrincipalProcesoComponent implements OnInit {
     
   }
   
-  // LIMPIAR CAMPOS PLANTILLA
-  LimpiarCamposPlantilla() {
-    // this.numero_paginaH = 1;
-    // this.numero_paginaD = 1;
-    // this.tamanio_paginaH = 5;
-    // this.tamanio_paginaD = 5;
-    // if (this.paginatorH) {
-    //   this.paginatorH.firstPage();
-    // }
-    // if (this.paginatorD) {
-    //   this.paginatorD.firstPage();
-    // }
-  }
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
@@ -461,7 +448,7 @@ export class PrincipalProcesoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Procesos.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -525,6 +512,7 @@ export class PrincipalProcesoComponent implements OnInit {
                 { text: 'Proceso Superior', style: 'tableHeader' },
               ],
               ...this.procesos.map((obj: any) => {
+                console.log(obj);
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -585,7 +573,6 @@ export class PrincipalProcesoComponent implements OnInit {
         "proceso": {
           '@id': obj.id,
           "nombre": obj.nombre,
-          "nivel": obj.nivel,
           "proceso_superior": obj.proc_padre,
         }
       }

@@ -16,6 +16,8 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
 
 @Component({
   selector: 'app-reporte-faltas',
@@ -112,6 +114,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   constructor(
     private validar: ValidacionesService,
@@ -122,10 +125,14 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private restGenero: GenerosService,
+    private restNacionalidades: NacionalidadService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.ObtenerGeneros();
+    this.ObtenerNacionalidades();
   }
 
   ngOnInit(): void {
@@ -467,6 +474,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       }
       general.push(informacion);
 
+
+
       // CABECERA PRINCIPAL
       n.push({
         style: 'tableMarginCabecera',
@@ -499,10 +508,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
       // PRESENTACION DE LA INFORMACION USUARIO
       selec.empleados.forEach((empl: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
         n.push({
           style: 'tableMarginCabeceraEmpleado',
           table: {
-            widths: ['*', 'auto', 'auto'],
+            widths: ['*', '*', '*'],
             headerRows: 2,
             body: [
               [
@@ -518,24 +533,41 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 },
                 {
                   border: [true, true, true, false],
-                  text: 'COD: ' + empl.codigo,
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
                   style: 'itemsTableInfoEmpleado',
                 },
               ],
               [
                 {
                   border: [true, false, false, false],
-                  text: 'RÉGIMEN LABORAL: ' + empl.regimen,
+                  text: 'CORREO: ' + empl.correo,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, false, false],
-                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  text: 'GENERO: ' + nombreGenero,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, true, false],
                   text: 'CARGO: ' + empl.cargo,
+                  style: 'itemsTableInfoEmpleado'
+                }
+              ],
+              [
+                {
+                  border: [true, false, false, false],
+                  text: 'REGIMEN: ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'ROL: ' + empl.rol,
                   style: 'itemsTableInfoEmpleado'
                 }
               ],
@@ -636,12 +668,34 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
+   
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+   nacionalidades: any=[];
+   ObtenerNacionalidades(){
+    this.restNacionalidades.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+    })
+   }
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
 
     this.data_pdf.forEach((suc) => {
       suc.empleados.map((empl: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+       
+
         empl.faltas.map((obj3: any) => {
           const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           datos.push([
@@ -649,7 +703,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             empl.cedula,
             empl.codigo,
             empl.apellido + ' ' + empl.nombre,
+            nombreGenero,
             empl.ciudad,
+            nombreNacionalidad,
             empl.sucursal,
             empl.regimen,
             empl.departamento,
@@ -698,7 +754,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       { key: "cedula", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
+      { key: "genero", width: 20 },
       { key: "ciudad", width: 20 },
+      { key: "nacionalidad", width: 20 },
       { key: "sucursal", width: 20 },
       { key: "regimen", width: 20 },
       { key: "departamento", width: 20 },
@@ -711,7 +769,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "GENERO", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
       { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
       { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
       { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
@@ -778,6 +838,12 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let n = 0;
     this.data_pdf.forEach((suc: any) => {
       suc.empleados.forEach((empl: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+       
         empl.faltas.forEach((usu: any) => {
           const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           n = n + 1;
@@ -786,7 +852,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             cedula: empl.cedula,
             codigo: empl.codigo,
             empleado: empl.apellido + ' ' + empl.nombre,
+            genero: nombreGenero,
             ciudad: empl.ciudad,
+            nacionalidad: nombreNacionalidad,
             sucursal: empl.sucursal,
             departamento: empl.departamento,
             cargo: empl.cargo,

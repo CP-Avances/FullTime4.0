@@ -240,6 +240,7 @@ import { EditarTipoAccionComponent } from './componentes/modulos/accionesPersona
 import { VerTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/ver-tipo-accion/ver-tipo-accion.component';
 import { EditarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/editar-pedido-accion/editar-pedido-accion.component';
 import { VerPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/ver-pedido-accion/ver-pedido-accion.component';
+
 // MODULO  --GEOLOCALIZACION
 import { CrearCoordenadasComponent } from './componentes/modulos/geolocalizacion/crear-coordenadas/crear-coordenadas.component';
 import { EditarCoordenadasComponent } from './componentes/modulos/geolocalizacion/editar-coordenadas/editar-coordenadas.component';
@@ -321,7 +322,32 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
-import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
+import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
+import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
+import { RegistrarGradoComponent } from './componentes/modulos/accionesPersonal/grados/registrar-grado/registrar-grado.component';
+import { EditarGradoComponent } from './componentes/modulos/accionesPersonal/grados/editar-grado/editar-grado.component';
+import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
+import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
+import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-interfaz/registro-interfaz-proceso.component';
+import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/registro-multiple/registro-multiple-proceso.component';
+import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/registro-interfaz-grado/registro-interfaz-grado.component';
+import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/registro-multiple-grado/registro-multiple-grado.component';
+import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
+import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
+import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/procesos/empleado-proceso/empleado-proceso.component';
+import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/empleado-grado/empleado-grado.component';
+import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/empleado-grupo/empleado-grupo.component';
+import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/editar-registro/editar-registro.component';
+import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
+import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
 
 @NgModule({
   declarations: [
@@ -531,6 +557,7 @@ import { IngresarProcesosComponent } from './componentes/modulos/accionesPersona
     VerTipoAccionComponent,
     EditarPedidoAccionComponent,
     VerPedidoAccionComponent,
+    EmpleadoProcesoComponent,
 
     CrearCoordenadasComponent,
     EditarCoordenadasComponent,
@@ -600,7 +627,32 @@ import { IngresarProcesosComponent } from './componentes/modulos/accionesPersona
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-    IngresarProcesosComponent,
+    RegistrarGeneroComponent,
+    EditarGeneroComponent,
+    ListarGeneroComponent,
+    ListarEstadoCivilComponent,
+    RegistrarEstadoCivilComponent,
+    EditarEstadoCivilComponent,
+    IngresarRegistrosComponent,
+    GradosComponent,
+    GrupoOcupacionalComponent,
+    RegistrarGradoComponent,
+    EditarGradoComponent,
+    RegistrarGrupoOcupacionalComponent,
+    EditarGrupoOcupacionalComponent,
+    RegistroInterfazProcesoComponent,
+    RegistroMultipleProcesoComponent,
+    RegistroInterfazGradoComponent,
+    RegistroMultipleGradoComponent,
+    RegistroMultipleGrupoComponent,
+    RegistroInterfazGrupoComponent,
+    EmpleadoProcesoComponent,
+    EmpleadoGradoComponent,
+    EmpleadoGrupoComponent,
+    EditarRegistroComponent,
+    EditarNacionalidadComponent,
+    ListarNacionalidadComponent,
+    RegistrarNacionalidadComponent,
 
   ],
 
@@ -669,7 +721,7 @@ import { IngresarProcesosComponent } from './componentes/modulos/accionesPersona
     HorarioMultipleEmpleadoComponent,
     PermisosMultiplesEmpleadosComponent,
   ],
-  exports: [CommonModule, TimbreMultipleComponent],
+  exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 
   bootstrap: [AppComponent]
 

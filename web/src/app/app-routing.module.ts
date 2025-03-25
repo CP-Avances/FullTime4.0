@@ -65,7 +65,10 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
-import { IngresarProcesosComponent } from './componentes/modulos/accionesPersonal/ingresar-procesos/ingresar-procesos.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
+
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 // MODULO  --TIMBRE VIRTUAL
@@ -145,6 +148,9 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
 
 const routes: Routes = [
 
@@ -180,6 +186,11 @@ const routes: Routes = [
 
   // USUARIOS
   { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard] },
+  { path: 'genero', component: ListarGeneroComponent, canActivate: [AuthGuard] },
+  { path: 'nacionalidad', component: ListarNacionalidadComponent, canActivate: [AuthGuard] },
+  
+  { path: 'estado-civil', component: ListarEstadoCivilComponent, canActivate: [AuthGuard] },
+
   { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard] },
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard] },
   { path: 'discapacidades', component: CatDiscapacidadComponent, canActivate: [AuthGuard] },
@@ -222,7 +233,9 @@ const routes: Routes = [
   { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard] },
   { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
-  { path: 'IngresarProcesos', component: IngresarProcesosComponent, canActivate: [AuthGuard] },
+  { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard]},
+  { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
+  { path: 'IngresarRegistros', component: IngresarRegistrosComponent, canActivate: [AuthGuard] },
   
 
   // MODULO  --GEOLOCALIZACION

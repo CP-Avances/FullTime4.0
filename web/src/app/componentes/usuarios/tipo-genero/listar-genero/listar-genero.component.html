@@ -1,0 +1,127 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-12 Tabla_titulo">
+                    <span>GÉNEROS</span>
+                </div>
+            </div>
+            <mat-card class="example-card mat-elevation-z8">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGenero()">
+                        Crear genero
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>RESULTADO DE BÚSQUEDA</span>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                    (click)="ConfirmarDeleteMultiple()">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionGeneros.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionGeneros.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Género</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
+                                    [formControl]="generoF">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de acuerdo a la columna de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let gene of generos | filtroGenero: generoF.value  | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionGeneros .toggle(gene) : null"
+                                [checked]="selectionGeneros.isSelected(gene)" [aria-label]="checkboxLabelPag(gene)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{gene.genero}}</td>
+                        <td class="justify-content-center">
+                            <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditarGenero(gene)" matSuffix
+                                matTooltipPosition="right" matTooltip="Editar los datos generales de este registro."
+                                id="t-editar">
+                                <p>Editar</p>
+                            </i>
+                            <i id="t-eliminar" (click)="ConfirmarDelete(gene)" class="far fa-trash-alt" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="generos.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <!--  **********************  DESCARGA DE REPORTES  *************************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Provincias en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="generarExcelGeneros()" id="excel" class="fas fa-file-excel" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Provincias en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Provincias en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Provincias en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de generos. </p>
+            </div>
+        </div>
+    </div>
+</div>

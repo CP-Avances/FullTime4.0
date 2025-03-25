@@ -235,11 +235,13 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
+                        <th scope="col">Rol</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
@@ -250,6 +252,7 @@
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
+                        <td>{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>

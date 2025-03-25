@@ -7,201 +7,209 @@
     </div>
 </div>
 <mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
-
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
     <mat-tab label="perfil">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">account_circle</mat-icon>
             <h6 id="items">Perfil Usuario</h6>
         </ng-template>
-        <div class="container" *ngFor="let e of empleadoUno" style="padding-top: 15px; padding-bottom: 25px;">
-            <div class="row">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="resultados">
-                            <h5 class="w-100 bd-highlight align-self-center">
-                                {{e.nombre.toUpperCase()}} {{e.apellido.toUpperCase()}}
-                            </h5>
-                        </div>
-                        <mat-card-content>
-                            <div class="container" style="padding-top: 15px;">
-                                <div class="row">
-                                    <div class="col-md m-auto d-flex align-items-center justify-content-center">
-                                        <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
-                                            <img src="{{urlImagen}}" alt="" id="avatarImagen">
-                                        </div>
-                                        <ng-template #inic>
-                                            <div mat-card-avatar id="avatar">
-                                                <span
-                                                    class="btn iniciales d-flex align-items-center justify-content-center">
-                                                    {{iniciales}}
-                                                </span>
-                                            </div>
-                                        </ng-template>
-                                    </div>
-                                    <div class="d-flex flex-wrap justify-content-around"
-                                        style="text-align: center; justify-content: center;">
-                                        <form method="post" enctype="multipart/form-data">
-                                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                                id="file" accept="image/png, image/jpeg">
-                                            <label for="file" class="btn-2">{{textoBoton}}</label>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Rol:</label>
-                                            <label>{{e.rol}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Código:</label>
-                                            <label>{{e.codigo}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Cédula:</label>
-                                            <label>{{e.cedula}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Domicilio:</label>
-                                            <label>{{e.domicilio | titlecase}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Teléfono:</label>
-                                            <label>{{e.telefono}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha de nacimiento:</label>
-                                            <label>{{ e.fec_nacimiento_ }}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md">
-                                        <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">E-mail:</label>
-                                            <label>{{e.correo}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <i type="submit" id="edit" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
-                                    matTooltipPosition="right"
-                                    matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
-                                    <p>Editar</p>
-                                </i>
-                            </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
-                <br>
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <mat-grid-list cols="2" rowHeight="3:1">
-                            <mat-grid-tile>
-                                <button type="submit" [routerLink]="['/empleado']"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons">keyboard_backspace</i><span>Atrás</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_buscar">
-                                <button (click)="BuscarFichaEmpleado()"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons">person</i><span>Ver Ficha</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_ficha">
-                                <button (click)="GenerarPdf('open')"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons">picture_as_pdf</i><span>Abrir PDF</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_ficha">
-                                <button (click)="GenerarPdf('download')"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons">cloud_download</i><span>Descargar PDF</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_ficha">
-                                <button (click)="ExportToXML()"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons fas fa-file-code"></i><span>Exportar a XML</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_ficha">
-                                <button (click)="generarExcel()"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons fas fa-file-excel"></i><span>Exportar a Excel</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="ver_ficha">
-                                <button (click)="ExportToCSV()"
-                                    class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector">
-                                    <i class="material-icons fas fa-file-csv"></i><span>Exportar a CSV</span>
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="activar">
-                                <button class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector" (click)="CambiarContrasena()">
-                                    Cambiar Contraseña
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile *ngIf="activar_frase">
-                                <button *ngIf="frase"
-                                    class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                    (click)="IngresarFrase()">
-                                    Frase Seguridad
-                                </button>
-                                <button *ngIf="cambiar_frase"
-                                    class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                    (click)="CambiarFrase()">
-                                    Cambiar Frase
-                                </button>
-                            </mat-grid-tile>
-                            <mat-grid-tile>
-                                <button class="btn btn-block d-flex align-items-center justify-content-center"
-                                    id="Selector" (click)="AbrirUbicacion(e.nombre, e.apellido)">
-                                    Ubicación Domicilio
-                                </button>
-                            </mat-grid-tile>
-                        </mat-grid-list>
-                    </mat-card>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="container">
-            <div id="geolocalizacion"></div>
+
+        <div style="padding-bottom: 35px;" *ngIf="editar_empleado">
+            <app-editar-empleado [empleado]="empleado_editar" [pagina]="pagina_empleado">
+            </app-editar-empleado>
         </div>
 
+        <div *ngIf="ver_empleado">
+            <div class="container" *ngFor="let e of empleadoUno" style="padding-top: 15px; padding-bottom: 25px;">
+                <div class="row">
+                    <div class="col-md">
+                        <mat-card class="mat-elevation-z8">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <h5 class="w-100 bd-highlight align-self-center">
+                                    {{e.nombre.toUpperCase()}} {{e.apellido.toUpperCase()}}
+                                </h5>
+                            </div>
+                            <mat-card-content>
+                                <div class="container" style="padding-top: 15px;">
+                                    <div class="row">
+                                        <div class="col-md m-auto d-flex align-items-center justify-content-center">
+                                            <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
+                                                <img src="{{urlImagen}}" alt="" id="avatarImagen">
+                                            </div>
+                                            <ng-template #inic>
+                                                <div mat-card-avatar id="avatar">
+                                                    <span
+                                                        class="btn iniciales d-flex align-items-center justify-content-center">
+                                                        {{iniciales}}
+                                                    </span>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+                                        <div class="d-flex flex-wrap justify-content-around"
+                                            style="text-align: center; justify-content: center;">
+                                            <form method="post" enctype="multipart/form-data">
+                                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
+                                                    id="file" accept="image/png, image/jpeg">
+                                                <label for="file" class="btn-2">{{textoBoton}}</label>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Rol:</label>
+                                                <label>{{e.rol}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Código:</label>
+                                                <label>{{e.codigo}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Cédula:</label>
+                                                <label>{{e.cedula}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Domicilio:</label>
+                                                <label>{{e.domicilio | titlecase}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Teléfono:</label>
+                                                <label>{{e.telefono}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">Fecha de nacimiento:</label>
+                                                <label>{{ e.fec_nacimiento_ }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <div class="espacio d-flex justify-content-start">
+                                                <label id="datosF">E-mail:</label>
+                                                <label>{{e.correo}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <i type="submit" id="edit" *ngIf="!editar_empleado" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                        <p>Editar</p>
+                                    </i>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                    <br>
+                    <div class="col-md">
+                        <mat-card class="mat-elevation-z8">
+                            <mat-grid-list cols="2" rowHeight="3:1">
+                                <mat-grid-tile>
+                                    <button type="submit" [routerLink]="['/empleado']"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons">keyboard_backspace</i><span>Atrás</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_buscar">
+                                    <button (click)="BuscarFichaEmpleado()"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons">person</i><span>Ver Ficha</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_ficha">
+                                    <button (click)="GenerarPdf('open')"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons">picture_as_pdf</i><span>Abrir PDF</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_ficha">
+                                    <button (click)="GenerarPdf('download')"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons">cloud_download</i><span>Descargar PDF</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_ficha">
+                                    <button (click)="ExportToXML()"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons fas fa-file-code"></i><span>Exportar a XML</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_ficha">
+                                    <button (click)="generarExcel()"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons fas fa-file-excel"></i><span>Exportar a Excel</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="ver_ficha">
+                                    <button (click)="ExportToCSV()"
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector">
+                                        <i class="material-icons fas fa-file-csv"></i><span>Exportar a CSV</span>
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="activar">
+                                    <button class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="CambiarContrasena()">
+                                        Cambiar Contraseña
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile *ngIf="activar_frase">
+                                    <button *ngIf="frase"
+                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
+                                        (click)="IngresarFrase()">
+                                        Frase Seguridad
+                                    </button>
+                                    <button *ngIf="cambiar_frase"
+                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
+                                        (click)="CambiarFrase()">
+                                        Cambiar Frase
+                                    </button>
+                                </mat-grid-tile>
+                                <mat-grid-tile>
+                                    <button class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="AbrirUbicacion(e.nombre, e.apellido)">
+                                        Ubicación Domicilio
+                                    </button>
+                                </mat-grid-tile>
+                            </mat-grid-list>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <div class="container">
+                <div id="geolocalizacion"></div>
+            </div>
+
+        </div>
     </mat-tab>
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
@@ -2580,3 +2588,4 @@
     </mat-tab>
 
 </mat-tab-group>
+

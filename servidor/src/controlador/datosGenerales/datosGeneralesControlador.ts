@@ -9,9 +9,11 @@ class DatosGeneralesControlador {
         let estado = req.params.estado;
         let informacion = await pool.query(
             `
-            SELECT * FROM informacion_general AS ig
+            SELECT ig.*, u.usuario
+            FROM informacion_general AS ig
+            LEFT JOIN eu_usuarios AS u ON ig.id = u.id_empleado
             WHERE ig.estado = $1
-            ORDER BY ig.name_suc ASC
+            ORDER BY ig.name_suc ASC;
             `
             , [estado]
         ).then((result: any) => { return result.rows });

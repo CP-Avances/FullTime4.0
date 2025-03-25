@@ -14,8 +14,8 @@ export class EmpleadoProcesosService {
   }
 
   // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
-  ObtenerProcesoUsuario(id_empl_cargo: number) {
-    return this.http.get<any>(`${environment.url}/empleadoProcesos/infoProceso/${id_empl_cargo}`);
+  ObtenerProcesoUsuario(id_empl: number) {
+    return this.http.get<any>(`${environment.url}/empleadoProcesos/infoProceso/${id_empl}`);
   }
 
   ActualizarUnProceso(datos: any) {

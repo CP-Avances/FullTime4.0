@@ -16,6 +16,8 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
 
 import { environment } from 'src/environments/environment';
 
@@ -137,6 +139,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() {
     return this.reporteService.filtroNombreEmp;
   }
+  get filtroRolEmp() { 
+    return this.reporteService.filtroRolEmp;
+  }
 
   constructor(
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
@@ -147,10 +152,14 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
+    private restGenero: GenerosService,
+    private restNacionalidades: NacionalidadService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.ObtenerGeneros();
+    this.ObtenerNacionalidades();
   }
 
   ngOnInit(): void {
@@ -549,13 +558,20 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           ],
         },
       });
+      
 
       // PRESENTACION DE LA INFORMACION
       selec.empleados.forEach((empl: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
         n.push({
           style: 'tableMarginCabeceraEmpleado',
           table: {
-            widths: ['*', 'auto', 'auto'],
+            widths: ['*', '*', '*'],
             headerRows: 2,
             body: [
               [
@@ -571,19 +587,19 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                 },
                 {
                   border: [true, true, true, false],
-                  text: 'COD: ' + empl.codigo,
+                  text: 'DEPARTAMENTO: ' + empl.departamento,
                   style: 'itemsTableInfoEmpleado',
                 },
               ],
               [
                 {
                   border: [true, false, false, false],
-                  text: 'RÉGIMEN LABORAL: ' + empl.regimen,
+                  text: 'CORREO: ' + empl.correo,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, false, false],
-                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  text: 'GENERO: ' + nombreGenero,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
@@ -592,9 +608,27 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   style: 'itemsTableInfoEmpleado'
                 }
               ],
+              [
+                {
+                  border: [true, false, false, false],
+                  text: 'REGIMEN: ' + empl.regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'ROL: ' + empl.rol,
+                  style: 'itemsTableInfoEmpleado'
+                }
+              ],
             ],
           },
         });
+        console.log(empl)
         n.push({
           style: 'tableMargin',
           table: {
@@ -640,23 +674,43 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+   nacionalidades: any=[];
+   ObtenerNacionalidades(){
+    this.restNacionalidades.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+    })
+   }
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
     this.data_pdf.forEach((selec) => {
       selec.empleados.map((empl: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
         empl.vacunas.map((vac: any) => {
           datos.push([
             n++,
             empl.cedula,
             empl.codigo,
             empl.apellido + ' ' + empl.nombre,
-            empl.genero == 1 ? 'M' : 'F',
+            nombreGenero,
             empl.ciudad,
             empl.sucursal,
             empl.regimen,
             empl.departamento,
             empl.cargo,
+            empl.rol,
             empl.correo,
             vac.carnet?.length ? 'Si' : 'No',
             vac.tipo_vacuna,
@@ -709,6 +763,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       { key: "regimen", width: 20 },
       { key: "departamento", width: 20 },
       { key: "cargo", width: 20 },
+      { key: "rol", width: 20 },
       { key: "correo", width: 35 },
       { key: "carnet", width: 20 },
       { key: "tipo_vacuna", width: 20 },
@@ -727,6 +782,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
       { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
       { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "ROL", totalsRowLabel: "", filterButton: true },
       { name: "CORREO", totalsRowLabel: "", filterButton: true },
       { name: "CARNET", totalsRowLabel: "", filterButton: true },
       { name: "TIPO VACUNA", totalsRowLabel: "", filterButton: true },
@@ -792,6 +848,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     let n = 0;
     this.data_pdf.forEach((empl: any) => {
       empl.empleados.forEach((vac: any) => {
+        let generoObj = this.generos.find((g: any) => g.id === vac.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === vac.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
         vac.vacunas.forEach((usu: any) => {
           const fecha = this.validar.FormatearFecha(
             usu.fecha.split('T')[0],
@@ -805,12 +866,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             cedula: vac.cedula,
             codigo: vac.codigo,
             empleado: vac.apellido + ' ' + vac.nombre,
-            genero: vac.genero,
+            genero: nombreGenero,
             ciudad: vac.ciudad,
             sucursal: vac.sucursal,
             regimen: vac.regimen,
             departamento: vac.departamento,
             cargo: vac.cargo,
+            rol: vac.rol,
             correo: vac.correo,
             carnet: usu.carnet,
             vacuna: usu.tipo_vacuna,

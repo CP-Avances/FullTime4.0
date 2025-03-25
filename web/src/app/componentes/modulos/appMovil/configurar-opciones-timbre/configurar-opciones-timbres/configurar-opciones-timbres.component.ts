@@ -67,6 +67,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol =  new FormControl('', [Validators.minLength(2)]);
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -128,6 +129,9 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   get filtroCedula() {
     return this.restR.filtroCedula;
   }
+  get filtroRolEmp() { 
+    return this.restR.filtroRolEmp;
+  }
 
   // FILTRO CARGOS
   get filtroNombreCarg() {
@@ -138,6 +142,8 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
   get filtroNombreReg() {
     return this.restR.filtroNombreReg;
   }
+
+
 
   constructor(
     private asignaciones: AsignacionesService,
@@ -341,6 +347,9 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       case 7:
         this.restR.setFiltroNombreReg(e);
         break;
+      case 8: 
+        this.restR.setFiltroRolEmp(e); 
+        break; 
       default:
         break;
     }
@@ -644,6 +653,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.cedula.reset();
       this.nombre_emp.reset();
       this.nombre_suc.reset();
+      this.nombre_rol.reset();
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -652,6 +662,7 @@ export class ConfigurarOpcionesTimbresComponent implements OnInit {
       this.Filtrar('', 4);
       this.Filtrar('', 5);
       this.Filtrar('', 6);
+      this.Filtrar('', 8);
     }
     this.seleccion_ubicacion.reset();
     this.seleccion_internet.reset();

@@ -250,7 +250,7 @@ export class ListarCoordenadasComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('CoordenadasGeograficas.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 
@@ -483,16 +483,16 @@ export class ListarCoordenadasComponent implements OnInit {
     var arregloCoordenadas: any = [];
     this.coordenadas.forEach((obj: any) => {
       objeto = {
-        "zonas": {
-          '@id': obj.id,
-          "descripcion": obj.descripcion,
-          "latitud": obj.latitud,
-          "longitud": obj.longitud,
-        }
+        codigo: {
+          "$": { "id": obj.id },
+          descripcion: obj.descripcion,
+          latitud: obj.latitud,
+          longitud: obj.longitud
+        },
       }
       arregloCoordenadas.push(objeto)
     });
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Coordenadas' });
     const xml = xmlBuilder.buildObject(arregloCoordenadas);
 
     if (xml === undefined) {
@@ -518,7 +518,6 @@ export class ListarCoordenadasComponent implements OnInit {
     a.download = 'CoordenadasUbicacion.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
-    this.ObtenerCoordenadas();
   }
 
 }

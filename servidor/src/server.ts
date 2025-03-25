@@ -49,6 +49,8 @@ import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
 import FUNCIONES_RUTAS from './rutas/funciones/funcionRutas';
+import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
+import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
 import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
@@ -71,6 +73,9 @@ import ALIMENTACION_RUTAS from './rutas/reportes/alimentacionRutas';
 import PROCESO_RUTA from './rutas/modulos/acciones-personal/catProcesoRutas';
 import EMPLEADO_PROCESO_RUTAS from './rutas/modulos/acciones-personal/empleProcesosRutas';
 import ACCION_PERSONAL_RUTAS from './rutas/modulos/acciones-personal/accionPersonalRutas';
+import GRADO_RUTAS from './rutas/modulos/acciones-personal/gradoRutas';
+import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcupacional';
+
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
 // MODULO RELOJ VIRTUAL
@@ -190,6 +195,9 @@ class Servidor {
         this.app.use(`/${ruta}/generalidades`, DATOS_GENERALES_RUTAS);
         this.app.use(`/${ruta}/notificacionSistema`, NOTIFICACION_RUTAS);
         this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
+        this.app.use(`/${ruta}/generos`, GENERO_RUTAS);
+        this.app.use(`/${ruta}/estado-civil`, ESTADO_CIVIL_RUTAS);
+
         // CON MODULOS
         this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
         this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);
@@ -209,6 +217,9 @@ class Servidor {
         this.app.use(`/${ruta}/proceso`, PROCESO_RUTA);
         this.app.use(`/${ruta}/empleadoProcesos`, EMPLEADO_PROCESO_RUTAS);
         this.app.use(`/${ruta}/accionPersonal`, ACCION_PERSONAL_RUTAS);
+        this.app.use(`/${ruta}/grado`, GRADO_RUTAS);
+        this.app.use(`/${ruta}/grupoOcupacional`, GRUPO_OCUPACIONAL_RUTAS);
+
         // MODULO ALIMENTACION
         this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
         this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
@@ -316,6 +327,7 @@ import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sen
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
+export const io = SERVIDOR.io;
 
 setInterval(async () => {
     atrasosDiarios();
@@ -325,9 +337,6 @@ setInterval(async () => {
     salidasAnticipadasSemanal();
     salidasAnticipadasDiarios();
 }, 2700000);
-
-export const io = SERVIDOR.io;
-
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 aniversario();
