@@ -19,6 +19,7 @@ export class SettingsComponent implements OnInit {
   btnActualizar: boolean = false;
   btnCrear: boolean = false;
   id_empleado: any;
+  ver_modulos: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -73,6 +74,7 @@ export class SettingsComponent implements OnInit {
     const formatearDato = decodeURIComponent(datoEncontrado);
     this.id_empleado = this.validar.DesencriptarDato(formatearDato);
 
+    this.VerModulos();
     this.avisos.ObtenerConfiguracionEmpleado(this.id_empleado).subscribe(res => {
       this.btnActualizar = true;
       this.formGroup.patchValue({
@@ -85,7 +87,13 @@ export class SettingsComponent implements OnInit {
         comidaMail: res[0].comida_mail,
         comidaNoti: res[0].comida_notificacion,
         comunicadoMail: res[0].comunicado_mail,
-        comunicadoNoti: res[0].comunicado_notificacion
+        comunicadoNoti: res[0].comunicado_notificacion,
+        atrasosMail: res[0].atrasos_mail,
+        atrasosNoti: res[0].atrasos_notificacion,
+        faltasMail: res[0].faltas_mail,
+        faltasNoti: res[0].faltas_notificacion,
+        salidasAnticipadasMail: res[0].salidas_anticipadas_mail,
+        salidasAnticipadasNoti: res[0].salidas_anticipadas_notificacion
       });
     }, error => {
       this.btnCrear = true;
@@ -93,26 +101,35 @@ export class SettingsComponent implements OnInit {
 
   }
 
+  // METODO PARA HABILITAR SELECCION DE OPCIONES DE MODULOS
+  VerModulos() {
+    this.ver_modulos = false;
+    if (this.habilitarPermisos === true || this.habilitarVacaciones === true ||
+      this.habilitarAlimentacion === true || this.habilitarHorasExtras) {
+      this.ver_modulos = true;
+    }
+  }
+
   // METODO PARA REGISTRAR CONFIGURACION DE NOTIFICACIONES
   CrearConfiguracion(form: any) {
     let data = {
       id_empleado: this.id_empleado,
       vaca_mail: form.vacaMail,
-      vaca_noti: form.vacaNoti,
+      vaca_notificacion: form.vacaNoti,
       permiso_mail: form.permisoMail,
-      permiso_noti: form.permisoNoti,
+      permiso_notificacion: form.permisoNoti,
       hora_extra_mail: form.horaExtraMail,
-      hora_extra_noti: form.horaExtraNoti,
+      hora_extra_notificacion: form.horaExtraNoti,
       comida_mail: form.comidaMail,
-      comida_noti: form.comidaNoti,
+      comida_notificacion: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
-      comunicado_noti: form.comunicadoNoti,
+      comunicado_notificacion: form.comunicadoNoti,
       atrasos_mail: form.atrasosMail,
-      atrasos_noti: form.atrasosNoti,
+      atrasos_notificacion: form.atrasosNoti,
       faltas_mail: form.faltasMail,
-      faltas_noti: form.faltasNoti,
+      faltas_notificacion: form.faltasNoti,
       salidas_anticipadas_mail: form.salidasAnticipadasMail,
-      salidas_anticipadas_noti: form.salidasAnticipadasNoti,
+      salidas_anticipadas_notificacion: form.salidasAnticipadasNoti,
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
@@ -129,21 +146,21 @@ export class SettingsComponent implements OnInit {
   ActualizarConfiguracion(form: any) {
     let data = {
       vaca_mail: form.vacaMail,
-      vaca_noti: form.vacaNoti,
+      vaca_notificacion: form.vacaNoti,
       permiso_mail: form.permisoMail,
-      permiso_noti: form.permisoNoti,
+      permiso_notificacion: form.permisoNoti,
       hora_extra_mail: form.horaExtraMail,
-      hora_extra_noti: form.horaExtraNoti,
+      hora_extra_notificacion: form.horaExtraNoti,
       comida_mail: form.comidaMail,
-      comida_noti: form.comidaNoti,
+      comida_notificacion: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
-      comunicado_noti: form.comunicadoNoti,
+      comunicado_notificacion: form.comunicadoNoti,
       atrasos_mail: form.atrasosMail,
-      atrasos_noti: form.atrasosNoti,
+      atrasos_notificacion: form.atrasosNoti,
       faltas_mail: form.faltasMail,
-      faltas_noti: form.faltasNoti,
+      faltas_notificacion: form.faltasNoti,
       salidas_anticipadas_mail: form.salidasAnticipadasMail,
-      salidas_anticipadas_noti: form.salidasAnticipadasNoti,
+      salidas_anticipadas_notificacion: form.salidasAnticipadasNoti,
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
@@ -154,6 +171,6 @@ export class SettingsComponent implements OnInit {
       });
       return this.router.navigate(['/home']);
     });
-
   }
+
 }

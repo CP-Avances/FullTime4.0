@@ -155,8 +155,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     public restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public restPermiso: PermisosService, // SERVICIO DATOS PERMISOS
     public restEmpresa: EmpresaService, // SERVICIO DATOS EMPRESA
-    public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACIÓN
-    public restTitulo: TituloService, // SERVICIO DATOS TÍTULO PROFESIONAL
+    public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACION
+    public restTitulo: TituloService, // SERVICIO DATOS TITULO PROFESIONAL
     public plan_hora: PlanHoraExtraService,
     public restCargo: EmplCargosService, // SERVICIO DATOS CARGO
     public parametro: ParametrosService,
@@ -628,6 +628,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // METODO EDICION DE REGISTRO DE EMPLEADO
+  verInformacionEmpleado: boolean = true;
+  verEditarEmpleado: boolean = false;
   AbirVentanaEditarEmpleado(dataEmpley: any) {
     this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
       .afterClosed().subscribe(result => {
