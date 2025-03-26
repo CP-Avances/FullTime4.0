@@ -49,39 +49,6 @@ export class AccionPersonalService {
     return this.http.post<any>(`${environment.url}/accionPersonal/accion/tipo`, datos);
   }
 
-  /** SERVICIOS PARA TABLA CARGO_PROPUESTO*/
-  ConsultarCargoPropuesto() {
-    return this.http.get(`${environment.url}/accionPersonal/cargo`);
-  }
-
-  ConsultarUnCargoPropuesto(id: number) {
-    return this.http.get(`${environment.url}/accionPersonal/cargo/${id}`);
-  }
-
-  IngresarCargoPropuesto(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/cargo`, datos);
-  }
-
-  BuscarIdCargoPropuesto() {
-    return this.http.get(`${environment.url}/accionPersonal/tipo/cargo`);
-  }
-
-  /** SERVICIOS PARA TABLA CONTEXTO LEGAL*/
-  ConsultarDecreto() {
-    return this.http.get(`${environment.url}/accionPersonal/decreto`);
-  }
-
-  ConsultarUnDecreto(id: number) {
-    return this.http.get(`${environment.url}/accionPersonal/decreto/${id}`);
-  }
-
-  IngresarDecreto(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/decreto`, datos);
-  }
-
-  BuscarIdDecreto() {
-    return this.http.get(`${environment.url}/accionPersonal/tipo/decreto`);
-  }
 
   /** SERVICIOS PARA TABLA PEDIDO_ACCION_EMPLEADO */
   IngresarPedidoAccion(datos: any) {
