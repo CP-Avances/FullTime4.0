@@ -8,9 +8,9 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
 @Component({
   selector: 'app-registrar-grupo-ocupacional',
   templateUrl: './registrar-grupo-ocupacional.component.html',
-  styleUrl: './registrar-grupo-ocupacional.component.scss'
+  styleUrl: './registrar-grupo-ocupacional.component.css'
 })
-export class RegistrarGrupoOcupacionalComponent implements OnInit{
+export class RegistrarGrupoOcupacionalComponent implements OnInit {
 
   ips_locales: any = '';
 
@@ -35,7 +35,7 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit{
     private toastr: ToastrService,
     public validar: ValidacionesService,
     public ventana: MatDialogRef<RegistrarGrupoOcupacionalComponent>,
-  ){}
+  ) { }
 
   // METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
@@ -48,28 +48,22 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit{
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    });   
+    });
   }
 
   // METODO DE VALIDACION DE CAMPOS
   ObtenerMensajeErrorNombre() {
-    if (this.grupo.hasError('required')) {
-      return 'Campo obligatorio.';
-    }
-    return this.grupo.hasError('pattern') ? 'No ingresar números.' : '';
+    return this.grupo.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
   }
   // METODO DE VALIDACION DE CAMPOS
   ObtenerMensajeErrorNumero() {
-    if (this.numero_partida.hasError('required')) {
-      return 'Campo obligatorio.';
-    }
-    return this.numero_partida.hasError('pattern') ? 'No ingresar letras.' : '';
+    return this.numero_partida.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
   }
 
-  InsertarGrupo(form: any){
+  InsertarGrupo(form: any) {
     let dataGrupo = {
       grupo: form.grupoForm,
       numero_partida: form.numero_partidaForm,
@@ -78,11 +72,11 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit{
     };
     this._grupoOp.IngresarGrupoOcupacion(dataGrupo).subscribe({
       next: (respuesta: any) => {
-        if(respuesta.codigo != 200){
+        if (respuesta.codigo != 200) {
           this.toastr.warning(respuesta.message, 'Error registro.', {
             timeOut: 6000,
           });
-        }else{
+        } else {
           this.toastr.success(respuesta.message, 'Registro guardado.', {
             timeOut: 6000,
           });

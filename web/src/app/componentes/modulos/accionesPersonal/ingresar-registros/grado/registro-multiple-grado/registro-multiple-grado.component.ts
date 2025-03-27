@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-registro-multiple-grado',
   templateUrl: './registro-multiple-grado.component.html',
-  styleUrl: './registro-multiple-grado.component.scss'
+  styleUrl: './registro-multiple-grado.component.css'
 })
 export class RegistroMultipleGradoComponent {
 

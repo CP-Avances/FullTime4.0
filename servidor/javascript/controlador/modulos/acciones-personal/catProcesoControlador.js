@@ -266,7 +266,7 @@ class ProcesoControlador {
                             headers[cell.value.toString().toUpperCase()] = colNumber;
                         });
                         // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                        if (!headers['ITEM'] || !headers['DESCRIPCION'] || !headers['PROCESO_PADRE']) {
+                        if (!headers['ITEM'] || !headers['DESCRIPCION'] || !headers['PROCESO_SUPERIOR']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -278,7 +278,7 @@ class ProcesoControlador {
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
                             const PROCESO = (_a = row.getCell(headers['DESCRIPCION']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
-                            const PROCESO_PADRE = (_b = row.getCell(headers['PROCESO_PADRE']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            const PROCESO_PADRE = (_b = row.getCell(headers['PROCESO_SUPERIOR']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (PROCESO != undefined && PROCESO != '') &&

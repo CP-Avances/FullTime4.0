@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-registro-multiple-grupo',
   templateUrl: './registro-multiple-grupo.component.html',
-  styleUrl: './registro-multiple-grupo.component.scss'
+  styleUrl: './registro-multiple-grupo.component.css'
 })
 export class RegistroMultipleGrupoComponent {
 

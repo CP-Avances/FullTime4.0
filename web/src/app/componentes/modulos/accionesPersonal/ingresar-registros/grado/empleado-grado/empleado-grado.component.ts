@@ -17,7 +17,7 @@ import { EditarRegistroComponent } from '../../editar-registro/editar-registro.c
 @Component({
   selector: 'app-empleado-grado',
   templateUrl: './empleado-grado.component.html',
-  styleUrl: './empleado-grado.component.scss'
+  styleUrl: './empleado-grado.component.css'
 })
 export class EmpleadoGradoComponent {
   @Input() data: any;

@@ -12,7 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 @Component({
   selector: 'app-registro-multiple-proceso',
   templateUrl: './registro-multiple-proceso.component.html',
-  styleUrl: './registro-multiple-proceso.component.scss'
+  styleUrl: './registro-multiple-proceso.component.css'
 })
 export class RegistroMultipleProcesoComponent {
 
