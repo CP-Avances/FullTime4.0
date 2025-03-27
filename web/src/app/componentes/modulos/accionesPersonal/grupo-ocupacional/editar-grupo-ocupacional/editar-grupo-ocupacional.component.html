@@ -33,7 +33,7 @@
                 <br/>
                 <mat-form-field>
                     <mat-label>Numero de partida</mat-label>
-                    <input matInput placeholder="Ej: Emergencia" [formControl]="numero_partida"
+                    <input matInput type="tel" placeholder="Ej: Emergencia" [formControl]="numero_partida"
                         (keypress)="IngresarSoloNumeros($event)" required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar el grado">

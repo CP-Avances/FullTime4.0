@@ -16,6 +16,9 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { Observable, map, startWith  } from 'rxjs';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 
 @Component({
   selector: 'app-lista-app',
@@ -36,7 +39,12 @@ export class ListaAppComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+
+  filteredRoles!: Observable<any[]>;
+  filteredRolesDH!: Observable<any[]>;
+  roles: any = [];
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -110,6 +118,9 @@ export class ListaAppComponent implements OnInit {
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
+  //FILTRO ROL
+  get filtroRolEmp() { return this.restR.filtroRolEmp };
+
 
   /** ********************************************************************************************************************** **
    ** **                         INICIALIZAR VARIABLES DE USUARIOS DESHABILITADOS TIMBRE WEB                              ** **
@@ -123,6 +134,7 @@ export class ListaAppComponent implements OnInit {
   nombre_suc_dh = new FormControl('', [Validators.minLength(2)]);
   nombre_reg_dh = new FormControl('', [Validators.minLength(2)]);
   nombre_carg_dh = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol_dh = new FormControl('', [Validators.minLength(2)]);
   seleccion_dh = new FormControl('');
 
   public _booleanOptions_dh: FormCriteriosBusqueda = {
@@ -195,6 +207,9 @@ export class ListaAppComponent implements OnInit {
   // FILTRO REGIMEN
   get dh_filtroNombreReg() { return this.restR.filtroNombreReg };
 
+  //FILTRO ROL
+  get dh_filtroRolEmp() { return this.restR.filtroRolEmp };
+
   // HABILITAR O DESHABILITAR EL ICONO DE PROCESO INDIVIDUAL
   individual: boolean = true;
   individual_dh: boolean = true;
@@ -213,6 +228,7 @@ export class ListaAppComponent implements OnInit {
     public general: DatosGeneralesService,
     public restR: ReportesService,
     private asignaciones: AsignacionesService,
+    private restRoles: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -238,6 +254,31 @@ export class ListaAppComponent implements OnInit {
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
       this.AdministrarInformacion();
     }
+
+    this, this.restRoles.BuscarRoles().subscribe((respuesta: any) => {
+      this.roles = respuesta
+      console.log('this.listaRoles: ', this.roles)
+    });
+
+        this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+          startWith(''),
+          map(value => this.filtrarRoles(value || ''))
+        );
+
+        this.filteredRolesDH = this.nombre_rol_dh.valueChanges.pipe(
+          startWith(''),
+          map(value => this.filtrarRoles(value || ''))
+        );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 14);
+    });
+
+    this.nombre_rol_dh.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 14);
+    });
+
+
   }
 
   ngOnDestroy() {
@@ -260,6 +301,13 @@ export class ListaAppComponent implements OnInit {
   AdministrarInformacion() {
     this.BuscarInformacionGeneral(false);
     this.BuscarInformacionGeneral(true);
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.roles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
@@ -594,6 +642,7 @@ export class ListaAppComponent implements OnInit {
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
       case 12: this.restR.setFiltroNombreReg(e); break;
+      case 14: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -840,6 +889,7 @@ export class ListaAppComponent implements OnInit {
       case 10: this.restR.setFiltroCedula(e); break;
       case 11: this.restR.setFiltroNombreEmp(e); break;
       case 13: this.restR.setFiltroNombreReg(e); break;
+      case 14: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }

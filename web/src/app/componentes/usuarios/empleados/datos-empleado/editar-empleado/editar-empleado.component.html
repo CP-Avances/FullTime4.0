@@ -62,7 +62,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Cédula</mat-label>
-                                <input matInput type="text" placeholder="1788300293" maxlength="10"
+                                <input matInput type="tel" placeholder="1788300293" maxlength="10"
                                     formControlName="cedulaForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     (keypress)="IngresarSoloNumeros($event)" required
@@ -131,7 +131,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Teléfono</mat-label>
-                                <input matInput placeholder="0984297443" type="text" maxlength="10"
+                                <input matInput placeholder="0984297443" type="tel" maxlength="10"
                                     formControlName="telefonoForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     (keypress)="IngresarSoloNumeros($event)">

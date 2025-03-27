@@ -76,7 +76,7 @@
                             <div class="d-flex flex-wrap justify-content-center m-auto">
                                 <mat-form-field>
                                     <mat-label>IP</mat-label>
-                                    <input matInput placeholder="Ingresar IP del reloj." [formControl]="ipF"
+                                    <input matInput type="tel" placeholder="Ingresar IP del reloj." [formControl]="ipF"
                                         (keypress)="IngresarIp($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar dirección IP del dispositivo.">
@@ -87,7 +87,7 @@
 
                                 <mat-form-field>
                                     <mat-label>Puerto</mat-label>
-                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF" maxlength="6"
+                                    <input matInput type="tel" placeholder="Ingresar puerto" [formControl]="puertoF" maxlength="6"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (keypress)="IngresarSoloNumeros($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"

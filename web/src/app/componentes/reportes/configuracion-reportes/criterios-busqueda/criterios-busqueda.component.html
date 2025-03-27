@@ -158,7 +158,7 @@
             <mat-form-field>
                 <mat-label>Código</mat-label>
                 <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 5)"
-                [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
+                [formControl]="codigo">
                 <mat-icon matSuffix matTooltipPosition="right"
                 matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
             </mat-form-field>
@@ -174,7 +174,7 @@
                 <mat-label>Cédula</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 6)"
                 oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"
                 matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
@@ -184,13 +184,24 @@
     
         <div class="col-md">
             <div class="d-flex flex-wrap justify-content-center">
-            <mat-form-field>
-                <mat-label>Rol</mat-label>
-                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_rol.value, 14)"
-                [formControl]="nombre_rol" type="text" (keypress)="IngresarSoloLetras($event)">
-                <mat-icon matSuffix matTooltipPosition="right"
-                matTooltip="Búsqueda de datos de empleado por rol.">help_outline</mat-icon>
-            </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Rol</mat-label>
+                    <input type="text"
+                           matInput
+                           placeholder="Buscar"
+                           aria-label="Rol"
+                           [formControl]="nombre_rol"
+                           [matAutocomplete]="autoRol"
+                           (keypress)="IngresarSoloLetras($event)">  
+                    <mat-autocomplete #autoRol="matAutocomplete">
+                      <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                        {{ rol.nombre }}
+                      </mat-option>
+                    </mat-autocomplete>
+                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                      help_outline
+                    </mat-icon>
+                </mat-form-field>
             </div>
         </div>
         </div>
@@ -201,7 +212,7 @@
             <mat-form-field>
                 <mat-label>Código</mat-label>
                 <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 8)" [formControl]="codigo"
-                    (keypress)="IngresarSoloNumeros($event)">
+                    >
                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por código.">
                     help_outline
                 </mat-icon>
@@ -210,7 +221,7 @@
                 <mat-label>Cédula</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 9)"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
                 </mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"
@@ -236,7 +247,7 @@
             <mat-form-field>
                 <mat-label>Código</mat-label>
                 <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 11)" [formControl]="codigo"
-                    (keypress)="IngresarSoloNumeros($event)">
+                    >
                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por código.">
                     help_outline
                 </mat-icon>
@@ -245,7 +256,7 @@
                 <mat-label>Cédula</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 12)"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
                 </mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"

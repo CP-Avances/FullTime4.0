@@ -144,7 +144,7 @@
                                 <input matInput placeholder="Buscar" maxlength="10"
                                     (input)="Filtrar(cedulaRol.value, 4)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedulaRol" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                    [formControl]="cedulaRol" type="tel" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                     help_outline
@@ -156,10 +156,20 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Rol</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_rolRol.value, 8)"
-                                    [formControl]="nombre_rolRol" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input type="text"
+                                       matInput
+                                       placeholder="Buscar"
+                                       aria-label="Rol"
+                                       [formControl]="nombre_rolRol"
+                                       [matAutocomplete]="autoRol"
+                                       (keypress)="IngresarSoloLetras($event)">  
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                    {{ rol.nombre }}
+                                  </mat-option>
+                                </mat-autocomplete>
                                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                    help_outline
+                                  help_outline
                                 </mat-icon>
                             </mat-form-field>
                         </div>
