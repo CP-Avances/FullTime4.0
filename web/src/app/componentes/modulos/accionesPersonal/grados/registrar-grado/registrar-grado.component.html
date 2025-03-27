@@ -1,7 +1,8 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR GRADO</span>
+        REGISTRAR GRADO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div style="text-align: center">
@@ -16,11 +17,12 @@
                 </div>
                 <mat-form-field>
                     <mat-label>Grado</mat-label>
-                    <input matInput placeholder="Ej: Emergencia" [formControl]="grado"
+                    <input matInput placeholder="Ej: Grado Uno" [formControl]="grado"
                         (keypress)="IngresarSoloLetras($event)" required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar el grado">
-                        help_outline</mat-icon>
+                        help_outline
+                    </mat-icon>
                     <mat-error *ngIf="grado.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
                 </mat-form-field>
             </div>

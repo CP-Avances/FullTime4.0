@@ -116,6 +116,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   constructor(
     private reportesTiempoLaborado: TiempoLaboradoService,
@@ -326,6 +327,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     this.data_pdf = []
     this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
+      console.log("ver datos del RESUMEN GENERAL DE ASISTENCIA: ", this.data_pdf)
       switch (accion) {
         case 'excel': this.generarExcel(); break;
         case 'ver': this.verDatos(); break;
@@ -707,26 +709,34 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
                   : '';
                 const entrada = lab.entrada.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(lab.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT');
+                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA');
                 const salida = lab.salida.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(lab.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT');
+                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA');
                 const inicioAlimentacion = lab.tipo == 'EAS'
                   ? (lab.inicioAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(lab.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT'))
+                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA'))
                   : '';
                 const finAlimentacion = lab.tipo == 'EAS'
                   ? (lab.finAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(lab.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT'))
+                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA'))
                   : '';
                 const alimentacion_asignada = lab.tipo == 'EAS' ? lab.inicioAlimentacion.minutos_alimentacion : 0;
                 const diferenciaEnMinutos = this.CalcularDiferenciaFechas(lab);
                 const minutosAlimentacion = diferenciaEnMinutos[0];
                 const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-                const minutosLaborados = diferenciaEnMinutos[1];
-                const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                let minutosLaborados = 0
+                let tiempoLaborado = ''
+                if (lab.control) {
+                  minutosLaborados = diferenciaEnMinutos[1];
+                  tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                } else {
+                  minutosLaborados = diferenciaEnMinutos[4];
+                  tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                }
+
                 const minutosAtraso = diferenciaEnMinutos[2];
                 const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
                 const minutosSalidaAnticipada = diferenciaEnMinutos[3];
@@ -909,19 +919,19 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
             : '';
           const entrada = t.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const salida = t.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const inicioAlimentacion = t.tipo == 'EAS'
             ? (t.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
           const finAlimentacion = t.tipo == 'EAS'
             ? (t.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
 
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
@@ -930,8 +940,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
           const minutosAlimentacion = diferenciaEnMinutos[0];
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-          const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          let minutosLaborados = 0
+          let tiempoLaborado = ''
+          if (t.control) {
+            minutosLaborados = diferenciaEnMinutos[1];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          } else {
+            minutosLaborados = diferenciaEnMinutos[4];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          }
           const minutosAtraso = diferenciaEnMinutos[2];
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
@@ -1128,19 +1145,19 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
             : '';
           const entrada = t.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const salida = t.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const inicioAlimentacion = t.tipo == 'EAS'
             ? (t.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
           const finAlimentacion = t.tipo == 'EAS'
             ? (t.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
 
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
@@ -1149,8 +1166,16 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
           const minutosAlimentacion = diferenciaEnMinutos[0];
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-          const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          let minutosLaborados = 0
+          let tiempoLaborado = ''
+          if (t.control) {
+            minutosLaborados = diferenciaEnMinutos[1];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          } else {
+            minutosLaborados = diferenciaEnMinutos[4];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          }
+
           const minutosAtraso = diferenciaEnMinutos[2];
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
@@ -1198,9 +1223,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     let minutosLaborados = 0;
     let minutosAtrasos = 0;
     let minutosSalidasAnticipadas = 0;
+    let minutosPlanificados = 0;
 
     if (timbre.origen === 'L' || timbre.origen === 'FD') {
-      return [0, 0, 0, 0];
+      return [0, 0, 0, 0, 0];
     }
 
     if (timbre.tipo === 'ES') {
@@ -1209,6 +1235,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
         minutosLaborados = Number(this.CalcularMinutosDiferencia(entrada.fecha_hora_timbre, salida.fecha_hora_timbre).toFixed(2));
         minutosAtrasos = Number(this.CalcularMinutosAtraso(entrada.fecha_hora_horario, entrada.fecha_hora_timbre, entrada.tolerancia));
         minutosSalidasAnticipadas = Number(this.CalcularMinutosSalidaAnticipada(salida.fecha_hora_horario, salida.fecha_hora_timbre).toFixed(2));
+        minutosPlanificados = this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario);
+
       }
     }
     else {
@@ -1222,12 +1250,13 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
       minutosAlimentacion = inicioAlimentacion.fecha_hora_timbre !== null && finAlimentacion.fecha_hora_timbre !== null
         ? Number(this.CalcularMinutosDiferencia(inicioAlimentacion.fecha_hora_timbre, finAlimentacion.fecha_hora_timbre).toFixed(2))
         : min_alimentacion;
+      minutosPlanificados = Number((this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario) - min_alimentacion).toFixed(2));
 
       if (minutosLaborados > 0) {
         minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2));
       }
     }
-    return [minutosAlimentacion, minutosLaborados, minutosAtrasos, minutosSalidasAnticipadas];
+    return [minutosAlimentacion, minutosLaborados, minutosAtrasos, minutosSalidasAnticipadas, minutosPlanificados];
   }
 
   CalcularMinutosDiferencia(inicio: any, fin: any): number {

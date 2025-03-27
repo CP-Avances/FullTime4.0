@@ -450,7 +450,7 @@ export class PrincipalProcesoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Procesos.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -514,6 +514,7 @@ export class PrincipalProcesoComponent implements OnInit {
                 { text: 'Proceso Superior', style: 'tableHeader' },
               ],
               ...this.procesos.map((obj: any) => {
+                console.log(obj);
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -574,7 +575,6 @@ export class PrincipalProcesoComponent implements OnInit {
         "proceso": {
           '@id': obj.id,
           "nombre": obj.nombre,
-          "nivel": obj.nivel,
           "proceso_superior": obj.proc_padre,
         }
       }

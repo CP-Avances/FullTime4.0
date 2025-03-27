@@ -117,6 +117,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+
 
   constructor(
     private reportesAtrasos: AtrasosService,

@@ -66,17 +66,12 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
 
   // METODO DE VALIDACION DE CAMPOS
   ObtenerMensajeErrorNombre() {
-    if (this.grupo.hasError('required')) {
-      return 'Campo obligatorio.';
-    }
-    return this.grupo.hasError('pattern') ? 'No ingresar números.' : '';
+    return this.grupo.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
   }
+  
   // METODO DE VALIDACION DE CAMPOS
   ObtenerMensajeErrorNumero() {
-    if (this.numero_partida.hasError('required')) {
-      return 'Campo obligatorio.';
-    }
-    return this.numero_partida.hasError('pattern') ? 'No ingresar letras.' : '';
+    return this.numero_partida.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
   }
 
   // METODO PARA SALIR DEL REGISTRO

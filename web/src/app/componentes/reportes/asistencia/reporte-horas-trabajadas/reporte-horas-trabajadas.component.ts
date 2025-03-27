@@ -113,6 +113,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+
 
   constructor(
     private reportesTiempoLaborado: TiempoLaboradoService,
@@ -642,19 +644,19 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                   : '';
                 const entrada = usu.entrada.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA');
                 const salida = usu.salida.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+                  : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA');
                 const inicioAlimentacion = usu.tipo == 'EAS'
                   ? (usu.inicioAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA'))
                   : '';
                 const finAlimentacion = usu.tipo == 'EAS'
                   ? (usu.finAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+                    : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen :  usu.control? 'FT': 'SCA'))
                   : '';
                 // SUMA DE MINUTOS DE TIEMPO LABORADO Y PLANIFICADO
                 const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
@@ -664,22 +666,42 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                 const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                 totalTiempoPlanificadoEmpleado += minutosPlanificados;
                 totalTiempoLaboradoEmpleado += minutosLaborados;
-                return [
-                  { style: 'itemsTableCentrado', text: c },
-                  { style: 'itemsTableCentrado', text: fecha },
-                  { style: 'itemsTableCentrado', text: entradaHorario },
-                  { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
-                  { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
-                  { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
-                  { style: 'itemsTableCentrado', text: finAlimentacionHorario },
-                  { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
-                  { style: 'itemsTableCentrado', text: salidaHorario },
-                  { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
-                  { style: 'itemsTableDerecha', text: tiempoPlanificado },
-                  { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
-                  { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: tiempoLaborado },
-                  { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: minutosLaborados.toFixed(2) },
-                ];
+
+                if(usu.control){
+                  return [
+                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: fecha },
+                    { style: 'itemsTableCentrado', text: entradaHorario },
+                    { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
+                    { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
+                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                    { style: 'itemsTableCentrado', text: finAlimentacionHorario },
+                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                    { style: 'itemsTableCentrado', text: salidaHorario },
+                    { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
+                    { style: 'itemsTableDerecha', text: tiempoPlanificado },
+                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: tiempoLaborado },
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' : 'itemsTableDerecha', text: minutosLaborados.toFixed(2) },
+                  ];
+                }else{
+                  return [
+                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: fecha },
+                    { style: 'itemsTableCentrado', text: entradaHorario },
+                    { style: entrada == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: entrada },
+                    { style: 'itemsTableCentrado', text: inicioAlimentacionHorario },
+                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                    { style: 'itemsTableCentrado', text: finAlimentacionHorario },
+                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                    { style: 'itemsTableCentrado', text: salidaHorario },
+                    { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
+                    { style: 'itemsTableDerecha', text: tiempoPlanificado },
+                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
+                    { style: 'itemsTableDerecha', text: tiempoPlanificado },
+                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2) },
+                  ];
+                }               
               }),
               [
                 {
@@ -824,19 +846,19 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             : '';
           const entrada = obj3.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(obj3.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT');
+            : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : obj3.control? 'FT': 'SCA');
           const salida = obj3.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(obj3.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT');
+            : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : obj3.control? 'FT': 'SCA');
           const inicioAlimentacion = obj3.tipo == 'EAS'
             ? (obj3.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT'))
+              : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : obj3.control? 'FT': 'SCA'))
             : '';
           const finAlimentacion = obj3.tipo == 'EAS'
             ? (obj3.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT'))
+              : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : obj3.control? 'FT': 'SCA'))
             : '';
 
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
@@ -844,30 +866,58 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
           const minutosLaborados = diferenciaEnMinutos[1];
           const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
-          datos.push([
-            n++,
-            empl.cedula,
-            empl.codigo,
-            empl.apellido + ' ' + empl.nombre,
-            empl.ciudad,
-            empl.sucursal,
-            empl.regimen,
-            empl.departamento,
-            empl.cargo,
-            new Date(obj3.entrada.fecha_hora_horario),
-            entradaHorario,
-            entrada,
-            inicioAlimentacionHorario,
-            inicioAlimentacion,
-            finAlimentacionHorario,
-            finAlimentacion,
-            salidaHorario,
-            salida,
-            tiempoPlanificado,
-            minutosPlanificados.toFixed(2),
-            tiempoLaborado,
-            minutosLaborados.toFixed(2),
-          ])
+          if(obj3.control){
+            datos.push([
+              n++,
+              empl.cedula,
+              empl.codigo,
+              empl.apellido + ' ' + empl.nombre,
+              empl.ciudad,
+              empl.sucursal,
+              empl.regimen,
+              empl.departamento,
+              empl.cargo,
+              new Date(obj3.entrada.fecha_hora_horario),
+              entradaHorario,
+              entrada,
+              inicioAlimentacionHorario,
+              inicioAlimentacion,
+              finAlimentacionHorario,
+              finAlimentacion,
+              salidaHorario,
+              salida,
+              tiempoPlanificado,
+              minutosPlanificados.toFixed(2),
+              tiempoLaborado,
+              minutosLaborados.toFixed(2),
+            ])
+          }else{
+            datos.push([
+              n++,
+              empl.cedula,
+              empl.codigo,
+              empl.apellido + ' ' + empl.nombre,
+              empl.ciudad,
+              empl.sucursal,
+              empl.regimen,
+              empl.departamento,
+              empl.cargo,
+              new Date(obj3.entrada.fecha_hora_horario),
+              entradaHorario,
+              entrada,
+              inicioAlimentacionHorario,
+              inicioAlimentacion,
+              finAlimentacionHorario,
+              finAlimentacion,
+              salidaHorario,
+              salida,
+              tiempoPlanificado,
+              minutosPlanificados.toFixed(2),
+              tiempoPlanificado,
+              minutosPlanificados.toFixed(2),
+            ])
+          }
+          
         });
       })
     });
@@ -1028,19 +1078,19 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             : '';
           const entrada = usu.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(usu.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA');
           const salida = usu.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(usu.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT');
+            : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen :usu.control? 'FT': 'SCA');
           const inicioAlimentacion = usu.tipo == 'EAS'
             ? (usu.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(usu.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+              : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA'))
             : '';
           const finAlimentacion = usu.tipo == 'EAS'
             ? (usu.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(usu.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : 'FT'))
+              : (usu.origen === 'L' || usu.origen === 'FD' ? usu.origen : usu.control? 'FT': 'SCA'))
             : '';
 
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(usu);
@@ -1068,6 +1118,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             minutosPlanificados: minutosPlanificados.toFixed(2),
             tiempoLaborado,
             minutosLaborados: minutosLaborados.toFixed(2),
+            control: usu.control
           }
           this.timbres.push(ele);
         })

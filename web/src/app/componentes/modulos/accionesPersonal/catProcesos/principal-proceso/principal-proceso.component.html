@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md">
             <div id="titulo" class="Tabla_titulo">
-                <span>ACCIONES DE PERSONAL PROCESOS</span>
+                <span>PROCESOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
@@ -19,7 +19,7 @@
         </div>
         <div class="col-md">
             <div id="titulo">
-                <span>CARGAR PLANTILLA DE ACCION DE PERSONAL PROCESOS</span>
+                <span>CARGAR PLANTILLA DE PROCESOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
@@ -27,15 +27,14 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="FileChange($event)" type="file"
-                                    [formControl]="archivoForm" id="file1"
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file1"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                     style="height: 65px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
-                                <label for="file1" matSuffix matTooltipPosition="right" 
+                                <label for="file1" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 65px;  padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
@@ -54,10 +53,10 @@
                                 <br> Descargar plantilla
                             </a>
                         </div>
-                        <div  class="d-flex flex-wrap justify-content-center m-auto">
-                            <button *ngIf="Datos_procesos && messajeExcel != 'error'" id="descargar" 
-                                class="btn m-auto" matSuffix matTooltipPosition="right"
-                                matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
+                        <div class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="Datos_procesos && messajeExcel != 'error'" id="descargar" class="btn m-auto"
+                                matSuffix matTooltipPosition="right" matTooltip="Guardar registro múltiple."
+                                (click)="ConfirmarRegistroMultiple()">
                                 Registrar
                             </button>
                         </div>
@@ -76,7 +75,6 @@
                 <thead class="thead-light">
                     <tr style="text-align: center;">
                         <th scope="col">Nombre</th>
-                        
                         <th scope="col">Proceso superior</th>
                         <th scope="col">Acción</th>
                     </tr>
@@ -99,13 +97,13 @@
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda del proceso de acuerdo a las columnas de la tabla.">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr
                         *ngFor="let proceso of procesos | filtrosNombres:buscarNombre.value | padre:buscarPadre.value | paginate:tamanio_pagina:numero_pagina">
                         <td>{{proceso.nombre}}</td>
-                        
                         <td>{{proceso.proc_padre}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(proceso)" id="accion" matSuffix
@@ -126,19 +124,19 @@
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato PDF.">
+                matTooltip="Descargar Lista de Procesos en formato PDF.">
                 <p>PDF</p>
             </i>
             <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato EXCEL.">
+                matTooltip="Descargar Lista de Procesos en formato EXCEL.">
                 <p>XLSL</p>
             </i>
             <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato CSV.">
+                matTooltip="Descargar Lista de Procesos en formato CSV.">
                 <p>CSV</p>
             </i>
             <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato XML.">
+                matTooltip="Descargar Lista de Procesos en formato XML.">
                 <p>XML</p>
             </i>
         </div>
@@ -159,7 +157,7 @@
 <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
     *ngIf="Datos_procesos && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div id="titulo">REGISTRO MÚLTIPLE</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -167,12 +165,11 @@
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
                         <th scope="col">Proceso</th>
-                        <th scope="col">Proceso padre</th>
+                        <th scope="col">Proceso superior</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        *ngFor="let pro of Datos_procesos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                    <tr *ngFor="let pro of Datos_procesos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                         <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
                             {{pro.fila}}</td>
                         <td style="font-size: 12px;" class="td_ob">
@@ -208,4 +205,3 @@
         </div>
     </div>
 </div>
-

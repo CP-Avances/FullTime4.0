@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-ingresar-registros',
   templateUrl: './ingresar-registros.component.html',
-  styleUrl: './ingresar-registros.component.scss'
+  styleUrl: './ingresar-registros.component.css'
 })
 export class IngresarRegistrosComponent {
 

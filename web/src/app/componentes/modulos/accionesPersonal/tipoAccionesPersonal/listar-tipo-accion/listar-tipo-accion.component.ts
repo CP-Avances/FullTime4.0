@@ -426,7 +426,7 @@ export class ListarTipoAccionComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('AccionesPersonal.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 

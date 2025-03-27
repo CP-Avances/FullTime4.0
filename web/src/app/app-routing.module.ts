@@ -148,6 +148,9 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
 
 const routes: Routes = [
 
@@ -183,6 +186,11 @@ const routes: Routes = [
 
   // USUARIOS
   { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard] },
+  { path: 'genero', component: ListarGeneroComponent, canActivate: [AuthGuard] },
+  { path: 'nacionalidad', component: ListarNacionalidadComponent, canActivate: [AuthGuard] },
+  
+  { path: 'estado-civil', component: ListarEstadoCivilComponent, canActivate: [AuthGuard] },
+
   { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard] },
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard] },
   { path: 'discapacidades', component: CatDiscapacidadComponent, canActivate: [AuthGuard] },

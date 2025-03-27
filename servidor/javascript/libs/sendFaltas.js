@@ -148,7 +148,7 @@ const faltas = function (desde, hasta, semanal) {
         // VERIFICAR HORA DE ENVIO
         console.log("ejecutando reporte de faltas ");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
@@ -326,7 +326,7 @@ const faltas = function (desde, hasta, semanal) {
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.correo = $1 AND da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `, [correo]);
@@ -416,7 +416,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("ejecutando reporte de faltas de departamento");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
@@ -587,7 +587,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id AND da.jefe = true AND da.name_dep = $1 AND da.id_suc = $2
                                 `, [departamento, depa.id_sucursal]);
@@ -666,7 +666,6 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 }
             }
             else {
-                console.log("no existen faltas en el departamento: ", +departamento);
             }
         }));
     });
@@ -676,7 +675,7 @@ const faltasIndividual = function (desde, hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("ejecutando reporte de faltas individuales");
         let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `, [1]).then((result) => { return result.rows; });
@@ -770,7 +769,9 @@ const faltasIndividual = function (desde, hasta) {
             }
             if (arregloEmpleados.length != 0) {
                 arregloEmpleados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    console.log("ver nombre de todos los empleados: ", item.nombre + ' ' + item.apellido);
                     if (item.faltas_mail) {
+                        console.log("ver nombre de los enviado correo: ", item.nombre + ' ' + item.apellido);
                         let dateTimeHorario = luxon_1.DateTime.fromSQL(item.faltas[0].fecha_hora_horario);
                         let isoStringHorario = dateTimeHorario.toISO();
                         let fechaHora = '';
@@ -844,7 +845,7 @@ const faltasIndividual = function (desde, hasta) {
                         });
                     }
                     else {
-                        console.log("faltas_email es false");
+                        console.log("ver nombre sin correo: ", item.nombre + ' ' + item.apellido);
                     }
                     if (item.faltas_notificacion) {
                         var tiempoN = (0, settingsMail_2.fechaHora)();

@@ -406,7 +406,7 @@ export class GradosComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('ListaGrados.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }

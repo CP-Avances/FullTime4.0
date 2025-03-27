@@ -248,6 +248,12 @@ export class MainNavComponent implements OnInit {
         icono: 'account_circle',
         children: [
           { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
+          { name: 'Generos', url: '/genero', color: true, ver: true },
+          { name: 'Nacionalidades', url: '/nacionalidad', color: true, ver: true },
+          
+
+          { name: 'Estados Civil', url: '/estado-civil', color: true, ver: true },
+
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
           { name: 'Tipo Discapacidad', url: '/discapacidades', color: true, ver: true },
@@ -440,13 +446,13 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
+              { name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true },
+              { name: 'Grado', url: '/listaGrados', color: true, ver: true },
               { name: 'Procesos', url: '/proceso', color: true, ver: true },
+              { name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true },
               { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
               { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
               { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
-              { name: 'Listar Grados', url: '/listaGrados', color: true, ver: true },
-              { name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true },
-              { name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true },
             ]
           },
           {

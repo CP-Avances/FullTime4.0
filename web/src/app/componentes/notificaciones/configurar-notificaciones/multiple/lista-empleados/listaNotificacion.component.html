@@ -1,4 +1,4 @@
-<div style="padding-top: 20px;">
+<div style="padding-top: 20px;" *ngIf="verConfiguracion">
     <div id="titulo">CONFIGURAR NOTIFICACIONES</div>
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
@@ -13,7 +13,7 @@
                         <label id="textoradiobtn">{{c.valor}}</label></mat-radio-button>
                 </mat-radio-group>
             </form>
-             <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+            <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
             <form *ngIf="_booleanOptions.bool_suc">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </form>
-             <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+            <!--  *********************************  FORM PARA CARGOS  ****************************  -->
             <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="row">
                     <div class="col-md">
@@ -122,57 +122,75 @@
             <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
             <form *ngIf="_booleanOptions.bool_emp">
                 <div class="row">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
-                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Nombres</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
-                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por nombre.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Código</mat-label>
-                                <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
-                                    [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por código.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Cédula</mat-label>
-                                <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
+                <!-- Primera fila -->
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Sucursal</mat-label>
+                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                        <mat-icon matSuffix matTooltipPosition="right"
+                        matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                    </mat-form-field>
                     </div>
                 </div>
-            </form>
+            
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Nombres</mat-label>
+                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
+                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                        <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras</mat-error>
+                        <mat-icon matSuffix matTooltipPosition="right"
+                        matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                    </mat-form-field>
+                    </div>
+                </div>
+            
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Código</mat-label>
+                        <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
+                        [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon matSuffix matTooltipPosition="right"
+                        matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                    </mat-form-field>
+                    </div>
+                </div>
+                </div>
+            
+                <!-- Segunda fila -->
+                <div class="row">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Cédula</mat-label>
+                        <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
+                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                        [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                        <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
+                        <mat-icon matSuffix matTooltipPosition="right"
+                        matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                    </mat-form-field>
+                    </div>
+                </div>
+            
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Rol</mat-label>
+                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_rol.value, 8)"
+                        [formControl]="nombre_rol" type="text" (keypress)="IngresarSoloLetras($event)">
+                        <mat-icon matSuffix matTooltipPosition="right"
+                        matTooltip="Búsqueda de datos de empleado por rol.">help_outline</mat-icon>
+                    </mat-form-field>
+                    </div>
+                </div>
+                </div>
+            </form>            
+
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                 <button class="btn btn-sm" type="submit" (click)="GuardarRegistros(0)">Configurar notificación</button>
@@ -182,9 +200,9 @@
             <hr>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-            
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -193,8 +211,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -250,9 +268,9 @@
 
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-               
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -261,8 +279,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -323,7 +341,7 @@
                 style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -332,8 +350,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -390,11 +408,11 @@
                 <br>
             </div>
 
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+            <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -403,8 +421,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -462,10 +480,10 @@
 
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-               
+
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -474,7 +492,7 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
+                            (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>
@@ -501,12 +519,13 @@
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
+                                <th scope="col">Rol</th>
                                 <th scope="col">Proceso</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td>
                                     <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmp.toggle(e) : null"
@@ -517,6 +536,7 @@
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
+                                <td>{{e.rol}}</td>
                                 <td class="d-flex justify-content-center">
                                     <i (click)="RegistrarConfiguracion(e)" id="plan" *ngIf="individual"
                                         class="fa fa-envelope" matSuffix matTooltipPosition="right"
@@ -539,4 +559,8 @@
             </div>
         </mat-card-content>
     </mat-card>
+</div>
+
+<div style="padding-top: 20px;" *ngIf="verSeleccion">
+    <app-configuracionNotificacion [empleados]="datosEmpleados"></app-configuracionNotificacion>
 </div>

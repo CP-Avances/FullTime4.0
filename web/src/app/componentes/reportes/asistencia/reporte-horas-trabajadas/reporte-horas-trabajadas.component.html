@@ -235,11 +235,12 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
+                        <th scope="col">Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
@@ -250,6 +251,7 @@
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
+                        <td>{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -264,21 +266,22 @@
 <div style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo" class="row w-100 m-auto align-items-center">
-            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-1" >
+            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-1">
                 <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                     matTooltip="Regresar">
                     <i class="fas fa-arrow-left"></i>
                 </button>
             </div>
             <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
-                <span class="text-uppercase">DETALLES DE TIEMPO LABORADO - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
+                <span class="text-uppercase">DETALLES DE TIEMPO LABORADO - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS':
+                    'INACTIVOS'}}</span>
             </div>
             <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-3">
             </div>
         </div>
         <div id="titulo">
-            
-            
+
+
         </div>
         <mat-card-content>
             <div style="padding-bottom: 25px; text-align: center; margin-top: 1rem">
@@ -290,6 +293,8 @@
                             <th scope="col" rowspan="2" class="colores rojo"></th>
                             <th scope="col" rowspan="2" class="coloresItem">TIEMPO LABORADO MENOR AL PLANIFICADO</th>
                             <th scope="col" rowspan="2" class="colores verde"></th>
+                            <th scope="col" rowspan="2" class="coloresItem">SIN CONTROL DE ASISTENCIA</th>
+                            <th scope="col" rowspan="2" class="coloresItem"> SCA</th>
                         </tr>
                     </table>
                 </div>
@@ -321,6 +326,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
+
                                 <td>{{ t.n }}</td>
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
@@ -335,10 +341,18 @@
                                 <td [ngClass]="ObtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
                                 <td>{{ t.tiempoPlanificado }}</td>
                                 <td>{{ t.minutosPlanificados }}</td>
-                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
+
+                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)"
+                                    *ngIf="t.control">{{
                                     t.tiempoLaborado }}</td>
-                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{
+                                <td [ngClass]="ObtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)"
+                                    *ngIf="t.control">{{
                                     t.minutosLaborados }}</td>
+
+                                <td *ngIf="!t.control">{{ t.tiempoPlanificado }}</td>
+                                <td *ngIf="!t.control">{{ t.minutosPlanificados }}</td>
+
+                              
                             </tr>
                         </tbody>
                     </table>

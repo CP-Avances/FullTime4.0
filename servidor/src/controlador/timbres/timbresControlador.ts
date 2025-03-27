@@ -12,13 +12,15 @@ class TimbresControlador {
         try {
             const { arregloAvisos, user_name, ip, ip_local } = req.body;
             let contador: number = 0;
+
             if (arregloAvisos.length > 0) {
                 contador = 0;
-                arregloAvisos.forEach(async (obj: number) => {
+                // Usamos un for...of para esperar que las promesas se resuelvan antes de continuar
+                for (const obj of arregloAvisos) {
                     // INICIAR TRANSACCION
                     await pool.query('BEGIN');
 
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                     const [datosOriginales] = consulta.rows;
 
@@ -34,51 +36,43 @@ class TimbresControlador {
                             observacion: `Error al eliminar el registro con id ${obj}. Registro no encontrado.`
                         });
 
-                        //FINALIZAR TRANSACCION
+                        // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
                         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                     }
 
-                    await pool.query(
-                        `
-                        DELETE FROM ecm_realtime_timbres WHERE id = $1
-                        `
-                        , [obj])
-                        .then(async (result: any) => {
-                            contador = contador + 1;
-                            // AUDITORIA
-                            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                                tabla: 'ecm_realtime_timbres',
-                                usuario: user_name,
-                                accion: 'D',
-                                datosOriginales: JSON.stringify(datosOriginales),
-                                datosNuevos: '',
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
+                    await pool.query('DELETE FROM ecm_realtime_timbres WHERE id = $1', [obj]);
+                    contador++;
 
-                            //FINALIZAR TRANSACCION
-                            await pool.query('COMMIT');
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'ecm_realtime_timbres',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
 
-                            if (contador === arregloAvisos.length) {
-                                return res.jsonp({ message: 'OK' });
-                            }
-                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                        });
-                });
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                }
+
+                // ENVÍO DE RESPUESTA UNA VEZ QUE SE HAYAN ELIMINADO TODOS LOS AVISOS
+                return res.jsonp({ message: 'OK', eliminados: contador });
             }
             else {
                 return res.jsonp({ message: 'error' });
             }
         } catch (error) {
-            // REVERTIR TRANSACCION
+            // REVERTIR TRANSACCION EN CASO DE ERROR
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
-
     }
-
+    
     // METODO PARA LISTAR MARCACIONES    **USADO
     public async ObtenerTimbres(req: Request, res: Response): Promise<any> {
         try {
@@ -723,7 +717,8 @@ class TimbresControlador {
                 visto: obj.visto,
                 id_timbre: obj.id_timbre,
                 empleado: fullname,
-                id: obj.id
+                id: obj.id,
+                mensaje: obj.mensaje
             }
         }));
         console.log(tim);

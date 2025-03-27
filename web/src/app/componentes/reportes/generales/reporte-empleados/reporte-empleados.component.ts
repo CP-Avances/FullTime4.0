@@ -18,6 +18,9 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -139,6 +142,11 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() {
     return this.reporteService.filtroNombreEmp;
   }
+  get filtroRolEmp() { 
+    return this.reporteService.filtroRolEmp;
+  }
+
+
 
   constructor(
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
@@ -149,10 +157,14 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
     private restP: ParametrosService,
+    private restGenero: GenerosService,
+    private resNacionalidades: NacionalidadService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.ObtenerGeneros();
+    this.ObtenerNacionalidades();
   }
 
   ngOnInit(): void {
@@ -489,58 +501,80 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         },
       });
 
-      // PRESENTACION DE LA INFORMACION
-      let arr_emp: any = [];
-      selec.empleados.forEach((empl: any) => {
-        arr_emp.push(empl)
-      });
 
-      arr_emp.sort(function (a: any, b: any) {
-        return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
-      });
+    // PRESENTACIÓN DE LA INFORMACIÓN
+    let arr_emp: any[] = [];
 
-      n.push({
-        style: 'tableMargin',
-        table: {
-          widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-          headerRows: 1,
-          body: [
-            [
-              { text: 'N°', style: 'tableHeader' },
-              { text: 'CÉDULA', style: 'tableHeader' },
-              { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'EMPLEADO', style: 'tableHeader' },
-              { text: 'GÉNERO', style: 'tableHeader' },
-              { text: 'CIUDAD', style: 'tableHeader' },
-              { text: 'SUCURSAL', style: 'tableHeader' },
-              { text: 'RÉGIMEN', style: 'tableHeader' },
-              { text: 'DEPARTAMENTO', style: 'tableHeader' },
-              { text: 'CARGO', style: 'tableHeader' },
-              { text: 'CORREO', style: 'tableHeader' }
-            ],
-            ...arr_emp.map((usu: any) => {
-              return [
-                { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                { style: 'itemsTable', text: usu.cedula },
-                { style: 'itemsTableCentrado', text: usu.codigo },
-                { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                { style: 'itemsTable', text: usu.ciudad },
-                { style: 'itemsTable', text: usu.sucursal },
-                { style: 'itemsTable', text: usu.regimen },
-                { style: 'itemsTable', text: usu.departamento },
-                { style: 'itemsTable', text: usu.cargo },
-                { style: 'itemsTable', text: usu.correo },
-              ]
-            }),
-          ]
+    selec.empleados.forEach((empl: any) => {
+      let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+      let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+      let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+      let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+      arr_emp.push({
+        ...empl,
+        genero: nombreGenero,
+        nacionalidad: nombreNacionalidad
+      });
+    });
+
+    // Construcción de la tabla
+    n.push({
+      style: 'tableMargin',
+      table: {
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto','auto','auto','auto'],
+        headerRows: 1,
+        body: [
+          [
+            { text: 'N°', style: 'tableHeader' },
+            { text: 'CÉDULA', style: 'tableHeader' },
+            { text: 'CÓDIGO', style: 'tableHeader' },
+            { text: 'EMPLEADO', style: 'tableHeader' },
+            { text: 'USUARIO', style: 'tableHeader' },
+            { text: 'GÉNERO', style: 'tableHeader' },
+            { text: 'NACIONALIDAD', style: 'tableHeader' },
+            { text: 'CIUDAD', style: 'tableHeader' },
+            { text: 'SUCURSAL', style: 'tableHeader' },
+            { text: 'RÉGIMEN', style: 'tableHeader' },
+            { text: 'DEPARTAMENTO', style: 'tableHeader' },
+            { text: 'CARGO', style: 'tableHeader' },
+            { text: 'ROL', style: 'tableHeader' },
+            { text: 'CORREO', style: 'tableHeader' }
+          ],
+          ...arr_emp.map((usu: any) => {
+            return [
+              { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
+              { style: 'itemsTableCentrado', text: usu.cedula },
+              { style: 'itemsTableCentrado', text: usu.codigo },
+              { style: 'itemsTable', text: `${usu.apellido} ${usu.nombre}` },
+              { style: 'itemsTableCentrado', text: usu.usuario },
+              { style: 'itemsTableCentrado', text: usu.genero },
+              { style: 'itemsTableCentrado', text: usu.nacionalidad },
+              { style: 'itemsTableCentrado', text: usu.ciudad },
+              { style: 'itemsTableCentrado', text: usu.sucursal },
+              { style: 'itemsTableCentrado', text: usu.regimen },
+              { style: 'itemsTableCentrado', text: usu.departamento },
+              { style: 'itemsTableCentrado', text: usu.cargo },
+              { style: 'itemsTableCentrado', text: usu.rol },
+              { style: 'itemsTable', text: usu.correo }
+            ];
+          })
+        ]
+      },
+      layout: {
+        fillColor: function (rowIndex: any) {
+          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
         },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
+        paddingLeft: function () { return 2; }, // Reduce el margen izquierdo en las celdas
+        paddingRight: function () { return 2; }, // Reduce el margen derecho en las celdas
+        paddingTop: function () { return 1; }, // Reduce el margen superior en las celdas
+        paddingBottom: function () { return 1; }, // Reduce el margen inferior en las celdas
+        columnGap: 2 // 🔹 Ajusta el espacio entre columnas (pruébalo con valores entre 1 y 4)
+      }
+    });
+    
+
     })
     return n;
   }
@@ -549,23 +583,49 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+   nacionalidades: any=[];
+   ObtenerNacionalidades(){
+    this.resNacionalidades.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+    })
+   }
+
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
+
     this.data_pdf.forEach((empl) => {
       empl.empleados.map((usu: any) => {
+        
+        let generoObj = this.generos.find((g: any) => g.id == usu.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((na: any) => na.id == usu.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
         datos.push([
           n++,
           usu.cedula,
           usu.codigo,
           usu.apellido,
           usu.nombre,
-          usu.genero == 1 ? 'M' : 'F',
+          usu.usuario,
+          nombreGenero,
+          nombreNacionalidad,
           usu.ciudad,
           usu.sucursal,
           usu.regimen,
           usu.departamento,
           usu.cargo,
+          usu.rol,
           usu.correo,
         ])
       })
@@ -608,12 +668,15 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       { key: "codigo", width: 30 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
+      { key: "usuario", width: 20 },
       { key: "genero", width: 20 },
+      { key: "nacionalidad", width: 20 },
       { key: "ciudad", width: 20 },
       { key: "sucursal", width: 20 },
       { key: "regimen", width: 20 },
       { key: "departamento", width: 20 },
       { key: "cargo", width: 20 },
+      { key: "rol", width: 20 },
       { key: "correo", width: 35 },
     ]
 
@@ -623,12 +686,15 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "USUARIO", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
       { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
       { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
       { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
       { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "ROL", totalsRowLabel: "", filterButton: true },
       { name: "CORREO", totalsRowLabel: "", filterButton: true },
     ]
 
@@ -691,7 +757,16 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     let n = 0;
     this.data_pdf.forEach((selec: any) => {
       selec.empleados.forEach((e: any) => {
-        this.arr_emp.push(e);
+        let generoObj = this.generos.find((g: any) => g.id == e.genero);
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === e.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+        this.arr_emp.push({
+          ...e, 
+          genero: nombreGenero,
+          nacionalidad: nombreNacionalidad
+        });
       })
     });
     this.arr_emp.sort(function (a: any, b: any) {

@@ -19,9 +19,11 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             let informacion = yield database_1.default.query(`
-            SELECT * FROM informacion_general AS ig
+            SELECT ig.*, u.usuario
+            FROM informacion_general AS ig
+            LEFT JOIN eu_usuarios AS u ON ig.id = u.id_empleado
             WHERE ig.estado = $1
-            ORDER BY ig.name_suc ASC
+            ORDER BY ig.name_suc ASC;
             `, [estado]).then((result) => { return result.rows; });
             if (informacion.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });

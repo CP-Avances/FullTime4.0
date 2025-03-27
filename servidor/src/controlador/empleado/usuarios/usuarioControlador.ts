@@ -380,15 +380,17 @@ class UsuarioControlador {
       const { array, web_habilita, user_name, ip, ip_local } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      console.log("ver ids_empleados", ids_empleados )
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
+      console.log("ver datos originales: ",  datosOriginales)
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
       const response: QueryResult = await pool.query(
         `
-            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = ANY($2::int[])
+            UPDATE eu_usuarios SET web_habilita = $1 WHERE id_empleado = ANY($2::int[])
           `
         , [!web_habilita, ids_empleados]);
 
@@ -416,6 +418,7 @@ class UsuarioControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
+      console.log('Ver error:',error)
       return res.status(500).jsonp({ message: error })
     }
   }
@@ -469,7 +472,7 @@ class UsuarioControlador {
       const { array, app_habilita, user_name, ip, ip_local } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
@@ -477,7 +480,7 @@ class UsuarioControlador {
 
       const response: QueryResult = await pool.query(
         `
-            UPDATE eu_usuarios SET app_habilita = $1 WHERE id = ANY($2::int[])
+            UPDATE eu_usuarios SET app_habilita = $1 WHERE id_empleado = ANY($2::int[])
           `
         , [!app_habilita, ids_empleados]);
 

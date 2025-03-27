@@ -127,7 +127,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -348,7 +348,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.correo = $1 AND da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `
@@ -455,7 +455,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -667,7 +667,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id AND da.jefe = true AND da.name_dep = $1 AND da.id_suc = $2
                                 `
@@ -757,7 +757,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
 
         } else {
-            console.log("no existen registros para el departamento: ", departamento)
+            //console.log("no existen registros para el departamento: ", departamento)
         }
     })
 
@@ -773,7 +773,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -983,14 +983,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                 } else {
                     console.log("atrasos_email es false")
                 }
-                let mensaje = {
-                    id_empl_envia: 0,
-                    id_empl_recive: item.id,
-                    descripcion: 'NOTIFICACIÓN DE ATRASO',
-                    mensaje: 'Llego atrasado al trabajo con: ' + tiempo,
-                    tipo: 6
-                }
-
+                
                 if (item.atrasos_notificacion) {
                     var tiempoN = fechaHora();
                     let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
@@ -1017,6 +1010,8 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                         descripcion: x.descripcion,
                         mensaje: x.mensaje,
                         tipo: 6,
+                        usuario: 'PLATAFORMA WEB'
+
                     }
 
                     io.emit('recibir_aviso', data_llega);

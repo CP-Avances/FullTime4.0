@@ -322,6 +322,12 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
+import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
 import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
 import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
 import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
@@ -339,6 +345,9 @@ import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal
 import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grado/empleado-grado/empleado-grado.component';
 import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/grupo-ocupacional/empleado-grupo/empleado-grupo.component';
 import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/editar-registro/editar-registro.component';
+import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
+import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
 
 @NgModule({
   declarations: [
@@ -618,6 +627,12 @@ import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
+    RegistrarGeneroComponent,
+    EditarGeneroComponent,
+    ListarGeneroComponent,
+    ListarEstadoCivilComponent,
+    RegistrarEstadoCivilComponent,
+    EditarEstadoCivilComponent,
     IngresarRegistrosComponent,
     GradosComponent,
     GrupoOcupacionalComponent,
@@ -635,6 +650,9 @@ import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/
     EmpleadoGradoComponent,
     EmpleadoGrupoComponent,
     EditarRegistroComponent,
+    EditarNacionalidadComponent,
+    ListarNacionalidadComponent,
+    RegistrarNacionalidadComponent,
 
   ],
 

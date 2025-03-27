@@ -21,6 +21,8 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_cargo = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
+
   seleccion = new FormControl('');
 
   public _booleanOptions: FormCriteriosBusqueda = {
@@ -165,6 +167,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
       case 11: this.reporteService.setFiltroCodigo_inc(e); break;
       case 12: this.reporteService.setFiltroCedula_inc(e); break;
       case 13: this.reporteService.setFiltroNombreInc(e); break;
+      case 14: this.reporteService.setFiltroRolEmp(e); break;
       default:
         break;
     }

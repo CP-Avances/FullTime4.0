@@ -5,12 +5,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { DateTime } from 'luxon';
-
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
-
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -20,7 +17,8 @@ import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
-
+import { Observable } from 'rxjs';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 @Component({
   selector: 'app-horario-multiple-empleado',
   templateUrl: './horario-multiple-empleado.component.html',
@@ -51,6 +49,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   // FILTROS SUCURSALES
@@ -69,6 +68,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.restR.filtroNombreReg };
+
+  //FILTRO ROL
+  get filtroRolEmp() { return this.restR.filtroRolEmp };
+
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_dep: false,
@@ -113,6 +116,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   public check: checkOptions[];
 
+  filteredOptProv: Observable<any[]>;
+  roles: any = [];
+
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public restCargo: EmplCargosService,
@@ -123,6 +129,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public plan: PlanGeneralService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     private asignaciones: AsignacionesService,
+    private roleS: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -136,6 +143,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.BuscarInformacionGeneral();
   }
+
 
   // METODO PARA DESTRUIR PROCESOS
   ngOnDestroy() {
@@ -158,6 +166,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.toastr.error(err.error.message)
     })
   }
+
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
@@ -268,6 +277,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       case 5: this.restR.setFiltroNombreEmp(e); break;
       case 6: this.restR.setFiltroNombreSuc(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -565,12 +575,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.cedula.reset();
       this.nombre_emp.reset();
       this.nombre_suc.reset();
+      this.nombre_rol.reset();
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.Filtrar('', 3);
       this.Filtrar('', 4);
       this.Filtrar('', 5);
       this.Filtrar('', 6);
+      this.Filtrar('', 8);
     }
   }
 
@@ -745,7 +757,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         })
 
         console.log("ver fin en metodo:", this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'))
-        console.log("ver inicio metodo ",this.fechaInicioFormluxon.toFormat('yyyy-MM-dd') )
+        console.log("ver inicio metodo ", this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'))
 
 
         let usuarios = {

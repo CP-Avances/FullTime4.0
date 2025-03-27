@@ -254,13 +254,13 @@ class GrupoOcupacionalControlador {
       const workbook = new Excel.Workbook();
       await workbook.xlsx.readFile(ruta);
       let verificador = ObtenerIndicePlantilla(workbook, 'GRUPO_OCUPACIONAL');
-
       if (verificador === false) {
         return res.jsonp({ message: 'no_existe', data: undefined });
       }
       else {
         const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
         const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+       
         let data: any = {
           fila: '',
           descripcion: '',

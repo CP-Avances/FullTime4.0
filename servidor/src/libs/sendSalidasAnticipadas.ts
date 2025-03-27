@@ -128,7 +128,7 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -349,7 +349,7 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.correo = $1 AND da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `
@@ -456,7 +456,7 @@ export const salidasAnticipadasDepartamentos = async function (desde: any, hasta
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -668,7 +668,7 @@ export const salidasAnticipadasDepartamentos = async function (desde: any, hasta
                                         SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, da.name_cargo, s.id_empresa, 
                                             ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                                             ce.pie_firma, ce.cabecera_firma  
-                                        FROM informacion_general AS da, e_sucursales AS s, e_empresa AS ce 
+                                        FROM configuracion_notificaciones_usuarios AS da, e_sucursales AS s, e_empresa AS ce 
                                         WHERE da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id AND da.jefe = true AND da.name_dep = $1 AND da.id_suc = $2
                                 `
@@ -774,7 +774,7 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
 
     let informacion = await pool.query(
         `
-            SELECT * FROM informacion_general AS ig
+            SELECT * FROM configuracion_notificaciones_usuarios AS ig
             WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
             `
@@ -1007,6 +1007,8 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
                         descripcion: x.descripcion,
                         mensaje: x.mensaje,
                         tipo: 6,
+                        usuario: 'PLATAFORMA WEB'
+
                     }
 
                     io.emit('recibir_aviso', data_llega);
