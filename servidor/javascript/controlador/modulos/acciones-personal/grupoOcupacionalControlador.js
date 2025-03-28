@@ -60,10 +60,15 @@ class GrupoOcupacionalControlador {
             try {
                 const GRUPO = yield database_1.default.query(`
           SELECT gp.id, gp.descripcion, gp.numero_partida FROM map_cat_grupo_ocupacional AS gp
-          WHERE UPPER(gp.descripcion) = UPPER($1)
-          `, [grupo]);
+          WHERE UPPER(gp.descripcion) = UPPER($1) OR numero_partida = $2
+          `, [grupo, numero_partida]);
                 if (GRUPO.rows[0] != '' && GRUPO.rows[0] != null, GRUPO.rows[0] != undefined) {
-                    res.jsonp({ message: 'Ya existe un grupo ocupacional con ese nombre', codigo: 300 });
+                    if (GRUPO.rows[0].descripcion.toLowerCase() == grupo.toLowerCase()) {
+                        res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado', codigo: 300 });
+                    }
+                    else {
+                        res.status(300).jsonp({ message: 'Ya existe el número de partida', codigo: 300 });
+                    }
                 }
                 else {
                     // INICIAR TRANSACCION
@@ -102,23 +107,41 @@ class GrupoOcupacionalControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-            UPDATE map_cat_grupo_ocupacional SET descripcion = $2, numero_partida = $3 WHERE id = $1
-          `, [id_grupo, grupo, numero_partida]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_cat_procesos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"id": "${id_grupo}"}, {"descripcion": "${grupo}"}, {"numero_partida": "${numero_partida}"}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
+                const DataGrupoOcu = yield database_1.default.query(`
+              SELECT * FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1) OR numero_partida = $2
+            `, [grupo, numero_partida]);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.status(200).jsonp({ message: 'El grupo ocupacional se ha actualizado con éxito', codigo: 200 });
+                console.log('DataGrupoOcu.rows[0]: ', DataGrupoOcu.rows[0]);
+                if (DataGrupoOcu.rows[0] != undefined && DataGrupoOcu.rows[0] != null && DataGrupoOcu.rows[0] != "") {
+                    if (DataGrupoOcu.rows[0].descripcion.toLowerCase() == grupo.toLowerCase()) {
+                        res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado', codigo: 300 });
+                    }
+                    else {
+                        res.status(300).jsonp({ message: 'Ya existe el número de partida', codigo: 300 });
+                    }
+                }
+                else {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    yield database_1.default.query(`
+            UPDATE map_cat_grupo_ocupacional SET descripcion = $2, numero_partida = $3 WHERE id = $1
+          `, [id_grupo, grupo, numero_partida]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{"id": "${id_grupo}"}, {"descripcion": "${grupo}"}, {"numero_partida": "${numero_partida}"}`,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    res.status(200).jsonp({ message: 'El grupo ocupacional se ha actualizado con éxito', codigo: 200 });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -259,6 +282,8 @@ class GrupoOcupacionalControlador {
                             const ITEM = row.getCell(headers['ITEM']).value;
                             const DESCRIPCION = (_a = row.getCell(headers['DESCRIPCION']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
                             const NUMERO_PARTIDA = (_b = row.getCell(headers['NUMERO_PARTIDA']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            console.log('DESCRIPCION: ', DESCRIPCION);
+                            console.log('NUMERO_PARTIDA: ', NUMERO_PARTIDA);
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (DESCRIPCION != undefined && DESCRIPCION != '') &&
@@ -283,14 +308,11 @@ class GrupoOcupacionalControlador {
                                 }
                                 if (DESCRIPCION == undefined) {
                                     data.descripcion = 'No registrado';
-                                    data.observacion = 'Grado ' + data.observacion;
+                                    data.observacion = 'Grupo ocupacional ' + data.observacion;
                                 }
-                                if (DESCRIPCION == undefined) {
-                                    data.descripcion = '-';
+                                if (NUMERO_PARTIDA == undefined) {
+                                    data.numero_partida = '-';
                                 }
-                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                                data.descripcion = data.descripcion.trim();
-                                data.numero_partida = data.numero_partida.trim();
                                 listaGrupoOcupacional.push(data);
                             }
                             data = {};
@@ -324,7 +346,7 @@ class GrupoOcupacionalControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'Ya existe el en el sistema';
+                                item.observacion = 'Ya existe en el sistema';
                             }
                         }
                     }));

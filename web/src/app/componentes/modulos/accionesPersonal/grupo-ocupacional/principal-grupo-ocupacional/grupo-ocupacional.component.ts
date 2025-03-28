@@ -447,7 +447,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [10, -25, 10, 10] },
         this.presentarDataPDFGrupoOcu(),
       ],
       styles: {
@@ -465,7 +465,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto'],
+            width: ['auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },

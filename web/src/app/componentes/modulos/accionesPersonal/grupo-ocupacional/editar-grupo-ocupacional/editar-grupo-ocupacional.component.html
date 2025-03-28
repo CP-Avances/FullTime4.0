@@ -23,13 +23,11 @@
                 </div>
                 <mat-form-field>
                     <mat-label>Grupo Ocupacional</mat-label>
-                    <input matInput placeholder="Ej: Emergencia" [formControl]="grupo"
-                        (keypress)="IngresarSoloLetras($event)" required>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="grupo" required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar el grupo ocupacional.">
                         help_outline
                     </mat-icon>
-                    <mat-error *ngIf="grupo.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
                 </mat-form-field>
                 <br />
                 <mat-form-field>
