@@ -56,10 +56,11 @@ class ProcesoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
+                console.log('nombre: ', nombre);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = $1
+          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
          `, [nombre]);
                 const [procesos] = response.rows;
                 // FINALIZAR TRANSACCION
@@ -111,9 +112,20 @@ class ProcesoControlador {
     ActualizarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
+                var { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
                 if (id == proc_padre) {
-                    return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso' });
+                    // CONSULTAR DATOS PROCESO PADRE
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const proce = yield database_1.default.query('SELECT * FROM map_cat_procesos WHERE id = $1', [proc_padre]);
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (proce.rows[0].nombre == nombre) {
+                        return res.status(300).jsonp({ message: 'Un proceso no puede ser su propio proceso superior. Verifique la selección e intente nuevamente.' });
+                    }
+                    else {
+                        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso anterior' });
+                    }
                 }
                 else {
                     // INICIAR TRANSACCION
@@ -139,19 +151,33 @@ class ProcesoControlador {
                     }
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    const response = yield database_1.default.query(`
-          SELECT * FROM map_cat_procesos WHERE id = $1
-         `, [proc_padre]);
-                    const [procesos] = response.rows;
+                    // CONSULTAR DATOSORIGINALES
+                    const proce = yield database_1.default.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)', [nombre]);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (proc_padre == procesos.id && id == procesos.proceso_padre) {
-                        return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+                    if (proce.rowCount > 0) {
+                        return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
                     }
                     else {
+                        if (proc_padre != "") {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const response = yield database_1.default.query(`
+            SELECT * FROM map_cat_procesos WHERE id = $1
+           `, [proc_padre]);
+                            const [procesos] = response.rows;
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            if (proc_padre == procesos.id && id == procesos.proceso_padre) {
+                                return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+                            }
+                        }
+                        else {
+                            proc_padre = null;
+                        }
                         yield database_1.default.query(`
-          UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
-          `, [nombre, proc_padre, id]);
+            UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
+            `, [nombre, proc_padre, id]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'map_cat_procesos',

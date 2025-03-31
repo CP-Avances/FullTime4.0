@@ -27,7 +27,7 @@ export class RegistroProcesoComponent implements OnInit {
   ip: string | null;
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
+  nombre = new FormControl('', Validators.required);
   procesoPadre = new FormControl('', Validators.required);
 
   procesos: any = [];

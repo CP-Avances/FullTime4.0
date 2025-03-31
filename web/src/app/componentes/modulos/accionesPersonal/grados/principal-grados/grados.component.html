@@ -69,21 +69,49 @@
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_grados">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">LISTA DE GRADOS</div>
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="row w-100">
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                     matTooltipPosition="right" matTooltip="Selección múltiple para eliminar registros." id="SelectCheck">
+                        library_add_check
+                    </mat-icon>
+                </div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        LISTA DE GRADOS
+                    </span>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
                         <th scope="col">Grado</th>
                         <th scope="col">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                    [formControl]="buscarNombre">
+                                    [formControl]="buscarGrupo">
                             </mat-form-field>
                         </td>
                         <td>
@@ -93,7 +121,13 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let grado of ListGrados | filtrosNombres:buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let grado of ListGrados | filtrosGrado:buscarGrupo.value | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(grado) : null" [checked]="selectionUno.isSelected(grado)"
+                                [aria-label]="checkboxLabel(grado)">
+                            </mat-checkbox>
+                        </td>
                         <td>{{grado.descripcion}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(grado)" id="accion" matSuffix

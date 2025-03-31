@@ -54,11 +54,13 @@ class ProcesoControlador {
     try {
       const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
 
+      console.log('nombre: ',nombre)
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN')
         const response: QueryResult = await pool.query(
           `
-          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = $1
+          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
          `
          , [nombre]
         )
@@ -122,10 +124,21 @@ class ProcesoControlador {
 
   public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
+      var { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
 
       if(id == proc_padre){
-        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso' });
+        // CONSULTAR DATOS PROCESO PADRE
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [proc_padre]);
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+        if(proce.rows[0].nombre == nombre){
+          return res.status(300).jsonp({ message: 'Un proceso no puede ser su propio proceso superior. Verifique la selección e intente nuevamente.' });
+        }else{
+          return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso anterior' });
+        }  
       }else{
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -153,24 +166,42 @@ class ProcesoControlador {
         }
 
         // INICIAR TRANSACCION
-        await pool.query('BEGIN')
-        const response: QueryResult = await pool.query(
-          `
-          SELECT * FROM map_cat_procesos WHERE id = $1
-         `
-          , [proc_padre]
-        )
-        const [procesos] = response.rows;
+        await pool.query('BEGIN');
+
+        // CONSULTAR DATOSORIGINALES
+        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)', [nombre]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        if (proc_padre == procesos.id && id == procesos.proceso_padre) {
-          return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
-        } else {
+        if( proce.rowCount! > 0){
+          return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
+        }else{
+
+          if (proc_padre != "") {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN')
+            const response: QueryResult = await pool.query(
+              `
+            SELECT * FROM map_cat_procesos WHERE id = $1
+           `
+              , [proc_padre]
+            )
+            const [procesos] = response.rows;
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (proc_padre == procesos.id && id == procesos.proceso_padre) {
+              return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+            }
+
+          } else {
+            proc_padre = null
+          }
+
           await pool.query(
             `
-          UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
-          `
+            UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
+            `
             , [nombre, proc_padre, id]);
 
           // AUDITORIA
@@ -188,7 +219,9 @@ class ProcesoControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
           return res.status(200).jsonp({ message: 'El proceso actualizado exitosamente' });
-        }
+
+        }       
+
       }
 
     } catch (error) {

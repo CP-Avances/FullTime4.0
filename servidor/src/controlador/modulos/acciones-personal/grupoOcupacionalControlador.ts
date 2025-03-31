@@ -126,8 +126,6 @@ class GrupoOcupacionalControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        console.log('DataGrupoOcu.rows[0]: ',DataGrupoOcu.rows[0])
-
       if (DataGrupoOcu.rows[0] != undefined && DataGrupoOcu.rows[0] != null && DataGrupoOcu.rows[0] != "") {
         if(DataGrupoOcu.rows[0].descripcion.toLowerCase() == grupo.toLowerCase()){
           res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado', codigo: 300 });
@@ -379,26 +377,37 @@ class GrupoOcupacionalControlador {
         // VALIDACINES DE LOS DATOS DE LA PLANTILLA
         listaGrupoOcupacional.forEach(async (item: any, index: number) => {
           if (item.observacion == 'no registrado') {
-            const VERIFICAR_PROCESO = await pool.query(
+            const VERIFICAR_GRUPO = await pool.query(
               `
                 SELECT gp.id, gp.descripcion, gp.numero_partida FROM map_cat_grupo_ocupacional gp
                 WHERE UPPER(gp.descripcion) = UPPER($1)
              `
               , [item.descripcion]);
 
-            if (VERIFICAR_PROCESO.rowCount === 0) {
+            if (VERIFICAR_GRUPO.rowCount === 0) {
 
-              // DISCRIMINACION DE ELEMENTOS IGUALES
-              if (duplicados.find((p: any) => (p.descripcion.toLowerCase() === item.descripcion.toLowerCase())
-                //|| (p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() && p.proceso.toLowerCase() === item.proceso_padre.toLowerCase())
-              ) == undefined) {
-                duplicados.push(item);
-              } else {
-                item.observacion = '1';
+              const VERIFICAR_PARTIDA = await pool.query(
+                `
+                  SELECT * FROM map_cat_grupo_ocupacional gp WHERE gp.numero_partida = $1
+                `
+              , [item.numero_partida]);
+
+              if(VERIFICAR_PARTIDA.rowCount === 0){
+                // DISCRIMINACION DE ELEMENTOS IGUALES
+                if (duplicados.find((p: any) => ((p.descripcion.toLowerCase() === item.descripcion.toLowerCase()) ||  
+                  (p.numero_partida === item.numero_partida))
+
+                ) == undefined) {
+                  duplicados.push(item);
+                } else {
+                  item.observacion = '1';
+                }
+
+              }else{
+                item.observacion = 'Número de partida ya existe en el sistema'
               }
-
             } else {
-              item.observacion = 'Ya existe en el sistema'
+              item.observacion = 'Grupo ocupacional ya existe en el sistema'
             }
           }
         });
@@ -972,8 +981,6 @@ class GrupoOcupacionalControlador {
   public async RegistrarEmpleadoGrupoOcu(req: Request, res: Response): Promise<any>{
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-    
-    console.log('id_empleado: ',plantilla)
 
     try {
       for (const item of plantilla) {
@@ -1268,6 +1275,60 @@ class GrupoOcupacionalControlador {
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
+  }
+
+  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+  public async EliminarGrupoMultiple(req: Request, res: Response): Promise<any>{
+    const { listaEliminar, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+
+    try {
+      
+      for (const item of listaEliminar) {
+         // INICIAR TRANSACCION
+         await pool.query('BEGIN');
+
+         const res = await pool.query( 
+           `
+             DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+           `
+           , [item.id]);
+
+          console.log('res: ',res)
+ 
+         // AUDITORIA
+         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+           tabla: 'map_cat_grupo_ocupacional',
+           usuario: user_name,
+           accion: 'I',
+           datosOriginales: '',
+           datosNuevos: `{"id": "${item.id}"}`,
+           ip: ip,
+           ip_local: ip_local,
+           observacion: null
+         });
+ 
+         // FINALIZAR TRANSACCION
+         await pool.query('COMMIT');
+      }
+
+      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200});
+
+    } catch(err) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      console.log('err: ',err)
+      
+      if (error) {
+        if(err.table == 'map_empleado_grupo_ocupacional'){
+          return res.status(500).jsonp({ message: err.detail });
+        }else{
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+        }
+      }
+    }
+
   }
 
 }
