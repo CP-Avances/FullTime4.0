@@ -388,23 +388,17 @@ class ProcesoControlador {
                                                 p.proceso_padre.toLowerCase() === item.proceso.toLowerCase() &&
                                                 p.observacion === 'no registrado' && item.observacion === 'no registrado'));
                                             if (cruzado) {
-                                                item.observacion = 'Procesos mal definidos (plantilla)';
+                                                item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.';
                                             }
                                             else {
                                                 if (existe_proceso_padre == false) {
-                                                    if (item.proceso_padre != 'No registrado') {
-                                                        const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre === obj.proceso);
-                                                        if (!hayCoincidencia) {
-                                                            item.observacion = 'Proceso padre no existe en el archivo como proceso.';
-                                                        }
-                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                                 else {
-                                    item.observacion = 'No se puede registrar proceso y proceso padre iguales';
+                                    item.observacion = 'No es posible registrar un proceso como su propio proceso superior.';
                                 }
                             }
                             else {
@@ -424,7 +418,16 @@ class ProcesoControlador {
                             return 0; // SON IGUALES
                         });
                         var filaDuplicada = 0;
-                        listaProcesos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                        listaProcesos.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == 'no registrado') {
+                                if (item.proceso_padre != 'No registrado') {
+                                    console.log('listaProcesos 111: ', listaProcesos);
+                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe el proceso en el sistema'));
+                                    if (!hayCoincidencia) {
+                                        item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
+                                    }
+                                }
+                            }
                             if (item.observacion == '1') {
                                 item.observacion = 'Registro duplicado';
                             }
@@ -1172,6 +1175,51 @@ class ProcesoControlador {
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    EliminarProcesoMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const res = yield database_1.default.query(`
+               DELETE FROM map_cat_procesos WHERE id = $1
+             `, [item.id]);
+                    console.log('res: ', res);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{"id": "${item.id}"}`,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                console.log('err: ', err);
+                if (error) {
+                    if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+                        return res.status(500).jsonp({ message: err.detail });
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                    }
+                }
             }
         });
     }

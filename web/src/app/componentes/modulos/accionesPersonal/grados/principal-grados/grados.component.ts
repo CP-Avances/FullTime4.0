@@ -279,10 +279,8 @@ export class GradosComponent implements OnInit {
       ip: this.ip, ip_local: this.ips_locales
     }
 
-    console.log('data: ',data);
-
     this._grados.EliminarGradoMult(data).subscribe({
-       next: (response: any) => {
+       next: () => {
          this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
            timeOut: 5000,
          });

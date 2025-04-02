@@ -1242,59 +1242,59 @@ class GradoControlador {
     }
   }
 
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
-    public async EliminarGradoMultiple(req: Request, res: Response): Promise<any>{
-      const { listaEliminar, user_name, ip, ip_local } = req.body;
-      let error: boolean = false;
-  
-      try {
-        
-        for (const item of listaEliminar) {
-           // INICIAR TRANSACCION
-           await pool.query('BEGIN');
-  
-           const res = await pool.query( 
-             `
+  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+  public async EliminarGradoMultiple(req: Request, res: Response): Promise<any> {
+    const { listaEliminar, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+
+    try {
+
+      for (const item of listaEliminar) {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const res = await pool.query(
+          `
                DELETE FROM map_cat_grado WHERE id = $1
              `
-             , [item.id]);
-  
-            console.log('res: ',res)
-   
-           // AUDITORIA
-           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-             tabla: 'map_cat_grado',
-             usuario: user_name,
-             accion: 'I',
-             datosOriginales: '',
-             datosNuevos: `{"id": "${item.id}"}`,
-             ip: ip,
-             ip_local: ip_local,
-             observacion: null
-           });
-   
-           // FINALIZAR TRANSACCION
-           await pool.query('COMMIT');
-        }
-  
-        res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200});
-  
-      } catch(err) {
-        // REVERTIR TRANSACCION
-        await pool.query('ROLLBACK');
-        error = true;
-        console.log('err: ',err)
-        
-        if (error) {
-          if(err.table == 'map_empleado_grado'){
-            return res.status(500).jsonp({ message: err.detail });
-          }else{
-            return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
-          }
+          , [item.id]);
+
+        console.log('res: ', res)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_grado',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{"id": "${item.id}"}`,
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      }
+
+      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+
+    } catch (err) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      console.log('err: ', err)
+
+      if (error) {
+        if (err.table == 'map_empleado_grado') {
+          return res.status(500).jsonp({ message: err.detail });
+        } else {
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
         }
       }
-  
     }
+
+  }
 
 }
 
