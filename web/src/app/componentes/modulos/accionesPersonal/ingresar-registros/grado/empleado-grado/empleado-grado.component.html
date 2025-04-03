@@ -82,7 +82,6 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Id</th>
                         <th scope="col">Grado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Acciones</th>
@@ -90,7 +89,6 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let gra of listaEmpleGrado | paginate: tamanio_pagina_p:numero_pagina_p">
-                        <td>{{gra.id}}</td>
                         <td>{{gra.grado.toLocaleUpperCase()}} </td>
                         <td>{{gra.estado ? 'ACTIVO' : 'INACTIVO'}}</td>
                         <td class="justify-content-center">

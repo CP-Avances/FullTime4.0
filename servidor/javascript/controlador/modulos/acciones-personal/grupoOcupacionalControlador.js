@@ -1030,27 +1030,57 @@ class GrupoOcupacionalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND id_grupo_ocupacional = $2
+        `, [id_empleado, id_accion]);
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                const [grupo_activo1] = response.rows;
+                if (grupo_activo1 != undefined && grupo_activo1 != null) {
+                    if (grupo_activo1.id != id) {
+                        return res.status(500).jsonp({ message: 'Grupo ocupacional ya asignado' });
+                    }
+                }
+                console.log('estado: ', estado);
                 if (estado == true) {
                     // CONSULTAR DATOSORIGINALES
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const grupo = yield database_1.default.query(`
-          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
-          `, [id_empleado]);
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
+              `, [id_empleado]);
                     const [grupo_] = grupo.rows;
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (grupo_ != undefined || grupo_ != null) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
                         yield database_1.default.query(`
-            UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
-            `, [false, grupo_.id]);
+                UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
+                `, [false, grupo_.id]);
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                     }
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     yield database_1.default.query(`
-            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-            `, [id_accion, estado, id]);
+                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+                `, [id_accion, estado, id]);
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
                 else {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     yield database_1.default.query(`
-            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-            `, [id_accion, estado, id]);
+                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+                `, [id_accion, estado, id]);
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+                return res.jsonp({ message: 'Registro actualizado exitosamente' });
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });

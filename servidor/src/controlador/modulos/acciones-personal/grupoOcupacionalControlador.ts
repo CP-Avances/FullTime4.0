@@ -1237,40 +1237,79 @@ class GrupoOcupacionalControlador {
   public async EditarRegistroGrupoEmple(req: Request, res: Response): Promise<any> {
     try {
 
-      const {id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+      const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+      const response: QueryResult = await pool.query(
+        `
+          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND id_grupo_ocupacional = $2
+        `
+        , [id_empleado, id_accion]);
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      const [grupo_activo1] = response.rows;
+
+      if (grupo_activo1 != undefined && grupo_activo1 != null) {
+        
+        if (grupo_activo1.id != id) {
+          return res.status(500).jsonp({ message: 'Grupo ocupacional ya asignado' });
+        }
+      }
+
+      console.log('estado: ',estado)
 
       if (estado == true) {
         // CONSULTAR DATOSORIGINALES
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
         const grupo = await pool.query(
           `
-          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
-          `
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
+              `
           , [id_empleado]);
         const [grupo_] = grupo.rows;
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
 
         if (grupo_ != undefined || grupo_ != null) {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
           await pool.query(
             `
-            UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
-            `
+                UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
+                `
             , [false, grupo_.id]);
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
         }
 
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
         await pool.query(
           `
-            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-            `
+                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+                `
           , [id_accion, estado, id]);
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
 
       } else {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
         await pool.query(
           `
-            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-            `
+                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+                `
           , [id_accion, estado, id]);
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
       }
 
-      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+      return res.jsonp({ message: 'Registro actualizado exitosamente' });
+
 
     } catch (error) {
       return res.status(500).jsonp({ message: error });
