@@ -13,6 +13,7 @@ import path from 'path';
 import jwt from 'jsonwebtoken';
 import * as os from 'os';
 import fs from 'fs';
+import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
   _id: number,
@@ -52,13 +53,14 @@ class LoginControlador {
 
     try {
       const { nombre_usuario, pass, movil } = req.body;
-      console.log('pass', pass)
+      let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
+
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `
-        , [nombre_usuario, pass]);
+        , [nombre_usuario, pass_encriptado]);
 
       // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
@@ -103,6 +105,8 @@ class LoginControlador {
           SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `
         );
+
+        //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
 
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
@@ -316,6 +320,7 @@ class LoginControlador {
     let { token, contrasena, user_name, ip, ip_local } = req.body;
 
     try {
+      let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
       try {
@@ -353,7 +358,7 @@ class LoginControlador {
           `
           UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
           `
-          , [id_empleado, contrasena]);
+          , [id_empleado, contrasena_encriptada]);
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -361,7 +366,7 @@ class LoginControlador {
           usuario: user_name,
           accion: 'U',
           datosOriginales: JSON.stringify(contrasenaOriginal),
-          datosNuevos: `{"contrasena": "${contrasena}"}`,
+          datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,
           ip: ip,
           ip_local: ip_local,
           observacion: null

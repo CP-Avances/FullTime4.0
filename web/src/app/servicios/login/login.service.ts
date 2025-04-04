@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '../../../environments/environment'
+import { environment } from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,9 @@ export class LoginService {
 
 
   // VALIDACIONES DE INGRESO AL SISTEMA     **USADO
-  ValidarCredenciales(data: any) {
-    return this.http.post<any>(`${environment.url}/login`, data);
+  async ValidarCredenciales(data: any) {
+    const response = await firstValueFrom(this.http.post<any>(`${environment.url}/login`, data));
+    return response;
   }
 
   // METODO PARA CAMBIAR CONTRASEÑA    **USADO

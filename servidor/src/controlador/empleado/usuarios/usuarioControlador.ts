@@ -7,6 +7,7 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import path from 'path';
 import pool from '../../../database';
 import jwt from 'jsonwebtoken';
+import FUNCIONES_LLAVES from '../../llaves/rsa-keys.service';
 //IMPORTACIONES PARA APP MOVIL
 import { QueryResult } from 'pg';
 import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
@@ -21,6 +22,7 @@ class UsuarioControlador {
   public async CrearUsuario(req: Request, res: Response) {
     try {
       const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip, ip_local } = req.body;
+      let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasena);
 
       // INCIAR TRANSACCION
       await pool.query('BEGIN');
@@ -30,7 +32,7 @@ class UsuarioControlador {
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
           VALUES ($1, $2, $3, $4, $5) RETURNING *
         `
-        , [usuario, contrasena, estado, id_rol, id_empleado]);
+        , [usuario, contrasena_encriptado, estado, id_rol, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -173,6 +175,7 @@ class UsuarioControlador {
   public async CambiarPasswordUsuario(req: Request, res: Response): Promise<Response> {
     try {
       const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
+      let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -202,7 +205,7 @@ class UsuarioControlador {
         `
         UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `
-        , [contrasena, id_empleado]);
+        , [contrasena_encriptada, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -210,7 +213,7 @@ class UsuarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{contrasena: ${contrasena}}`,
+        datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
         ip: ip,
         ip_local: ip_local,
         observacion: null
