@@ -14,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { RegistrarGrupoOcupacionalComponent } from '../registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
 import { EditarGrupoOcupacionalComponent } from '../editar-grupo-ocupacional/editar-grupo-ocupacional.component';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-grupo-ocupacional',
@@ -24,7 +25,7 @@ export class GrupoOcupacionalComponent implements OnInit {
 
   ips_locales: any = '';
 
-  buscarNombre = new FormControl('', [Validators.minLength(2)]);
+  buscarGrupo = new FormControl('', [Validators.minLength(2)]);
   archivoForm = new FormControl('', Validators.required);
 
   ListGrupoOcupacional: any
@@ -54,6 +55,10 @@ export class GrupoOcupacionalComponent implements OnInit {
   idEmpleado: number;
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+
+  // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
+  selectionUno = new SelectionModel<any>(true, []);
+  grupoOcupacionalEliminar: any = [];
 
   constructor(
     private _GrupoOp: CatGrupoOcupacionalService,
@@ -92,13 +97,13 @@ export class GrupoOcupacionalComponent implements OnInit {
     }
   }
 
-  LimpiarCampos() { 
+  LimpiarCampos() {
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoForm.reset();
     this.Datos_gruposOcupacional = null;
     this.messajeExcel = '';
-    this.buscarNombre.reset();
+    this.buscarGrupo.reset();
     this.OptenerListaGrupoOcupacional();
     this.mostrarbtnsubir = false;
   }
@@ -136,7 +141,6 @@ export class GrupoOcupacionalComponent implements OnInit {
     this._GrupoOp.ConsultarGrupoOcupacion().subscribe({
       next: (respuesta: any) => {
         this.ListGrupoOcupacional = respuesta
-        console.log('this.ListGrupoOcupacional: ',this.ListGrupoOcupacional);
       }, error: (err) => {
         this.toastr.error(err.error.message, 'Erro server', {
           timeOut: 6000,
@@ -155,12 +159,46 @@ export class GrupoOcupacionalComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelected() {
+    const numSelected = this.selectionUno.selected.length;
+    const numRows = this.ListGrupoOcupacional.length;
+    return numSelected === numRows;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selectionUno.clear() :
+      this.ListGrupoOcupacional.forEach((row: any) => this.selectionUno.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabel(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+    this.grupoOcupacionalEliminar = this.selectionUno.selected;
+    return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // METODO PARA HACTIBAR LA SELECCION
+  btnCheckHabilitar: boolean = false;
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+    } else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.selectionUno.clear();
+    }
+  }
+
 
   //METODO PARA ABRIR VENTANA EDITAR GRUPO OCUPACIONAL
-  AbrirVentanaRegistrarGrupo() { 
+  AbrirVentanaRegistrarGrupo() {
     //console.log(datosSeleccionados);
     this.ventana.open(RegistrarGrupoOcupacionalComponent,
-      {width: '450px'}).afterClosed().subscribe(items => {
+      { width: '450px' }).afterClosed().subscribe(items => {
         this.OptenerListaGrupoOcupacional();
       });
   }
@@ -211,6 +249,49 @@ export class GrupoOcupacionalComponent implements OnInit {
         timeOut: 6000,
       });
     });
+  }
+
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.grupoOcupacionalEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.btnCheckHabilitar = true;
+            // this.plan_multiple = false;
+            // this.plan_multiple_ = false;
+            this.grupoOcupacionalEliminar = [];
+            this.selectionUno.clear();
+            this.ngOnInit();
+          } else {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+  EliminarMultiple(){    
+    const data = {
+      listaEliminar: this.grupoOcupacionalEliminar,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    }
+
+    this._GrupoOp.EliminarGrupoMult(data).subscribe({
+      next: (response: any) => {
+        this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+          timeOut: 5000,
+        });
+      },error: (err) => {
+        console.log('error: ',err)
+        this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
+          timeOut: 4000,
+        });
+      },
+    })
+    
   }
 
 
@@ -272,7 +353,7 @@ export class GrupoOcupacionalComponent implements OnInit {
   VerificarPlantilla() {
     this.listaGrupoOcupacionalCorrectas = [];
     let formData = new FormData();
-    
+
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
@@ -319,8 +400,8 @@ export class GrupoOcupacionalComponent implements OnInit {
       });
     });
 
-   }
-   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  }
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -328,7 +409,9 @@ export class GrupoOcupacionalComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema') {
+    } else if (observacion == 'Grupo ocupacional ya existe en el sistema' ||
+      observacion == 'Número de partida ya existe en el sistema'
+    ) {
       return 'rgb(239, 203, 106)';
     } else {
       return 'rgb(242, 21, 21)';
@@ -357,8 +440,8 @@ export class GrupoOcupacionalComponent implements OnInit {
       });
   }
 
-  RegistrarGrados(){
-    console.log('listaGrupoOcupacionalCorrectas: ',this.listaGrupoOcupacionalCorrectas.length)
+  RegistrarGrados() {
+    console.log('listaGrupoOcupacionalCorrectas: ', this.listaGrupoOcupacionalCorrectas.length)
     if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaGrupoOcupacionalCorrectas,
@@ -385,7 +468,7 @@ export class GrupoOcupacionalComponent implements OnInit {
           this.archivoForm.reset();
         }
       });
-      
+
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
@@ -447,7 +530,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [10, -25, 10, 10] },
         this.presentarDataPDFGrupoOcu(),
       ],
       styles: {
@@ -465,7 +548,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto'],
+            width: ['auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },
@@ -476,7 +559,7 @@ export class GrupoOcupacionalComponent implements OnInit {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  { text: obj.numero_partida, style: 'itemsTable'}
+                  { text: obj.numero_partida, style: 'itemsTable' }
                 ];
               })
             ]

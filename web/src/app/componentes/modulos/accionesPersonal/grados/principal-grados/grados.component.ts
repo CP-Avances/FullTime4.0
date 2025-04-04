@@ -14,6 +14,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { RegistrarGradoComponent } from '../registrar-grado/registrar-grado.component';
 import { ToastrService } from 'ngx-toastr';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-grados',
@@ -24,7 +25,7 @@ export class GradosComponent implements OnInit {
 
   ips_locales: any = '';
 
-  buscarNombre = new FormControl('', [Validators.minLength(2)]);
+  buscarGrupo = new FormControl('', [Validators.minLength(2)]);
   archivoForm = new FormControl('', Validators.required);
 
   ListGrados: any
@@ -54,6 +55,10 @@ export class GradosComponent implements OnInit {
   idEmpleado: number;
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+
+  // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
+  selectionUno = new SelectionModel<any>(true, []);
+  gradoEliminar: any = [];
 
   constructor(
     private _grados: CatGradoService,
@@ -98,7 +103,7 @@ export class GradosComponent implements OnInit {
     this.archivoForm.reset();
     this.Datos_grados = null;
     this.messajeExcel = '';
-    this.buscarNombre.reset();
+    this.buscarGrupo.reset();
     this.OptenerListaGrados();
     this.mostrarbtnsubir = false;
   }
@@ -154,6 +159,40 @@ export class GradosComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
+
+    // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+    isAllSelected() {
+      const numSelected = this.selectionUno.selected.length;
+      const numRows = this.ListGrados.length;
+      return numSelected === numRows;
+    }
+  
+    // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+    masterToggle() {
+      this.isAllSelected() ?
+        this.selectionUno.clear() :
+        this.ListGrados.forEach((row: any) => this.selectionUno.select(row));
+    }
+  
+    // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+    checkboxLabel(row?: any): string {
+      if (!row) {
+        return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+      }
+      this.gradoEliminar = this.selectionUno.selected;
+      return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    }
+  
+    // METODO PARA HACTIBAR LA SELECCION
+    btnCheckHabilitar: boolean = false;
+    HabilitarSeleccion() {
+      if (this.btnCheckHabilitar === false) {
+        this.btnCheckHabilitar = true;
+      } else if (this.btnCheckHabilitar === true) {
+        this.btnCheckHabilitar = false;
+        this.selectionUno.clear();
+      }
+    }
 
   //METODO PARA ABRIR VENTANA EDITAR GRADO
   AbrirVentanaRegistrarGrado() { 
@@ -211,6 +250,50 @@ export class GradosComponent implements OnInit {
       });
     });
   }
+
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.gradoEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.btnCheckHabilitar = true;
+            // this.plan_multiple = false;
+            // this.plan_multiple_ = false;
+            this.gradoEliminar = [];
+            this.selectionUno.clear();
+            this.ngOnInit();
+          } else {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+  EliminarMultiple(){    
+    const data = {
+      listaEliminar: this.gradoEliminar,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    }
+
+    this._grados.EliminarGradoMult(data).subscribe({
+       next: () => {
+         this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+           timeOut: 5000,
+         });
+       },error: (err) => {
+         console.log('error: ',err)
+         this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
+           timeOut: 4000,
+         });
+       },
+    })
+    
+  }
+
 
   // METODO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {

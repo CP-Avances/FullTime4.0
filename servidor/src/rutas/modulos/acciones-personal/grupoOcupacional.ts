@@ -44,6 +44,9 @@ class GrupoOcupacionalRutas {
         this.router.post('/cargar_plantilla/registro_empleadoGrupoOcupacional', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.RegistrarEmpleadoGrupoOcu);
         // METODO PARA ACTUALIZAR EL GRUPO   **USADO
         this.router.post('/actualizacionGrupo', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EditarRegistroGrupoEmple);
+        // METODO PARA ELIMINAR GRUPOS DE MANERA MULTIPLE   **USADO
+        this.router.post('/eliminarGrupoOcuMult', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EliminarGrupoMultiple);
+    
     }
 }
 

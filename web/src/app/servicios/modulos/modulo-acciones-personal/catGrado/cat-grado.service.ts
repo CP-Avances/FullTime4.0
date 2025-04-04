@@ -79,4 +79,9 @@ export class CatGradoService {
     return this.http.post<any>(environment.url + '/grado/actualizacionGrado', formData);
   }
 
+  // METODO PARA ELIMINAR GRADO MULTIPLES
+  EliminarGradoMult(data: any) {
+    return this.http.post<any>(environment.url + '/grado/eliminarGradoMult', data);
+  }
+
 }

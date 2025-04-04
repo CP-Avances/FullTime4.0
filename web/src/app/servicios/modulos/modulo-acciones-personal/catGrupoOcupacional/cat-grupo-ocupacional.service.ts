@@ -79,4 +79,9 @@ export class CatGrupoOcupacionalService {
     return this.http.post<any>(environment.url + '/grupoOcupacional/actualizacionGrupo', formData);
   }
 
+  // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES
+  EliminarGrupoMult(data: any){
+    return this.http.post<any>(environment.url + '/grupoOcupacional/eliminarGrupoOcuMult', data);
+  }
+
 }

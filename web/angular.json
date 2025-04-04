@@ -27,7 +27,8 @@
               "xml2js",
               "src/assets/build/pdfmake.js",
               "src/assets/build/vfs_fonts.js",
-              "exceljs"
+              "exceljs",
+              "crypto-js"
             ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",

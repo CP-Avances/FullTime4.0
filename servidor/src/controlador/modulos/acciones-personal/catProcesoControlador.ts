@@ -54,11 +54,13 @@ class ProcesoControlador {
     try {
       const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
 
+      console.log('nombre: ',nombre)
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN')
         const response: QueryResult = await pool.query(
           `
-          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = $1
+          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
          `
          , [nombre]
         )
@@ -122,10 +124,21 @@ class ProcesoControlador {
 
   public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
+      var { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
 
       if(id == proc_padre){
-        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso' });
+        // CONSULTAR DATOS PROCESO PADRE
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [proc_padre]);
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+        if(proce.rows[0].nombre == nombre){
+          return res.status(300).jsonp({ message: 'Un proceso no puede ser su propio proceso superior. Verifique la selección e intente nuevamente.' });
+        }else{
+          return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso anterior' });
+        }  
       }else{
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -153,24 +166,42 @@ class ProcesoControlador {
         }
 
         // INICIAR TRANSACCION
-        await pool.query('BEGIN')
-        const response: QueryResult = await pool.query(
-          `
-          SELECT * FROM map_cat_procesos WHERE id = $1
-         `
-          , [proc_padre]
-        )
-        const [procesos] = response.rows;
+        await pool.query('BEGIN');
+
+        // CONSULTAR DATOSORIGINALES
+        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)', [nombre]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        if (proc_padre == procesos.id && id == procesos.proceso_padre) {
-          return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
-        } else {
+        if( proce.rowCount! > 0){
+          return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
+        }else{
+
+          if (proc_padre != "") {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN')
+            const response: QueryResult = await pool.query(
+              `
+            SELECT * FROM map_cat_procesos WHERE id = $1
+           `
+              , [proc_padre]
+            )
+            const [procesos] = response.rows;
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (proc_padre == procesos.id && id == procesos.proceso_padre) {
+              return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+            }
+
+          } else {
+            proc_padre = null
+          }
+
           await pool.query(
             `
-          UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
-          `
+            UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
+            `
             , [nombre, proc_padre, id]);
 
           // AUDITORIA
@@ -188,7 +219,9 @@ class ProcesoControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
           return res.status(200).jsonp({ message: 'El proceso actualizado exitosamente' });
-        }
+
+        }       
+
       }
 
     } catch (error) {
@@ -418,20 +451,12 @@ class ProcesoControlador {
                             );
   
                             if (cruzado) {
-                              item.observacion = 'Procesos mal definidos (plantilla)';
+                              item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.';
                             }else{
 
                               if(existe_proceso_padre == false){
 
-                                if(item.proceso_padre != 'No registrado'){
-                                  const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
-                                    otroIndex !== index && item.proceso_padre === obj.proceso
-                                  );
-  
-                                  if(!hayCoincidencia){
-                                    item.observacion = 'Proceso padre no existe en el archivo como proceso.';
-                                  }
-                                }
+                                
                                 
                               }
                               
@@ -442,7 +467,7 @@ class ProcesoControlador {
                         }
 
                     }else{
-                      item.observacion = 'No se puede registrar proceso y proceso padre iguales'
+                      item.observacion = 'No es posible registrar un proceso como su propio proceso superior.'
                     }
 
                   }else{
@@ -465,7 +490,23 @@ class ProcesoControlador {
 
                 var filaDuplicada: number = 0;
 
-                listaProcesos.forEach(async (item: any) => {
+                listaProcesos.forEach(async (item: any, index: number) => {
+
+                  if (item.observacion == 'no registrado'){
+                    if(item.proceso_padre != 'No registrado'){
+                      console.log('listaProcesos 111: ',listaProcesos)
+                      const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
+                        otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe el proceso en el sistema')
+                      );
+  
+                      if(!hayCoincidencia){
+                        item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
+                      }
+                    }
+                  }
+                  
+
+
                     if (item.observacion == '1') {
                         item.observacion = 'Registro duplicado'
                     }else if(item.observacion == 'no registrado'){
@@ -1391,6 +1432,60 @@ class ProcesoControlador {
     }catch(error){
       return res.status(500).jsonp({ message: error });
     }
+  }
+
+   // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+   public async EliminarProcesoMultiple(req: Request, res: Response): Promise<any> {
+    const { listaEliminar, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+
+    try {
+
+      for (const item of listaEliminar) {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const res = await pool.query(
+          `
+               DELETE FROM map_cat_procesos WHERE id = $1
+             `
+          , [item.id]);
+
+        console.log('res: ', res)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_procesos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{"id": "${item.id}"}`,
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      }
+
+      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+
+    } catch (err) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      console.log('err: ', err)
+
+      if (error) {
+        if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+          return res.status(500).jsonp({ message: err.detail });
+        } else {
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+        }
+      }
+    }
+
   }
 
 }

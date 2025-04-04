@@ -101,23 +101,35 @@ class GradoControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-            UPDATE map_cat_grado SET descripcion = $2 WHERE id = $1
-          `, [id_grado, grado]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_cat_procesos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"id": "${id_grado}"}, {"descripcion": "${grado}"}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
+                const DataGrado = yield database_1.default.query(`
+            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
+          `, [grado]);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.status(200).jsonp({ message: 'El grado ha actualizado con éxito', codigo: 200 });
+                if (DataGrado.rows[0] != undefined && DataGrado.rows[0] != null && DataGrado.rows[0] != "") {
+                    res.status(300).jsonp({ message: 'Ya existe un grado  registrado', codigo: 300 });
+                }
+                else {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    yield database_1.default.query(`
+            UPDATE map_cat_grado SET descripcion = $2 WHERE id = $1
+          `, [id_grado, grado]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{"id": "${id_grado}"}, {"descripcion": "${grado}"}`,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    res.status(200).jsonp({ message: 'Grado actualizado con éxito', codigo: 200 });
+                }
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -1006,6 +1018,51 @@ class GradoControlador {
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    EliminarGradoMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const res = yield database_1.default.query(`
+               DELETE FROM map_cat_grado WHERE id = $1
+             `, [item.id]);
+                    console.log('res: ', res);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_grado',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{"id": "${item.id}"}`,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                console.log('err: ', err);
+                if (error) {
+                    if (err.table == 'map_empleado_grado') {
+                        return res.status(500).jsonp({ message: err.detail });
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                    }
+                }
             }
         });
     }
