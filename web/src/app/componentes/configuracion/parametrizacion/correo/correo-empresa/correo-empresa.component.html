@@ -34,7 +34,7 @@
                 </mat-form-field>
                 <mat-form-field class="correo">
                     <mat-label>Puerto de salida*</mat-label>
-                    <input matInput placeholder="465" [formControl]="puertoF" (keypress)="IngresarSoloNumeros($event)">
+                    <input matInput type="tel" placeholder="465" [formControl]="puertoF" (keypress)="IngresarSoloNumeros($event)" >
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Actualizar puerto de salida de correo electrónico principal.">
                         create

@@ -139,7 +139,7 @@
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
                                 <input matInput placeholder="Buscar" (input)="FiltrarDep(codigoDep.value, 3)"
-                                    [formControl]="codigoDep" (keypress)="IngresarSoloNumeros($event)">
+                                    [formControl]="codigoDep" >
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por código.">
                                     help_outline
@@ -169,7 +169,7 @@
                                 <input matInput placeholder="Buscar" maxlength="10"
                                     (input)="FiltrarDep(cedulaDep.value, 4)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedulaDep" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                    [formControl]="cedulaDep" type="tel" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                     help_outline

@@ -137,56 +137,79 @@
                 <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_emp">
                     <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
-                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Nombres</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 11)"
-                                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por nombre.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Sucursal</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                              [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                          </mat-form-field>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Código</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 9)"
-                                        [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por código.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Cédula</mat-label>
-                                    <input matInput placeholder="Buscar" maxlength="10"
-                                        (input)="Filtrar(cedula.value, 10)"
-                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                        [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Nombres</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 11)"
+                              [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                          </mat-form-field>
                         </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Código</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 9)"
+                              [formControl]="codigo">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  
+                    <div class="row">
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Cédula</mat-label>
+                            <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 10)"
+                              oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                              [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text"
+                                       matInput
+                                       placeholder="Buscar"
+                                       aria-label="Rol"
+                                       [formControl]="nombre_rol"
+                                       [matAutocomplete]="autoRol"
+                                       (keypress)="IngresarSoloLetras($event)">  
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                    {{ rol.nombre }}
+                                  </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                  help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                      </div>
                     </div>
                 </form>
 
@@ -517,12 +540,13 @@
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
+                                    <th scope="col">Rol</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                    *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp.toggle(e) : null"
@@ -533,6 +557,7 @@
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
+                                    <td>{{e.rol}}</td>
                                     <td class="d-flex justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 2)" id="plan" *ngIf="individual"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
@@ -698,60 +723,81 @@
                 <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_emp">
                     <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
-                                        [formControl]="nombre_suc_dh" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Nombres</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 6)"
-                                        [formControl]="nombre_emp_dh" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por nombre.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Sucursal</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                              [formControl]="nombre_suc_dh" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                          </mat-form-field>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Código</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 4)"
-                                        [formControl]="codigo_dh" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por código.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
-                                    <mat-label>Cédula</mat-label>
-                                    <input matInput placeholder="Buscar" maxlength="10"
-                                        (input)="Filtrar_DH(cedula_dh.value, 5)"
-                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                        [formControl]="cedula_dh" type="text" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Nombres</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 6)"
+                              [formControl]="nombre_emp_dh" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                          </mat-form-field>
                         </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Código</mat-label>
+                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 4)"
+                              [formControl]="codigo_dh">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                          </mat-form-field>
+                        </div>
+                      </div>
                     </div>
-                </form>
+                  
+                    <div class="row">
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                          <mat-form-field>
+                            <mat-label>Cédula</mat-label>
+                            <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar_DH(cedula_dh.value, 5)"
+                              oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                              [formControl]="cedula_dh" type="tel" (keypress)="IngresarSoloNumeros($event)" >
+                            <mat-icon matSuffix matTooltipPosition="right"
+                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                  
+                      <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text"
+                                       matInput
+                                       placeholder="Buscar"
+                                       aria-label="Rol"
+                                       [formControl]="nombre_rol_dh"
+                                       [matAutocomplete]="autoRol"
+                                       (keypress)="IngresarSoloLetras($event)">  
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                    {{ rol.nombre }}
+                                  </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                  help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
 
                 <div *ngIf="activar_boton_dh" class="d-flex flex-wrap justify-content-center"
                     style="padding-top: 15px;">
@@ -1071,12 +1117,13 @@
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
+                                    <th scope="col">Rol</th>
                                     <th scope="col">Proceso</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados_dh  | sucNombre: dh_filtroNombreSuc | filtroCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | nombreCompleto: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
+                                    *ngFor="let e of empleados_dh  | sucNombre: dh_filtroNombreSuc | filtroCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | nombreCompleto: dh_filtroNombreEmp | roles: dh_filtroRolEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp_dh.toggle(e) : null"
@@ -1088,6 +1135,7 @@
                                     <td>{{e.cedula}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
+                                    <td>{{e.rol}}</td>
                                     <td class="d-flex justify-content-center">
                                         <i (click)="RegistrarConfiguracion(e, 1)" id="plan_dh" *ngIf="individual_dh"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"

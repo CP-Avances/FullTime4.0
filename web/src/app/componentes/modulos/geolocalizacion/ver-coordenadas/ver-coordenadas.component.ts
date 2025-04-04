@@ -23,6 +23,9 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { Observable, map, startWith  } from 'rxjs';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -52,7 +55,11 @@ export class VerCoordenadasComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+
+  filteredRoles!: Observable<any[]>;
+  roles: any = [];
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -128,6 +135,9 @@ export class VerCoordenadasComponent implements OnInit {
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.filtros.filtroNombreReg };
 
+  //FILTRO ROL
+  get filtroRolEmp() { return this.filtros.filtroRolEmp };  
+
   coordenadas: any = [];
   datosUsuarios: any = [];
 
@@ -151,6 +161,7 @@ export class VerCoordenadasComponent implements OnInit {
     public informacion: DatosGeneralesService,
     public componentec: ListarCoordenadasComponent,
     private asignaciones: AsignacionesService,
+    private restRoles: RolesService
   ) { }
 
   ngOnInit(): void {
@@ -168,6 +179,24 @@ export class VerCoordenadasComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.ConsultarDatos();
+
+    this, this.restRoles.BuscarRoles().subscribe((respuesta: any) => {
+      this.roles = respuesta
+      console.log('this.listaRoles: ', this.roles)
+    });
+
+        this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+          startWith(''),
+          map(value => this.filtrarRoles(value || ''))
+        );
+
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
+
+
+
   }
 
   // METODO PARA CONSULTAR INFORMACION
@@ -195,6 +224,14 @@ export class VerCoordenadasComponent implements OnInit {
       this.btnCheckHabilitar = false;
       this.auto_individual = true;
     }
+  }
+
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.roles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO PARA MANEJAR PAGINACION DE TABLAS
@@ -391,6 +428,7 @@ export class VerCoordenadasComponent implements OnInit {
       case 5: this.filtros.setFiltroCedula(e); break;
       case 6: this.filtros.setFiltroNombreEmp(e); break;
       case 7: this.filtros.setFiltroNombreReg(e); break;
+      case 8: this.filtros.setFiltroRolEmp(e); break;
       default:
         break;
     }

@@ -374,40 +374,50 @@ export class RegistroComponent implements OnInit {
 
   cedulaValida:boolean=false;
   ValidarCedula(cedula: any) {
-    console.log("entra a validar Cedula", cedula)
-    const inputElement =cedula.cedulaForm;
-
+    console.log("entra a validar Cedula", cedula);
+    const inputElement = cedula.cedulaForm;
+  
     const cad: string = inputElement;
     let total: number = 0;
     const longitud: number = cad.length;
     const longcheck: number = longitud - 1;
-
+  
+    // 👉 Si es menos de 10 dígitos, marcar como inválido
+    if (longitud < 10) {
+      this.cedulaValida = false;
+      this.cdRef.detectChanges();
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
+      console.log("Cédula con menos de 10 dígitos");
+      return; // salir
+    }
+  
+    // 👉 Validación normal si tiene 10 dígitos
     if (cad !== "" && longitud === 10) {
       for (let i = 0; i < longcheck; i++) {
         let num = parseInt(cad.charAt(i), 10);
         if (isNaN(num)) return;
-
+  
         if (i % 2 === 0) {
           num *= 2;
           if (num > 9) num -= 9;
         }
         total += num;
       }
-
+  
       total = total % 10 ? 10 - (total % 10) : 0;
-
+  
       if (parseInt(cad.charAt(longitud - 1), 10) === total) {
-        this.cedulaValida=true;
-        console.log("Cédula Válida")
+        this.cedulaValida = true;
+        console.log("Cédula Válida");
       } else {
-        this.cedulaValida=false;
+        this.cedulaValida = false;
         this.cdRef.detectChanges();
-        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true }); // Cédula inválida
-        console.log("Cédula Inválida")
+        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
+        console.log("Cédula Inválida");
       }
     }
-
   }
+  
 
 
   pasaporteValida:boolean=false;

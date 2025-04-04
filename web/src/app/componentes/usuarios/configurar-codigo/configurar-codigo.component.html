@@ -39,7 +39,7 @@
                             </section>
                             <mat-form-field *ngIf="!HabilitarDescrip">
                                 <mat-label id="letras">Código Automático desde:</mat-label>
-                                <input matInput placeholder="1000" [formControl]="inicioF" maxlength="10"
+                                <input matInput type="tel" placeholder="1000" [formControl]="inicioF" maxlength="10"
                                     (keypress)="IngresarSoloNumeros($event)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"

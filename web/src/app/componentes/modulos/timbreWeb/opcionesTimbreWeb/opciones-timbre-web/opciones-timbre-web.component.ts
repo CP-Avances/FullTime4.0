@@ -5,6 +5,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+import { Observable, map, startWith } from 'rxjs';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -16,6 +17,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
   selector: 'app-opciones-timbre-web',
@@ -67,6 +69,8 @@ export class OpcionesTimbreWebComponent implements OnInit {
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   nombre_rol= new FormControl('', [Validators.minLength(2)]);
+
+  filteredRoles!: Observable<any[]>;
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -144,8 +148,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
     return this.restR.filtroRolEmp;
   }
 
-
-
+  listaRoles: any = [];
 
 
   constructor(
@@ -154,7 +157,8 @@ export class OpcionesTimbreWebComponent implements OnInit {
     private restUsuario: UsuarioService,
     private validar: ValidacionesService,
     private toastr: ToastrService,
-    private restR: ReportesService
+    private restR: ReportesService,
+    private restRol: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(
       localStorage.getItem('empleado') as string
@@ -185,6 +189,22 @@ export class OpcionesTimbreWebComponent implements OnInit {
       { opcion: 'Timbre Ubicación Desconocida' },
     ];
     this.BuscarInformacionGeneral();
+
+
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+      this.listaRoles = respuesta
+      console.log('this.listaRoles: ', this.listaRoles)
+    });
+
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
+
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
@@ -202,6 +222,13 @@ export class OpcionesTimbreWebComponent implements OnInit {
       (err) => {
         this.toastr.error(err.error.message);
       }
+    );
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.listaRoles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
     );
   }
 

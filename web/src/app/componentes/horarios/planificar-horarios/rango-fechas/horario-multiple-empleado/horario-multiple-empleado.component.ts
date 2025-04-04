@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
+
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -17,7 +18,7 @@ import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
-import { Observable } from 'rxjs';
+import { Observable, map, startWith  } from 'rxjs';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -51,6 +52,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+
+  filteredRoles!: Observable<any[]>;
 
   // FILTROS SUCURSALES
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
@@ -142,6 +145,22 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.BuscarInformacionGeneral();
+
+this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
+      this.roles = respuesta
+      console.log('this.listaRoles: ', this.roles)
+    });
+
+        this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+          startWith(''),
+          map(value => this.filtrarRoles(value || ''))
+        );
+
+
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
   }
 
 
@@ -150,6 +169,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.roles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO DE BUSQUEDA DE DATOS DE EMPLEADOS

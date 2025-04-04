@@ -239,7 +239,7 @@
                                 </mat-form-field>
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label>Salario propuesto</mat-label>
-                                    <input matInput [formControl]="sueldoF" style="text-align: right;"
+                                    <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
                                         (keypress)="IngresarSoloNumeros($event)" value="0">
                                     <span matTextPrefix>$&nbsp;</span>
                                     <span matTextSuffix>.00</span>
@@ -254,7 +254,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Número partida propuesta</mat-label>
-                                    <input class="numero" matInput placeholder="13369689656312"
+                                    <input class="numero" type="tel" matInput placeholder="13369689656312"
                                         formControlName="numPropuestaForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar número de partida propuesta.">
@@ -263,7 +263,7 @@
                                 </mat-form-field>
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Partida presupuestaria individual</mat-label>
-                                    <input class="numero" matInput placeholder="13369689656312"
+                                    <input class="numero" type="tel" matInput placeholder="13369689656312"
                                         formControlName="numPartidaIForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar número de partida individual.">
@@ -279,7 +279,7 @@
                         </div>
                         <mat-form-field class="contenedor-completo">
                             <mat-label class="letra">Número partida presupuestaria</mat-label>
-                            <input class="numero" matInput placeholder="13369689656312" formControlName="numPartidaForm"
+                            <input class="numero" type="tel" matInput placeholder="13369689656312" formControlName="numPartidaForm"
                                 required (keypress)="IngresarSoloNumeros($event)" readonly>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Número de partida presupuestaria empresarial.">
@@ -462,7 +462,7 @@
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label class="letra">Número de acción</mat-label>
-                                    <input class="numero" matInput placeholder="13369689656312"
+                                    <input class="numero" type="tel" matInput placeholder="13369689656312"
                                         formControlName="accionReempForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar número de acción.">

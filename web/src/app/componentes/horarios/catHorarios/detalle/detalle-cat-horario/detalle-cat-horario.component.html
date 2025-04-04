@@ -54,7 +54,7 @@
                     </mat-form-field>
                     <mat-form-field *ngIf="espera">
                         <mat-label>Minutos de espera</mat-label>
-                        <input matInput placeholder="Ej: 60" [formControl]="minEsperaF"
+                        <input matInput type="tel" placeholder="Ej: 60" [formControl]="minEsperaF"
                             (keypress)="IngresarSoloNumeros($event)">
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Indicar los minutos de tolerancia de espera para ingreso">

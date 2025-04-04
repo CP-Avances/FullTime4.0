@@ -5,6 +5,7 @@ import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { Observable, map, startWith } from 'rxjs';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -15,6 +16,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
 
@@ -36,6 +38,9 @@ export class ListaNotificacionComponent implements OnInit {
     nombre_carg = new FormControl('', [Validators.minLength(2)]);
     nombre_rol = new FormControl('', [Validators.minLength(2)]);
     seleccion = new FormControl('');
+
+    filteredRoles!: Observable<any[]>;
+    listaRoles: any = [];
 
     public _booleanOptions: FormCriteriosBusqueda = {
         bool_suc: false,
@@ -126,6 +131,7 @@ export class ListaNotificacionComponent implements OnInit {
         private ventana: MatDialog,
         private validar: ValidacionesService,
         private toastr: ToastrService,
+        private restRol: RolesService
     ) {
         this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -139,6 +145,21 @@ export class ListaNotificacionComponent implements OnInit {
         this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
         this.BuscarInformaciongeneral();
+
+        this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+            this.listaRoles = respuesta
+            console.log('this.listaRoles: ', this.listaRoles)
+          });
+      
+          this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+            startWith(''),
+            map(value => this.filtrarRoles(value || ''))
+          );
+      
+          this.nombre_rol.valueChanges.subscribe(valor => {
+            this.Filtrar(valor, 8);
+          });
+
     }
 
     ngOnDestroy() {
@@ -161,6 +182,13 @@ export class ListaNotificacionComponent implements OnInit {
             this.toastr.error(err.error.message)
         })
     }
+
+    filtrarRoles(valor: string): any[] {
+        const filtro = valor.toLowerCase();
+        return this.listaRoles.filter(rol =>
+          rol.nombre.toLowerCase().includes(filtro)
+        );
+      }
 
     // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
     ProcesarDatos(informacion: any) {
