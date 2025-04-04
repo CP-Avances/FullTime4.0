@@ -5,6 +5,7 @@ class FuncionesControlador {
 
     // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
     public async ConsultarFunciones(req: Request, res: Response) {
+        console.log('funciones...');
         const FUNCIONES = await pool.query(
             `
             SELECT * FROM e_funciones

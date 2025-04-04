@@ -52,6 +52,7 @@ class LoginControlador {
 
     try {
       const { nombre_usuario, pass, movil } = req.body;
+      console.log('pass', pass)
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
@@ -205,6 +206,7 @@ class LoginControlador {
         return res.jsonp({ message: 'error' });
       }
     } catch (error) {
+      console.log('error', error)
       return res.jsonp({ message: 'error', text: ip_cliente });
     }
   }

@@ -12,24 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FUNCIONES_CONTROLADOR = void 0;
+exports.parametrizacionControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
-class FuncionesControlador {
-    // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
-    ConsultarFunciones(req, res) {
+const builder = require('xmlbuilder');
+class ParametrizacionControlador {
+    //Servicio con datos por defecto
+    ObtenerParametrizacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('funciones...');
-            const FUNCIONES = yield database_1.default.query(`
-            SELECT * FROM e_funciones
-            `);
-            if (FUNCIONES.rowCount != 0) {
-                return res.jsonp(FUNCIONES.rows);
+            try {
+                const { id } = req.params;
+                const PARAMETRO = yield database_1.default.query(`
+                SELECT 999 AS id_tipo, 'ejecucion_inicial' AS tipo, 999 AS id_detalle, CASE WHEN $1 = 25 THEN 'DD/MM/YYYY' WHEN $1 = 26 THEN 'hh:mm:ss A' END AS descripcion
+                `, [id]);
+                if (PARAMETRO.rowCount != null) {
+                    if (PARAMETRO.rowCount > 0) {
+                        return res.jsonp(PARAMETRO.rows);
+                    }
+                }
+                else {
+                    res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            catch (error) {
+                res.status(500).jsonp({ text: 'error' });
             }
         });
     }
 }
-exports.FUNCIONES_CONTROLADOR = new FuncionesControlador();
-exports.default = exports.FUNCIONES_CONTROLADOR;
+exports.parametrizacionControlador = new ParametrizacionControlador;
+exports.default = exports.parametrizacionControlador;

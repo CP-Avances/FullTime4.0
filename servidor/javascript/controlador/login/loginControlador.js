@@ -44,6 +44,7 @@ class LoginControlador {
             console.log('IP Pública:', ip_cliente);
             try {
                 const { nombre_usuario, pass, movil } = req.body;
+                console.log('pass', pass);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
@@ -178,6 +179,7 @@ class LoginControlador {
                 }
             }
             catch (error) {
+                console.log('error', error);
                 return res.jsonp({ message: 'error', text: ip_cliente });
             }
         });

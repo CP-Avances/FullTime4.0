@@ -12,24 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FUNCIONES_CONTROLADOR = void 0;
+exports.empleadoControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
-class FuncionesControlador {
-    // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
-    ConsultarFunciones(req, res) {
+class EmpleadoControlador {
+    //Servicio con datos por defecto
+    ObtenerEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('funciones...');
-            const FUNCIONES = yield database_1.default.query(`
-            SELECT * FROM e_funciones
-            `);
-            if (FUNCIONES.rowCount != 0) {
-                return res.jsonp(FUNCIONES.rows);
+            try {
+                const empleado = yield database_1.default.query(`
+                SELECT 0 AS id, 'Ejecucion' AS nombre, 'Inicial' AS apellido
+                `).then((result) => {
+                    return result.rows.map((obj) => {
+                        return {
+                            id: obj.id,
+                            empleado: obj.apellido + ' ' + obj.nombre
+                        };
+                    });
+                });
+                res.jsonp(empleado);
             }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            catch (error) {
+                res.status(500).jsonp({ message: 'error' });
             }
         });
     }
 }
-exports.FUNCIONES_CONTROLADOR = new FuncionesControlador();
-exports.default = exports.FUNCIONES_CONTROLADOR;
+exports.empleadoControlador = new EmpleadoControlador;
+exports.default = exports.empleadoControlador;

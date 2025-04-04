@@ -130,7 +130,11 @@ class Servidor {
             },
         });
         this.io.on('connection', (socket) => {
-            // console.log('Cliente conectado:', socket.id);  // Verifica la conexión
+            console.log('Cliente conectado:', socket.id);
+            socket.on("connect_error", (err) => {
+                console.log("Error de conexión:", err.message);
+            });
+            // Verifica la conexión
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
             });
