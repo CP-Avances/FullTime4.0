@@ -44,6 +44,8 @@ class ProcesoRutas {
         this.router.post('/cargar_plantilla/registro_epleadoProceso', TokenValidation, PROCESO_CONTROLADOR.RegistrarEmpleadoProceso);
         // METODO PARA ACTUALIZAR EL PROCESO   **USADO
         this.router.post('/actualizacionProceso', TokenValidation, PROCESO_CONTROLADOR.EditarRegistroProcesoEmple);
+        // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
+        this.router.post('/eliminarProcesoMult', TokenValidation, PROCESO_CONTROLADOR.EliminarProcesoMultiple);
     }
 }
 

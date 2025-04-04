@@ -44,6 +44,8 @@ class GradoRutas {
         this.router.post('/cargar_plantilla/registro_epleadoGrado', verificarToken_1.TokenValidation, gradoControlador_1.default.RegistrarEmpleadoGrado);
         // METODO PARA ACTUALIZAR EL GRADO   **USADO
         this.router.post('/actualizacionGrado', verificarToken_1.TokenValidation, gradoControlador_1.default.EditarRegistroGradoEmple);
+        // METODO PARA ELIMINAR GRUPOS DE MANERA MULTIPLE   **USADO
+        this.router.post('/eliminarGradoMult', verificarToken_1.TokenValidation, gradoControlador_1.default.EliminarGradoMultiple);
     }
 }
 const GRADO_RUTAS = new GradoRutas();

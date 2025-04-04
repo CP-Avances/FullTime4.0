@@ -28,7 +28,7 @@ export class EditarCatProcesosComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   procesoPadre = new FormControl('', Validators.required);
-  nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
+  nombre = new FormControl('', Validators.required);
 
   procesos: any = [];
 
@@ -78,10 +78,14 @@ export class EditarCatProcesosComponent implements OnInit {
   EditarProceso(form: any) {
     var procesoPadreId: any;
     var procesoPadreNombre = form.procesoPadreForm;
+
+    console.log('procesoPadreNombre: ',procesoPadreNombre)
+
     if (procesoPadreNombre === 'Ninguno') {
       let dataProceso = {
         id: this.data.datosP.id,
         nombre: form.procesoNombreForm,
+        proc_padre: "",
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales
       };
@@ -96,6 +100,9 @@ export class EditarCatProcesosComponent implements OnInit {
           user_name: this.user_name,
           ip: this.ip, ip_local: this.ips_locales
         };
+
+        console.log('dataProceso: ',dataProceso)
+
         this.ActualizarDatos(dataProceso);
       });
     }
@@ -112,7 +119,7 @@ export class EditarCatProcesosComponent implements OnInit {
       this.LimpiarCampos();
       this.CerrarVentana();
     }, error => {
-      this.toastr.error(error.error.message, 'Registro.', {
+      this.toastr.error(error.error.message, 'Actualización.', {
         timeOut: 6000,
       });
      });

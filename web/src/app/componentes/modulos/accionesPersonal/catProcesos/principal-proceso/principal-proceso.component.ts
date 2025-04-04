@@ -20,6 +20,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-principal-proceso',
@@ -56,6 +57,10 @@ export class PrincipalProcesoComponent implements OnInit {
   hipervinculo: string = environment.url
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+
+  // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
+  selectionUno = new SelectionModel<any>(true, []);
+  procesoEliminar: any = [];
 
   constructor(
     public restEmpre: EmpresaService,
@@ -147,7 +152,7 @@ export class PrincipalProcesoComponent implements OnInit {
     this.ObtenerProcesos();
     this.mostrarbtnsubir = false;
   }
-  
+
 
   // METODO PARA LISTAR PROCESOS
   ObtenerProcesos() {
@@ -156,6 +161,40 @@ export class PrincipalProcesoComponent implements OnInit {
       this.procesos = data;
       //console.log('ver datos de procesos ', this.procesos)
     });
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelected() {
+    const numSelected = this.selectionUno.selected.length;
+    const numRows = this.procesos.length;
+    return numSelected === numRows;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selectionUno.clear() :
+      this.procesos.forEach((row: any) => this.selectionUno.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabel(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+    this.procesoEliminar = this.selectionUno.selected;
+    return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // METODO PARA HACTIBAR LA SELECCION
+  btnCheckHabilitar: boolean = false;
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+    } else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.selectionUno.clear();
+    }
   }
 
   // METODO PARA ABRIR PANTALLA DE REGISTRO DE PROCESO
@@ -208,6 +247,50 @@ export class PrincipalProcesoComponent implements OnInit {
           this.router.navigate(['/proceso']);
         }
       });
+  }
+
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.procesoEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.btnCheckHabilitar = true;
+            // this.plan_multiple = false;
+            // this.plan_multiple_ = false;
+            this.procesoEliminar = [];
+            this.selectionUno.clear();
+            this.ngOnInit();
+          } else {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+  EliminarMultiple(){    
+    const data = {
+      listaEliminar: this.procesoEliminar,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    }
+
+    console.log('data: ',data);
+
+    this.rest.EliminarProcesoMult(data).subscribe({
+      next: () => {
+        this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+          timeOut: 5000,
+        });
+      }, error: (err) => {
+        console.log('error: ', err)
+        this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
+          timeOut: 4000,
+        });
+      },
+    })
   }
 
   // METODO PARA VALIDAR INGRESO DE NUMEROS
@@ -376,11 +459,14 @@ export class PrincipalProcesoComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe el proceso en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'Registro cruzado' || observacion == 'Proceso padre no existe en el archivo como proceso.' ||
-      observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+    } else if (observacion  == 'Registro cruzado' || observacion == 'Proceso superior no existe en el sistema como un proceso..' ||
+      observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos' ||
+      observacion == 'No es posible registrar un proceso como su propio proceso superior.' || 
+      observacion == 'Proceso superior no existe en el sistema como un proceso.'
     ) {
       return 'rgb(238, 21, 242)';
-    }else if(observacion == 'Procesos mal definidos (plantilla)' || observacion == 'Procesos mal definidos'){
+    }else if(observacion == 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.' || 
+        observacion == 'Procesos mal definidos'){
       return 'rgb(232, 137, 207)';
     } else {
       return 'rgb(242, 21, 21)';
@@ -505,12 +591,11 @@ export class PrincipalProcesoComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Nivel', style: 'tableHeader' },
                 { text: 'Proceso Superior', style: 'tableHeader' },
               ],
               ...this.procesos.map((obj: any) => {
@@ -518,7 +603,6 @@ export class PrincipalProcesoComponent implements OnInit {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.nivel, style: 'itemsTableC' },
                   { text: obj.proc_padre, style: 'itemsTable' },
                 ];
               })

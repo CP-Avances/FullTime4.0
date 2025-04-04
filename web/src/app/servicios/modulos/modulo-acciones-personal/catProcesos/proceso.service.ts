@@ -73,5 +73,10 @@ export class ProcesoService {
   ActualizarProcesoEmple(formData: any) {
     return this.http.post<any>(environment.url + '/proceso/actualizacionProceso', formData);
   }
+
+  // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES
+  EliminarProcesoMult(data: any) {
+    return this.http.post<any>(environment.url + '/proceso/eliminarProcesoMult', data);
+  }
   
 }

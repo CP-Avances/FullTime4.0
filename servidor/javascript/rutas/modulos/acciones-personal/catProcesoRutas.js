@@ -44,6 +44,8 @@ class ProcesoRutas {
         this.router.post('/cargar_plantilla/registro_epleadoProceso', verificarToken_1.TokenValidation, catProcesoControlador_1.default.RegistrarEmpleadoProceso);
         // METODO PARA ACTUALIZAR EL PROCESO   **USADO
         this.router.post('/actualizacionProceso', verificarToken_1.TokenValidation, catProcesoControlador_1.default.EditarRegistroProcesoEmple);
+        // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
+        this.router.post('/eliminarProcesoMult', verificarToken_1.TokenValidation, catProcesoControlador_1.default.EliminarProcesoMultiple);
     }
 }
 const PROCESO_RUTAS = new ProcesoRutas();

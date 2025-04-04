@@ -61,13 +61,12 @@ export class EditarRegistroComponent {
     }); 
 
     this.listadoAccion = []
-    this.tipoAccionPersonal = this.data.tipo.toLocaleUpperCase();
+    this.tipoAccionPersonal = this.data.tipo.toUpperCase();
     this.listadoAccion = this.data.listAccion;
     this.infoAccion = this.data.info;
     this.LlenarFormulario() 
     this.id = this.data.info.id
     this.id_empleado = this.data.id_empleado
-    console.log('data edit: ',this.data)
   }
 
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
@@ -111,6 +110,7 @@ export class EditarRegistroComponent {
       ip: this.ip, 
       ip_local: this.ips_locales
     }
+
     if(this.tipoAccionPersonal == 'PROCESO'){
       this.restPr.ActualizarProcesoEmple(data).subscribe({ 
         next: (value: any) => {
@@ -118,7 +118,9 @@ export class EditarRegistroComponent {
             timeOut: 4500,
           });
         },error: (err) => {
-          console.log('err: ',err)
+          this.toastr.warning(err.error.message, 'Advertencia.', {
+            timeOut: 4500,
+          });
         },
       })
     }else if(this.tipoAccionPersonal == 'GRADOS'){
@@ -128,7 +130,9 @@ export class EditarRegistroComponent {
             timeOut: 4500,
           });
         },error: (err) => {
-          console.log('err: ',err)
+          this.toastr.warning(err.error.message, 'Advertencia.', {
+            timeOut: 4500,
+          });
         },
       })
     }else{
@@ -138,9 +142,12 @@ export class EditarRegistroComponent {
             timeOut: 4500,
           });
         },error: (err) => {
-          console.log('err: ',err)
+          this.toastr.warning(err.error.message, 'Advertencia.', {
+            timeOut: 4500,
+          });
         },
       })
+
     }
     this.ventana.close(true);
   }

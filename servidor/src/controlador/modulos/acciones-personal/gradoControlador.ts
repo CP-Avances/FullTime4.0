@@ -112,11 +112,22 @@ class GradoControlador {
     const { id_grado, grado, user_name, ip, ip_local } = req.body;
 
     try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+        const DataGrado = await pool.query(
+          `
+            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
+          `
+          , [grado]);
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
+      if (DataGrado.rows[0] != undefined && DataGrado.rows[0] != null && DataGrado.rows[0] != "") {
+          res.status(300).jsonp({ message: 'Ya existe un grado  registrado', codigo: 300 });
+      }else{
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-
-        await pool.query( 
+          await pool.query( 
           `
             UPDATE map_cat_grado SET descripcion = $2 WHERE id = $1
           `
@@ -137,7 +148,9 @@ class GradoControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        res.status(200).jsonp({ message: 'El grado ha actualizado con éxito', codigo: 200 });
+        res.status(200).jsonp({ message: 'Grado actualizado con éxito', codigo: 200 });
+    
+      }
 
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -1227,6 +1240,60 @@ class GradoControlador {
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
+  }
+
+  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+  public async EliminarGradoMultiple(req: Request, res: Response): Promise<any> {
+    const { listaEliminar, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+
+    try {
+
+      for (const item of listaEliminar) {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const res = await pool.query(
+          `
+               DELETE FROM map_cat_grado WHERE id = $1
+             `
+          , [item.id]);
+
+        console.log('res: ', res)
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_grado',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{"id": "${item.id}"}`,
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      }
+
+      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+
+    } catch (err) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+      console.log('err: ', err)
+
+      if (error) {
+        if (err.table == 'map_empleado_grado') {
+          return res.status(500).jsonp({ message: err.detail });
+        } else {
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+        }
+      }
+    }
+
   }
 
 }
