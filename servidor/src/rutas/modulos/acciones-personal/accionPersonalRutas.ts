@@ -35,19 +35,6 @@ class DepartamentoRutas {
         /** TABLA TIPO_ACCION */
         this.router.get('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccion);
         this.router.post('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearTipoAccion);
-        
-
-        /** TABLA CARGO_PROPUESTO */
-        this.router.get('/cargo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarCargoPropuestos);
-        this.router.post('/cargo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearCargoPropuesto);
-        this.router.get('/tipo/cargo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarUltimoCargoP);
-        this.router.get('/cargo/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarUnCargoPropuestos);
-
-        /** TABLA CONTEXTO LEGAL */
-        this.router.get('/decreto', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarDecretos);
-        this.router.get('/decreto/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarUnDecreto);
-        this.router.post('/decreto', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearDecreto);
-        this.router.get('/tipo/decreto', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarUltimoDecreto);
 
         /** TABLA PEDIDO_ACCION_EMPLEADO */
         this.router.post('/pedido/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearPedidoAccionPersonal);

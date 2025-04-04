@@ -91,9 +91,9 @@
                                         help_outline
                                     </mat-icon>
                                     <mat-select [formControl]="tipoDecretoF">
-                                        <mat-option *ngFor="let d of decretos" [value]="d.id"
+                                        <mat-option 
                                             (click)="IngresarOtro(firstFormGroup.value)">
-                                            {{d.descripcion.toUpperCase()}}
+                                            revisar
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
@@ -223,9 +223,9 @@
                                         help_outline
                                     </mat-icon>
                                     <mat-select [formControl]="tipoCargoF">
-                                        <mat-option *ngFor="let c of cargos" [value]="c.id"
+                                        <mat-option 
                                             (click)="IngresarCargo(secondFormGroup.value)">
-                                            {{c.descripcion}}
+                                            revisar
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>

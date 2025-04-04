@@ -11,7 +11,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 @Component({
   selector: 'app-editar-registro',
   templateUrl: './editar-registro.component.html',
-  styleUrl: './editar-registro.component.scss'
+  styleUrl: './editar-registro.component.css'
 })
 export class EditarRegistroComponent {
 

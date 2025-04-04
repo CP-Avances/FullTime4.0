@@ -102,9 +102,6 @@ export class VerPedidoAccionComponent implements OnInit {
           this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_dos).subscribe(data3 => {
             this.datoEmpleadoG = data3[0].apellido + ' ' + data3[0].nombre;
             this.cargoG = data3[0].cargo;
-            this.restAccion.ConsultarUnDecreto(this.datosPedido[0].id_contexto_legal).subscribe(data8 => {
-              this.decreto = data8[0].descripcion;
-            });
             this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado_responsable).subscribe(data4 => {
               this.datoEmpleadoR = data4[0].apellido + ' ' + data4[0].nombre;
               this.cargoR = data4[0].cargo;
@@ -116,9 +113,6 @@ export class VerPedidoAccionComponent implements OnInit {
               this.proceso = data6[0].nombre;
             });
             console.log("ver this.datosPedido[0]", this.datosPedido[0])
-            this.restAccion.ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto).subscribe(data7 => {
-              this.cargop = data7[0].descripcion;
-            });
 
           });
         });

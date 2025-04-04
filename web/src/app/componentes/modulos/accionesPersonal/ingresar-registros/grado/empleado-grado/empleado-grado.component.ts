@@ -17,7 +17,7 @@ import { EditarRegistroComponent } from '../../editar-registro/editar-registro.c
 @Component({
   selector: 'app-empleado-grado',
   templateUrl: './empleado-grado.component.html',
-  styleUrl: './empleado-grado.component.scss'
+  styleUrl: './empleado-grado.component.css'
 })
 export class EmpleadoGradoComponent {
   @Input() data: any;
@@ -206,7 +206,7 @@ export class EmpleadoGradoComponent {
     this.ventana.open(EditarRegistroComponent, { width: '450px', data: datos }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          //this.ngOnInit();
+          this.ngOnInit();
         }
       });
   }
@@ -232,6 +232,7 @@ export class EmpleadoGradoComponent {
         this.toastr.success(respuesta.message, 'Correcto.', {
           timeOut: 4500,
         });
+        this.ngOnInit();
       },error: (err: any) => {
         this.toastr.error(err.error.message, 'Error.', {
           timeOut: 4500,

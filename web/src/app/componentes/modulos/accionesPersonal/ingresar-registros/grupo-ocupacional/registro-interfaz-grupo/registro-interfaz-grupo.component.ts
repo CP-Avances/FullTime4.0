@@ -21,7 +21,7 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
 @Component({
   selector: 'app-registro-interfaz-grupo',
   templateUrl: './registro-interfaz-grupo.component.html',
-  styleUrl: './registro-interfaz-grupo.component.scss'
+  styleUrl: './registro-interfaz-grupo.component.css'
 })
 export class RegistroInterfazGrupoComponent {
 

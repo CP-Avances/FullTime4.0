@@ -2,12 +2,12 @@
     <div class="row">
         <div class="col-md">
             <div id="titulo" class="Tabla_titulo">
-                <span>ACCIONES DE GRUPO OCUPACIONAL</span>
+                <span>GRUPO OCUPACIONAL</span>
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
                     <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrupo()">
-                        Crear proceso
+                        Crear grupo ocupacional
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
@@ -57,7 +57,7 @@
                         <div  class="d-flex flex-wrap justify-content-center m-auto">
                             <button *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'" id="descargar" 
                                 class="btn m-auto" matSuffix matTooltipPosition="right"
-                                matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
+                                matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
                                 Registrar
                             </button>
                         </div>
@@ -74,8 +74,8 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Grupo</th>
-                        <th scope="col">Numero partida</th>
+                        <th scope="col">Grupo Ocupacional</th>
+                        <th scope="col">Número partida</th>
                         <th scope="col">Acción</th>
                     </tr>
                 </thead>
@@ -117,24 +117,24 @@
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato PDF.">
+                matTooltip="Descargar Lista de Grupo Ocupacional en formato PDF.">
                 <p>PDF</p>
             </i>
             <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato EXCEL.">
+                matTooltip="Descargar Lista de Grupo Ocupacional en formato EXCEL.">
                 <p>XLSL</p>
             </i>
             <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato CSV.">
+                matTooltip="Descargar Lista de Grupo Ocupacional en formato CSV.">
                 <p>CSV</p>
             </i>
             <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato XML.">
+                matTooltip="Descargar Lista de Grupo Ocupacional en formato XML.">
                 <p>XML</p>
             </i>
         </div>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de procesos. </p>
+            <p> Reporte de grupo ocupacional. </p>
         </div>
     </div>
 </div>
@@ -150,7 +150,7 @@
 <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
     *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div id="titulo">REGISTRO MÚLTIPLE</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -158,7 +158,7 @@
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
                         <th scope="col">Grupo Ocupacional</th>
-                        <th scope="col">Numero partida</th>
+                        <th scope="col">Número de partida</th>
                     </tr>
                 </thead>
                 <tbody>

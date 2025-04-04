@@ -160,8 +160,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     public restEstadoCivil: EstadoCivilService,
     public restPermiso: PermisosService, // SERVICIO DATOS PERMISOS
     public restEmpresa: EmpresaService, // SERVICIO DATOS EMPRESA
-    public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACIÓN
-    public restTitulo: TituloService, // SERVICIO DATOS TÍTULO PROFESIONAL
+    public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACION
+    public restTitulo: TituloService, // SERVICIO DATOS TITULO PROFESIONAL
     public plan_hora: PlanHoraExtraService,
     public restCargo: EmplCargosService, // SERVICIO DATOS CARGO
     public parametro: ParametrosService,

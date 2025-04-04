@@ -250,23 +250,30 @@ export class EditarTipoAccionComponent implements OnInit {
   // METODO PARA VERIFICAR DUPLICIDAD
   contar: number = 0;
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
-    this.contar = 0;
-    this.tipos.map((obj: any) => {
-      if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
-        this.contar = this.contar + 1;
-      }
+
+    this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
+      datos.id_tipo = resol.id;
+      // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
+      this.GuardarInformacion(datos);
     });
-    if (this.contar != 0) {
-      this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-        'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      })
-    } else {
-      this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
-        datos.id_tipo = resol.id;
-        // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
-        this.GuardarInformacion(datos);
-      });
-    }
+
+    // this.contar = 0;
+    // this.tipos.map((obj: any) => {
+    //   if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
+    //     this.contar = this.contar + 1;
+    //   }
+    // });
+    // if (this.contar != 0) {
+    //   this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
+    //     'Ups!!! algo salio mal.', {
+    //     timeOut: 6000,
+    //   })
+    // } else {
+    //   this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
+    //     datos.id_tipo = resol.id;
+    //     // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
+    //     this.GuardarInformacion(datos);
+    //   });
+    // }
   }
 }

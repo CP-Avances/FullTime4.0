@@ -55,33 +55,55 @@ class ProcesoControlador {
       const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
-      await pool.query('BEGIN');
+      await pool.query('BEGIN')
+        const response: QueryResult = await pool.query(
+          `
+          SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = $1
+         `
+         , [nombre]
+        )
 
-      await pool.query(
-        `
-        INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2)
-        `
-        , [nombre, proc_padre]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'map_cat_procesos',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
+      const [procesos] = response.rows;
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'El departamento ha sido guardado en éxito' });
+
+      if(procesos != undefined || procesos != null){
+
+        res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
+      }else{
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+
+          await pool.query(
+            `
+            INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2)
+            `
+            , [nombre, proc_padre]);
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_procesos',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          res.status(200).jsonp({ message: 'El proceso ha sido guardado en éxito' });
+
+      }
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al guardar el departamento' });
+      res.status(500).jsonp({ message: 'Error al guardar el proceso' });
     }
   }
 
@@ -102,52 +124,73 @@ class ProcesoControlador {
     try {
       const { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
 
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
+      if(id == proc_padre){
+        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso' });
+      }else{
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [id]);
-      const [datosOriginales] = proceso.rows;
+        // CONSULTAR DATOSORIGINALES
+        const proceso = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [id]);
+        const [datosOriginales] = proceso.rows;
 
-      if (!datosOriginales) {
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_procesos',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
-        });
+        if (!datosOriginales) {
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_procesos',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            ip_local: ip_local,
+            observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
+          });
 
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          return res.status(404).jsonp({ message: 'error' });
+        }
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN')
+        const response: QueryResult = await pool.query(
+          `
+          SELECT * FROM map_cat_procesos WHERE id = $1
+         `
+          , [proc_padre]
+        )
+        const [procesos] = response.rows;
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'error' });
+
+        if (proc_padre == procesos.id && id == procesos.proceso_padre) {
+          return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+        } else {
+          await pool.query(
+            `
+          UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
+          `
+            , [nombre, proc_padre, id]);
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_procesos',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
+            ip: ip,
+            ip_local: ip_local,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          return res.status(200).jsonp({ message: 'El proceso actualizado exitosamente' });
+        }
       }
 
-      await pool.query(
-        `
-        UPDATE map_cat_procesos SET nombre = $1, proceso_padre = $2 WHERE id = $3
-        `
-        , [nombre, proc_padre, id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'map_cat_procesos',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"nombre": "${nombre}", "proc_padre": "${proc_padre}"}`,
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -257,7 +300,7 @@ class ProcesoControlador {
                 });
 
                 // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                if (!headers['ITEM'] || !headers['DESCRIPCION'] || !headers['PROCESO_PADRE']
+                if (!headers['ITEM'] || !headers['DESCRIPCION'] || !headers['PROCESO_SUPERIOR']
                 ) {
                     return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                 }
@@ -270,7 +313,7 @@ class ProcesoControlador {
                     // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                     const ITEM = row.getCell(headers['ITEM']).value;
                     const PROCESO = row.getCell(headers['DESCRIPCION']).value?.toString().trim();
-                    const PROCESO_PADRE = row.getCell(headers['PROCESO_PADRE']).value?.toString().trim();
+                    const PROCESO_PADRE = row.getCell(headers['PROCESO_SUPERIOR']).value?.toString().trim();
 
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
@@ -349,7 +392,7 @@ class ProcesoControlador {
                           existe_proceso_padre = true
                           const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
                           if(procesoPadre == item.proceso){
-                            item.observacion = 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos'
+                            item.observacion = 'Procesos mal definidos'
                           }
                         }else{
                           existe_proceso_padre = false
@@ -375,7 +418,7 @@ class ProcesoControlador {
                             );
   
                             if (cruzado) {
-                              item.observacion = 'Registro cruzado';
+                              item.observacion = 'Procesos mal definidos (plantilla)';
                             }else{
 
                               if(existe_proceso_padre == false){
@@ -1311,11 +1354,6 @@ class ProcesoControlador {
     try {
 
       const {id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
-
-      console.log('id_empleado',id_empleado)
-      console.log('id',id)
-      console.log('id_accion',id_accion)
-      console.log('estado',estado)
 
       if( estado == true){
         // CONSULTAR DATOSORIGINALES

@@ -51,6 +51,8 @@ export class ListaNotificacionComponent implements OnInit {
     };
 
     mostrarTablas: boolean = false;
+    verConfiguracion: boolean = true;
+    verSeleccion: boolean = false;
 
     public check: checkOptions[];
 
@@ -462,7 +464,7 @@ export class ListaNotificacionComponent implements OnInit {
         }
     }
 
-    
+
     /** ************************************************************************************** **
      ** **                    METODOS DE REGISTRO DE CONFIGURACIONES                        ** **
      ** ************************************************************************************** **/
@@ -484,16 +486,11 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     // METODO PARA CONFIGURAR DATOS
+    datosEmpleados: any;
     Registrar(seleccionados: any) {
-        this.ventana.open(ConfiguracionNotificacionComponent,
-            { width: '350px', data: seleccionados }).afterClosed().subscribe(evento => {
-                if (evento) {
-                    if (evento != false) {
-                        this.individual = true;
-                        this.LimpiarFormulario();
-                    }
-                }
-            })
+        this.datosEmpleados = seleccionados;
+        this.verConfiguracion = false;
+        this.verSeleccion = true;
     }
 
     // METODO PARA TOMAR DATOS SELECCIONADOS

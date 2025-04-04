@@ -975,23 +975,32 @@ class UsuarioControlador {
     getEmpleadosActivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.default.query('SELECT e.cedula, e.codigo,  e.nombre, e.apellido, ' +
-                    '( e.apellido || \' \' || e.nombre) as fullname, e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol ' +
-                    'FROM informacion_general AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+                const query = `
+        SELECT e.cedula, e.codigo, e.nombre, e.apellido,
+               (e.apellido || ' ' || e.nombre) AS fullname,
+               e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol,
+               e.domicilio, e.ciudad, e.name_suc, e.name_dep, e.name_regimen,
+               g.genero AS nombre_genero,
+               n.nombre AS nombre_nacionalidad
+        FROM informacion_general AS e
+        JOIN eu_usuarios AS u ON e.id = u.id_empleado
+        LEFT JOIN e_genero AS g ON e.genero = g.id
+        LEFT JOIN e_cat_nacionalidades AS n ON e.id_nacionalidad = n.id
+        WHERE e.estado = 1
+        ORDER BY fullname
+      `;
+                const response = yield database_1.default.query(query);
                 const empleados = response.rows;
                 return res.status(200).jsonp(empleados);
             }
             catch (error) {
                 console.log(error);
-                return res.status(500).
-                    jsonp({
-                    message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
-                        'o https://casapazmino.com.ec'
+                return res.status(500).jsonp({
+                    message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec'
                 });
             }
         });
     }
-    ;
     // METODO PARA OBTENER LA INFORMACION DEL USUARIO
     getUserById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -396,15 +396,7 @@ export class ListarPedidoAccionComponent implements OnInit {
         .subscribe((proc1) => {
           this.procesoPropuesto = proc1;
           this.EscribirProcesosPropuestos(this.procesoPropuesto);
-          this.restAccion
-            .ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto)
-            .subscribe((carg) => {
-              this.DefinirColor(
-                this.datosPedido,
-                carg[0].descripcion.toUpperCase()
-              );
-              tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
-            });
+          tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
         });
     } else if (
       this.datosPedido[0].id_proceso_propuesto != null &&
@@ -422,15 +414,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       this.datosPedido[0].id_proceso_propuesto === null &&
       this.datosPedido[0].id_cargo_propuesto != null
     ) {
-      this.restAccion
-        .ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto)
-        .subscribe((carg) => {
-          this.DefinirColor(
-            this.datosPedido,
-            carg[0].descripcion.toUpperCase()
-          );
-          tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
-        });
+        tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
     }
   }
 
@@ -582,33 +566,11 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.decreto = ["", "", "", "_______________", "", "white"];
     let decretoTexto: string = "";
     if (this.datosPedido[0].id_contexto_legal !== null) {
-      try {
-        this.restAccion
-          .ConsultarUnDecreto(this.datosPedido[0].id_contexto_legal)
-          .subscribe((data8) => {
-            decretoTexto = data8[0].descripcion;
-            let texto: string = decretoTexto.toUpperCase();
-            switch (texto) {
-              case "DECRETO":
-                this.decreto[0] = "X";
-                break;
-              case "ACUERDO":
-                this.decreto[1] = "X";
-                break;
-              case "RESOLUCIÓN":
-              case "RESOLUCION":
-                this.decreto[2] = "X";
-                break;
-              default:
-                this.decreto[3] = texto;
+      decretoTexto = '';
+      let texto: string = decretoTexto.toUpperCase();
+      this.decreto[3] = texto;
                 this.decreto[4] = "X";
                 this.decreto[5] = "black";
-                break;
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
     }
   }
 

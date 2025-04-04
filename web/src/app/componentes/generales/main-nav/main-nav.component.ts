@@ -446,13 +446,13 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
+              { name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true },
+              { name: 'Grado', url: '/listaGrados', color: true, ver: true },
               { name: 'Procesos', url: '/proceso', color: true, ver: true },
+              { name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true },
               { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
               { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
               { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
-              { name: 'Listar Grados', url: '/listaGrados', color: true, ver: true },
-              { name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true },
-              { name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true },
             ]
           },
           {

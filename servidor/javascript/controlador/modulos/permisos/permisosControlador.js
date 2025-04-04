@@ -1090,7 +1090,7 @@ class PermisosControlador {
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
                             El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
                         </p>
-                        <h3 style="font-family: Arial; text-align: center;">REGISTRO MULTIPLE DE PERMISO</h3>
+                        <h3 style="font-family: Arial; text-align: center;">REGISTRO MÚLTIPLE DE PERMISO</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
                             <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 

@@ -17,7 +17,7 @@ import { EditarRegistroComponent } from '../../editar-registro/editar-registro.c
 @Component({
   selector: 'app-empleado-grupo',
   templateUrl: './empleado-grupo.component.html',
-  styleUrl: './empleado-grupo.component.scss'
+  styleUrl: './empleado-grupo.component.css'
 })
 export class EmpleadoGrupoComponent {
 
@@ -165,6 +165,7 @@ export class EmpleadoGrupoComponent {
              this.toastr.success(respuesta.message, 'Correcto.', {
                timeOut: 4500,
              });
+             this.ngOnInit();
            },error: (err: any) => {
              this.toastr.error(err.error.message, 'Error.', {
                timeOut: 4500,
