@@ -7,13 +7,12 @@ import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
-import { Md5 } from 'ts-md5';
 import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
 import sharp from 'sharp';
 import fs from 'fs';
-
+import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';
 
 class EmpleadoControlador {
 
@@ -2152,8 +2151,7 @@ class EmpleadoControlador {
         }
 
         // ENCRIPTAR CONTRASEÑA
-        var md5 = new Md5();
-        var contrasena = md5.appendStr(data.contrasena).end()?.toString();
+        let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
@@ -2309,7 +2307,7 @@ class EmpleadoControlador {
           await pool.query('COMMIT');
         }
         contador = contador + 1;
-        contrasena = undefined;
+        contrasena = '';
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
@@ -2903,8 +2901,7 @@ class EmpleadoControlador {
         }
 
         // ENCRIPTAR CONTRASEÑA
-        const md5 = new Md5();
-        const contrasena = md5.appendStr(data.contrasena).end();
+        let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,
