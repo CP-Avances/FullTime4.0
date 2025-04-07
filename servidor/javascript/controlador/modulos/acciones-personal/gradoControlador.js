@@ -102,8 +102,8 @@ class GradoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const DataGrado = yield database_1.default.query(`
-            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
-          `, [grado]);
+            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1) AND id != $2
+          `, [grado, id_grado]);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (DataGrado.rows[0] != undefined && DataGrado.rows[0] != null && DataGrado.rows[0] != "") {

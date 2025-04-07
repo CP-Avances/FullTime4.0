@@ -465,7 +465,7 @@ export class PrincipalProcesoComponent implements OnInit {
       observacion == 'Proceso superior no existe en el sistema como un proceso.'
     ) {
       return 'rgb(238, 21, 242)';
-    }else if(observacion == 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.' || 
+    }else if(arrayObservacion[0] == 'Un' || 
         observacion == 'Procesos mal definidos'){
       return 'rgb(232, 137, 207)';
     } else {

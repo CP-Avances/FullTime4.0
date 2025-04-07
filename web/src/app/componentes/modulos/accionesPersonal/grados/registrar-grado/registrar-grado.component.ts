@@ -19,7 +19,7 @@ export class RegistrarGradoComponent  implements OnInit{
   ip: string | null;
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  grado = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
+  grado = new FormControl('', Validators.required);
 
   procesos: any = [];
 

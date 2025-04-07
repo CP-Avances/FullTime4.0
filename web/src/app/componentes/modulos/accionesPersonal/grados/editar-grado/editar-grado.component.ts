@@ -20,7 +20,7 @@ export class EditarGradoComponent {
   ip: string | null;
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  grado = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
+  grado = new FormControl('', Validators.required);
 
   procesos: any = [];
 
@@ -76,21 +76,22 @@ export class EditarGradoComponent {
 
     this._grados.EditarGrado(dataGrado).subscribe({
       next: (res: any) => {
-        if(res.codigo != 200){
-          this.toastr.warning(res.message, 'Error registro.', {
-            timeOut: 6000,
-          });
-        }else{
+        
           this.toastr.success(res.message, 'Registro actualizado.', {
             timeOut: 6000,
           });
           this.Salir();
-        }
         
       },error: (err) => {
-        this.toastr.error(err.error.message, 'Erro server', {
-          timeOut: 6000,
-        });
+        if(err.status == 300){
+          this.toastr.warning(err.error.message, 'Advertencia.', {
+            timeOut: 6000,
+          });
+        }else{
+          this.toastr.error(err.error.message, 'Erro server', {
+            timeOut: 6000,
+          });
+        }
       },
     })
 
