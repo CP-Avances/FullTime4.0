@@ -70,8 +70,15 @@ export class CrearDetalleParametroComponent implements OnInit {
       }
     }
     // PARAMETROS DE REGISTRO DE HORA PARA ENVIO DE NOTIFICACIONES POR CORREO ELECTRONICO
-    else if (this.data.parametros.id === 9 || this.data.parametros.id === 11 || this.data.parametros.id === 14 ||
-      this.data.parametros.id === 18 || this.data.parametros.id === 21 || this.data.parametros.id === 25
+    else if (
+      this.data.parametros.id === 9       // ----> MENSAJE CUMPLEAÑOS
+      || this.data.parametros.id === 11   // ----> REPORTE ATRASOS DIARIO
+      || this.data.parametros.id === 14   // ----> REPORTE ATRASOS SEMANAL
+      || this.data.parametros.id === 18   // ----> REPORTE FALTAS DIARIO
+      || this.data.parametros.id === 21   // ----> REPORTE FALTAS SEMANAL
+      || this.data.parametros.id === 25   // ----> MENSAJE ANIVERSARIO
+      || this.data.parametros.id === 27   // ----> REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.data.parametros.id === 30   // ----> REPORTE SALIDAS ANTICIPADAS SEMANAL
     ) {
       this.hora = true;
       this.especificacion = 'Registrar la hora en la que se enviará la notificación (formato de 24 horas).';
@@ -95,9 +102,21 @@ export class CrearDetalleParametroComponent implements OnInit {
       else if (this.data.parametros.id === 25) {
         this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por aniversarios.';
       }
+      else if (this.data.parametros.id === 27) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por salidas anticipadas diarias del personal.';
+      }
+      else if (this.data.parametros.id === 30) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por salidas anticipadas semanales del personal.';
+      }
     }
-    else if (this.data.parametros.id === 12 || this.data.parametros.id === 16 ||
-      this.data.parametros.id === 19 || this.data.parametros.id === 23
+    else if (
+      // INGRESO DE CORREO GENERAL DE ENVIO DE REPORTES
+      this.data.parametros.id === 12      // ----> REPORTE ATRASOS DIARIO
+      || this.data.parametros.id === 16   // ----> REPORTE ATRASOS SEMANAL
+      || this.data.parametros.id === 19   // ----> REPORTE FALTAS DIARIO
+      || this.data.parametros.id === 23   // ----> REPORTE FALTAS SEMANAL
+      || this.data.parametros.id === 28   // ----> REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.data.parametros.id === 32   // ----> REPORTE SALIDAS ANTICIPADAS SEMANAL
     ) {
       this.texto = true;
       this.descripcion.setValidators([Validators.required, Validators.email]);

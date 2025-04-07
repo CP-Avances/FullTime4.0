@@ -40,7 +40,7 @@ export const salidasAnticipadasSemanal = async function () {
 
     const PARAMETRO_SEMANAL = await pool.query(
         `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 47
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 29
         `);
 
     const diasSemana = [
@@ -57,7 +57,7 @@ export const salidasAnticipadasSemanal = async function () {
     if (PARAMETRO_SEMANAL.rows[0].descripcion == 'Si') {
         const PARAMETRO_DIA_SEMANAL = await pool.query(
             `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 52
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 31
             `);
 
         if (PARAMETRO_DIA_SEMANAL.rowCount != 0) {
@@ -65,7 +65,7 @@ export const salidasAnticipadasSemanal = async function () {
             if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
                 const PARAMETRO_HORA_SEMANAL = await pool.query(
                     `
-                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 51
+                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 30
                     `);
 
                 console.log("ver Parametro hora semanal: ", PARAMETRO_HORA_SEMANAL.rows[0].descripcion)
@@ -94,13 +94,13 @@ export const salidasAnticipadasDiarios = async function () {
 
     const PARAMETRO_DIARIO = await pool.query(
         `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 48
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 26
         `);
 
     if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
         const PARAMETRO_HORA_DIARIO = await pool.query(
             `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 49
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 27
             `);
 
         console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion)
@@ -324,10 +324,10 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
 
         const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
         const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-        let id_parametro_correo = 50;
+        let id_parametro_correo = 28;
 
         if (semanal) {
-            id_parametro_correo = 53;
+            id_parametro_correo = 32;
         }
 
 
