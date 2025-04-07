@@ -2150,8 +2150,11 @@ class EmpleadoControlador {
           apellidoE = lastname1
         }
 
+        //TODO: ACA SE REALIZA LA ENCRIPTACION
+        console.log(' encriptando')
         // ENCRIPTAR CONTRASEÑA
         let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+        console.log('contraseña plantilla automatico: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
@@ -2900,8 +2903,12 @@ class EmpleadoControlador {
           apellidoE = lastname1
         }
 
+        //TODO: ACA SE REALIZA LA ENCRIPTACION
+
         // ENCRIPTAR CONTRASEÑA
         let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+
+        console.log('contraseña plantilla manual: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,

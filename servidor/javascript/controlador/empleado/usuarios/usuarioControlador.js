@@ -107,9 +107,8 @@ class UsuarioControlador {
     // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: No actualizar contraseña
             try {
-                const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
+                const { usuario, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -131,9 +130,10 @@ class UsuarioControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3, estado = $5 
+        UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
         WHERE id_empleado = $4 RETURNING *
-        `, [usuario, contrasena, id_rol, id_empleado, estado]);
+        `, [usuario, id_rol, estado, id_empleado]);
+                datosOriginales.contrasena = '';
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_usuarios',

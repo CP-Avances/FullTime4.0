@@ -113,9 +113,8 @@ class UsuarioControlador {
 
   // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
-    // TODO: No actualizar contraseña
     try {
-      const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
+      const { usuario, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -143,10 +142,12 @@ class UsuarioControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3, estado = $5 
+        UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
         WHERE id_empleado = $4 RETURNING *
         `
-        , [usuario, contrasena, id_rol, id_empleado, estado]);
+        , [usuario, id_rol, estado, id_empleado]);
+
+      datosOriginales.contrasena = '';
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
