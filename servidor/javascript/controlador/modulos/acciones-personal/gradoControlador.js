@@ -26,7 +26,7 @@ class GradoControlador {
             try {
                 const GRADOS = yield database_1.default.query(`
         SELECT g.id, g.descripcion FROM map_cat_grado AS g
-        ORDER BY g.id DESC
+        ORDER BY g.id ASC
         `);
                 res.jsonp(GRADOS.rows);
             }
@@ -162,12 +162,12 @@ class GradoControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.status(200).jsonp({ message: 'El grado se ha eliminado con éxito', codigo: 200 });
+                res.status(200).jsonp({ message: 'Registro eliminado.', codigo: 200 });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'Error al eliminar el grado' });
+                res.status(500).jsonp({ message: 'Existen datos relacionados con este registro.' });
             }
         });
     }
@@ -326,7 +326,7 @@ class GradoControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'Ya existe el grado en el sistema';
+                                item.observacion = 'Ya existe en el sistema';
                             }
                         }
                     }));
@@ -685,11 +685,11 @@ class GradoControlador {
                                 }
                                 if (CEDULA == undefined) {
                                     data.cedula = 'No registrado';
-                                    data.observacion = 'Cedula ' + data.observacion;
+                                    data.observacion = 'Cédula ' + data.observacion;
                                 }
                                 if (GRADO == undefined) {
                                     data.grado = 'No registrado';
-                                    data.observacion = 'Proceso ' + data.observacion;
+                                    data.observacion = 'Grado ' + data.observacion;
                                 }
                                 listaGrados.push(data);
                             }
@@ -724,7 +724,7 @@ class GradoControlador {
                                     const [grado_emple] = response.rows;
                                     console.log('grado_emple: ', grado_emple);
                                     if (grado_emple != undefined && grado_emple != '' && grado_emple != null) {
-                                        item.observacion = 'Ya existe un registro activo con este usuario y grado';
+                                        item.observacion = 'Ya existe un registro activo con este Grado.';
                                     }
                                     else {
                                         if (item.observacion == 'no registrado') {
@@ -739,11 +739,11 @@ class GradoControlador {
                                     }
                                 }
                                 else {
-                                    item.observacion = 'Proceso ingresado no esta registrado en el sistema';
+                                    item.observacion = 'Grado ingresado no esta registrado en el sistema';
                                 }
                             }
                             else {
-                                item.observacion = 'La cedula ingresada no esta registrada en el sistema';
+                                item.observacion = 'La cédula ingresada no esta registrada en el sistema';
                             }
                         }
                     }));

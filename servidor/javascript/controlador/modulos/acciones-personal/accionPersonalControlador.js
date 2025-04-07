@@ -606,11 +606,11 @@ class AccionPersonalControlador {
                                 }
                                 if (TIPO_ACCION_PERSONAL == undefined) {
                                     data.tipo_accion_personal = 'No registrado';
-                                    data.observacion = 'Tipo accion personal ' + data.observacion;
+                                    data.observacion = 'Tipo de acción de personal ' + data.observacion;
                                 }
                                 if (DESCRIPCION == undefined) {
                                     data.descripcion = 'No registrado';
-                                    data.observacion = 'Descripcion ' + data.observacion;
+                                    data.observacion = 'Descripción ' + data.observacion;
                                 }
                                 if (BASE_LEGAL == undefined) {
                                     data.base_legal = '-';
@@ -637,7 +637,7 @@ class AccionPersonalControlador {
                     WHERE UPPER(descripcion) = UPPER($1)
                     `, [item.tipo_accion_personal]);
                             if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
-                                item.observacion = 'No existe el tipo de accion en el sistema';
+                                item.observacion = 'No existe el tipo de acción de personal en el sistema';
                             }
                             else {
                                 // const VERIFICAR_ACCION = await pool.query(
@@ -654,7 +654,7 @@ class AccionPersonalControlador {
                                 //         item.observacion = '1';
                                 //     }
                                 // }else{
-                                //     item.observacion = 'Ya existe el detalle de la accion personal en el sistema'  
+                                //     item.observacion = 'Ya existe en el sistema'  
                                 // }
                             }
                         }

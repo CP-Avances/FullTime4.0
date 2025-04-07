@@ -124,7 +124,7 @@ class ProcesoControlador {
                         return res.status(300).jsonp({ message: 'Un proceso no puede ser su propio proceso superior. Verifique la selección e intente nuevamente.' });
                     }
                     else {
-                        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso padre es el mismo proceso anterior' });
+                        return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso superior es el mismo proceso anterior' });
                     }
                 }
                 else {
@@ -156,7 +156,7 @@ class ProcesoControlador {
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     if (proce.rowCount > 0) {
-                        return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
+                        return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre.' });
                     }
                     else {
                         if (proc_padre != "") {
@@ -169,7 +169,7 @@ class ProcesoControlador {
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
                             if (proc_padre == procesos.id && id == procesos.proceso_padre) {
-                                return res.status(300).jsonp({ message: 'No se puede actualizar debido a que se cruza con el proceso ' + procesos.nombre });
+                                return res.status(300).jsonp({ message: 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior. \nVerifique proceso ' + procesos.nombre });
                             }
                         }
                         else {
@@ -388,7 +388,7 @@ class ProcesoControlador {
                                                 p.proceso_padre.toLowerCase() === item.proceso.toLowerCase() &&
                                                 p.observacion === 'no registrado' && item.observacion === 'no registrado'));
                                             if (cruzado) {
-                                                item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.' + '(Item ' + cruzado.fila + ')';
+                                                item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.' + '(Revisar Item ' + cruzado.fila + ')';
                                             }
                                             else {
                                                 if (existe_proceso_padre == false) {
@@ -402,7 +402,7 @@ class ProcesoControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'Ya existe el proceso en el sistema';
+                                item.observacion = 'Ya existe en el sistema';
                             }
                         }
                     }));
@@ -421,7 +421,7 @@ class ProcesoControlador {
                         listaProcesos.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                             if (item.observacion == 'no registrado') {
                                 if (item.proceso_padre != 'No registrado') {
-                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe el proceso en el sistema'));
+                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe en el sistema'));
                                     if (!hayCoincidencia) {
                                         item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
                                     }
@@ -840,7 +840,7 @@ class ProcesoControlador {
                                 }
                                 if (CEDULA == undefined) {
                                     data.cedula = 'No registrado';
-                                    data.observacion = 'Cedula ' + data.observacion;
+                                    data.observacion = 'Cédula ' + data.observacion;
                                 }
                                 if (PROCESOS == undefined) {
                                     data.proceso = 'No registrado';
@@ -879,7 +879,7 @@ class ProcesoControlador {
                                     const [procesos_emple] = response.rows;
                                     console.log('procesos_emple: ', procesos_emple);
                                     if (procesos_emple != undefined && procesos_emple != '' && procesos_emple != null) {
-                                        item.observacion = 'Ya existe un registro activo con este usuario y proceso';
+                                        item.observacion = 'Ya existe un registro activo con este Proceso.';
                                     }
                                     else {
                                         if (item.observacion == 'no registrado') {
@@ -898,7 +898,7 @@ class ProcesoControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'La cedula ingresada no esta registrada en el sistema';
+                                item.observacion = 'La cédula ingresada no esta registrada en el sistema';
                             }
                         }
                     }));

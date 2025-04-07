@@ -14,7 +14,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { PageEvent } from '@angular/material/paginator';
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { EditarRegistroComponent } from '../../editar-registro/editar-registro.component';
+import { EditarRegistroComponent } from '../../../asignar-registros-usuarios/editar-registro/editar-registro.component';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 @Component({

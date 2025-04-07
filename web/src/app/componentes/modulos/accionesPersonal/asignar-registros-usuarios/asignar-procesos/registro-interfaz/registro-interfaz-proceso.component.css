@@ -4,6 +4,10 @@
     color: white;
 }
 
+p {
+    font-size: x-small;
+}
+
 td {
     padding-top: 10px;
     white-space: nowrap;

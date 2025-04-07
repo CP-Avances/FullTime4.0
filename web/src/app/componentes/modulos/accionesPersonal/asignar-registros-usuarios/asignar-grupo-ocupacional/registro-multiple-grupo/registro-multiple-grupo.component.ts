@@ -1,20 +1,19 @@
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 import { environment } from 'src/environments/environment';
 
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
-import { PageEvent } from '@angular/material/paginator';
-
 @Component({
-  selector: 'app-registro-multiple-proceso',
-  templateUrl: './registro-multiple-proceso.component.html',
-  styleUrl: './registro-multiple-proceso.component.css'
+  selector: 'app-registro-multiple-grupo',
+  templateUrl: './registro-multiple-grupo.component.html',
+  styleUrl: './registro-multiple-grupo.component.css'
 })
-export class RegistroMultipleProcesoComponent {
+export class RegistroMultipleGrupoComponent {
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -31,7 +30,6 @@ export class RegistroMultipleProcesoComponent {
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
 
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
@@ -40,13 +38,11 @@ export class RegistroMultipleProcesoComponent {
   empleado: any = [];
   idEmpleado: number;
 
-  DatosProcesos: any
-
   constructor(
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public validar: ValidacionesService,
-    private rest: ProcesoService,
+    public rest: CatGrupoOcupacionalService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -72,8 +68,6 @@ export class RegistroMultipleProcesoComponent {
   nameFileCargo: string;
   archivoSubidoCargo: Array<File>;
 
-
-  listaGradoCorrectas: any = [];
   messajeExcel: string = '';
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CONTRATOS EMPLEADOS
   FileChange(element: any, tipo: string) {
@@ -108,14 +102,13 @@ export class RegistroMultipleProcesoComponent {
     this.mostrarbtnsubir = true;
   }
 
-
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
-  Datos_procesos: any
-  listaProcesosCorrectas: any = [];
-  listaProcesosCorrectasCont: number;
+  Datos_grupoOcupacional: any
+  listaGrupoOcupacionalCorrectas: any = [];
+  listaGrupoOcupacionalCorrectasCont: number;
   // METODO PARA VERIFICAR DATOS DE PLANTILLA
   VerificarPlantilla() {
-    this.listaProcesosCorrectas = [];
+    this.listaGrupoOcupacionalCorrectas = [];
     let formData = new FormData();
     
     for (let i = 0; i < this.archivoSubido.length; i++) {
@@ -123,11 +116,11 @@ export class RegistroMultipleProcesoComponent {
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-    this.rest.RevisarFormatoEMPLEPROCESO(formData).subscribe(res => {
-        this.Datos_procesos = res.data;
+    this.rest.RevisarFormatoEmpleGrupoOcu(formData).subscribe(res => {
+        this.Datos_grupoOcupacional = res.data;
         this.messajeExcel = res.message;
 
-        console.log('this.Datos_procesos: ',this.Datos_procesos)
+        console.log('this.Datos_procesos: ',this.Datos_grupoOcupacional)
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -136,14 +129,14 @@ export class RegistroMultipleProcesoComponent {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña grupo ocupacional en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
       }
       else {
 
-        this.Datos_procesos.sort((a: any, b: any) => {
+        this.Datos_grupoOcupacional.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
           }
@@ -153,22 +146,22 @@ export class RegistroMultipleProcesoComponent {
           return 0;
         });
 
-        this.Datos_procesos.forEach((item: any) => {
+        this.Datos_grupoOcupacional.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
-            this.listaProcesosCorrectas.push(item);
+            this.listaGrupoOcupacionalCorrectas.push(item);
           }
         });
-        this.listaProcesosCorrectasCont = this.listaProcesosCorrectas.length;
+        this.listaGrupoOcupacionalCorrectasCont = this.listaGrupoOcupacionalCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
     });
-    
   }
+
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
-  ConfirmarRegistroMultiple() { 
+  ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -176,7 +169,8 @@ export class RegistroMultipleProcesoComponent {
           this.RegistrarProcesos();
         }
       });
-  }
+   }
+
    // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
    colorCelda: string = ''
    EstiloCelda(observacion: string): string {
@@ -185,10 +179,10 @@ export class RegistroMultipleProcesoComponent {
        return 'rgb(156, 214, 255)';
      } else if (observacion == 'ok') {
        return 'rgb(159, 221, 154)';
-     } else if (observacion == 'Ya existe un registro activo con este usuario y proceso') {
+     } else if (observacion == 'Ya existe un registro activo con este Grupo Ocupacional.') {
        return 'rgb(239, 203, 106)';
-     } else if (observacion  == 'La cedula ingresada no esta registrada en el sistema' ||
-       observacion == 'Proceso ingresado no esta registrado en el sistema'
+     } else if (observacion  == 'La cédula ingresada no esta registrada en el sistema' ||
+       observacion == 'Grupo Ocupacional no esta registrado en el sistema'
      ) {
        return 'rgb(255, 192, 203)';
      } else {
@@ -209,19 +203,19 @@ export class RegistroMultipleProcesoComponent {
  
    // METODO PARA REGISTRAR DATOS
    RegistrarProcesos() {
-     console.log('listaProcesosCorrectas: ',this.listaProcesosCorrectas.length)
-     if (this.listaProcesosCorrectas?.length > 0) {
+    console.log('listaGrupoOcupacionalCorrectas: ',this.listaGrupoOcupacionalCorrectas.length)
+     if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
        const data = {
-         plantilla: this.listaProcesosCorrectas,
+         plantilla: this.listaGrupoOcupacionalCorrectas,
          user_name: this.user_name,
          ip: this.ip, ip_local: this.ips_locales
        }
-       this.rest.RegistrarPlantillaEmpleProce(data).subscribe({
+       this.rest.RegistrarPlantillaEmpleGrupoOcu(data).subscribe({
          next: (response: any) => {
-           this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+           this.toastr.success('Plantilla de Grupo Ocupacional importada.', 'Operación exitosa.', {
              timeOut: 5000,
            });
-           if (this.listaProcesosCorrectas?.length > 0) {
+           if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
              setTimeout(() => {
                //this.ngOnInit();
              }, 500);
@@ -244,7 +238,6 @@ export class RegistroMultipleProcesoComponent {
  
      this.archivoSubido = [];
      this.nameFile = '';
- 
    }
 
 

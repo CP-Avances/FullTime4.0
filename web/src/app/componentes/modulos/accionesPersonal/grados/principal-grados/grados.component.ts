@@ -222,7 +222,7 @@ export class GradosComponent implements OnInit {
         if (confirmado) {
           this.Eliminar(datos.id);
         } else {
-          this.router.navigate(['/proceso']);
+          this.router.navigate(['/listaGrados']);
         }
       });
   }
@@ -235,7 +235,7 @@ export class GradosComponent implements OnInit {
     };
     this._grados.ElminarGrado(dataGrado).subscribe((res: any) => {
       if (res.codigo != 200) {
-        this.toastr.error('No se completo el proceso', 'No fue posible eliminar.', {
+        this.toastr.error('No se completo el proceso.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -286,7 +286,7 @@ export class GradosComponent implements OnInit {
          });
        },error: (err) => {
          console.log('error: ',err)
-         this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
+         this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
            timeOut: 4000,
          });
        },
@@ -368,7 +368,7 @@ export class GradosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña grado en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña GRADO en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
@@ -393,7 +393,7 @@ export class GradosComponent implements OnInit {
         this.listaGradosCorrectasCont = this.listaGradosCorrectas.length;
       }
     }, error => {
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
     });
@@ -407,7 +407,7 @@ export class GradosComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe el grado en el sistema') {
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     } else {
       return 'rgb(242, 21, 21)';
@@ -447,7 +447,7 @@ export class GradosComponent implements OnInit {
 
       this._grados.RegistrarPlantilla(data).subscribe({
         next: (response: any) => {
-          this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+          this.toastr.success('Plantilla de Grado importada.', 'Operación exitosa.', {
             timeOut: 5000,
           });
           if (this.listaGradosCorrectas?.length > 0) {
@@ -458,7 +458,7 @@ export class GradosComponent implements OnInit {
           this.LimpiarCampos();
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups !!! algo salio mal.', {
             timeOut: 4000,
           });
           this.archivoForm.reset();
@@ -526,13 +526,13 @@ export class GradosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Grados', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'LISTA DE GRADOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, -30, 0, 10] },
         this.presentarDataPDFGrados(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 9 },
+        itemsTableC: { fontSize: 9, alignment: 'center' }
       }
     };
   }
@@ -547,8 +547,8 @@ export class GradosComponent implements OnInit {
             widths: ['auto', 'auto'],
             body: [
               [
-                { text: 'Id', style: 'tableHeader' },
-                { text: 'Grado', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'GRADO', style: 'tableHeader' },
               ],
               ...this.ListGrados.map((obj: any) => {
                 return [
@@ -606,10 +606,9 @@ export class GradosComponent implements OnInit {
     var arregloGrados: any = [];
     this.ListGrados.forEach((obj: any) => {
       objeto = {
-        "proceso": {
+        "grado": {
           '@id': obj.id,
           "nombre": obj.nombre,
-          "nivel": obj.nivel,
           "proceso_superior": obj.proc_padre,
         }
       }

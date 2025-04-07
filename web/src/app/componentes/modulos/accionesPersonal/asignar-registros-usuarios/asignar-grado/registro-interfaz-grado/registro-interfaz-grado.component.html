@@ -1,8 +1,10 @@
-
-<div style="padding-top: 20px;" *ngIf="seleccionarDepa">
-    <div id="titulo">CRITERIOS DE BÚSQUEDA</div>
+<div style="padding-top: 5px; padding-bottom: 20px;" *ngIf="seleccionarDepa">
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
+            <div id="resultados">
+                <span>CRITERIOS DE BÚSQUEDA</span>
+            </div>
+            <br>
             <form>
                 <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccionDep">
                     <mat-radio-button class="example-radio-button" *ngFor="let cd of checkDep" [value]="cd.opcion"
@@ -186,24 +188,22 @@
                 <div class="col-12 col-md-6">
                     <div class="container d-flex flex-wrap justify-content-center">
                         <mat-form-field>
-                            <mat-label>Seleccionar el grupo ocupacional</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Lista de sucursales.">
+                            <mat-label>Seleccionar el grado</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de grados.">
                                 help_outline</mat-icon>
                             <mat-select [formControl]="idsucursal" required
-                                (selectionChange)="selecctGrupo($event.value);">
-                                <mat-option *ngFor="let grup of lisGrupoOcupaciona" [value]="grup.id">
-                                    {{grup.descripcion}}
+                                (selectionChange)="selecctGrado($event.value);">
+                                <mat-option *ngFor="let gra of Lgrados" [value]="gra.id">
+                                    {{gra.descripcion}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
                     </div>
                 </div>
-    
             </div>
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                 <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltroDep(0, 'e')">
-                    Registrar Grupo Ocupacional
+                    Registrar Grado
                 </button>
             </div>
 
@@ -213,7 +213,7 @@
             <div *ngIf="_booleanOptionsDep.bool_suc && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -221,9 +221,9 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarListaDep()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarListaDep()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -273,7 +273,7 @@
             <div *ngIf="_booleanOptionsDep.bool_reg && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -281,9 +281,9 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarListaDep()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarListaDep()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -335,7 +335,7 @@
             <div *ngIf="_booleanOptionsDep.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -343,9 +343,9 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarListaDep()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarListaDep()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -400,7 +400,7 @@
             <div *ngIf="_booleanOptionsDep.bool_dep && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -408,9 +408,9 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarListaDep()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarListaDep()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -463,7 +463,7 @@
             <div *ngIf="_booleanOptionsDep.bool_emp && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -471,13 +471,13 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarListaDep()">
-                        Mostrar lista
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarListaDep()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">

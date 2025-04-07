@@ -10,13 +10,13 @@ import Excel from 'exceljs';
 class GrupoOcupacionalControlador {
 
   // METODO PARA BUSCAR LISTA DE GRUPO OCUPACIONAL **USADO
-  public async listaGrupoOcupacional(req: Request, res: Response) {
+  public async ListaGrupoOcupacional(req: Request, res: Response) {
 
     try {
       const GRUPO_OCUPACIONAL = await pool.query(
         `
         SELECT gp.id, gp.descripcion, gp.numero_partida FROM map_cat_grupo_ocupacional AS gp 
-        ORDER BY gp.id DESC
+        ORDER BY gp.id ASC
         `
       );
 
@@ -200,12 +200,12 @@ class GrupoOcupacionalControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
-      res.status(200).jsonp({ message: 'El grado se ha eliminado con éxito', codigo: 200 });
+      res.status(200).jsonp({ message: 'Registro eliminado.', codigo: 200 });
 
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al eliminar el grado' });
+      res.status(500).jsonp({ message: 'Existen datos relacionados con este registro.' });
     }
 
   }
@@ -353,7 +353,7 @@ class GrupoOcupacionalControlador {
 
               if (DESCRIPCION == undefined) {
                 data.descripcion = 'No registrado';
-                data.observacion = 'Grupo ocupacional ' + data.observacion;
+                data.observacion = 'Grupo Ocupacional ' + data.observacion;
               }
 
               if (NUMERO_PARTIDA == undefined) {
@@ -407,7 +407,7 @@ class GrupoOcupacionalControlador {
                 item.observacion = 'Número de partida ya existe en el sistema'
               }
             } else {
-              item.observacion = 'Grupo ocupacional ya existe en el sistema'
+              item.observacion = 'Grupo Ocupacional ya existe en el sistema'
             }
           }
         });
@@ -655,7 +655,7 @@ class GrupoOcupacionalControlador {
           }
 
         } else {
-         
+
           if (grupo.estado == false) {
             //actualizao a true
 
@@ -870,7 +870,7 @@ class GrupoOcupacionalControlador {
 
               if (CEDULA == undefined) {
                 data.cedula = 'No registrado';
-                data.observacion = 'Cedula ' + data.observacion;
+                data.observacion = 'Cédula ' + data.observacion;
               }
 
               if (GRUPO_OCUPACIONAL == undefined) {
@@ -927,7 +927,7 @@ class GrupoOcupacionalControlador {
                 const [gupoOcu_emple] = response.rows;
 
                 if (gupoOcu_emple != undefined && gupoOcu_emple != '' && gupoOcu_emple != null) {
-                  item.observacion = 'Ya existe un registro activo con este usuario y grupo Ocupacional'
+                  item.observacion = 'Ya existe un registro activo con este Grupo Ocupacional.'
                 } else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -945,7 +945,7 @@ class GrupoOcupacionalControlador {
               }
 
             } else {
-              item.observacion = 'La cedula ingresada no esta registrada en el sistema'
+              item.observacion = 'La cédula ingresada no esta registrada en el sistema'
             }
 
           }
@@ -1280,7 +1280,7 @@ class GrupoOcupacionalControlador {
       if (grupo_activo1 != undefined && grupo_activo1 != null) {
 
         if (grupo_activo1.id != id) {
-          return res.status(500).jsonp({ message: 'Grupo ocupacional ya asignado' });
+          return res.status(500).jsonp({ message: 'Grupo Ocupacional ya asignado' });
         }
       }
 

@@ -257,8 +257,6 @@ export class PrincipalProcesoComponent implements OnInit {
           if (this.procesoEliminar.length != 0) {
             this.EliminarMultiple();
             this.btnCheckHabilitar = true;
-            // this.plan_multiple = false;
-            // this.plan_multiple_ = false;
             this.procesoEliminar = [];
             this.selectionUno.clear();
             this.ngOnInit();
@@ -405,7 +403,7 @@ export class PrincipalProcesoComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña PROESOS en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
@@ -430,7 +428,7 @@ export class PrincipalProcesoComponent implements OnInit {
         this.listaProcesosCorrectasCont = this.listaProcesosCorrectas.length;
       }
     }, error => {
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
     });
@@ -457,7 +455,7 @@ export class PrincipalProcesoComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe el proceso en el sistema') {
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     } else if (observacion  == 'Registro cruzado' || observacion == 'Proceso superior no existe en el sistema como un proceso..' ||
       observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos' ||
@@ -573,13 +571,13 @@ export class PrincipalProcesoComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Procesos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'LISTA DE PROCESOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, -30, 0, 10] },
         this.presentarDataPDFProcesos(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 9 },
+        itemsTableC: { fontSize: 9, alignment: 'center' }
       }
     };
   }
@@ -594,9 +592,9 @@ export class PrincipalProcesoComponent implements OnInit {
             widths: ['auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Proceso Superior', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'NOMBRE', style: 'tableHeader' },
+                { text: 'PROCESO SUPERIOR', style: 'tableHeader' },
               ],
               ...this.procesos.map((obj: any) => {
                 console.log(obj);
