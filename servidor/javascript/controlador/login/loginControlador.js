@@ -21,6 +21,7 @@ const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
+const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
@@ -44,11 +45,11 @@ class LoginControlador {
             console.log('IP Pública:', ip_cliente);
             try {
                 const { nombre_usuario, pass, movil } = req.body;
-                console.log('pass', pass);
+                let pass_encriptado = rsa_keys_service_1.default.encriptarLogin(pass);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
-        `, [nombre_usuario, pass]);
+        `, [nombre_usuario, pass_encriptado]);
                 // SI EXISTE USUARIOS
                 if (USUARIO.rowCount != 0) {
                     const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
@@ -82,6 +83,7 @@ class LoginControlador {
                     const EMPRESA = yield database_1.default.query(`
           SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `);
+                    //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
                     const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
                     let archivo_licencia = (0, accesoCarpetas_1.ObtenerRutaLicencia)();
@@ -277,6 +279,7 @@ class LoginControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { token, contrasena, user_name, ip, ip_local } = req.body;
             try {
+                let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
                 try {
@@ -304,14 +307,14 @@ class LoginControlador {
                     }
                     yield database_1.default.query(`
           UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
-          `, [id_empleado, contrasena]);
+          `, [id_empleado, contrasena_encriptada]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_usuarios',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: JSON.stringify(contrasenaOriginal),
-                        datosNuevos: `{"contrasena": "${contrasena}"}`,
+                        datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,
                         ip: ip,
                         ip_local: ip_local,
                         observacion: null

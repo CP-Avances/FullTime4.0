@@ -18,6 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const rsa_keys_service_1 = __importDefault(require("../../llaves/rsa-keys.service"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 class UsuarioControlador {
     // CREAR REGISTRO DE USUARIOS    **USADO
@@ -25,12 +26,13 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip, ip_local } = req.body;
+                let contrasena_encriptado = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 // INCIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
           VALUES ($1, $2, $3, $4, $5) RETURNING *
-        `, [usuario, contrasena, estado, id_rol, id_empleado]);
+        `, [usuario, contrasena_encriptado, estado, id_rol, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_usuarios',
@@ -158,6 +160,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
+                let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -180,14 +183,14 @@ class UsuarioControlador {
                 }
                 yield database_1.default.query(`
         UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
-        `, [contrasena, id_empleado]);
+        `, [contrasena_encriptada, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'usuarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{contrasena: ${contrasena}}`,
+                    datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null

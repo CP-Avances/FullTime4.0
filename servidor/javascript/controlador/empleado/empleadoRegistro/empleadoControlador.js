@@ -21,12 +21,12 @@ const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const luxon_1 = require("luxon");
-const ts_md5_1 = require("ts-md5");
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importDefault(require("fs"));
+const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service"));
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -1880,7 +1880,6 @@ class EmpleadoControlador {
     // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const { plantilla, user_name, ip, ip_local } = req.body;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
@@ -1922,8 +1921,7 @@ class EmpleadoControlador {
                         apellidoE = lastname1;
                     }
                     // ENCRIPTAR CONTRASEÑA
-                    var md5 = new ts_md5_1.Md5();
-                    var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
+                    let contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
                     // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                     const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                     //OBTENER ID DEL ESTADO_CIVIL
@@ -2048,7 +2046,7 @@ class EmpleadoControlador {
                         yield database_1.default.query('COMMIT');
                     }
                     contador = contador + 1;
-                    contrasena = undefined;
+                    contrasena = '';
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
@@ -2612,8 +2610,7 @@ class EmpleadoControlador {
                         apellidoE = lastname1;
                     }
                     // ENCRIPTAR CONTRASEÑA
-                    const md5 = new ts_md5_1.Md5();
-                    const contrasena = md5.appendStr(data.contrasena).end();
+                    let contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
                     // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                     const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                     // OBTENER ID DEL ESTADO_CIVIL
