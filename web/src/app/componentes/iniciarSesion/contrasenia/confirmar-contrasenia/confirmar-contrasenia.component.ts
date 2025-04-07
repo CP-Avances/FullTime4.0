@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Md5 } from 'ts-md5';
+// import { Md5 } from 'ts-md5';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
@@ -45,10 +45,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // METODO PARA COMPARAR LAS CONTRASEÑAS
@@ -63,13 +63,9 @@ export class ConfirmarContraseniaComponent implements OnInit {
   // NETODO PARA CAMBIAR CONTRASEÑA
   EnviarContraseniaConfirmacion(form: any) {
 
-    // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let clave = md5.appendStr(form.cPass).end();
-
     let data = {
       token: this.token,
-      contrasena: clave,
+      contrasena: form.cPass,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     }

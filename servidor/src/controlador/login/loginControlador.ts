@@ -328,15 +328,15 @@ class LoginControlador {
         await pool.query('BEGIN');
 
         // OBTENER DATOSORIGINALES
-        const datosOriginales = await pool.query(
+        const consulta = await pool.query(
           `
-          SELECT contrasena FROM eu_usuarios WHERE id_empleado = $1
+          SELECT * FROM eu_usuarios WHERE id_empleado = $1
           `
           , [id_empleado]);
 
-        const [contrasenaOriginal] = datosOriginales.rows;
+        const [datosOriginales] = consulta.rows;
 
-        if (!contrasenaOriginal) {
+        if (!datosOriginales) {
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_usuarios',
             usuario: user_name,
@@ -360,13 +360,16 @@ class LoginControlador {
           `
           , [id_empleado, contrasena_encriptada]);
 
+        
+        datosOriginales.contrasena = '';
+
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
-          datosOriginales: JSON.stringify(contrasenaOriginal),
-          datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,
+          datosOriginales: JSON.stringify(datosOriginales),
+          datosNuevos: `{"contrasena": "Contraseña actualizada"}`,
           ip: ip,
           ip_local: ip_local,
           observacion: null

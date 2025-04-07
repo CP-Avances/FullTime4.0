@@ -60,7 +60,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const UN_USUARIO = yield database_1.default.query(`
-      SELECT * FROM eu_usuarios WHERE id_empleado = $1
+      SELECT id, id_empleado, id_rol, usuario, estado, app_habilita, web_habilita, administra_comida, frase  FROM eu_usuarios WHERE id_empleado = $1
       `, [id_empleado]);
             if (UN_USUARIO.rowCount != 0) {
                 return res.jsonp(UN_USUARIO.rows);
@@ -107,6 +107,7 @@ class UsuarioControlador {
     // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            // TODO: No actualizar contraseña
             try {
                 const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
@@ -159,7 +160,7 @@ class UsuarioControlador {
     CambiarPasswordUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
+                const { contrasenaActual, contrasena, id_empleado, user_name, ip, ip_local } = req.body;
                 let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -181,16 +182,23 @@ class UsuarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
+                let contrasena_encriptado = rsa_keys_service_1.default.encriptarLogin(contrasenaActual);
+                const contrasenaCorrecta = contrasena_encriptado == datosOriginales.contrasena;
+                if (!contrasenaCorrecta) {
+                    yield database_1.default.query('COMMIT');
+                    return res.status(403).jsonp({ message: 'La contraseña actual no es correcta.' });
+                }
                 yield database_1.default.query(`
         UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `, [contrasena_encriptada, id_empleado]);
+                datosOriginales.contrasena = '';
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'usuarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
+                    datosNuevos: `{contrasena: "Contraseña actualizada"}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null

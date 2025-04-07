@@ -4,10 +4,10 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Md5 } from 'ts-md5';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-cambiar-contrasena',
@@ -50,31 +50,38 @@ export class CambiarContrasenaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // METODO PARA CONPARAR CONTRASEÑAS
-  CompararContrasenia(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let pass = md5.appendStr(form.aPass).end();
-    this.datosUser = [];
-    this.restUser.BuscarDatosUser(parseInt(this.usuario)).subscribe(data => {
-      this.datosUser = data;
-      if (pass === this.datosUser[0].contrasena) {
-        if (form.nPass != form.cPass) {
-          this.toastr.error('Incorrecto.', 'Las contraseñas no coinciden.', {
-            timeOut: 6000,
-          });
-        }
-        else {
-          this.EnviarContraseniaConfirmacion(form);
-        }
-      }
-      else {
+  cambiarContrasena(form: any) {
+    let datos = {
+      id_empleado: parseInt(this.usuario),
+      contrasenaActual: form.aPass,
+      contrasena: form.cPass,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales,
+    }
+
+    if (form.nPass != form.cPass) {
+      return this.toastr.error('Incorrecto.', 'Las contraseñas no coinciden.', {
+        timeOut: 6000,
+      });
+    }
+
+    this.restUser.ActualizarPassword(datos).subscribe({
+      next: () => {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+          timeOut: 6000,
+        });
+        this.CerrarRegistro(true);
+
+      },
+      error: (error) => {
+        console.log('error: ', error)
         this.toastr.error('Incorrecto.', 'La contraseña actual no es la correcta.', {
           timeOut: 6000,
         });
@@ -82,24 +89,6 @@ export class CambiarContrasenaComponent implements OnInit {
     });
   }
 
-  // METODO PARA ACTUALIZAR CONTRASEÑA
-  EnviarContraseniaConfirmacion(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let clave = md5.appendStr(form.cPass).end();
-    let datos = {
-      id_empleado: parseInt(this.usuario),
-      contrasena: clave,
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.restUser.ActualizarPassword(datos).subscribe(data => {
-      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-        timeOut: 6000,
-      });
-      this.CerrarRegistro(true);
-    });
-  }
 
   // METODO PARA CERRAR VENTANA
   CerrarRegistro(valor: boolean) {

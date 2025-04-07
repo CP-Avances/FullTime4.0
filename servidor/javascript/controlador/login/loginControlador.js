@@ -286,11 +286,11 @@ class LoginControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // OBTENER DATOSORIGINALES
-                    const datosOriginales = yield database_1.default.query(`
-          SELECT contrasena FROM eu_usuarios WHERE id_empleado = $1
+                    const consulta = yield database_1.default.query(`
+          SELECT * FROM eu_usuarios WHERE id_empleado = $1
           `, [id_empleado]);
-                    const [contrasenaOriginal] = datosOriginales.rows;
-                    if (!contrasenaOriginal) {
+                    const [datosOriginales] = consulta.rows;
+                    if (!datosOriginales) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_usuarios',
                             usuario: user_name,
@@ -308,13 +308,14 @@ class LoginControlador {
                     yield database_1.default.query(`
           UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
           `, [id_empleado, contrasena_encriptada]);
+                    datosOriginales.contrasena = '';
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_usuarios',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(contrasenaOriginal),
-                        datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: `{"contrasena": "Contraseña actualizada"}`,
                         ip: ip,
                         ip_local: ip_local,
                         observacion: null
