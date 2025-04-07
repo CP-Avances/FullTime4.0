@@ -116,9 +116,9 @@ class GradoControlador {
       await pool.query('BEGIN');
         const DataGrado = await pool.query(
           `
-            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
+            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1) AND id != $2
           `
-          , [grado]);
+          , [grado, id_grado]);
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 

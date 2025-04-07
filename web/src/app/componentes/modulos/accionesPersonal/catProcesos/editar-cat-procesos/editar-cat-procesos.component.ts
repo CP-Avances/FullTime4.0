@@ -118,10 +118,16 @@ export class EditarCatProcesosComponent implements OnInit {
       this.ObtenerProcesos();
       this.LimpiarCampos();
       this.CerrarVentana();
-    }, error => {
-      this.toastr.error(error.error.message, 'Actualización.', {
-        timeOut: 6000,
-      });
+    }, err => {
+      if(err.status == 300){
+        this.toastr.warning(err.error.message, 'Advertencia.', {
+          timeOut: 6000,
+        });
+      }else{
+        this.toastr.error(err.error.message, 'Erro server', {
+          timeOut: 6000,
+        });
+      }
      });
   }
 

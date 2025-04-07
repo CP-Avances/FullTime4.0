@@ -108,8 +108,8 @@ class GrupoOcupacionalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const DataGrupoOcu = yield database_1.default.query(`
-              SELECT * FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1) OR numero_partida = $2
-            `, [grupo, numero_partida]);
+              SELECT * FROM map_cat_grupo_ocupacional WHERE (UPPER(descripcion) = UPPER($1) OR numero_partida = $2) AND id != $3
+            `, [grupo, numero_partida, id_grupo]);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (DataGrupoOcu.rows[0] != undefined && DataGrupoOcu.rows[0] != null && DataGrupoOcu.rows[0] != "") {
@@ -473,7 +473,6 @@ class GrupoOcupacionalControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    console.log('grupo: ', grupo);
                     if (grupo == undefined || grupo == '' || grupo == null) {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
@@ -558,7 +557,6 @@ class GrupoOcupacionalControlador {
                         }
                     }
                     else {
-                        console.log('proceso: ', grupo.estado);
                         if (grupo.estado == false) {
                             //actualizao a true
                             // INICIAR TRANSACCION
@@ -580,44 +578,67 @@ class GrupoOcupacionalControlador {
                             });
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const grupo_update = yield database_1.default.query(`
+                            if (grupo_activo1 != undefined && grupo_activo1 != null && grupo_activo1 != '') {
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const grupo_update = yield database_1.default.query(`
               UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
               `, [grupo.id]);
-                            const [grup_UPD] = grupo_update.rows;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_empleado_grupo_ocupacional',
-                                usuario: user_name,
-                                accion: 'I',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(grup_UPD),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const grupo_update_false = yield database_1.default.query(`
+                                const [grup_UPD] = grupo_update.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grupo_ocupacional',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grup_UPD),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const grupo_update_false = yield database_1.default.query(`
               UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
               `, [grupo_activo1.id]);
-                            const [grupo_UPD] = grupo_update_false.rows;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_empleado_grupo_ocupacional',
-                                usuario: user_name,
-                                accion: 'I',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(grupo_UPD),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
+                                const [grupo_UPD] = grupo_update_false.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grupo_ocupacional',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grupo_UPD),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                            }
+                            else {
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const grupo_update = yield database_1.default.query(`
+              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+              `, [grupo.id]);
+                                const [grup_UPD] = grupo_update.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grupo_ocupacional',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grup_UPD),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                            }
                         }
                     }
                 }
@@ -755,7 +776,6 @@ class GrupoOcupacionalControlador {
                    SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
                   `, [id_grupoOcupa, id_empleado]);
                                     const [gupoOcu_emple] = response.rows;
-                                    console.log('procesos_emple: ', gupoOcu_emple);
                                     if (gupoOcu_emple != undefined && gupoOcu_emple != '' && gupoOcu_emple != null) {
                                         item.observacion = 'Ya existe un registro activo con este usuario y grupo Ocupacional';
                                     }
@@ -835,7 +855,6 @@ class GrupoOcupacionalControlador {
                     const VERIFICAR_IDGRUPO = yield database_1.default.query(`
           SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
           `, [grupo_ocupacional]);
-                    console.log('VERIFICAR_IDGRUPO.rows[0].id: ', VERIFICAR_IDGRUPO.rows[0].id);
                     const id_grupo_ocupacional = VERIFICAR_IDGRUPO.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -846,6 +865,8 @@ class GrupoOcupacionalControlador {
                     const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
+                    console.log('id_grupo_ocupacional: ', id_grupo_ocupacional);
+                    console.log('id_empleado: ', id_empleado);
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`

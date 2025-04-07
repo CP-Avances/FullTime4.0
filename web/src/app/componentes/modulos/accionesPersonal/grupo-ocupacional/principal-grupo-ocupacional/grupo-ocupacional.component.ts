@@ -551,9 +551,9 @@ export class GrupoOcupacionalComponent implements OnInit {
             width: ['auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Id', style: 'tableHeader' },
+                { text: 'Código', style: 'tableHeader' },
                 { text: 'Grupo', style: 'tableHeader' },
-                { text: 'Numero partida', style: 'tableHeader' },
+                { text: 'Número partida', style: 'tableHeader' },
               ],
               ...this.ListGrupoOcupacional.map((obj: any) => {
                 return [

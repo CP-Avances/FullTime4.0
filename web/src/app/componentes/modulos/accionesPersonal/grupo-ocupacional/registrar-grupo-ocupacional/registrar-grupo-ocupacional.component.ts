@@ -19,8 +19,8 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
   ip: string | null;
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  grupo = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
-  numero_partida = new FormControl('', [Validators.required, Validators.pattern('[1-9]*')]);
+  grupo = new FormControl('', Validators.required);
+  numero_partida = new FormControl('', Validators.required);
 
   procesos: any = [];
 
@@ -72,21 +72,20 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
     };
     this._grupoOp.IngresarGrupoOcupacion(dataGrupo).subscribe({
       next: (respuesta: any) => {
-        if (respuesta.codigo != 200) {
-          this.toastr.warning(respuesta.message, 'Error registro.', {
-            timeOut: 6000,
-          });
-        } else {
           this.toastr.success(respuesta.message, 'Registro guardado.', {
             timeOut: 6000,
           });
           this.CerrarVentana();
-        }
-
       }, error: (err) => {
-        this.toastr.error(err.error.message, 'Erro server', {
-          timeOut: 6000,
-        });
+       if(err.status == 300){
+          this.toastr.warning(err.error.message, 'Advertencia.', {
+            timeOut: 6000,
+          });
+        }else{
+          this.toastr.error(err.error.message, 'Erro server', {
+            timeOut: 6000,
+          });
+        }
       },
     })
   }

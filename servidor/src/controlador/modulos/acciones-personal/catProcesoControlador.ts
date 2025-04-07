@@ -169,7 +169,8 @@ class ProcesoControlador {
         await pool.query('BEGIN');
 
         // CONSULTAR DATOSORIGINALES
-        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)', [nombre]);
+        const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1) AND id != $2'
+          , [nombre, id]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
@@ -442,6 +443,7 @@ class ProcesoControlador {
                           }
   
                           if(item.observacion == 'no registrado'){
+                           
                             const cruzado = listaProcesos.slice(0, index).find((p: any) => 
                               (
                                 p.proceso.toLowerCase() === item.proceso_padre.toLowerCase() &&
@@ -449,14 +451,12 @@ class ProcesoControlador {
                                 p.observacion === 'no registrado' && item.observacion === 'no registrado'
                               )
                             );
-  
+
                             if (cruzado) {
-                              item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.';
+                              item.observacion = 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior.'+'(Item '+ cruzado.fila +')';
                             }else{
 
                               if(existe_proceso_padre == false){
-
-                                
                                 
                               }
                               
@@ -494,7 +494,6 @@ class ProcesoControlador {
 
                   if (item.observacion == 'no registrado'){
                     if(item.proceso_padre != 'No registrado'){
-                      console.log('listaProcesos 111: ',listaProcesos)
                       const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) => 
                         otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe el proceso en el sistema')
                       );
@@ -503,6 +502,8 @@ class ProcesoControlador {
                         item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
                       }
                     }
+
+                    
                   }
                   
 
