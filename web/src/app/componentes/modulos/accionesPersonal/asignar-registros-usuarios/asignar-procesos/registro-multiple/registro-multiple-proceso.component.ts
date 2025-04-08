@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
 import { environment } from 'src/environments/environment';
 
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
+import { PageEvent } from '@angular/material/paginator';
+
 @Component({
-  selector: 'app-registro-multiple-grado',
-  templateUrl: './registro-multiple-grado.component.html',
-  styleUrl: './registro-multiple-grado.component.css'
+  selector: 'app-registro-multiple-proceso',
+  templateUrl: './registro-multiple-proceso.component.html',
+  styleUrl: './registro-multiple-proceso.component.css'
 })
-export class RegistroMultipleGradoComponent {
+export class RegistroMultipleProcesoComponent {
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -21,9 +22,9 @@ export class RegistroMultipleGradoComponent {
 
   ips_locales: any = '';
 
- archivoForm = new FormControl('', Validators.required);
- // VARIABLE PARA TOMAR RUTA DEL SISTEMA
- hipervinculo: string = environment.url
+  archivoForm = new FormControl('', Validators.required);
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
@@ -39,15 +40,29 @@ export class RegistroMultipleGradoComponent {
   empleado: any = [];
   idEmpleado: number;
 
-  DatosGrado: any
+  DatosProcesos: any
 
   constructor(
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public validar: ValidacionesService,
-    private rest: CatGradoService
+    private rest: ProcesoService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
+  }
+
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   /** ************************************************************************************************************* **
@@ -57,6 +72,8 @@ export class RegistroMultipleGradoComponent {
   nameFileCargo: string;
   archivoSubidoCargo: Array<File>;
 
+
+  listaGradoCorrectas: any = [];
   messajeExcel: string = '';
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CONTRATOS EMPLEADOS
   FileChange(element: any, tipo: string) {
@@ -91,19 +108,14 @@ export class RegistroMultipleGradoComponent {
     this.mostrarbtnsubir = true;
   }
 
-  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-  ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
-  }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
-  Datos_grado: any
-  listaGradoCorrectas: any = [];
-  listaGradoCorrectasCont: number;
+  Datos_procesos: any
+  listaProcesosCorrectas: any = [];
+  listaProcesosCorrectasCont: number;
   // METODO PARA VERIFICAR DATOS DE PLANTILLA
   VerificarPlantilla() {
-    this.listaGradoCorrectas = [];
+    this.listaProcesosCorrectas = [];
     let formData = new FormData();
     
     for (let i = 0; i < this.archivoSubido.length; i++) {
@@ -111,11 +123,11 @@ export class RegistroMultipleGradoComponent {
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-    this.rest.RevisarFormatoEmpleGrado(formData).subscribe(res => {
-        this.Datos_grado = res.data;
+    this.rest.RevisarFormatoEMPLEPROCESO(formData).subscribe(res => {
+        this.Datos_procesos = res.data;
         this.messajeExcel = res.message;
 
-        console.log('res: ',res)
+        console.log('this.Datos_procesos: ',this.Datos_procesos)
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -124,14 +136,14 @@ export class RegistroMultipleGradoComponent {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña EMPLEADO_GRADO en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña procesos en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
       }
       else {
 
-        this.Datos_grado.sort((a: any, b: any) => {
+        this.Datos_procesos.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
           }
@@ -141,75 +153,75 @@ export class RegistroMultipleGradoComponent {
           return 0;
         });
 
-        this.Datos_grado.forEach((item: any) => {
+        this.Datos_procesos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
-            this.listaGradoCorrectas.push(item);
+            this.listaProcesosCorrectas.push(item);
           }
         });
-        this.listaGradoCorrectasCont = this.listaGradoCorrectas.length;
+        this.listaProcesosCorrectasCont = this.listaProcesosCorrectas.length;
       }
     }, error => {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
     });
+    
   }
-
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() { 
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.RegistrarGrado();
+          this.RegistrarProcesos();
         }
       });
   }
-
-  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
-  colorCelda: string = ''
-  EstiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
-    if (observacion == 'Registro duplicado') {
-      return 'rgb(156, 214, 255)';
-    } else if (observacion == 'ok') {
-      return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe un registro activo con este usuario y grado') {
-      return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'La cedula ingresada no esta registrada en el sistema' ||
-      observacion == 'Proceso ingresado no esta registrado en el sistema'
-    ) {
-      return 'rgb(255, 192, 203)';
-    } else {
-      return 'rgb(242, 21, 21)';
-    }
-  }
-
-  colorTexto: string = '';
-  EstiloTextoCelda(texto: string): string {
-    texto = texto.toString()
-    let arrayObservacion = texto.split(" ");
-    if (arrayObservacion[0] == 'No') {
-      return 'rgb(255, 80, 80)';
-    } else {
-      return 'black'
-    }
-  }
-
-  RegistrarGrado(){
-    console.log('listaGradoCorrectas: ',this.listaGradoCorrectas.length)
-     if (this.listaGradoCorrectas?.length > 0) {
+   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+   colorCelda: string = ''
+   EstiloCelda(observacion: string): string {
+     let arrayObservacion = observacion.split(" ");
+     if (observacion == 'Registro duplicado') {
+       return 'rgb(156, 214, 255)';
+     } else if (observacion == 'ok') {
+       return 'rgb(159, 221, 154)';
+     } else if (observacion == 'Ya existe un registro activo con este Proceso.') {
+       return 'rgb(239, 203, 106)';
+     } else if (observacion  == 'La cédula ingresada no esta registrada en el sistema' ||
+       observacion == 'Proceso ingresado no esta registrado en el sistema'
+     ) {
+       return 'rgb(255, 192, 203)';
+     } else {
+       return 'rgb(242, 21, 21)';
+     }
+   }
+ 
+   colorTexto: string = '';
+   EstiloTextoCelda(texto: string): string {
+     texto = texto.toString()
+     let arrayObservacion = texto.split(" ");
+     if (arrayObservacion[0] == 'No') {
+       return 'rgb(255, 80, 80)';
+     } else {
+       return 'black'
+     }
+   }
+ 
+   // METODO PARA REGISTRAR DATOS
+   RegistrarProcesos() {
+     console.log('listaProcesosCorrectas: ',this.listaProcesosCorrectas.length)
+     if (this.listaProcesosCorrectas?.length > 0) {
        const data = {
-         plantilla: this.listaGradoCorrectas,
+         plantilla: this.listaProcesosCorrectas,
          user_name: this.user_name,
          ip: this.ip, ip_local: this.ips_locales
        }
-       this.rest.RegistrarPlantillaEmpleGrado(data).subscribe({
+       this.rest.RegistrarPlantillaEmpleProce(data).subscribe({
          next: (response: any) => {
            this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
              timeOut: 5000,
            });
-           if (this.listaGradoCorrectas?.length > 0) {
+           if (this.listaProcesosCorrectas?.length > 0) {
              setTimeout(() => {
                //this.ngOnInit();
              }, 500);

@@ -3,6 +3,7 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
@@ -69,8 +70,15 @@ export class EditarDetalleParametroComponent implements OnInit {
       }
     }
     // PARAMETROS DE REGISTRO DE HORA PARA ENVIO DE NOTIFICACIONES POR CORREO ELECTRONICO
-    else if (this.data.parametros.id_tipo === 9 || this.data.parametros.id_tipo === 11 || this.data.parametros.id_tipo === 14 ||
-      this.data.parametros.id_tipo === 18 || this.data.parametros.id_tipo === 21 || this.data.parametros.id_tipo === 25
+    else if (
+      this.data.parametros.id_tipo === 9       // ----> MENSAJE CUMPLEAÑOS
+      || this.data.parametros.id_tipo === 11   // ----> REPORTE ATRASOS DIARIO
+      || this.data.parametros.id_tipo === 14   // ----> REPORTE ATRASOS SEMANAL
+      || this.data.parametros.id_tipo === 18   // ----> REPORTE FALTAS DIARIO
+      || this.data.parametros.id_tipo === 21   // ----> REPORTE FALTAS SEMANAL
+      || this.data.parametros.id_tipo === 25   // ----> MENSAJE ANIVERSARIO
+      || this.data.parametros.id_tipo === 27   // ----> REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.data.parametros.id_tipo === 30   // ----> REPORTE SALIDAS ANTICIPADAS SEMANAL
     ) {
       this.hora = true;
       this.especificacion = 'Registrar la hora en la que se enviará la notificación (formato de 24 horas).';
@@ -94,9 +102,21 @@ export class EditarDetalleParametroComponent implements OnInit {
       else if (this.data.parametros.id_tipo === 25) {
         this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por aniversarios.';
       }
+      else if (this.data.parametros.id_tipo === 27) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por salidas anticipadas diarias del personal.';
+      }
+      else if (this.data.parametros.id_tipo === 30) {
+        this.observacion = 'Hora en la que se enviará de forma automática notificaciones de correo electrónico por salidas anticipadas semanales del personal.';
+      }
     }
-    else if (this.data.parametros.id_tipo === 12 || this.data.parametros.id_tipo === 16 ||
-      this.data.parametros.id_tipo === 19 || this.data.parametros.id_tipo === 23
+    else if (
+      // INGRESO DE CORREO GENERAL DE ENVIO DE REPORTES
+      this.data.parametros.id_tipo === 12      // ----> REPORTE ATRASOS DIARIO
+      || this.data.parametros.id_tipo === 16   // ----> REPORTE ATRASOS SEMANAL
+      || this.data.parametros.id_tipo === 19   // ----> REPORTE FALTAS DIARIO
+      || this.data.parametros.id_tipo === 23   // ----> REPORTE FALTAS SEMANAL
+      || this.data.parametros.id_tipo === 28   // ----> REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.data.parametros.id_tipo === 32   // ----> REPORTE SALIDAS ANTICIPADAS SEMANAL
     ) {
       this.texto = true;
       this.descripcion.setValidators([Validators.required, Validators.email]);

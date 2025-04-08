@@ -3,6 +3,10 @@
     color: white;
 }
 
+p {
+    font-size: x-small;
+}
+
 #items {
     font-size: 12px;
     margin-top: 8%;

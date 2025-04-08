@@ -27,15 +27,14 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="FileChange($event)" type="file"
-                                    [formControl]="archivoForm" id="file1"
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file1"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                     style="height: 65px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
-                                <label for="file1" matSuffix matTooltipPosition="right" 
+                                <label for="file1" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 65px;  padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
@@ -54,8 +53,8 @@
                                 <br> Descargar plantilla
                             </a>
                         </div>
-                        <div  class="d-flex flex-wrap justify-content-center m-auto">
-                            <button *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'" id="descargar" 
+                        <div class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="Datos_gruposOcupacional && messajeExcel != 'error'" id="descargar"
                                 class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
                                 Registrar
@@ -71,9 +70,10 @@
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <div class="row w-100">
-                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
-                     matTooltipPosition="right" matTooltip="Selección múltiple para eliminar registros." id="SelectCheck">
+                        matTooltipPosition="right" matTooltip="Selección múltiple para eliminar registros."
+                        id="SelectCheck">
                         library_add_check
                     </mat-icon>
                 </div>
@@ -118,16 +118,17 @@
                         <td></td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda del proceso de acuerdo a las columnas de la tabla.">
-                                help_outline</mat-icon>
+                                matTooltip="Búsqueda del grupo ocupacional de acuerdo a las columnas de la tabla.">
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr
                         *ngFor="let grupo of ListGrupoOcupacional | filtrosGrupo:buscarGrupo.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionUno.toggle(grupo) : null" [checked]="selectionUno.isSelected(grupo)"
-                                [aria-label]="checkboxLabel(grupo)">
+                                (change)="$event ? selectionUno.toggle(grupo) : null"
+                                [checked]="selectionUno.isSelected(grupo)" [aria-label]="checkboxLabel(grupo)">
                             </mat-checkbox>
                         </td>
                         <td>{{grupo.descripcion}}</td>

@@ -12,18 +12,18 @@ class GradoControlador {
   // METODO PARA BUSCAR LISTA DE GRADOS **USADO 
   public async listaGrados(req: Request, res: Response) {
 
-    try{
+    try {
 
       const GRADOS = await pool.query(
         `
         SELECT g.id, g.descripcion FROM map_cat_grado AS g
-        ORDER BY g.id DESC
+        ORDER BY g.id ASC
         `
       );
-  
+
       res.jsonp(GRADOS.rows);
 
-    }catch (error) {
+    } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al optener los grados' });
@@ -35,7 +35,7 @@ class GradoControlador {
   public async GradoByEmple(req: Request, res: Response) {
     const { id_empleado } = req.params;
 
-    console.log('req.params: ',req.params)
+    console.log('req.params: ', req.params)
 
     const EMPLEADO_GRADO = await pool.query(
       `
@@ -45,10 +45,10 @@ class GradoControlador {
       `
       , [id_empleado]);
     if (EMPLEADO_GRADO.rowCount != 0) {
-      return res.status(200).jsonp({grados: EMPLEADO_GRADO.rows, text: 'correcto', status: 200})
+      return res.status(200).jsonp({ grados: EMPLEADO_GRADO.rows, text: 'correcto', status: 200 })
     }
 
-    res.status(404).jsonp({grados: undefined, text: 'Registro no encontrado.', status: 400 });
+    res.status(404).jsonp({ grados: undefined, text: 'Registro no encontrado.', status: 400 });
   }
 
   // METODO PARA INSERTAR EL GRADO **USADO 
@@ -101,7 +101,7 @@ class GradoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al guardar el grado'});
+      res.status(500).jsonp({ message: 'Error al guardar el grado' });
     }
 
   }
@@ -114,20 +114,20 @@ class GradoControlador {
     try {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-        const DataGrado = await pool.query(
+      const DataGrado = await pool.query(
+        `
+            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1) AND id != $2
           `
-            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
-          `
-          , [grado]);
+        , [grado, id_grado]);
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (DataGrado.rows[0] != undefined && DataGrado.rows[0] != null && DataGrado.rows[0] != "") {
-          res.status(300).jsonp({ message: 'Ya existe un grado  registrado', codigo: 300 });
-      }else{
+        res.status(300).jsonp({ message: 'Ya existe un grado  registrado', codigo: 300 });
+      } else {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-          await pool.query( 
+        await pool.query(
           `
             UPDATE map_cat_grado SET descripcion = $2 WHERE id = $1
           `
@@ -149,13 +149,13 @@ class GradoControlador {
         await pool.query('COMMIT');
 
         res.status(200).jsonp({ message: 'Grado actualizado con éxito', codigo: 200 });
-    
+
       }
 
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al actualizar el grado'});
+      res.status(500).jsonp({ message: 'Error al actualizar el grado' });
     }
 
   }
@@ -169,47 +169,47 @@ class GradoControlador {
 
     try {
 
-        // INICIAR TRANSACCION
-        await pool.query('BEGIN');
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-        await pool.query( 
-          `
+      await pool.query(
+        `
             DELETE FROM map_cat_grado WHERE id = $1
           `
-          , [id_grado]);
+        , [id_grado]);
 
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_procesos',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: `{"id": "${id_grado}"}`,
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'map_cat_procesos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"id": "${id_grado}"}`,
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
 
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
-        res.status(200).jsonp({ message: 'El grado se ha eliminado con éxito', codigo: 200});
+      res.status(200).jsonp({ message: 'Registro eliminado.', codigo: 200 });
 
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al eliminar el grado'});
+      res.status(500).jsonp({ message: 'Existen datos relacionados con este registro.' });
     }
 
   }
 
   // METODO PARA ELIMINAR EL GRADO POR EMPLEADO **USADO 
-  public async EliminarEmpleGrado(req: Request, res: Response){
+  public async EliminarEmpleGrado(req: Request, res: Response) {
     try {
       const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
-      console.log('id: ',id);
+      console.log('id: ', id);
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -380,7 +380,7 @@ class GradoControlador {
               }
 
             } else {
-              item.observacion = 'Ya existe el grado en el sistema'
+              item.observacion = 'Ya existe en el sistema'
             }
           }
         });
@@ -441,18 +441,18 @@ class GradoControlador {
 
     for (const item of plantilla) {
       const { descripcion } = item;
-    
+
       try {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-        
+
         const response: QueryResult = await pool.query(
           `
           INSERT INTO map_cat_grado (descripcion) VALUES ($1) RETURNING *
           `
           , [descripcion]);
         const [gradoIn] = response.rows;
- 
+
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'map_cat_grado',
@@ -465,7 +465,7 @@ class GradoControlador {
           observacion: null
         });
 
-        
+
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
@@ -485,39 +485,39 @@ class GradoControlador {
   }
 
   // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
-  public async  RegistrarGrados(req: Request, res: Response){
+  public async RegistrarGrados(req: Request, res: Response) {
     const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-    
-    try{
-      for (const item of listaUsuarios){
 
-        const {id_empleado} = item;
+    try {
+      for (const item of listaUsuarios) {
 
-         // INICIAR TRANSACCION
-         await pool.query('BEGIN');
-         const response: QueryResult = await pool.query(
-           `
+        const { id_empleado } = item;
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+        const response: QueryResult = await pool.query(
+          `
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
            `
-           , [id_grado, id_empleado]);
+          , [id_grado, id_empleado]);
 
-         const [grados] = response.rows;
-         // AUDITORIA
-         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-           tabla: 'map_empleado_grado',
-           usuario: user_name,
-           accion: 'I',
-           datosOriginales: '',
-           datosNuevos: JSON.stringify(grados),
-           ip: ip,
-           ip_local: ip_local,
-           observacion: null
-         });
-         // FINALIZAR TRANSACCION
-         await pool.query('COMMIT');
+        const [grados] = response.rows;
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_empleado_grado',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(grados),
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
 
-         console.log('grados: ',grados)
+        console.log('grados: ', grados)
 
         if (grados == undefined || grados == '' || grados == null) {
 
@@ -544,10 +544,10 @@ class GradoControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
-          console.log('grado_activo: ',grado_activo)
+          console.log('grado_activo: ', grado_activo)
 
-          if(grado_activo == undefined || grado_activo == '' || grado_activo == null){
-            
+          if (grado_activo == undefined || grado_activo == '' || grado_activo == null) {
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const responsee: QueryResult = await pool.query(
@@ -572,7 +572,7 @@ class GradoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            
+
 
           } else {
 
@@ -623,32 +623,32 @@ class GradoControlador {
             await pool.query('COMMIT');
           }
 
-        }else{
-          console.log('proceso: ',grados.estado)
-          if(grados.estado == false){
-            
+        } else {
+          console.log('proceso: ', grados.estado)
+          if (grados.estado == false) {
+
             // INICIAR TRANSACCION
-          await pool.query('BEGIN');
-          const response: QueryResult = await pool.query(
-            `
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+              `
             SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
            `
-            , [id_empleado]);
+              , [id_empleado]);
 
-          const [grado_activo1] = response.rows;
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'map_empleado_grado',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(grado_activo1),
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
-          // FINALIZAR TRANSACCION
-          await pool.query('COMMIT');
+            const [grado_activo1] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_empleado_grado',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(grado_activo1),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -747,7 +747,7 @@ class GradoControlador {
         var duplicados: any = [];
         var mensaje: string = 'correcto';
 
-        if (plantilla) { 
+        if (plantilla) {
           // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
           const headerRow = plantilla.getRow(1);
           const headers: any = {};
@@ -757,8 +757,8 @@ class GradoControlador {
           });
 
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-          if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || 
-              !headers['CEDULA'] || !headers['GRADO']
+          if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] ||
+            !headers['CEDULA'] || !headers['GRADO']
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
@@ -815,12 +815,12 @@ class GradoControlador {
 
               if (CEDULA == undefined) {
                 data.cedula = 'No registrado';
-                data.observacion = 'Cedula ' + data.observacion;
+                data.observacion = 'Cédula ' + data.observacion;
               }
 
               if (GRADO == undefined) {
                 data.grado = 'No registrado';
-                data.observacion = 'Proceso ' + data.observacion;
+                data.observacion = 'Grado ' + data.observacion;
               }
 
               listaGrados.push(data);
@@ -850,7 +850,7 @@ class GradoControlador {
               , [item.cedula.trim()]);
 
             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
-              
+
               let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id
 
               const VERIFICAR_IDGRADO = await pool.query(
@@ -868,13 +868,13 @@ class GradoControlador {
                    SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2 and estado = true
                   `
                   , [id_grado, id_empleado]);
-       
+
                 const [grado_emple] = response.rows;
-                  console.log('grado_emple: ',grado_emple);
+                console.log('grado_emple: ', grado_emple);
 
                 if (grado_emple != undefined && grado_emple != '' && grado_emple != null) {
-                  item.observacion = 'Ya existe un registro activo con este usuario y grado'
-                }else{
+                  item.observacion = 'Ya existe un registro activo con este Grado.'
+                } else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
                     if (duplicados.find((p: any) => (p.cedula.trim() === item.cedula.trim())
@@ -886,12 +886,12 @@ class GradoControlador {
                   }
                 }
 
-              }else{
-                item.observacion = 'Proceso ingresado no esta registrado en el sistema'
+              } else {
+                item.observacion = 'Grado ingresado no esta registrado en el sistema'
               }
 
             } else {
-              item.observacion = 'La cedula ingresada no esta registrada en el sistema'
+              item.observacion = 'La cédula ingresada no esta registrada en el sistema'
             }
 
           }
@@ -949,7 +949,7 @@ class GradoControlador {
   }
 
   // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA
-  public async RegistrarEmpleadoGrado(req: Request, res: Response): Promise<any>{
+  public async RegistrarEmpleadoGrado(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
@@ -964,7 +964,7 @@ class GradoControlador {
           SELECT id FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1)
           `
           , [grado]);
-          console.log('VERIFICAR_IDGRADO.rows[0].id: ',VERIFICAR_IDGRADO.rows[0].id)
+        console.log('VERIFICAR_IDGRADO.rows[0].id: ', VERIFICAR_IDGRADO.rows[0].id)
 
         const id_grado = VERIFICAR_IDGRADO.rows[0].id;
         // FINALIZAR TRANSACCION
@@ -985,25 +985,25 @@ class GradoControlador {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const response: QueryResult = await pool.query(
-           `
+          `
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
            `
-           , [id_grado, id_empleado]);
+          , [id_grado, id_empleado]);
 
-         const [grados] = response.rows;
-         // AUDITORIA
-         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-           tabla: 'map_empleado_grado',
-           usuario: user_name,
-           accion: 'I',
-           datosOriginales: '',
-           datosNuevos: JSON.stringify(grados),
-           ip: ip,
-           ip_local: ip_local,
-           observacion: null
-         });
-         // FINALIZAR TRANSACCION
-         await pool.query('COMMIT');
+        const [grados] = response.rows;
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_empleado_grado',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(grados),
+          ip: ip,
+          ip_local: ip_local,
+          observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
 
         if (grados == undefined || grados == '' || grados == null) {
 
@@ -1030,8 +1030,8 @@ class GradoControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
-          if(grado_activo == undefined || grado_activo == '' || grado_activo == null){
-            
+          if (grado_activo == undefined || grado_activo == '' || grado_activo == null) {
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const responsee: QueryResult = await pool.query(
@@ -1056,7 +1056,7 @@ class GradoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            
+
 
           } else {
 
@@ -1107,10 +1107,10 @@ class GradoControlador {
             await pool.query('COMMIT');
           }
 
-        }else{
-          console.log('proceso: ',grados.estado)
-          if(grados.estado == false){
-            
+        } else {
+          console.log('proceso: ', grados.estado)
+          if (grados.estado == false) {
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const response: QueryResult = await pool.query(
@@ -1195,14 +1195,14 @@ class GradoControlador {
       }
     }
 
-  
+
   }
 
   // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
   public async EditarRegistroGradoEmple(req: Request, res: Response): Promise<any> {
     try {
 
-      const {id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+      const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
 
       if (estado == true) {
         // CONSULTAR DATOSORIGINALES

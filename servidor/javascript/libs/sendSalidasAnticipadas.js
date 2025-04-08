@@ -81,7 +81,7 @@ const salidasAnticipadasSemanal = function () {
         const fecha = date.toJSON().split("T")[0]; // Fecha actual
         const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
         const PARAMETRO_SEMANAL = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 47
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 29
         `);
         const diasSemana = [
             "Domingo",
@@ -94,13 +94,13 @@ const salidasAnticipadasSemanal = function () {
         ];
         if (PARAMETRO_SEMANAL.rows[0].descripcion == 'Si') {
             const PARAMETRO_DIA_SEMANAL = yield database_1.default.query(`
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 52
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 31
             `);
             if (PARAMETRO_DIA_SEMANAL.rowCount != 0) {
                 console.log("ver Parametro DIA SEMANAL: ", PARAMETRO_DIA_SEMANAL.rows[0].descripcion);
                 if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
                     const PARAMETRO_HORA_SEMANAL = yield database_1.default.query(`
-                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 51
+                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 30
                     `);
                     console.log("ver Parametro hora semanal: ", PARAMETRO_HORA_SEMANAL.rows[0].descripcion);
                     if (hora === parseInt(PARAMETRO_HORA_SEMANAL.rows[0].descripcion)) {
@@ -124,11 +124,11 @@ const salidasAnticipadasDiarios = function () {
         const hora = date.getHours();
         const minutos = date.getMinutes();
         const PARAMETRO_DIARIO = yield database_1.default.query(`
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 48
+        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 26
         `);
         if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
             const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 49
+            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 27
             `);
             console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
             if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
@@ -309,9 +309,9 @@ const salidasAnticipadas = function (desde, hasta, semanal) {
             // OBTENER FECHA Y HORA
             const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
             const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-            let id_parametro_correo = 50;
+            let id_parametro_correo = 28;
             if (semanal) {
-                id_parametro_correo = 53;
+                id_parametro_correo = 32;
             }
             const PARAMETRO_CORREO = yield database_1.default.query(`
                         SELECT * FROM ep_detalle_parametro WHERE id_parametro = $1

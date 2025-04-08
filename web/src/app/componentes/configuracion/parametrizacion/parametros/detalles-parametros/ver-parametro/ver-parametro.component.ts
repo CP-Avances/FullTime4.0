@@ -10,6 +10,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 import { ListarParametroComponent } from '../../listar-parametro/listar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
@@ -164,7 +165,7 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '7') {
       this.nota_parametro =
         `
-        NOTA: Revisar el uso de certificados de seguridad(SSL) en el sistema(GEOLOCALIZACIÓN).
+        NOTA: Revisar el uso de certificados de seguridad(SSL) en el sistema (GEOLOCALIZACIÓN).
         `
         ;
     }
@@ -330,6 +331,71 @@ export class VerParametroComponent implements OnInit {
         `
         ;
     }
+
+    // ENVIAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '26') {
+      this.nota_parametro =
+        `
+          NOTA: Enviar notificaciones diarias con el reporte de salidas anticipadas de los colaboradores.
+          `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '27') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+          NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de salidas anticipadas de los 
+          colaboradores. Por ejemplo: 23.
+          `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '28') {
+      this.nota_parametro =
+        `
+          NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de faltas 
+          general de los colaboradores.
+          `
+        ;
+    }
+    // ENVIAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '29') {
+      this.nota_parametro =
+        `
+          NOTA: Enviar notificaciones semanales con el reporte de salidas anticipadas de los colaboradores.
+          `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '30') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+          NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+          colaboradores. Por ejemplo: 23.
+          `
+        ;
+    }
+    // DIA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '31') {
+      this.seleccionar_dia = true;
+      this.nota_parametro =
+        `
+          NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+          colaboradores.
+          `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '32') {
+      this.nota_parametro =
+        `
+          NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de salidas anticipadas 
+          general de los colaboradores.
+          `
+        ;
+    }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '97') {
       this.carga = true;
@@ -366,18 +432,39 @@ export class VerParametroComponent implements OnInit {
         ;
     }
     // PARAMETROS PARA INGRESAR DETALLE
-    if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '9' ||
-      this.idParametro === '11' || this.idParametro === '12' || this.idParametro === '14' ||
-      this.idParametro === '16' || this.idParametro === '18' ||
-      this.idParametro === '19' || this.idParametro === '21' ||
-      this.idParametro === '23' || this.idParametro === '25' || this.idParametro === '100') {
+    if (this.idParametro === '4'    // ----> TOLERANCIA UBICACION
+      || this.idParametro === '6'   // ----> DISPOSITIVOS MOVILES 
+      || this.idParametro === '9'   // ----> HORA ENVIO CUMPLEAÑOS
+      || this.idParametro === '11'  // ----> HORA ENVIO REPORTE ATRASOS DIARIO
+      || this.idParametro === '12'  // ----> CORREO REPORTE ATRASOS DIARIO
+      || this.idParametro === '14'  // ----> HORA ENVIO REPORTE ATRASOS SEMANAL
+      || this.idParametro === '16'  // ----> CORREO REPORTE ATRASOS SEMANAL
+      || this.idParametro === '18'  // ----> HORA ENVIO REPORTE FALTAS DIARIO
+      || this.idParametro === '19'  // ----> CORREO REPORTE FALTAS DIARIO
+      || this.idParametro === '21'  // ----> HORA ENVIO REPORTE FALTAS SEMANAL
+      || this.idParametro === '23'  // ----> CORREO REPORTE FALTAS SEMANAL
+      || this.idParametro === '25'  // ----> HORA ENVIO ANIVERSARIO
+      || this.idParametro === '27'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '28'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '32'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
+    ) {
       this.ver_editar = true;
       this.ver_detalles = true;
     }
-    // PARAMETROS CON FORMULARIO
-    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' ||
-      this.idParametro === '10' || this.idParametro === '13' || this.idParametro === '17' ||
-      this.idParametro === '20' || this.idParametro === '24') {
+    // PARAMETROS CON FORMULARIO DE SELECION
+    if (this.idParametro === '5'   // ----> ACTIVAR SEGUNDOS EN MARCACIONES
+      || this.idParametro === '7'  // ----> ACTIVAR CERTIFICADOS DE SEGURIDAD
+      || this.idParametro === '8'  // ----> ACTIVAR MENSAJE DE CUMPLEAÑOS
+      || this.idParametro === '10' // ----> ACTIVAR REPORTE DE ATRASOS DIARIO
+      || this.idParametro === '13' // ----> ACTIVAR REPORTE DE ATRASOS SEMANAL
+      || this.idParametro === '17' // ----> ACTIVAR REPORTE DE FALTAS DIARIO
+      || this.idParametro === '20' // ----> ACTIVAR REPORTE DE FALTAS SEMANAL
+      || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
+      || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    ) {
       this.ver_formulario = true;
     }
 
@@ -462,21 +549,39 @@ export class VerParametroComponent implements OnInit {
         this.domingo = '#4194F0';
       }
 
+      // ----> OPCIONES TOLERANCIA ATRASOS
       if (this.idParametro === '3') {
         this.VerConfiguracionAtrasos();
       }
 
       // PARAMETROS QUE EXISTEN Y NO NECESITAN REGISTRO ADICIONAL
-      if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '9' ||
-        this.idParametro === '11' || this.idParametro === '14' || this.idParametro === '18' ||
-        this.idParametro === '21' || this.idParametro === '25' || this.idParametro === '100') {
+      if (this.idParametro === '4'    // ----> TOLERANCIA UBICACION
+        || this.idParametro === '6'   // ----> DISPOSITIVOS MOVILES 
+        || this.idParametro === '9'   // ----> HORA ENVIO CUMPLEAÑOS
+        || this.idParametro === '11'  // ----> HORA ENVIO REPORTE ATRASOS DIARIO
+        || this.idParametro === '14'  // ----> HORA ENVIO REPORTE ATRASOS SEMANAL
+        || this.idParametro === '18'  // ----> HORA ENVIO REPORTE FALTAS DIARIO
+        || this.idParametro === '21'  // ----> HORA ENVIO REPORTE FALTAS SEMANAL
+        || this.idParametro === '25'  // ----> HORA ENVIO ANIVERSARIO
+        || this.idParametro === '27'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS DIARIO
+        || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
+        || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
+      ) {
         this.boton_registrar = false;
       }
 
-      // PARAMETROS CON DETALLES
-      if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' ||
-        this.idParametro === '10' || this.idParametro === '13' || this.idParametro === '17' ||
-        this.idParametro === '19' || this.idParametro === '20' || this.idParametro === '24') {
+      // PARAMETROS CON SELECCION DE OPCIONES
+      if (this.idParametro === '5'   // ----> ACTIVAR SEGUNDOS EN MARCACIONES
+        || this.idParametro === '7'  // ----> ACTIVAR CERTIFICADOS DE SEGURIDAD
+        || this.idParametro === '8'  // ----> ACTIVAR MENSAJE DE CUMPLEAÑOS
+        || this.idParametro === '10' // ----> ACTIVAR REPORTE DE ATRASOS DIARIO
+        || this.idParametro === '13' // ----> ACTIVAR REPORTE DE ATRASOS SEMANAL
+        || this.idParametro === '17' // ----> ACTIVAR REPORTE DE FALTAS DIARIO
+        || this.idParametro === '20' // ----> ACTIVAR REPORTE DE FALTAS SEMANAL
+        || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
+        || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+        || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+      ) {
         this.VerConfiguracionRegistro();
       }
 

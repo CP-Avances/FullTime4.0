@@ -67,7 +67,7 @@ import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPerson
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
 import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
 import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
-import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/ingresar-registros/ingresar-registros.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/ingresar-registros/ingresar-registros.component';
 
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';

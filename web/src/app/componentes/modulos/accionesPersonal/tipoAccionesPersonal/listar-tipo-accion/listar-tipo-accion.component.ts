@@ -352,10 +352,10 @@ export class ListarTipoAccionComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe el detalle de la accion personal en el sistema') {
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     } else if (observacion  == 'Registro cruzado' ||
-      observacion == 'No existe el tipo de accion en el sistema'
+      observacion == 'No existe el tipo de acción de personal en el sistema'
     ) {
       return 'rgb(238, 21, 242)';
     } else {

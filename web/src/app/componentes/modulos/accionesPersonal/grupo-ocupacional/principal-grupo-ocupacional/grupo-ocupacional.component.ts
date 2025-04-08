@@ -1,26 +1,29 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { Router } from '@angular/router';
-import { DateTime } from 'luxon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { environment } from 'src/environments/environment';
 import { FormControl, Validators } from '@angular/forms';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
-import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
+import { environment } from 'src/environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
+
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { RegistrarGrupoOcupacionalComponent } from '../registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
 import { EditarGrupoOcupacionalComponent } from '../editar-grupo-ocupacional/editar-grupo-ocupacional.component';
-import { SelectionModel } from '@angular/cdk/collections';
+
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 
 @Component({
   selector: 'app-grupo-ocupacional',
   templateUrl: './grupo-ocupacional.component.html',
   styleUrl: './grupo-ocupacional.component.css'
 })
+
 export class GrupoOcupacionalComponent implements OnInit {
 
   ips_locales: any = '';
@@ -61,14 +64,14 @@ export class GrupoOcupacionalComponent implements OnInit {
   grupoOcupacionalEliminar: any = [];
 
   constructor(
-    private _GrupoOp: CatGrupoOcupacionalService,
-    public ventana: MatDialog,
-    private router: Router,
-    private validar: ValidacionesService,
-    public restEmpre: EmpresaService,
-    public restE: EmpleadoService,
     private funciones: MainNavService,
+    private _GrupoOp: CatGrupoOcupacionalService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
+    private router: Router,
+    public restE: EmpleadoService,
+    public ventana: MatDialog,
+    public restEmpre: EmpresaService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -142,7 +145,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       next: (respuesta: any) => {
         this.ListGrupoOcupacional = respuesta
       }, error: (err) => {
-        this.toastr.error(err.error.message, 'Erro server', {
+        this.toastr.error(err.error.message, 'Ups!!! se ha producido un error.', {
           timeOut: 6000,
         });
       },
@@ -222,7 +225,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         if (confirmado) {
           this.Eliminar(datos.id);
         } else {
-          this.router.navigate(['/proceso']);
+          this.router.navigate(['/grupo-ocupacional']);
         }
       });
   }
@@ -235,7 +238,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     };
     this._GrupoOp.ElminarGrupoOcupacion(dataGrupo).subscribe((res: any) => {
       if (res.codigo != 200) {
-        this.toastr.error('No se completo el proceso', 'No fue posible eliminar.', {
+        this.toastr.error('No se completo el proceso.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -259,8 +262,6 @@ export class GrupoOcupacionalComponent implements OnInit {
           if (this.grupoOcupacionalEliminar.length != 0) {
             this.EliminarMultiple();
             this.btnCheckHabilitar = true;
-            // this.plan_multiple = false;
-            // this.plan_multiple_ = false;
             this.grupoOcupacionalEliminar = [];
             this.selectionUno.clear();
             this.ngOnInit();
@@ -286,7 +287,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         });
       },error: (err) => {
         console.log('error: ',err)
-        this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
+        this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
           timeOut: 4000,
         });
       },
@@ -370,7 +371,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña grado en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña GRUPO_OCUPACIONAL en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
@@ -395,7 +396,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         this.listaGrupoOcupaciCorrectasCont = this.listaGrupoOcupacionalCorrectas.length;
       }
     }, error => {
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
     });
@@ -409,7 +410,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Grupo ocupacional ya existe en el sistema' ||
+    } else if (observacion == 'Grupo Ocupacional ya existe en el sistema' ||
       observacion == 'Número de partida ya existe en el sistema'
     ) {
       return 'rgb(239, 203, 106)';
@@ -435,12 +436,12 @@ export class GrupoOcupacionalComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.RegistrarGrados();
+          this.RegistrarGrupoOcupacional();
         }
       });
   }
 
-  RegistrarGrados() {
+  RegistrarGrupoOcupacional() {
     console.log('listaGrupoOcupacionalCorrectas: ', this.listaGrupoOcupacionalCorrectas.length)
     if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
       const data = {
@@ -451,7 +452,7 @@ export class GrupoOcupacionalComponent implements OnInit {
 
       this._GrupoOp.RegistrarPlantilla(data).subscribe({
         next: (response: any) => {
-          this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+          this.toastr.success('Plantilla de Grupo Ocupacional importada.', 'Operación exitosa.', {
             timeOut: 5000,
           });
           if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
@@ -530,13 +531,13 @@ export class GrupoOcupacionalComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Grupo Ocupacional', bold: true, fontSize: 20, alignment: 'center', margin: [10, -25, 10, 10] },
+        { text: 'LISTA DE GRUPO OCUPACIONAL', bold: true, fontSize: 12, alignment: 'center', margin: [10, -25, 10, 10] },
         this.presentarDataPDFGrupoOcu(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 9 },
+        itemsTableC: { fontSize: 9, alignment: 'center' }
       }
     };
   }
@@ -551,9 +552,9 @@ export class GrupoOcupacionalComponent implements OnInit {
             width: ['auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'Id', style: 'tableHeader' },
-                { text: 'Grupo', style: 'tableHeader' },
-                { text: 'Numero partida', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'GRUPO OCUPACIONAL', style: 'tableHeader' },
+                { text: 'NÚMERO DE PARTIDA', style: 'tableHeader' },
               ],
               ...this.ListGrupoOcupacional.map((obj: any) => {
                 return [
@@ -608,17 +609,17 @@ export class GrupoOcupacionalComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
-    var objeto;
-    var arregloGrados: any = [];
+    var objeto: any;
+    var arregloGrupoOcupacional: any = [];
     this.ListGrupoOcupacional.forEach((obj: any) => {
       objeto = {
-        "proceso": {
+        "grupo_ocupacional": {
           '@id': obj.id,
           "descripcion": obj.descripcion,
           "numero_partida": obj.numero_partida,
         }
       }
-      arregloGrados.push(objeto)
+      arregloGrupoOcupacional.push(objeto)
     });
 
     /*this.rest.CrearXML(arregloGrados).subscribe(res => {
