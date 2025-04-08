@@ -44,14 +44,18 @@ export class RegistrarEstadoCivilComponent {
 
   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarEstadoCivil(form: any) {
+    let nombreEstado = form.estadoForm.trim();
+    let nombre_estado = nombreEstado.toUpperCase(); 
+    let estadoFormateado = nombreEstado.charAt(0).toUpperCase() + nombreEstado.slice(1).toLowerCase(); 
+  
     let genero = {
-      estado: form.estadoForm,
+      estado: estadoFormateado,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let estado = (genero.estado).toUpperCase();
-    this.estadoS.BuscarEstadoCivil(estado).subscribe(response => {
+    this.estadoS.BuscarEstadoCivil(nombre_estado).subscribe(response => {
       this.toastr.warning('El estado civil ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
         timeOut: 3000,
       });

@@ -5,6 +5,9 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -750,38 +753,47 @@ export class CatModalidaLaboralComponent implements OnInit {
       });
   }
 
+
   // METODO DE ELIMINACION MULTIPLE DE DATOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    }
-    this.ingresar = false;
-    this.contador = 0;
-    this.modalidadesEliminar = this.selectionModalidad.selected;
-    this.modalidadesEliminar.forEach((datos: any) => {
-      this.listaModalida_Laboral = this.listaModalida_Laboral.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this._ModalidaLaboral.Eliminar(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+      ip: this.ip,
+      ip_local: this.ips_locales
+    };
+  
+    const peticiones = this.selectionModalidad.selected.map((datos: any) =>
+      this._ModalidaLaboral.Eliminar(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', descripcion: datos.descripcion })),
+        catchError(() => of({ success: false, descripcion: datos.descripcion }))
+      )
+    );
+  
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+  
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ngOnInit();
         }
       });
-    }
-    );
+  
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+  
+      this.modalidadesEliminar = [];
+      this.selectionModalidad.clear();
+      this.ngOnInit();
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE

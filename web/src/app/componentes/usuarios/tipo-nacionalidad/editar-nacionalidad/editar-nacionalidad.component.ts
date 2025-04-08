@@ -65,27 +65,36 @@ export class EditarNacionalidadComponent {
 
   // METODO PARA ACTUALIZAR NACIONALIDAD
   ActualizarNacionalidad(form: any) {
+    let nombreNacionalidad = form.NacionalidadForm.trim();
+    let nombre_nacionalidad = nombreNacionalidad.toUpperCase();
+    let nacionalidadFormateada = nombreNacionalidad.charAt(0).toUpperCase() + nombreNacionalidad.slice(1).toLowerCase();
+  
     let nacionalidad = {
       id: this.data.id,
-      nacionalidad: form.NacionalidadForm,
+      nacionalidad: nacionalidadFormateada,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
-    if ((nacionalidad.nacionalidad).toUpperCase() === (this.data.nombre).toUpperCase()) {
+  
+    // Si el nombre no ha cambiado, actualiza directamente
+    if (nombre_nacionalidad === this.data.nombre.toUpperCase()) {
       this.AlmacenarTitulo(nacionalidad);
-    }
-    else {
-      // METODO PARA VALIDAR DUPLICADOS
-      this.nacionalidadS.BuscarNacionalidad((nacionalidad.nacionalidad).toUpperCase()).subscribe(response => {
-        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
-          timeOut: 3000,
-        });
-      }, vacio => {
-        this.AlmacenarTitulo(nacionalidad);
+    } else {
+      // Verifica duplicado en toda la lista
+      this.nacionalidadS.ListarNacionalidad().subscribe((lista: any) => {
+        const existe = lista.some(n => n.nombre.toUpperCase() === nombre_nacionalidad);
+  
+        if (existe) {
+          this.toastr.warning('La nacionalidad ingresada ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+            timeOut: 3000,
+          });
+        } else {
+          this.AlmacenarTitulo(nacionalidad);
+        }
       });
     }
-  }
+  }  
 
 
 

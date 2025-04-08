@@ -594,33 +594,43 @@ export class PrincipalProvinciaComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionProvincias.selected.length;
+  
     this.provinciasEliminar = this.selectionProvincias.selected;
+  
     this.provinciasEliminar.forEach((datos: any) => {
-      this.provincias = this.provincias.filter((item: any) => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarProvincia(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.provincias = this.provincias.filter((item: any) => item.id !== datos.id);
+        }
+  
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+          this.selectionProvincias.clear();
+          this.provinciasEliminar = [];
           this.ListarProvincias();
         }
       });
-    }
-    );
+    });
   }
+  
 
   // METODO PARA CONFIRMAR ELIMINAR MULTIPLE
   ConfirmarDeleteMultiple() {

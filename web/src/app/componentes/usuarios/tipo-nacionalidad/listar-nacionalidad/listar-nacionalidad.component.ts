@@ -4,6 +4,8 @@ import { PageEvent } from '@angular/material/paginator';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -198,44 +200,48 @@ ConfirmarDeleteMultiple() {
           })
         }
       } else {
-        this.router.navigate(['/nacionalidades']);
+        this.router.navigate(['/nacionalidad']);
       }
     });
 }
 
-
-// METODO DE ELIMINACION MULTIPLE
-contador: number = 0;
-ingresar: boolean = false;
-EliminarMultiple() {
+ // METODO DE ELIMINACION MULTIPLE
+ EliminarMultiple() {
   const data = {
     user_name: this.user_name,
-    ip: this.ip, ip_local: this.ips_locales
+    ip: this.ip,
+    ip_local: this.ips_locales
   };
-  this.ingresar = false;
-  this.contador = 0;
-  this.nacionalidadesEliminar = this.selectionNacionalidades.selected;
-  this.nacionalidadesEliminar.forEach((datos: any) => {
-    this.nacionalidades = this.nacionalidades.filter(item => item.id !== datos.id);
-    this.contador = this.contador + 1;
-    this.restG.EliminarNacionalidad(datos.id, data).subscribe((res: any) => {
-      if (res.message === 'error') {
-        this.toastr.error('Existen datos relacionados con ' + datos.nacionalidad + '.', 'No fue posible eliminar.', {
+
+  const peticiones = this.selectionNacionalidades.selected.map((datos: any) =>
+    this.restG.EliminarNacionalidad(datos.id, data).pipe(
+      map((res: any) => ({ success: res.message !== 'error', nombre: datos.nombre })),
+      catchError(() => of({ success: false, nombre: datos.nombre }))
+    )
+  );
+
+  forkJoin(peticiones).subscribe(resultados => {
+    let eliminados = 0;
+
+    resultados.forEach(resultado => {
+      if (resultado.success) {
+        eliminados++;
+      } else {
+        this.toastr.warning('Existen datos relacionados con ' + resultado.nombre + '.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
-        this.contador = this.contador - 1;
-      } else {
-        if (!this.ingresar) {
-          this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-            timeOut: 6000,
-          });
-          this.ingresar = true;
-        }
-        this.ListarNacionalidades();
       }
     });
-  }
-  )
+
+    if (eliminados > 0) {
+      this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+        timeOut: 6000,
+      });
+    }
+    this.nacionalidadesEliminar = [];
+    this.selectionNacionalidades.clear();
+    this.ListarNacionalidades();
+  });
 }
 
 

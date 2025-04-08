@@ -126,25 +126,29 @@ export class TitulosComponent implements OnInit {
 
   // METODO PARA GUARDAR TITULO
   GuardarTitulo(form: any, idNivel: number) {
+    let nombreIngresado = form.tituloNombreForm.trim();
+    let nombreFormateado = nombreIngresado.charAt(0).toUpperCase() + nombreIngresado.slice(1).toLowerCase();
     let titulo = {
-      nombre: form.tituloNombreForm,
+      nombre: nombreFormateado,
       id_nivel: idNivel,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    // METODO PARA VALIDAR DUPLICADOS
     let verificar = {
-      nombre: (titulo.nombre).toUpperCase(),
-      nivel: titulo.id_nivel
-    }
+      nombre: nombreIngresado.toUpperCase(),
+      nivel: idNivel
+    };
+  
     this.rest.BuscarTituloNombre(verificar).subscribe(response => {
-      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {
       this.AlmacenarTitulo(titulo);
     });
   }
+  
 
   // METODO PARA ALMACENAR EN LA BASE DE DATOS
   AlmacenarTitulo(titulo: any) {

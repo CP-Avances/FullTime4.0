@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import ExcelJS, { FillPattern } from "exceljs";
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
@@ -200,49 +202,55 @@ export class ListarEstadoCivilComponent {
               this.selectionEstadosCivil.clear();
               this.ListarEstadoCivil();
             } else {
-              this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+              this.toastr.warning('No ha seleccionado estados civiles.', 'Ups!!! algo salio mal.', {
                 timeOut: 6000,
               })
             }
           } else {
-            this.router.navigate(['/nivelTitulos']);
+            this.router.navigate(['/estado-civil']);
           }
         });
     }
   
   
       // METODO DE ELIMINACION MULTIPLE
-      contador: number = 0;
-      ingresar: boolean = false;
       EliminarMultiple() {
         const data = {
           user_name: this.user_name,
-          ip: this.ip, ip_local: this.ips_locales
+          ip: this.ip,
+          ip_local: this.ips_locales
         };
-        this.ingresar = false;
-        this.contador = 0;
-        this.estadosCivilEliminar = this.selectionEstadosCivil.selected;
-        this.estadosCivilEliminar.forEach((datos: any) => {
-          this.estadosCivil = this.estadosCivil.filter(item => item.id !== datos.id);
-          this.contador = this.contador + 1;
-          this.restEC.EliminarEstadoCivil(datos.id, data).subscribe((res: any) => {
-            if (res.message === 'error') {
-              this.toastr.error('Existen datos relacionados con ' + datos.estado_civil + '.', 'No fue posible eliminar.', {
+      
+        const peticiones = this.selectionEstadosCivil.selected.map((datos: any) =>
+          this.restEC.EliminarEstadoCivil(datos.id, data).pipe(
+            map((res: any) => ({ success: res.message !== 'error', estado_civil: datos.estado_civil })),
+            catchError(() => of({ success: false, estado_civil: datos.estado_civil }))
+          )
+        );
+      
+        forkJoin(peticiones).subscribe(resultados => {
+          let eliminados = 0;
+      
+          resultados.forEach(resultado => {
+            if (resultado.success) {
+              eliminados++;
+            } else {
+              this.toastr.warning('Existen datos relacionados con ' + resultado.estado_civil + '.', 'No fue posible eliminar.', {
                 timeOut: 6000,
               });
-              this.contador = this.contador - 1;
-            } else {
-              if (!this.ingresar) {
-                this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-                  timeOut: 6000,
-                });
-                this.ingresar = true;
-              }
-              this.ListarEstadoCivil();
             }
           });
-        }
-        )
+      
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+              timeOut: 6000,
+            });
+          }
+      
+          this.estadosCivilEliminar = [];
+          this.selectionEstadosCivil.clear();
+          this.ListarEstadoCivil();
+        });
       }
     
   
