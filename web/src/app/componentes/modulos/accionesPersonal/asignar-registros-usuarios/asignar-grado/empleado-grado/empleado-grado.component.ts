@@ -73,9 +73,8 @@ export class EmpleadoGradoComponent {
       this.validar.ObtenerIPsLocales().then((ips) => {
         this.ips_locales = ips;
       }); 
-  
-      console.log('dataList: ',this.data)
       this.name_sucursal = this.data.nombre
+      this.infoEmpleGrado = false;
       this.BuscarUsuariosSucursal();
       this.OptenerListGrados();
     }
@@ -174,9 +173,6 @@ export class EmpleadoGradoComponent {
     this.rest.ObtenerGradoUsuario(valor.id).subscribe({
       next: (respuesta: any) => {
         if (respuesta.status == 200) {
-
-          console.log('respuesta: ', respuesta)
-
           this.nombreUsuarioSelect = valor.apellido + ' ' + valor.nombre
           this.idEmpleadoSelec = valor.id
           this.listaEmpleGrado = respuesta.grados
@@ -240,5 +236,9 @@ export class EmpleadoGradoComponent {
      },
    })
 
+  }
+
+  regresar(){
+    this.ngOnInit();
   }
 }

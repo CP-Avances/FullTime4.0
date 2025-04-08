@@ -73,8 +73,17 @@
     <!--  **************************** INFORMACION DE EMPLEADO PROCESO *********************************  -->
     <div style="padding-bottom: 10px;" *ngIf="infoEmpleProceso">
         <div class="d-flex bd-highlight" id="titulo">
-            <div class="w-100 bd-highlight">
-                <span>{{nombreUsuarioSelect.toLocaleUpperCase()}}</span>
+            <div class="row w-100">
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2"></div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>{{nombreUsuarioSelect.toLocaleUpperCase()}}</span>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                        (click)="regresar()">
+                        Regresar
+                    </button>
+                </div>
             </div>
         </div>
         <div class="table-responsive">

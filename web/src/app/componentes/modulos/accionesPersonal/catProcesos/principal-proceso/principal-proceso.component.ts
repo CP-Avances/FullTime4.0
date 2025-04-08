@@ -275,18 +275,24 @@ export class PrincipalProcesoComponent implements OnInit {
       ip: this.ip, ip_local: this.ips_locales
     }
 
-    console.log('data: ',data);
-
     this.rest.EliminarProcesoMult(data).subscribe({
       next: () => {
         this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
           timeOut: 5000,
         });
       }, error: (err) => {
-        console.log('error: ', err)
-        this.toastr.error(err.error.message, 'Ups !!! algo salio mal', {
-          timeOut: 4000,
-        });
+        if(err.status == 300){
+          this.toastr.error(err.error.message,'', {
+            timeOut: 4500,
+          });
+          this.toastr.warning(err.error.ms2, 'Advertencia.', {
+            timeOut: 5000,
+          });
+        }else{
+          this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
+            timeOut: 4000,
+          });
+        }
       },
     })
   }

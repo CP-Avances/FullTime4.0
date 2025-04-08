@@ -239,4 +239,8 @@ export class EmpleadoProcesoComponent {
     })
   }
 
+  regresar(){
+    this.ngOnInit();
+  }
+
 }

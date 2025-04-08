@@ -242,4 +242,8 @@ export class EmpleadoGrupoComponent {
     })
   }
 
+  regresar(){
+    this.ngOnInit();
+  }
+
 }

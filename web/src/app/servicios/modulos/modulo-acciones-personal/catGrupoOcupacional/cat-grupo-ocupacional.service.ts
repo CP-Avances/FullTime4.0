@@ -42,7 +42,6 @@ export class CatGrupoOcupacionalService {
 
   // METODO PARA ELIMINAR GRUPO OCUPACIONAL POR EMPLEADO **USADO
   EliminarGrupoOcupaEmple(id: number, datos: any){
-    console.log('enviar id: ',id);
     const url = `${environment.url}/grupoOcupacional/deleteGrupoOcupacional/${id}`;
     const httpOtions = {
       body: datos

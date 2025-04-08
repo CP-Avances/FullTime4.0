@@ -1026,10 +1026,13 @@ class GradoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar, user_name, ip, ip_local } = req.body;
             let error = false;
+            var count = 0;
+            var datoEliminar = '';
             try {
                 for (const item of listaEliminar) {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
+                    datoEliminar = item.descripcion;
                     const res = yield database_1.default.query(`
                DELETE FROM map_cat_grado WHERE id = $1
              `, [item.id]);
@@ -1047,6 +1050,7 @@ class GradoControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
+                    count += 1;
                 }
                 res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
             }
@@ -1054,10 +1058,14 @@ class GradoControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 error = true;
-                console.log('err: ', err);
                 if (error) {
                     if (err.table == 'map_empleado_grado') {
-                        return res.status(500).jsonp({ message: err.detail });
+                        if (count <= 1) {
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grado ' + datoEliminar });
+                        }
+                        else if (count > 1) {
+                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grado ' + datoEliminar });
+                        }
                     }
                     else {
                         return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });

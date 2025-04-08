@@ -6,6 +6,7 @@ import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
 import Excel from 'exceljs';
+import { count } from 'console';
 
 class GrupoOcupacionalControlador {
 
@@ -1346,20 +1347,19 @@ class GrupoOcupacionalControlador {
   public async EliminarGrupoMultiple(req: Request, res: Response): Promise<any> {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-
+    var count = 0;
+    var datoEliminar = ''
     try {
 
       for (const item of listaEliminar) {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-
+        datoEliminar = item.descripcion
         const res = await pool.query(
           `
              DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
            `
           , [item.id]);
-
-        console.log('res: ', res)
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1375,6 +1375,7 @@ class GrupoOcupacionalControlador {
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
+        count += 1;
       }
 
       res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
@@ -1383,11 +1384,14 @@ class GrupoOcupacionalControlador {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       error = true;
-      console.log('err: ', err)
 
       if (error) {
         if (err.table == 'map_empleado_grupo_ocupacional') {
-          return res.status(500).jsonp({ message: err.detail });
+          if(count == 1){
+            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registro.', ms2:'Existen datos relacionados con el grupo '+datoEliminar });
+          }else{
+            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registros.', ms2:'Existen datos relacionados con el grupo '+datoEliminar });
+          }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
         }
