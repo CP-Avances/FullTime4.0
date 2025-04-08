@@ -107,6 +107,7 @@ export class LoginComponent implements OnInit {
           //GUARDAMOS IP O DEVOLVEMOS ERROR
           this.mensaje = v;
           if (this.mensaje.message === 'ok') {
+            console.log("empresaURL: ", this.mensaje.empresas[0].empresa_direccion);
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
           }
           else if (this.mensaje.message === 'vacio') {
@@ -133,7 +134,7 @@ export class LoginComponent implements OnInit {
           var hora = localStorage.getItem('time_wait');
 
           if (hora != undefined) {
-            if (f.format('HH:mm:ss') > hora) {
+            if (f.toFormat('HH:mm:ss') > hora) {
               localStorage.removeItem('time_wait');
               this.intentos = 0;
               local = false;
