@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -760,38 +762,51 @@ export class CatTipoCargosComponent {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.ingresar = false;
-    this.contador = 0;
-    this.tiposCargoEliminar = this.selectionTipoCargo.selected;
-    this.tiposCargoEliminar.forEach((datos: any) => {
-      this.listaTipoCargos = this.listaTipoCargos.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this._TipoCargos.Eliminar(datos.id, data).subscribe(res => {
-        if (!this.ingresar) {
-          this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-            timeOut: 6000,
-          });
-          this.ingresar = true;
-        }
-        this.ngOnInit();
-      }, error => {
-        if (error.error.code == "23503") {
-          this.toastr.error('Existen datos relacionados con ' + datos.cargo + '.', 'No fue posible eliminar.', {
-            timeOut: 6000,
-          });
-        } else {
-          this.toastr.error(error.error.message, 'Error al eliminar dato.', {
-            timeOut: 6000,
-          });
-        }
-        this.contador = this.contador - 1;
-
-      })
-    }
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    };
+  
+    const peticiones = this.selectionTipoCargo.selected.map((datos: any) =>
+      this._TipoCargos.Eliminar(datos.id, data).pipe(
+        map((res: any) => ({ success: true, cargo: datos.cargo, relacionado: false })),
+        catchError((error) => {
+          if (error.error.code === "23503") {
+            return of({ success: false, cargo: datos.cargo, relacionado: true });
+          } else {
+            this.toastr.error(error.error.message, 'Error al eliminar dato.', {
+              timeOut: 6000,
+            });
+            return of({ success: false, cargo: datos.cargo, relacionado: false });
+          }
+        })
+      )
     );
+  
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+  
+      resultados.forEach((resultado: any) => {
+        if (resultado.success) {
+          eliminados++;
+        } else if (resultado.relacionado) {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.cargo + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+        }
+      });
+  
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+  
+      this.tiposCargoEliminar = [];
+      this.selectionTipoCargo.clear();
+      this.ngOnInit();
+    });
   }
+  
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {

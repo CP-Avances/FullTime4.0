@@ -28,7 +28,7 @@ export class RegistrarGeneroComponent {
 
   constructor(
     private toastr: ToastrService,
-    private genero: GenerosService,
+    private generoS: GenerosService,
     public ventana: MatDialogRef<RegistrarGeneroComponent>,
     public validar: ValidacionesService,
   ) { }
@@ -41,30 +41,31 @@ export class RegistrarGeneroComponent {
     });
   }
 
-  // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarGenero(form: any) {
     let nombreGenero = form.generoForm.trim();
-    let generoFormateado = nombreGenero.charAt(0).toUpperCase() + nombreGenero.slice(1).toLowerCase();
+    let nombre_genero = nombreGenero.toUpperCase(); 
+    let generoFormateado = nombreGenero.charAt(0).toUpperCase() + nombreGenero.slice(1).toLowerCase(); 
   
     let genero = {
-      genero: generoFormateado,
+      genero: generoFormateado, 
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-  
-    this.genero.BuscarGenero(generoFormateado).subscribe(response => {
-      this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups!!! Algo salió mal.', {
+
+    this.generoS.BuscarGenero(nombre_genero).subscribe(response => {
+      this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {
       this.GuardarDatos(genero);
     });
   }
+  
 
   // METODO PARA ALMACENRA EN LA BASE DE DATOS
   GuardarDatos(genero: any) {
-    this.genero.RegistrarGenero(genero).subscribe(response => {
+    this.generoS.RegistrarGenero(genero).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });

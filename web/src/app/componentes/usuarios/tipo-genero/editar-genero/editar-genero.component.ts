@@ -69,8 +69,9 @@ export class EditarGeneroComponent {
   // MÉTODO PARA ACTUALIZAR GÉNERO
   ActualizarTitulo(form: any) {
     let nombreGenero = form.GeneroForm.trim();
+    let nombre_genero = nombreGenero.toUpperCase(); 
     let generoFormateado = nombreGenero.charAt(0).toUpperCase() + nombreGenero.slice(1).toLowerCase();
-
+  
     let genero = {
       id: this.data.id,
       genero: generoFormateado,
@@ -78,12 +79,12 @@ export class EditarGeneroComponent {
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-
+  
     if (generoFormateado === this.data.genero) {
       this.AlmacenarTitulo(genero);
     } else {
-      this.generoS.BuscarGenero(generoFormateado).subscribe(response => {
-        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+      this.generoS.BuscarGenero(nombre_genero).subscribe(response => {
+        this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
           timeOut: 3000,
         });
       }, vacio => {
@@ -91,6 +92,7 @@ export class EditarGeneroComponent {
       });
     }
   }
+  
 
   // MÉTODO PARA ALMACENAR DATOS DEL GÉNERO ACTUALIZADO EN LA BASE DE DATOS
   AlmacenarTitulo(titulo: any) {

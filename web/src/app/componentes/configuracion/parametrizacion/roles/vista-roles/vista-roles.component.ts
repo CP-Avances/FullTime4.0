@@ -6,6 +6,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -749,32 +751,40 @@ export class VistaRolesComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
-    this.rolesEliminar = this.selectionRoles.selected;
-    this.rolesEliminar.forEach((datos: any) => {
-      this.roles = this.roles.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this.rest.EliminarRoles(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+  
+    const peticiones = this.selectionRoles.selected.map((datos: any) =>
+      this.rest.EliminarRoles(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', nombre: datos.nombre })),
+        catchError(() => of({ success: false, nombre: datos.nombre }))
+      )
+    );
+  
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+  
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ObtenerRoles();
         }
       });
-    }
-    )
+  
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+  
+      this.rolesEliminar = [];
+      this.selectionRoles.clear();
+      this.ObtenerRoles();
+    });
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO LOS REGISTROS

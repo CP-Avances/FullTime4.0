@@ -5,6 +5,8 @@ import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -195,12 +197,12 @@ export class ListarGeneroComponent {
             this.selectionGeneros.clear();
             this.ListarGeneros();
           } else {
-            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ningun genero.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
           }
         } else {
-          this.router.navigate(['/estado-civil']);
+          this.router.navigate(['/genero']);
         }
       });
   }
@@ -212,32 +214,40 @@ export class ListarGeneroComponent {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
-    this.generosEliminar = this.selectionGeneros.selected;
-    this.generosEliminar.forEach((datos: any) => {
-      this.generos = this.generos.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this.restG.EliminarGenero(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.genero + '.', 'No fue posible eliminar.', {
+  
+    const peticiones = this.selectionGeneros.selected.map((datos: any) =>
+      this.restG.EliminarGenero(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', genero: datos.genero })),
+        catchError(() => of({ success: false, genero: datos.genero }))
+      )
+    );
+  
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+  
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.genero + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ListarGeneros();
         }
       });
-    }
-    )
+  
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+  
+      this.generosEliminar = [];
+      this.selectionGeneros.clear();
+      this.ListarGeneros();
+    });
   }
 
 

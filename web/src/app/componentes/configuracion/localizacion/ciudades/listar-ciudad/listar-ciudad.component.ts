@@ -595,33 +595,44 @@ export class ListarCiudadComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    }
-    this.ingresar = false;
-    this.contador = 0;
+      ip: this.ip,
+      ip_local: this.ips_locales
+    };
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectiondatosCiudades.selected.length;
+  
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
+  
     this.datosCiudadesEliminar.forEach((datos: any) => {
-      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarCiudad(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+        }
+  
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+  
+          this.selectiondatosCiudades.clear();
+          this.datosCiudadesEliminar = [];
           this.ListarCiudades();
         }
       });
-    }
-    )
+    });
   }
+  
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {

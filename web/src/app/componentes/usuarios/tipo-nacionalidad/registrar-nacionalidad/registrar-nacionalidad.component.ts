@@ -16,7 +16,7 @@ import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/
 })
 export class RegistrarNacionalidadComponent {
 
-  
+  nacionalidades: any = [];
   ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
@@ -31,7 +31,7 @@ export class RegistrarNacionalidadComponent {
 
   constructor(
     private toastr: ToastrService,
-    private nacionalidad: NacionalidadService,
+    private nacionalidadS: NacionalidadService,
     public ventana: MatDialogRef<RegistrarNacionalidadComponent>,
     public validar: ValidacionesService,
   ) { }
@@ -44,28 +44,36 @@ export class RegistrarNacionalidadComponent {
     });
   }
 
-   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
-   InsertarNacionalidad(form: any) {
+  InsertarNacionalidad(form: any) {
+    let nombreNacionalidad = form.nacionalidadForm.trim();
+    let nombre_nacionalidad = nombreNacionalidad.toUpperCase();
+    let nacionalidadFormateada = nombreNacionalidad.charAt(0).toUpperCase() + nombreNacionalidad.slice(1).toLowerCase();
+  
     let nacionalidad = {
-      nacionalidad: form.nacionalidadForm,
+      nacionalidad: nacionalidadFormateada,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    // VERIIFCAR DUPLICIDAD
-    let nombre_nacionalidad = (nacionalidad.nacionalidad).toUpperCase();
-    this.nacionalidad.BuscarNacionalidad(nombre_nacionalidad).subscribe(response => {
-      this.toastr.warning('La nacionalidad ingresada ya existe en el sistema.', 'Ups!!! algo salio mal.', {
-        timeOut: 3000,
-      });
-    }, vacio => {
-      // GUARDAR DATOS EN EL SISTEMA
-      this.GuardarDatos(nacionalidad);
+  
+    this.nacionalidadS.ListarNacionalidad().subscribe((lista: any) => {
+      const existe = lista.some(n => n.nombre.toUpperCase() === nombre_nacionalidad);
+  
+      if (existe) {
+        this.toastr.warning('La nacionalidad ingresada ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+          timeOut: 3000,
+        });
+      } else {
+        this.GuardarDatos(nacionalidad);
+      }
     });
   }
+  
+  
 
   // METODO PARA ALMACENRA EN LA BASE DE DATOS
   GuardarDatos(nacionalidad: any) {
-    this.nacionalidad.RegistrarNacionalidad(nacionalidad).subscribe(response => {
+    this.nacionalidadS.RegistrarNacionalidad(nacionalidad).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
@@ -90,6 +98,13 @@ export class RegistrarNacionalidadComponent {
     return this.validar.IngresarSoloLetras(e);
   }
 
+  // METODO PARA BUSCAR NACIONALIDADES
+  ListarNacionalidades() {
 
+    this.nacionalidades = [];
+    this.nacionalidadS.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+  })
 
+}
 }

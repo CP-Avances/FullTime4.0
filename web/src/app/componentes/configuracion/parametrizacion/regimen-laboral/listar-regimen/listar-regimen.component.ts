@@ -6,6 +6,8 @@ import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from "file-saver";
@@ -670,31 +672,37 @@ export class ListarRegimenComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-    this.ingresar = false;
-    this.contador = 0;
-    this.regimenesEliminar = this.selectionRegimen.selected;
-    this.regimenesEliminar.forEach((datos: any) => {
-      this.regimen = this.regimen.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      //AQUI MODIFICAR EL METODO
-      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+
+    const peticiones = this.selectionRegimen.selected.map((datos: any) =>
+      this.rest.EliminarRegistro(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', descripcion: datos.descripcion })),
+        catchError(() => of({ success: false, descripcion: datos.descripcion }))
+      )
+    );
+
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ObtenerRegimen();
         }
       });
-    }
-    )
+
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+
+      this.regimenesEliminar = [];
+      this.selectionRegimen.clear();
+      this.ObtenerRegimen();
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE

@@ -849,64 +849,69 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   EliminarMultiple() {
-    const datos = {
+    const datosGenerales = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    }
-    this.ingresar = false;
-    this.contador = 0;
+      ip: this.ip,
+      ip_local: this.ips_locales
+    };
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionDepartamentos.selected.length;
+  
     this.departamentosEliminar = this.selectionDepartamentos.selected;
+  
     this.departamentosEliminar.forEach((datos: any) => {
-      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id, datos).subscribe((res: any) => {
+      this.rest.EliminarRegistro(datos.id, datosGenerales).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          this.departamentosNiveles = [];
-          var id_departamento = datos.id;
-          var id_establecimiento = datos.id_sucursal;
+          eliminados++;
+          this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+  
+          const id_departamento = datos.id;
+          const id_establecimiento = datos.id_sucursal;
+  
           if (datos.nivel != 0) {
-            this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
-              this.departamentosNiveles = datos;
-              this.departamentosNiveles.filter(item => {
-                this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
-                  (res: any) => {
-                    if (res.message === 'error') {
-                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.', {
-                        timeOut: 6000,
-                      });
-                    } else {
-                      this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
-                        timeOut: 6000,
-                      });
-                      this.ListaDepartamentos();
-                    }
+            this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(niveles => {
+              const nivelesArray = Array.isArray(niveles) ? niveles : [];
+  
+              nivelesArray.forEach((item: any) => {
+                this.rest.EliminarRegistroNivelDepa(item.id, datosGenerales).subscribe((res: any) => {
+                  if (res.message === 'error') {
+                    this.toastr.warning('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.', {
+                      timeOut: 6000,
+                    });
+                  } else {
+                    this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
                   }
-                )
-                this.ListaDepartamentos();
-              })
-            })
-            this.ListaDepartamentos();
-          } else {
-            this.ListaDepartamentos();
+                });
+              });
+            });
           }
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+        }
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+  
+          this.selectionDepartamentos.clear();
+          this.departamentosEliminar = [];
           this.ListaDepartamentos();
         }
       });
-    }
-    )
+    });
   }
-
+  
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
