@@ -87,9 +87,9 @@ export class EditarEmpleadoComponent implements OnInit {
         nacionalidad.nombre.toLowerCase().includes(filterValue)
       );
     }
-    return this.nacionalidades; 
+    return this.nacionalidades;
   }
-  
+
 
   // METODO PARA LISTAR ROLES
   CargarRoles() {
@@ -132,7 +132,7 @@ export class EditarEmpleadoComponent implements OnInit {
         startWith(''),
         map((value: any) => this._filter(value))
       );
-      
+
     });
   }
 
@@ -309,7 +309,6 @@ export class EditarEmpleadoComponent implements OnInit {
     this.contador = 0;
     let dataUser = {
       id_empleado: this.idEmpleado,
-      contrasena: this.usuario[0].contrasena,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: estado_user,
@@ -412,22 +411,22 @@ export class EditarEmpleadoComponent implements OnInit {
     this.primeroFormGroup.reset();
     this.segundoFormGroup.reset();
     this.terceroFormGroup.reset();
-  
+
   }
 
   // METODO PARA CERRAR VENTANA
   Cancelar(opcion: any) {
     this.componentev.ver_empleado = true;
-    
+
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_empleado = false;
-      
+
       if (opcion === 2) {
         this.componentev.VerEmpleado(this.componentev.formato_fecha);
-  
+
         setTimeout(() => {
           const divMapa = document.getElementById('geolocalizacion');
-  
+
           if (divMapa) {
             var empleado = this.componentev.empleadoUno[0].nombre + ' ' + this.componentev.empleadoUno[0].apellido;
             this.componentev.MapGeolocalizar(
@@ -435,7 +434,7 @@ export class EditarEmpleadoComponent implements OnInit {
               this.componentev.empleadoUno[0].longitud,
               empleado
             );
-          } 
+          }
         }, 200);
       }
     }

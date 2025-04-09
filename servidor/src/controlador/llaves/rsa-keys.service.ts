@@ -25,16 +25,13 @@ class RsaKeysService {
 
     public encriptarLogin(password: string): string{
         //Encriptacion con key encriptada para passwords
-        let aux = CryptoJS.AES.encrypt(password, this.keyLogin, { iv: this.iv}).toString();
-        return aux;
+        return CryptoJS.AES.encrypt(password, this.keyLogin, { iv: this.iv}).toString();
     }
 
-    
     private desencriptarLogin(passwordEncrypted: string): string {
         return CryptoJS.AES.decrypt(passwordEncrypted, this.keyLogin, { iv: this.iv}).toString(CryptoJS.enc.Utf8);
     }
     
-
 }
 
 export const FUNCIONES_LLAVES = new RsaKeysService();

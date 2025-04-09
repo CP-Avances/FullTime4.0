@@ -161,61 +161,57 @@ export class LoginComponent implements OnInit {
   }
 
   // METODO PARA INICIAR SESION
-  IniciarSesion(form: any) {
-    // CIFRADO DE CONTRASEÑA?
+  async IniciarSesion(form: any) {
+    console.log('IniciarSesion');
+    // CIFRADO DE CONTRASENA
     let clave = form.passwordF.toString();
-    
+
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
       pass: clave,
       movil: false
     };
-    console.log("IPs Locales del Cliente:", this.ips_locales);
-    // VALIDACION DEL LOGIN
-    this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
+    console.log('dataUsuario', dataUsuario);
+
+    try {
+      const datos = await this.rest.ValidarCredenciales(dataUsuario);
       console.log('res login ', datos)
+
       if (datos.message === 'error') {
         const f = DateTime.now();
-        const espera = Duration.fromISO('PT1M'); // 1 minuto
-        if (this.intentos === 12) {
-          const verificar = f.plus(espera).toFormat('HH:mm:ss');
+
+        if (this.intentos === 200) {
+          const verificar = f.plus({ minutes: 1 }).toFormat('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
+
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {
             timeOut: 3000,
           });
-        }
-        else {
+
+        } else {
           this.toastr.error('Usuario o contraseña no son correctos.', 'Ups!!! algo ha salido mal.', {
             timeOut: 6000,
-          })
+          });
         }
-      }
-      else if (datos.message === 'error_') {
-        this.toastr.error('Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.', 'Oops!', {
-          timeOut: 6000,
-        })
-      }
-      else if (datos.message === 'inactivo') {
-        this.toastr.error('Usuario no se encuentra activo en el sistema.', 'Oops!', {
-          timeOut: 6000,
-        })
-      }
-      else if (datos.message === 'licencia_expirada') {
-        this.toastr.error('Licencia del sistema ha expirado.', 'Oops!', {
-          timeOut: 6000,
-        })
-      }
-      else if (datos.message === 'sin_permiso_acceso') {
-        this.toastr.error('Usuario no tiene permisos de acceso al sistema.', 'Oops!', {
-          timeOut: 6000,
-        })
-      }
-      else if (datos.message === 'licencia_no_existe') {
-        this.toastr.error('No se ha encontrado registro de licencia del sistema.', 'Oops!', {
-          timeOut: 6000,
-        })
-      }
-      else {
+
+        return;
+
+      } else {
+        const mensajesError: { [key: string]: string } = {
+          error_: "Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.",
+          inactivo: "Usuario no se encuentra activo en el sistema.",
+          licencia_expirada: "Licencia del sistema ha expirado.",
+          sin_permiso_acceso: "Usuario no tiene permisos de acceso al sistema.",
+          licencia_no_existe: "No se ha encontrado registro de licencia del sistema.",
+          sin_permiso_acces_movil: "Usuario no habilitado para usar la aplicación móvil.",
+        };
+
+        if (mensajesError[datos.message]) {
+          return this.toastr.error(mensajesError[datos.message], 'Oops!', {
+            timeOut: 6000,
+          });
+        }
+
         localStorage.setItem('rol', datos.rol);
         localStorage.setItem('token', datos.token);
         localStorage.setItem('ip', datos.ip_adress);
@@ -228,10 +224,12 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('ultimoContrato', datos.id_contrato);
         localStorage.setItem('bool_timbres', datos.acciones_timbres);
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+
         this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
-        })
+        });
+
         if (!!localStorage.getItem("redireccionar")) {
           let redi = localStorage.getItem("redireccionar");
           this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
@@ -239,16 +237,12 @@ export class LoginComponent implements OnInit {
         } else {
           this.router.navigate(['/home']);
         };
+
       }
-    }, err => {
-      if (err.error.message === 'sin_permiso_acceso') {
-        this.toastr.error('Usuario no tiene permisos de acceso al sistema.', 'Oops!', {
-          timeOut: 6000,
-        })
-      } else{
-        this.toastr.error(err.error.message);
-      }
-    })
+
+    } catch (error: any) {
+      this.toastr.error(error.error.message)
+    }
   }
 
 }

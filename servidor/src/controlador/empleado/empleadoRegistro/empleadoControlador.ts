@@ -7,13 +7,12 @@ import { Request, Response } from 'express';
 import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
-import { Md5 } from 'ts-md5';
 import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
 import sharp from 'sharp';
 import fs from 'fs';
-import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';//Importacion de llaves
+import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';
 
 class EmpleadoControlador {
 
@@ -2151,8 +2150,12 @@ class EmpleadoControlador {
           apellidoE = lastname1
         }
 
+        //TODO: ACA SE REALIZA LA ENCRIPTACION
+        console.log(' encriptando')
         // ENCRIPTAR CONTRASEÑA
-        var contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+        let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+        console.log('contraseña plantilla automatico: ', contrasena);
+
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
           nacionalidad, usuario, rol } = data;
@@ -2307,7 +2310,7 @@ class EmpleadoControlador {
           await pool.query('COMMIT');
         }
         contador = contador + 1;
-        contrasena = 'undefined';
+        contrasena = '';
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
@@ -2900,8 +2903,11 @@ class EmpleadoControlador {
           apellidoE = lastname1
         }
 
+        //TODO: ACA SE REALIZA LA ENCRIPTACION
+
         // ENCRIPTAR CONTRASEÑA
-        var contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+        let contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+        console.log('contraseña plantilla manual: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,

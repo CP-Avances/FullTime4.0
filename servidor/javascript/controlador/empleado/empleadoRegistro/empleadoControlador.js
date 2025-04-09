@@ -26,7 +26,7 @@ const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importDefault(require("fs"));
-const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service")); //Importacion de llaves
+const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service"));
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -1922,8 +1922,11 @@ class EmpleadoControlador {
                         let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
                         apellidoE = lastname1;
                     }
+                    //TODO: ACA SE REALIZA LA ENCRIPTACION
+                    console.log(' encriptando');
                     // ENCRIPTAR CONTRASEÑA
-                    var contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
+                    let contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
+                    console.log('contraseña plantilla automatico: ', contrasena);
                     // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                     const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                     //OBTENER ID DEL ESTADO_CIVIL
@@ -2048,7 +2051,7 @@ class EmpleadoControlador {
                         yield database_1.default.query('COMMIT');
                     }
                     contador = contador + 1;
-                    contrasena = 'undefined';
+                    contrasena = '';
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
@@ -2611,8 +2614,10 @@ class EmpleadoControlador {
                         let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
                         apellidoE = lastname1;
                     }
+                    //TODO: ACA SE REALIZA LA ENCRIPTACION
                     // ENCRIPTAR CONTRASEÑA
-                    var contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
+                    let contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
+                    console.log('contraseña plantilla manual: ', contrasena);
                     // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                     const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                     // OBTENER ID DEL ESTADO_CIVIL

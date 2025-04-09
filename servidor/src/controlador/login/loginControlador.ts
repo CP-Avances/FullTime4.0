@@ -29,7 +29,7 @@ class LoginControlador {
 
   // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
-
+    console.log('ValidarCredenciales');
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
@@ -107,7 +107,8 @@ class LoginControlador {
           SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `
         );
-        console.log('(process.env.DIRECCIONAMIENTO as string)', (process.env.DIRECCIONAMIENTO as string));
+
+        //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
@@ -212,6 +213,7 @@ class LoginControlador {
         return res.jsonp({ message: 'error' });
       }
     } catch (error) {
+      console.log('error', error)
       return res.jsonp({ message: 'error', text: ip_cliente });
     }
   }
@@ -325,6 +327,7 @@ class LoginControlador {
     console.log(contrasena,'_',contrasena_encriptada);
 
     try {
+      let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
       try {
@@ -332,15 +335,15 @@ class LoginControlador {
         await pool.query('BEGIN');
 
         // OBTENER DATOSORIGINALES
-        const datosOriginales = await pool.query(
+        const consulta = await pool.query(
           `
-          SELECT contrasena FROM eu_usuarios WHERE id_empleado = $1
+          SELECT * FROM eu_usuarios WHERE id_empleado = $1
           `
           , [id_empleado]);
 
-        const [contrasenaOriginal] = datosOriginales.rows;
+        const [datosOriginales] = consulta.rows;
 
-        if (!contrasenaOriginal) {
+        if (!datosOriginales) {
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_usuarios',
             usuario: user_name,
@@ -364,14 +367,16 @@ class LoginControlador {
           `
           , [id_empleado, contrasena_encriptada]);
 
+        datosOriginales.contrasena = '';
+
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
-          datosOriginales: JSON.stringify(contrasenaOriginal),
-          datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,//FIXME COLOCAR TODA LA DATA DE LA ACTUALIZACION
-          ip,
+          datosOriginales: JSON.stringify(datosOriginales),
+          datosNuevos: `{"contrasena": "Contraseña actualizada"}`,
+          ip: ip,
           ip_local: ip_local,
           observacion: null
         });

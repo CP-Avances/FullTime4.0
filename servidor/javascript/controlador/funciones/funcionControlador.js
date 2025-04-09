@@ -18,6 +18,7 @@ class FuncionesControlador {
     // METODO PARA LISTAR FUNCIONES DEL SISTEMA  **USO TEMPORAL
     ConsultarFunciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('funciones...');
             const FUNCIONES = yield database_1.default.query(`
             SELECT * FROM e_funciones
             `);

@@ -6,7 +6,6 @@ import { ToastrService } from 'ngx-toastr'
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Md5 } from 'ts-md5/dist/md5';
 import { MatRadioChange } from '@angular/material/radio';
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -60,8 +59,8 @@ export class RegistroComponent implements OnInit {
     public generoS: GenerosService,
     public estadoS: EstadoCivilService,
     private cdRef: ChangeDetectorRef
-  ) { 
-   
+  ) {
+
   }
    identificacion ="Cedula"
 
@@ -154,10 +153,10 @@ export class RegistroComponent implements OnInit {
           this.cedula = true;
           this.escritura = true;
         }
-    
+
       }
       else {
-        
+
         this.escritura = false;
 
       }
@@ -246,7 +245,7 @@ export class RegistroComponent implements OnInit {
   // METODO PARA GUARDAR DATOS DE USUARIO
   contador: number = 0;
   GuardarDatosUsuario(form3: any, id: any, form1: any) {
-    // CIFRADO DE CONTRASEÑA?
+    // CIFRADO DE CONTRASEÑA
     let clave = form3.passForm.toString();
     let dataUser = {
       id_empleado: id,
@@ -310,7 +309,7 @@ export class RegistroComponent implements OnInit {
 
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
-  
+
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
@@ -331,7 +330,7 @@ export class RegistroComponent implements OnInit {
 
   // METODO PARA COLOCAR EL CODIGO SIMILAR AL CAMPO CEDULA
   LlenarCodigo(form1: any) {
-    
+
     if (this.cedula) {
       let codigo: number = form1.cedulaForm;
       this.primeroFormGroup.patchValue({
@@ -365,7 +364,7 @@ export class RegistroComponent implements OnInit {
     });
   }
 
-  
+
 
   CambiarIdentificacion(ob: MatRadioChange){
     this.identificacion=ob.value;
@@ -421,7 +420,7 @@ export class RegistroComponent implements OnInit {
 
   pasaporteValida:boolean=false;
   ValidarPasaporte(pasaporte:any){
-    
+
 
   }
 

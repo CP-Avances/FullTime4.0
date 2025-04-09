@@ -22,7 +22,6 @@ class UsuarioControlador {
   public async CrearUsuario(req: Request, res: Response) {
     try {
       const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip, ip_local } = req.body;
-
       let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasena);
 
       // INCIAR TRANSACCION
@@ -64,7 +63,7 @@ class UsuarioControlador {
     const { id_empleado } = req.params;
     const UN_USUARIO = await pool.query(
       `
-      SELECT * FROM eu_usuarios WHERE id_empleado = $1
+      SELECT id, id_empleado, id_rol, usuario, estado, app_habilita, web_habilita, administra_comida, frase  FROM eu_usuarios WHERE id_empleado = $1
       `
       , [id_empleado]);
     if (UN_USUARIO.rowCount != 0) {
@@ -115,7 +114,7 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
     try {
-      const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
+      const { usuario, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -143,10 +142,12 @@ class UsuarioControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3, estado = $5 
+        UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
         WHERE id_empleado = $4 RETURNING *
         `
-        , [usuario, contrasena, id_rol, id_empleado, estado]);
+        , [usuario, id_rol, estado, id_empleado]);
+
+      datosOriginales.contrasena = '';
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -175,9 +176,9 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR CONTRASEÑA    **USADO
   public async CambiarPasswordUsuario(req: Request, res: Response): Promise<Response> {
     try {
-      const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
+      const { contrasenaActual, contrasena, id_empleado, user_name, ip, ip_local } = req.body;
       let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
-  
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -202,20 +203,30 @@ class UsuarioControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
+      let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasenaActual);
+      const contrasenaCorrecta = contrasena_encriptado == datosOriginales.contrasena;
+      
+      if (!contrasenaCorrecta) {
+        await pool.query('COMMIT');
+        return res.status(403).jsonp({ message: 'La contraseña actual no es correcta.' });
+      }
+      
       await pool.query(
         `
         UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `
         , [contrasena_encriptada, id_empleado]);
-  
+
+      datosOriginales.contrasena = '';
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'usuarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
-        ip,
+        datosNuevos: `{contrasena: "Contraseña actualizada"}`,
+        ip: ip,
         ip_local: ip_local,
         observacion: null
       });

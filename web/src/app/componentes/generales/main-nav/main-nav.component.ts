@@ -1003,7 +1003,7 @@ export class MainNavComponent implements OnInit {
                         this.childrenAccionPersonal.push({name: 'Procesos', url: '/proceso', color: true, ver: true}); 
                       }
                       break;
-                    case 'grado':
+                    case 'listaGrados':
                       this.itemModulos = true;
                       this.subItemModulosAccionPersonal = true;
                       for (const parametrizacion of this.childrenAccionPersonal) {

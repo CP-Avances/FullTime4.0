@@ -22,10 +22,11 @@ class EmpresasControlador {
                 //consulta de empresa en base a codigo encriptado
                 let { codigo_empresa } = req.body;
                 let codigo_empresa_encriptado = rsa_key_service_1.default.encriptarLogin(codigo_empresa);
+                console.log('body: ', req.body);
                 console.log('codigo_empresa: ', codigo_empresa);
                 console.log('codigo_empresa e: ', codigo_empresa_encriptado);
                 let empresasRows = 0;
-                let empresas = yield database_1.default.query("SELECT emp.empresa_codigo, emp.empresa_direccion, emp.empresa_descripcion FROM empresa AS emp WHERE emp.empresa_codigo = $1", [codigo_empresa_encriptado]).then((result) => {
+                let empresas = yield database_1.default.query("SELECT emp.empresa_codigo, emp.empresa_direccion, emp.empresa_descripcion, emp.movil_socket_direccion FROM empresa AS emp WHERE emp.empresa_codigo = $1", [codigo_empresa_encriptado]).then((result) => {
                     empresasRows = result.rowCount;
                     if (result.rowCount > 0) {
                         return res.status(200).jsonp({ message: 'ok', empresas: result.rows });
