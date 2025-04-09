@@ -22,7 +22,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { PermisosMultiplesEmpleadosComponent } from '../../multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
-import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
+import { Router } from '@angular/router';
 
 interface opcionesDiasHoras {
   valor: string;
@@ -130,6 +130,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     private restP: PermisosService,
     private restH: EmpleadoHorariosService,
     public restE: EmpleadoService,
+    public router: Router,
     public feriado: FeriadosService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -1720,8 +1721,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA ABRIR CONFIGURACION DE NOTIFICACIONES
   ConfigurarNotificaciones() {
-    const id_empleado = parseInt(this.datos.id_empleado);
-    this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });
+    let dato = this.validar.EncriptarDato(parseInt(this.datos.id_empleado));
+    return this.router.navigate(['/configuraciones-alertas/', dato]);
   }
 
   // METODO PARA ENVIAR CORREO ELECTRONICO
